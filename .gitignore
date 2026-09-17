@@ -1,0 +1,11 @@
+# Local toolchains, downloaded sources, generated binaries, and experiments.
+.cache/
+.work/
+node_modules/
+dist/
+.lake/
+*.log
+
+# Editor and OS files.
+.DS_Store
+*~
