@@ -68,7 +68,8 @@ stubs for missing native facilities:
    overflow or a time limit for nonterminating Lean code.
 5. Initialize the supported alloc/object/thread runtime directly. Native process,
    signal, mmap and libuv initialization is excluded. Panic's stderr primitive
-   writes through libc and fails fatally if the write fails.
+   writes through libc and fails fatally if the write fails. Its symbol is renamed
+   in `object.cpp` to avoid colliding with Lean's full `IO.eprintln` implementation.
 
 The linked WASI imports are exactly `fd_close`, `fd_fdstat_get`, `fd_read`,
 `fd_seek`, `fd_write`, `environ_get`, `environ_sizes_get`, `clock_time_get`, and
@@ -96,10 +97,11 @@ It does not synchronously force the JS garbage collector. Further calls fail.
 
 ## Remaining gates
 
-- Real Lean IO filesystem/HTTP calls and suspension through closures.
-- Async cancellation, rejection, serialization, and result lifetime tests.
-- Optional JSPI with the same API; flag-free Asyncify baseline.
-- A separate-project package smoke test and paths with spaces.
+- Real Lean IO, cancellation, rejection, sequential calls, repeated resource use,
+  Asyncify and JSPI are now implemented and tested; see [IO.md](IO.md).
+- A copied generated module runs in a separate Node project with no compiler on
+  PATH, including a build in a directory containing spaces. Published-package
+  installation and package-manager support still need validation.
 - Lake dependency resolution and supported-platform release packaging.
 - Compare the installed Lean Clang/LLD route with the full runtime, not only the
   earlier scalar probe; measure a distributable sysroot and all notices.

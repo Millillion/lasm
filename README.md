@@ -15,11 +15,12 @@ The full displayed conversation has been reviewed and its key claims tested.
 
 - [Accepted implementation plan](docs/PLAN.md)
 - [Runtime implementation and boundaries](docs/RUNTIME.md)
+- [Lean filesystem/HTTP IO and async backends](docs/IO.md)
 - [Feasibility results and corrections](docs/FEASIBILITY.md)
 - [Conversation digest and original goals](docs/THREAD_REVIEW.md)
 - [Reproduce the local experiments](experiments/feasibility/README.md)
 
-On Linux x64 with Node 24 and elan's Lean 4.32.0 installed:
+On Linux x64 with Node 24, elan's Lean 4.32.0, and Binaryen 108 (`wasm-opt`) installed:
 
 ```sh
 npm run setup
@@ -43,10 +44,13 @@ types are `Nat`/`Int` as `bigint`, `String`, `ByteArray` as `Uint8Array`, `UInt3
 `Bool`, and `Unit` as `undefined`.
 
 Local modules and their standard-library runtime dependencies are compiled from
-source. Lake dependency resolution, normal `IO.FS`, async host operations, and
-browser loading are not yet part of this interface. Unsupported native symbols
-fail during linking. See the implementation document for failure and lifecycle
-semantics. The original research probes remain available as `npm run probe` and
+source. `npm run build:io` builds the actual Lean IO example with Asyncify; it
+reads/writes bytes and makes HTTP requests through explicitly supplied Node host
+capabilities. Optional JSPI uses the same interface. See [IO.md](docs/IO.md).
+
+Lake dependency resolution, normal `IO.FS` compatibility, release packaging, and
+browser loading remain future work. Unsupported native symbols fail during
+linking. The original research probes remain available as `npm run probe` and
 `npm run probe:runtime`.
 
 Development is local on `main`. Commits are unsigned, and no remote is configured.

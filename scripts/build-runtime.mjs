@@ -49,8 +49,15 @@ export function buildRuntime() {
   const headersIdentity = digest.digest('hex');
   const units = ['object', 'mpz', 'mpn', 'utf8', 'apply', 'thread', 'alloc', 'hash', 'byteslice', 'platform', 'interrupt'];
   const objects = [];
-  for (const unit of [...units, 'lasm-core', 'lasm-stack']) {
+  for (const unit of [...units, 'lasm-core', 'lasm-stack', 'lasm-host']) {
     let source = unit.startsWith('lasm-') ? join(root, 'runtime', `${unit.slice(5)}.cpp`) : join(leanSource, 'src/runtime', `${unit}.cpp`);
+    if (unit === 'object') {
+      const original = readFileSync(source, 'utf8');
+      if (original.split('lean_io_eprintln').length !== 3) throw new Error('Unexpected Lean panic diagnostic path');
+      source = join(runtimeDir, 'patched/object.cpp');
+      writeFileSync(source, '// Lasm change: panic diagnostics use the port\'s libc stderr writer.\n' +
+        original.replaceAll('lean_io_eprintln', 'lasm_runtime_eprintln'));
+    }
     if (unit === 'thread') {
       const original = readFileSync(source, 'utf8');
       const include = '#include "runtime/stack_overflow.h"';

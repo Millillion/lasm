@@ -1,5 +1,6 @@
 {
   "module": "Example",
+  "asyncMode": "sync",
   "modules": [
     "LasmGeneratedEntry",
     "Example",
@@ -94,7 +95,7 @@
     "Init.Data.Format.Basic",
     "Init.Control.State"
   ],
-  "wasmBytes": 332924,
+  "wasmBytes": 333038,
   "imports": [
     {
       "module": "wasi_snapshot_preview1",
@@ -142,8 +143,8 @@
       "kind": "function"
     }
   ],
-  "elapsedMs": 4929.781568,
-  "instantiateMs": 10.917830000000322,
+  "elapsedMs": 905.2521389999999,
+  "instantiateMs": 10.41326499999991,
   "nativeComparisons": 67,
   "repeatedCalls": 6120,
   "warmBytes": 2097152,

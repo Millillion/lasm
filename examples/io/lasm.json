@@ -1,0 +1,14 @@
+{
+  "module": "Example",
+  "exports": {
+    "readPair": { "declaration": "Example.readPair", "parameters": ["String", "String"], "result": "ByteArray", "effect": "io" },
+    "copy": { "declaration": "Example.copy", "parameters": ["String", "String"], "result": "ByteArray", "effect": "io" },
+    "fetch": { "declaration": "Example.fetch", "parameters": ["String"], "result": "ByteArray", "effect": "io" },
+    "fetchPair": { "declaration": "Example.fetchPair", "parameters": ["String", "String"], "result": "ByteArray", "effect": "io" },
+    "write": { "declaration": "Example.write", "parameters": ["String", "ByteArray"], "result": "Unit", "effect": "io" },
+    "recover": { "declaration": "Example.recover", "parameters": ["String"], "result": "String", "effect": "io" },
+    "ready": { "declaration": "Example.ready", "parameters": [], "result": "Nat", "effect": "io" },
+    "scalar": { "declaration": "Example.scalar", "parameters": [], "result": "UInt32", "effect": "io" },
+    "truth": { "declaration": "Example.truth", "parameters": [], "result": "Bool", "effect": "io" }
+  }
+}

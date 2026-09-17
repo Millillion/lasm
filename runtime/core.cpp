@@ -8,7 +8,7 @@
 // This port initializes the supported single-threaded object runtime. OS
 // processes, libuv, native sockets and native signal handlers are not included.
 namespace lean {
-extern "C" lean_obj_res lean_io_eprintln(lean_obj_arg text) {
+extern "C" lean_obj_res lasm_runtime_eprintln(lean_obj_arg text) {
     const size_t length = lean_string_size(text) - 1;
     const bool failed = fwrite(lean_string_cstr(text), 1, length, stderr) != length
         || fputc('\n', stderr) == EOF;
@@ -79,4 +79,12 @@ lean_object *lasm_io_value(lean_object *result) {
     lean_dec(result);
     return value;
 }
+__attribute__((export_name("lasm_unbox_u32")))
+uint32_t lasm_unbox_u32(lean_object *value) {
+    uint32_t result = lean_unbox_uint32(value);
+    lean_dec(value);
+    return result;
+}
+__attribute__((export_name("lasm_unbox_scalar")))
+uint32_t lasm_unbox_scalar(lean_object *value) { return lean_unbox(value); }
 }

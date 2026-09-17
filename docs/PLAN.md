@@ -1,9 +1,10 @@
 # Lasm implementation plan
 
 Status: the user accepted these recommendations on 2026-09-17. Implementation is
-underway. Milestone 1 has a validated core slice, and milestone 2 has an
-experimental callable module interface. See [RUNTIME.md](RUNTIME.md) for tested
-behavior and the remaining acceptance work. Later milestones remain planned.
+underway. Milestone 1 has a validated core slice; milestones 2 and 3 have
+experimental callable modules and real Lean IO on Asyncify/JSPI. See
+[RUNTIME.md](RUNTIME.md) and [IO.md](IO.md) for tested behavior and remaining
+acceptance work. Release packaging and browser/cloud adapters remain planned.
 
 ## Intended product
 
@@ -126,7 +127,7 @@ Specify error propagation, disposal, supported reentry, and async serialization.
 Keep `main` invocation as an adapter if that matches the user's preferred first
 experience. Validate pure and heap-using calls from a separate Node project.
 
-### 3. Filesystem and HTTP vertical slice
+### 3. Filesystem and HTTP vertical slice — implemented and tested on Node
 
 Implement Node host bindings for a bounded filesystem API, then `fetch` requests
 and byte responses. Exercise these from actual Lean `IO`, not merely a C probe.
@@ -172,6 +173,6 @@ possible extension, not automatic portability.
 | Minimum Node/Lean versions | One exact Lean release and an explicit Node baseline initially | Versioned native/runtime ABI compatibility must be maintained and tested. |
 | Meaning of lightweight | Prioritize simple setup, then measure download and runtime footprint separately | The thread specifies convenience but no numeric size budget. |
 
-The next implementation target is real Lean IO suspension through the explicit
-Lasm API. Packaging and toolchain-distribution choices remain gated on measured
-runtime and async behavior.
+The next acceptance work is Lake integration and release packaging, followed by
+real browser/cloud adapters. Keep the experimental scope explicit while those
+compatibility and installation gates are still open.
