@@ -1,0 +1,16 @@
+{
+  "module": "Example",
+  "exports": {
+    "square": { "declaration": "Example.square", "parameters": ["Nat"], "result": "Nat" },
+    "signed": { "declaration": "Example.signed", "parameters": ["Int"], "result": "Int" },
+    "array": { "declaration": "Example.array", "parameters": ["Nat"], "result": "Nat" },
+    "closure": { "declaration": "Example.closure", "parameters": ["Nat"], "result": "Nat" },
+    "tree": { "declaration": "Example.tree", "parameters": ["Nat"], "result": "Nat" },
+    "unicode": { "declaration": "Example.unicode", "parameters": ["String"], "result": "String" },
+    "bytes": { "declaration": "Example.bytes", "parameters": ["ByteArray"], "result": "ByteArray" },
+    "add32": { "declaration": "Example.add32", "parameters": ["UInt32", "UInt32"], "result": "UInt32" },
+    "negate": { "declaration": "Example.negate", "parameters": ["Bool"], "result": "Bool" },
+    "unit": { "declaration": "Example.unit", "parameters": ["Unit"], "result": "Unit" },
+    "panicProbe": { "declaration": "Example.panicProbe", "parameters": ["Nat"], "result": "Nat" }
+  }
+}

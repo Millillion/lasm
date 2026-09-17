@@ -6,5 +6,6 @@
 - Separate experimentally verified behavior from design proposals and open questions.
 - Keep downloaded toolchains, third-party source trees, caches, and generated
   experiment artifacts in ignored `.cache/` or `.work/` directories.
-- The initial task is architecture validation and planning. Do not present a
-  limited experiment as a complete Lean runtime port or production compiler.
+- The user approved the recommendations in `docs/PLAN.md`; proceed through the
+  implementation milestones. Do not present a limited implementation as a
+  complete Lean runtime port or production compiler.

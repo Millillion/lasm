@@ -1,8 +1,9 @@
-# Proposed Lasm plan
+# Lasm implementation plan
 
-Status: recommendation for discussion, informed by the initial thread and local
-experiments on 2026-09-17. The experiments are implemented; the product architecture
-below is not yet implemented or an agreed compatibility promise.
+Status: the user accepted these recommendations on 2026-09-17. Implementation is
+underway. Milestone 1 has a validated core slice, and milestone 2 has an
+experimental callable module interface. See [RUNTIME.md](RUNTIME.md) for tested
+behavior and the remaining acceptance work. Later milestones remain planned.
 
 ## Intended product
 
@@ -11,10 +12,8 @@ builds a Lean project, and imports its generated Wasm-backed module from ordinar
 Node code. Running the built artifact should require Node and the small runtime
 wrapper, not Lean, Zig, or a compiler installation.
 
-Recommend starting with callable Lean functions. A `main` runner can be an adapter
-over the same initialized instance. The user's preference between those entry
-points is still open; neither the current experiments nor the package metadata
-claim to provide a finished interface.
+Start with callable Lean functions. A `main` runner can be an adapter over the
+same initialized instance. This direction was accepted with the plan.
 
 ## Proposed architecture
 
@@ -95,7 +94,7 @@ Repository setup, full displayed-thread review, source checks, scalar Wasm
 execution, import inspection, async C host probes, and runtime translation-unit
 checks are committed. See [FEASIBILITY.md](FEASIBILITY.md) for precise limits.
 
-### 1. Real Lean runtime and library slice — next
+### 1. Real Lean runtime and library slice — core slice validated
 
 Pin Lean 4.32.0 for the initial experiment. Build the actual runtime core and
 required Lean-generated libraries for wasm32 with a target-specific configuration.
@@ -119,7 +118,7 @@ If a direct Zig build requires invasive runtime changes, compare an Emscripten
 reference build. It can remain a maintainer tool; users need not manually install
 it. Choose the route with measured complexity and package-size benefits.
 
-### 2. Stable callable module and lifecycle
+### 2. Stable callable module and lifecycle — experimental implementation
 
 Define explicit exports and conversions for the initial type set. Generate a
 small module factory that initializes a fresh instance and its Lean modules.
@@ -162,17 +161,17 @@ requirements, and filesystem differences. Do not promise every Wasm host can run
 a module that expects JavaScript imports. WASI/component support is a distinct
 possible extension, not automatic portability.
 
-## Decisions for deliberation
+## Accepted directions
 
-| Decision | Recommendation | Why it remains a decision |
+| Decision | Accepted direction | Remaining implementation evidence |
 | --- | --- | --- |
-| Callable functions versus a `main` runner | Callable functions first, with a later/simple `main` adapter | The thread prioritizes embedding but does not settle the API. |
+| Callable functions versus a `main` runner | Callable functions first, with a later/simple `main` adapter | Typed callable interface implemented; runner remains an adapter to add. |
 | Existing Lean IO compatibility | Small explicit Lasm API first, then useful standard IO subsets | Full compatibility enlarges the runtime and async scope considerably. |
 | Custom-only versus hybrid internal imports | Keep the public host API custom; permit a measured minimal WASI layer internally | Final runtime reachability has not been established. |
 | Bundled compiler choice | Use Zig for reference; evaluate already-installed Lean Clang/LLD before packaging | Local scalar success does not establish a full portable toolchain. |
 | Minimum Node/Lean versions | One exact Lean release and an explicit Node baseline initially | Versioned native/runtime ABI compatibility must be maintained and tested. |
 | Meaning of lightweight | Prioritize simple setup, then measure download and runtime footprint separately | The thread specifies convenience but no numeric size budget. |
 
-The immediate implementation target should be milestone 1. Its runtime evidence
-will settle the largest remaining risks before we invest in a polished CLI or
-commit to distributing a particular toolchain.
+The next implementation target is real Lean IO suspension through the explicit
+Lasm API. Packaging and toolchain-distribution choices remain gated on measured
+runtime and async behavior.

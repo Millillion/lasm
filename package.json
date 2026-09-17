@@ -3,10 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Local architecture research for a Lean-to-WebAssembly compiler",
+  "description": "Experimental Lean-to-WebAssembly compiler for JavaScript hosts",
+  "bin": { "lasm": "bin/lasm.mjs" },
   "scripts": {
+    "setup": "node scripts/bootstrap.mjs",
     "probe": "node experiments/feasibility/run.mjs",
-    "probe:runtime": "node experiments/feasibility/runtime-compile.mjs"
+    "probe:runtime": "node experiments/feasibility/runtime-compile.mjs",
+    "build:example": "node bin/lasm.mjs build examples/basic/lasm.json",
+    "test": "node test/runtime.test.mjs"
   },
   "engines": {
     "node": ">=24"
