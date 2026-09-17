@@ -1,0 +1,82 @@
+{
+  "node": "v24.13.1",
+  "platform": "linux-x64",
+  "compiler": "lasm-compiler-0.1.0-experimental.1.tgz",
+  "compilerSha256": "31202c3d41e64c2789e1e96069871c9f828dd0078b864bc28133e2f63b5970c8",
+  "compressedBytes": 34547804,
+  "installedBytes": 143532046,
+  "targetArchive": "/home/lastmjs/development/lasm/compiler/.work/release/lean-4.32.0-wasm32-v1.tar.gz",
+  "targetSha256": "717f9e04c9b2fb9d8fd85b34057199258556f71554a56c3101907f79bdd1a4aa",
+  "targetCompressedBytes": 31273864,
+  "targetInstalledBytes": 132056853,
+  "standardModules": 445,
+  "elapsedMs": 60411.162623,
+  "tests": [
+    {
+      "manager": "npm",
+      "installMs": 3600.699953,
+      "firstBuildMs": 18316.513012,
+      "cachedBuildMs": 18003.677183,
+      "wasmBytes": 781784,
+      "prebuiltModules": 297,
+      "emptyCacheOfflineInstall": true,
+      "offlineLockedInstall": true,
+      "isolatedCompilerPath": [
+        "node",
+        "lean",
+        "lake"
+      ],
+      "osUtilities": [
+        "sh",
+        "dirname",
+        "sed",
+        "uname"
+      ],
+      "standaloneExecution": true
+    },
+    {
+      "manager": "pnpm",
+      "installMs": 1042.197782000003,
+      "firstBuildMs": 18261.022025000006,
+      "cachedBuildMs": 18347.382836999997,
+      "wasmBytes": 781784,
+      "prebuiltModules": 297,
+      "emptyCacheOfflineInstall": true,
+      "offlineLockedInstall": true,
+      "isolatedCompilerPath": [
+        "node",
+        "lean",
+        "lake"
+      ],
+      "osUtilities": [
+        "sh",
+        "dirname",
+        "sed",
+        "uname"
+      ],
+      "standaloneExecution": true
+    },
+    {
+      "manager": "yarn",
+      "installMs": 4055.263289999988,
+      "firstBuildMs": 18126.753220000013,
+      "cachedBuildMs": 18079.846135,
+      "wasmBytes": 781784,
+      "prebuiltModules": 297,
+      "emptyCacheOfflineInstall": true,
+      "offlineLockedInstall": true,
+      "isolatedCompilerPath": [
+        "node",
+        "lean",
+        "lake"
+      ],
+      "osUtilities": [
+        "sh",
+        "dirname",
+        "sed",
+        "uname"
+      ],
+      "standaloneExecution": true
+    }
+  ]
+}

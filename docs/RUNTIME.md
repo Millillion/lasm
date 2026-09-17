@@ -41,9 +41,11 @@ For local imports the compiler asks Lean for source dependencies, builds their
 artifacts, and type-checks generated export wrappers. The Wasm dependency walk
 follows calls in generated runtime initializers. This parser is deliberately tied
 to Lean 4.32.0's C format and fails if a required initializer cannot be resolved.
-The source compiler supports ASCII module/declaration names and a single source
-root. Arbitrary Lake packages, plugins, custom compiler options, and foreign
-libraries need further integration.
+The compiler supports ASCII module/declaration names. Lake projects use Lake's
+own generated C, dependency graph, source directories, compiler options, and host
+metaprograms. The standalone source mode remains available. Foreign executable
+code still requires explicit Wasm implementations. See
+[DEVELOPER_WORKFLOW.md](DEVELOPER_WORKFLOW.md).
 
 Caches include source, compiler version, flags, and runtime/header fingerprints.
 The source build checks the host compiler commit and the project's Lean toolchain.
@@ -101,26 +103,28 @@ references would be unsafe. `dispose()` is idempotent and drops all instance and
 WASI references, allowing JS garbage collection to reclaim persistent globals.
 It does not synchronously force the JS garbage collector. Further calls fail.
 
-## Remaining gates
+## Installation and portable hosts
 
 - Real Lean IO, cancellation, rejection, sequential calls, repeated resource use,
   Asyncify and JSPI are now implemented and tested; see [IO.md](IO.md).
 - A copied generated module runs in a separate Node project with no compiler on
-  PATH, including a build in a directory containing spaces. Published-package
-  installation and package-manager support still need validation.
-- Lake dependency resolution and supported-platform release packaging.
+  PATH. Local tarball installation, multi-module Lake builds, paths containing
+  spaces, and offline reinstalls pass with npm, pnpm, and Yarn. The compiler remains
+  unpublished. See [RELEASE.md](RELEASE.md).
 - The recorded installed Lean Clang/LLD experiment compiled the then-current 14 runtime translation units
   and the 92-module core example. It passes 27 comparisons with the Zig artifact,
   including large integers, captured closures, Unicode, bytes, and imported
   initialization. See `docs/evidence/2026-09-17-bundled-runtime.json`.
   The later JSON/Express work adds a fifteenth unit for the upstream reference and
-  initialization primitives; that addition is validated with the Zig reference
-  build and the core, IO, and Express suites.
-- That experiment still uses Zig's C/C++ headers and six startup/library link
-  inputs. It establishes a viable compiler path, not a finished distributable
-  sysroot. Measure and package the required headers/libraries and target archives
-  before changing the default reference toolchain.
-- Browser/cloud loading and explicit host capabilities.
+  initialization primitives. Local release packages now include all 15 units,
+  standard-library archives, C/C++ headers, and the six startup/library inputs.
+  Installed packages compile and link real Lean IO with Lean's Clang/LLD and the
+  packaged sysroot; Zig is used only by the maintainer reference build.
+- Real Chrome and local workerd execute the Asyncify artifact using the portable
+  WASI adapter and explicit byte-storage/fetch capabilities; see [HOSTS.md](HOSTS.md).
+
+Other build platforms, arbitrary native Lean libraries, more browser engines,
+and live cloud deployment have not been validated.
 
 The package remains private. There is no remote or publication step in this work.
 

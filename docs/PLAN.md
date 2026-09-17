@@ -1,10 +1,12 @@
 # Lasm implementation plan
 
-Status: the user accepted these recommendations on 2026-09-17. Implementation is
-underway. Milestone 1 has a validated core slice; milestones 2 and 3 have
-experimental callable modules and real Lean IO on Asyncify/JSPI. See
-[RUNTIME.md](RUNTIME.md) and [IO.md](IO.md) for tested behavior and remaining
-acceptance work. Release packaging and browser/cloud adapters remain planned.
+Status: the user accepted these recommendations on 2026-09-17. The experimental
+runtime, callable modules, Lean IO, Lake integration, local release packaging,
+and browser/Workers adapters are implemented. Validation covers Linux x64 builds,
+Node 24.13.1, real Chrome, and local Cloudflare workerd. See [RUNTIME.md](RUNTIME.md),
+[IO.md](IO.md), [DEVELOPER_WORKFLOW.md](DEVELOPER_WORKFLOW.md), [RELEASE.md](RELEASE.md),
+and [HOSTS.md](HOSTS.md) for the exact tested scope. Broader Lean/OS compatibility
+and live cloud deployment are outside this first experimental release.
 
 ## Intended product
 
@@ -139,7 +141,7 @@ and response limits; cancellation behavior; correct cleanup. Test Asyncify
 through Lean closures/indirect calls and across consecutive suspensions. Verify
 the same public interface against the optional JSPI build.
 
-### 4. Package and installation experience
+### 4. Package and installation experience — implemented for Linux x64
 
 Split build dependencies from the runtime needed by a deployed application.
 Package version-matched target archives, headers/sysroot, the compiler adapter,
@@ -147,20 +149,28 @@ and Binaryen if the selected build needs it. If a native toolchain must be
 distributed, use pinned platform packages with `os`/`cpu` metadata and clear
 diagnostics when optional packages have been omitted.
 
-Acceptance: from a clean supported machine with only Node and the documented
-Lean toolchain, install, build a multi-module Lake project, and execute its output.
-Test npm/pnpm/yarn behavior, locked/offline installs, paths with spaces, supported
-OS/architecture combinations, and unsupported Lean versions. Measure compressed
-download size, installed size, first build, and cached build separately. Check
-third-party redistribution notices for whatever is actually shipped.
+Acceptance implemented: fresh npm/pnpm/Yarn project directories and empty caches,
+offline local-tarball installation, multi-module Lake builds, paths with spaces,
+locked reinstalls, deterministic rebuilds, and execution without compiler tools.
+Build PATH is restricted to Node, Lean, Lake, and ordinary shell utilities. Tests
+reject unsupported platform combinations, injected mismatching Lean identities,
+and damaged target archives. Reports measure compressed/installed sizes and
+install/first/cached-build time. Shipped inputs include redistribution notices.
+These are isolated tests on the development Linux host; testing pristine machines
+or adding macOS/Windows/ARM support requires a separate platform validation pass.
 
-### 5. Browser and cloud adapters
+### 5. Browser and cloud adapters — tested in Chrome and local workerd
 
 Reuse the same ABI and, where feature support permits, the same artifact. Test
 real target environments for memory limits, async engine support, module-loading
 requirements, and filesystem differences. Do not promise every Wasm host can run
 a module that expects JavaScript imports. WASI/component support is a distinct
 possible extension, not automatic portability.
+
+The Asyncify artifact now runs through a portable WASI adapter in real Chrome
+with IndexedDB/fetch, and through a static Wasm import in local Cloudflare workerd
+with KV/service bindings. Host capabilities are explicitly supplied. See
+[HOSTS.md](HOSTS.md) for loading, limits, and the runnable acceptance suite.
 
 ## Accepted directions
 
@@ -169,10 +179,11 @@ possible extension, not automatic portability.
 | Callable functions versus a `main` runner | Callable functions first, with a later/simple `main` adapter | Typed callable interface implemented; runner remains an adapter to add. |
 | Existing Lean IO compatibility | Small explicit Lasm API first, then useful standard IO subsets | Full compatibility enlarges the runtime and async scope considerably. |
 | Custom-only versus hybrid internal imports | Keep the public host API custom; permit a measured minimal WASI layer internally | Final runtime reachability has not been established. |
-| Bundled compiler choice | Keep Zig for reference; package a sysroot for already-installed Lean Clang/LLD if platform checks hold | The full core slice now passes with bundled Clang/LLD; distributable dependencies and other platforms remain unverified. |
+| Bundled compiler choice | Zig builds maintainer archives; installed Lean Clang/LLD uses the packaged sysroot | Local package installation and real Lean IO pass on Linux x64; other build platforms are rejected. |
 | Minimum Node/Lean versions | One exact Lean release and an explicit Node baseline initially | Versioned native/runtime ABI compatibility must be maintained and tested. |
 | Meaning of lightweight | Prioritize simple setup, then measure download and runtime footprint separately | The thread specifies convenience but no numeric size budget. |
 
-The next acceptance work is Lake integration and release packaging, followed by
-real browser/cloud adapters. Keep the experimental scope explicit while those
-compatibility and installation gates are still open.
+The three remaining items tracked in [NEXT_STEPS.md](../NEXT_STEPS.md) are complete
+within the supported matrix above. Potential later work includes a `main` runner,
+additional boundary types and host APIs, more build platforms/browser engines,
+and production performance and operational validation.

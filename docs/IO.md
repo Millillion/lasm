@@ -8,9 +8,9 @@ an Asyncify artifact.
 
 ## Build and run
 
-The reference async build additionally requires Binaryen's `wasm-opt` (tested
-version 108). Set `WASM_OPT` to select its path. The current setup downloader
-provides Zig and Lean source, not Binaryen.
+Asyncify uses pinned Binaryen 132.0.0: an npm dependency in the source checkout,
+and a standalone bundled optimizer in the compiler release. No system Binaryen
+installation is required. `WASM_OPT` selects an explicit maintainer override.
 
 ```sh
 npm run build:io
@@ -90,8 +90,8 @@ The internal WASI import allowlist remains separate from the two Lasm imports.
 
 ## Evidence
 
-`npm test` passes 14 tests covering compiler validation, native/Wasm comparisons,
-memory/lifecycle behavior, and real Lean Asyncify IO. `npm run test:jspi` passes
+`npm test` covers compiler validation, native/Wasm comparisons, memory/lifecycle
+behavior, real Lean Asyncify IO, Lake builds, and target integrity. `npm run test:jspi` passes
 the same six IO tests on JSPI, including mutable references and initialization
 state. The IO suite performs 349 host operations, including
 110 repeated success/failure cycles with linear memory stable after warm-up.
@@ -112,3 +112,6 @@ endpoints implement CRUD, validation, search/pagination, optimistic versioning,
 statistics, and HTTP imports. The Node adapter queues whole IO calls and provides
 atomic file replacement for this example; those policies are application-specific,
 not behavior of the general-purpose `createNodeHost` write operation.
+
+The same IO artifact also passes real Chrome IndexedDB/fetch and local Cloudflare
+workerd KV/service-binding tests. See [HOSTS.md](HOSTS.md) for portable adapters.

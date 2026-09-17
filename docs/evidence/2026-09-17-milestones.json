@@ -1,0 +1,93 @@
+{
+  "date": "2026-09-17",
+  "node": "v24.13.1",
+  "platform": "linux-x64",
+  "lean": "4.32.0",
+  "compilerVersion": "0.1.0-experimental.1",
+  "tests": [
+    {
+      "command": "npm test",
+      "passed": 21
+    },
+    {
+      "command": "npm run test:jspi",
+      "passed": 6
+    },
+    {
+      "command": "npm run test:express",
+      "passed": 57
+    },
+    {
+      "command": "npm run test:hosts",
+      "passed": 2
+    },
+    {
+      "command": "npm run test:release",
+      "passed": 3
+    }
+  ],
+  "totalPassed": 89,
+  "core": {
+    "module": "Example",
+    "asyncMode": "sync",
+    "toolchain": "reference-zig",
+    "lakeProject": null,
+    "prebuiltModules": 0,
+    "wasmBytes": 333101,
+    "elapsedMs": 1025.020638,
+    "instantiateMs": 12.983357000000069,
+    "nativeComparisons": 67,
+    "repeatedCalls": 6120,
+    "warmBytes": 2097152,
+    "node": "v24.13.1",
+    "separateInstances": true,
+    "moduleCount": 92
+  },
+  "asyncify": {
+    "module": "Example",
+    "asyncMode": "asyncify",
+    "toolchain": "reference-zig",
+    "lakeProject": null,
+    "prebuiltModules": 0,
+    "wasmBytes": 797739,
+    "elapsedMs": 20414.65958,
+    "hostCalls": 349,
+    "memoryBytes": 3735552,
+    "repeatedCycles": 110,
+    "node": "v24.13.1",
+    "errorTests": {
+      "actualMissingFile": true,
+      "injectedPermissionDenied": true,
+      "injectedTransportFailure": true
+    },
+    "moduleCount": 300
+  },
+  "jspi": {
+    "module": "Example",
+    "asyncMode": "jspi",
+    "toolchain": "reference-zig",
+    "lakeProject": null,
+    "prebuiltModules": 0,
+    "wasmBytes": 544775,
+    "elapsedMs": 1454.246162,
+    "hostCalls": 349,
+    "memoryBytes": 1638400,
+    "repeatedCycles": 110,
+    "node": "v24.13.1",
+    "errorTests": {
+      "actualMissingFile": true,
+      "injectedPermissionDenied": true,
+      "injectedTransportFailure": true
+    },
+    "moduleCount": 300
+  },
+  "express": {
+    "lake": true,
+    "moduleCount": 449,
+    "wasmBytes": 1332450
+  },
+  "releaseReport": "2026-09-17-release-install.json",
+  "hostsReport": "2026-09-17-hosts.json",
+  "scope": "Isolated Linux projects on the development host; actual Chrome and local workerd. No live cloud deployment or other build OS validation.",
+  "unsupportedLeanCheck": "Injected mismatching compiler identity; only Lean 4.32.0 runtime is validated."
+}
