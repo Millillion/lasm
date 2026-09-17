@@ -1,0 +1,14 @@
+{
+  "name": "@lasm/compiler",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local architecture research for a Lean-to-WebAssembly compiler",
+  "scripts": {
+    "probe": "node experiments/feasibility/run.mjs",
+    "probe:runtime": "node experiments/feasibility/runtime-compile.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

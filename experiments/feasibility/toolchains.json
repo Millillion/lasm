@@ -1,0 +1,23 @@
+{
+  "lean": {
+    "version": "4.32.0",
+    "commit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "sourceUrl": "https://codeload.github.com/leanprover/lean4/tar.gz/refs/tags/v4.32.0",
+    "observedSourceArchiveSha256": "f39c6d87a9b4e9253bef15ffae460d2652b668e619688e4c01e59bbd2cd3b002"
+  },
+  "zig": {
+    "version": "0.16.0",
+    "platform": "x86_64-linux",
+    "url": "https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz",
+    "officialSha256": "70e49664a74374b48b51e6f3fdfbf437f6395d42509050588bd49abe52ba3d00",
+    "compressedBytes": 55478392,
+    "checksumSource": "https://ziglang.org/download/index.json"
+  },
+  "nodeTested": "24.13.1",
+  "binaryenTested": "108",
+  "notes": [
+    "These are experiment pins, not a promised support matrix.",
+    "The Lean archive checksum records the observed download; it is not an upstream signed checksum.",
+    "Node, Lean, and Binaryen were already installed; Zig and Lean source were downloaded into the ignored local cache."
+  ]
+}
