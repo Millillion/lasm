@@ -90,9 +90,10 @@ The internal WASI import allowlist remains separate from the two Lasm imports.
 
 ## Evidence
 
-`npm test` passes 13 tests covering compiler validation, native/Wasm comparisons,
+`npm test` passes 14 tests covering compiler validation, native/Wasm comparisons,
 memory/lifecycle behavior, and real Lean Asyncify IO. `npm run test:jspi` passes
-the same five IO tests on JSPI. The IO suite performs 349 host operations, including
+the same six IO tests on JSPI, including mutable references and initialization
+state. The IO suite performs 349 host operations, including
 110 repeated success/failure cycles with linear memory stable after warm-up.
 
 It uses actual temporary files and a loopback HTTP server for binary/Unicode
@@ -104,3 +105,10 @@ permission handling or a particular network's behavior.
 The tested IO program links 300 generated Lean modules. Committed reports under
 `docs/evidence` record each backend's artifact size, memory, imports, and build
 time. Generated output includes upstream third-party license notices.
+
+The [Express task board](../examples/express/README.md) adds an application-level
+Vitest suite against actual HTTP listeners and persistent files. Its Lean
+endpoints implement CRUD, validation, search/pagination, optimistic versioning,
+statistics, and HTTP imports. The Node adapter queues whole IO calls and provides
+atomic file replacement for this example; those policies are application-specific,
+not behavior of the general-purpose `createNodeHost` write operation.

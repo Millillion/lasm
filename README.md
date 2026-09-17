@@ -16,6 +16,8 @@ The full displayed conversation has been reviewed and its key claims tested.
 - [Accepted implementation plan](docs/PLAN.md)
 - [Runtime implementation and boundaries](docs/RUNTIME.md)
 - [Lean filesystem/HTTP IO and async backends](docs/IO.md)
+- [Express task board with Lean endpoints and Vitest tests](examples/express/README.md)
+- [Next steps](NEXT_STEPS.md)
 - [Feasibility results and corrections](docs/FEASIBILITY.md)
 - [Conversation digest and original goals](docs/THREAD_REVIEW.md)
 - [Reproduce the local experiments](experiments/feasibility/README.md)
@@ -23,6 +25,7 @@ The full displayed conversation has been reviewed and its key claims tested.
 On Linux x64 with Node 24, elan's Lean 4.32.0, and Binaryen 108 (`wasm-opt`) installed:
 
 ```sh
+npm ci
 npm run setup
 npm test
 npm run build:example
@@ -47,6 +50,12 @@ Local modules and their standard-library runtime dependencies are compiled from
 source. `npm run build:io` builds the actual Lean IO example with Asyncify; it
 reads/writes bytes and makes HTTP requests through explicitly supplied Node host
 capabilities. Optional JSPI uses the same interface. See [IO.md](docs/IO.md).
+
+The [Express example](examples/express/README.md) uses Lean for endpoint routing,
+validation, versioned CRUD, filtering, summaries, and HTTP template imports, with
+Node supplying filesystem and HTTP capabilities. Try it with
+`npm run build:express` followed by `npm run start:express`; run its real-server
+Vitest suite with `npm run test:express`.
 
 Lake dependency resolution, normal `IO.FS` compatibility, release packaging, and
 browser loading remain future work. Unsupported native symbols fail during

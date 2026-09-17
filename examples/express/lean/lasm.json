@@ -1,0 +1,12 @@
+{
+  "module": "App",
+  "exports": {
+    "initialState": { "declaration": "Board.initialState", "parameters": [], "result": "String" },
+    "handle": {
+      "declaration": "Board.handle",
+      "parameters": ["String", "String", "String", "String", "String"],
+      "result": "String",
+      "effect": "io"
+    }
+  }
+}

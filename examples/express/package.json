@@ -1,0 +1,19 @@
+{
+  "name": "@lasm/example-express",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An Express task board whose endpoints execute in Lean WebAssembly",
+  "scripts": {
+    "build": "npm --prefix ../.. run build:express",
+    "start": "node server.mjs",
+    "templates": "node templates.mjs",
+    "test": "npm --prefix ../.. run test:express"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "express": "5.2.1"
+  }
+}

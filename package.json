@@ -2,9 +2,14 @@
   "name": "@lasm/compiler",
   "version": "0.0.0",
   "private": true,
+  "workspaces": [
+    "examples/express"
+  ],
   "type": "module",
   "description": "Experimental Lean-to-WebAssembly compiler for JavaScript hosts",
-  "bin": { "lasm": "bin/lasm.mjs" },
+  "bin": {
+    "lasm": "bin/lasm.mjs"
+  },
   "scripts": {
     "setup": "node scripts/bootstrap.mjs",
     "probe": "node experiments/feasibility/run.mjs",
@@ -12,10 +17,16 @@
     "probe:bundled-runtime": "node experiments/feasibility/full-bundled-tools.mjs",
     "build:example": "node bin/lasm.mjs build examples/basic/lasm.json",
     "build:io": "node bin/lasm.mjs build examples/io/lasm.json",
+    "build:express": "node bin/lasm.mjs build examples/express/lean/lasm.json examples/express/dist",
+    "start:express": "npm run start --workspace @lasm/example-express",
+    "test:express": "npm run build:express && vitest run --config examples/express/vitest.config.mjs",
     "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "test:jspi": "node --experimental-wasm-jspi test/io.test.mjs jspi"
   },
   "engines": {
     "node": ">=24"
+  },
+  "devDependencies": {
+    "vitest": "5.0.1"
   }
 }
