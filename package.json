@@ -1,6 +1,6 @@
 {
   "name": "@lasm/compiler",
-  "version": "0.0.0",
+  "version": "0.1.0-experimental.1",
   "private": true,
   "workspaces": [
     "examples/express"
@@ -20,6 +20,10 @@
     "build:express": "node bin/lasm.mjs build examples/express/lean/lasm.json examples/express/dist",
     "start:express": "npm run start --workspace @lasm/example-express",
     "test:express": "npm run build:express && vitest run --config examples/express/vitest.config.mjs",
+    "package:release": "node scripts/package-release.mjs",
+    "test:lake": "node --test test/lake.test.mjs",
+    "test:release": "node --test --test-concurrency=1 integration/release.test.mjs",
+    "test:hosts": "node --test --test-concurrency=1 integration/hosts.test.mjs",
     "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "test:jspi": "node --experimental-wasm-jspi test/io.test.mjs jspi"
   },
@@ -27,6 +31,13 @@
     "node": ">=24"
   },
   "devDependencies": {
+    "@yarnpkg/cli-dist": "4.18.0",
+    "miniflare": "5.20260917.0-alpha",
+    "playwright-core": "1.63.0",
+    "pnpm": "12.4.2",
     "vitest": "5.0.1"
+  },
+  "dependencies": {
+    "binaryen": "132.0.0"
   }
 }

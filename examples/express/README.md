@@ -97,13 +97,18 @@ Errors have the shape `{ "error": { "code": "...", "message": "..." } }`.
 
 ## Where the code runs
 
-- [Model.lean](lean/Model.lean): JSON decoding, task validation, and storage schema.
+- [Model.lean](lean/domain/Model.lean): JSON decoding, task validation, and storage schema
+  in the separate `boardDomain` Lake package.
 - [App.lean](lean/App.lean): routing, CRUD, queries, version checks, summaries, and
   filesystem/HTTP calls through `Lasm.IO`.
 - [app.mjs](app.mjs): Express transport, bounded request queue, cancellation,
   capability restrictions, and atomic file replacement.
 - [server.mjs](server.mjs): process configuration and graceful shutdown.
 - [templates.mjs](templates.mjs): optional local HTTP upstream.
+
+The Lean application is a normal Lake project. Its path dependency on
+`boardDomain` and that package's dependency on `Lasm.IO` are resolved by Lake;
+Lasm uses the generated C and package-qualified initializer symbols.
 
 The task board uses one Wasm instance. Its queue serializes each complete Lean IO
 call, including read-modify-write operations, so concurrent requests cannot lose
@@ -162,7 +167,7 @@ npm run test:jspi
 ```
 
 On the tested Linux x64 / Node 24.13.1 environment, the example links 449 Lean
-modules into 1,367,935 bytes of Wasm (about 1.30 MiB). This verifies the described
+modules into 1,332,450 bytes of Wasm (about 1.27 MiB). This verifies the described
 workload on that platform, not unrestricted library compatibility or production
 readiness. The application uses [Express 5](https://expressjs.com/en/5x/api/) and
 [Vitest](https://vitest.dev/guide/), with exact versions recorded in the lockfile.

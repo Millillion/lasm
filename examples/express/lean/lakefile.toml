@@ -1,0 +1,10 @@
+name = "taskBoard"
+version = "0.0.0"
+defaultTargets = ["App"]
+
+[[require]]
+name = "boardDomain"
+path = "domain"
+
+[[lean_lib]]
+name = "App"

@@ -12,6 +12,7 @@ namespace Example
   pure (first ++ second)
 
 def readPair (a b : String) : IO ByteArray := callTwice Lasm.readBytes a b
+def read (path : String) : IO ByteArray := Lasm.readBytes path
 def copy (source destination : String) : IO ByteArray := do
   let bytes ← Lasm.readBytes source
   Lasm.writeBytes destination bytes

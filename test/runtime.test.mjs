@@ -121,6 +121,7 @@ test('repeated calls plateau in linear memory; instances have independent lifeti
 
 test('manifest validation rejects unsafe names and unsupported signatures', () => {
   assert.throws(() => validateSpec({ module: '../Main', exports: {} }), /module name/);
+  assert.throws(() => validateSpec({ module: 'LasmGeneratedEntry', exports: {} }), /reserved/);
   assert.throws(() => validateSpec({ module: 'Main', exports: { dispose: {} } }), /reserved/);
   assert.throws(() => validateSpec({ module: 'Main', exports: { f: { declaration: 'f', parameters: ['Float'], result: 'Nat' } } }), /unsupported/);
   assert.ok(report.modules.includes('Support'));

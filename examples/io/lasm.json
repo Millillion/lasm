@@ -1,6 +1,7 @@
 {
   "module": "Example",
   "exports": {
+    "read": { "declaration": "Example.read", "parameters": ["String"], "result": "ByteArray", "effect": "io" },
     "readPair": { "declaration": "Example.readPair", "parameters": ["String", "String"], "result": "ByteArray", "effect": "io" },
     "copy": { "declaration": "Example.copy", "parameters": ["String", "String"], "result": "ByteArray", "effect": "io" },
     "fetch": { "declaration": "Example.fetch", "parameters": ["String"], "result": "ByteArray", "effect": "io" },

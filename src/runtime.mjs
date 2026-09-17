@@ -1,4 +1,4 @@
-import { WASI } from 'node:wasi';
+import { createPortableWasi } from './wasi.mjs';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { fatal: true });
@@ -7,13 +7,13 @@ const MAX_TRANSFER = 16 * 1024 * 1024;
 class LeanIOError extends Error { name = 'LeanIOError'; }
 
 /** Internal ABI adapter. Applications receive typed functions, never pointers. */
-export async function instantiate(bytes, manifest, { host = {} } = {}) {
+export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWasi, stdio } = {}) {
   if (manifest.abi !== 1) throw new Error(`Unsupported Lasm ABI: ${manifest.abi}`);
-  const module = await WebAssembly.compile(bytes);
+  const module = bytes instanceof WebAssembly.Module ? bytes : await WebAssembly.compile(bytes);
   if (JSON.stringify(WebAssembly.Module.imports(module)) !== JSON.stringify(manifest.imports)) {
     throw new Error('Wasm imports do not match the build manifest');
   }
-  let wasi = new WASI({ version: 'preview1', args: [], env: {}, preopens: {}, returnOnExit: true });
+  let wasi = suppliedWasi ?? createPortableWasi(stdio);
   let instance;
   let e;
   let failure;

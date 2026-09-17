@@ -1,0 +1,10 @@
+name = "boardDomain"
+version = "0.0.0"
+defaultTargets = ["Model"]
+
+[[require]]
+name = "lasm"
+path = "../../../../lean"
+
+[[lean_lib]]
+name = "Model"

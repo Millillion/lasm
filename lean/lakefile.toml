@@ -1,0 +1,6 @@
+name = "lasm"
+version = "0.0.0"
+defaultTargets = ["Lasm"]
+
+[[lean_lib]]
+name = "Lasm"
