@@ -169,7 +169,7 @@ possible extension, not automatic portability.
 | Callable functions versus a `main` runner | Callable functions first, with a later/simple `main` adapter | Typed callable interface implemented; runner remains an adapter to add. |
 | Existing Lean IO compatibility | Small explicit Lasm API first, then useful standard IO subsets | Full compatibility enlarges the runtime and async scope considerably. |
 | Custom-only versus hybrid internal imports | Keep the public host API custom; permit a measured minimal WASI layer internally | Final runtime reachability has not been established. |
-| Bundled compiler choice | Use Zig for reference; evaluate already-installed Lean Clang/LLD before packaging | Local scalar success does not establish a full portable toolchain. |
+| Bundled compiler choice | Keep Zig for reference; package a sysroot for already-installed Lean Clang/LLD if platform checks hold | The full core slice now passes with bundled Clang/LLD; distributable dependencies and other platforms remain unverified. |
 | Minimum Node/Lean versions | One exact Lean release and an explicit Node baseline initially | Versioned native/runtime ABI compatibility must be maintained and tested. |
 | Meaning of lightweight | Prioritize simple setup, then measure download and runtime footprint separately | The thread specifies convenience but no numeric size budget. |
 

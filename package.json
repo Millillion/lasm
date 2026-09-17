@@ -9,6 +9,7 @@
     "setup": "node scripts/bootstrap.mjs",
     "probe": "node experiments/feasibility/run.mjs",
     "probe:runtime": "node experiments/feasibility/runtime-compile.mjs",
+    "probe:bundled-runtime": "node experiments/feasibility/full-bundled-tools.mjs",
     "build:example": "node bin/lasm.mjs build examples/basic/lasm.json",
     "build:io": "node bin/lasm.mjs build examples/io/lasm.json",
     "test": "node --test --test-concurrency=1 test/*.test.mjs",

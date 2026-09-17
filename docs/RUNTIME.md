@@ -103,8 +103,18 @@ It does not synchronously force the JS garbage collector. Further calls fail.
   PATH, including a build in a directory containing spaces. Published-package
   installation and package-manager support still need validation.
 - Lake dependency resolution and supported-platform release packaging.
-- Compare the installed Lean Clang/LLD route with the full runtime, not only the
-  earlier scalar probe; measure a distributable sysroot and all notices.
+- The installed Lean Clang/LLD route now compiles all 14 runtime translation units
+  and the 92-module core example. It passes 27 comparisons with the Zig artifact,
+  including large integers, captured closures, Unicode, bytes, and imported
+  initialization. See `docs/evidence/2026-09-17-bundled-runtime.json`.
+- That experiment still uses Zig's C/C++ headers and six startup/library link
+  inputs. It establishes a viable compiler path, not a finished distributable
+  sysroot. Measure and package the required headers/libraries and target archives
+  before changing the default reference toolchain.
 - Browser/cloud loading and explicit host capabilities.
 
 The package remains private. There is no remote or publication step in this work.
+
+After `npm test`, reproduce the full bundled-toolchain comparison with
+`npm run probe:bundled-runtime`. It discovers Zig's actual link inputs from a
+fresh verbose reference link rather than hard-coding cache directory hashes.
