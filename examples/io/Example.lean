@@ -30,4 +30,15 @@ def ready : IO Nat := pure 42
 def scalar : IO UInt32 := pure 4294967295
 def truth : IO Bool := pure true
 
+initialize counter : IO.Ref Nat ← IO.mkRef 0
+initialize initializedDuringStartup : Bool ← IO.initializing
+
+def increment : IO Nat := do
+  let next := (← counter.get) + 1
+  counter.set next
+  pure next
+
+def wasInitializing : IO Bool := pure initializedDuringStartup
+def isInitializing : IO Bool := IO.initializing
+
 end Example

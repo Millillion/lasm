@@ -9,6 +9,9 @@
     "recover": { "declaration": "Example.recover", "parameters": ["String"], "result": "String", "effect": "io" },
     "ready": { "declaration": "Example.ready", "parameters": [], "result": "Nat", "effect": "io" },
     "scalar": { "declaration": "Example.scalar", "parameters": [], "result": "UInt32", "effect": "io" },
-    "truth": { "declaration": "Example.truth", "parameters": [], "result": "Bool", "effect": "io" }
+    "truth": { "declaration": "Example.truth", "parameters": [], "result": "Bool", "effect": "io" },
+    "increment": { "declaration": "Example.increment", "parameters": [], "result": "Nat", "effect": "io" },
+    "wasInitializing": { "declaration": "Example.wasInitializing", "parameters": [], "result": "Bool", "effect": "io" },
+    "isInitializing": { "declaration": "Example.isInitializing", "parameters": [], "result": "Bool", "effect": "io" }
   }
 }

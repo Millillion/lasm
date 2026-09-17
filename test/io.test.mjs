@@ -95,6 +95,19 @@ test(`${mode}: capabilities and host failures are recoverable IO errors`, async 
   permission.dispose();
 });
 
+test(`${mode}: references and initialization state are local to each instance`, async () => {
+  const first = await createModule();
+  const second = await createModule();
+  try {
+    assert.equal(await first.wasInitializing(), true);
+    assert.equal(await first.isInitializing(), false);
+    assert.equal(await first.increment(), 1n);
+    assert.equal(await first.increment(), 2n);
+    assert.equal(await second.increment(), 1n);
+    assert.equal(await second.isInitializing(), false);
+  } finally { first.dispose(); second.dispose(); }
+});
+
 test(`${mode}: repeated success and failure release guest resources`, async () => {
   const cycle = async () => {
     assert.deepEqual(await api.readPair('binary', 'unicode'), Uint8Array.from([...binary, ...unicode]));

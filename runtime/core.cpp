@@ -30,6 +30,9 @@ void lasm_runtime_initialize() {
     initialized = true;
 }
 
+__attribute__((export_name("lasm_runtime_finish_initialization")))
+void lasm_runtime_finish_initialization() { lean_io_mark_end_initialization(); }
+
 __attribute__((export_name("lasm_alloc")))
 void *lasm_alloc(size_t bytes) { return malloc(bytes); }
 __attribute__((export_name("lasm_free")))

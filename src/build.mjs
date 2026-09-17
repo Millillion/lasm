@@ -7,7 +7,7 @@ const types = new Set(['Nat', 'Int', 'String', 'ByteArray', 'UInt32', 'Bool', 'U
 const identifier = /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*)*$/;
 export const mangle = name => name.replaceAll('_', '__').replaceAll('.', '_');
 const hash = value => createHash('sha256').update(value).digest('hex');
-const bridgeNames = ['runtime_initialize', 'alloc', 'free', 'release', 'string_new', 'string_data',
+const bridgeNames = ['runtime_initialize', 'runtime_finish_initialization', 'alloc', 'free', 'release', 'string_new', 'string_data',
   'string_size', 'nat_new', 'nat_string', 'int_new', 'int_string', 'bytes_new', 'bytes_data',
   'bytes_size', 'io_is_error', 'io_value', 'unbox_u32', 'unbox_scalar'].map(n => `lasm_${n}`);
 export const allowedWasiImports = ['fd_close', 'environ_get', 'environ_sizes_get', 'clock_time_get',

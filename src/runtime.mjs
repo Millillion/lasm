@@ -159,6 +159,7 @@ export async function instantiate(bytes, manifest, { host = {} } = {}) {
     const failed = e.lasm_io_is_error(result);
     e.lasm_release(result);
     if (failed) throw new Error('Lean module initialization failed');
+    e.lasm_runtime_finish_initialization();
     if (mode === 'asyncify') {
       const stackSize = 1024 * 1024;
       asyncData = e.lasm_alloc(stackSize + 8);

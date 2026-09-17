@@ -70,6 +70,12 @@ stubs for missing native facilities:
    signal, mmap and libuv initialization is excluded. Panic's stderr primitive
    writes through libc and fails fatally if the write fails. Its symbol is renamed
    in `object.cpp` to avoid colliding with Lean's full `IO.eprintln` implementation.
+6. Extract the unchanged initialization-state and `ST.Ref` primitives from the
+   pinned upstream `io.cpp`, without its unrelated native OS/libuv dependencies.
+   Source boundaries are checked during the build. The JS loader marks the end of
+   initialization after all module initializers succeed. This supports Lean's JSON
+   library and `IO.Ref`; tests verify initialization state and independent mutable
+   references in separate instances on both Asyncify and JSPI.
 
 The linked WASI imports are exactly `fd_close`, `fd_fdstat_get`, `fd_read`,
 `fd_seek`, `fd_write`, `environ_get`, `environ_sizes_get`, `clock_time_get`, and
@@ -103,10 +109,13 @@ It does not synchronously force the JS garbage collector. Further calls fail.
   PATH, including a build in a directory containing spaces. Published-package
   installation and package-manager support still need validation.
 - Lake dependency resolution and supported-platform release packaging.
-- The installed Lean Clang/LLD route now compiles all 14 runtime translation units
+- The recorded installed Lean Clang/LLD experiment compiled the then-current 14 runtime translation units
   and the 92-module core example. It passes 27 comparisons with the Zig artifact,
   including large integers, captured closures, Unicode, bytes, and imported
   initialization. See `docs/evidence/2026-09-17-bundled-runtime.json`.
+  The later JSON/Express work adds a fifteenth unit for the upstream reference and
+  initialization primitives; that addition is validated with the Zig reference
+  build and the core, IO, and Express suites.
 - That experiment still uses Zig's C/C++ headers and six startup/library link
   inputs. It establishes a viable compiler path, not a finished distributable
   sysroot. Measure and package the required headers/libraries and target archives

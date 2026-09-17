@@ -49,8 +49,26 @@ export function buildRuntime() {
   const headersIdentity = digest.digest('hex');
   const units = ['object', 'mpz', 'mpn', 'utf8', 'apply', 'thread', 'alloc', 'hash', 'byteslice', 'platform', 'interrupt'];
   const objects = [];
-  for (const unit of [...units, 'lasm-core', 'lasm-stack', 'lasm-host']) {
+  for (const unit of [...units, 'io-core', 'lasm-core', 'lasm-stack', 'lasm-host']) {
     let source = unit.startsWith('lasm-') ? join(root, 'runtime', `${unit.slice(5)}.cpp`) : join(leanSource, 'src/runtime', `${unit}.cpp`);
+    if (unit === 'io-core') {
+      // Keep the upstream implementations, without io.cpp's native OS/libuv
+      // includes and unrelated filesystem/process implementations.
+      const original = readFileSync(join(leanSource, 'src/runtime/io.cpp'), 'utf8');
+      const slice = (start, end) => {
+        if (original.split(start).length !== 2 || original.split(end).length !== 2) throw new Error('Unexpected Lean IO core boundaries');
+        const from = original.indexOf(start);
+        const to = original.indexOf(end, from);
+        if (to < from) throw new Error('Invalid Lean IO core boundaries');
+        return original.slice(from, to);
+      };
+      source = join(runtimeDir, 'patched/io-core.cpp');
+      const copyright = original.slice(0, original.indexOf('*/') + 2);
+      writeFileSync(source, `${copyright}\n// Lasm change: extract the unchanged initialization and ST.Ref primitives.\n` +
+        '#include "runtime/object.h"\n#include "runtime/thread.h"\nnamespace lean {\n' +
+        slice('static bool g_initializing = true;', 'static obj_res mk_file_not_found_error') +
+        slice('// ST ref primitives', '/* {α : Type} (act : BaseIO α)') + '\n}\n');
+    }
     if (unit === 'object') {
       const original = readFileSync(source, 'utf8');
       if (original.split('lean_io_eprintln').length !== 3) throw new Error('Unexpected Lean panic diagnostic path');
