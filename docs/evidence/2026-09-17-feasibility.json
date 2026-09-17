@@ -1,0 +1,84 @@
+{
+  "node": "v24.13.1",
+  "v8": "13.6.233.17-node.40",
+  "lean": "Lean (version 4.32.0, x86_64-unknown-linux-gnu, commit 8c9756b28d64dab099da31a4c09229a9e6a2ef35, Release)",
+  "zig": "0.16.0",
+  "wasmOpt": "wasm-opt version 108",
+  "jspiByDefault": false,
+  "probes": {
+    "scalar": {
+      "bytes": 186,
+      "imports": [],
+      "nativeComparisons": 98
+    },
+    "bundledTools": {
+      "clang": "clang version 22.1.4 (https://github.com/llvm/llvm-project 35990504507d79e0b9deb809c8ee5e1b34ceef20)",
+      "bytes": 126,
+      "imports": [],
+      "nativeComparisons": 98,
+      "usesZigHeaders": true,
+      "usesZigExecutable": false
+    },
+    "natWithoutRuntime": {
+      "expectedFailure": true,
+      "missing": "lean_nat_big_mul"
+    },
+    "custom": {
+      "bytes": 943,
+      "imports": [
+        {
+          "module": "lasm",
+          "name": "double",
+          "kind": "function"
+        }
+      ],
+      "allocationBytes": 4096
+    },
+    "stdio": {
+      "bytes": 2094,
+      "imports": [
+        {
+          "module": "wasi_snapshot_preview1",
+          "name": "fd_close",
+          "kind": "function"
+        },
+        {
+          "module": "wasi_snapshot_preview1",
+          "name": "fd_fdstat_get",
+          "kind": "function"
+        },
+        {
+          "module": "wasi_snapshot_preview1",
+          "name": "fd_seek",
+          "kind": "function"
+        },
+        {
+          "module": "wasi_snapshot_preview1",
+          "name": "fd_write",
+          "kind": "function"
+        }
+      ],
+      "emptyImportsRejected": true
+    },
+    "jspi": {
+      "mode": "jspi",
+      "results": [
+        2,
+        44,
+        68
+      ],
+      "hostCalls": 6
+    },
+    "asyncify": {
+      "mode": "asyncify",
+      "results": [
+        2,
+        44,
+        68
+      ],
+      "hostCalls": 6,
+      "originalBytes": 232,
+      "transformedBytes": 612
+    }
+  }
+}

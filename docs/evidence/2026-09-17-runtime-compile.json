@@ -1,0 +1,23 @@
+{
+  "mpz": {
+    "compiled": true,
+    "objectBytes": 220324
+  },
+  "mpn": {
+    "compiled": true,
+    "objectBytes": 107466
+  },
+  "object": {
+    "compiled": true,
+    "objectBytes": 613857
+  },
+  "io": {
+    "compiled": false,
+    "expectedFailure": true,
+    "diagnostics": [
+      "mmap",
+      "signals",
+      "uv.h"
+    ]
+  }
+}
