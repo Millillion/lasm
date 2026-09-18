@@ -1,0 +1,114 @@
+{
+  "node": "v24.13.1",
+  "platform": "linux-x64",
+  "compiler": "lasm-compiler-0.1.0-experimental.3.tgz",
+  "compilerSha256": "c4d65a2e4382daeabeb7a72871d35f242fa2de5a24dc50ef3af12a50f04125ed",
+  "compressedBytes": 62661624,
+  "installedBytes": 256385046,
+  "targetArchive": "/home/lastmjs/development/lasm/compiler/.work/release/lean-4.32.0-wasm32-v1.tar.gz",
+  "targetSha256": "5ed0126e3be2c53b5bdceedf7d686a1ac394fea1e70273aada7a3b406890c733",
+  "targetCompressedBytes": 55375875,
+  "targetInstalledBytes": 233195966,
+  "standardModules": 953,
+  "elapsedMs": 108366.732336,
+  "testedNode": "v24.13.1",
+  "testedPlatform": "linux-x64",
+  "executionEnvironment": "native",
+  "expectedManagers": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "complete": true,
+  "ordinaryMain": {
+    "installedCompiler": true,
+    "source": "ordinary Lake main",
+    "standardHttpServer": true,
+    "unicodePersistence": true,
+    "streaming": true,
+    "gracefulShutdown": true,
+    "compilerRemovedBeforeSecondRun": true,
+    "toolchain": "packaged-clang",
+    "wasmBytes": 3971836
+  },
+  "tests": [
+    {
+      "manager": "npm",
+      "installMs": 7195.819552,
+      "firstBuildMs": 24437.473208,
+      "cachedBuildMs": 28374.770461,
+      "wasmBytes": 763323,
+      "prebuiltModules": 297,
+      "emptyCacheOfflineInstall": true,
+      "offlineLockedInstall": true,
+      "isolatedCompilerPath": [
+        "node",
+        "lean",
+        "lake"
+      ],
+      "osUtilities": [
+        "sh",
+        "dirname",
+        "sed",
+        "uname"
+      ],
+      "compilerPackageRemovedBeforeExecution": true,
+      "standaloneExecution": true
+    },
+    {
+      "manager": "pnpm",
+      "installMs": 4054.130878000011,
+      "firstBuildMs": 35492.03457700001,
+      "cachedBuildMs": 35903.221846,
+      "wasmBytes": 763323,
+      "prebuiltModules": 297,
+      "emptyCacheOfflineInstall": true,
+      "offlineLockedInstall": true,
+      "isolatedCompilerPath": [
+        "node",
+        "lean",
+        "lake"
+      ],
+      "osUtilities": [
+        "sh",
+        "dirname",
+        "sed",
+        "uname"
+      ],
+      "compilerPackageRemovedBeforeExecution": true,
+      "standaloneExecution": true
+    },
+    {
+      "manager": "yarn",
+      "installMs": 11815.229849000025,
+      "firstBuildMs": 30041.62494899999,
+      "cachedBuildMs": 29161.64735700001,
+      "wasmBytes": 763323,
+      "prebuiltModules": 297,
+      "emptyCacheOfflineInstall": true,
+      "offlineLockedInstall": true,
+      "isolatedCompilerPath": [
+        "node",
+        "lean",
+        "lake"
+      ],
+      "osUtilities": [
+        "sh",
+        "dirname",
+        "sed",
+        "uname"
+      ],
+      "compilerPackageRemovedBeforeExecution": true,
+      "standaloneExecution": true
+    },
+    {
+      "manager": "npm",
+      "ordinaryNativeParity": [
+        "IO.FS",
+        "IO.Process",
+        "Lean.Expr"
+      ],
+      "installedPackage": true
+    }
+  ]
+}

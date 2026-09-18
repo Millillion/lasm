@@ -1,0 +1,111 @@
+{
+  "recordedAt": "2026-09-18T22:06:26.296Z",
+  "implementationCommit": "fd2a6a9ea119eec80461ffe308845351ffe78b83",
+  "node": "v24.13.1",
+  "platform": "linux-x64",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "scope": "Latest successful local regression runs after the runtime fixes; later changes affect the optimizer deadline, test adapter, audit reporting and documentation. These are separate runs, with overlapping tests; do not sum them as unique cases.",
+  "checks": [
+    {
+      "command": "npm test",
+      "passed": 50,
+      "log": ".work/regressions-current.log",
+      "sha256": "94e419c1700ee0380aca6fea4300886d2071d95559c6549caa0db7f899b913c9"
+    },
+    {
+      "command": "npm run test:lean-server",
+      "passed": 22,
+      "log": ".work/lean-server-final.log",
+      "sha256": "b7a817eb584c42fd5cb2d711910259ff8041ca63a4f097a1aa264a46423e4faf"
+    },
+    {
+      "command": "npm run test:express",
+      "passed": 57,
+      "log": ".work/express-final.log",
+      "sha256": "5d4c1cf6738c917e8f9b5dc085abe15dedda784d004d6a70d9505bd6596054aa"
+    },
+    {
+      "command": "npm run test:jspi",
+      "passed": 6,
+      "log": ".work/jspi-current.log",
+      "sha256": "53c5334bd6160dfc0bccd608657a46a297caf4d80b61835cab0bf925976923e8"
+    },
+    {
+      "command": "npm run test:hosts",
+      "passed": 2,
+      "log": ".work/hosts-current.log",
+      "sha256": "f3a778e309b8b1321612195c68ac81de1fb74d0a4c193cf4d0d59f45ace6282f"
+    },
+    {
+      "command": "npm run test:release",
+      "passed": 5,
+      "log": ".work/release-final.log",
+      "sha256": "84385e9a63339fb58eae637430a05589e8b54e431e37c4497aa4c21dd15d4aed"
+    },
+    {
+      "command": "node --test --test-concurrency=1 test/conformance.test.mjs test/native-files.test.mjs test/node-host.test.mjs test/node-network.test.mjs",
+      "passed": 13,
+      "log": ".work/final-core-tests.log",
+      "sha256": "42cc9260a90d5c63f29e2882c21d8e6df600db09ce5e03508f0fec94cc04fc7d"
+    }
+  ],
+  "upstream": {
+    "report": "docs/compatibility/lean-4.32.0-results.json",
+    "sha256": "144543fafa58518a89a04a1540afd309622ecf7b7595199b018bd039cebfcb06",
+    "completed": 620,
+    "scope": "Exploratory observations plus explicit rechecks; artifacts span compiler versions, not one final-revision sweep.",
+    "counts": {
+      "matched-native": 336,
+      "wasm-failed": 5,
+      "build-failed": 249,
+      "needs-upstream-driver": 1,
+      "build-timeout": 19,
+      "matched-native-with-errors": 4,
+      "output-mismatch": 5,
+      "native-baseline-failed": 1
+    },
+    "http": {
+      "files": 20,
+      "matchedNative": 20,
+      "runtimeCommands": 609
+    },
+    "filesystem": {
+      "files": 8,
+      "matchedNative": 8,
+      "runtimeCommands": 50,
+      "mainPrograms": 1,
+      "names": [
+        "compile/file_read_overflow.lean",
+        "elab/getline_crash.lean",
+        "elab/handleLocking.lean",
+        "elab/IO_test.lean",
+        "elab/ioNulBytes.lean",
+        "elab/realPath.lean",
+        "elab/stdio.lean",
+        "elab/tempfile.lean"
+      ]
+    }
+  },
+  "release": {
+    "report": "2026-09-18-io-conformance-release.json",
+    "sha256": "847a30fb6e3afc0143e16f3586f0e3a55a4b4aca0553b557c34e84b77295e2eb",
+    "archive": "lasm-compiler-0.1.0-experimental.3.tgz",
+    "archiveSha256": "c4d65a2e4382daeabeb7a72871d35f242fa2de5a24dc50ef3af12a50f04125ed",
+    "complete": true,
+    "note": "This exact archive passed all five installed-package tests. It predates the final audit-only edits; no later product/runtime changes were made."
+  },
+  "hosts": {
+    "report": "2026-09-18-io-conformance-hosts.json",
+    "sha256": "65e0b584ed13f30c495cfd752291a528c504c24f3ddb078b8edf0f0382e3574a"
+  },
+  "nativeAcceptance": {
+    "linux-x64": "passed",
+    "linux-arm64": "pending",
+    "darwin-x64": "pending",
+    "darwin-arm64": "pending",
+    "win32-x64": "pending",
+    "win32-arm64": "pending"
+  },
+  "remainingLimitations": "../../IO_LIMITATIONS.md",
+  "publication": "Unsigned local commits on main. No remote, push, or npm publication."
+}

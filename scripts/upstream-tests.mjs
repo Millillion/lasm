@@ -201,7 +201,7 @@ for (const entry of selected) {
       result.stderrEqual = normal(native.stderr, 'native') === normal(wasm.stderr, 'wasm');
       const exitMatches = run => expectedExit === 'nonzero' ? !!run.signal || run.code !== null && run.code !== 0 : run.code === Number(expectedExit);
       result.status = native.timedOut || native.outputLimit || !exitMatches(native) ? 'native-baseline-failed'
-        : wasm.outputLimit ? 'wasm-output-limit' : wasm.timedOut ? 'wasm-timeout' : wasm.code !== native.code ? 'wasm-failed'
+        : wasm.outputLimit ? 'wasm-output-limit' : wasm.timedOut ? 'wasm-timeout' : wasm.code !== native.code || wasm.signal !== native.signal ? 'wasm-failed'
         : result.stdoutEqual && result.stderrEqual ? 'matched-native' : 'output-mismatch';
       if (adapted) {
         const markers = text => [...text.matchAll(/LASM_UPSTREAM_END:(\d+):(ok|error:[^\n]*)/g)].map(m => ({ id: Number(m[1]), result: m[2] }));

@@ -5,6 +5,8 @@ Lasm uses Lean 4.32.0, commit
 `npm run setup` includes Lean's own [test suite](https://github.com/leanprover/lean4/tree/v4.32.0/tests).
 Its [README](https://github.com/leanprover/lean4/blob/v4.32.0/tests/README.md)
 describes the piles, test drivers and expected-output files.
+The [recorded audit](UPSTREAM_RESULTS.md) includes all 620 selected runtime
+candidates and preserves failures, timeouts and unsupported test-driver cases.
 
 ## What runs in Node
 
@@ -63,6 +65,18 @@ The compile pile also has a compiled-C baseline, matching upstream's `leanc -O3
 a sweep to compare its SHA-verified Wasm artifacts with native executables. The
 comparison normalizes benchmark measurements exactly as upstream `tests/util.sh`
 does, and substitutes each test's own working directory. Raw outputs remain intact.
+Optional positional arguments select a test name and a runtime deadline:
+
+```sh
+node scripts/upstream/recheck-compiled.mjs .work/upstream-all '^compile_bench/io_compute\.lean$' 120000
+node scripts/upstream/report.mjs .work/upstream-all
+```
+
+The report combines evidence directories in argument order, with the newest
+explicit rechecks last. It refuses to publish a complete audit while selected
+candidates lack observations; `--partial` labels an unfinished audit explicitly.
+The checked-in report is an exploratory audit across revisions. A new sweep of a
+frozen checkout is required before claiming results for one final revision.
 
 ## API inventory
 

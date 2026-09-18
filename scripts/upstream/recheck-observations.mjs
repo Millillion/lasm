@@ -7,10 +7,14 @@ import { normalizeOutput, normalizeDiagnostics } from './comparison.mjs';
 const input = resolve(process.argv[2] ?? 'docs/compatibility/lean-4.32.0-results.json');
 const output = resolve(process.argv[3] ?? '.work/upstream-baseline-recheck');
 const prior = JSON.parse(readFileSync(input));
+if (prior.leanCommit !== leanCommit) throw new Error('Wrong upstream version');
 const { lean } = resolveLean(root);
 const source = join(root, '.cache/lean4-4.32.0/tests');
 mkdirSync(output, { recursive: true });
-const entries = [];
+const resultFile = join(output, 'results-original-recheck.json');
+const previous = existsSync(resultFile) ? JSON.parse(readFileSync(resultFile)) : null;
+if (previous && previous.leanCommit !== leanCommit) throw new Error('Wrong upstream version in previous recheck');
+const entries = previous?.entries ?? [];
 for (const observation of prior.entries.filter(e=>e.status==='original-native-failed' || e.name==='elab/currentDir.lean')) {
   const work = join(root, observation.work);
   if (createHash('sha256').update(readFileSync(join(work, 'dist/module.wasm'))).digest('hex') !== observation.artifactSha256)
@@ -39,7 +43,8 @@ for (const observation of prior.entries.filter(e=>e.status==='original-native-fa
     nativeOriginalRechecked: { code, expectedMatches, output: cwd.slice(root.length+1) },
     status: code !== 0 || expectedMatches === false ? 'original-native-failed'
       : !same ? 'output-mismatch' : errors ? 'matched-native-with-errors' : 'matched-native' };
-  entries.push(entry);
-  writeFileSync(join(output, 'results-original-recheck.json'), JSON.stringify({ leanCommit, entries }, null, 2) + '\n');
+  const index = entries.findIndex(e=>e.name===entry.name);
+  if (index < 0) entries.push(entry); else entries[index] = entry;
+  writeFileSync(resultFile, JSON.stringify({ leanCommit, entries }, null, 2) + '\n');
   console.log(entry.status + ': ' + entry.name);
 }

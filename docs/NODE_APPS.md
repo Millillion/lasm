@@ -64,7 +64,8 @@ own control flow, object representation, reference counting, and error handling.
 `Std.Http.Server` is compiled from the unmodified pinned standard library. Its
 HTTP parser, protocol state machine, streaming, routing callbacks, and async
 combinators run in Wasm. Standard TCP primitives use Node `net`; file primitives
-use Node `fs`. Node is not running Express or implementing the endpoint handlers.
+use Node `fs` and the host C library through bundled Koffi bindings for native
+buffering, line reads, file locks, and process pipes. Endpoint handlers run in Lean.
 
 Asyncify suspends a Lean invocation on a host Promise. Every suspended task has
 its own C and Asyncify stacks. A cooperative scheduler runs one Wasm invocation
@@ -77,16 +78,19 @@ parallel CPU execution or preempt a long computation.
 | Surface | Implemented and exercised |
 | --- | --- |
 | Console | `IO.print`/`println`/`eprintln`, stdin/stdout/stderr streams, buffer redirection |
-| Files | Text/binary files, modes, partial reads, append, flush, rewind, truncate, handle lifetime |
+| Files | Text/binary files, modes, partial reads, append, flush, rewind, truncate, shared/exclusive locks, handle lifetime |
 | Paths | Metadata, directory creation/listing/removal, rename, hard links, temporary files/directories, canonical paths |
 | Tasks | Promises, spawn/map/bind/waits, cooperative explicit cancellation, mutexes, condition variables |
 | Async | Sleep/timers and the selectors/channels/cancellation used by `Std.Http.Server` |
 | HTTP server | HTTP/1.1, concurrent requests, binary/chunked bodies, response streams, limits, disconnects, graceful shutdown |
 | Process context | Arguments, environment lookup, instance working directory, exit status, clocks and entropy |
+| Child processes | Spawn, output, wait/poll, PID, kill, environment overrides, redirected and inherited pipes |
 
 See [the example](../examples/lean-server/README.md) and the current unchecked
 [limitations](../IO_LIMITATIONS.md). The implementation is tested on Linux x64.
 The six native OS/architecture CI targets are prepared, but have not run.
+The [upstream audit](UPSTREAM_RESULTS.md) separates observed matches from missing
+APIs, adaptation failures, resource limits, and behavior differences.
 
 Node applications have ordinary process-level filesystem/network access. Relative
 paths resolve against the supplied working directory; `IO.Process.setCurrentDir`

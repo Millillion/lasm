@@ -10,11 +10,16 @@ structured errors, file-handle lifetime, tasks/promises, cooperative synchroniza
 timers, and `Std.Http.Server`. An ordinary Lean `main` can run in Node with no
 Lasm imports or custom annotations. See [Node applications](docs/NODE_APPS.md)
 and [the full Lean server](examples/lean-server/README.md).
+The [upstream audit](docs/UPSTREAM_RESULTS.md) records all 620 selected runtime
+candidates, including every failure or unfinished compatibility gate. Lean's full
+native compiler/LSP/Lake test suite has not been ported to this Node runtime.
 
 ## Standard API coverage
 
 - [ ] Complete a declaration-by-declaration compatibility audit; the implemented
-  primitives and tested higher-level APIs are not all of Lean IO.
+  primitives and tested higher-level APIs are not all of Lean IO. The pinned
+  inventory now lists 193 `IO.FS` and 1,938 `Std.Http` declarations. All 20 direct
+  `IO.FS` externs have implementations; this is not complete behavioral coverage.
 - [ ] Validate devices, pipes, FIFOs, large files, permission combinations, symlink
   races, and every open/seek/metadata edge case across OSs. Current tests focus on
   regular files and common directory operations.
@@ -24,6 +29,7 @@ and [the full Lean server](examples/lean-server/README.md).
 - [ ] Broaden native child-process, process-group, pipe, signal and thread-ID
   parity tests, especially Windows quoting and process termination. Ordinary
   spawn/output/wait/poll/PID/kill operations and file-backed pipes are implemented.
+  `IO.getTID` remains an unimplemented extern.
 - [ ] `IO.Process.setCurrentDir` changes only this instance's virtual cwd;
   `IO.appPath` reports the containing Node executable. Audit further native context
   differences before claiming complete process compatibility.
@@ -31,7 +37,9 @@ and [the full Lean server](examples/lean-server/README.md).
   error. Date/time behavior beyond tested UTC HTTP dates needs broader OS coverage.
 - [ ] Native FFI dependencies still need Wasm implementations or internal host
   adapters. Build-time Lake plugins do not supply their runtime native externs.
-- [ ] Link errors need a complete mapping from missing externs to affected Lean APIs.
+- [ ] Extend missing-extern diagnostics to dependency libraries outside the pinned
+  Lean/Std environment. The upstream audit now maps 954 declaration/symbol pairs
+  and associates observed link failures with affected declarations.
 
 ## HTTP and networking
 
@@ -41,6 +49,8 @@ and [the full Lean server](examples/lean-server/README.md).
   socket address queries therefore differ before listening.
 - [ ] Validate IPv6, keepalive details, transport half-close/error behavior,
   connection floods, slow consumers, and timer-boundary races more extensively.
+  IPv6 wildcard dual-stack acceptance and response-after-client-half-close now
+  have passing Linux tests; outbound connections retain configured socket options.
 - [ ] The server example is a single-process, loopback demo with an unauthenticated
   shutdown route. Authentication, TLS termination, production deployment, and
   shared storage coordination remain application work.
@@ -58,6 +68,8 @@ and [the full Lean server](examples/lean-server/README.md).
   stops its ordinary worker pool before joining dedicated workers, so a dedicated
   task that spawns more ordinary work after shutdown begins can behave differently.
 - [ ] Complete `Std.Async` coverage, including unported process and signal APIs.
+  The broad sweep also exposes missing UDP/system-information primitives and
+  `Std.BaseSharedMutex` externs. Passing HTTP tests does not cover these libraries.
 - [ ] Standard Node tasks currently require Asyncify. JSPI remains available for
   the legacy custom-host bridge only, with a separate artifact and engine support.
 - [ ] CPU-bound Lean code cannot be interrupted by an AbortSignal or a timer;
@@ -83,6 +95,14 @@ and [the full Lean server](examples/lean-server/README.md).
 - [ ] Memory is capped at 1 GiB; each async invocation has fixed 256 KiB C and
   Asyncify stacks. Stack queries track the active fiber, but unchecked C recursion
   is not comprehensively protected or tested for every exhaustion path.
+  Upstream `elab/12676.lean` exhausts memory and `compile_bench/const_fold.lean`
+  exceeds the runtime stack. Raising the heap limit did not fix the former.
+- [ ] `USize` and `ISize` are 32-bit in Wasm32, unlike native 64-bit Lean builds.
+  Width-sensitive upstream results therefore differ. Supporting a different
+  target width requires a separate runtime/compiler target.
+- [ ] Blocking native device/FIFO/pipe reads can occupy the finite FFI worker
+  pool. Finalizing a buffered pipe can block while flushing, and a pending C read
+  cannot be safely interrupted by disposing the Wasm instance.
 - [ ] Traps, panics, native heartbeat/interrupt traps, and failed ABI conversion
   poison the instance rather than providing native recovery semantics.
 - [ ] Complete source-level stack traces and mapped diagnostics are missing;
@@ -137,3 +157,12 @@ Additional differential fixtures verify OS symlink/dot-segment resolution,
 directory enumeration order, invalid paths, native error messages, stdin EOF,
 environment overrides, process termination and simultaneous 1 MiB output pipes.
 Remaining platform and semantic checks above are still open.
+
+The upstream-driven fixes also preserve static 64-bit scalar fields on Wasm32
+(including Lean Name/Expr hashes), execute synchronous cancellation callbacks
+inline, wait for outstanding tasks at ordinary main shutdown, route `timeit` and
+`allocprof` through Lean's current stderr, and preserve native uncaught-error text.
+See [the upstream results](docs/UPSTREAM_RESULTS.md),
+[testing workflow](docs/UPSTREAM_TESTS.md), and
+[regression/package evidence](docs/evidence/2026-09-18-io-conformance.json) for
+reproducible commands, source/API inventories, and the limits of these comparisons.

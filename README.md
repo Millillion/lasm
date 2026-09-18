@@ -24,6 +24,7 @@ The full displayed conversation has been reviewed and its key claims tested.
 - [Browser, IndexedDB, and Workers adapters](docs/HOSTS.md)
 - [Runtime implementation and boundaries](docs/RUNTIME.md)
 - [Lean filesystem/HTTP IO and async backends](docs/IO.md)
+- [Upstream Lean compatibility results and reproducible tests](docs/UPSTREAM_RESULTS.md)
 - [Express task board with Lean endpoints and Vitest tests](examples/express/README.md)
 - [Next steps](NEXT_STEPS.md)
 - [Feasibility results and corrections](docs/FEASIBILITY.md)
@@ -87,8 +88,8 @@ empty-cache offline installs, Lake dependencies, isolated compiler paths, and
 standalone execution. `npm run test:hosts` runs real headless Chrome and local
 Cloudflare workerd tests. See the linked docs for prerequisites and scope.
 
-Standard Node console, filesystem, tasks and HTTP server support use Asyncify.
-Native child processes, TLS, DNS, UDP, parallel threads, and unrestricted
+Standard Node console, filesystem, child processes, tasks and HTTP server support
+use Asyncify. TLS, DNS, UDP, parallel threads, and unrestricted
 `Std.Async` remain outside the supported runtime slice. See [IO limitations](IO_LIMITATIONS.md). Unsupported native symbols fail during
 linking. Browser support is tested in Chrome and cloud support in local workerd;
 no live cloud deployment has been performed. The original research probes remain

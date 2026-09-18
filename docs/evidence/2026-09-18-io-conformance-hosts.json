@@ -1,0 +1,21 @@
+{
+  "node": "v24.13.1",
+  "platform": "linux-x64",
+  "miniflare": "5.20260917.0-alpha",
+  "workerd": "1.20260917.1",
+  "wasm": {
+    "basic": {
+      "bytes": 339909,
+      "sha256": "485f0b9328965e1c262c1521f4dea450893fb106f0ff86a806257d3b1898c4f1"
+    },
+    "io": {
+      "bytes": 778281,
+      "sha256": "f7c1dbeaf2dc3c52ccad829f43fb06b7c0325521dd45314a01530e04d9d4cbd9"
+    }
+  },
+  "passed": [
+    "Chrome: integers, Unicode, closures, IndexedDB persistence, HTTP failures/limits/redirects, cancellation, disabled capabilities",
+    "workerd: static Wasm module, KV across requests, service binding, failures/redirects, request limits, disabled capabilities"
+  ],
+  "chrome": "153.0.8010.36"
+}
