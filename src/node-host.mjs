@@ -178,7 +178,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       return { error: false, bytes: result };
     } catch (err) { if (err instanceof LeanExit) throw err; return encodeError(err); }
   }
-  return { request, release,
+  return { request, release, platform: process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0,
     start(...args) { const id = nextRequest++; pending.set(id, request(...args)); return id; },
     close() { closed = true; for (const id of resources.keys()) release(id); pending.clear(); },
     stats() { return { resources: resources.size - 3 }; },

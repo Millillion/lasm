@@ -148,7 +148,7 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
     throw new Error('Host IO requires an asynchronous build');
   }
   const imports = wasi.getImportObject();
-  imports.lasm = { ...scheduler.imports };
+  imports.lasm = { ...scheduler.imports, platform: () => nodeRuntime?.platform ?? 0 };
   Object.assign(imports.lasm, {
     node_call(operation, handle, argument, pointer, length) {
       if (!nodeRuntime) throw new Error('Standard Lean OS APIs require the Node runtime');

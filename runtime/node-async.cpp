@@ -168,7 +168,18 @@ static O *parse_ip(O *text, bool v6) {
 }
 O *lean_uv_pton_v4(O *s) { return parse_ip(s, false); }
 O *lean_uv_pton_v6(O *s) { return parse_ip(s, true); }
-O *lean_windows_get_next_transition(O*, uint64_t, uint8_t) {
+O *lean_windows_get_next_transition(O *name, uint64_t timestamp, uint8_t initial) {
+    // UTC is fixed and needs no OS timezone database. Std.Http.Server uses it
+    // for Date headers; named Windows zones remain explicitly unsupported.
+    if (strcmp(lean_string_cstr(name), "UTC") == 0 && lean_string_size(name) == 4) {
+        if (!initial) return ok(lean_box(0));
+        auto *zone = lean_alloc_ctor(0, 3, 1);
+        lean_ctor_set(zone, 0, lean_box(0));
+        lean_ctor_set(zone, 1, lean_mk_string("UTC"));
+        lean_ctor_set(zone, 2, lean_mk_string("UTC"));
+        lean_ctor_set_uint8(zone, 3 * sizeof(void*), 0);
+        return ok(some(pair(lean_box_uint64(timestamp), zone)));
+    }
     return lean_io_result_mk_error(lean_mk_io_error_unsupported_operation(0, lean_mk_string("Windows time zone transitions are not supported")));
 }
 }

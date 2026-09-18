@@ -210,7 +210,7 @@ private def runProgram : IO UInt32 := do
   const imports = WebAssembly.Module.imports(wasmModule);
   for (const i of imports) {
     const allowed = i.module === 'wasi_snapshot_preview1' && allowedWasiImports.includes(i.name)
-      || i.module === 'lasm' && (['task_enqueue', 'task_resolve', 'task_drop', 'task_wait', 'task_wait_any', 'task_current', 'node_call', 'node_copy', 'node_release', 'node_start'].includes(i.name)
+      || i.module === 'lasm' && (['platform', 'task_enqueue', 'task_resolve', 'task_drop', 'task_wait', 'task_wait_any', 'task_current', 'node_call', 'node_copy', 'node_release', 'node_start'].includes(i.name)
         || spec.asyncMode !== 'sync' && ['request', 'copy_response'].includes(i.name));
     if (i.kind !== 'function' || !allowed) {
       throw new Error(`Unexpected Wasm import: ${i.module}.${i.name}`);

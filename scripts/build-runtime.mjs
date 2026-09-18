@@ -51,6 +51,16 @@ export function buildRuntime(log = console.log) {
   const objects = [];
   for (const unit of [...units, 'io-core', 'lasm-core', 'lasm-stack', 'lasm-host', 'lasm-node-io', 'lasm-node-async']) {
     let source = unit.startsWith('lasm-') ? join(root, 'runtime', `${unit.slice(5)}.cpp`) : join(leanSource, 'src/runtime', `${unit}.cpp`);
+    if (unit === 'platform') {
+      const original = readFileSync(source, 'utf8');
+      const windows = '#if defined(LEAN_WINDOWS)\n    return 1;\n#else\n    return 0;\n#endif';
+      const mac = '#if defined(__APPLE__)\n    return 1;\n#else\n    return 0;\n#endif';
+      if (!original.includes(windows) || !original.includes(mac)) throw new Error('Unexpected Lean platform primitives');
+      source = join(runtimeDir, 'patched/platform.cpp');
+      writeFileSync(source, 'extern "C" __attribute__((import_module("lasm"), import_name("platform"))) unsigned lasm_host_platform();\n' +
+        original.replace(windows, '    return lasm_host_platform() == 1;')
+          .replace(mac, '    return lasm_host_platform() == 2;'));
+    }
     if (unit === 'io-core') {
       // Keep the upstream implementations, without io.cpp's native OS/libuv
       // includes and unrelated filesystem/process implementations.
