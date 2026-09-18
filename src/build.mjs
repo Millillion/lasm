@@ -5,6 +5,7 @@ import { getToolchain, optimizeWasm, run, root, env } from './toolchain.mjs';
 import { findLakeProject, loadLake } from './lake.mjs';
 import { referenceNotices } from './notices.mjs';
 import { insideDirectory } from './platform.mjs';
+import { copyNativeBundle } from './native-bundle.mjs';
 
 const types = new Set(['Nat', 'Int', 'String', 'ByteArray', 'UInt32', 'Bool', 'Unit']);
 const identifier = /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*)*$/;
@@ -12,7 +13,7 @@ export const mangle = name => name.replaceAll('_', '__').replaceAll('.', '_');
 const hash = value => createHash('sha256').update(value).digest('hex');
 const bridgeNames = ['runtime_initialize', 'runtime_finish_initialization', 'alloc', 'free', 'release', 'string_new', 'string_data',
   'string_size', 'nat_new', 'nat_string', 'int_new', 'int_string', 'bytes_new', 'bytes_data',
-  'bytes_size', 'io_is_error', 'io_value', 'unbox_u32', 'unbox_scalar', 'task_execute', 'stack_bounds'].map(n => `lasm_${n}`);
+  'bytes_size', 'io_is_error', 'io_value', 'unbox_u32', 'unbox_scalar', 'task_execute', 'stack_bounds', 'release_fiber_context'].map(n => `lasm_${n}`);
 export const allowedWasiImports = ['fd_close', 'environ_get', 'environ_sizes_get', 'clock_time_get',
   'fd_fdstat_get', 'fd_read', 'fd_seek', 'fd_write', 'proc_exit'];
 
@@ -210,7 +211,7 @@ private def runProgram : IO UInt32 := do
   const imports = WebAssembly.Module.imports(wasmModule);
   for (const i of imports) {
     const allowed = i.module === 'wasi_snapshot_preview1' && allowedWasiImports.includes(i.name)
-      || i.module === 'lasm' && (['platform', 'task_enqueue', 'task_resolve', 'task_drop', 'task_wait', 'task_wait_any', 'task_current', 'node_call', 'node_copy', 'node_release', 'node_start'].includes(i.name)
+      || i.module === 'lasm' && (['platform', 'task_enqueue', 'task_resolve', 'task_drop', 'task_wait', 'task_wait_any', 'task_current', 'fiber_current', 'node_call', 'node_copy', 'node_release', 'node_start'].includes(i.name)
         || spec.asyncMode !== 'sync' && ['request', 'copy_response'].includes(i.name));
     if (i.kind !== 'function' || !allowed) {
       throw new Error(`Unexpected Wasm import: ${i.module}.${i.name}`);
@@ -221,7 +222,10 @@ private def runProgram : IO UInt32 := do
   copyFileSync(join(root, 'src/runtime.mjs'), join(output, 'runtime.mjs'));
   copyFileSync(join(root, 'src/scheduler.mjs'), join(output, 'scheduler.mjs'));
   copyFileSync(join(root, 'src/node-host.mjs'), join(output, 'node-host.mjs'));
+  copyFileSync(join(root, 'src/native-files.mjs'), join(output, 'native-files.mjs'));
+  copyNativeBundle(root, output);
   copyFileSync(join(root, 'src/node-network.mjs'), join(output, 'node-network.mjs'));
+  copyFileSync(join(root, 'src/node-process.mjs'), join(output, 'node-process.mjs'));
   copyFileSync(join(root, 'src/host.mjs'), join(output, 'host.mjs'));
   copyFileSync(join(root, 'src/wasi.mjs'), join(output, 'wasi.mjs'));
   copyFileSync(join(root, 'src/web-host.mjs'), join(output, 'web-host.mjs'));

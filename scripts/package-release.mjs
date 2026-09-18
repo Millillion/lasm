@@ -6,6 +6,7 @@ import { buildMain } from '../src/main.mjs';
 import { targetName, leanCommit, sha256 } from '../src/toolchain.mjs';
 import { buildPlatforms } from '../src/platform.mjs';
 import { referenceNotices } from '../src/notices.mjs';
+import { copyNativeBundle } from '../src/native-bundle.mjs';
 import * as reference from './build-runtime.mjs';
 
 const { root, runtimeDir, zig, run } = reference;
@@ -81,6 +82,7 @@ for (const path of ['bin', 'src', 'lean', 'docs']) cpSync(join(root, path), join
   recursive: true, filter: source => !source.split('/').includes('.lake') && source !== join(root, 'docs/evidence'),
 });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+copyNativeBundle(root, join(staging, 'src'));
 copyFileSync(join(root, 'node-shim.js'), join(staging, 'node-shim.js'));
 copyFileSync(join(root, 'IO_LIMITATIONS.md'), join(staging, 'IO_LIMITATIONS.md'));
 cpSync(join(root, 'examples/lean-server'), join(staging, 'examples/lean-server'), {

@@ -29,3 +29,27 @@ test('runtime teardown cancels sleeps and releases their Node timers', async () 
   assert.equal(host.stats().resources, 0);
   host.close();
 });
+
+test('Std.Async timers preserve UInt64 delays and reset without overflowing Node timeouts', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const host = createNodeRuntimeHost();
+  t.after(() => host.close());
+  const call = (op, id = 0, arg = 0n) => host.request(op, id, arg, new Uint8Array());
+  const id = Number(call(70, 0, 2_147_483_652n).bytes.readBigUInt64LE());
+  call(71, id);
+  let done = false;
+  const pending = call(72, id).then(r => { done = true; return r; });
+  t.mock.timers.tick(2_147_483_647); await Promise.resolve();
+  assert.equal(done, false);
+  t.mock.timers.tick(5);
+  assert.equal((await pending).error, false);
+  host.release(id);
+  const huge = Number(call(70, 0, 0xffffffffffffffffn).bytes.readBigUInt64LE());
+  call(71, huge);
+  const waiting = call(72, huge);
+  t.mock.timers.tick(2_147_483_647);
+  call(73, huge);
+  host.release(huge);
+  assert.equal((await waiting).error, true);
+  assert.equal(host.stats().resources, 0);
+});

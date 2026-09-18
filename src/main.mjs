@@ -80,7 +80,7 @@ try {
 } finally { api?.dispose(); }
 `);
   signature = fingerprint(directory, source, project);
-  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'node-network.mjs', 'wasi.mjs', 'manifest.json'];
+  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'node-network.mjs', 'node-process.mjs', 'native-files.mjs', 'native/manifest.json', 'wasi.mjs', 'manifest.json'];
   writeFileSync(stampFile, JSON.stringify({ signature, files }) + '\n');
   return { ...result, cacheHit: false, signature };
 }

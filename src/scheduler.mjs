@@ -43,6 +43,7 @@ export function createScheduler(getExports, mode) {
     return { pointer, top: (pointer + stackBytes) & ~15, data: pointer + stackBytes + 16 };
   }
   function release(fiber) {
+    if (fiber.task) exports().lasm_release_fiber_context(fiber.id);
     fibers.delete(fiber);
     if (pool.length < 8) pool.push(fiber.stack);
     else exports().lasm_free(fiber.stack.pointer);
@@ -150,6 +151,7 @@ export function createScheduler(getExports, mode) {
       });
     },
     task_current() { return current?.task ?? 0; },
+    fiber_current() { return current?.task ? current.id : 0; },
   };
   return { run, suspend, imports, get current() { return current; },
     get stopped() { return stopped; },

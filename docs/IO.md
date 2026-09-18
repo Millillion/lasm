@@ -26,6 +26,13 @@ OS code, and relevant paths. Text validation and higher-level file operations
 remain Lean standard-library code. Handles own host resources by reference
 counting, and instance teardown closes remaining resources.
 
+File handles use the host C library through a pinned, bundled Node-API adapter.
+This preserves buffered file positions, `fflush`, and real OS file locks. The
+package includes prebuilt adapters for Linux, macOS and Windows on x64 and ARM64;
+users do not compile native code at installation. Child-process pipes use the
+same handle implementation. Ordinary process spawning, output, wait, polling,
+PID and termination operations are available.
+
 Node tasks suspend while waiting on asynchronous host work. Scheduling is
 cooperative, with one Wasm invocation executing at a time. Standard HTTP parsing
 and streaming run in Lean; Node supplies TCP sockets. Filesystem, promise,
@@ -33,6 +40,6 @@ mutex, condition-variable, sleep, and timer conformance is checked against nativ
 Lean. Vitest tests the same full server natively and under Node/Wasm.
 
 Coverage is deliberately version-pinned to Lean 4.32.0. This does not implement
-all Lean IO, native threading, TLS, DNS, UDP, child processes, or all of
+all Lean IO, native threading, TLS, DNS, UDP, or all of
 `Std.Async`. See the current [unchecked limitations](../IO_LIMITATIONS.md) and
 [runtime internals](RUNTIME.md). Only native Linux x64 has been validated so far.

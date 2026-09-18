@@ -116,7 +116,7 @@ export async function getToolchain(cwd, { log = console.log } = {}) {
 }
 
 export function optimizeWasm(input, output) {
-  const args = [input, '-O2', '--asyncify', '--pass-arg=asyncify-imports@lasm.request,lasm.task_wait,lasm.task_wait_any,lasm.node_call', '--enable-bulk-memory', '--enable-sign-ext', '-o', output];
+  const args = [input, '-O2', '--asyncify', '--pass-arg=asyncify-imports@lasm.request,lasm.task_wait,lasm.task_wait_any,lasm.node_call', '--enable-bulk-memory', '--enable-sign-ext', '--enable-nontrapping-float-to-int', '-o', output];
   if (process.env.WASM_OPT) return run(process.env.WASM_OPT, args);
   const bundled = join(root, 'tools/wasm-opt.cjs');
   if (existsSync(bundled)) {

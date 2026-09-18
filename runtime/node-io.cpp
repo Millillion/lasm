@@ -1,6 +1,12 @@
 #include "node.hpp"
 #include "runtime/object.h"
 #include <cstdlib>
+#include <cerrno>
+#include <array>
+#include <unordered_map>
+
+extern "C" __attribute__((import_module("lasm"), import_name("fiber_current")))
+uint32_t lasm_fiber_current();
 
 namespace lasm {
 O *Reply::error(O *path) const {
@@ -17,6 +23,14 @@ O *Reply::error(O *path) const {
     case 7: if (path) lean_dec(path); return lean_mk_io_error_time_expired(code, message);
     case 8: if (path) lean_dec(path); return lean_mk_io_error_unsupported_operation(code, message);
     case 9: if (path) lean_dec(path); return lean_mk_io_error_resource_vanished(code, message);
+    case 11: return path ? lean_mk_io_error_resource_exhausted_file(path, code, message) : lean_mk_io_error_resource_exhausted(code, message);
+    case 12: return path ? lean_mk_io_error_no_such_thing_file(path, code, message) : lean_mk_io_error_no_such_thing(code, message);
+    case 13: if (path) lean_dec(path); return lean_mk_io_error_hardware_fault(code, message);
+    case 14: if (path) lean_dec(path); return lean_mk_io_error_unsatisfied_constraints(code, message);
+    case 15: if (path) lean_dec(path); return lean_mk_io_error_illegal_operation(code, message);
+    case 16: if (path) lean_dec(path); return lean_mk_io_error_protocol_error(code, message);
+    case 17: return lean_mk_io_error_interrupted(path ? path : lean_mk_string(""), code, message);
+    case 18: if (path) lean_dec(path); return lean_mk_io_user_error(message);
     default: if (path) lean_dec(path); return lean_mk_io_error_other_error(code, message);
     }
 }
@@ -50,6 +64,8 @@ O *lean_io_prim_handle_mk(O *path, uint8_t mode) {
     return r.failed ? r.result(lean_box(0), path) : ok(wrap_handle(r.number()));
 }
 O *lean_io_prim_handle_read(O *h, size_t n) {
+    if (lean_alloc_sarray_would_overflow(1, n))
+        return lean_io_result_mk_error(lean_mk_io_error_resource_exhausted(ENOMEM, lean_mk_string("out of memory")));
     auto r = Reply(2, handle_id(h), n); return r.failed ? r.result() : ok(r.array());
 }
 O *lean_io_prim_handle_write(O *h, O *bytes) {
@@ -109,6 +125,48 @@ O *lean_io_getenv(O *name) {
 O *lean_io_current_dir() { auto r = Reply(23); return r.failed ? r.result() : ok(r.string()); }
 O *lean_io_process_get_current_dir() { return lean_io_current_dir(); }
 O *lean_io_process_set_current_dir(O *path) { return path_call(29, path).result(lean_box(0), path); }
+uint32_t lean_io_process_get_pid() { return Reply(85).number(); }
+static uint32_t child_id(O *child) { return handle_id(lean_ctor_get(child, 3)); }
+O *lean_io_process_child_wait(O*, O *child) {
+    auto r = Reply(82, child_id(child)); return r.failed ? r.result() : ok(lean_box_uint32(r.number()));
+}
+O *lean_io_process_child_try_wait(O*, O *child) {
+    auto r = Reply(83, child_id(child));
+    return r.failed ? r.result() : ok(r.number() ? some(lean_box_uint32(r.number(8))) : lean_box(0));
+}
+O *lean_io_process_child_kill(O*, O *child) { return Reply(84, child_id(child)).result(); }
+uint32_t lean_io_process_child_pid(O*, O *child) { return Reply(81, child_id(child)).number(); }
+O *lean_io_process_child_take_stdin(O*, O *child) {
+    auto *next = lean_alloc_ctor(0, 4, 0);
+    lean_ctor_set(next, 0, lean_box(0));
+    for (unsigned i = 1; i < 4; i++) { auto *v = lean_ctor_get(child, i); lean_inc(v); lean_ctor_set(next, i, v); }
+    auto *input = lean_ctor_get(child, 0); lean_inc(input); lean_dec(child);
+    return ok(pair(input, next));
+}
+O *lean_io_process_spawn(O *args) {
+    std::vector<uint8_t> bytes;
+    auto put = [&](uint64_t value) { auto n = bytes.size(); bytes.resize(n + 8); memcpy(bytes.data() + n, &value, 8); };
+    auto text = [&](O *s) { auto n = lean_string_size(s)-1; put(n); auto *p = (const uint8_t*)lean_string_cstr(s); bytes.insert(bytes.end(), p, p+n); };
+    auto *cfg = lean_ctor_get(args, 0), *argv = lean_ctor_get(args, 2), *env = lean_ctor_get(args, 4), *cwd = lean_ctor_get(args, 3);
+    for (unsigned i = 0; i < 3; i++) put(lean_ctor_get_uint8(cfg, i));
+    put(lean_ctor_get_uint8(args, 5 * sizeof(void*)));
+    put(lean_ctor_get_uint8(args, 5 * sizeof(void*) + 1));
+    put(lean_array_size(argv)); put(lean_array_size(env)); put(!lean_is_scalar(cwd));
+    text(lean_ctor_get(args, 1));
+    for (size_t i = 0; i < lean_array_size(argv); i++) text(lean_array_get_core(argv, i));
+    if (!lean_is_scalar(cwd)) text(lean_ctor_get(cwd, 0));
+    for (size_t i = 0; i < lean_array_size(env); i++) {
+        auto *entry = lean_array_get_core(env, i), *value = lean_ctor_get(entry, 1);
+        text(lean_ctor_get(entry, 0)); put(!lean_is_scalar(value));
+        if (!lean_is_scalar(value)) text(lean_ctor_get(value, 0));
+    }
+    auto r = Reply(80, 0, 0, bytes.data(), bytes.size()); lean_dec(args);
+    if (r.failed) return r.result();
+    auto *child = lean_alloc_ctor(0, 4, 0);
+    for (unsigned i = 0; i < 3; i++) lean_ctor_set(child, i, r.number(16 + i*8) ? wrap_handle(r.number(16 + i*8)) : lean_box(0));
+    lean_ctor_set(child, 3, wrap_handle(r.number()));
+    return ok(child);
+}
 O *lean_io_app_path() { auto r = Reply(24); return r.failed ? r.result() : ok(r.string()); }
 O *lean_io_mono_ms_now() { return lean_uint64_to_nat(Reply(25).number()); }
 O *lean_io_mono_nanos_now() { return lean_uint64_to_nat(Reply(26).number()); }
@@ -139,13 +197,23 @@ O *lean_option_get_or_block(O *option) {
     auto *v = lean_ctor_get(option, 0); lean_inc(v); lean_dec(option); return v;
 }
 O *lean_stream_of_handle(O *h);
-static O *streams[3] = {nullptr, nullptr, nullptr};
+static std::unordered_map<uint32_t, std::array<O*, 3>> stream_contexts;
+extern "C" __attribute__((export_name("lasm_release_fiber_context")))
+void lasm_release_fiber_context(uint32_t id) {
+    auto it = stream_contexts.find(id);
+    if (it == stream_contexts.end()) return;
+    for (auto *stream : it->second) if (stream) lean_dec(stream);
+    stream_contexts.erase(it);
+}
 static O *get_stream(uint32_t id) {
+    auto &streams = stream_contexts[lasm_fiber_current()];
     if (!streams[id]) streams[id] = lean_stream_of_handle(wrap_handle(id));
     lean_inc(streams[id]); return streams[id];
 }
 static O *set_stream(uint32_t id, O *stream) {
-    auto *old = get_stream(id); lean_dec(streams[id]); streams[id] = stream; return old;
+    auto *old = get_stream(id);
+    auto &streams = stream_contexts[lasm_fiber_current()];
+    lean_dec(streams[id]); streams[id] = stream; return old;
 }
 O *lean_get_stdin() { return get_stream(0); }
 O *lean_get_stdout() { return get_stream(1); }

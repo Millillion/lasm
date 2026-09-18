@@ -54,7 +54,8 @@ export function createNodeNetwork({ add, get, release }) {
     });
   }
   function timer(timeout, repeating) {
-    if (!Number.isSafeInteger(timeout) || timeout < 0 || timeout > 2_147_483_647) throw failure('EINVAL', 'Timer interval is outside the supported range');
+    timeout = BigInt(timeout);
+    if (timeout < 0n || timeout > 0xffffffffffffffffn) throw failure('EINVAL', 'Timer interval is outside UInt64');
     const t = { type: 'timer', timeout, repeating, phase: 'initial', generation: 0 };
     t.fresh = () => {
       t.generation++;
@@ -64,11 +65,18 @@ export function createNodeNetwork({ add, get, release }) {
     };
     t.arm = delay => {
       clearTimeout(t.handle);
-      t.handle = setTimeout(() => {
-        if (t.promise && !t.done) { t.done = true; t.resolve(empty); }
-        if (repeating && timeout > 0) t.arm(timeout);
-        else t.phase = 'finished';
-      }, delay);
+      let remaining = BigInt(delay);
+      const step = () => {
+        const chunk = remaining > 2_147_483_647n ? 2_147_483_647n : remaining;
+        t.handle = setTimeout(() => {
+          remaining -= chunk;
+          if (remaining > 0n) return step();
+          if (t.promise && !t.done) { t.done = true; t.resolve(empty); }
+          if (repeating && timeout > 0n) t.arm(timeout);
+          else t.phase = 'finished';
+        }, Number(chunk));
+      };
+      step();
     };
     t.start = () => {
       t.fresh();
@@ -175,7 +183,7 @@ export function createNodeNetwork({ add, get, release }) {
         t.socket.connect(address(bytes), () => { t.socket.off('error', failed); resolve(empty); });
       });
     }
-    case 70: return numbers(add(timer(n, id !== 0)));
+    case 70: return numbers(add(timer(arg, id !== 0)));
     case 71: {
       const t = get(id, 'timer');
       if (t.phase === 'initial') t.start();

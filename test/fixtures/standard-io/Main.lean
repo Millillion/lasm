@@ -63,6 +63,18 @@ def exercise (directory : String) : IO Unit := do
   let buffer ← IO.mkRef ({} : IO.FS.Stream.Buffer)
   IO.withStdout (IO.FS.Stream.ofBuffer buffer) do IO.println "captured λ"
   ensure ((← buffer.get).data == "captured λ\n".toUTF8) "standard stream redirection"
+  let leftBuffer ← IO.mkRef ({} : IO.FS.Stream.Buffer)
+  let rightBuffer ← IO.mkRef ({} : IO.FS.Stream.Buffer)
+  let leftOutput ← IO.asTask <| IO.withStdout (IO.FS.Stream.ofBuffer leftBuffer) do
+    IO.sleep 20
+    IO.println "left"
+  let rightOutput ← IO.asTask <| IO.withStdout (IO.FS.Stream.ofBuffer rightBuffer) do
+    IO.sleep 5
+    IO.println "right"
+  discard <| IO.ofExcept (← IO.wait leftOutput)
+  discard <| IO.ofExcept (← IO.wait rightOutput)
+  ensure ((← leftBuffer.get).data == "left\n".toUTF8) "left task stream isolation"
+  ensure ((← rightBuffer.get).data == "right\n".toUTF8) "right task stream isolation"
   IO.FS.withTempFile fun handle path => do
     handle.putStr "temporary"
     handle.flush

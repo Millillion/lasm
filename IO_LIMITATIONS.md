@@ -15,20 +15,15 @@ and [the full Lean server](examples/lean-server/README.md).
 
 - [ ] Complete a declaration-by-declaration compatibility audit; the implemented
   primitives and tested higher-level APIs are not all of Lean IO.
-- [ ] Native file locking is unsupported and returns an explicit unsupported
-  operation error, including `tryLock`; it never pretends to acquire a lock.
 - [ ] Validate devices, pipes, FIFOs, large files, permission combinations, symlink
   races, and every open/seek/metadata edge case across OSs. Current tests focus on
   regular files and common directory operations.
 - [ ] Refine exact error mappings and platform-specific errno behavior beyond
   tested missing-file, exclusive-create, invalid-path, and UTF-8 cases.
-- [ ] Flush currently uses `fsync` for files, which is stronger and potentially
-  slower than native Lean's buffered-stream flush.
-- [ ] Standard stream replacement is instance-wide, not native thread-local;
-  overlapping `IO.withStdout`/`withStderr` scopes in different tasks can interfere.
 - [ ] Expand stdin, terminal, redirected-console, and interactive backpressure tests.
-- [ ] Child processes, process/thread IDs, native signals, process pipes, and
-  general `IO.Process` operations beyond current-directory/exit helpers are missing.
+- [ ] Broaden native child-process, process-group, pipe, signal and thread-ID
+  parity tests, especially Windows quoting and process termination. Ordinary
+  spawn/output/wait/poll/PID/kill operations and file-backed pipes are implemented.
 - [ ] `IO.Process.setCurrentDir` changes only this instance's virtual cwd;
   `IO.appPath` reports the containing Node executable. Audit further native context
   differences before claiming complete process compatibility.
@@ -62,8 +57,6 @@ and [the full Lean server](examples/lean-server/README.md).
 - [ ] Complete `Std.Async` coverage, including unported process and signal APIs.
 - [ ] Standard Node tasks currently require Asyncify. JSPI remains available for
   the legacy custom-host bridge only, with a separate artifact and engine support.
-- [ ] `Std.Async` timer durations currently must fit Node's 31-bit millisecond
-  timeout range. Ordinary `IO.sleep` supports its full UInt32 range in chunks.
 - [ ] CPU-bound Lean code cannot be interrupted by an AbortSignal or a timer;
   isolation in a Worker/process is needed for enforceable execution deadlines.
 - [ ] Aborting a standard-IO export from JavaScript discards the whole instance;
@@ -132,3 +125,10 @@ and [the full Lean server](examples/lean-server/README.md).
 Implementation: [IO runtime](runtime/node-io.cpp), [async runtime](runtime/node-async.cpp),
 [tasks](runtime/tasks.inc.cpp), [Node primitives](src/node-host.mjs),
 [network/timers](src/node-network.mjs), [scheduler](src/scheduler.mjs).
+
+Recent fixes (2026-09-18): real shared/exclusive locks, C-library buffered file
+handles and flush/truncate behavior, reads beyond 16 MiB, native line decoding,
+expanded errno families, independent standard streams for suspended tasks,
+UInt64 asynchronous timers, and ordinary child processes/pipes. The initial eight
+selected upstream filesystem/console files matched native Lean on Linux x64.
+Remaining platform and semantic checks above are still open.
