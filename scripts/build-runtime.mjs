@@ -18,9 +18,9 @@ export function run(executable, args, extra = {}) {
 }
 export const prefix = run(lean, ['--print-prefix']);
 export const targetFlags = ['-target', 'wasm32-wasi', '-O2', '-DNDEBUG', '-ffunction-sections', '-fdata-sections',
-  '-I', join(runtimeDir, 'include'), '-I', join(prefix, 'include'), '-I', join(leanSource, 'src')];
+  '-I', join(runtimeDir, 'include'), '-I', join(prefix, 'include'), '-I', join(leanSource, 'src'), '-I', join(root, 'runtime')];
 
-export function buildRuntime() {
+export function buildRuntime(log = console.log) {
   if (run(lean, ['--short-version']) !== '4.32.0') throw new Error('Lasm currently requires Lean 4.32.0');
   if (run(lean, ['--githash']) !== '8c9756b28d64dab099da31a4c09229a9e6a2ef35') throw new Error('Lean build commit does not match the target runtime');
   if (run(zig, ['version']) !== '0.16.0') throw new Error('Lasm currently requires Zig 0.16.0');
@@ -49,7 +49,7 @@ export function buildRuntime() {
   const headersIdentity = digest.digest('hex');
   const units = ['object', 'mpz', 'mpn', 'utf8', 'apply', 'thread', 'alloc', 'hash', 'byteslice', 'platform', 'interrupt'];
   const objects = [];
-  for (const unit of [...units, 'io-core', 'lasm-core', 'lasm-stack', 'lasm-host']) {
+  for (const unit of [...units, 'io-core', 'lasm-core', 'lasm-stack', 'lasm-host', 'lasm-node-io', 'lasm-node-async']) {
     let source = unit.startsWith('lasm-') ? join(root, 'runtime', `${unit.slice(5)}.cpp`) : join(leanSource, 'src/runtime', `${unit}.cpp`);
     if (unit === 'io-core') {
       // Keep the upstream implementations, without io.cpp's native OS/libuv
@@ -65,16 +65,25 @@ export function buildRuntime() {
       source = join(runtimeDir, 'patched/io-core.cpp');
       const copyright = original.slice(0, original.indexOf('*/') + 2);
       writeFileSync(source, `${copyright}\n// Lasm change: extract the unchanged initialization and ST.Ref primitives.\n` +
-        '#include "runtime/object.h"\n#include "runtime/thread.h"\nnamespace lean {\n' +
+        '#include "runtime/object.h"\n#include "runtime/object_ref.h"\n#include "runtime/thread.h"\nnamespace lean {\n' +
         slice('static bool g_initializing = true;', 'static obj_res mk_file_not_found_error') +
-        slice('// ST ref primitives', '/* {α : Type} (act : BaseIO α)') + '\n}\n');
+        slice('// ST ref primitives', '/* {α : Type} (act : BaseIO α)') +
+        slice('/* {α : Type} (act : BaseIO α)', 'extern "C" LEAN_EXPORT obj_res lean_io_exit') + '\n}\n');
     }
     if (unit === 'object') {
       const original = readFileSync(source, 'utf8');
       if (original.split('lean_io_eprintln').length !== 3) throw new Error('Unexpected Lean panic diagnostic path');
       source = join(runtimeDir, 'patched/object.cpp');
-      writeFileSync(source, '// Lasm change: panic diagnostics use the port\'s libc stderr writer.\n' +
-        original.replaceAll('lean_io_eprintln', 'lasm_runtime_eprintln'));
+      const taskStart = original.indexOf('LEAN_THREAD_PTR(lean_task_object, g_current_task_object);');
+      const taskEnd = original.indexOf('// =======================================\n// Natural numbers', taskStart);
+      if (taskStart < 0 || taskEnd < 0) throw new Error('Unexpected Lean task runtime boundaries');
+      const sleepBody = '    chrono::milliseconds c(ms);\n    this_thread::sleep_for(c);';
+      if (original.split(sleepBody).length !== 2) throw new Error('Unexpected Lean sleep primitive');
+      writeFileSync(source, '// Lasm: cooperative tasks and a libc panic diagnostic path.\n' +
+        '#include <lean/lean.h>\nextern "C" lean_object *lean_io_sleep(uint32_t);\n' +
+        (original.slice(0, taskStart) + '#include "tasks.inc.cpp"\n\n' + original.slice(taskEnd))
+          .replaceAll('lean_io_eprintln', 'lasm_runtime_eprintln')
+          .replace(sleepBody, '    lean_io_sleep(ms);'));
     }
     if (unit === 'thread') {
       const original = readFileSync(source, 'utf8');
@@ -96,7 +105,7 @@ export function buildRuntime() {
     const stamp = `${object}.source`;
     const identity = JSON.stringify({ content: readFileSync(source, 'utf8'), flags: targetFlags, headersIdentity });
     if (!existsSync(object) || !existsSync(stamp) || readFileSync(stamp, 'utf8') !== identity) {
-      console.log(`Compiling runtime ${unit}.cpp`);
+      log(`Compiling runtime ${unit}.cpp`);
       run(zig, ['c++', ...targetFlags, '-std=c++20', '-fno-exceptions', '-c', source, '-o', object]);
       writeFileSync(stamp, identity);
     }

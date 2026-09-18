@@ -12,12 +12,13 @@ export const mangle = name => name.replaceAll('_', '__').replaceAll('.', '_');
 const hash = value => createHash('sha256').update(value).digest('hex');
 const bridgeNames = ['runtime_initialize', 'runtime_finish_initialization', 'alloc', 'free', 'release', 'string_new', 'string_data',
   'string_size', 'nat_new', 'nat_string', 'int_new', 'int_string', 'bytes_new', 'bytes_data',
-  'bytes_size', 'io_is_error', 'io_value', 'unbox_u32', 'unbox_scalar'].map(n => `lasm_${n}`);
+  'bytes_size', 'io_is_error', 'io_value', 'unbox_u32', 'unbox_scalar', 'task_execute', 'stack_bounds'].map(n => `lasm_${n}`);
 export const allowedWasiImports = ['fd_close', 'environ_get', 'environ_sizes_get', 'clock_time_get',
   'fd_fdstat_get', 'fd_read', 'fd_seek', 'fd_write', 'proc_exit'];
 
 export function validateSpec(spec) {
   if (!spec || !identifier.test(spec.module ?? '')) throw new Error('Expected an ASCII Lean module name');
+  if (spec.main === true) spec = { ...spec, exports: { runMain: { declaration: 'main', parameters: [], result: 'UInt32', effect: 'io' } } };
   if (spec.module === 'LasmGeneratedEntry') throw new Error('LasmGeneratedEntry is reserved for generated bindings');
   if (!spec.exports || typeof spec.exports !== 'object' || Array.isArray(spec.exports) || !Object.keys(spec.exports).length) {
     throw new Error('At least one export is required');
@@ -41,13 +42,13 @@ export function validateSpec(spec) {
   return { module: spec.module, exports, asyncMode };
 }
 
-export async function build(configPath, outputPath, { asyncMode } = {}) {
+export async function build(configPath, outputPath, { asyncMode, log = console.log } = {}) {
   const started = performance.now();
   const configFile = resolve(configPath);
-  const sourceRoot = dirname(configFile);
   const inputSpec = JSON.parse(readFileSync(configFile, 'utf8'));
+  const sourceRoot = resolve(dirname(configFile), inputSpec.sourceRoot ?? '.');
   const spec = validateSpec(asyncMode === undefined ? inputSpec : { ...inputSpec, async: asyncMode });
-  const toolchain = await getToolchain(findLakeProject(configFile, inputSpec) ?? sourceRoot);
+  const toolchain = await getToolchain(findLakeProject(configFile, inputSpec) ?? sourceRoot, { log });
   const { prefix, hostCommit, lean } = toolchain;
   const output = resolve(outputPath ?? join(sourceRoot, 'dist'));
   mkdirSync(output, { recursive: true });
@@ -81,12 +82,17 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
       visiting.delete(name);
       return result;
     }
-    const local = join(sourceRoot, ...name.split('.')) + '.lean';
+    const standalone = !lake && inputSpec.sourceFile && name === spec.module;
+    const local = standalone ? join(buildDir, 'source', `${name}.lean`) : join(sourceRoot, ...name.split('.')) + '.lean';
+    if (standalone) {
+      mkdirSync(dirname(local), { recursive: true });
+      writeFileSync(local, readFileSync(resolve(sourceRoot, inputSpec.sourceFile)));
+    }
     const library = join(libraryRoot, ...name.split('.')) + '.lean';
     const standard = join(standardRoot, ...name.split('.')) + '.lean';
-    const moduleRoot = existsSync(local) ? sourceRoot : existsSync(library) ? libraryRoot : standardRoot;
+    const moduleRoot = standalone ? dirname(local) : existsSync(local) ? sourceRoot : existsSync(library) ? libraryRoot : standardRoot;
     const isStandard = moduleRoot === standardRoot;
-    const source = moduleRoot === sourceRoot ? local : moduleRoot === libraryRoot ? library : standard;
+    const source = standalone || moduleRoot === sourceRoot ? local : moduleRoot === libraryRoot ? library : standard;
     if (!existsSync(source)) throw new Error(`Source for ${name} is unavailable; declare its dependency in a Lake project`);
     const stamp = hash(readFileSync(source)) + '\n' + hostCommit;
     if (isStandard && toolchain.standardDirectory) {
@@ -114,7 +120,7 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
       }
     }
     if (!isStandard || !existsSync(base + '.c') || !existsSync(base + '.source') || readFileSync(base + '.source', 'utf8') !== stamp) {
-      console.log(`Generating ${name}`);
+      log(`Generating ${name}`);
       run(lean, ['-R', moduleRoot, '-Dcompiler.postponeCompile=false',
         ...(!isStandard ? ['-o', base + '.olean'] : []), '-c', base + '.c', source], { cwd: sourceRoot, env: leanEnv });
       writeFileSync(base + '.source', stamp);
@@ -125,12 +131,28 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
     visiting.delete(name);
     return result;
   }
-  compileSource(spec.module);
+  const userModule = compileSource(spec.module);
+  const modular = /LEAN_EXPORT lean_object\* runtime_initialize_[A-Za-z0-9_]+\(uint8_t builtin\) \{/.test(userModule.c);
   const entryName = 'LasmGeneratedEntry';
   if (existsSync(join(sourceRoot, `${entryName}.lean`))) throw new Error(`${entryName} is reserved for generated bindings`);
-  const entrySource = `module\nprelude\npublic import ${spec.module}\npublic section\n` + spec.exports.map(e => {
+  const mainSupport = inputSpec.main ? `
+private class MainProgram (α : Type) where
+  run : α → List String → IO UInt32
+private instance : MainProgram (IO Unit) where
+  run action _ := do action; pure 0
+private instance : MainProgram (IO UInt32) where
+  run action _ := action
+private instance : MainProgram (List String → IO Unit) where
+  run action args := do action args; pure 0
+private instance : MainProgram (List String → IO UInt32) where
+  run action args := action args
+@[extern "lasm_main_args"] private opaque mainArgs : IO (List String)
+private def runProgram : IO UInt32 := do
+  MainProgram.run main (← mainArgs)
+` : '';
+  const entrySource = (modular ? `module\nprelude\npublic import ${spec.module}\npublic section\n` : `import ${spec.module}\n`) + mainSupport + spec.exports.map(e => {
     const args = e.parameters.map((t, i) => `(a${i} : ${t})`).join(' ') || '(_lasmUnit : Unit)';
-    const call = `${e.declaration} ${e.parameters.map((_, i) => `a${i}`).join(' ')}`;
+    const call = inputSpec.main ? 'runProgram' : `${e.declaration} ${e.parameters.map((_, i) => `a${i}`).join(' ')}`;
     const result = e.effect === 'io' ? `EIO String ${e.result}` : e.result;
     const body = e.effect === 'io' ? `((${call}) : IO ${e.result}).toEIO IO.Error.toString` : call;
     return `@[export ${e.symbol}]\ndef lasmEntry${e.symbol.split('_').at(-1)} ${args} : ${result} := ${body}\n`;
@@ -141,7 +163,8 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
   compiled.set(entryName, { name: entryName, base: entryBase, c: readFileSync(entryBase + '.c', 'utf8') });
   // Walk actual runtime initializer calls in compiler-generated C. Meta-only
   // elaborator modules are not required in the deployed runtime.
-  const queue = [{ name: entryName, kind: 'runtime_initialize' }];
+  const entryKind = modular ? 'runtime_initialize' : 'initialize';
+  const queue = [{ name: entryName, kind: entryKind }];
   const visited = new Set();
   const included = new Map();
   for (const current of queue) {
@@ -152,7 +175,7 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
     visited.add(key);
     included.set(current.name, unit);
     const start = unit.c.indexOf(`LEAN_EXPORT lean_object* ${key}(uint8_t builtin) {`);
-    if (start < 0) throw new Error(`Missing initializer ${key}. Use Lean's module system (a 'module' header).`);
+    if (start < 0) throw new Error(`Missing initializer ${key}`);
     const body = unit.c.slice(start, unit.c.indexOf('\n}', start));
     const imports = [...new Set([...unit.c.split('\n')[2].matchAll(/\bimport (?:all )?([A-Za-z0-9_.]+)/g)].map(m => m[1]))];
     for (const call of body.matchAll(/res = ((?:runtime_|meta_)?initialize)_([A-Za-z0-9_]+)\(builtin\);/g)) {
@@ -166,20 +189,20 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
   const objects = [];
   for (const unit of included.values()) {
     if (unit.prebuilt) continue;
-    const stamp = hash(unit.c + toolchain.identity);
+    const stamp = hash(unit.c + (toolchain.compileIdentity ?? toolchain.identity));
     if (!existsSync(unit.base + '.o') || !existsSync(unit.base + '.object-source') || readFileSync(unit.base + '.object-source', 'utf8') !== stamp) {
-      console.log(`Compiling ${unit.name}`);
+      log(`Compiling ${unit.name}`);
       toolchain.compileC(unit.base + '.c', unit.base + '.o');
       writeFileSync(unit.base + '.object-source', stamp);
     }
     objects.push(unit.base + '.o');
   }
-  const initializer = `runtime_initialize_${mangle(entryName)}`;
+  const initializer = `${entryKind}_${mangle(entryName)}`;
   const wasmPath = join(output, 'module.wasm');
   const linkPath = spec.asyncMode === 'asyncify' ? join(buildDir, 'module.raw.wasm') : wasmPath;
-  toolchain.link(objects, [initializer, ...bridgeNames, ...spec.exports.map(e => e.symbol)], linkPath);
+  toolchain.link(objects, ['__stack_pointer', initializer, ...bridgeNames, ...spec.exports.map(e => e.symbol)], linkPath);
   if (spec.asyncMode === 'asyncify') {
-    console.log('Instrumenting real Lean calls with Asyncify');
+    log('Instrumenting real Lean calls with Asyncify');
     optimizeWasm(linkPath, wasmPath);
   }
   const bytes = readFileSync(wasmPath);
@@ -187,7 +210,8 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
   const imports = WebAssembly.Module.imports(wasmModule);
   for (const i of imports) {
     const allowed = i.module === 'wasi_snapshot_preview1' && allowedWasiImports.includes(i.name)
-      || i.module === 'lasm' && spec.asyncMode !== 'sync' && ['request', 'copy_response'].includes(i.name);
+      || i.module === 'lasm' && (['task_enqueue', 'task_resolve', 'task_drop', 'task_wait', 'task_wait_any', 'task_current', 'node_call', 'node_copy', 'node_release', 'node_start'].includes(i.name)
+        || spec.asyncMode !== 'sync' && ['request', 'copy_response'].includes(i.name));
     if (i.kind !== 'function' || !allowed) {
       throw new Error(`Unexpected Wasm import: ${i.module}.${i.name}`);
     }
@@ -195,16 +219,19 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
   const manifest = { abi: 1, lean: '4.32.0', asyncMode: spec.asyncMode, initializer, exports: spec.exports, imports };
   writeFileSync(join(output, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
   copyFileSync(join(root, 'src/runtime.mjs'), join(output, 'runtime.mjs'));
+  copyFileSync(join(root, 'src/scheduler.mjs'), join(output, 'scheduler.mjs'));
+  copyFileSync(join(root, 'src/node-host.mjs'), join(output, 'node-host.mjs'));
+  copyFileSync(join(root, 'src/node-network.mjs'), join(output, 'node-network.mjs'));
   copyFileSync(join(root, 'src/host.mjs'), join(output, 'host.mjs'));
   copyFileSync(join(root, 'src/wasi.mjs'), join(output, 'wasi.mjs'));
   copyFileSync(join(root, 'src/web-host.mjs'), join(output, 'web-host.mjs'));
   writeFileSync(join(output, 'THIRD_PARTY_NOTICES.txt'),
     toolchain.noticeFile ? readFileSync(toolchain.noticeFile, 'utf8') : referenceNotices(toolchain.reference));
-  writeFileSync(join(output, 'index.mjs'), `import { readFile } from 'node:fs/promises';\nimport { WASI } from 'node:wasi';\nimport { instantiate } from './runtime.mjs';\nconst manifest = ${JSON.stringify(manifest)};\nexport default async function createModule(options) {\n  const wasi = new WASI({ version: 'preview1', args: [], env: {}, preopens: {}, returnOnExit: true });\n  return instantiate(await readFile(new URL('./module.wasm', import.meta.url)), manifest, {...options, wasi});\n}\n`);
+  writeFileSync(join(output, 'index.mjs'), `import { readFile } from 'node:fs/promises';\nimport { instantiate } from './runtime.mjs';\nimport { createNodeRuntimeHost } from './node-host.mjs';\nconst manifest = ${JSON.stringify(manifest)};\nexport default async function createModule(options = {}) {\n  const stdio = {stdout: bytes => process.stdout.write(bytes), stderr: bytes => process.stderr.write(bytes), ...options.stdio};\n  const nodeRuntime = createNodeRuntimeHost(options);\n  return instantiate(await readFile(new URL('./module.wasm', import.meta.url)), manifest, {...options, stdio, nodeRuntime});\n}\n`);
   writeFileSync(join(output, 'browser.mjs'), `import { instantiate } from './runtime.mjs';\nconst manifest = ${JSON.stringify(manifest)};\nexport default async function createModule({source = new URL('./module.wasm', import.meta.url), ...options} = {}) {\n  if (!(source instanceof WebAssembly.Module) && !(source instanceof ArrayBuffer) && !ArrayBuffer.isView(source)) {\n    const response = source instanceof Response ? source : await fetch(source);\n    if (!response.ok) throw new Error('Cannot load Lasm Wasm: HTTP ' + response.status);\n    source = await response.arrayBuffer();\n  }\n  return instantiate(source, manifest, options);\n}\n`);
   writeFileSync(join(output, 'worker.mjs'), `import source from './module.wasm';\nimport createModule from './browser.mjs';\nexport default function createWorkerModule(options) { return createModule({...options, source}); }\n`);
   const tsTypes = { Nat: 'bigint', Int: 'bigint', String: 'string', ByteArray: 'Uint8Array', UInt32: 'number', Bool: 'boolean', Unit: 'undefined' };
-  writeFileSync(join(output, 'index.d.mts'), `export interface LasmHost {\n  readBytes?(path: string, options: {signal: AbortSignal}): Promise<Uint8Array>;\n  writeBytes?(path: string, bytes: Uint8Array, options: {signal: AbortSignal}): Promise<void>;\n  fetchBytes?(url: string, options: {signal: AbortSignal}): Promise<Uint8Array>;\n}\nexport interface LasmModule {\n${spec.exports.map(e => `  ${e.name}(${[...e.parameters.map((t, i) => `a${i}: ${tsTypes[t]}`), ...(e.effect === 'io' ? ['options?: {signal?: AbortSignal}'] : [])].join(', ')}): ${e.effect === 'io' ? `Promise<${tsTypes[e.result]}>` : tsTypes[e.result]};`).join('\n')}\n  dispose(): void;\n  stats(): { memoryBytes: number; disposed: boolean; busy: boolean };\n}\nexport default function createModule(options?: {host?: LasmHost}): Promise<LasmModule>;\n`);
+  writeFileSync(join(output, 'index.d.mts'), `export interface LasmHost {\n  readBytes?(path: string, options: {signal: AbortSignal}): Promise<Uint8Array>;\n  writeBytes?(path: string, bytes: Uint8Array, options: {signal: AbortSignal}): Promise<void>;\n  fetchBytes?(url: string, options: {signal: AbortSignal}): Promise<Uint8Array>;\n}\nexport interface LasmModule {\n${spec.exports.map(e => `  ${e.name}(${[...e.parameters.map((t, i) => `a${i}: ${tsTypes[t]}`), ...(e.effect === 'io' ? ['options?: {signal?: AbortSignal}'] : [])].join(', ')}): ${e.effect === 'io' ? `Promise<${tsTypes[e.result]}>` : tsTypes[e.result]};`).join('\n')}\n  dispose(): void;\n  stats(): { memoryBytes: number; disposed: boolean; busy: boolean; fibers: number; waitingTasks: number; queued: number; resources?: number };\n}\nexport default function createModule(options?: {host?: LasmHost; args?: string[]; cwd?: string; stdio?: {stdout?: (bytes: Uint8Array) => void | Promise<void>; stderr?: (bytes: Uint8Array) => void | Promise<void>}}): Promise<LasmModule>;\n`);
   writeFileSync(join(output, 'browser.d.mts'), `import type {LasmHost, LasmModule} from './index.mjs';\nexport interface PortableOptions {\n  source?: WebAssembly.Module | ArrayBuffer | ArrayBufferView | Response | URL | string;\n  host?: LasmHost;\n  stdio?: {stdout?: (bytes: Uint8Array) => void; stderr?: (bytes: Uint8Array) => void};\n}\nexport default function createModule(options?: PortableOptions): Promise<LasmModule>;\n`);
   writeFileSync(join(output, 'worker.d.mts'), `import type {LasmModule} from './index.mjs';\nimport type {PortableOptions} from './browser.mjs';\nexport default function createModule(options?: Omit<PortableOptions, 'source'>): Promise<LasmModule>;\n`);
   writeFileSync(join(output, 'host.d.mts'), `import type {LasmHost} from './index.mjs';\nexport function createNodeHost(options?: {directory?: string; fetch?: typeof fetch; maxBytes?: number; timeoutMs?: number}): Promise<LasmHost>;\n`);

@@ -1,4 +1,5 @@
 import { createPortableWasi } from './wasi.mjs';
+import { createScheduler } from './scheduler.mjs';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { fatal: true });
@@ -7,7 +8,7 @@ const MAX_TRANSFER = 16 * 1024 * 1024;
 class LeanIOError extends Error { name = 'LeanIOError'; }
 
 /** Internal ABI adapter. Applications receive typed functions, never pointers. */
-export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWasi, stdio } = {}) {
+export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWasi, stdio, nodeRuntime } = {}) {
   if (manifest.abi !== 1) throw new Error(`Unsupported Lasm ABI: ${manifest.abi}`);
   const module = bytes instanceof WebAssembly.Module ? bytes : await WebAssembly.compile(bytes);
   if (JSON.stringify(WebAssembly.Module.imports(module)) !== JSON.stringify(manifest.imports)) {
@@ -22,14 +23,17 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
   let currentSignal;
   let pending;
   let response;
-  let asyncData;
   const mode = manifest.asyncMode ?? 'sync';
+  const standardIO = manifest.imports.some(item => item.module === 'lasm' && item.name === 'node_call');
+  const scheduler = createScheduler(() => e, mode);
   if (mode === 'jspi' && (typeof WebAssembly.Suspending !== 'function' || typeof WebAssembly.promising !== 'function')) {
     throw new Error('This artifact requires JSPI. Use an Asyncify artifact for flag-free Node.');
   }
   function drop(error) {
     failure = error;
     disposed = true;
+    scheduler.stop(error);
+    nodeRuntime?.close();
     e = null;
     instance = null;
     wasi = null;
@@ -129,45 +133,63 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
       return { bytes: encoder.encode(message), error: true };
     }
   }
-  function responseCode() { return response.error ? -response.bytes.length - 1 : response.bytes.length; }
+  function responseCode(value = response) { return value.error ? -value.bytes.length - 1 : value.bytes.length; }
   function request(...args) {
-    if (mode === 'asyncify' && e.asyncify_get_state() === 2) {
-      e.asyncify_stop_rewind();
-      return responseCode();
+    if (mode === 'asyncify') {
+      if (!busy || !currentSignal) throw new Error('Host IO during module initialization is not supported');
+      const value = scheduler.suspend(() => hostRequest(...args));
+      if (e.asyncify_get_state() === 1) return 0;
+      scheduler.current.ioResponse = value;
+      return responseCode(value);
     }
     if (!busy || !currentSignal) throw new Error('Host IO during module initialization is not supported');
     pending = hostRequest(...args);
     if (mode === 'jspi') return pending.then(value => { response = value; return responseCode(); });
-    e.asyncify_start_unwind(asyncData);
-    return 0;
+    throw new Error('Host IO requires an asynchronous build');
   }
   const imports = wasi.getImportObject();
-  if (mode !== 'sync') imports.lasm = {
+  imports.lasm = { ...scheduler.imports };
+  Object.assign(imports.lasm, {
+    node_call(operation, handle, argument, pointer, length) {
+      if (!nodeRuntime) throw new Error('Standard Lean OS APIs require the Node runtime');
+      const value = scheduler.suspend(() => nodeRuntime.request(operation, handle, argument,
+        view(pointer, length).slice(), { fiber: scheduler.current.id }));
+      if (e.asyncify_get_state() === 1) return 0;
+      scheduler.current.nodeResponse = value;
+      return value.error ? -value.bytes.length - 1 : value.bytes.length;
+    },
+    node_copy(pointer, length) {
+      const value = scheduler.current?.nodeResponse;
+      if (!value || value.bytes.length !== (length >>> 0)) throw new Error('Invalid Node response');
+      view(pointer, length).set(value.bytes);
+      scheduler.current.nodeResponse = null;
+    },
+    node_release(handle) { nodeRuntime?.release(handle); },
+    node_start(operation, handle, argument, pointer, length) {
+      if (!nodeRuntime) throw new Error('Standard Lean async APIs require the Node runtime');
+      return nodeRuntime.start(operation, handle, argument, view(pointer, length).slice(), { fiber: scheduler.current?.id });
+    },
+  });
+  if (mode !== 'sync') Object.assign(imports.lasm, {
     request: mode === 'jspi' ? new WebAssembly.Suspending(request) : request,
     copy_response(pointer, length) {
-      if (!response || (length >>> 0) !== response.bytes.length) throw new Error('Invalid host response copy');
-      view(pointer, length).set(response.bytes);
-      response = null;
+      const value = mode === 'asyncify' ? scheduler.current.ioResponse : response;
+      if (!value || (length >>> 0) !== value.bytes.length) throw new Error('Invalid host response copy');
+      view(pointer, length).set(value.bytes);
+      if (mode === 'asyncify') scheduler.current.ioResponse = null;
+      else response = null;
     },
-  };
+  });
   instance = await WebAssembly.instantiate(module, imports);
   e = instance.exports;
   try {
     wasi.initialize(instance);
     e.lasm_runtime_initialize();
-    const result = e[manifest.initializer](1);
+    const result = mode === 'asyncify' ? await scheduler.run(e[manifest.initializer], [1]) : e[manifest.initializer](1);
     const failed = e.lasm_io_is_error(result);
     e.lasm_release(result);
     if (failed) throw new Error('Lean module initialization failed');
     e.lasm_runtime_finish_initialization();
-    if (mode === 'asyncify') {
-      const stackSize = 1024 * 1024;
-      asyncData = e.lasm_alloc(stackSize + 8);
-      if (!asyncData) throw new Error('Cannot allocate Asyncify stack');
-      const data = new DataView(e.memory.buffer);
-      data.setUint32(asyncData, asyncData + 8, true);
-      data.setUint32(asyncData + 4, asyncData + 8 + stackSize, true);
-    }
   } catch (error) { drop(error); throw error; }
   const api = Object.create(null);
   for (const declaration of manifest.exports) {
@@ -207,20 +229,15 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
       currentSignal = options?.signal ?? new AbortController().signal;
       currentSignal.throwIfAborted();
       busy = true;
+      // Native-style tasks may be waiting on many operations. An external JS
+      // abort ends this whole instance; Lean's own cancellation remains separate.
+      const onAbort = () => scheduler.stop(currentSignal.reason ?? new Error('Lean call aborted'));
+      if (standardIO) currentSignal.addEventListener('abort', onAbort, { once: true });
       try {
         const encoded = encodeArguments(prepared);
         let result;
         if (mode === 'jspi') result = await WebAssembly.promising(e[declaration.symbol])(...encoded);
-        else {
-          result = e[declaration.symbol](...encoded);
-          while (e.asyncify_get_state() === 1) {
-            e.asyncify_stop_unwind();
-            response = await pending;
-            e.asyncify_start_rewind(asyncData);
-            result = e[declaration.symbol](...encoded);
-          }
-          if (e.asyncify_get_state() !== 0) throw new Error('Invalid Asyncify state after execution');
-        }
+        else result = await scheduler.run(e[declaration.symbol], encoded);
         const failed = e.lasm_io_is_error(result);
         const value = e.lasm_io_value(result);
         if (failed) throw new LeanIOError(decode('String', value));
@@ -231,6 +248,7 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
         if (error instanceof LeanIOError) throw error;
         throw fatal(error);
       } finally {
+        currentSignal?.removeEventListener('abort', onAbort);
         busy = false;
         currentSignal = undefined;
         pending = null;
@@ -239,6 +257,7 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
     };
   }
   api.dispose = () => { if (busy) throw new Error('Cannot dispose a busy instance; cancel and await its active call'); if (!disposed) drop(); };
-  api.stats = () => ({ memoryBytes: e?.memory.buffer.byteLength ?? 0, disposed, busy });
+  api.stats = () => ({ memoryBytes: e?.memory.buffer.byteLength ?? 0, disposed, busy,
+    ...scheduler.stats(), ...(nodeRuntime?.stats() ?? {}) });
   return Object.freeze(api);
 }

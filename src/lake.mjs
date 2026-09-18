@@ -32,7 +32,9 @@ export function loadLake(configFile, spec, { run, lean, env, hostCommit }) {
     flags.push('-K', `${key}=${value}`);
   }
   const lake = args => run(executable, [...flags, ...args], { cwd: directory, env, timeout: 600_000 });
-  const environment = JSON.parse(lake(['--reconfigure', 'env', process.execPath, '-e', 'process.stdout.write(JSON.stringify(process.env))']));
+  const environmentText = lake(['--reconfigure', 'env', process.execPath, '-e', 'process.stdout.write(JSON.stringify(process.env))']);
+  if (!environmentText) throw new Error('Lake returned no environment. Check that `lake env node --version` works and that nested subprocesses are allowed.');
+  const environment = JSON.parse(environmentText);
   return {
     directory, env: environment,
     cSource(name) {

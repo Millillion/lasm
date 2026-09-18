@@ -3,6 +3,7 @@ import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from 'node:
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { homedir } from 'node:os';
 import { buildPlatforms, bundledTools, executableName, insideDirectory, responseFile } from './platform.mjs';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -48,11 +49,27 @@ export function readTargetManifest(target) {
   return { manifest, identity: sha256(bytes) };
 }
 
-export async function getToolchain(cwd) {
+export function resolveLean(cwd) {
   assertPlatform();
-  const hostCommit = run(lean, ['--githash'], { cwd });
+  let selectedLean = lean;
+  let hostCommit;
+  try { hostCommit = run(selectedLean, ['--githash'], { cwd }); }
+  catch (error) {
+    // An installed Elan toolchain need not be the global default. Resolve the
+    // exact already-installed version without downloading or changing settings.
+    const installed = join(process.env.ELAN_HOME ?? join(homedir(), '.elan'), 'toolchains',
+      'leanprover--lean4---v4.32.0', 'bin', executableName('lean'));
+    if (process.env.LEAN || !String(error.stderr).includes('no default toolchain configured') || !existsSync(installed)) throw error;
+    selectedLean = installed;
+    hostCommit = run(selectedLean, ['--githash'], { cwd });
+  }
   assertLeanCommit(hostCommit);
-  const prefix = run(lean, ['--print-prefix'], { cwd });
+  const prefix = run(selectedLean, ['--print-prefix'], { cwd });
+  return { prefix, hostCommit, lean: join(prefix, 'bin', executableName('lean')) };
+}
+
+export async function getToolchain(cwd, { log = console.log } = {}) {
+  const { prefix, hostCommit } = resolveLean(cwd);
   const tools = bundledTools(prefix);
   const target = resolve(process.env.LASM_TARGET_DIR ?? join(root, 'targets', targetName));
   if (existsSync(join(target, 'target.json'))) {
@@ -83,9 +100,12 @@ export async function getToolchain(cwd) {
     throw new Error('Maintainer runtime packaging requires Linux x64. Install the compiler tarball to build applications on this host.');
   }
   const reference = await import('../scripts/build-runtime.mjs');
-  const archive = reference.buildRuntime();
+  const archive = reference.buildRuntime(log);
   return {
     prefix, lean: tools.lean, hostCommit, identity: readFileSync(join(reference.runtimeDir, 'build-identity.json'), 'utf8'), kind: 'reference-zig',
+    compileIdentity: sha256(JSON.stringify(reference.targetFlags) + hostCommit
+      + readFileSync(join(prefix, 'include/lean/lean.h'), 'utf8')
+      + readFileSync(join(reference.runtimeDir, 'include/lean/config.h'), 'utf8')),
     standardCache: join(reference.runtimeDir, 'stdlib'), reference,
     compileC(source, object) { reference.run(reference.zig, ['cc', ...reference.targetFlags, '-c', source, '-o', object]); },
     link(objects, exports, output) {
@@ -96,7 +116,7 @@ export async function getToolchain(cwd) {
 }
 
 export function optimizeWasm(input, output) {
-  const args = [input, '-O2', '--asyncify', '--pass-arg=asyncify-imports@lasm.request', '--enable-bulk-memory', '--enable-sign-ext', '-o', output];
+  const args = [input, '-O2', '--asyncify', '--pass-arg=asyncify-imports@lasm.request,lasm.task_wait,lasm.task_wait_any,lasm.node_call', '--enable-bulk-memory', '--enable-sign-ext', '-o', output];
   if (process.env.WASM_OPT) return run(process.env.WASM_OPT, args);
   const bundled = join(root, 'tools/wasm-opt.cjs');
   if (existsSync(bundled)) {

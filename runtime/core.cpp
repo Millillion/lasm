@@ -8,6 +8,9 @@
 // This port initializes the supported single-threaded object runtime. OS
 // processes, libuv, native sockets and native signal handlers are not included.
 namespace lean {
+void notify_assertion_violation(char const *file, int line, char const *condition) {
+    fprintf(stderr, "Lean runtime assertion at %s:%d: %s\n", file, line, condition);
+}
 extern "C" lean_obj_res lasm_runtime_eprintln(lean_obj_arg text) {
     const size_t length = lean_string_size(text) - 1;
     const bool failed = fwrite(lean_string_cstr(text), 1, length, stderr) != length
