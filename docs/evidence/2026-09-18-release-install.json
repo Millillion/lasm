@@ -1,0 +1,94 @@
+{
+  "node": "v24.13.1",
+  "platform": "linux-x64",
+  "compiler": "lasm-compiler-0.1.0-experimental.2.tgz",
+  "compilerSha256": "2c3c252c60ef16bc6b1105495c3626bac017366ac009c9af2ec709ba6c3965c4",
+  "compressedBytes": 34549729,
+  "installedBytes": 143539215,
+  "targetArchive": "/home/lastmjs/development/lasm/compiler/.work/release/lean-4.32.0-wasm32-v1.tar.gz",
+  "targetSha256": "e247b60f01f5042bc85aca748b59694fb4a40502e78bc2ea986a3aaaecc810a1",
+  "targetCompressedBytes": 31273904,
+  "targetInstalledBytes": 132056999,
+  "standardModules": 445,
+  "elapsedMs": 67508.015915,
+  "testedNode": "v24.13.1",
+  "testedPlatform": "linux-x64",
+  "executionEnvironment": "native",
+  "expectedManagers": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "complete": true,
+  "tests": [
+    {
+      "manager": "npm",
+      "installMs": 4960.004704,
+      "firstBuildMs": 24344.251252000002,
+      "cachedBuildMs": 18142.735432,
+      "wasmBytes": 782833,
+      "prebuiltModules": 297,
+      "emptyCacheOfflineInstall": true,
+      "offlineLockedInstall": true,
+      "isolatedCompilerPath": [
+        "node",
+        "lean",
+        "lake"
+      ],
+      "osUtilities": [
+        "sh",
+        "dirname",
+        "sed",
+        "uname"
+      ],
+      "compilerPackageRemovedBeforeExecution": true,
+      "standaloneExecution": true
+    },
+    {
+      "manager": "pnpm",
+      "installMs": 1457.2700949999999,
+      "firstBuildMs": 18378.773535,
+      "cachedBuildMs": 18543.564207000003,
+      "wasmBytes": 782833,
+      "prebuiltModules": 297,
+      "emptyCacheOfflineInstall": true,
+      "offlineLockedInstall": true,
+      "isolatedCompilerPath": [
+        "node",
+        "lean",
+        "lake"
+      ],
+      "osUtilities": [
+        "sh",
+        "dirname",
+        "sed",
+        "uname"
+      ],
+      "compilerPackageRemovedBeforeExecution": true,
+      "standaloneExecution": true
+    },
+    {
+      "manager": "yarn",
+      "installMs": 3988.219947999998,
+      "firstBuildMs": 18811.945106,
+      "cachedBuildMs": 18221.722772999987,
+      "wasmBytes": 782833,
+      "prebuiltModules": 297,
+      "emptyCacheOfflineInstall": true,
+      "offlineLockedInstall": true,
+      "isolatedCompilerPath": [
+        "node",
+        "lean",
+        "lake"
+      ],
+      "osUtilities": [
+        "sh",
+        "dirname",
+        "sed",
+        "uname"
+      ],
+      "compilerPackageRemovedBeforeExecution": true,
+      "standaloneExecution": true
+    }
+  ]
+}

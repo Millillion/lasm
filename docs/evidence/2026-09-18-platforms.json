@@ -1,0 +1,69 @@
+{
+  "date": "2026-09-18T04:15:26.280Z",
+  "implementationCommit": "4dd7112",
+  "compilerVersion": "0.1.0-experimental.2",
+  "compilerSha256": "2c3c252c60ef16bc6b1105495c3626bac017366ac009c9af2ec709ba6c3965c4",
+  "nativeAcceptance": {
+    "linux-x64": "passed",
+    "linux-arm64": "pending",
+    "darwin-x64": "pending",
+    "darwin-arm64": "pending",
+    "win32-x64": "pending",
+    "win32-arm64": "pending"
+  },
+  "linuxChecks": [
+    {
+      "command": "npm test",
+      "passed": 24
+    },
+    {
+      "command": "npm run test:jspi",
+      "passed": 6
+    },
+    {
+      "command": "npm run test:express",
+      "passed": 57
+    },
+    {
+      "command": "npm run test:release",
+      "passed": 3
+    }
+  ],
+  "releaseReport": "2026-09-18-release-install.json",
+  "windowsCompatibilityProbe": {
+    "nativeWindows": false,
+    "environment": "Wine 11.17 in a Debian trixie Linux container, network disabled",
+    "leanVersion": "Lean (version 4.32.0, x86_64-w64-windows-gnu, commit 8c9756b28d64dab099da31a4c09229a9e6a2ef35, Release)",
+    "clangVersion": "22.1.4",
+    "windowsLeanSourceFingerprintsMatched": 445,
+    "compileAndLink": {
+      "passed": true,
+      "unicodeAndSpacePaths": true,
+      "responseBytes": 56161,
+      "wasmSha256": "6a359252ab6a9318a182a71f9b48eb884ae196bfe160e4f2f7eddd2671ea9178",
+      "observedAnswer": 42
+    },
+    "npmAcceptance": "not run; the Windows Node process fails before loading the test script",
+    "nodeFailure": "Assertion failed: ncrypto::CSPRNG(nullptr, 0) in Windows Node 24.13.1 under Wine 11.17",
+    "earlierAttempt": "Node initially reached JavaScript but failed on Wine redirected stdout with EBADF; a Windows-file-handle launcher could not proceed past the subsequent CSPRNG startup failure.",
+    "scope": "Lean startup and a scalar Windows LLVM compile/link were exercised. This is not native Windows or complete npm acceptance.",
+    "officialInputs": [
+      {
+        "file": "lean-4.32.0-windows.tar.zst",
+        "sha256": "98acc2f9a6b990205166c55c9758a8c2f00ab0dfa42b721d6d91fe4cd15b82bb",
+        "source": "https://github.com/leanprover/lean4/releases/tag/v4.32.0"
+      },
+      {
+        "file": "node-v24.13.1-win-x64.zip",
+        "sha256": "fba577c4bb87df04d54dd87bbdaa5a2272f1f99a2acbf9152e1a91b8b5f0b279",
+        "source": "https://nodejs.org/download/release/v24.13.1/SHASUMS256.txt"
+      }
+    ]
+  },
+  "nativeCi": {
+    "workflow": ".github/workflows/platform-acceptance.yml",
+    "status": "prepared, not run",
+    "trigger": "manual dispatch after an authorized remote exists"
+  },
+  "publication": "No remote, push, or npm publication"
+}
