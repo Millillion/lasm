@@ -64,7 +64,7 @@ try{process.exitCode=await api.runMain()}catch(e){if(e.name!=='LeanExit')console
     entry.native = { code: native.code, signal: native.signal, timedOut: native.timedOut };
     entry.wasm = { code: wasm.code, signal: wasm.signal, timedOut: wasm.timedOut };
     const expectedExit = prior.expectedExit ?? '0';
-    const exitMatches = expectedExit === 'nonzero' ? native.code !== null && native.code !== 0 : native.code === Number(expectedExit);
+    const exitMatches = expectedExit === 'nonzero' ? native.signal !== null || native.code !== null && native.code !== 0 : native.code === Number(expectedExit);
     const n = text => normalizeOutput(text, join(work, 'native'));
     const w = text => normalizeOutput(text, join(work, 'wasm'));
     entry.outputNormalization = ['upstream measurement values', 'test working directory'];

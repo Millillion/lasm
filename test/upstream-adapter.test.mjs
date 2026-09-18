@@ -32,3 +32,11 @@ test('upstream adapter preserves ordinary source and module visibility', () => {
   assert.doesNotMatch(result.source, /#guard_msgs/);
   assert.doesNotMatch(result.source, /public section/);
 });
+
+test('diagnostic guards remain around compiler-only commands and declarations end legacy do blocks', () => {
+  const source = 'def action : IO Unit := do\npure ()\n#guard_msgs in\n#eval action\n/-- info: Nat : Type -/\n#guard_msgs in #check Nat\n';
+  const result = adapt(source);
+  assert.match(result.source, /pure \(\)\nprivate unsafe def/);
+  assert.match(result.source, /#guard_msgs in #check Nat/);
+  assert.equal(result.cases.length, 1);
+});

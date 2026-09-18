@@ -56,12 +56,19 @@ export function adapt(source, { legacyImports = [] } = {}) {
     const kind = match[1] === 'guard' ? 'guard' : 'eval';
     const line = source.slice(0, start).split('\n').length - Number(legacy);
     cases.push({ id, kind, line });
-    edits.push({ start, end, value: `unsafe def _root_.LasmUpstream.case${id} : IO Unit := ${kind === 'eval' ? 'lasm_upstream_eval% ' : 'LasmUpstream.guard $ '}` });
+    // `unsafe` alone can be parsed as a term following a legacy unindented do
+    // block. `private` unambiguously starts a new declaration in that grammar.
+    edits.push({ start, end, value: `private unsafe def _root_.LasmUpstream.case${id} : IO Unit := ${kind === 'eval' ? 'lasm_upstream_eval% ' : 'LasmUpstream.guard $ '}` });
   }
   // #guard_msgs verifies elaborator messages; native-original execution checks
   // those expectations. Runtime output/errors are compared separately below.
   for (const match of mask.matchAll(/#guard_msgs\b[^\n]*?\bin\s*/g)) {
-    edits.push({ start: match.index, end: match.index + match[0].length, value: '' });
+    const end = match.index + match[0].length;
+    // Preserve guards for #check/#print and deliberately failing elaboration.
+    // Their preceding documentation comments cannot attach directly to those
+    // commands, and their expected diagnostics must stay contained.
+    if (edits.some(edit => edit.start === end))
+      edits.push({ start: match.index, end, value: '' });
   }
   let headerEnd = 0;
   for (const match of mask.matchAll(/^(?:public |meta |public meta )?import\b[^\n]*|^prelude\b[^\n]*|^module\b[^\n]*/gm))

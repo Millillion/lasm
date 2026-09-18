@@ -116,15 +116,18 @@ export async function getToolchain(cwd, { log = console.log } = {}) {
 }
 
 export function optimizeWasm(input, output) {
+  // The portable Node optimizer can take several minutes on a full Std.Http
+  // application, particularly on shared CI machines and ARM64 hosts.
+  const options = { timeout: 600_000 };
   const args = [input, '-O2', '--asyncify', '--pass-arg=asyncify-imports@lasm.request,lasm.task_wait,lasm.task_wait_any,lasm.node_call', '--enable-bulk-memory', '--enable-sign-ext', '--enable-nontrapping-float-to-int', '-o', output];
-  if (process.env.WASM_OPT) return run(process.env.WASM_OPT, args);
+  if (process.env.WASM_OPT) return run(process.env.WASM_OPT, args, options);
   const bundled = join(root, 'tools/wasm-opt.cjs');
   if (existsSync(bundled)) {
     const metadata = JSON.parse(readFileSync(join(root, 'tools/tooling.json')));
     if (metadata.binaryen !== '132.0.0' || metadata.sha256 !== sha256(readFileSync(bundled))) throw new Error('Packaged Binaryen checksum mismatch');
-    return run(process.execPath, [bundled, ...args]);
+    return run(process.execPath, [bundled, ...args], options);
   }
   if (existsSync(join(root, 'targets'))) throw new Error('Packaged Binaryen optimizer is missing; reinstall the complete compiler package');
   const binaryen = fileURLToPath(new URL('./bin/wasm-opt', import.meta.resolve('binaryen')));
-  return run(process.execPath, [binaryen, ...args]);
+  return run(process.execPath, [binaryen, ...args], options);
 }

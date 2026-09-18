@@ -202,7 +202,7 @@ test('npm: installed ordinary filesystem, process and expression APIs match nati
       if (process.platform !== 'win32') symlinkSync('directory/inner', join(cwd, 'linkdir'));
     }
     const args = name === 'process' ? [process.execPath] : [];
-    const native = run(lean, ['--run', join(fixture, 'Main.lean'), ...args], { cwd: join(fixture, 'native'), env: environment, timeout: 60_000 });
+    const native = run(join(leanPrefix, 'bin', executableName('lean')), ['--run', join(fixture, 'Main.lean'), ...args], { cwd: join(fixture, 'native'), env: environment, timeout: 60_000 });
     const wasm = run(process.execPath, [join(fixture, 'dist/main.mjs'), ...args], { cwd: join(fixture, 'wasm'), env: environment, timeout: 60_000 });
     assert.equal(wasm, native, `${name} differs from native Lean on ${process.platform}-${process.arch}`);
   }
@@ -214,5 +214,6 @@ test.after(() => {
   writeFileSync(process.env.LASM_TEST_REPORT ?? join(root, '.work/evidence/release-install.json'), JSON.stringify({ ...release,
     testedNode: process.version, testedPlatform: `${process.platform}-${process.arch}`,
     executionEnvironment: process.env.LASM_TEST_ENVIRONMENT ?? 'native',
-    expectedManagers: Object.keys(managers), complete: reports.length === Object.keys(managers).length && !!ordinaryMain, ordinaryMain, tests: reports }, null, 2) + '\n');
+    expectedManagers: Object.keys(managers), complete: Object.keys(managers).every(manager => reports.some(r => r.manager === manager && r.standaloneExecution))
+      && !!ordinaryMain && reports.some(r => r.installedPackage && r.ordinaryNativeParity), ordinaryMain, tests: reports }, null, 2) + '\n');
 });

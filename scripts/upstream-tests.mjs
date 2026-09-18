@@ -199,8 +199,8 @@ for (const entry of selected) {
       result.outputNormalization = ['upstream measurement values', 'test working directory'];
       result.stdoutEqual = normal(native.stdout, 'native') === normal(wasm.stdout, 'wasm');
       result.stderrEqual = normal(native.stderr, 'native') === normal(wasm.stderr, 'wasm');
-      const exitMatches = code => expectedExit === 'nonzero' ? code !== null && code !== 0 : code === Number(expectedExit);
-      result.status = native.timedOut || native.outputLimit || !exitMatches(native.code) ? 'native-baseline-failed'
+      const exitMatches = run => expectedExit === 'nonzero' ? !!run.signal || run.code !== null && run.code !== 0 : run.code === Number(expectedExit);
+      result.status = native.timedOut || native.outputLimit || !exitMatches(native) ? 'native-baseline-failed'
         : wasm.outputLimit ? 'wasm-output-limit' : wasm.timedOut ? 'wasm-timeout' : wasm.code !== native.code ? 'wasm-failed'
         : result.stdoutEqual && result.stderrEqual ? 'matched-native' : 'output-mismatch';
       if (adapted) {
