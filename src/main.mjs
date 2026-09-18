@@ -76,7 +76,7 @@ try {
   process.exitCode = await api.runMain();
 } catch (error) {
   if (error.name === 'LeanExit') process.exitCode = error.code;
-  else { console.error(error.message); process.exitCode = 1; }
+  else { console.error(error.name === 'LeanIOError' ? 'uncaught exception: ' + error.message : error.message); process.exitCode = 1; }
 } finally { api?.dispose(); }
 `);
   signature = fingerprint(directory, source, project);

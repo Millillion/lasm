@@ -238,6 +238,7 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
         let result;
         if (mode === 'jspi') result = await WebAssembly.promising(e[declaration.symbol])(...encoded);
         else result = await scheduler.run(e[declaration.symbol], encoded);
+        if (manifest.main) await scheduler.drain();
         const failed = e.lasm_io_is_error(result);
         const value = e.lasm_io_value(result);
         if (failed) throw new LeanIOError(decode('String', value));

@@ -5,7 +5,9 @@ const empty = Buffer.alloc(0);
 const failure = (code, message) => Object.assign(new Error(message), { code });
 const cancelled = () => failure('ECANCELED', 'Operation cancelled');
 function address(bytes) {
-  return { host: bytes.subarray(16).toString(), port: Number(bytes.readBigUInt64LE(8)), ipv6Only: bytes.readBigUInt64LE(0) === 6n };
+  // Lean calls uv_tcp_bind with flags=0, permitting IPv4-mapped connections on
+  // an IPv6 wildcard listener where the host supports dual-stack sockets.
+  return { host: bytes.subarray(16).toString(), port: Number(bytes.readBigUInt64LE(8)), ipv6Only: false };
 }
 function encodeAddress(value) {
   if (!value || typeof value === 'string') throw failure('ENOTCONN', 'Socket has no address');
@@ -176,6 +178,8 @@ export function createNodeNetwork({ add, get, release }) {
       const t = get(id, 'tcp');
       if (t.socket || t.server) throw failure('EINVAL', 'Socket is already in use');
       t.socket = new net.Socket({ allowHalfOpen: true }); t.socket.pause();
+      t.socket.setNoDelay(t.noDelay);
+      if (t.keepAlive) t.socket.setKeepAlive(...t.keepAlive);
       t.socket.on('error', err => { t.error = err; });
       return new Promise((resolve, reject) => {
         const failed = err => reject(err);

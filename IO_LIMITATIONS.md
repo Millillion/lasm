@@ -54,6 +54,9 @@ and [the full Lean server](examples/lean-server/README.md).
 - [ ] Validate all task-drop/cancellation propagation behavior against the native
   scheduler, beyond explicit cooperative cancellation and tested task/promise
   lifetimes. Do not infer complete scheduling equivalence from server tests.
+- [ ] Main shutdown drains runnable and running cooperative tasks. Native Lean
+  stops its ordinary worker pool before joining dedicated workers, so a dedicated
+  task that spawns more ordinary work after shutdown begins can behave differently.
 - [ ] Complete `Std.Async` coverage, including unported process and signal APIs.
 - [ ] Standard Node tasks currently require Asyncify. JSPI remains available for
   the legacy custom-host bridge only, with a separate artifact and engine support.

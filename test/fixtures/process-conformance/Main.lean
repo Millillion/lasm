@@ -1,4 +1,4 @@
-import Std
+import Init
 
 def ensure (value : Bool) (label : String) : IO Unit :=
   unless value do throw (IO.userError label)
@@ -21,8 +21,11 @@ def main (args : List String) : IO Unit := do
     args := #["-e", "process.stdout.write('a'.repeat(1048576));process.stderr.write('b'.repeat(1048576))"] }
   ensure (large.stdout.length == 1048576 && large.stderr.length == 1048576) "concurrent pipes exceed kernel buffer"
   let child ← IO.Process.spawn {
-    cmd := node, args := #["-e", "setTimeout(()=>{},60000)"],
-    stdin := .null, stdout := .null, stderr := .null, setsid := true }
+    cmd := node, args := #["-e", "console.log('ready');setTimeout(()=>{},60000)"],
+    stdin := .null, stdout := .piped, stderr := .null, setsid := true }
+  -- Native Lean can return from fork before the child establishes its session.
+  -- A handshake avoids racing process-group creation with group termination.
+  ensure ((← child.stdout.getLine) == "ready\n") "child readiness"
   ensure (child.pid != 0 && child.pid != (← IO.Process.getPID)) "real process id"
   ensure ((← child.tryWait).isNone) "nonblocking tryWait"
   child.kill

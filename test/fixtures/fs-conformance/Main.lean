@@ -1,4 +1,4 @@
-import Std
+import Init
 
 def ensure (value : Bool) (label : String) : IO Unit :=
   unless value do throw (IO.userError label)

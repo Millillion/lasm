@@ -55,6 +55,7 @@ test('main supports IO Unit, IO UInt32 and argument-taking IO Unit', async () =>
     ['Unit', 'def main : IO Unit := IO.println "unit"', [], 'unit\n'],
     ['Status', 'def main : IO UInt32 := pure 0', [], ''],
     ['Arguments', 'def main (args : List String) : IO Unit := IO.println args.length', ['a','b'], '2\n'],
+    ['Reserved', 'syntax "run" : term\nmacro_rules | `(run) => `(term| (1 : Nat))\ndef main : IO Unit := IO.println run', [], '1\n'],
   ]) {
     const file = join(directory, `${name}.lean`);
     await writeFile(file, body + '\n');
@@ -65,7 +66,7 @@ test('main supports IO Unit, IO UInt32 and argument-taking IO Unit', async () =>
 
 test('uncaught Lean errors and explicit process exit set the Node exit code', async () => {
   for (const [name, body, code, message] of [
-    ['Failure', 'def main : IO Unit := throw (IO.userError "expected failure")', 1, /expected failure/],
+    ['Failure', 'def main : IO Unit := throw (IO.userError "expected failure")', 1, /^uncaught exception: expected failure\n$/],
     ['Exit', 'def main : IO Unit := IO.Process.exit 9', 9, /^$/],
   ]) {
     const file = join(directory, `${name}.lean`);
@@ -75,6 +76,25 @@ test('uncaught Lean errors and explicit process exit set the Node exit code', as
       assert.equal(error.code, code); assert.match(error.stderr, message); return true;
     });
   }
+});
+
+test('main waits for outstanding ordinary and dedicated tasks', async () => {
+  const file = join(directory, 'Shutdown.lean');
+  await writeFile(file, `def main : IO Unit := do
+  discard <| IO.asTask (prio := .dedicated) do
+    IO.sleep 20
+    IO.println "dedicated"
+  discard <| IO.asTask do
+    IO.sleep 5
+    IO.println "ordinary"
+`);
+  const built = await buildMain(file);
+  const options = { env: { ...process.env, LEAN_NUM_THREADS: '2' }, timeout: 10_000 };
+  const native = await exec(lean, ['--run', file], options);
+  const wasm = await exec(process.execPath, [join(built.output, 'main.mjs')], options);
+  assert.deepEqual(wasm.stdout.trim().split('\n').sort(), native.stdout.trim().split('\n').sort());
+  assert.equal(wasm.stdout.trim().split('\n').length, 2);
+  assert.equal(wasm.stderr, native.stderr);
 });
 
 test('the main runner respects Lake source directories and local dependencies', async () => {

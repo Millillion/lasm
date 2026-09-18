@@ -64,7 +64,7 @@ export function buildRuntime(log = console.log) {
   const identityFile = join(runtimeDir, 'build-identity.json');
   if (existsSync(archive) && existsSync(identityFile)
       && JSON.parse(readFileSync(identityFile, 'utf8')).headersIdentity === headersIdentity) return archive;
-  const units = ['object', 'mpz', 'mpn', 'utf8', 'apply', 'thread', 'alloc', 'hash', 'byteslice', 'platform', 'interrupt', 'kernel-data'];
+  const units = ['object', 'mpz', 'mpn', 'utf8', 'apply', 'thread', 'alloc', 'allocprof', 'hash', 'byteslice', 'platform', 'interrupt', 'kernel-data'];
   const objects = [];
   for (const unit of [...units, 'io-core', 'lasm-core', 'lasm-stack', 'lasm-host', 'lasm-node-io', 'lasm-node-async']) {
     let source = unit.startsWith('lasm-') ? join(root, 'runtime', `${unit.slice(5)}.cpp`) : join(leanSource, 'src/runtime', `${unit}.cpp`);
@@ -106,10 +106,15 @@ export function buildRuntime(log = console.log) {
       source = join(runtimeDir, 'patched/io-core.cpp');
       const copyright = original.slice(0, original.indexOf('*/') + 2);
       writeFileSync(source, `${copyright}\n// Lasm change: extract the unchanged initialization and ST.Ref primitives.\n` +
-        '#include "runtime/object.h"\n#include "runtime/object_ref.h"\n#include "runtime/thread.h"\nnamespace lean {\n' +
+        '#include "runtime/object.h"\n#include "runtime/object_ref.h"\n#include "runtime/thread.h"\n#include "runtime/alloc.h"\n#include "runtime/allocprof.h"\n#include "runtime/sstream.h"\n#include <chrono>\n#include <iomanip>\nnamespace lean {\n' +
         slice('static bool g_initializing = true;', 'static obj_res mk_file_not_found_error') +
         slice('// ST ref primitives', '/* {α : Type} (act : BaseIO α)') +
-        slice('/* {α : Type} (act : BaseIO α)', 'extern "C" LEAN_EXPORT obj_res lean_io_exit') + '\n}\n');
+        slice('/* {α : Type} (act : BaseIO α)', 'extern "C" LEAN_EXPORT obj_res lean_io_exit') +
+        slice('/* getNumHeartbeats : BaseIO Nat */', 'extern "C" LEAN_EXPORT obj_res lean_io_getenv') +
+        // Route profiler output through the current Lean stream, unlike panic
+        // diagnostics, which must remain synchronous even on a damaged stack.
+        'extern "C" obj_res lean_io_eprintln(obj_arg);\nstatic void profiling_eprintln(obj_arg s) { lean_dec(lean_io_eprintln(s)); }\n' +
+        slice('/* timeit {α : Type}', '/* getNumHeartbeats : BaseIO Nat */').replaceAll('io_eprintln(', 'profiling_eprintln(') + '\n}\n');
     }
     if (unit === 'object') {
       const original = readFileSync(source, 'utf8');
@@ -121,7 +126,7 @@ export function buildRuntime(log = console.log) {
       const sleepBody = '    chrono::milliseconds c(ms);\n    this_thread::sleep_for(c);';
       if (original.split(sleepBody).length !== 2) throw new Error('Unexpected Lean sleep primitive');
       writeFileSync(source, '// Lasm: cooperative tasks and a libc panic diagnostic path.\n' +
-        '#include <lean/lean.h>\nextern "C" lean_object *lean_io_sleep(uint32_t);\n' +
+        '#include <lean/lean.h>\n#include <unordered_map>\nextern "C" lean_object *lean_io_sleep(uint32_t);\n' +
         (original.slice(0, taskStart) + '#include "tasks.inc.cpp"\n\n' + original.slice(taskEnd))
           .replaceAll('lean_io_eprintln', 'lasm_runtime_eprintln')
           .replace(sleepBody, '    lean_io_sleep(ms);'));

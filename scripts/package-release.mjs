@@ -78,7 +78,7 @@ function fingerprint(path) {
 }
 fingerprint(target);
 writeFileSync(join(target, 'target.json'), JSON.stringify({ schema: 1, name: targetName, leanCommit,
-  buildPlatforms, validatedNativePlatforms: ['linux-x64'], zig: '0.16.0', runtimeUnits: 18, standardModules: objects.length, linkLibraries, files }, null, 2) + '\n');
+  buildPlatforms, validatedNativePlatforms: ['linux-x64'], zig: '0.16.0', runtimeUnits: 19, standardModules: objects.length, linkLibraries, files }, null, 2) + '\n');
 targetInstalledBytes += statSync(join(target, 'target.json')).size;
 const targetArchive = join(directory, `${targetName}.tar.gz`);
 run('tar', ['--sort=name', '--mtime=@0', '--owner=0', '--group=0', '--numeric-owner', '-czf', targetArchive, '-C', join(staging, 'targets'), targetName]);

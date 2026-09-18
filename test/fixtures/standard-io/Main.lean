@@ -63,6 +63,34 @@ def exercise (directory : String) : IO Unit := do
   let buffer ← IO.mkRef ({} : IO.FS.Stream.Buffer)
   IO.withStdout (IO.FS.Stream.ofBuffer buffer) do IO.println "captured λ"
   ensure ((← buffer.get).data == "captured λ\n".toUTF8) "standard stream redirection"
+  let profileBuffer ← IO.mkRef ({} : IO.FS.Stream.Buffer)
+  IO.withStderr (IO.FS.Stream.ofBuffer profileBuffer) do
+    let value ← timeit "timed action" do IO.sleep 2; pure (42 : Nat)
+    ensure (value == 42) "timeit result"
+    let caught ← try
+        timeit "timed failure" (throw (IO.userError "timed error") : IO Unit)
+        pure false
+      catch e => pure (e.toString == "timed error")
+    ensure caught "timeit preserves IO errors"
+    let profiled ← allocprof "allocations" (pure (17 : Nat))
+    ensure (profiled == 17) "allocation profiler result"
+  let profileText := String.fromUTF8! (← profileBuffer.get).data
+  ensure (profileText.startsWith "timed action ") "timeit current stderr"
+  ensure (profileText.contains "timed failure ") "failed action timing"
+  ensure (profileText.contains "allocations") "allocation profiler current stderr"
+  IO.setNumHeartbeats 1200
+  IO.addHeartbeats 300
+  ensure ((← IO.getNumHeartbeats) ≥ 1500) "heartbeat counter"
+  let cancellation ← IO.CancelToken.new
+  let callbacks ← IO.mkRef (0 : Nat)
+  for _ in [0:5] do cancellation.onSet (callbacks.modify (· + 1))
+  ensure ((← callbacks.get) == 0) "cancellation callbacks wait for set"
+  cancellation.set
+  ensure ((← callbacks.get) == 5) "cancellation callbacks run inline"
+  cancellation.onSet (callbacks.modify (· + 1))
+  ensure ((← callbacks.get) == 6) "already set cancellation callback"
+  cancellation.set
+  ensure ((← callbacks.get) == 6) "cancellation is idempotent"
   let leftBuffer ← IO.mkRef ({} : IO.FS.Stream.Buffer)
   let rightBuffer ← IO.mkRef ({} : IO.FS.Stream.Buffer)
   let leftOutput ← IO.asTask <| IO.withStdout (IO.FS.Stream.ofBuffer leftBuffer) do

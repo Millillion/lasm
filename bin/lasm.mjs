@@ -15,7 +15,8 @@ if (!['build', 'run'].includes(process.argv[2]) || !process.argv[3]) {
       console.log(`Built ${result.module}: ${result.wasmBytes} bytes, ${result.modules.length} modules → ${result.output}`);
     }
   } catch (error) {
-    console.error((error.stderr?.toString() || error.stdout?.toString() || error.message).slice(-12000));
+    console.error(error.name === 'LeanIOError' ? 'uncaught exception: ' + error.message
+      : (error.stderr?.toString() || error.stdout?.toString() || error.message).slice(-12000));
     process.exitCode = 1;
   }
 }

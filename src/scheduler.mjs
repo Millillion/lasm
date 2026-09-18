@@ -6,6 +6,7 @@ export function createScheduler(getExports, mode) {
   const queue = [];
   const fibers = new Set();
   const calls = new Set();
+  const drains = new Set();
   const pool = [];
   let current;
   let scheduled = false;
@@ -25,6 +26,12 @@ export function createScheduler(getExports, mode) {
     // create a chain of microtasks that starves Node's sockets and timers.
     if (queue.length && !stopped) schedule(pump);
     else scheduled = false;
+    settleDrains();
+  }
+  function settleDrains() {
+    if (queue.length || fibers.size) return;
+    for (const waiter of drains) waiter.resolve();
+    drains.clear();
   }
   function subscribe(task, callback) {
     let callbacks = waiting.get(task);
@@ -80,6 +87,8 @@ export function createScheduler(getExports, mode) {
     tasks.clear();
     for (const call of calls) call.reject(error);
     calls.clear();
+    for (const waiter of drains) waiter.reject(error);
+    drains.clear();
     fibers.clear();
   }
   function run(fn, args, task = 0, immediate = false) {
@@ -153,7 +162,15 @@ export function createScheduler(getExports, mode) {
     task_current() { return current?.task ?? 0; },
     fiber_current() { return current?.task ? current.id : 0; },
   };
-  return { run, suspend, imports, get current() { return current; },
+  return { run, suspend, imports,
+    // Native executable shutdown waits for runnable and running task workers.
+    // A continuation registered only on an unresolved promise is not a worker.
+    drain() {
+      if (stopped) return Promise.reject(stopped);
+      if (!queue.length && !fibers.size) return Promise.resolve();
+      return new Promise((resolve, reject) => drains.add({ resolve, reject }));
+    },
+    get current() { return current; },
     get stopped() { return stopped; },
     stop(error = new Error('Lean runtime disposed')) { fail(error); },
     stats() { return { fibers: fibers.size, waitingTasks: waiting.size, queued: queue.length }; },

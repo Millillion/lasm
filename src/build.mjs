@@ -139,23 +139,23 @@ export async function build(configPath, outputPath, { asyncMode, log = console.l
   const entryName = 'LasmGeneratedEntry';
   if (existsSync(join(sourceRoot, `${entryName}.lean`))) throw new Error(`${entryName} is reserved for generated bindings`);
   const mainSupport = inputSpec.main ? `
-private class MainProgram (α : Type) where
-  run : α → List String → IO UInt32
-private instance : MainProgram (IO Unit) where
-  run action _ := do action; pure 0
-private instance : MainProgram (IO UInt32) where
-  run action _ := action
-private instance : MainProgram (List String → IO Unit) where
-  run action args := do action args; pure 0
-private instance : MainProgram (List String → IO UInt32) where
-  run action args := action args
+private class «MainProgram» (α : Type) where
+  «run» : α → List String → IO UInt32
+private instance : «MainProgram» (IO Unit) where
+  «run» action _ := do action; pure 0
+private instance : «MainProgram» (IO UInt32) where
+  «run» action _ := action
+private instance : «MainProgram» (List String → IO Unit) where
+  «run» action args := do action args; pure 0
+private instance : «MainProgram» (List String → IO UInt32) where
+  «run» action args := action args
 @[extern "lasm_main_args"] private opaque mainArgs : IO (List String)
-private unsafe def runProgram : IO UInt32 := do
-  MainProgram.run main (← mainArgs)
+private unsafe def «runProgram» : IO UInt32 := do
+  «MainProgram».«run» «main» (← mainArgs)
 ` : '';
   const entrySource = (modular ? `module\nprelude\npublic import ${spec.module}\npublic section\n` : `import ${spec.module}\n`) + mainSupport + spec.exports.map(e => {
     const args = e.parameters.map((t, i) => `(a${i} : ${t})`).join(' ') || '(_lasmUnit : Unit)';
-    const call = inputSpec.main ? 'runProgram' : `${e.declaration} ${e.parameters.map((_, i) => `a${i}`).join(' ')}`;
+    const call = inputSpec.main ? '«runProgram»' : `${e.declaration} ${e.parameters.map((_, i) => `a${i}`).join(' ')}`;
     const result = e.effect === 'io' ? `EIO String ${e.result}` : e.result;
     const body = e.effect === 'io' ? `((${call}) : IO ${e.result}).toEIO IO.Error.toString` : call;
     return `@[export ${e.symbol}]\nunsafe def lasmEntry${e.symbol.split('_').at(-1)} ${args} : ${result} := ${body}\n`;
@@ -221,7 +221,7 @@ private unsafe def runProgram : IO UInt32 := do
       throw new Error(`Unexpected Wasm import: ${i.module}.${i.name}`);
     }
   }
-  const manifest = { abi: 1, lean: '4.32.0', asyncMode: spec.asyncMode, initializer, exports: spec.exports, imports };
+  const manifest = { abi: 1, lean: '4.32.0', asyncMode: spec.asyncMode, ...(inputSpec.main ? { main: true } : {}), initializer, exports: spec.exports, imports };
   writeFileSync(join(output, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
   copyFileSync(join(root, 'src/runtime.mjs'), join(output, 'runtime.mjs'));
   copyFileSync(join(root, 'src/scheduler.mjs'), join(output, 'scheduler.mjs'));
