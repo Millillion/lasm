@@ -25,3 +25,35 @@ See [developer workflow](docs/DEVELOPER_WORKFLOW.md),
 The CI workflow is prepared locally and has not run. It requires a future
 authorized remote and manual dispatch. Wine checks, if performed, are separate
 compatibility evidence and do not check off native Windows acceptance.
+
+## Application development improvements
+
+Proposed improvements, in recommended order:
+
+- [ ] Add extensible, typed JavaScript calls from Lean. Allow applications to
+  register host functions for databases, crypto, timers, and npm libraries without
+  modifying Lasm's compiler. Expand HTTP support to methods, headers, request
+  bodies, and response status.
+- [ ] Complete the developer workflow. Add `lasm init` for Node/Lake scaffolding,
+  `lasm doctor` for setup diagnostics, and a development command that rebuilds and
+  restarts on changes. Provide actionable diagnostics for unsupported APIs.
+- [ ] Support richer Lean–JavaScript data types. Extend generated TypeScript
+  bindings to records, arrays, `Option`, and explicit success/error results,
+  reducing manual JSON plumbing.
+- [ ] Improve incremental build performance. Profile build stages and cache
+  linking and Asyncify results when their inputs have not changed, with correct
+  cache invalidation. Benchmark startup time, memory use, and request throughput.
+- [ ] Provide reusable server execution support. Extract the Express example's
+  queueing, cancellation, and recovery into reusable utilities. Add worker-backed
+  execution for CPU-heavy Lean code, with explicit instance-state ownership and
+  deadline handling.
+- [ ] Broaden correctness and compatibility coverage. Expand native-Lean-versus-Wasm
+  comparisons, randomized boundary tests, and long-running resource tests. Document
+  a library compatibility matrix and add an example with proven Lean domain
+  invariants, making the compiler/runtime trust boundary explicit.
+
+## First integration milestone
+
+- [ ] Deliver a scaffolded application with typed Lean endpoints, HTTP POST, and
+  database access through the extensible host API, exercising the first three
+  improvements together.
