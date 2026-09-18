@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { root, resolveLean, leanCommit } from '../src/toolchain.mjs';
 import { adapt, codeMask, harnessSource, elaboratorSource } from './upstream/adapter.mjs';
 import { compilerIdentity as getCompilerIdentity } from './upstream/identity.mjs';
-import { normalizeOutput } from './upstream/comparison.mjs';
+import { normalizeOutput, normalizeDiagnostics } from './upstream/comparison.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
@@ -137,12 +137,13 @@ for (const entry of selected) {
       result.adaptation = adapted ? { evalAndGuardCommands: adapted.cases, originalMessagesCheckedNatively: false } : null;
       for (const mode of ['original', 'native', 'wasm']) {
         rmSync(join(work, mode), { recursive: true, force: true });
-        mkdirSync(join(work, mode), { recursive: true });
-        cpSync(join(upstream, 'tests', entry.name), join(work, mode, entry.name.split('/').at(-1)));
+        const cwd = mode === 'original' ? join(work, mode, entry.pile) : join(work, mode);
+        mkdirSync(cwd, { recursive: true });
+        cpSync(join(upstream, 'tests', entry.name), join(cwd, entry.name.split('/').at(-1)));
         for (const file of readdirSync(dirname(join(upstream, 'tests', entry.name)))) {
           if (file.startsWith(entry.name.split('/').at(-1) + '.') && !file.endsWith('.sh')) {
             const path = join(upstream, 'tests', entry.pile, file);
-            if (existsSync(path)) cpSync(path, join(work, mode, file), { recursive: true });
+            if (existsSync(path)) cpSync(path, join(cwd, file), { recursive: true });
           }
         }
       }
@@ -158,12 +159,12 @@ for (const entry of selected) {
       if (adapted) {
         // Independently check the original #guard_msgs, including expected
         // failures. This is a native elaboration check, never a Node pass.
-        const check = await execute(lean, ['-Dlinter.all=false', '-DElab.inServer=true', '-Dcompiler.postponeCompile=false', entry.name.split('/').at(-1)], join(work, 'original'));
+        const check = await execute(lean, ['--root=..', '-DprintMessageEndPos=true', '-Dlinter.all=false', '-DElab.inServer=true', '-Dcompiler.postponeCompile=false', entry.name.split('/').at(-1)], join(work, 'original', entry.pile));
         result.originalNative = { code: check.code, timedOut: check.timedOut };
         result.adaptation.originalMessagesCheckedNatively = check.code === 0 && !check.timedOut;
         const expectedPath = join(upstream, 'tests', entry.name + '.out.expected');
         result.originalNative.expectedOutputMatches = entry.auxiliary.includes('out.ignored') ? null
-          : check.stdout + check.stderr === (existsSync(expectedPath) ? readFileSync(expectedPath, 'utf8') : '');
+          : normalizeDiagnostics(check.stdout + check.stderr) === (existsSync(expectedPath) ? readFileSync(expectedPath, 'utf8') : '');
         writeFileSync(join(work, 'original-native.stdout'), check.stdout);
         writeFileSync(join(work, 'original-native.stderr'), check.stderr);
       }

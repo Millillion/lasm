@@ -32,7 +32,8 @@ const externs = JSON.parse(readFileSync(join(root, 'docs/compatibility/lean-4.32
 const counts = {}, categories = {}, missing = new Map();
 const rows = [...entries.values()].sort((a,b)=>a.name.localeCompare(b.name)).map(e => {
   counts[e.status] = (counts[e.status] ?? 0) + 1;
-  const undefinedSymbols = [...new Set([...(e.error ?? '').matchAll(/undefined symbol: ([^\s]+)/g)].map(x=>x[1]))];
+  const undefinedSymbols = e.status === 'build-failed'
+    ? [...new Set([...(e.error ?? '').matchAll(/undefined symbol: ([^\s]+)/g)].map(x=>x[1]))] : [];
   for (const symbol of undefinedSymbols) missing.set(symbol, [...(missing.get(symbol) ?? []), e.name]);
   const category = e.status === 'build-failed' ? (undefinedSymbols.length ? 'missing-native-extern' : 'build-or-test-adaptation')
     : e.status.startsWith('matched-native') ? e.status
@@ -44,7 +45,7 @@ const rows = [...entries.values()].sort((a,b)=>a.name.localeCompare(b.name)).map
     compilerSourcesChangedDuringBuild: e.compilerSourcesChangedDuringBuild ?? null,
     runtimeCommands: e.adaptation?.evalAndGuardCommands.length ?? null,
     native: e.native ?? null, wasm: e.wasm ?? null, work: e.work,
-    undefinedSymbols, reason: e.reason ?? (e.error?.split('\n').filter(line=> /error:|^Source for /.test(line)).slice(0,2).join('\n').slice(0,1000) || null),
+    undefinedSymbols, reason: e.status === 'build-failed' ? (e.error?.split('\n').filter(line=> /error:|^Source for /.test(line)).slice(0,2).join('\n').slice(0,1000) || null) : e.reason ?? null,
     history: history.get(e.name) };
 });
 const http = rows.filter(x=>/^elab\/async_http/.test(x.name));
