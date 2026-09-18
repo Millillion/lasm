@@ -4,6 +4,8 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { root, resolveLean, leanCommit } from '../src/toolchain.mjs';
 import { adapt, codeMask, harnessSource, elaboratorSource } from './upstream/adapter.mjs';
+import { compilerIdentity as getCompilerIdentity } from './upstream/identity.mjs';
+import { normalizeOutput } from './upstream/comparison.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
@@ -84,7 +86,8 @@ function execute(executable, argv, cwd, environment = {}, deadline = timeout) {
   });
 }
 const resultFile = join(directory, `results-${suite}${partitions > 1 ? '-' + partition : ''}.json`);
-const compilerIdentity = digest([...walk(join(root, 'src')), ...walk(join(root, 'runtime')), ...walk(join(root, 'scripts/upstream')), join(root, 'scripts/upstream-tests.mjs'), join(root, 'scripts/build-runtime.mjs')].map(path => readFileSync(path)).reduce((a,b) => Buffer.concat([a,b]), Buffer.alloc(0)));
+const compilerIdentity = getCompilerIdentity();
+const startedAt = new Date().toISOString();
 let results = [];
 const previous = existsSync(resultFile) ? JSON.parse(readFileSync(resultFile)) : null;
 const previousDirectory = option('--continue-from', null);
@@ -105,10 +108,11 @@ if (args.includes('--resume') && existsSync(resultFile)) {
   const prior = JSON.parse(readFileSync(resultFile));
   if (prior.compilerIdentity === compilerIdentity) results = prior.entries.filter(e => selected.some(s => s.name === e.name && s.sha256 === e.sha256));
 }
-const report = () => writeFileSync(resultFile, JSON.stringify({ leanCommit, compilerIdentity,
+const report = () => writeFileSync(resultFile, JSON.stringify({ leanCommit, compilerIdentity, startedAt, updatedAt: new Date().toISOString(),
   platform: `${process.platform}-${process.arch}`, node: process.version, suite, partition, partitions, totalInventory: inventory.length,
   selected: selected.length, completed: results.length, counts: Object.fromEntries([...new Set(results.map(x=>x.status))].map(k=>[k,results.filter(x=>x.status===k).length])),
   entries: results }, null, 2) + '\n');
+report();
 for (const entry of selected) {
   if (results.some(r => r.name === entry.name)) continue;
   const started = Date.now();
@@ -176,6 +180,8 @@ for (const entry of selected) {
       result.reusedArtifact = !!reuse;
       result.artifactCompilerIdentity = reuse ? prior.artifactCompilerIdentity ?? previous.compilerIdentity : compilerIdentity;
       const built = JSON.parse(readFileSync(join(work, 'build-result.json')));
+      if (built.compilerIdentityAtBuild) result.artifactCompilerIdentity = built.compilerIdentityAtBuild;
+      result.compilerSourcesChangedDuringBuild = built.compilerSourcesChangedDuringBuild ?? null;
       result.artifactSha256 = digest(readFileSync(join(work, 'dist/module.wasm')));
       const runner = adapted ? 'unsafe def main : IO UInt32 := lasmUpstreamRun' : '';
       // Compile-pile programs retain their own main. Command-pile adapters use a
@@ -184,12 +190,14 @@ for (const entry of selected) {
       const native = await execute(lean, ['-Dlinter.all=false', '--run', join(work, 'Native.lean'), ...testArgs], join(work, 'native'), { LEAN_PATH: built.buildDir });
       result.native = { code: native.code, signal: native.signal, timedOut: native.timedOut };
       writeFileSync(join(work, 'native.stdout'), native.stdout); writeFileSync(join(work, 'native.stderr'), native.stderr);
-      writeFileSync(join(work, 'run.mjs'), `import createModule from './dist/index.mjs';\nconst api=await createModule({cwd:process.cwd(),args:process.argv.slice(2)});\ntry { process.exitCode=await api.${adapted ? 'runTests' : 'runMain'}(); } catch(e) { console.error(e.message); process.exitCode=e.name==='LeanExit'?e.code:1; } finally { api.dispose(); }\n`);
+      writeFileSync(join(work, 'run.mjs'), `import createModule from './dist/index.mjs';\nconst api=await createModule({cwd:process.cwd(),args:process.argv.slice(2)});\ntry { process.exitCode=await api.${adapted ? 'runTests' : 'runMain'}(); } catch(e) { if(e.name!=='LeanExit') console.error(e.name==='LeanIOError'?'uncaught exception: '+e.message:e.message); process.exitCode=e.name==='LeanExit'?e.code:1; } finally { api.dispose(); }\n`);
       const wasm = await execute(process.execPath, [join(work, 'run.mjs'), ...testArgs], join(work, 'wasm'));
       result.wasm = { code: wasm.code, signal: wasm.signal, timedOut: wasm.timedOut };
       writeFileSync(join(work, 'wasm.stdout'), wasm.stdout); writeFileSync(join(work, 'wasm.stderr'), wasm.stderr);
-      result.stdoutEqual = native.stdout === wasm.stdout;
-      result.stderrEqual = native.stderr === wasm.stderr;
+      const normal = (text, mode) => normalizeOutput(text, join(work, mode));
+      result.outputNormalization = ['upstream measurement values', 'test working directory'];
+      result.stdoutEqual = normal(native.stdout, 'native') === normal(wasm.stdout, 'wasm');
+      result.stderrEqual = normal(native.stderr, 'native') === normal(wasm.stderr, 'wasm');
       const exitMatches = code => expectedExit === 'nonzero' ? code !== null && code !== 0 : code === Number(expectedExit);
       result.status = native.timedOut || native.outputLimit || !exitMatches(native.code) ? 'native-baseline-failed'
         : wasm.outputLimit ? 'wasm-output-limit' : wasm.timedOut ? 'wasm-timeout' : wasm.code !== native.code ? 'wasm-failed'
@@ -206,7 +214,7 @@ for (const entry of selected) {
       }
       if (entry.kind === 'runtime-main' && !entry.auxiliary.includes('out.ignored')) {
         const expected = existsSync(join(upstream, 'tests', `${entry.name}.out.expected`)) ? readFileSync(join(upstream, 'tests', `${entry.name}.out.expected`), 'utf8') : '';
-        result.upstreamExpected = native.stdout + native.stderr === expected;
+        result.upstreamExpected = normal(native.stdout + native.stderr, 'native') === normal(expected, 'native');
         if (!result.upstreamExpected && result.status === 'matched-native') result.status = 'native-expectation-mismatch';
       }
     }

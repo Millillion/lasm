@@ -1,0 +1,4772 @@
+[
+  {
+    "backend": "all",
+    "name": "Float.acos",
+    "symbol": "acos"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.acos",
+    "symbol": "acosf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.acosh",
+    "symbol": "acosh"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.acosh",
+    "symbol": "acoshf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.asin",
+    "symbol": "asin"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.asin",
+    "symbol": "asinf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.asinh",
+    "symbol": "asinh"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.asinh",
+    "symbol": "asinhf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.atan",
+    "symbol": "atan"
+  },
+  {
+    "backend": "all",
+    "name": "Float.atan2",
+    "symbol": "atan2"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.atan2",
+    "symbol": "atan2f"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.atan",
+    "symbol": "atanf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.atanh",
+    "symbol": "atanh"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.atanh",
+    "symbol": "atanhf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.cbrt",
+    "symbol": "cbrt"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.cbrt",
+    "symbol": "cbrtf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.ceil",
+    "symbol": "ceil"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.ceil",
+    "symbol": "ceilf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.cos",
+    "symbol": "cos"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.cos",
+    "symbol": "cosf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.cosh",
+    "symbol": "cosh"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.cosh",
+    "symbol": "coshf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.exp",
+    "symbol": "exp"
+  },
+  {
+    "backend": "all",
+    "name": "Float.exp2",
+    "symbol": "exp2"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.exp2",
+    "symbol": "exp2f"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.exp",
+    "symbol": "expf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.abs",
+    "symbol": "fabs"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.abs",
+    "symbol": "fabsf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.floor",
+    "symbol": "floor"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.floor",
+    "symbol": "floorf"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Kernel.Environment.addDeclCore",
+    "symbol": "lean_add_decl"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Kernel.Environment.addDeclWithoutChecking",
+    "symbol": "lean_add_decl_without_checking"
+  },
+  {
+    "backend": "all",
+    "name": "Array.getInternal",
+    "symbol": "lean_array_fget"
+  },
+  {
+    "backend": "all",
+    "name": "Array.getInternalBorrowed",
+    "symbol": "lean_array_fget_borrowed"
+  },
+  {
+    "backend": "all",
+    "name": "Array.set",
+    "symbol": "lean_array_fset"
+  },
+  {
+    "backend": "all",
+    "name": "Array.swap",
+    "symbol": "lean_array_fswap"
+  },
+  {
+    "backend": "all",
+    "name": "Array.get!Internal",
+    "symbol": "lean_array_get"
+  },
+  {
+    "backend": "all",
+    "name": "Array.get!InternalBorrowed",
+    "symbol": "lean_array_get_borrowed"
+  },
+  {
+    "backend": "all",
+    "name": "Array.size",
+    "symbol": "lean_array_get_size"
+  },
+  {
+    "backend": "all",
+    "name": "Array.mk",
+    "symbol": "lean_array_mk"
+  },
+  {
+    "backend": "all",
+    "name": "Array.pop",
+    "symbol": "lean_array_pop"
+  },
+  {
+    "backend": "all",
+    "name": "Array.push",
+    "symbol": "lean_array_push"
+  },
+  {
+    "backend": "all",
+    "name": "Array.set!",
+    "symbol": "lean_array_set"
+  },
+  {
+    "backend": "all",
+    "name": "Array.usize",
+    "symbol": "lean_array_size"
+  },
+  {
+    "backend": "all",
+    "name": "Array.swapIfInBounds",
+    "symbol": "lean_array_swap"
+  },
+  {
+    "backend": "all",
+    "name": "Array.toList",
+    "symbol": "lean_array_to_list"
+  },
+  {
+    "backend": "all",
+    "name": "Array.uget",
+    "symbol": "lean_array_uget"
+  },
+  {
+    "backend": "all",
+    "name": "Array.ugetBorrowed",
+    "symbol": "lean_array_uget_borrowed"
+  },
+  {
+    "backend": "all",
+    "name": "Array.uset",
+    "symbol": "lean_array_uset"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toInt16",
+    "symbol": "lean_bool_to_int16"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toInt32",
+    "symbol": "lean_bool_to_int32"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toInt64",
+    "symbol": "lean_bool_to_int64"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toInt8",
+    "symbol": "lean_bool_to_int8"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toISize",
+    "symbol": "lean_bool_to_isize"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toUInt16",
+    "symbol": "lean_bool_to_uint16"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toUInt32",
+    "symbol": "lean_bool_to_uint32"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toUInt64",
+    "symbol": "lean_bool_to_uint64"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toUInt8",
+    "symbol": "lean_bool_to_uint8"
+  },
+  {
+    "backend": "all",
+    "name": "Bool.toUSize",
+    "symbol": "lean_bool_to_usize"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.copySlice",
+    "symbol": "lean_byte_array_copy_slice"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.data",
+    "symbol": "lean_byte_array_data"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.get",
+    "symbol": "lean_byte_array_fget"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.set",
+    "symbol": "lean_byte_array_fset"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.get!",
+    "symbol": "lean_byte_array_get"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.hash",
+    "symbol": "lean_byte_array_hash"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.mk",
+    "symbol": "lean_byte_array_mk"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.push",
+    "symbol": "lean_byte_array_push"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.set!",
+    "symbol": "lean_byte_array_set"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.size",
+    "symbol": "lean_byte_array_size"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.uget",
+    "symbol": "lean_byte_array_uget"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.uset",
+    "symbol": "lean_byte_array_uset"
+  },
+  {
+    "backend": "all",
+    "name": "ByteSlice.beq",
+    "symbol": "lean_byteslice_beq"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.MVarId.checkedAssign",
+    "symbol": "lean_checked_assign"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Prim.setAccessRights",
+    "symbol": "lean_chmod"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.closureMaxArgsFn",
+    "symbol": "lean_closure_max_args"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.CompactedRegion.free",
+    "symbol": "lean_compacted_region_free"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.CompactedRegion.read",
+    "symbol": "lean_compacted_region_read"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.CompactedRegion.save",
+    "symbol": "lean_compacted_region_save"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Meta.Tactic.Grind.Arith.Cutsat.Proof.0.Lean.Meta.Grind.Arith.Cutsat.EqCnstr.toExprProof",
+    "symbol": "lean_cutsat_eq_cnstr_to_proof"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.Arith.Cutsat.propagateNonlinearTerm",
+    "symbol": "lean_cutsat_propagate_nonlinear"
+  },
+  {
+    "backend": "all",
+    "name": "dbgSleep",
+    "symbol": "lean_dbg_sleep"
+  },
+  {
+    "backend": "all",
+    "name": "dbgStackTrace",
+    "symbol": "lean_dbg_stack_trace"
+  },
+  {
+    "backend": "all",
+    "name": "dbgTrace",
+    "symbol": "lean_dbg_trace"
+  },
+  {
+    "backend": "all",
+    "name": "dbgTraceIfShared",
+    "symbol": "lean_dbg_trace_if_shared"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.decodeLossyUTF8",
+    "symbol": "lean_decode_lossy_utf8"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.displayCumulativeProfilingTimes",
+    "symbol": "lean_display_cumulative_profiling_times"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Simp.dsimp",
+    "symbol": "lean_dsimp"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Dynlib.get?",
+    "symbol": "lean_dynlib_get"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Dynlib.load",
+    "symbol": "lean_dynlib_load"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Dynlib.Symbol.runAsInit",
+    "symbol": "lean_dynlib_symbol_run_as_init"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Environment.0.Lean.Environment.addDeclCheck",
+    "symbol": "lean_elab_add_decl"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Environment.0.Lean.Environment.addDeclWithoutChecking",
+    "symbol": "lean_elab_add_decl_without_checking"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.emitLLVM",
+    "symbol": "lean_emit_llvm"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Environment.0.Lean.Environment.evalCheckMeta",
+    "symbol": "lean_eval_check_meta"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Environment.0.Lean.Environment.evalConstCore",
+    "symbol": "lean_eval_const"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.runMain",
+    "symbol": "lean_eval_main"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Elab.Tactic.Try.evalSuggest",
+    "symbol": "lean_eval_suggest_tactic"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.abstract",
+    "symbol": "lean_expr_abstract"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.abstractRange",
+    "symbol": "lean_expr_abstract_range"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.data",
+    "symbol": "lean_expr_data"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.dbgToString",
+    "symbol": "lean_expr_dbg_to_string"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.equal",
+    "symbol": "lean_expr_equal"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.eqv",
+    "symbol": "lean_expr_eqv"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.hasLooseBVar",
+    "symbol": "lean_expr_has_loose_bvar"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.instantiate",
+    "symbol": "lean_expr_instantiate"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.instantiateRange",
+    "symbol": "lean_expr_instantiate_range"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.instantiateRev",
+    "symbol": "lean_expr_instantiate_rev"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.instantiateRevRange",
+    "symbol": "lean_expr_instantiate_rev_range"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.instantiate1",
+    "symbol": "lean_expr_instantiate1"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.liftLooseBVars",
+    "symbol": "lean_expr_lift_loose_bvars"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.lowerLooseBVars",
+    "symbol": "lean_expr_lower_loose_bvars"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.lt",
+    "symbol": "lean_expr_lt"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.mkAppData",
+    "symbol": "lean_expr_mk_app_data"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.mkData",
+    "symbol": "lean_expr_mk_data"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.quickLt",
+    "symbol": "lean_expr_quick_lt"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.findImpl?",
+    "symbol": "lean_find_expr"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.findExtImpl?",
+    "symbol": "lean_find_ext_expr"
+  },
+  {
+    "backend": "all",
+    "name": "Float.add",
+    "symbol": "lean_float_add"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.data",
+    "symbol": "lean_float_array_data"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.get",
+    "symbol": "lean_float_array_fget"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.set",
+    "symbol": "lean_float_array_fset"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.get!",
+    "symbol": "lean_float_array_get"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.mk",
+    "symbol": "lean_float_array_mk"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.push",
+    "symbol": "lean_float_array_push"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.set!",
+    "symbol": "lean_float_array_set"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.size",
+    "symbol": "lean_float_array_size"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.uget",
+    "symbol": "lean_float_array_uget"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.uset",
+    "symbol": "lean_float_array_uset"
+  },
+  {
+    "backend": "all",
+    "name": "Float.beq",
+    "symbol": "lean_float_beq"
+  },
+  {
+    "backend": "all",
+    "name": "Float.decLe",
+    "symbol": "lean_float_decLe"
+  },
+  {
+    "backend": "all",
+    "name": "Float.decLt",
+    "symbol": "lean_float_decLt"
+  },
+  {
+    "backend": "all",
+    "name": "Float.div",
+    "symbol": "lean_float_div"
+  },
+  {
+    "backend": "all",
+    "name": "Float.frExp",
+    "symbol": "lean_float_frexp"
+  },
+  {
+    "backend": "all",
+    "name": "Float.isFinite",
+    "symbol": "lean_float_isfinite"
+  },
+  {
+    "backend": "all",
+    "name": "Float.isInf",
+    "symbol": "lean_float_isinf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.isNaN",
+    "symbol": "lean_float_isnan"
+  },
+  {
+    "backend": "all",
+    "name": "Float.mul",
+    "symbol": "lean_float_mul"
+  },
+  {
+    "backend": "all",
+    "name": "Float.neg",
+    "symbol": "lean_float_negate"
+  },
+  {
+    "backend": "all",
+    "name": "Float.ofBits",
+    "symbol": "lean_float_of_bits"
+  },
+  {
+    "backend": "all",
+    "name": "Float.scaleB",
+    "symbol": "lean_float_scaleb"
+  },
+  {
+    "backend": "all",
+    "name": "Float.sub",
+    "symbol": "lean_float_sub"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toBits",
+    "symbol": "lean_float_to_bits"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toFloat32",
+    "symbol": "lean_float_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toInt16",
+    "symbol": "lean_float_to_int16"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toInt32",
+    "symbol": "lean_float_to_int32"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toInt64",
+    "symbol": "lean_float_to_int64"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toInt8",
+    "symbol": "lean_float_to_int8"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toISize",
+    "symbol": "lean_float_to_isize"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toString",
+    "symbol": "lean_float_to_string"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toUInt16",
+    "symbol": "lean_float_to_uint16"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toUInt32",
+    "symbol": "lean_float_to_uint32"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toUInt64",
+    "symbol": "lean_float_to_uint64"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toUInt8",
+    "symbol": "lean_float_to_uint8"
+  },
+  {
+    "backend": "all",
+    "name": "Float.toUSize",
+    "symbol": "lean_float_to_usize"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.add",
+    "symbol": "lean_float32_add"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.beq",
+    "symbol": "lean_float32_beq"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.decLe",
+    "symbol": "lean_float32_decLe"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.decLt",
+    "symbol": "lean_float32_decLt"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.div",
+    "symbol": "lean_float32_div"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.frExp",
+    "symbol": "lean_float32_frexp"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.isFinite",
+    "symbol": "lean_float32_isfinite"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.isInf",
+    "symbol": "lean_float32_isinf"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.isNaN",
+    "symbol": "lean_float32_isnan"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.mul",
+    "symbol": "lean_float32_mul"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.neg",
+    "symbol": "lean_float32_negate"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.ofBits",
+    "symbol": "lean_float32_of_bits"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.scaleB",
+    "symbol": "lean_float32_scaleb"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.sub",
+    "symbol": "lean_float32_sub"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toBits",
+    "symbol": "lean_float32_to_bits"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toFloat",
+    "symbol": "lean_float32_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toInt16",
+    "symbol": "lean_float32_to_int16"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toInt32",
+    "symbol": "lean_float32_to_int32"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toInt64",
+    "symbol": "lean_float32_to_int64"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toInt8",
+    "symbol": "lean_float32_to_int8"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toISize",
+    "symbol": "lean_float32_to_isize"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toString",
+    "symbol": "lean_float32_to_string"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toUInt16",
+    "symbol": "lean_float32_to_uint16"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toUInt32",
+    "symbol": "lean_float32_to_uint32"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toUInt64",
+    "symbol": "lean_float32_to_uint64"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toUInt8",
+    "symbol": "lean_float32_to_uint8"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.toUSize",
+    "symbol": "lean_float32_to_usize"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Match.genMatchCongrEqns",
+    "symbol": "lean_get_congr_match_equations_for"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Time.Timestamp.now",
+    "symbol": "lean_get_current_time"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.getGithash",
+    "symbol": "lean_get_githash"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Compiler.FFI.0.Lean.Compiler.FFI.getBuiltinInternalLinkerFlags",
+    "symbol": "lean_get_internal_linker_flags"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Environment.0.Lean.getIRExtraConstNames",
+    "symbol": "lean_get_ir_extra_const_names"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Compiler.FFI.0.Lean.Compiler.FFI.getLeancExtraFlags",
+    "symbol": "lean_get_leanc_extra_flags"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Compiler.FFI.0.Lean.Compiler.FFI.getLeancInternalFlags",
+    "symbol": "lean_get_leanc_internal_flags"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Compiler.FFI.0.Lean.Compiler.FFI.getBuiltinLinkerFlags",
+    "symbol": "lean_get_linker_flags"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Match.getEquationsFor",
+    "symbol": "lean_get_match_equations_for"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.IR.Checker.getMaxCtorFields",
+    "symbol": "lean_get_max_ctor_fields"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.IR.Checker.getMaxCtorScalarsSize",
+    "symbol": "lean_get_max_ctor_scalars_size"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.IR.Checker.getMaxCtorTag",
+    "symbol": "lean_get_max_ctor_tag"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.getNumBuiltinAttributes",
+    "symbol": "lean_get_num_attributes"
+  },
+  {
+    "backend": "all",
+    "name": "IO.setStderr",
+    "symbol": "lean_get_set_stderr"
+  },
+  {
+    "backend": "all",
+    "name": "IO.setStdin",
+    "symbol": "lean_get_set_stdin"
+  },
+  {
+    "backend": "all",
+    "name": "IO.setStdout",
+    "symbol": "lean_get_set_stdout"
+  },
+  {
+    "backend": "all",
+    "name": "IO.getStderr",
+    "symbol": "lean_get_stderr"
+  },
+  {
+    "backend": "all",
+    "name": "IO.getStdin",
+    "symbol": "lean_get_stdin"
+  },
+  {
+    "backend": "all",
+    "name": "IO.getStdout",
+    "symbol": "lean_get_stdout"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.getStructuralRecArgPos?",
+    "symbol": "lean_get_structural_rec_arg_pos"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.IR.Checker.getUSizeSize",
+    "symbol": "lean_get_usize_size"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Time.Database.Windows.getLocalTimeZoneIdentifierAt",
+    "symbol": "lean_get_windows_local_timezone_id_at"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.Arith.Cutsat.EqCnstr.assert",
+    "symbol": "lean_grind_cutsat_assert_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.Arith.Cutsat.LeCnstr.assert",
+    "symbol": "lean_grind_cutsat_assert_le"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.Arith.Cutsat.mkVar",
+    "symbol": "lean_grind_cutsat_mk_var"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.internalize",
+    "symbol": "lean_grind_internalize"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.mkEqProof",
+    "symbol": "lean_grind_mk_eq_proof"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.mkHEqProof",
+    "symbol": "lean_grind_mk_heq_proof"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.normalize",
+    "symbol": "lean_grind_normalize"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.preprocess",
+    "symbol": "lean_grind_preprocess"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Grind.processNewFacts",
+    "symbol": "lean_grind_process_new_facts"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.hasCompileError",
+    "symbol": "lean_has_compile_error"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Idbg.idbgClientLoop",
+    "symbol": "lean_idbg_client_loop"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.inferType",
+    "symbol": "lean_infer_type"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.initLLVM",
+    "symbol": "lean_init_llvm"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.instantiateExprMVarsImp",
+    "symbol": "lean_instantiate_expr_mvars"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.instantiateLevelMVarsImp",
+    "symbol": "lean_instantiate_level_mvars"
+  },
+  {
+    "backend": "all",
+    "name": "Int.add",
+    "symbol": "lean_int_add"
+  },
+  {
+    "backend": "all",
+    "name": "Int.decEq",
+    "symbol": "lean_int_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Int.decLe",
+    "symbol": "lean_int_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "Int.decLt",
+    "symbol": "lean_int_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "Int.decNonneg",
+    "symbol": "lean_int_dec_nonneg"
+  },
+  {
+    "backend": "all",
+    "name": "Int.tdiv",
+    "symbol": "lean_int_div"
+  },
+  {
+    "backend": "all",
+    "name": "Int.divExact",
+    "symbol": "lean_int_div_exact"
+  },
+  {
+    "backend": "all",
+    "name": "Int.ediv",
+    "symbol": "lean_int_ediv"
+  },
+  {
+    "backend": "all",
+    "name": "Int.emod",
+    "symbol": "lean_int_emod"
+  },
+  {
+    "backend": "all",
+    "name": "Int.tmod",
+    "symbol": "lean_int_mod"
+  },
+  {
+    "backend": "all",
+    "name": "Int.mul",
+    "symbol": "lean_int_mul"
+  },
+  {
+    "backend": "all",
+    "name": "Int.neg",
+    "symbol": "lean_int_neg"
+  },
+  {
+    "backend": "all",
+    "name": "Int.negSucc",
+    "symbol": "lean_int_neg_succ_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "Int.sub",
+    "symbol": "lean_int_sub"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.abs",
+    "symbol": "lean_int16_abs"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.add",
+    "symbol": "lean_int16_add"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.complement",
+    "symbol": "lean_int16_complement"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.decEq",
+    "symbol": "lean_int16_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.decLe",
+    "symbol": "lean_int16_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.decLt",
+    "symbol": "lean_int16_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.div",
+    "symbol": "lean_int16_div"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.land",
+    "symbol": "lean_int16_land"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.lor",
+    "symbol": "lean_int16_lor"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.mod",
+    "symbol": "lean_int16_mod"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.mul",
+    "symbol": "lean_int16_mul"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.neg",
+    "symbol": "lean_int16_neg"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.ofInt",
+    "symbol": "lean_int16_of_int"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.ofNat",
+    "symbol": "lean_int16_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.shiftLeft",
+    "symbol": "lean_int16_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.shiftRight",
+    "symbol": "lean_int16_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.sub",
+    "symbol": "lean_int16_sub"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.toFloat",
+    "symbol": "lean_int16_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.toFloat32",
+    "symbol": "lean_int16_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.toInt",
+    "symbol": "lean_int16_to_int"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.toInt32",
+    "symbol": "lean_int16_to_int32"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.toInt64",
+    "symbol": "lean_int16_to_int64"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.toInt8",
+    "symbol": "lean_int16_to_int8"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.toISize",
+    "symbol": "lean_int16_to_isize"
+  },
+  {
+    "backend": "all",
+    "name": "Int16.xor",
+    "symbol": "lean_int16_xor"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.abs",
+    "symbol": "lean_int32_abs"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.add",
+    "symbol": "lean_int32_add"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.complement",
+    "symbol": "lean_int32_complement"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.decEq",
+    "symbol": "lean_int32_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.decLe",
+    "symbol": "lean_int32_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.decLt",
+    "symbol": "lean_int32_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.div",
+    "symbol": "lean_int32_div"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.land",
+    "symbol": "lean_int32_land"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.lor",
+    "symbol": "lean_int32_lor"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.mod",
+    "symbol": "lean_int32_mod"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.mul",
+    "symbol": "lean_int32_mul"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.neg",
+    "symbol": "lean_int32_neg"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.ofInt",
+    "symbol": "lean_int32_of_int"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.ofNat",
+    "symbol": "lean_int32_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.shiftLeft",
+    "symbol": "lean_int32_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.shiftRight",
+    "symbol": "lean_int32_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.sub",
+    "symbol": "lean_int32_sub"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.toFloat",
+    "symbol": "lean_int32_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.toFloat32",
+    "symbol": "lean_int32_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.toInt",
+    "symbol": "lean_int32_to_int"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.toInt16",
+    "symbol": "lean_int32_to_int16"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.toInt64",
+    "symbol": "lean_int32_to_int64"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.toInt8",
+    "symbol": "lean_int32_to_int8"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.toISize",
+    "symbol": "lean_int32_to_isize"
+  },
+  {
+    "backend": "all",
+    "name": "Int32.xor",
+    "symbol": "lean_int32_xor"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.abs",
+    "symbol": "lean_int64_abs"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.add",
+    "symbol": "lean_int64_add"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.complement",
+    "symbol": "lean_int64_complement"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.decEq",
+    "symbol": "lean_int64_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.decLe",
+    "symbol": "lean_int64_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.decLt",
+    "symbol": "lean_int64_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.div",
+    "symbol": "lean_int64_div"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.land",
+    "symbol": "lean_int64_land"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.lor",
+    "symbol": "lean_int64_lor"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.mod",
+    "symbol": "lean_int64_mod"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.mul",
+    "symbol": "lean_int64_mul"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.neg",
+    "symbol": "lean_int64_neg"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.ofInt",
+    "symbol": "lean_int64_of_int"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.ofNat",
+    "symbol": "lean_int64_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.shiftLeft",
+    "symbol": "lean_int64_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.shiftRight",
+    "symbol": "lean_int64_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.sub",
+    "symbol": "lean_int64_sub"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.toFloat",
+    "symbol": "lean_int64_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.toFloat32",
+    "symbol": "lean_int64_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.toInt",
+    "symbol": "lean_int64_to_int_sint"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.toInt16",
+    "symbol": "lean_int64_to_int16"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.toInt32",
+    "symbol": "lean_int64_to_int32"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.toInt8",
+    "symbol": "lean_int64_to_int8"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.toISize",
+    "symbol": "lean_int64_to_isize"
+  },
+  {
+    "backend": "all",
+    "name": "Int64.xor",
+    "symbol": "lean_int64_xor"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.abs",
+    "symbol": "lean_int8_abs"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.add",
+    "symbol": "lean_int8_add"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.complement",
+    "symbol": "lean_int8_complement"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.decEq",
+    "symbol": "lean_int8_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.decLe",
+    "symbol": "lean_int8_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.decLt",
+    "symbol": "lean_int8_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.div",
+    "symbol": "lean_int8_div"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.land",
+    "symbol": "lean_int8_land"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.lor",
+    "symbol": "lean_int8_lor"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.mod",
+    "symbol": "lean_int8_mod"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.mul",
+    "symbol": "lean_int8_mul"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.neg",
+    "symbol": "lean_int8_neg"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.ofInt",
+    "symbol": "lean_int8_of_int"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.ofNat",
+    "symbol": "lean_int8_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.shiftLeft",
+    "symbol": "lean_int8_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.shiftRight",
+    "symbol": "lean_int8_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.sub",
+    "symbol": "lean_int8_sub"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.toFloat",
+    "symbol": "lean_int8_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.toFloat32",
+    "symbol": "lean_int8_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.toInt",
+    "symbol": "lean_int8_to_int"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.toInt16",
+    "symbol": "lean_int8_to_int16"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.toInt32",
+    "symbol": "lean_int8_to_int32"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.toInt64",
+    "symbol": "lean_int8_to_int64"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.toISize",
+    "symbol": "lean_int8_to_isize"
+  },
+  {
+    "backend": "all",
+    "name": "Int8.xor",
+    "symbol": "lean_int8_xor"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.enableDebug",
+    "symbol": "lean_internal_enable_debug"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.getBelieverTrustLevel",
+    "symbol": "lean_internal_get_believer_trust_level"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.getBuildType",
+    "symbol": "lean_internal_get_build_type"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.getDefaultMaxHeartbeat",
+    "symbol": "lean_internal_get_default_max_heartbeat"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.getDefaultMaxMemory",
+    "symbol": "lean_internal_get_default_max_memory"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.getDefaultOptions",
+    "symbol": "lean_internal_get_default_options"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.getDefaultVerbose",
+    "symbol": "lean_internal_get_default_verbose"
+  },
+  {
+    "backend": "all",
+    "name": "System.Platform.Internal.getHardwareConcurrency",
+    "symbol": "lean_internal_get_hardware_concurrency"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.hasAddressSanitizer",
+    "symbol": "lean_internal_has_address_sanitizer"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Internal.hasLLVMBackend",
+    "symbol": "lean_internal_has_llvm_backend"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.isDebug",
+    "symbol": "lean_internal_is_debug"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.isMultiThread",
+    "symbol": "lean_internal_is_multi_thread"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Internal.isStage0",
+    "symbol": "lean_internal_is_stage0"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.setExitOnPanic",
+    "symbol": "lean_internal_set_exit_on_panic"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.setMaxHeartbeat",
+    "symbol": "lean_internal_set_max_heartbeat"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.setMaxMemory",
+    "symbol": "lean_internal_set_max_memory"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Shell.0.Lean.Internal.setThreadStackSize",
+    "symbol": "lean_internal_set_thread_stack_size"
+  },
+  {
+    "backend": "all",
+    "name": "allocprof",
+    "symbol": "lean_io_allocprof"
+  },
+  {
+    "backend": "all",
+    "name": "IO.appPath",
+    "symbol": "lean_io_app_path"
+  },
+  {
+    "backend": "all",
+    "name": "BaseIO.asTask",
+    "symbol": "lean_io_as_task"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseMutex.lock",
+    "symbol": "lean_io_basemutex_lock"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseMutex.new",
+    "symbol": "lean_io_basemutex_new"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseMutex.tryLock",
+    "symbol": "lean_io_basemutex_try_lock"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseMutex.unlock",
+    "symbol": "lean_io_basemutex_unlock"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseRecursiveMutex.lock",
+    "symbol": "lean_io_baserecmutex_lock"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseRecursiveMutex.new",
+    "symbol": "lean_io_baserecmutex_new"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseRecursiveMutex.tryLock",
+    "symbol": "lean_io_baserecmutex_try_lock"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseRecursiveMutex.unlock",
+    "symbol": "lean_io_baserecmutex_unlock"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseSharedMutex.new",
+    "symbol": "lean_io_basesharedmutex_new"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseSharedMutex.read",
+    "symbol": "lean_io_basesharedmutex_read"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseSharedMutex.tryRead",
+    "symbol": "lean_io_basesharedmutex_try_read"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseSharedMutex.tryWrite",
+    "symbol": "lean_io_basesharedmutex_try_write"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseSharedMutex.unlockRead",
+    "symbol": "lean_io_basesharedmutex_unlock_read"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseSharedMutex.unlockWrite",
+    "symbol": "lean_io_basesharedmutex_unlock_write"
+  },
+  {
+    "backend": "all",
+    "name": "Std.BaseSharedMutex.write",
+    "symbol": "lean_io_basesharedmutex_write"
+  },
+  {
+    "backend": "all",
+    "name": "BaseIO.bindTask",
+    "symbol": "lean_io_bind_task"
+  },
+  {
+    "backend": "all",
+    "name": "IO.cancel",
+    "symbol": "lean_io_cancel"
+  },
+  {
+    "backend": "all",
+    "name": "IO.checkCanceled",
+    "symbol": "lean_io_check_canceled"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Condvar.new",
+    "symbol": "lean_io_condvar_new"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Condvar.notifyAll",
+    "symbol": "lean_io_condvar_notify_all"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Condvar.notifyOne",
+    "symbol": "lean_io_condvar_notify_one"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Condvar.wait",
+    "symbol": "lean_io_condvar_wait"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.createDir",
+    "symbol": "lean_io_create_dir"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.createTempDir",
+    "symbol": "lean_io_create_tempdir"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.createTempFile",
+    "symbol": "lean_io_create_tempfile"
+  },
+  {
+    "backend": "all",
+    "name": "IO.currentDir",
+    "symbol": "lean_io_current_dir"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.exit",
+    "symbol": "lean_io_exit"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.forceExit",
+    "symbol": "lean_io_force_exit"
+  },
+  {
+    "backend": "all",
+    "name": "IO.getNumHeartbeats",
+    "symbol": "lean_io_get_num_heartbeats"
+  },
+  {
+    "backend": "all",
+    "name": "IO.getRandomBytes",
+    "symbol": "lean_io_get_random_bytes"
+  },
+  {
+    "backend": "all",
+    "name": "IO.getTaskState",
+    "symbol": "lean_io_get_task_state"
+  },
+  {
+    "backend": "all",
+    "name": "IO.getTID",
+    "symbol": "lean_io_get_tid"
+  },
+  {
+    "backend": "all",
+    "name": "IO.getEnv",
+    "symbol": "lean_io_getenv"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.hardLink",
+    "symbol": "lean_io_hard_link"
+  },
+  {
+    "backend": "all",
+    "name": "IO.initializing",
+    "symbol": "lean_io_initializing"
+  },
+  {
+    "backend": "all",
+    "name": "BaseIO.mapTask",
+    "symbol": "lean_io_map_task"
+  },
+  {
+    "backend": "all",
+    "name": "System.FilePath.metadata",
+    "symbol": "lean_io_metadata"
+  },
+  {
+    "backend": "all",
+    "name": "IO.monoMsNow",
+    "symbol": "lean_io_mono_ms_now"
+  },
+  {
+    "backend": "all",
+    "name": "IO.monoNanosNow",
+    "symbol": "lean_io_mono_nanos_now"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.flush",
+    "symbol": "lean_io_prim_handle_flush"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.getLine",
+    "symbol": "lean_io_prim_handle_get_line"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.isTty",
+    "symbol": "lean_io_prim_handle_is_tty"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.lock",
+    "symbol": "lean_io_prim_handle_lock"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.mk",
+    "symbol": "lean_io_prim_handle_mk"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.putStr",
+    "symbol": "lean_io_prim_handle_put_str"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.read",
+    "symbol": "lean_io_prim_handle_read"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.rewind",
+    "symbol": "lean_io_prim_handle_rewind"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.truncate",
+    "symbol": "lean_io_prim_handle_truncate"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.tryLock",
+    "symbol": "lean_io_prim_handle_try_lock"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.unlock",
+    "symbol": "lean_io_prim_handle_unlock"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.Handle.write",
+    "symbol": "lean_io_prim_handle_write"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.Child.kill",
+    "symbol": "lean_io_process_child_kill"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.Child.pid",
+    "symbol": "lean_io_process_child_pid"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.Child.takeStdin",
+    "symbol": "lean_io_process_child_take_stdin"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.Child.tryWait",
+    "symbol": "lean_io_process_child_try_wait"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.Child.wait",
+    "symbol": "lean_io_process_child_wait"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.getCurrentDir",
+    "symbol": "lean_io_process_get_current_dir"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.getPID",
+    "symbol": "lean_io_process_get_pid"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.setCurrentDir",
+    "symbol": "lean_io_process_set_current_dir"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Process.spawn",
+    "symbol": "lean_io_process_spawn"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Promise.new",
+    "symbol": "lean_io_promise_new"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Promise.resolve",
+    "symbol": "lean_io_promise_resolve"
+  },
+  {
+    "backend": "all",
+    "name": "IO.Promise.result?",
+    "symbol": "lean_io_promise_result_opt"
+  },
+  {
+    "backend": "all",
+    "name": "System.FilePath.readDir",
+    "symbol": "lean_io_read_dir"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.realPath",
+    "symbol": "lean_io_realpath"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.removeDir",
+    "symbol": "lean_io_remove_dir"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.removeFile",
+    "symbol": "lean_io_remove_file"
+  },
+  {
+    "backend": "all",
+    "name": "IO.FS.rename",
+    "symbol": "lean_io_rename"
+  },
+  {
+    "backend": "all",
+    "name": "IO.setNumHeartbeats",
+    "symbol": "lean_io_set_heartbeats"
+  },
+  {
+    "backend": "all",
+    "name": "System.FilePath.symlinkMetadata",
+    "symbol": "lean_io_symlink_metadata"
+  },
+  {
+    "backend": "all",
+    "name": "timeit",
+    "symbol": "lean_io_timeit"
+  },
+  {
+    "backend": "all",
+    "name": "IO.wait",
+    "symbol": "lean_io_wait"
+  },
+  {
+    "backend": "all",
+    "name": "IO.waitAny",
+    "symbol": "lean_io_wait_any"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Environment.0.Lean.exportIREntries",
+    "symbol": "lean_ir_export_entries"
+  },
+  {
+    "backend": "all",
+    "name": "isExclusiveUnsafe",
+    "symbol": "lean_is_exclusive_obj"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.isExprDefEqAux",
+    "symbol": "lean_is_expr_def_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.isLevelDefEqAux",
+    "symbol": "lean_is_level_def_eq"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Environment.0.Lean.Environment.isReservedName",
+    "symbol": "lean_is_reserved_name"
+  },
+  {
+    "backend": "all",
+    "name": "isScalarObj",
+    "symbol": "lean_is_scalar"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.abs",
+    "symbol": "lean_isize_abs"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.add",
+    "symbol": "lean_isize_add"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.complement",
+    "symbol": "lean_isize_complement"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.decEq",
+    "symbol": "lean_isize_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.decLe",
+    "symbol": "lean_isize_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.decLt",
+    "symbol": "lean_isize_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.div",
+    "symbol": "lean_isize_div"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.land",
+    "symbol": "lean_isize_land"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.lor",
+    "symbol": "lean_isize_lor"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.mod",
+    "symbol": "lean_isize_mod"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.mul",
+    "symbol": "lean_isize_mul"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.neg",
+    "symbol": "lean_isize_neg"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.ofInt",
+    "symbol": "lean_isize_of_int"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.ofNat",
+    "symbol": "lean_isize_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.shiftLeft",
+    "symbol": "lean_isize_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.shiftRight",
+    "symbol": "lean_isize_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.sub",
+    "symbol": "lean_isize_sub"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.toFloat",
+    "symbol": "lean_isize_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.toFloat32",
+    "symbol": "lean_isize_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.toInt",
+    "symbol": "lean_isize_to_int"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.toInt16",
+    "symbol": "lean_isize_to_int16"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.toInt32",
+    "symbol": "lean_isize_to_int32"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.toInt64",
+    "symbol": "lean_isize_to_int64"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.toInt8",
+    "symbol": "lean_isize_to_int8"
+  },
+  {
+    "backend": "all",
+    "name": "ISize.xor",
+    "symbol": "lean_isize_xor"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Kernel.check",
+    "symbol": "lean_kernel_check"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Kernel.isDefEq",
+    "symbol": "lean_kernel_is_def_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Kernel.whnf",
+    "symbol": "lean_kernel_whnf"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Level.beq",
+    "symbol": "lean_level_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Level.mkData",
+    "symbol": "lean_level_mk_data"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.libUVVersionFn",
+    "symbol": "lean_libuv_version"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.addAttributeAtIndex",
+    "symbol": "lean_llvm_add_attribute_at_index"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.addCase",
+    "symbol": "lean_llvm_add_case"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.addFunction",
+    "symbol": "lean_llvm_add_function"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.addGlobal",
+    "symbol": "lean_llvm_add_global"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.appendBasicBlockInContext",
+    "symbol": "lean_llvm_append_basic_block_in_context"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.arrayType",
+    "symbol": "lean_llvm_array_type"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildAdd",
+    "symbol": "lean_llvm_build_add"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildAlloca",
+    "symbol": "lean_llvm_build_alloca"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildBr",
+    "symbol": "lean_llvm_build_br"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildCall2",
+    "symbol": "lean_llvm_build_call2"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildCondBr",
+    "symbol": "lean_llvm_build_cond_br"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildGEP2",
+    "symbol": "lean_llvm_build_gep2"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildGlobalString",
+    "symbol": "lean_llvm_build_global_string"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildICmp",
+    "symbol": "lean_llvm_build_icmp"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildInBoundsGEP2",
+    "symbol": "lean_llvm_build_inbounds_gep2"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildLoad2",
+    "symbol": "lean_llvm_build_load2"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildMul",
+    "symbol": "lean_llvm_build_mul"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildNot",
+    "symbol": "lean_llvm_build_not"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildPtrToInt",
+    "symbol": "lean_llvm_build_ptr_to_int"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildRet",
+    "symbol": "lean_llvm_build_ret"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildSext",
+    "symbol": "lean_llvm_build_sext"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildSextOrTrunc",
+    "symbol": "lean_llvm_build_sext_or_trunc"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildStore",
+    "symbol": "lean_llvm_build_store"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildSub",
+    "symbol": "lean_llvm_build_sub"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildSwitch",
+    "symbol": "lean_llvm_build_switch"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildUnreachable",
+    "symbol": "lean_llvm_build_unreachable"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.buildZext",
+    "symbol": "lean_llvm_build_zext"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.clearInsertionPosition",
+    "symbol": "lean_llvm_clear_insertion_position"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.constArray",
+    "symbol": "lean_llvm_const_array"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.constInt",
+    "symbol": "lean_llvm_const_int"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.constPointerNull",
+    "symbol": "lean_llvm_const_pointer_null"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.constString",
+    "symbol": "lean_llvm_const_string"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.countBasicBlocks",
+    "symbol": "lean_llvm_count_basic_blocks"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.createBuilderInContext",
+    "symbol": "lean_llvm_create_builder_in_context"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.createContext",
+    "symbol": "lean_llvm_create_context"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.createMemoryBufferWithContentsOfFile",
+    "symbol": "lean_llvm_create_memory_buffer_with_contents_of_file"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.createModule",
+    "symbol": "lean_llvm_create_module"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.createStringAttribute",
+    "symbol": "lean_llvm_create_string_attribute"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.createTargetMachine",
+    "symbol": "lean_llvm_create_target_machine"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.disposeModule",
+    "symbol": "lean_llvm_dispose_module"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.disposeTargetMachine",
+    "symbol": "lean_llvm_dispose_target_machine"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.doubleTypeInContext",
+    "symbol": "lean_llvm_double_type_in_context"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.floatTypeInContext",
+    "symbol": "lean_llvm_float_type_in_context"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.functionType",
+    "symbol": "lean_llvm_function_type"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getBasicBlockParent",
+    "symbol": "lean_llvm_get_basic_block_parent"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getDefaultTargetTriple",
+    "symbol": "lean_llvm_get_default_target_triple"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getEntryBasicBlock",
+    "symbol": "lean_llvm_get_entry_basic_block"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getFirstFunction",
+    "symbol": "lean_llvm_get_first_function"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getFirstGlobal",
+    "symbol": "lean_llvm_get_first_global"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getFirstInstruction",
+    "symbol": "lean_llvm_get_first_instruction"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getInsertBlock",
+    "symbol": "lean_llvm_get_insert_block"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getNamedFunction",
+    "symbol": "lean_llvm_get_named_function"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getNamedGlobal",
+    "symbol": "lean_llvm_get_named_global"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getNextFunction",
+    "symbol": "lean_llvm_get_next_function"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getNextGlobal",
+    "symbol": "lean_llvm_get_next_global"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getTargetFromTriple",
+    "symbol": "lean_llvm_get_target_from_triple"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getUndef",
+    "symbol": "lean_llvm_get_undef"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.Value.getName",
+    "symbol": "lean_llvm_get_value_name2"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.llvmInitializeTargetInfo",
+    "symbol": "lean_llvm_initialize_target_info"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.intTypeInContext",
+    "symbol": "lean_llvm_int_type_in_context"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.linkModules",
+    "symbol": "lean_llvm_link_modules"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.moduleToString",
+    "symbol": "lean_llvm_module_to_string"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.opaquePointerTypeInContext",
+    "symbol": "lean_llvm_opaque_pointer_type_in_context"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.parseBitcode",
+    "symbol": "lean_llvm_parse_bitcode"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.pointerType",
+    "symbol": "lean_llvm_pointer_type"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.positionBuilderAtEnd",
+    "symbol": "lean_llvm_position_builder_at_end"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.positionBuilderBefore",
+    "symbol": "lean_llvm_position_builder_before"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.printModuletoFile",
+    "symbol": "lean_llvm_print_module_to_file"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.printModuletoString",
+    "symbol": "lean_llvm_print_module_to_string"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.setDLLStorageClass",
+    "symbol": "lean_llvm_set_dll_storage_class"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.setInitializer",
+    "symbol": "lean_llvm_set_initializer"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.setLinkage",
+    "symbol": "lean_llvm_set_linkage"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.setTailCall",
+    "symbol": "lean_llvm_set_tail_call"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.setVisibility",
+    "symbol": "lean_llvm_set_visibility"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.targetMachineEmitToFile",
+    "symbol": "lean_llvm_target_machine_emit_to_file"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.typeOf",
+    "symbol": "lean_llvm_type_of"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.verifyModule",
+    "symbol": "lean_llvm_verify_module"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.voidType",
+    "symbol": "lean_llvm_void_type_in_context"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.writeBitcodeToFile",
+    "symbol": "lean_llvm_write_bitcode_to_file"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.DocString.Links.0.Lean.getManualRoot",
+    "symbol": "lean_manual_get_root"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.maxSmallNatFn",
+    "symbol": "lean_max_small_nat"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.PrettyPrinter.Formatter.mkAntiquot.formatter'",
+    "symbol": "lean_mk_antiquot_formatter"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.PrettyPrinter.Parenthesizer.mkAntiquot.parenthesizer'",
+    "symbol": "lean_mk_antiquot_parenthesizer"
+  },
+  {
+    "backend": "all",
+    "name": "Array.replicate",
+    "symbol": "lean_mk_array"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.mkCasesOnImp",
+    "symbol": "lean_mk_cases_on"
+  },
+  {
+    "backend": "all",
+    "name": "Array.emptyWithCapacity",
+    "symbol": "lean_mk_empty_array_with_capacity"
+  },
+  {
+    "backend": "all",
+    "name": "Array.mkEmpty",
+    "symbol": "lean_mk_empty_array_with_capacity"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.emptyWithCapacity",
+    "symbol": "lean_mk_empty_byte_array"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.emptyWithCapacity",
+    "symbol": "lean_mk_empty_float_array"
+  },
+  {
+    "backend": "all",
+    "name": "Thunk.mk",
+    "symbol": "lean_mk_thunk"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Name.beq",
+    "symbol": "lean_name_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Int.natAbs",
+    "symbol": "lean_nat_abs"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.add",
+    "symbol": "lean_nat_add"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.beq",
+    "symbol": "lean_nat_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.decEq",
+    "symbol": "lean_nat_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.ble",
+    "symbol": "lean_nat_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.decLe",
+    "symbol": "lean_nat_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.decLt",
+    "symbol": "lean_nat_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.div",
+    "symbol": "lean_nat_div"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.divExact",
+    "symbol": "lean_nat_div_exact"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.gcd",
+    "symbol": "lean_nat_gcd"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.gcd._unary",
+    "symbol": "lean_nat_gcd"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.land",
+    "symbol": "lean_nat_land"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.log2",
+    "symbol": "lean_nat_log2"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.lor",
+    "symbol": "lean_nat_lor"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.xor",
+    "symbol": "lean_nat_lxor"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.mod",
+    "symbol": "lean_nat_mod"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.modCore",
+    "symbol": "lean_nat_mod"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.mul",
+    "symbol": "lean_nat_mul"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.pow",
+    "symbol": "lean_nat_pow"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.pred",
+    "symbol": "lean_nat_pred"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.shiftLeft",
+    "symbol": "lean_nat_shiftl"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.shiftRight",
+    "symbol": "lean_nat_shiftr"
+  },
+  {
+    "backend": "all",
+    "name": "Nat.sub",
+    "symbol": "lean_nat_sub"
+  },
+  {
+    "backend": "all",
+    "name": "Int.ofNat",
+    "symbol": "lean_nat_to_int"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.openSSLVersionFn",
+    "symbol": "lean_openssl_version"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Init.System.Promise.0.IO.Option.getOrBlock!",
+    "symbol": "lean_option_get_or_block"
+  },
+  {
+    "backend": "all",
+    "name": "panicCore",
+    "symbol": "lean_panic_fn_borrowed"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.PrettyPrinter.Formatter.interpretParserDescr'",
+    "symbol": "lean_pretty_printer_formatter_interpret_parser_descr"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.PrettyPrinter.Parenthesizer.interpretParserDescr'",
+    "symbol": "lean_pretty_printer_parenthesizer_interpret_parser_descr"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.profileit",
+    "symbol": "lean_profileit"
+  },
+  {
+    "backend": "all",
+    "name": "ptrAddrUnsafe",
+    "symbol": "lean_ptr_addr"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Expr.replaceImpl",
+    "symbol": "lean_replace_expr"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.runInit",
+    "symbol": "lean_run_init"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Environment.0.Lean.runInitAttrs",
+    "symbol": "lean_run_init_attrs"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Compiler.InitAttr.0.Lean.runModInitCore",
+    "symbol": "lean_run_mod_init_core"
+  },
+  {
+    "backend": "all",
+    "name": "Runtime.forget",
+    "symbol": "lean_runtime_forget"
+  },
+  {
+    "backend": "all",
+    "name": "Runtime.hold",
+    "symbol": "lean_runtime_hold"
+  },
+  {
+    "backend": "all",
+    "name": "Runtime.markMultiThreaded",
+    "symbol": "lean_runtime_mark_multi_threaded"
+  },
+  {
+    "backend": "all",
+    "name": "Runtime.markPersistent",
+    "symbol": "lean_runtime_mark_persistent"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.beq",
+    "symbol": "lean_sarray_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.decEq",
+    "symbol": "lean_sarray_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.usize",
+    "symbol": "lean_sarray_size"
+  },
+  {
+    "backend": "all",
+    "name": "FloatArray.usize",
+    "symbol": "lean_sarray_size"
+  },
+  {
+    "backend": "all",
+    "name": "ShareCommon.Object.eq",
+    "symbol": "lean_sharecommon_eq"
+  },
+  {
+    "backend": "all",
+    "name": "ShareCommon.Object.hash",
+    "symbol": "lean_sharecommon_hash"
+  },
+  {
+    "backend": "all",
+    "name": "ShareCommon.shareCommon'",
+    "symbol": "lean_sharecommon_quick"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Simp.simp",
+    "symbol": "lean_simp"
+  },
+  {
+    "backend": "all",
+    "name": "String.Slice.instDecidableLt",
+    "symbol": "lean_slice_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "String.Slice.hash",
+    "symbol": "lean_slice_hash"
+  },
+  {
+    "backend": "all",
+    "name": "sorryAx",
+    "symbol": "lean_sorry"
+  },
+  {
+    "backend": "all",
+    "name": "ST.Prim.mkRef",
+    "symbol": "lean_st_mk_ref"
+  },
+  {
+    "backend": "all",
+    "name": "ST.Prim.Ref.get",
+    "symbol": "lean_st_ref_get"
+  },
+  {
+    "backend": "all",
+    "name": "ST.Prim.Ref.ptrEq",
+    "symbol": "lean_st_ref_ptr_eq"
+  },
+  {
+    "backend": "all",
+    "name": "ST.Prim.Ref.set",
+    "symbol": "lean_st_ref_set"
+  },
+  {
+    "backend": "all",
+    "name": "ST.Prim.Ref.swap",
+    "symbol": "lean_st_ref_swap"
+  },
+  {
+    "backend": "all",
+    "name": "ST.Prim.Ref.take",
+    "symbol": "lean_st_ref_take"
+  },
+  {
+    "backend": "all",
+    "name": "ShareCommon.State.shareCommon",
+    "symbol": "lean_state_sharecommon"
+  },
+  {
+    "backend": "all",
+    "name": "strictAnd",
+    "symbol": "lean_strict_and"
+  },
+  {
+    "backend": "all",
+    "name": "strictOr",
+    "symbol": "lean_strict_or"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.any",
+    "symbol": "lean_string_any"
+  },
+  {
+    "backend": "all",
+    "name": "String.append",
+    "symbol": "lean_string_append"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.append",
+    "symbol": "lean_string_append"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.capitalize",
+    "symbol": "lean_string_capitalize"
+  },
+  {
+    "backend": "all",
+    "name": "String.compare",
+    "symbol": "lean_string_compare"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.contains",
+    "symbol": "lean_string_contains"
+  },
+  {
+    "backend": "all",
+    "name": "String.data",
+    "symbol": "lean_string_data"
+  },
+  {
+    "backend": "all",
+    "name": "String.toList",
+    "symbol": "lean_string_data"
+  },
+  {
+    "backend": "all",
+    "name": "String.decEq",
+    "symbol": "lean_string_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "String.decidableLT",
+    "symbol": "lean_string_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.drop",
+    "symbol": "lean_string_drop"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.dropRight",
+    "symbol": "lean_string_dropright"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.foldl",
+    "symbol": "lean_string_foldl"
+  },
+  {
+    "backend": "all",
+    "name": "String.ofByteArray",
+    "symbol": "lean_string_from_utf8_unchecked"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.front",
+    "symbol": "lean_string_front"
+  },
+  {
+    "backend": "all",
+    "name": "String.getUtf8Byte",
+    "symbol": "lean_string_get_byte_fast"
+  },
+  {
+    "backend": "all",
+    "name": "String.getUTF8Byte",
+    "symbol": "lean_string_get_byte_fast"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.getUTF8Byte",
+    "symbol": "lean_string_get_byte_fast"
+  },
+  {
+    "backend": "all",
+    "name": "String.hash",
+    "symbol": "lean_string_hash"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.intercalate",
+    "symbol": "lean_string_intercalate"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.isValid",
+    "symbol": "lean_string_is_valid_pos"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.isEmpty",
+    "symbol": "lean_string_isempty"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.isPrefixOf",
+    "symbol": "lean_string_isprefixof"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.length",
+    "symbol": "lean_string_length"
+  },
+  {
+    "backend": "all",
+    "name": "String.length",
+    "symbol": "lean_string_length"
+  },
+  {
+    "backend": "all",
+    "name": "String.Slice.Pattern.Internal.memcmpStr",
+    "symbol": "lean_string_memcmp"
+  },
+  {
+    "backend": "all",
+    "name": "String.mk",
+    "symbol": "lean_string_mk"
+  },
+  {
+    "backend": "all",
+    "name": "String.ofList",
+    "symbol": "lean_string_mk"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.nextWhile",
+    "symbol": "lean_string_nextwhile"
+  },
+  {
+    "backend": "all",
+    "name": "USize.repr",
+    "symbol": "lean_string_of_usize"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.offsetOfPos",
+    "symbol": "lean_string_offsetofpos"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.Internal.min",
+    "symbol": "lean_string_pos_min"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.Internal.sub",
+    "symbol": "lean_string_pos_sub"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.posOf",
+    "symbol": "lean_string_posof"
+  },
+  {
+    "backend": "all",
+    "name": "String.push",
+    "symbol": "lean_string_push"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.pushn",
+    "symbol": "lean_string_pushn"
+  },
+  {
+    "backend": "all",
+    "name": "String.toByteArray",
+    "symbol": "lean_string_to_utf8"
+  },
+  {
+    "backend": "all",
+    "name": "String.toUTF8",
+    "symbol": "lean_string_to_utf8"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.trim",
+    "symbol": "lean_string_trim"
+  },
+  {
+    "backend": "all",
+    "name": "String.atEnd",
+    "symbol": "lean_string_utf8_at_end"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.atEnd",
+    "symbol": "lean_string_utf8_at_end"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.atEnd",
+    "symbol": "lean_string_utf8_at_end"
+  },
+  {
+    "backend": "all",
+    "name": "String.utf8ByteSize",
+    "symbol": "lean_string_utf8_byte_size"
+  },
+  {
+    "backend": "all",
+    "name": "String.extract",
+    "symbol": "lean_string_utf8_extract"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.extract",
+    "symbol": "lean_string_utf8_extract"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.extract",
+    "symbol": "lean_string_utf8_extract"
+  },
+  {
+    "backend": "all",
+    "name": "String.get",
+    "symbol": "lean_string_utf8_get"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.get",
+    "symbol": "lean_string_utf8_get"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.get",
+    "symbol": "lean_string_utf8_get"
+  },
+  {
+    "backend": "all",
+    "name": "String.get!",
+    "symbol": "lean_string_utf8_get_bang"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.get!",
+    "symbol": "lean_string_utf8_get_bang"
+  },
+  {
+    "backend": "all",
+    "name": "String.decodeChar",
+    "symbol": "lean_string_utf8_get_fast"
+  },
+  {
+    "backend": "all",
+    "name": "String.get'",
+    "symbol": "lean_string_utf8_get_fast"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.get'",
+    "symbol": "lean_string_utf8_get_fast"
+  },
+  {
+    "backend": "all",
+    "name": "String.get?",
+    "symbol": "lean_string_utf8_get_opt"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.get?",
+    "symbol": "lean_string_utf8_get_opt"
+  },
+  {
+    "backend": "all",
+    "name": "String.Internal.next",
+    "symbol": "lean_string_utf8_next"
+  },
+  {
+    "backend": "all",
+    "name": "String.next",
+    "symbol": "lean_string_utf8_next"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.next",
+    "symbol": "lean_string_utf8_next"
+  },
+  {
+    "backend": "all",
+    "name": "String.next'",
+    "symbol": "lean_string_utf8_next_fast"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.next",
+    "symbol": "lean_string_utf8_next_fast"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.next'",
+    "symbol": "lean_string_utf8_next_fast"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.prev",
+    "symbol": "lean_string_utf8_prev"
+  },
+  {
+    "backend": "all",
+    "name": "String.prev",
+    "symbol": "lean_string_utf8_prev"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.Raw.set",
+    "symbol": "lean_string_utf8_set"
+  },
+  {
+    "backend": "all",
+    "name": "String.Pos.set",
+    "symbol": "lean_string_utf8_set"
+  },
+  {
+    "backend": "all",
+    "name": "String.set",
+    "symbol": "lean_string_utf8_set"
+  },
+  {
+    "backend": "all",
+    "name": "ByteArray.validateUTF8",
+    "symbol": "lean_string_validate_utf8"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.all",
+    "symbol": "lean_substring_all"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.beq",
+    "symbol": "lean_substring_beq"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.drop",
+    "symbol": "lean_substring_drop"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.extract",
+    "symbol": "lean_substring_extract"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.front",
+    "symbol": "lean_substring_front"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.get",
+    "symbol": "lean_substring_get"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.isEmpty",
+    "symbol": "lean_substring_isempty"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.prev",
+    "symbol": "lean_substring_prev"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.takeWhile",
+    "symbol": "lean_substring_takewhile"
+  },
+  {
+    "backend": "all",
+    "name": "Substring.Raw.Internal.toString",
+    "symbol": "lean_substring_tostring"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Lean.Meta.Sym.Pattern.0.Lean.Meta.Sym.isDefEqMain",
+    "symbol": "lean_sym_def_eq"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Sym.DSimp.dsimp",
+    "symbol": "lean_sym_dsimp"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.Sym.Simp.simp",
+    "symbol": "lean_sym_simp"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.synthPending",
+    "symbol": "lean_synth_pending"
+  },
+  {
+    "backend": "all",
+    "name": "System.Platform.getIsEmscripten",
+    "symbol": "lean_system_platform_emscripten"
+  },
+  {
+    "backend": "all",
+    "name": "System.Platform.getNumBits",
+    "symbol": "lean_system_platform_nbits"
+  },
+  {
+    "backend": "all",
+    "name": "System.Platform.getIsOSX",
+    "symbol": "lean_system_platform_osx"
+  },
+  {
+    "backend": "all",
+    "name": "System.Platform.getTarget",
+    "symbol": "lean_system_platform_target"
+  },
+  {
+    "backend": "all",
+    "name": "System.Platform.getIsWindows",
+    "symbol": "lean_system_platform_windows"
+  },
+  {
+    "backend": "all",
+    "name": "Task.bind",
+    "symbol": "lean_task_bind"
+  },
+  {
+    "backend": "all",
+    "name": "Task.get",
+    "symbol": "lean_task_get_own"
+  },
+  {
+    "backend": "all",
+    "name": "Task.map",
+    "symbol": "lean_task_map"
+  },
+  {
+    "backend": "all",
+    "name": "Task.pure",
+    "symbol": "lean_task_pure"
+  },
+  {
+    "backend": "all",
+    "name": "Task.spawn",
+    "symbol": "lean_task_spawn"
+  },
+  {
+    "backend": "all",
+    "name": "Thunk.get",
+    "symbol": "lean_thunk_get_own"
+  },
+  {
+    "backend": "all",
+    "name": "Thunk.pure",
+    "symbol": "lean_thunk_pure"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.add",
+    "symbol": "lean_uint16_add"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.complement",
+    "symbol": "lean_uint16_complement"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.decEq",
+    "symbol": "lean_uint16_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.decLe",
+    "symbol": "lean_uint16_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.decLt",
+    "symbol": "lean_uint16_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.div",
+    "symbol": "lean_uint16_div"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.land",
+    "symbol": "lean_uint16_land"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.log2",
+    "symbol": "lean_uint16_log2"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.lor",
+    "symbol": "lean_uint16_lor"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.mod",
+    "symbol": "lean_uint16_mod"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.mul",
+    "symbol": "lean_uint16_mul"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.neg",
+    "symbol": "lean_uint16_neg"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.ofNat",
+    "symbol": "lean_uint16_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.ofNatLT",
+    "symbol": "lean_uint16_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.ofBitVec",
+    "symbol": "lean_uint16_of_nat_mk"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.shiftLeft",
+    "symbol": "lean_uint16_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.shiftRight",
+    "symbol": "lean_uint16_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.sub",
+    "symbol": "lean_uint16_sub"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.toFloat",
+    "symbol": "lean_uint16_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.toFloat32",
+    "symbol": "lean_uint16_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.toBitVec",
+    "symbol": "lean_uint16_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.toNat",
+    "symbol": "lean_uint16_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.toUInt32",
+    "symbol": "lean_uint16_to_uint32"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.toUInt64",
+    "symbol": "lean_uint16_to_uint64"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.toUInt8",
+    "symbol": "lean_uint16_to_uint8"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.toUSize",
+    "symbol": "lean_uint16_to_usize"
+  },
+  {
+    "backend": "all",
+    "name": "UInt16.xor",
+    "symbol": "lean_uint16_xor"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.add",
+    "symbol": "lean_uint32_add"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.complement",
+    "symbol": "lean_uint32_complement"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.decEq",
+    "symbol": "lean_uint32_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.decLe",
+    "symbol": "lean_uint32_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.decLt",
+    "symbol": "lean_uint32_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.div",
+    "symbol": "lean_uint32_div"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.land",
+    "symbol": "lean_uint32_land"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.log2",
+    "symbol": "lean_uint32_log2"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.lor",
+    "symbol": "lean_uint32_lor"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.mod",
+    "symbol": "lean_uint32_mod"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.mul",
+    "symbol": "lean_uint32_mul"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.neg",
+    "symbol": "lean_uint32_neg"
+  },
+  {
+    "backend": "all",
+    "name": "Char.ofNatAux",
+    "symbol": "lean_uint32_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.ofNat",
+    "symbol": "lean_uint32_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.ofNatLT",
+    "symbol": "lean_uint32_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.ofBitVec",
+    "symbol": "lean_uint32_of_nat_mk"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.shiftLeft",
+    "symbol": "lean_uint32_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.shiftRight",
+    "symbol": "lean_uint32_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.sub",
+    "symbol": "lean_uint32_sub"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.toFloat",
+    "symbol": "lean_uint32_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.toFloat32",
+    "symbol": "lean_uint32_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.toBitVec",
+    "symbol": "lean_uint32_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.toNat",
+    "symbol": "lean_uint32_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.toUInt16",
+    "symbol": "lean_uint32_to_uint16"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.toUInt64",
+    "symbol": "lean_uint32_to_uint64"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.toUInt8",
+    "symbol": "lean_uint32_to_uint8"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.toUSize",
+    "symbol": "lean_uint32_to_usize"
+  },
+  {
+    "backend": "all",
+    "name": "UInt32.xor",
+    "symbol": "lean_uint32_xor"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.add",
+    "symbol": "lean_uint64_add"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.complement",
+    "symbol": "lean_uint64_complement"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.decEq",
+    "symbol": "lean_uint64_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.decLe",
+    "symbol": "lean_uint64_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.decLt",
+    "symbol": "lean_uint64_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.div",
+    "symbol": "lean_uint64_div"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.land",
+    "symbol": "lean_uint64_land"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.log2",
+    "symbol": "lean_uint64_log2"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.lor",
+    "symbol": "lean_uint64_lor"
+  },
+  {
+    "backend": "all",
+    "name": "mixHash",
+    "symbol": "lean_uint64_mix_hash"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.mod",
+    "symbol": "lean_uint64_mod"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.mul",
+    "symbol": "lean_uint64_mul"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.neg",
+    "symbol": "lean_uint64_neg"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.ofNat",
+    "symbol": "lean_uint64_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.ofNatLT",
+    "symbol": "lean_uint64_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.ofBitVec",
+    "symbol": "lean_uint64_of_nat_mk"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.shiftLeft",
+    "symbol": "lean_uint64_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.shiftRight",
+    "symbol": "lean_uint64_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.sub",
+    "symbol": "lean_uint64_sub"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.toFloat",
+    "symbol": "lean_uint64_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.toFloat32",
+    "symbol": "lean_uint64_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.toBitVec",
+    "symbol": "lean_uint64_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.toNat",
+    "symbol": "lean_uint64_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.toUInt16",
+    "symbol": "lean_uint64_to_uint16"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.toUInt32",
+    "symbol": "lean_uint64_to_uint32"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.toUInt8",
+    "symbol": "lean_uint64_to_uint8"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.toUSize",
+    "symbol": "lean_uint64_to_usize"
+  },
+  {
+    "backend": "all",
+    "name": "UInt64.xor",
+    "symbol": "lean_uint64_xor"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.add",
+    "symbol": "lean_uint8_add"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.complement",
+    "symbol": "lean_uint8_complement"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.decEq",
+    "symbol": "lean_uint8_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.decLe",
+    "symbol": "lean_uint8_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.decLt",
+    "symbol": "lean_uint8_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.div",
+    "symbol": "lean_uint8_div"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.land",
+    "symbol": "lean_uint8_land"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.log2",
+    "symbol": "lean_uint8_log2"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.lor",
+    "symbol": "lean_uint8_lor"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.mod",
+    "symbol": "lean_uint8_mod"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.mul",
+    "symbol": "lean_uint8_mul"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.neg",
+    "symbol": "lean_uint8_neg"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.ofNat",
+    "symbol": "lean_uint8_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.ofNatLT",
+    "symbol": "lean_uint8_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.ofBitVec",
+    "symbol": "lean_uint8_of_nat_mk"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.shiftLeft",
+    "symbol": "lean_uint8_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.shiftRight",
+    "symbol": "lean_uint8_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.sub",
+    "symbol": "lean_uint8_sub"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.toFloat",
+    "symbol": "lean_uint8_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.toFloat32",
+    "symbol": "lean_uint8_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.toBitVec",
+    "symbol": "lean_uint8_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.toNat",
+    "symbol": "lean_uint8_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.toUInt16",
+    "symbol": "lean_uint8_to_uint16"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.toUInt32",
+    "symbol": "lean_uint8_to_uint32"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.BinderInfo.toUInt64",
+    "symbol": "lean_uint8_to_uint64"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.toUInt64",
+    "symbol": "lean_uint8_to_uint64"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.toUSize",
+    "symbol": "lean_uint8_to_usize"
+  },
+  {
+    "backend": "all",
+    "name": "UInt8.xor",
+    "symbol": "lean_uint8_xor"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.updateEnvAttributes",
+    "symbol": "lean_update_env_attributes"
+  },
+  {
+    "backend": "all",
+    "name": "USize.add",
+    "symbol": "lean_usize_add"
+  },
+  {
+    "backend": "all",
+    "name": "USize.complement",
+    "symbol": "lean_usize_complement"
+  },
+  {
+    "backend": "all",
+    "name": "USize.decEq",
+    "symbol": "lean_usize_dec_eq"
+  },
+  {
+    "backend": "all",
+    "name": "USize.decLe",
+    "symbol": "lean_usize_dec_le"
+  },
+  {
+    "backend": "all",
+    "name": "USize.decLt",
+    "symbol": "lean_usize_dec_lt"
+  },
+  {
+    "backend": "all",
+    "name": "USize.div",
+    "symbol": "lean_usize_div"
+  },
+  {
+    "backend": "all",
+    "name": "USize.land",
+    "symbol": "lean_usize_land"
+  },
+  {
+    "backend": "all",
+    "name": "USize.log2",
+    "symbol": "lean_usize_log2"
+  },
+  {
+    "backend": "all",
+    "name": "USize.lor",
+    "symbol": "lean_usize_lor"
+  },
+  {
+    "backend": "all",
+    "name": "USize.mod",
+    "symbol": "lean_usize_mod"
+  },
+  {
+    "backend": "all",
+    "name": "USize.mul",
+    "symbol": "lean_usize_mul"
+  },
+  {
+    "backend": "all",
+    "name": "USize.neg",
+    "symbol": "lean_usize_neg"
+  },
+  {
+    "backend": "all",
+    "name": "USize.ofNat",
+    "symbol": "lean_usize_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "USize.ofNat32",
+    "symbol": "lean_usize_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "USize.ofNatLT",
+    "symbol": "lean_usize_of_nat"
+  },
+  {
+    "backend": "all",
+    "name": "USize.ofBitVec",
+    "symbol": "lean_usize_of_nat_mk"
+  },
+  {
+    "backend": "all",
+    "name": "USize.shiftLeft",
+    "symbol": "lean_usize_shift_left"
+  },
+  {
+    "backend": "all",
+    "name": "USize.shiftRight",
+    "symbol": "lean_usize_shift_right"
+  },
+  {
+    "backend": "all",
+    "name": "USize.sub",
+    "symbol": "lean_usize_sub"
+  },
+  {
+    "backend": "all",
+    "name": "USize.toFloat",
+    "symbol": "lean_usize_to_float"
+  },
+  {
+    "backend": "all",
+    "name": "USize.toFloat32",
+    "symbol": "lean_usize_to_float32"
+  },
+  {
+    "backend": "all",
+    "name": "USize.toBitVec",
+    "symbol": "lean_usize_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "USize.toNat",
+    "symbol": "lean_usize_to_nat"
+  },
+  {
+    "backend": "all",
+    "name": "USize.toUInt16",
+    "symbol": "lean_usize_to_uint16"
+  },
+  {
+    "backend": "all",
+    "name": "USize.toUInt32",
+    "symbol": "lean_usize_to_uint32"
+  },
+  {
+    "backend": "all",
+    "name": "USize.toUInt64",
+    "symbol": "lean_usize_to_uint64"
+  },
+  {
+    "backend": "all",
+    "name": "USize.toUInt8",
+    "symbol": "lean_usize_to_uint8"
+  },
+  {
+    "backend": "all",
+    "name": "USize.xor",
+    "symbol": "lean_usize_xor"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.chdir",
+    "symbol": "lean_uv_chdir"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.cpuInfo",
+    "symbol": "lean_uv_cpu_info"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.cwd",
+    "symbol": "lean_uv_cwd"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.DNS.getAddrInfo",
+    "symbol": "lean_uv_dns_get_info"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.DNS.getNameInfo",
+    "symbol": "lean_uv_dns_get_name"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Loop.alive",
+    "symbol": "lean_uv_event_loop_alive"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Loop.configure",
+    "symbol": "lean_uv_event_loop_configure"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.exePath",
+    "symbol": "lean_uv_exepath"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.availableMemory",
+    "symbol": "lean_uv_get_available_memory"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.constrainedMemory",
+    "symbol": "lean_uv_get_constrained_memory"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.freeMemory",
+    "symbol": "lean_uv_get_free_memory"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.getProcessTitle",
+    "symbol": "lean_uv_get_process_title"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.totalMemory",
+    "symbol": "lean_uv_get_total_memory"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.getrusage",
+    "symbol": "lean_uv_getrusage"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.hrtime",
+    "symbol": "lean_uv_hrtime"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Net.interfaceAddresses",
+    "symbol": "lean_uv_interface_addresses"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Net.IPv4Addr.toString",
+    "symbol": "lean_uv_ntop_v4"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Net.IPv6Addr.toString",
+    "symbol": "lean_uv_ntop_v6"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osEnviron",
+    "symbol": "lean_uv_os_environ"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osGetGroup",
+    "symbol": "lean_uv_os_get_group"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osGetPasswd",
+    "symbol": "lean_uv_os_get_passwd"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osGetenv",
+    "symbol": "lean_uv_os_getenv"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osGetHostname",
+    "symbol": "lean_uv_os_gethostname"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osGetPid",
+    "symbol": "lean_uv_os_getpid"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osGetPpid",
+    "symbol": "lean_uv_os_getppid"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osGetPriority",
+    "symbol": "lean_uv_os_getpriority"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osHomedir",
+    "symbol": "lean_uv_os_homedir"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osSetenv",
+    "symbol": "lean_uv_os_setenv"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osSetPriority",
+    "symbol": "lean_uv_os_setpriority"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osTmpdir",
+    "symbol": "lean_uv_os_tmpdir"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osUname",
+    "symbol": "lean_uv_os_uname"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.osUnsetenv",
+    "symbol": "lean_uv_os_unsetenv"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Net.IPv4Addr.ofString",
+    "symbol": "lean_uv_pton_v4"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Net.IPv6Addr.ofString",
+    "symbol": "lean_uv_pton_v6"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.random",
+    "symbol": "lean_uv_random"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.setProcessTitle",
+    "symbol": "lean_uv_set_process_title"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Signal.cancel",
+    "symbol": "lean_uv_signal_cancel"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Signal.mk",
+    "symbol": "lean_uv_signal_mk"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Signal.next",
+    "symbol": "lean_uv_signal_next"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Signal.stop",
+    "symbol": "lean_uv_signal_stop"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.accept",
+    "symbol": "lean_uv_tcp_accept"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.bind",
+    "symbol": "lean_uv_tcp_bind"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.cancelAccept",
+    "symbol": "lean_uv_tcp_cancel_accept"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.cancelRecv",
+    "symbol": "lean_uv_tcp_cancel_recv"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.connect",
+    "symbol": "lean_uv_tcp_connect"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.getPeerName",
+    "symbol": "lean_uv_tcp_getpeername"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.getSockName",
+    "symbol": "lean_uv_tcp_getsockname"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.keepAlive",
+    "symbol": "lean_uv_tcp_keepalive"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.listen",
+    "symbol": "lean_uv_tcp_listen"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.new",
+    "symbol": "lean_uv_tcp_new"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.noDelay",
+    "symbol": "lean_uv_tcp_nodelay"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.recv?",
+    "symbol": "lean_uv_tcp_recv"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.send",
+    "symbol": "lean_uv_tcp_send"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.shutdown",
+    "symbol": "lean_uv_tcp_shutdown"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.tryAccept",
+    "symbol": "lean_uv_tcp_try_accept"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.TCP.Socket.waitReadable",
+    "symbol": "lean_uv_tcp_wait_readable"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Timer.cancel",
+    "symbol": "lean_uv_timer_cancel"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Timer.mk",
+    "symbol": "lean_uv_timer_mk"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Timer.next",
+    "symbol": "lean_uv_timer_next"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Timer.reset",
+    "symbol": "lean_uv_timer_reset"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.Timer.stop",
+    "symbol": "lean_uv_timer_stop"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.bind",
+    "symbol": "lean_uv_udp_bind"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.cancelRecv",
+    "symbol": "lean_uv_udp_cancel_recv"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.connect",
+    "symbol": "lean_uv_udp_connect"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.getPeerName",
+    "symbol": "lean_uv_udp_getpeername"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.getSockName",
+    "symbol": "lean_uv_udp_getsockname"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.new",
+    "symbol": "lean_uv_udp_new"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.recv",
+    "symbol": "lean_uv_udp_recv"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.send",
+    "symbol": "lean_uv_udp_send"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.setBroadcast",
+    "symbol": "lean_uv_udp_set_broadcast"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.setMembership",
+    "symbol": "lean_uv_udp_set_membership"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.setMulticastInterface",
+    "symbol": "lean_uv_udp_set_multicast_interface"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.setMulticastLoop",
+    "symbol": "lean_uv_udp_set_multicast_loop"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.setMulticastTTL",
+    "symbol": "lean_uv_udp_set_multicast_ttl"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.setTTL",
+    "symbol": "lean_uv_udp_set_ttl"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.UDP.Socket.waitReadable",
+    "symbol": "lean_uv_udp_wait_readable"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Internal.UV.System.uptime",
+    "symbol": "lean_uv_uptime"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.version.getIsRelease",
+    "symbol": "lean_version_get_is_release"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Init.Meta.Defs.0.Lean.version.getMajor",
+    "symbol": "lean_version_get_major"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Init.Meta.Defs.0.Lean.version.getMinor",
+    "symbol": "lean_version_get_minor"
+  },
+  {
+    "backend": "all",
+    "name": "_private.Init.Meta.Defs.0.Lean.version.getPatch",
+    "symbol": "lean_version_get_patch"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.version.getSpecialDesc",
+    "symbol": "lean_version_get_special_desc"
+  },
+  {
+    "backend": "all",
+    "name": "Void.mk",
+    "symbol": "lean_void_mk"
+  },
+  {
+    "backend": "all",
+    "name": "Lean.Meta.whnf",
+    "symbol": "lean_whnf"
+  },
+  {
+    "backend": "all",
+    "name": "Std.Time.Database.Windows.getNextTransition",
+    "symbol": "lean_windows_get_next_transition"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.countParams",
+    "symbol": "llvm_count_params"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.getParam",
+    "symbol": "llvm_get_param"
+  },
+  {
+    "backend": "all",
+    "name": "LLVM.isDeclaration",
+    "symbol": "llvm_is_declaration"
+  },
+  {
+    "backend": "all",
+    "name": "Float.log",
+    "symbol": "log"
+  },
+  {
+    "backend": "all",
+    "name": "Float.log10",
+    "symbol": "log10"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.log10",
+    "symbol": "log10f"
+  },
+  {
+    "backend": "all",
+    "name": "Float.log2",
+    "symbol": "log2"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.log2",
+    "symbol": "log2f"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.log",
+    "symbol": "logf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.pow",
+    "symbol": "pow"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.pow",
+    "symbol": "powf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.round",
+    "symbol": "round"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.round",
+    "symbol": "roundf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.sin",
+    "symbol": "sin"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.sin",
+    "symbol": "sinf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.sinh",
+    "symbol": "sinh"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.sinh",
+    "symbol": "sinhf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.sqrt",
+    "symbol": "sqrt"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.sqrt",
+    "symbol": "sqrtf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.tan",
+    "symbol": "tan"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.tan",
+    "symbol": "tanf"
+  },
+  {
+    "backend": "all",
+    "name": "Float.tanh",
+    "symbol": "tanh"
+  },
+  {
+    "backend": "all",
+    "name": "Float32.tanh",
+    "symbol": "tanhf"
+  }
+]
