@@ -30,7 +30,10 @@ export function createScheduler(getExports, mode) {
     let callbacks = waiting.get(task);
     if (!callbacks) waiting.set(task, callbacks = new Set());
     callbacks.add(callback);
-    return () => { callbacks.delete(callback); if (!callbacks.size) waiting.delete(task); };
+    return () => {
+      callbacks.delete(callback);
+      if (!callbacks.size && waiting.get(task) === callbacks) waiting.delete(task);
+    };
   }
   function allocate() {
     if (pool.length) return pool.pop();

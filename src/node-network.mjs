@@ -124,7 +124,8 @@ export function createNodeNetwork({ add, get, release }) {
       t.server = net.createServer({ pauseOnConnect: true, allowHalfOpen: true }, socket => {
         socket.setNoDelay(t.noDelay);
         if (t.keepAlive) socket.setKeepAlive(...t.keepAlive);
-        const client = add(tcp(socket));
+        let client;
+        try { client = add(tcp(socket)); } catch { socket.destroy(); return; }
         if (t.acceptWait) { const waiter = t.acceptWait; t.acceptWait = null; waiter.resolve(numbers(client)); }
         else t.accepted.push(client);
       });

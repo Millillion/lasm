@@ -149,7 +149,20 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     case 30: throw new LeanExit(n);
     case 31: return Buffer.from(args.map(value => value + '\0').join(''));
     case 32: case 33: case 34: throw error('ENOTSUP', 'Native file locking is not supported by this Node runtime');
-    case 35: return new Promise(resolve => setTimeout(() => resolve(empty), n));
+    case 35: return new Promise((resolve, reject) => {
+      let timer;
+      let remaining = n;
+      const token = add({ type: 'sleep', close() { clearTimeout(timer); reject(error('ECANCELED', 'Sleep cancelled')); } });
+      const step = () => {
+        const delay = Math.min(remaining, 2_147_483_647);
+        timer = setTimeout(() => {
+          remaining -= delay;
+          if (remaining > 0) step();
+          else { resources.delete(token); resolve(empty); }
+        }, delay);
+      };
+      step();
+    });
     default: throw error('ENOSYS', `Unsupported Lean runtime operation ${op}`);
     }
   }
