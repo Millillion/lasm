@@ -1,14 +1,12 @@
-import * as fs from 'node:fs';
 import * as fsp from 'node:fs/promises';
-import { promisify, getSystemErrorMessage } from 'node:util';
-import { resolve, join } from 'node:path';
+import { getSystemErrorMessage } from 'node:util';
+import { resolve, join, isAbsolute, sep } from 'node:path';
 import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
 import { createNodeNetwork } from './node-network.mjs';
 import { nativeFiles } from './native-files.mjs';
 import { createNodeProcesses } from './node-process.mjs';
 
-const open = promisify(fs.open);
 const empty = Buffer.alloc(0);
 export class LeanExit extends Error { constructor(code) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; } }
 export function numbers(...values) {
@@ -62,7 +60,9 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   function path(bytes) {
     const value = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
     if (value.includes('\0')) throw Object.assign(error('EINVAL', 'string contains NUL bytes'), { errno: 22, nativeMessage: true });
-    return resolve(directory, value);
+    // Leave dot segments and trailing separators for the OS to resolve. In
+    // particular, link/../file is not equivalent to lexical path normalization.
+    return !value || isAbsolute(value) ? value : directory + sep + value;
   }
   function serial(file, action) {
     file.pending = (file.pending ?? 0) + 1;
@@ -109,13 +109,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     const n = Number(arg);
     switch (op) {
     case 1: return (async () => {
-      const flags = [fs.constants.O_RDONLY, fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_TRUNC,
-        fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_TRUNC | fs.constants.O_EXCL,
-        fs.constants.O_RDWR, fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_APPEND][n];
-      if (flags === undefined) throw error('EINVAL', 'Invalid open mode');
-      const fd = await open(path(bytes), flags, 0o666).catch(err => { throw nativeFiles().error(Math.abs(err.errno)); });
-      try { return numbers(add(nativeFiles().openDescriptor(fd, ['r', 'w', 'w', 'r+', 'a'][n]))); }
-      catch (err) { try { fs.closeSync(fd); } catch {} throw err; }
+      return numbers(add(await nativeFiles().open(path(bytes), n)));
     })();
     case 2: { const f = get(id, 'file'); return serial(f, () => fileRead(f, n)); }
     case 3: { const f = get(id, 'file'); return serial(f, () => fileWrite(f, bytes)); }
@@ -128,21 +122,33 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     case 9: return numbers(nativeFiles().isTty(get(id, 'file')));
     case 10: case 11: return (async () => {
       const stat = await (op === 11 && process.platform !== 'win32' ? fsp.lstat : fsp.stat)(path(bytes), { bigint: true });
-      const time = ns => [ns / 1_000_000_000n, ns % 1_000_000_000n];
+      const time = ns => { const rest = (ns % 1_000_000_000n + 1_000_000_000n) % 1_000_000_000n; return [(ns - rest) / 1_000_000_000n, rest]; };
       return numbers(...time(stat.atimeNs), ...time(stat.mtimeNs), stat.size, stat.nlink,
         stat.isDirectory() ? 0 : stat.isFile() ? 1 : stat.isSymbolicLink() ? 2 : 3);
     })();
-    case 12: return fsp.realpath(path(bytes)).then(value => Buffer.from(value));
-    case 13: return fsp.readdir(path(bytes)).then(names => Buffer.from(names.map(name => name + '\0').join('')));
-    case 14: return fsp.mkdir(path(bytes)).then(() => empty);
+    case 12: return fsp.realpath(path(bytes)).then(value => Buffer.from(process.platform === 'win32' ? value.replace(/^[A-Z]:/, x => x.toLowerCase()) : value), () => {
+      // Lean deliberately reports this constructor for every realpath failure.
+      throw Object.assign(error('ENOENT', ''), { errno: 2, nativeMessage: true });
+    });
+    case 13: return (async () => {
+      try {
+        const dir = await fsp.opendir(path(bytes), { encoding: 'buffer' });
+        const names = [];
+        for await (const entry of dir) names.push(entry.name, Buffer.from([0]));
+        return Buffer.concat(names);
+      } catch (err) { if (err.nativeMessage) throw err; throw nativeFiles().fromNodeError(err); }
+    })();
+    case 14: return fsp.mkdir(path(bytes)).then(() => empty, err => { throw nativeFiles().fromNodeError(err); });
     case 15: return fsp.unlink(path(bytes)).then(() => empty);
-    case 16: return fsp.rmdir(path(bytes)).then(() => empty);
-    case 17: case 18: return (op === 17 ? fsp.rename : fsp.link)(path(bytes.subarray(0, n)), path(bytes.subarray(n + 1))).then(() => empty);
-    case 19: return fsp.chmod(path(bytes), n).then(() => empty);
+    case 16: return fsp.rmdir(path(bytes)).then(() => empty, err => { throw nativeFiles().fromNodeError(err); });
+    case 17: case 18: return (op === 17 ? fsp.rename : fsp.link)(path(bytes.subarray(0, n)), path(bytes.subarray(n + 1))).then(() => empty, err => {
+      if (op === 17 && process.platform !== 'win32') throw nativeFiles().fromNodeError(err);
+      throw err;
+    });
+    case 19: return fsp.chmod(path(bytes), n).then(() => empty, err => { throw nativeFiles().fromNodeError(err); });
     case 20: return (async () => {
       const name = join(tmpdir(), 'lean-' + randomBytes(16).toString('hex'));
-      const fd = await open(name, 'wx+', 0o600);
-      return Buffer.concat([numbers(add(nativeFiles().openDescriptor(fd, 'r+'))), Buffer.from(name)]);
+      return Buffer.concat([numbers(add(await nativeFiles().open(name, 5, 0o600))), Buffer.from(name)]);
     })();
     case 21: return fsp.mkdtemp(join(tmpdir(), 'lean-')).then(name => Buffer.from(name));
     case 22: { const value = process.env[bytes.toString()]; return value === undefined ? empty : Buffer.from('\x01' + value); }
@@ -152,9 +158,9 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     case 26: return numbers(process.hrtime.bigint());
     case 27: { const ms = BigInt(Date.now()); return numbers(ms / 1000n, ms % 1000n * 1_000_000n); }
     case 28: return randomBytes(n);
-    case 29: return fsp.stat(path(bytes)).then(stat => {
+    case 29: return fsp.stat(path(bytes)).then(async stat => {
       if (!stat.isDirectory()) throw error('ENOTDIR', 'Working directory must be a directory');
-      directory = path(bytes); return empty;
+      directory = await fsp.realpath(path(bytes)); return empty;
     });
     case 30: throw new LeanExit(n);
     case 31: return Buffer.from(args.map(value => value + '\0').join(''));
@@ -176,6 +182,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       };
       step();
     });
+    case 36: throw nativeFiles().outOfMemory();
     default: throw error('ENOSYS', `Unsupported Lean runtime operation ${op}`);
     }
   }

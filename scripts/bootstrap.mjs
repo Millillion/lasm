@@ -38,4 +38,5 @@ for (const artifact of [
   }
   console.log(`Verified ${artifact.directory}`);
 }
+await import('./prepare-native.mjs');
 console.log('Reference build dependencies are ready. Lean 4.32.0 must also be installed through elan.');

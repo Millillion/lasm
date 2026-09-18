@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import { existsSync } from 'node:fs';
+import { existsSync, constants } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 // Only the Node host loads this private adapter. No Lean declaration or user
@@ -14,8 +14,11 @@ export function nativeFiles() {
   const libc = ffi.load(windows ? 'ucrtbase.dll' : process.platform === 'darwin' ? '/usr/lib/libSystem.B.dylib' : null);
   const bind = (name, result, args) => libc.func(name, result, args);
   const fdopen = bind(windows ? '_fdopen' : 'fdopen', 'void *', ['int', 'str']);
+  const openFile = windows ? libc.func('int _wsopen_s(_Out_ int *fd, str16 path, int flags, int sharing, int mode)')
+    : libc.func('int open(str path, int flags, uint32_t mode)');
   const dup = bind(windows ? '_dup' : 'dup', 'int', ['int']);
   const closeFd = bind(windows ? '_close' : 'close', 'int', ['int']);
+  const fcntl = windows ? null : bind('fcntl', 'int', ['int', 'int', 'int']);
   const pipe = windows ? libc.func('int _pipe(_Out_ int *fds, uint size, int mode)')
     : libc.func('int pipe(_Out_ int *fds)');
   const fclose = bind('fclose', 'int', ['void *']);
@@ -37,6 +40,7 @@ export function nativeFiles() {
   function failure(errno = ffi.errno()) {
     return Object.assign(new Error(strerror(errno)), { code: codes[errno] ?? 'EIO', errno, nativeMessage: true });
   }
+  const fromNodeError = error => failure(ffi.os.errno[error.code] ?? ffi.os.errno.EIO);
   // Capture errno in the callback, before another asynchronous result can
   // overwrite the calling thread's errno. Koffi propagates the worker's errno.
   const call = (fn, ...args) => new Promise((resolve, reject) => fn.async(...args, (error, value) => {
@@ -48,13 +52,15 @@ export function nativeFiles() {
     if (result.value < 0) throw failure(result.errno);
     return result.value;
   };
-  let lock;
+  let lock, terminal = file => !!isatty(file.fd);
   if (windows) {
     const kernel = ffi.load('kernel32.dll');
     const handle = bind('_get_osfhandle', 'intptr_t', ['int']);
     const lockFile = kernel.func('int __stdcall LockFileEx(intptr_t, uint32_t, uint32_t, uint32_t, uint32_t, void *)');
     const unlockFile = kernel.func('int __stdcall UnlockFileEx(intptr_t, uint32_t, uint32_t, uint32_t, void *)');
     const getError = kernel.func('uint32_t __stdcall GetLastError()');
+    const consoleMode = kernel.func('int __stdcall GetConsoleMode(intptr_t handle, _Out_ uint32_t *mode)');
+    terminal = file => !!consoleMode(handle(file.fd), [0]);
     lock = async (stream, exclusive, attempt, unlock) => {
       const overlapped = Buffer.alloc(32);
       const fn = unlock ? unlockFile : lockFile;
@@ -80,10 +86,37 @@ export function nativeFiles() {
   }
   implementation = {
     error: failure,
+    fromNodeError,
+    outOfMemory() { return failure(ffi.os.errno.ENOMEM); },
     strerror,
+    async open(path, mode, permissions = 0o666) {
+      // Open and fdopen in the same C runtime. Windows CRT descriptors are not
+      // interchangeable between libraries that maintain separate fd tables.
+      let fd;
+      if (windows) {
+        const flags = [0, 1|0x100|0x200, 1|0x100|0x200|0x400, 2, 1|0x100|8, 2|0x100|0x400][mode];
+        if (flags === undefined) throw failure(ffi.os.errno.EINVAL);
+        const output = [-1];
+        const { value } = await call(openFile, output, path, flags|0x8000|0x80, 0x40, permissions & 0o600);
+        if (value) throw failure(value);
+        fd = output[0];
+      } else {
+        const c = constants;
+        const flags = [c.O_RDONLY, c.O_WRONLY|c.O_CREAT|c.O_TRUNC, c.O_WRONLY|c.O_CREAT|c.O_TRUNC|c.O_EXCL,
+          c.O_RDWR, c.O_WRONLY|c.O_CREAT|c.O_APPEND, c.O_RDWR|c.O_CREAT|c.O_EXCL][mode];
+        if (flags === undefined) throw failure(ffi.os.errno.EINVAL);
+        // Node does not expose O_CLOEXEC on every supported OS.
+        fd = await checked(openFile, path, flags | (process.platform === 'darwin' ? 0x1000000 : 0x80000), permissions);
+      }
+      try { return implementation.openDescriptor(fd, ['r','w','w','r+','a','r+'][mode]); }
+      catch (error) { closeFd(fd); throw error; }
+    },
     pipe() {
       const fds = [0, 0];
       if ((windows ? pipe(fds, 4096, 0x8000 | 0x0080) : pipe(fds)) < 0) throw failure();
+      if (!windows && fds.some(fd => fcntl(fd, 2, 1) < 0)) {
+        const error = failure(); for (const fd of fds) closeFd(fd); throw error;
+      }
       return fds;
     },
     closeDescriptor(fd) { closeFd(fd); },
@@ -95,6 +128,7 @@ export function nativeFiles() {
     duplicateDescriptor(fd, mode) {
       const owned = dup(fd);
       if (owned < 0) throw failure();
+      if (!windows && fcntl(owned, 2, 1) < 0) { const error = failure(); closeFd(owned); throw error; }
       return implementation.openDescriptor(owned, mode);
     },
     close(file) { fclose(file.stream); file.stream = null; },
@@ -143,7 +177,7 @@ export function nativeFiles() {
       }
       return Buffer.from(bytes);
     },
-    isTty(file) { return !!isatty(file.fd); },
+    isTty: terminal,
     lock(file, exclusive, attempt = false, unlock = false) { return lock(file.stream, exclusive, attempt, unlock); },
   };
   return implementation;

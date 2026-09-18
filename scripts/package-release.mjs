@@ -125,7 +125,8 @@ writeFileSync(join(staging, 'tools/wasm-opt.cjs'), optimizer);
 writeFileSync(join(staging, 'tools/tooling.json'), JSON.stringify({ binaryen: sourcePackage.dependencies.binaryen,
   sha256: sha256(optimizer) }, null, 2) + '\n');
 writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), referenceNotices(reference) +
-  '\n=== Binaryen 132.0.0 standalone Node wasm-opt ===\n' + readFileSync(join(root, 'node_modules/binaryen/LICENSE'), 'utf8'));
+  '\n=== Binaryen 132.0.0 standalone Node wasm-opt ===\n' + readFileSync(join(root, 'node_modules/binaryen/LICENSE'), 'utf8') +
+  '\n=== Koffi 3.3.0 Node-API host adapters ===\n' + readFileSync(join(root, '.cache/native-host/node_modules/koffi/LICENSE.txt'), 'utf8'));
 const packageSpec = { name: sourcePackage.name, version: sourcePackage.version, private: true, license: 'UNLICENSED',
   type: 'module', description: sourcePackage.description, bin: sourcePackage.bin,
   files: ['bin', 'src', 'lean', 'targets', 'tools', 'docs', 'examples', 'node-shim.js', 'README.md', 'IO_LIMITATIONS.md', 'THIRD_PARTY_NOTICES.txt'], os: ['linux', 'darwin', 'win32'], cpu: ['x64', 'arm64'],

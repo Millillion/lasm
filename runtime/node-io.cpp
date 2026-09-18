@@ -65,7 +65,7 @@ O *lean_io_prim_handle_mk(O *path, uint8_t mode) {
 }
 O *lean_io_prim_handle_read(O *h, size_t n) {
     if (lean_alloc_sarray_would_overflow(1, n))
-        return lean_io_result_mk_error(lean_mk_io_error_resource_exhausted(ENOMEM, lean_mk_string("out of memory")));
+        return Reply(36).result();
     auto r = Reply(2, handle_id(h), n); return r.failed ? r.result() : ok(r.array());
 }
 O *lean_io_prim_handle_write(O *h, O *bytes) {
@@ -88,7 +88,11 @@ O *lean_io_prim_handle_try_lock(O *h, uint8_t exclusive) {
 O *lean_io_prim_handle_unlock(O *h) { return Reply(34, handle_id(h)).result(); }
 O *lean_io_metadata(O *path) { return metadata(path, 10); }
 O *lean_io_symlink_metadata(O *path) { return metadata(path, 11); }
-O *lean_io_realpath(O *path) { auto r = path_call(12, path); return r.failed ? r.result(lean_box(0), path) : ok(r.string()); }
+O *lean_io_realpath(O *path) {
+    auto r = path_call(12, path);
+    auto *result = r.failed ? r.result(lean_box(0), path) : ok(r.string());
+    lean_dec(path); return result;
+}
 O *lean_io_read_dir(O *path) {
     auto r = path_call(13, path);
     if (r.failed) return r.result(lean_box(0), path);
@@ -106,11 +110,21 @@ O *lean_io_remove_file(O *path) { return path_call(15, path).result(lean_box(0),
 O *lean_io_remove_dir(O *path) { return path_call(16, path).result(lean_box(0), path); }
 static O *two_paths(uint32_t op, O *a, O *b) {
     auto sizeA = lean_string_size(a), sizeB = lean_string_size(b);
+    for (auto *path : {a, b}) if (strlen(lean_string_cstr(path)) != lean_string_size(path) - 1) {
+        lean_inc(path);
+        return lean_io_result_mk_error(lean_mk_io_error_invalid_argument_file(path, 22, lean_mk_string("string contains NUL bytes")));
+    }
     std::vector<uint8_t> bytes(sizeA + sizeB - 1);
     memcpy(bytes.data(), lean_string_cstr(a), sizeA);
     memcpy(bytes.data()+sizeA, lean_string_cstr(b), sizeB-1);
     // The separator offset makes embedded NULs distinguishable from the separator.
-    return Reply(op, 0, sizeA - 1, bytes.data(), bytes.size()).result(lean_box(0), a);
+    auto r = Reply(op, 0, sizeA - 1, bytes.data(), bytes.size());
+    if (op == 17 && r.failed) {
+        auto label = std::string(lean_string_cstr(a)) + " and/or " + lean_string_cstr(b);
+        auto *path = lean_mk_string(label.c_str());
+        auto *result = r.result(lean_box(0), path); lean_dec(path); return result;
+    }
+    return r.result(lean_box(0), a);
 }
 O *lean_io_rename(O *a, O *b) { return two_paths(17, a, b); }
 O *lean_io_hard_link(O *a, O *b) { return two_paths(18, a, b); }
