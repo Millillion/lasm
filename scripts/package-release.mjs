@@ -2,6 +2,7 @@
 import { readFileSync, writeFileSync, mkdirSync, cpSync, copyFileSync, readdirSync, rmSync, statSync, openSync, closeSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { build } from '../src/build.mjs';
+import { buildMain } from '../src/main.mjs';
 import { targetName, leanCommit, sha256 } from '../src/toolchain.mjs';
 import { buildPlatforms } from '../src/platform.mjs';
 import { referenceNotices } from '../src/notices.mjs';
@@ -9,10 +10,11 @@ import * as reference from './build-runtime.mjs';
 
 const { root, runtimeDir, zig, run } = reference;
 const started = performance.now();
-// Prime all three supported workloads; other standard modules compile on demand.
+// Prime supported workloads; other standard modules compile on demand.
 for (const name of ['basic', 'io', 'express/lean']) {
   await build(join(root, 'examples', name, 'lasm.json'), join(root, '.work/release-builds', name));
 }
+await buildMain(join(root, 'examples/lean-server/Main.lean'), { output: join(root, '.work/release-builds/lean-server') });
 const directory = join(root, '.work/release');
 const staging = join(directory, 'compiler');
 rmSync(staging, { recursive: true, force: true });
@@ -69,7 +71,7 @@ function fingerprint(path) {
 }
 fingerprint(target);
 writeFileSync(join(target, 'target.json'), JSON.stringify({ schema: 1, name: targetName, leanCommit,
-  buildPlatforms, validatedNativePlatforms: ['linux-x64'], zig: '0.16.0', runtimeUnits: 15, standardModules: objects.length, linkLibraries, files }, null, 2) + '\n');
+  buildPlatforms, validatedNativePlatforms: ['linux-x64'], zig: '0.16.0', runtimeUnits: 17, standardModules: objects.length, linkLibraries, files }, null, 2) + '\n');
 targetInstalledBytes += statSync(join(target, 'target.json')).size;
 const targetArchive = join(directory, `${targetName}.tar.gz`);
 run('tar', ['--sort=name', '--mtime=@0', '--owner=0', '--group=0', '--numeric-owner', '-czf', targetArchive, '-C', join(staging, 'targets'), targetName]);
@@ -79,6 +81,11 @@ for (const path of ['bin', 'src', 'lean', 'docs']) cpSync(join(root, path), join
   recursive: true, filter: source => !source.split('/').includes('.lake') && source !== join(root, 'docs/evidence'),
 });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+copyFileSync(join(root, 'node-shim.js'), join(staging, 'node-shim.js'));
+copyFileSync(join(root, 'IO_LIMITATIONS.md'), join(staging, 'IO_LIMITATIONS.md'));
+cpSync(join(root, 'examples/lean-server'), join(staging, 'examples/lean-server'), {
+  recursive: true, filter: source => !relative(join(root, 'examples/lean-server'), source).split('/').some(part => ['.lake', 'dist', 'data', 'test'].includes(part)),
+});
 writeFileSync(join(staging, 'README.md'), `# Lasm compiler
 
 Experimental Lean-to-WebAssembly compiler for Node.js, browsers, and Cloudflare
@@ -88,10 +95,16 @@ macOS/Windows validation is still pending; see the release guide. This local pac
 includes its versioned Wasm runtime/sysroot and standalone Binaryen optimizer;
 Zig and a separate C SDK are not required.
 
-Run \`lasm build lean/lasm.json dist\` through your package manager's script runner.
+Run an ordinary Lean application with \`npx lasm run Main.lean\`, or build it with
+\`npx lasm build Main.lean dist\` and run \`node dist/main.mjs\`. The included
+\`examples/lean-server\` project uses ordinary \`Std.Http.Server\`, \`IO.FS\`, and
+console APIs, with no Lasm imports. The first run builds; unchanged runs are cached.
+For callable libraries use \`lasm build lean/lasm.json dist\`.
 Lasm uses your normal Lake project for dependencies and compiler configuration.
 The generated output includes typed ESM factories and the Wasm artifact. Running
-that output requires only the application host and its explicitly supplied IO.
+that output requires only the application host. Standard Lean console, filesystem,
+and HTTP server support currently targets Node with Asyncify. Node applications
+have the current process's filesystem and network access.
 
 - [Developer workflow](docs/DEVELOPER_WORKFLOW.md)
 - [Supported release and installation modes](docs/RELEASE.md)
@@ -113,7 +126,7 @@ writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), referenceNotices(referen
   '\n=== Binaryen 132.0.0 standalone Node wasm-opt ===\n' + readFileSync(join(root, 'node_modules/binaryen/LICENSE'), 'utf8'));
 const packageSpec = { name: sourcePackage.name, version: sourcePackage.version, private: true, license: 'UNLICENSED',
   type: 'module', description: sourcePackage.description, bin: sourcePackage.bin,
-  files: ['bin', 'src', 'lean', 'targets', 'tools', 'docs', 'README.md', 'THIRD_PARTY_NOTICES.txt'], os: ['linux', 'darwin', 'win32'], cpu: ['x64', 'arm64'],
+  files: ['bin', 'src', 'lean', 'targets', 'tools', 'docs', 'examples', 'node-shim.js', 'README.md', 'IO_LIMITATIONS.md', 'THIRD_PARTY_NOTICES.txt'], os: ['linux', 'darwin', 'win32'], cpu: ['x64', 'arm64'],
   engines: sourcePackage.engines };
 writeFileSync(join(staging, 'package.json'), JSON.stringify(packageSpec, null, 2) + '\n');
 const packed = JSON.parse(run('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', directory, '--cache', join(root, '.cache/npm')], { cwd: staging }))[0];

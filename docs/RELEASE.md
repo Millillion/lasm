@@ -48,10 +48,11 @@ npm run package:release
 npm run test:release
 ```
 
-The packaging command builds representative core, IO, and Lake/Express workloads,
+The packaging command builds representative core, IO, Lake/Express, and ordinary
+Lean HTTP-server workloads,
 then writes these ignored local artifacts under `.work/release/`:
 
-- `lasm-compiler-0.1.0-experimental.2.tgz`: installable compiler candidate.
+- `lasm-compiler-0.1.0-experimental.3.tgz`: installable compiler candidate.
 - `lean-4.32.0-wasm32-v1.tar.gz`: versioned target archive containing the runtime,
   prebuilt standard-library archive and dependency source, C headers, startup
   object, libc/C++ libraries, compiler runtime, and third-party notices.
@@ -73,12 +74,14 @@ not yet a size-minimized SDK.
 ## Install into a separate project
 
 ```sh
-npm install --save-dev ./lasm-compiler-0.1.0-experimental.2.tgz
+npm install --save-dev ./lasm-compiler-0.1.0-experimental.3.tgz
 ```
 
 Nothing is published to npm; installing by registry name is not available yet.
-Use the local tarball. Installation does not scaffold a Lean project: the app still
-needs its Lake files, Lean source, export manifest, and a build script.
+Use the local tarball. Installation does not scaffold a Lean project. For an
+executable, write an ordinary `Main.lean` and run `npx lasm run Main.lean`; Lake
+projects work too. Only callable libraries need an export manifest. See
+[Node applications](NODE_APPS.md) for the full Lean server example.
 
 The same tarball is tested with `pnpm add -D` or `yarn add -D` on Linux. Yarn uses
 `nodeLinker: node-modules`, since Lake reads Lean sources as ordinary filesystem
@@ -97,7 +100,10 @@ multi-module Lake application with a library dependency and real Lean IO, rebuil
 deterministically, performs a locked offline reinstall, removes `node_modules`,
 and executes the output with compilers absent from `PATH`. Runtime checks cover
 small and 128-bit integers, Unicode and NUL strings, binary filesystem reads/writes,
-and a real local HTTP request. During compilation, `PATH` contains Node, Lean's
+and a real local HTTP request. A second npm consumer builds the complete ordinary
+Lean HTTP server, checks CRUD persistence and streaming, then removes the compiler
+package and runs the same output again using Node alone. This standard-main test
+is part of each prepared native CI matrix job. During compilation, `PATH` contains Node, Lean's
 bundled tools, and basic OS utilities, with no separate C SDK. The
 packaged SDK is the only source of the Wasm sysroot/runtime; the checkout's reference
 toolchain is not used by those installed packages.
@@ -142,7 +148,8 @@ Set `LASM_TEST_ENVIRONMENT` when using a compatibility layer or VM so its eviden
 is identified accurately. A report with `complete: false` is not acceptance.
 
 The local [manual CI workflow](../.github/workflows/platform-acceptance.yml) builds
-one tarball on Linux, then runs the same npm-only acceptance suite on all six
+the compiler and ordinary-server tests and one tarball on Linux, then runs the
+same npm-only acceptance suite on all six
 OS/architecture combinations. It has not run. It is prepared for a future
 authorized remote and manual dispatch; it does not publish an npm package.
 Its Windows ARM64 job also tests whether Lean's installer/emulation path works.

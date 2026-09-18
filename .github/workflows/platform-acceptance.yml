@@ -28,6 +28,8 @@ jobs:
           use-mathlib-cache: false
       - run: npm ci
       - run: npm run setup
+      - run: npm test
+      - run: npm run test:lean-server
       - run: npm run package:release
       - uses: actions/upload-artifact@v7
         with:

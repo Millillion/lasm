@@ -1,6 +1,7 @@
 # Experimental runtime and callable modules
 
-Implemented and tested locally on 2026-09-17, Linux x64, Node 24.13.1, Lean
+Original core evidence recorded on 2026-09-17; Node application runtime added
+on 2026-09-18. Tested locally on Linux x64, Node 24.13.1, Lean
 4.32.0 (`8c9756b28d64dab099da31a4c09229a9e6a2ef35`), Zig 0.16.0.
 
 ## Verified behavior
@@ -65,8 +66,9 @@ stubs for missing native facilities:
    an unused native exception helper include from `interrupt.cpp`. These are
    fatal instance failures, not recoverable Lean IO errors.
 4. Implement stack queries using wasm-ld's stack-bound symbols, with a trapping
-   `check_stack`. The linear stack is configured to 1 MiB and maximum memory to
-   256 MiB. This does not promise protection against every unchecked C stack
+   `check_stack`. The base linear stack is 1 MiB; async fibers have separate 256 KiB C
+   and Asyncify stacks, with active bounds supplied by the scheduler. Maximum
+   memory is 256 MiB. This does not promise protection against every unchecked C stack
    overflow or a time limit for nonterminating Lean code.
 5. Initialize the supported alloc/object/thread runtime directly. Native process,
    signal, mmap and libuv initialization is excluded. Panic's stderr primitive
@@ -78,12 +80,27 @@ stubs for missing native facilities:
    initialization after all module initializers succeed. This supports Lean's JSON
    library and `IO.Ref`; tests verify initialization state and independent mutable
    references in separate instances on both Asyncify and JSPI.
+7. Read Windows/macOS flags from the private Node host import so ordinary
+   `System.FilePath` uses the host's separators and drive rules. Pointer width
+   stays 32 bits for Wasm. Portable browser/Worker instances use Unix-style paths.
+   Windows UTC lookup is implemented for standard HTTP dates; other Windows
+   named time zones remain explicitly unsupported.
 
-The linked WASI imports are exactly `fd_close`, `fd_fdstat_get`, `fd_read`,
+The linked libc WASI allowlist is `fd_close`, `fd_fdstat_get`, `fd_read`,
 `fd_seek`, `fd_write`, `environ_get`, `environ_sizes_get`, `clock_time_get`, and
-`proc_exit`. Node's WASI adapter receives no environment variables or preopened
-directories, and uses `returnOnExit` so guest exit cannot terminate the Node
-process. This is internal libc compatibility, not a supported `IO.FS` API.
+`proc_exit`. All hosts now use the portable adapter; Node defaults diagnostics
+to its standard streams. Files/network/environment are handled through separate
+private Node runtime imports, not WASI filesystem preopens.
+
+The standard Node runtime adds file/console/context primitives and the TCP,
+timer, and synchronization primitives needed by unmodified `Std.Http.Server`.
+It replaces native task management with cooperative execution using Lean's actual
+task/promise objects. Dropped pure-task registrations are removed; IO tasks keep
+running to completion. Each suspended invocation owns its own stacks and response
+buffer. Scheduler batches yield to the Node event loop, including when every
+Promise is already resolved. No OS threads or native task priorities are emulated.
+See [NODE_APPS.md](NODE_APPS.md), [IO.md](IO.md), and the unchecked
+[remaining limitations](../IO_LIMITATIONS.md).
 
 ## ABI and lifecycle
 
@@ -116,7 +133,7 @@ It does not synchronously force the JS garbage collector. Further calls fail.
   including large integers, captured closures, Unicode, bytes, and imported
   initialization. See `docs/evidence/2026-09-17-bundled-runtime.json`.
   The later JSON/Express work adds a fifteenth unit for the upstream reference and
-  initialization primitives. Local release packages now include all 15 units,
+  initialization primitives. Local release packages now include all 17 units (including Node IO and async primitives),
   standard-library archives, C/C++ headers, and the six startup/library inputs.
   Installed packages compile and link real Lean IO with Lean's Clang/LLD and the
   packaged sysroot; Zig is used only by the maintainer reference build.

@@ -35,10 +35,18 @@ test('standalone files need no module header, manifest, annotations or Lasm impo
   catch (error) { result = error; }
   assert.equal(result.code, 7);
   assert.equal(result.stdout, 'λ 日本語||a b\n');
+  await assert.rejects(exec(process.execPath, [join(root, 'node-shim.js'), file, 'λ 日本語', '', 'a b'], {
+    cwd: root, timeout: 30_000,
+  }), error => {
+    assert.equal(error.code, 7);
+    assert.equal(error.stdout, 'λ 日本語||a b\n');
+    assert.equal(error.stderr, ''); // A warm invocation must not rebuild.
+    return true;
+  });
   assert.equal((await buildMain(file)).cacheHit, true);
   await writeFile(file, (await readFile(file, 'utf8')).replace('return 7', 'return 0'));
   assert.equal((await buildMain(file)).cacheHit, false);
-  const run = await exec(process.execPath, [join(built.output, 'main.mjs'), 'new'], { timeout: 10_000 });
+  const run = await exec(process.execPath, [join(root, 'bin/lasm.mjs'), 'run', file, '--', 'new'], { timeout: 30_000 });
   assert.equal(run.stdout, 'new\n');
 });
 

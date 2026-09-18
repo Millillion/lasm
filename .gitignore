@@ -7,6 +7,9 @@ dist/
 *.log
 .vitest/
 
+# Data from running the Lean server example at the repository root.
+/data/
+
 # Editor and OS files.
 .DS_Store
 *~

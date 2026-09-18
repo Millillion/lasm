@@ -30,10 +30,10 @@ compatibility evidence and do not check off native Windows acceptance.
 
 Proposed improvements, in recommended order:
 
-- [ ] Add extensible, typed JavaScript calls from Lean. Allow applications to
-  register host functions for databases, crypto, timers, and npm libraries without
-  modifying Lasm's compiler. Expand HTTP support to methods, headers, request
-  bodies, and response status.
+- [ ] Broaden ordinary Lean standard-library support on Node, retaining the
+  requirement that application source uses regular Lean APIs. Audit current
+  console/filesystem/server compatibility and extend the internal host primitives
+  for further standard APIs and existing Lean libraries.
 - [ ] Complete the developer workflow. Add `lasm init` for Node/Lake scaffolding,
   `lasm doctor` for setup diagnostics, and a development command that rebuilds and
   restarts on changes. Provide actionable diagnostics for unsupported APIs.
@@ -54,6 +54,10 @@ Proposed improvements, in recommended order:
 
 ## First integration milestone
 
-- [ ] Deliver a scaffolded application with typed Lean endpoints, HTTP POST, and
-  database access through the extensible host API, exercising the first three
-  improvements together.
+The console/filesystem/HTTP-server milestone now has a complete ordinary Lean
+application, an automatically generated main runner, and native/Wasm Vitest tests;
+see [the example](examples/lean-server/README.md).
+
+- [ ] Add scaffolding and watch/restart support around the ordinary Lean main workflow.
+- [ ] Evaluate an existing Lean database library and its runtime dependencies
+  before choosing the next integration; avoid introducing a Lasm-specific Lean API.

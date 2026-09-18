@@ -1,0 +1,10 @@
+name = "leanServer"
+version = "0.1.0"
+defaultTargets = ["server"]
+
+[[lean_lib]]
+name = "App"
+
+[[lean_exe]]
+name = "server"
+root = "Main"

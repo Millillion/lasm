@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, copyFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, copyFileSync, existsSync, cpSync } from 'node:fs';
+import { spawn } from 'node:child_process';
 import { join, dirname, resolve, delimiter, basename } from 'node:path';
 import { tmpdir } from 'node:os';
 import { root, run, sha256, lean } from '../src/toolchain.mjs';
@@ -38,6 +39,7 @@ const managers = Object.fromEntries((process.env.LASM_TEST_MANAGERS ?? 'npm,pnpm
 }));
 const withPath = (env, value) => ({ ...Object.fromEntries(Object.entries(env).filter(([key]) => key.toLowerCase() !== 'path')), PATH: value });
 const reports = [];
+let ordinaryMain;
 
 for (const [name, cli] of Object.entries(managers)) test(`${name}: local package, isolated build, locked offline reinstall, standalone execution`, { timeout: 600_000 }, async t => {
   const project = mkdtempSync(join(tmpdir(), `lasm ${name} 日本語 project with spaces `));
@@ -126,10 +128,59 @@ try {
     osUtilities, compilerPackageRemovedBeforeExecution: true, standaloneExecution: true });
 });
 
+test('npm: ordinary Lean main and HTTP server run from the installed package', { timeout: 600_000 }, async t => {
+  const project = mkdtempSync(join(tmpdir(), 'lasm Lean server 日本語 '));
+  t.after(() => rmSync(project, { recursive: true, force: true }));
+  cpSync(join(root, 'examples/lean-server'), project, { recursive: true,
+    filter: source => !source.slice(join(root, 'examples/lean-server').length).split(/[\\/]/).some(part => ['.lake', 'dist', 'data', 'test'].includes(part)) });
+  writeFileSync(join(project, 'package.json'), JSON.stringify({ name: 'ordinary-lean-acceptance', private: true,
+    type: 'module', devDependencies: { '@lasm/compiler': `file:${archive}` } }));
+  const environment = { ...process.env, npm_config_cache: join(project, '.npm-cache'), npm_config_update_notifier: 'false' };
+  for (const key of ['LEAN', 'LEAN_SOURCE', 'ZIG', 'WASM_OPT', 'LASM_TARGET_DIR', 'LASM_CACHE_DIR', 'LEAN_PATH', 'LEAN_SRC_PATH']) delete environment[key];
+  run(process.execPath, [npmCli, 'install', '--offline', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: project, env: environment });
+  const isolated = withPath(environment, [tools, join(leanPrefix, 'bin'),
+    ...(process.platform === 'win32' ? [join(process.env.SystemRoot ?? 'C:\\Windows', 'System32')] : [])].join(delimiter));
+  const compiler = join(project, 'node_modules/@lasm/compiler');
+  run(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', 'Main.lean', 'dist'], { cwd: project, env: isolated, timeout: 600_000 });
+  const report = JSON.parse(readFileSync(join(project, 'dist/build-report.json')));
+  assert.equal(report.toolchain, 'packaged-clang');
+  assert.ok(report.modules.includes('Std.Http.Server'));
+  async function exercise(entry, expectedCount) {
+    const child = spawn(process.execPath, [entry, '0', join(project, 'data')], { cwd: project, env: withPath(environment, join(project, 'empty-path')) });
+    let output = '', errors = '';
+    const exited = new Promise((resolve, reject) => { child.once('error', reject); child.once('exit', (code, signal) => resolve({ code, signal })); });
+    child.stderr.on('data', bytes => { errors += bytes; });
+    const address = new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => { child.kill(); reject(new Error(`Lean server did not start: ${errors}`)); }, 15_000);
+      child.stdout.on('data', bytes => { output += bytes; const match = output.match(/http:\/\/127\.0\.0\.1:\d+/); if (match) { clearTimeout(timeout); resolve(match[0]); } });
+      exited.then(result => { clearTimeout(timeout); reject(new Error(`Lean server exited early: ${JSON.stringify(result)} ${errors}`)); }, reject);
+    });
+    try {
+      const base = await address;
+      const listing = await fetch(base + '/todos');
+      assert.ok(Math.abs(Date.parse(listing.headers.get('date')) - Date.now()) < 5000);
+      assert.equal((await listing.json()).length, expectedCount);
+      const response = await fetch(base + '/todos', { method: 'POST', body: JSON.stringify({ title: 'installed Lean λ' }) });
+      assert.equal(response.status, 201); assert.equal((await response.json()).title, 'installed Lean λ');
+      const events = await fetch(base + '/events'); assert.equal(await events.text(), 'data: 0\n\ndata: 1\n\ndata: 2\n\n');
+      const stop = await fetch(base + '/shutdown', { method: 'POST' }); await stop.arrayBuffer();
+      const timeout = setTimeout(() => child.kill('SIGKILL'), 5000);
+      const result = await exited; clearTimeout(timeout);
+      assert.deepEqual(result, { code: 0, signal: null }, errors);
+    } finally { if (child.exitCode === null && !child.signalCode) child.kill('SIGKILL'); await exited; }
+  }
+  await exercise(join(project, 'dist/main.mjs'), 0);
+  rmSync(join(project, 'node_modules'), { recursive: true, force: true });
+  await exercise(join(project, 'dist/main.mjs'), 1);
+  ordinaryMain = { installedCompiler: true, source: 'ordinary Lake main', standardHttpServer: true,
+    unicodePersistence: true, streaming: true, gracefulShutdown: true, compilerRemovedBeforeSecondRun: true,
+    toolchain: report.toolchain, wasmBytes: report.wasmBytes };
+});
+
 test.after(() => {
   mkdirSync(join(root, '.work/evidence'), { recursive: true });
   writeFileSync(process.env.LASM_TEST_REPORT ?? join(root, '.work/evidence/release-install.json'), JSON.stringify({ ...release,
     testedNode: process.version, testedPlatform: `${process.platform}-${process.arch}`,
     executionEnvironment: process.env.LASM_TEST_ENVIRONMENT ?? 'native',
-    expectedManagers: Object.keys(managers), complete: reports.length === Object.keys(managers).length, tests: reports }, null, 2) + '\n');
+    expectedManagers: Object.keys(managers), complete: reports.length === Object.keys(managers).length && !!ordinaryMain, ordinaryMain, tests: reports }, null, 2) + '\n');
 });

@@ -1,214 +1,134 @@
 # Current IO limitations in Lasm
 
-Snapshot: 2026-09-18, Lasm `0.1.0-experimental.2`, Lean `4.32.0`.
-These are limitations of Lean programs running through Lasm, not limitations of
-Lean itself. Every checkbox is intentionally empty. This inventory covers known
-implementation gaps, adapter policies, and validation gaps; it is not a promise
-to remove every restriction. An exhaustive per-declaration compatibility audit
-is itself still outstanding.
+Snapshot: 2026-09-18, `0.1.0-experimental.3`, Lean `4.32.0`.
+Every checkbox below is intentionally empty and describes remaining work, a
+known difference, or a validation gap. These are Lasm limitations, not Lean
+limitations. This list does not promise that every restriction will be removed.
 
-The working baseline is Lean's real `IO` type, ordinary sequencing and error
-handling, mutable `IO.Ref` values, and three custom operations:
-`Lasm.readBytes`, `Lasm.writeBytes`, and `Lasm.fetchBytes`. Those operations can
-suspend and resume through Asyncify or JSPI, including through closures and
-consecutive IO calls. Pure or memory-only standard-library helpers may already
-work; missing host integration does not mean every function returning `IO` fails.
+The implemented Node baseline now includes ordinary console and filesystem APIs,
+structured errors, file-handle lifetime, tasks/promises, cooperative synchronization,
+timers, and `Std.Http.Server`. An ordinary Lean `main` can run in Node with no
+Lasm imports or custom annotations. See [Node applications](docs/NODE_APPS.md)
+and [the full Lean server](examples/lean-server/README.md).
 
-## Standard Lean API compatibility
+## Standard API coverage
 
-- [ ] Standard filesystem entry points such as `IO.FS.readFile`, `readBinFile`,
-  `writeFile`, and `writeBinFile` are not connected to Lasm's host capabilities.
-  Applications currently use the custom `Lasm.IO` wrappers.
-- [ ] Native file handles and their operations are not implemented: open modes,
-  partial reads/writes, append, flush, rewind, truncate, file locking, TTY queries,
-  and native-handle lifetime management.
-- [ ] Directory and metadata APIs are missing: listing/walking directories,
-  creating/removing directories and files, rename, hard links, temporary files,
-  canonical paths, metadata, symlink metadata, and access-right changes.
-- [ ] Standard console and stream integration is missing, including
-  `IO.getStdin`, `getStdout`, `getStderr`, their replacement/scoping operations,
-  and ordinary `IO.print`/`println`/`eprintln`. The internal panic writer is not
-  a general implementation of those APIs.
-- [ ] Standard environment and process-information APIs are not bridged:
-  environment variables, application path, current directory and its mutation,
-  process IDs, and thread IDs. The Node loader supplies empty WASI arguments and
-  environment and no filesystem preopens.
-- [ ] Standard time and entropy APIs are not provided as a tested host-backed
-  surface: monotonic clock queries, asynchronous sleep/timers, and
-  `IO.getRandomBytes`. Internal WASI clock support is not equivalent to these APIs.
-- [ ] `IO.Process` child-process operations are missing: spawning, redirected
-  streams, waiting, exit status, process IDs, termination, and output collection.
-- [ ] Lean `IO.Process.exit` and `forceExit` have no public compatibility policy.
-  Internal WASI guest exit is contained by the loader; it does not terminate Node.
-- [ ] Full coverage of Lean's profiling, heartbeat-accounting, and runtime-control
-  helpers has not been established. The runtime includes a selected subset of
-  upstream implementations, not the whole native IO runtime.
-- [ ] There is no declaration-by-declaration support matrix for the pinned Lean
-  IO surface. Unsupported native symbols normally fail at linking; there is no
-  complete diagnostic mapping from each missing symbol to a supported alternative.
-- [ ] Runtime native externs and libraries need explicit Wasm implementations or
-  host adapters. Host-native Lake plugins running during compilation do not imply
-  that their runtime IO/FFI code works inside the generated Wasm.
+- [ ] Complete a declaration-by-declaration compatibility audit; the implemented
+  primitives and tested higher-level APIs are not all of Lean IO.
+- [ ] Native file locking is unsupported and returns an explicit unsupported
+  operation error, including `tryLock`; it never pretends to acquire a lock.
+- [ ] Validate devices, pipes, FIFOs, large files, permission combinations, symlink
+  races, and every open/seek/metadata edge case across OSs. Current tests focus on
+  regular files and common directory operations.
+- [ ] Refine exact error mappings and platform-specific errno behavior beyond
+  tested missing-file, exclusive-create, invalid-path, and UTF-8 cases.
+- [ ] Flush currently uses `fsync` for files, which is stronger and potentially
+  slower than native Lean's buffered-stream flush.
+- [ ] Standard stream replacement is instance-wide, not native thread-local;
+  overlapping `IO.withStdout`/`withStderr` scopes in different tasks can interfere.
+- [ ] Expand stdin, terminal, redirected-console, and interactive backpressure tests.
+- [ ] Child processes, process/thread IDs, native signals, process pipes, and
+  general `IO.Process` operations beyond current-directory/exit helpers are missing.
+- [ ] `IO.Process.setCurrentDir` changes only this instance's virtual cwd;
+  `IO.appPath` reports the containing Node executable. Audit further native context
+  differences before claiming complete process compatibility.
+- [ ] Windows named time zones other than UTC return an explicit unsupported
+  error. Date/time behavior beyond tested UTC HTTP dates needs broader OS coverage.
+- [ ] Native FFI dependencies still need Wasm implementations or internal host
+  adapters. Build-time Lake plugins do not supply their runtime native externs.
+- [ ] Link errors need a complete mapping from missing externs to affected Lean APIs.
 
-## Custom host interface and data boundary
+## HTTP and networking
 
-- [ ] The public host interface has only three fixed operations. Applications can
-  replace their implementations, but there is no supported registry for additional
-  named operations such as database, crypto, timer, or other npm-library calls.
-- [ ] The request protocol carries an operation number, a string key, and bytes;
-  it has no general typed request/response schema or resource-handle protocol.
-- [ ] Exported IO signatures are limited to the supported primitive boundary
-  types: `Nat`, `Int`, `String`, `ByteArray`, `UInt32`, `Bool`, and `Unit`.
-  Records, arrays, `Option`, custom error types, callbacks, and native resources
-  do not receive automatic JavaScript bindings. This restriction is at the export
-  boundary; richer Lean values can be used internally.
-- [ ] Requests and responses are buffered and copied across the boundary. There
-  is no incremental stream, backpressure, or zero-copy transfer interface.
-- [ ] The bridge has a fixed 16 MiB per-key/body/response transfer ceiling; host
-  adapters can impose smaller byte limits. Larger operations require a different
-  protocol rather than simply increasing the host's `maxBytes` setting.
-- [ ] Host failures become generic Lean `IO.userError` values, losing structured
-  OS error kinds, codes, paths, HTTP metadata, and original JavaScript stacks.
-  The host error message is truncated to 8,192 JavaScript string code units.
-- [ ] Unhandled Lean IO errors reach JavaScript as `LeanIOError` messages without
-  a structured representation of Lean's original `IO.Error` variant.
+- [ ] TLS, DNS, UDP, WebSockets, and a full outbound HTTP client are outside this
+  console/filesystem/HTTP-server milestone. There is no `IO.HTTP` API to port.
+- [ ] Node TCP bind is performed when `listen` runs; bind-time errors and bound
+  socket address queries therefore differ before listening.
+- [ ] Validate IPv6, keepalive details, transport half-close/error behavior,
+  connection floods, slow consumers, and timer-boundary races more extensively.
+- [ ] The server example is a single-process, loopback demo with an unauthenticated
+  shutdown route. Authentication, TLS termination, production deployment, and
+  shared storage coordination remain application work.
+- [ ] File replacement does not imply transactions, rollback, interprocess
+  locking, or crash durability. Separate processes need their own coordination.
 
-## Built-in Node filesystem adapter
+## Scheduling and cancellation
 
-- [ ] Access is limited to one configured existing directory. There is no mount
-  table, multiple directory capabilities, or API for creating the configured root.
-  Omitting the directory intentionally disables filesystem access.
-- [ ] Reads require regular files; paths outside the root and NUL paths are
-  rejected, and writes to existing terminal symlinks are rejected. There is no
-  device, pipe, or general native filesystem access through this adapter.
-- [ ] Path checks do not provide isolation against another process racing to
-  replace directories or files. The adapter assumes trusted application storage.
-- [ ] Writes truncate/replace their destination directly. They do not provide
-  atomic replacement, rollback, transactions, or a crash-durability guarantee.
-  Cancellation or failure can leave partial data.
-- [ ] There is no general coordination for multiple instances/processes accessing
-  the same files. The Express example's queue, directory lock, and temporary-file
-  replacement are application-specific, not default filesystem behavior.
+- [ ] Lean tasks run cooperatively on one JavaScript thread. There are no native
+  worker threads, CPU parallelism, native priority scheduling, or shared heaps.
+- [ ] Validate all task-drop/cancellation propagation behavior against the native
+  scheduler, beyond explicit cooperative cancellation and tested task/promise
+  lifetimes. Do not infer complete scheduling equivalence from server tests.
+- [ ] Complete `Std.Async` coverage, including unported process and signal APIs.
+- [ ] Standard Node tasks currently require Asyncify. JSPI remains available for
+  the legacy custom-host bridge only, with a separate artifact and engine support.
+- [ ] `Std.Async` timer durations currently must fit Node's 31-bit millisecond
+  timeout range. Ordinary `IO.sleep` supports its full UInt32 range in chunks.
+- [ ] CPU-bound Lean code cannot be interrupted by an AbortSignal or a timer;
+  isolation in a Worker/process is needed for enforceable execution deadlines.
+- [ ] Aborting a standard-IO export from JavaScript discards the whole instance;
+  it is not the same as Lean's cooperative task cancellation. Completed or already
+  issued host effects are not rolled back.
+- [ ] Each instance permits one active external async call; callbacks cannot
+  reenter it. Lean's internal concurrent tasks/HTTP connections are supported.
+- [ ] Busy instances require their active call to settle before disposal; use a
+  normal shutdown path or abort. Long-lived background tasks need application
+  lifecycle management.
 
-## Built-in HTTP and networking adapters
+## Runtime and data boundary
 
-- [ ] Outbound HTTP is GET-only. Lean cannot specify a method, request headers,
-  request body, or per-request authentication/credential options through this API.
-- [ ] Successful HTTP calls return only response bytes, without status, headers,
-  or other response metadata. Non-2xx responses become errors rather than
-  inspectable response objects.
-- [ ] Redirects are rejected and only HTTP/HTTPS URLs are accepted. There is no
-  Lean-level redirect policy or alternative URL-scheme support.
-- [ ] Response bodies are collected in memory within the byte limit. Reading the
-  underlying response in chunks does not expose streaming to Lean; uploads,
-  downloads, and bidirectional streams need additional APIs.
-- [ ] HTTP timeout is configured on the host adapter, with a ten-second default.
-  There are no per-call timeout, connection-pool, proxy, or TLS configuration
-  options exposed to Lean. A supplied JavaScript fetch implementation can impose
-  its own policy, and omitting it intentionally disables HTTP.
-- [ ] Raw TCP/UDP, DNS operations, socket listeners, TLS configuration, and
-  WebSockets are not exposed. Host-provided HTTPS fetch already handles TLS;
-  that does not provide Lean with a general TLS/socket API.
-- [ ] Lean's `Std.Async` networking and `Std.Http` transport/server facilities
-  have not been ported or validated as a supported surface. The Express example
-  receives requests in JavaScript and calls Lean endpoint logic.
+- [ ] Unhandled Lean IO errors reach JS as messages, without a structured public
+  JavaScript representation of the original Lean error constructor.
+- [ ] JS-callable exports support primitive boundary types only: `Nat`, `Int`,
+  `String`, `ByteArray`, `UInt32`, `Bool`, `Unit`. Lean-internal records, arrays,
+  callbacks and resources work without automatic JavaScript bindings.
+- [ ] Guest/host byte transfers copy memory. There is no zero-copy or shared-memory
+  IO contract, and the JS export/legacy bridge has a 16 MiB transfer ceiling.
+- [ ] Memory is capped at 256 MiB; each async invocation has fixed 256 KiB C and
+  Asyncify stacks. Stack queries track the active fiber, but unchecked C recursion
+  is not comprehensively protected or tested for every exhaustion path.
+- [ ] Traps, panics, native heartbeat/interrupt traps, and failed ABI conversion
+  poison the instance rather than providing native recovery semantics.
+- [ ] Complete source-level stack traces and mapped diagnostics are missing;
+  standalone build errors may mention the generated cache source path.
+- [ ] Warm main caches use source/config/compiler fingerprints, not an integrity
+  audit of every installed Lean binary or generated output on every invocation.
+  Force a rebuild after manually modifying toolchain installations/artifacts.
+- [ ] Legacy custom-host IO inside module initializers is unsupported. Standard
+  Node IO initializers need broader conformance testing.
 
-## Async execution, scheduling, and cancellation
+## Legacy custom adapters and other hosts
 
-- [ ] Each instance allows only one active async export call. Overlapping calls
-  and host callbacks that reenter the busy instance are rejected; generic runtime
-  queueing and instance pooling are not provided.
-- [ ] Standard Lean task scheduling and promises are unsupported, including
-  `IO.asTask`, task waits, task state/cancellation, and `IO.Promise`. Suspending a
-  custom host call does not implement the native task scheduler.
-- [ ] Lean multithreading, shared-heap coordination, and native synchronization
-  facilities such as mutexes, condition variables, and concurrent channels have
-  not been ported. Independent Wasm instances do not share their Lean `IO.Ref`s.
-- [ ] `Std.Async` combinators, selectors, task races, concurrent composition,
-  timers, processes, and signals are not supported as a complete library.
-  Its task/promise and libuv integration needs a separate implementation strategy.
-- [ ] CPU-bound Lean execution runs on the calling JavaScript thread and cannot
-  be preempted by `AbortSignal`. There is no general execution deadline, worker
-  isolation, or CPU cancellation mechanism in the generated loader.
-- [ ] Cancellation is cooperative at host-operation boundaries and can be caught
-  as a Lean IO error. A cancelled call is not guaranteed to terminate immediately
-  if Lean catches the error and continues computing.
-- [ ] Cancelling the guest's wait does not guarantee the underlying custom host
-  operation has stopped or settled. Hosts must honor signals and manage remaining
-  work; the generic bridge has no host-operation drain protocol. The Express
-  example implements its own drain policy.
-- [ ] Cancellation cannot undo completed external effects, such as a committed
-  file replacement or accepted storage write. Transactional behavior requires a
-  separate storage/application contract.
-- [ ] Asyncify and JSPI require separate artifacts. There is no automatic backend
-  fallback; JSPI requires engine support and was tested with Node 24.13.1's
-  experimental flag. Asyncify is the default and works without that flag.
+- [ ] Existing `Lasm.IO` byte/fetch wrappers remain for compatibility. They have
+  three fixed operations rather than a general typed JS interop mechanism.
+- [ ] Their filesystem adapter is confined to one existing directory, has stricter
+  file/symlink policies, and is not a race-proof security sandbox.
+- [ ] Their outbound HTTP adapter is GET-only, rejects redirects/non-2xx responses,
+  returns bytes without metadata, buffers bounded bodies, and has host-configured
+  timeouts. Those restrictions are separate from standard HTTP server support.
+- [ ] Legacy host errors use generic user errors and truncated messages; custom
+  hosts must implement their own cancellation and external-operation cleanup.
+- [ ] Standard Node IO is not available in browsers or Workers. Their portable
+  WASI has empty stdin and explicit output callbacks; storage keys are not a
+  POSIX filesystem, and CORS/platform limitations still apply.
+- [ ] Browser IndexedDB and Worker KV do not offer identical consistency,
+  transactions, or native OS semantics.
 
-## Initialization, lifetime, and runtime limits
+## Validation still outstanding
 
-- [ ] Host IO during module initialization is unsupported and fails instance
-  creation. This does not prohibit the supported in-memory `IO.Ref` initialization.
-- [ ] Busy instances cannot be disposed. Callers must cancel as appropriate,
-  await the active call, and handle remaining host work before releasing resources.
-- [ ] Guest traps, panics, and failed result conversions discard the entire
-  instance. Only ordinary Lean IO errors are recoverable through this interface.
-- [ ] Native interrupt/heartbeat exception paths have been changed to fatal Wasm
-  traps. They do not provide native Lean's exception-based recovery semantics.
-- [ ] Memory/stack limits are fixed by the current build: maximum linear memory
-  is 256 MiB, the linear stack is 1 MiB, and Asyncify has a separate 1 MiB unwind
-  stack. There is no public configuration API or comprehensive exhaustion testing.
-- [ ] `dispose()` drops guest references but does not force JavaScript garbage
-  collection or provide a general host-resource finalizer contract. Persistent
-  file/socket handles would need explicit ownership and cleanup rules.
-- [ ] There is no general Lean `main` runner with argument, environment, standard
-  stream, and exit-code conventions. The current interface is exported functions.
+- [ ] Repeated new HTTP connections retain a growing chain of accept-loop task
+  continuations until server shutdown. Sockets/timers are released and shutdown
+  clears the tasks, but this workload does not have a constant task-heap bound.
+  Audit native Lean behavior and shorten these chains before claiming long-running
+  server memory stability. Keep-alive request workloads have separate plateau tests.
+- [ ] Run the prepared package/ordinary-main/HTTP tests on native Linux ARM64,
+  macOS Intel and Apple Silicon, and Windows x64 and ARM64.
+- [ ] Broaden browser engines and live cloud validation beyond prior Chrome and
+  local workerd experiments; no live deployment is authorized here.
+- [ ] Add longer endurance, randomized concurrency, fault injection, memory/stack
+  exhaustion, and wider library-compatibility tests. Bounded workload stability
+  is not a general leak proof or production reliability claim.
 
-## Browser/Workers differences and validation gaps
-
-- [ ] Browser IndexedDB and Worker KV expose byte storage keys, not a POSIX
-  filesystem. File handles, directory metadata, permissions, and locking do not
-  automatically have equivalent behavior on those hosts.
-- [ ] Browser HTTP remains subject to browser permissions and CORS. Native process
-  creation, unrestricted local files, and native socket/OS operations cannot be
-  promised uniformly across Node, browsers, and cloud Workers.
-- [ ] Worker KV has platform-specific consistency and cancellation behavior; it
-  is not a transactional database. Separate guest instances do not serialize
-  access to shared external storage.
-- [ ] The portable WASI adapter has empty stdin, requires explicit stdout/stderr
-  callbacks, and does not supply process/thread CPU clocks. Its limited libc
-  compatibility does not implement the complete Lean standard IO APIs.
-- [ ] Native IO/package validation beyond Linux x64 is still pending. Existing
-  browser/cloud evidence covers Chrome and local workerd, not every browser or
-  a live cloud deployment; see [NEXT_STEPS.md](NEXT_STEPS.md).
-- [ ] Permission-denied and transport-failure cases include injected failures;
-  actual OS permission models, filesystem races, and every native IO error mapping
-  have not been validated.
-- [ ] Current resource tests demonstrate stability for bounded workloads, not a
-  general leak proof or long-duration production reliability. Streaming, native
-  tasks, new host resources, exhaustion, and broader failure cases need tests.
-
-## Scope of future standard-IO support
-
-Broad source-compatible standard IO on Node is a plausible engineering goal:
-implement the relevant Lean runtime primitives using explicit Node capabilities,
-and test their results and error semantics against native Lean. Higher-level Lean
-wrappers can then use those primitives without requiring application code to call
-`Lasm.readBytes` directly. This is a proposed approach, not completed support.
-
-Full task/thread compatibility additionally requires a scheduler, ownership and
-synchronization design. Asyncify/JSPI alone only solve suspension across the host
-boundary. Exact native behavior for every IO API on every host is not an established
-or uniform guarantee; browser/Worker capabilities and native OS differences must
-be reflected in the eventual support contract.
-
-The pinned Lean declarations include native handles, processes, task operations,
-and runtime hooks; see [Lean 4.32.0 IO source](https://github.com/leanprover/lean4/blob/v4.32.0/src/Init/System/IO.lean).
-The scheduler semantics are described in the
-[Lean tasks and threads reference](https://lean-lang.org/doc/reference/latest/IO/Tasks-and-Threads/).
-
-Implementation and evidence used for this inventory: [Lean wrappers](lean/Lasm/IO.lean),
-[host bridge](runtime/host.cpp), [JavaScript runtime](src/runtime.mjs),
-[Node adapter](src/host.mjs), [portable adapters](src/web-host.mjs),
-[runtime construction](scripts/build-runtime.mjs), [IO tests](test/io.test.mjs),
-[IO behavior](docs/IO.md), [runtime scope](docs/RUNTIME.md), and
-[browser/Workers scope](docs/HOSTS.md).
+Implementation: [IO runtime](runtime/node-io.cpp), [async runtime](runtime/node-async.cpp),
+[tasks](runtime/tasks.inc.cpp), [Node primitives](src/node-host.mjs),
+[network/timers](src/node-network.mjs), [scheduler](src/scheduler.mjs).

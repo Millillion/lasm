@@ -113,7 +113,7 @@ test('real workerd loads the compiled module and uses explicit KV and service bi
     modulesRoot: root,
     modules: [
       { type: 'ESModule', path: join(root, 'examples/worker/worker.mjs') },
-      ...['worker.mjs', 'browser.mjs', 'runtime.mjs', 'wasi.mjs', 'web-host.mjs'].map(file => ({ type: 'ESModule', path: join(io.output, file) })),
+      ...['worker.mjs', 'browser.mjs', 'runtime.mjs', 'scheduler.mjs', 'wasi.mjs', 'web-host.mjs'].map(file => ({ type: 'ESModule', path: join(io.output, file) })),
       { type: 'CompiledWasm', path: join(io.output, 'module.wasm') },
     ],
     compatibilityDate: '2026-09-17', cf: false,

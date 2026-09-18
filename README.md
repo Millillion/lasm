@@ -2,7 +2,8 @@
 
 Lasm compiles Lean programs to WebAssembly modules callable from Node.js,
 browsers, and Cloudflare Workers. It uses Lean's actual object and arbitrary-integer
-runtime, with typed JavaScript bindings and explicit asynchronous host capabilities.
+runtime, with typed JavaScript bindings. Node applications can use ordinary Lean
+console, filesystem, async tasks, and `Std.Http.Server` APIs.
 
 The experimental compiler supports normal Lake projects and a local installable
 package. Developers need Node 24+ and the complete official Lean 4.32.0 toolchain;
@@ -15,6 +16,8 @@ The initial design discussion is the
 [shared Claude conversation](https://claude.ai/share/1a8522ee-e3a9-4ce5-9447-8d8457b6f005).
 The full displayed conversation has been reviewed and its key claims tested.
 
+- [Run ordinary Lean mains and HTTP servers in Node](docs/NODE_APPS.md)
+- [Complete Lean HTTP server and Vitest tests](examples/lean-server/README.md)
 - [Accepted implementation plan](docs/PLAN.md)
 - [Developer workflow: Lake and Node projects](docs/DEVELOPER_WORKFLOW.md)
 - [Local release packaging and supported platforms](docs/RELEASE.md)
@@ -37,6 +40,20 @@ npm test
 npm run build:example
 node --input-type=module -e "import createModule from './examples/basic/dist/index.mjs'; const m = await createModule(); console.log(m.square(2n ** 128n)); m.dispose();"
 ```
+
+Run the new complete Lean application with:
+
+```sh
+node node-shim.js examples/lean-server/Main.lean
+# After installing the compiler package in your own project:
+npx lasm run Main.lean
+npx lasm build Main.lean dist
+node dist/main.mjs
+```
+
+The first run builds; unchanged runs are cached. No Lasm imports, export manifest,
+or custom annotations are needed for a Lean executable. Run its native/Node
+HTTP tests with `npm run test:lean-server`.
 
 `setup` explicitly downloads and verifies the pinned reference toolchain and Lean
 source into `.cache`. There is no install hook. Building is local:
@@ -70,8 +87,9 @@ empty-cache offline installs, Lake dependencies, isolated compiler paths, and
 standalone execution. `npm run test:hosts` runs real headless Chrome and local
 Cloudflare workerd tests. See the linked docs for prerequisites and scope.
 
-Normal `IO.FS`, native processes/sockets, and unrestricted `Std.Async` remain
-outside the supported runtime slice. Unsupported native symbols fail during
+Standard Node console, filesystem, tasks and HTTP server support use Asyncify.
+Native child processes, TLS, DNS, UDP, parallel threads, and unrestricted
+`Std.Async` remain outside the supported runtime slice. See [IO limitations](IO_LIMITATIONS.md). Unsupported native symbols fail during
 linking. Browser support is tested in Chrome and cloud support in local workerd;
 no live cloud deployment has been performed. The original research probes remain
 available as `npm run probe` and `npm run probe:runtime`.
