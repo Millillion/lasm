@@ -87,3 +87,20 @@ test('exclusive create and invalid descriptors retain native error categories', 
   assert.equal(writeError.bytes.readBigUInt64LE(), 4n);
   await ok(5, h);
 });
+
+test('more lock waiters than FFI workers cannot deadlock the lock holder', { timeout: 5000 }, async t => {
+  const { directory, ok, open } = setup(t);
+  writeFileSync(join(directory, 'contended'), '');
+  const holder = await open('contended');
+  const waiters = await Promise.all(Array.from({ length: 12 }, () => open('contended')));
+  await ok(32, holder, 1);
+  let completed = 0;
+  const pending = waiters.map(async id => { await ok(32, id, 1); completed++; await ok(34, id); });
+  await new Promise(resolve => setTimeout(resolve, 20));
+  assert.equal(completed, 0);
+  await ok(3, holder, 0, 'holder can still write');
+  await ok(4, holder);
+  await ok(34, holder);
+  await Promise.all(pending);
+  assert.equal(completed, 12);
+});

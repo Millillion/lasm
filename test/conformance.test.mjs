@@ -10,7 +10,7 @@ import { root, resolveLean } from '../src/toolchain.mjs';
 const exec = promisify(execFile);
 const { lean } = resolveLean(root);
 
-for (const name of ['fs', 'process']) test(`${name}: ordinary Lean agrees with the native runtime`, { timeout: 240_000 }, async t => {
+for (const name of ['fs', 'process', 'expr']) test(`${name}: ordinary Lean agrees with the native runtime`, { timeout: 240_000 }, async t => {
   const directory = await mkdtemp(join(tmpdir(), `lasm-${name}-conformance-`));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const source = join(root, `test/fixtures/${name}-conformance/Main.lean`);

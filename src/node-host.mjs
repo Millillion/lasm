@@ -200,7 +200,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   }
   return { request, release, platform: process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0,
     start(...args) { const id = nextRequest++; pending.set(id, request(...args)); return id; },
-    close() { closed = true; for (const id of resources.keys()) release(id); for (const id of [0,1,2]) { const f = resources.get(id); if (f.stream) closeResource(f); } pending.clear(); },
+    close() { closed = true; for (const value of resources.values()) value.cancelled = true; for (const id of resources.keys()) release(id); for (const id of [0,1,2]) { const f = resources.get(id); if (f.stream) closeResource(f); } pending.clear(); },
     stats() { return { resources: resources.size - 3 }; },
   };
 }

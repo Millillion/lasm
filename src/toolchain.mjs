@@ -83,7 +83,7 @@ export async function getToolchain(cwd, { log = console.log } = {}) {
       compileC(source, object) { run(tools.clang, [...cFlags, '-c', source, '-o', object], { cwd }); },
       link(objects, exports, output) {
         const arguments_ = ['--entry=_initialize', '--export-memory', '--stack-first', '--strip-all',
-          '-z', 'stack-size=1048576', '--max-memory=268435456', ...exports.map(e => `--export=${e}`), ...objects,
+          '-z', 'stack-size=1048576', '--max-memory=1073741824', ...exports.map(e => `--export=${e}`), ...objects,
           join(target, 'lib/libleanrt.a'), join(target, 'lib/libleanstd.a'),
           ...manifest.linkLibraries.map(file => join(target, file)), '-o', output];
         const response = output + '.link.rsp';
@@ -104,13 +104,13 @@ export async function getToolchain(cwd, { log = console.log } = {}) {
   return {
     prefix, lean: tools.lean, hostCommit, identity: readFileSync(join(reference.runtimeDir, 'build-identity.json'), 'utf8'), kind: 'reference-zig',
     compileIdentity: sha256(JSON.stringify(reference.targetFlags) + hostCommit
-      + readFileSync(join(prefix, 'include/lean/lean.h'), 'utf8')
+      + readFileSync(join(reference.runtimeDir, 'include/lean/lean.h'), 'utf8')
       + readFileSync(join(reference.runtimeDir, 'include/lean/config.h'), 'utf8')),
     standardCache: join(reference.runtimeDir, 'stdlib'), reference,
     compileC(source, object) { reference.run(reference.zig, ['cc', ...reference.targetFlags, '-c', source, '-o', object]); },
     link(objects, exports, output) {
       reference.run(reference.zig, ['c++', ...reference.targetFlags, '-fno-exceptions', '-mexec-model=reactor', ...objects, archive,
-        ...exports.map(n => `-Wl,--export=${n}`), '-Wl,--strip-all', '-Wl,-z,stack-size=1048576', '-Wl,--max-memory=268435456', '-o', output]);
+        ...exports.map(n => `-Wl,--export=${n}`), '-Wl,--strip-all', '-Wl,-z,stack-size=1048576', '-Wl,--max-memory=1073741824', '-o', output]);
     },
   };
 }

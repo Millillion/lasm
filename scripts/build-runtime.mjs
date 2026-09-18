@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, readFileSync, existsSync, rmSync, readdirSync } from 'node:fs';
-import { createHash } from 'node:crypto';
+import { mkdirSync, writeFileSync as writeRaw, readFileSync, existsSync, rmSync, readdirSync, renameSync } from 'node:fs';
+import { createHash, randomUUID } from 'node:crypto';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,8 +17,14 @@ export function run(executable, args, extra = {}) {
   }).trim();
 }
 export const prefix = run(lean, ['--print-prefix']);
-export const targetFlags = ['-target', 'wasm32-wasi', '-O2', '-DNDEBUG', '-ffunction-sections', '-fdata-sections',
+export const targetFlags = ['-target', 'wasm32-wasi', '-O2', '-DNDEBUG', '-DLASM_WASM32_SCALAR_LITERALS=1', '-ffunction-sections', '-fdata-sections',
   '-I', join(runtimeDir, 'include'), '-I', join(prefix, 'include'), '-I', join(leanSource, 'src'), '-I', join(root, 'runtime')];
+
+function writeFileSync(path, text) {
+  if (existsSync(path) && readFileSync(path, 'utf8') === text) return;
+  const temporary = path + '.' + randomUUID() + '.tmp';
+  writeRaw(temporary, text); renameSync(temporary, path);
+}
 
 export function buildRuntime(log = console.log) {
   if (run(lean, ['--short-version']) !== '4.32.0') throw new Error('Lasm currently requires Lean 4.32.0');
@@ -30,6 +36,13 @@ export function buildRuntime(log = console.log) {
   mkdirSync(join(runtimeDir, 'patched'), { recursive: true });
   writeFileSync(join(runtimeDir, 'include/lean/config.h'),
     '#pragma once\n#include <lean/version.h>\n#define LEAN_IS_STAGE0 0\n');
+  const leanHeader = readFileSync(join(prefix, 'include/lean/lean.h'), 'utf8');
+  const scalarLiteral = '#ifdef LEAN_EMSCRIPTEN\n#define LEAN_SCALAR_PTR_LITERAL';
+  if (leanHeader.split(scalarLiteral).length !== 2) throw new Error('Unexpected Lean static scalar literal layout');
+  // Upstream selects two pointer slots only for Emscripten. WASI also has 32-bit
+  // pointers: a single slot silently truncates every static 64-bit scalar field.
+  writeFileSync(join(runtimeDir, 'include/lean/lean.h'), leanHeader.replace(scalarLiteral,
+    '#if UINTPTR_MAX == UINT32_MAX\n#define LEAN_SCALAR_PTR_LITERAL'));
   writeFileSync(join(runtimeDir, 'include/githash.h'), '#define LEAN_GITHASH "8c9756b28d64dab099da31a4c09229a9e6a2ef35"\n');
   const debugHeader = readFileSync(join(leanSource, 'src/runtime/debug.h'), 'utf8');
   if (!debugHeader.includes('throw lean::unreachable_reached();')) throw new Error('Unexpected Lean debug.h');
@@ -43,14 +56,32 @@ export function buildRuntime(log = console.log) {
       else if (entry.isFile()) digest.update(full).update(readFileSync(full));
     }
   }
-  for (const path of [join(leanSource, 'src/runtime'), join(leanSource, 'src/util'), join(prefix, 'include/lean'),
+  for (const path of [join(leanSource, 'src/runtime'), join(leanSource, 'src/util'), join(leanSource, 'src/kernel'), join(prefix, 'include/lean'),
     join(runtimeDir, 'include'), join(root, 'runtime')]) fingerprint(path);
   digest.update(readFileSync(fileURLToPath(import.meta.url)));
   const headersIdentity = digest.digest('hex');
-  const units = ['object', 'mpz', 'mpn', 'utf8', 'apply', 'thread', 'alloc', 'hash', 'byteslice', 'platform', 'interrupt'];
+  const archive = join(runtimeDir, 'libleanrt.a');
+  const identityFile = join(runtimeDir, 'build-identity.json');
+  if (existsSync(archive) && existsSync(identityFile)
+      && JSON.parse(readFileSync(identityFile, 'utf8')).headersIdentity === headersIdentity) return archive;
+  const units = ['object', 'mpz', 'mpn', 'utf8', 'apply', 'thread', 'alloc', 'hash', 'byteslice', 'platform', 'interrupt', 'kernel-data'];
   const objects = [];
   for (const unit of [...units, 'io-core', 'lasm-core', 'lasm-stack', 'lasm-host', 'lasm-node-io', 'lasm-node-async']) {
     let source = unit.startsWith('lasm-') ? join(root, 'runtime', `${unit.slice(5)}.cpp`) : join(leanSource, 'src/runtime', `${unit}.cpp`);
+    if (unit === 'kernel-data') {
+      // These three pure metadata primitives are also used by ordinary programs
+      // manipulating Lean.Expr/Level. Keep their pinned upstream implementations.
+      function extract(file, start, end) {
+        const text = readFileSync(join(leanSource, 'src/kernel', file), 'utf8');
+        if (text.split(start).length !== 2 || text.split(end).length !== 2) throw new Error('Unexpected kernel data source boundaries');
+        return text.slice(0, text.indexOf('*/') + 2) + '\n' + text.slice(text.indexOf(start), text.indexOf(end, text.indexOf(start)));
+      }
+      source = join(runtimeDir, 'patched/kernel-data.cpp');
+      writeFileSync(source, '// Lasm: unchanged pure metadata functions extracted from the pinned kernel.\n' +
+        '#include <algorithm>\n#include "runtime/object.h"\n#include "runtime/hash.h"\nnamespace lean {\n' +
+        extract('expr.cpp', 'extern "C" LEAN_EXPORT uint64_t lean_expr_mk_data', '// =======================================\n// Constructors') +
+        extract('level.cpp', 'extern "C" LEAN_EXPORT uint64_t lean_level_mk_data', 'bool is_explicit(level const & l)') + '\n}\n');
+    }
     if (unit === 'platform') {
       const original = readFileSync(source, 'utf8');
       const windows = '#if defined(LEAN_WINDOWS)\n    return 1;\n#else\n    return 0;\n#endif';
@@ -116,14 +147,16 @@ export function buildRuntime(log = console.log) {
     const identity = JSON.stringify({ content: readFileSync(source, 'utf8'), flags: targetFlags, headersIdentity });
     if (!existsSync(object) || !existsSync(stamp) || readFileSync(stamp, 'utf8') !== identity) {
       log(`Compiling runtime ${unit}.cpp`);
-      run(zig, ['c++', ...targetFlags, '-std=c++20', '-fno-exceptions', '-c', source, '-o', object]);
+      const temporary = object + '.' + randomUUID() + '.o';
+      run(zig, ['c++', ...targetFlags, '-std=c++20', '-fno-exceptions', '-c', source, '-o', temporary]);
+      renameSync(temporary, object);
       writeFileSync(stamp, identity);
     }
     objects.push(object);
   }
-  const archive = join(runtimeDir, 'libleanrt.a');
-  rmSync(archive, { force: true });
-  run(zig, ['ar', 'rcs', archive, ...objects]);
+  const temporary = archive + '.' + randomUUID() + '.a';
+  run(zig, ['ar', 'rcs', temporary, ...objects]);
+  renameSync(temporary, archive);
   writeFileSync(join(runtimeDir, 'build-identity.json'), JSON.stringify({ lean: '4.32.0', zig: '0.16.0', headersIdentity, targetFlags }, null, 2) + '\n');
   return archive;
 }

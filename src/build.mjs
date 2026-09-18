@@ -1,6 +1,6 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync, realpathSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync, realpathSync, renameSync } from 'node:fs';
 import { resolve, dirname, join, relative, sep, delimiter } from 'node:path';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { getToolchain, optimizeWasm, run, root, env } from './toolchain.mjs';
 import { findLakeProject, loadLake } from './lake.mjs';
 import { referenceNotices } from './notices.mjs';
@@ -122,8 +122,10 @@ export async function build(configPath, outputPath, { asyncMode, log = console.l
     }
     if (!isStandard || !existsSync(base + '.c') || !existsSync(base + '.source') || readFileSync(base + '.source', 'utf8') !== stamp) {
       log(`Generating ${name}`);
+      const temporary = base + '.' + randomUUID() + '.c';
       run(lean, ['-R', moduleRoot, '-Dcompiler.postponeCompile=false',
-        ...(!isStandard ? ['-o', base + '.olean'] : []), '-c', base + '.c', source], { cwd: sourceRoot, env: leanEnv });
+        ...(!isStandard ? ['-o', base + '.olean'] : []), '-c', temporary, source], { cwd: sourceRoot, env: leanEnv });
+      renameSync(temporary, base + '.c');
       writeFileSync(base + '.source', stamp);
     }
     const c = readFileSync(base + '.c', 'utf8');
@@ -148,7 +150,7 @@ private instance : MainProgram (List String → IO Unit) where
 private instance : MainProgram (List String → IO UInt32) where
   run action args := action args
 @[extern "lasm_main_args"] private opaque mainArgs : IO (List String)
-private def runProgram : IO UInt32 := do
+private unsafe def runProgram : IO UInt32 := do
   MainProgram.run main (← mainArgs)
 ` : '';
   const entrySource = (modular ? `module\nprelude\npublic import ${spec.module}\npublic section\n` : `import ${spec.module}\n`) + mainSupport + spec.exports.map(e => {
@@ -156,7 +158,7 @@ private def runProgram : IO UInt32 := do
     const call = inputSpec.main ? 'runProgram' : `${e.declaration} ${e.parameters.map((_, i) => `a${i}`).join(' ')}`;
     const result = e.effect === 'io' ? `EIO String ${e.result}` : e.result;
     const body = e.effect === 'io' ? `((${call}) : IO ${e.result}).toEIO IO.Error.toString` : call;
-    return `@[export ${e.symbol}]\ndef lasmEntry${e.symbol.split('_').at(-1)} ${args} : ${result} := ${body}\n`;
+    return `@[export ${e.symbol}]\nunsafe def lasmEntry${e.symbol.split('_').at(-1)} ${args} : ${result} := ${body}\n`;
   }).join('\n');
   writeFileSync(join(buildDir, `${entryName}.lean`), entrySource);
   const entryBase = join(buildDir, entryName);
@@ -193,7 +195,9 @@ private def runProgram : IO UInt32 := do
     const stamp = hash(unit.c + (toolchain.compileIdentity ?? toolchain.identity));
     if (!existsSync(unit.base + '.o') || !existsSync(unit.base + '.object-source') || readFileSync(unit.base + '.object-source', 'utf8') !== stamp) {
       log(`Compiling ${unit.name}`);
-      toolchain.compileC(unit.base + '.c', unit.base + '.o');
+      const temporary = unit.base + '.' + randomUUID() + '.o';
+      toolchain.compileC(unit.base + '.c', temporary);
+      renameSync(temporary, unit.base + '.o');
       writeFileSync(unit.base + '.object-source', stamp);
     }
     objects.push(unit.base + '.o');

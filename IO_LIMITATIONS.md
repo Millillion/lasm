@@ -77,7 +77,7 @@ and [the full Lean server](examples/lean-server/README.md).
   callbacks and resources work without automatic JavaScript bindings.
 - [ ] Guest/host byte transfers copy memory. There is no zero-copy or shared-memory
   IO contract, and the JS export/legacy bridge has a 16 MiB transfer ceiling.
-- [ ] Memory is capped at 256 MiB; each async invocation has fixed 256 KiB C and
+- [ ] Memory is capped at 1 GiB; each async invocation has fixed 256 KiB C and
   Asyncify stacks. Stack queries track the active fiber, but unchecked C recursion
   is not comprehensively protected or tested for every exhaustion path.
 - [ ] Traps, panics, native heartbeat/interrupt traps, and failed ABI conversion
@@ -130,4 +130,7 @@ handles and flush/truncate behavior, reads beyond 16 MiB, native line decoding,
 expanded errno families, independent standard streams for suspended tasks,
 UInt64 asynchronous timers, and ordinary child processes/pipes. The initial eight
 selected upstream filesystem/console files matched native Lean on Linux x64.
+Additional differential fixtures verify OS symlink/dot-segment resolution,
+directory enumeration order, invalid paths, native error messages, stdin EOF,
+environment overrides, process termination and simultaneous 1 MiB output pipes.
 Remaining platform and semantic checks above are still open.

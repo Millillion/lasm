@@ -68,7 +68,7 @@ stubs for missing native facilities:
 4. Implement stack queries using wasm-ld's stack-bound symbols, with a trapping
    `check_stack`. The base linear stack is 1 MiB; async fibers have separate 256 KiB C
    and Asyncify stacks, with active bounds supplied by the scheduler. Maximum
-   memory is 256 MiB. This does not promise protection against every unchecked C stack
+   memory is 1 GiB (grown on demand). This does not promise protection against every unchecked C stack
    overflow or a time limit for nonterminating Lean code.
 5. Initialize the supported alloc/object/thread runtime directly. Native process,
    signal, mmap and libuv initialization is excluded. Panic's stderr primitive
@@ -85,6 +85,13 @@ stubs for missing native facilities:
    stays 32 bits for Wasm. Portable browser/Worker instances use Unix-style paths.
    Windows UTC lookup is implemented for standard HTTP dates; other Windows
    named time zones remain explicitly unsupported.
+8. Select the upstream two-slot static scalar layout for every 32-bit target,
+   including WASI. Lean's installed header selects that layout only for
+   Emscripten; using its default layout truncated static 64-bit fields such as
+   cached name hashes. The native differential expression fixture covers the fix.
+9. Extract the three unchanged pure `Lean.Expr`/`Lean.Level` metadata primitives
+   from the pinned kernel sources. This enables ordinary expression data without
+   claiming that the kernel, elaborator or compiler itself is ported.
 
 The linked libc WASI allowlist is `fd_close`, `fd_fdstat_get`, `fd_read`,
 `fd_seek`, `fd_write`, `environ_get`, `environ_sizes_get`, `clock_time_get`, and

@@ -61,14 +61,14 @@ export function nativeFiles() {
     const getError = kernel.func('uint32_t __stdcall GetLastError()');
     const consoleMode = kernel.func('int __stdcall GetConsoleMode(intptr_t handle, _Out_ uint32_t *mode)');
     terminal = file => !!consoleMode(handle(file.fd), [0]);
-    lock = async (stream, exclusive, attempt, unlock) => {
+    lock = (stream, exclusive, attempt, unlock) => {
       const overlapped = Buffer.alloc(32);
       const fn = unlock ? unlockFile : lockFile;
       const args = unlock ? [handle(fileno(stream)), 0, 0xffffffff, 0xffffffff, overlapped]
         : [handle(fileno(stream)), (exclusive ? 2 : 0) | (attempt ? 1 : 0), 0, 0xffffffff, 0xffffffff, overlapped];
-      const result = await new Promise((resolve, reject) => fn.async(...args, (err, value) => {
-        const code = getError(); if (err) reject(err); else resolve({ value, code });
-      }));
+      // Every acquisition uses FAIL_IMMEDIATELY; waiting is implemented below.
+      // GetLastError must be read on the same thread as LockFileEx.
+      const value = fn(...args), result = { value, code: value ? 0 : getError() };
       if (result.value || unlock && result.code === 158) return true;
       if (attempt && result.code === 33) return false;
       // Native Lean reports LockFileEx errors as IO.userError containing the
@@ -77,8 +77,9 @@ export function nativeFiles() {
     };
   } else {
     const flock = bind('flock', 'int', ['int', 'int']);
-    lock = async (stream, exclusive, attempt, unlock) => {
-      const result = await call(flock, fileno(stream), unlock ? 8 : (exclusive ? 2 : 1) | (attempt ? 4 : 0));
+    lock = (stream, exclusive, attempt, unlock) => {
+      const value = flock(fileno(stream), unlock ? 8 : (exclusive ? 2 : 1) | (attempt ? 4 : 0));
+      const result = { value, errno: ffi.errno() };
       if (result.value === 0) return true;
       if (attempt && result.errno === ffi.os.errno.EWOULDBLOCK) return false;
       throw failure(result.errno);
@@ -178,7 +179,16 @@ export function nativeFiles() {
       return Buffer.from(bytes);
     },
     isTty: terminal,
-    lock(file, exclusive, attempt = false, unlock = false) { return lock(file.stream, exclusive, attempt, unlock); },
+    async lock(file, exclusive, attempt = false, unlock = false) {
+      // Blocking locks must not fill the FFI worker pool and prevent the holder
+      // from flushing/unlocking. Retain real OS locks, yielding between attempts.
+      for (;;) {
+        if (file.cancelled) throw failure(ffi.os.errno.ECANCELED);
+        const acquired = lock(file.stream, exclusive, true, unlock);
+        if (acquired || attempt || unlock) return acquired;
+        await new Promise(resolve => setTimeout(resolve, 5));
+      }
+    },
   };
   return implementation;
 }
