@@ -55,6 +55,9 @@ static void schedule_task(lean_task_object *t, lean_task_object *dependency = nu
     // IO tasks must complete even if discarded. Pure tasks may be reclaimed
     // while waiting; task_drop removes their weak scheduler registration.
     if (t->m_imp->m_keep_alive) lean_inc_ref((object*)t);
+    // In this cooperative port m_next_dep records this task's own dependency.
+    // Its closure owns the corresponding reference; the scheduler is weak.
+    t->m_imp->m_next_dep = dependency;
     lasm_task_enqueue(task_id(t), dependency && !dependency->m_value ? task_id(dependency) : 0);
 }
 extern "C" LEAN_EXPORT void lean_init_task_manager_using(unsigned) {}
@@ -94,6 +97,25 @@ static obj_res task_bind_fn(obj_arg t, obj_arg f, obj_arg) {
     if (lean_to_task(next)->m_value) return lean_task_get_own(next);
     auto *current = (lean_task_object*)(uintptr_t)lasm_task_current();
     lean_always_assert(current && current->m_imp);
+    auto *nested = lean_to_task(next);
+    auto *imp = nested->m_imp;
+    // A uniquely owned, not-yet-running nested task can continue in the current
+    // task. This avoids one retained forwarding task per iteration of an Async
+    // accept loop. Shared tasks and running tasks keep their original identity.
+    if (imp && imp->m_closure && imp->m_prio == 0
+        && next->m_rc == (imp->m_keep_alive ? 2 : 1)
+        && (current->m_imp->m_keep_alive || !imp->m_keep_alive)) {
+        bool held = imp->m_keep_alive;
+        auto *dependency = imp->m_next_dep;
+        current->m_imp->m_closure = imp->m_closure;
+        current->m_imp->m_canceled |= imp->m_canceled;
+        imp->m_closure = nullptr;
+        lasm_task_drop(task_id(nested));
+        if (held) lean_dec_ref(next);
+        lean_dec_ref(next);
+        schedule_task(current, dependency);
+        return nullptr;
+    }
     current->m_imp->m_closure = mk_closure_2_1(task_bind_result, next);
     schedule_task(current, lean_to_task(next));
     return nullptr;
@@ -109,6 +131,7 @@ extern "C" __attribute__((export_name("lasm_task_execute")))
 void lasm_task_execute(lean_object *task) {
     auto *t = lean_to_task(task);
     bool keep_alive = t->m_imp->m_keep_alive;
+    t->m_imp->m_next_dep = nullptr;
     t->m_imp->m_prio = 1;
     auto *closure = t->m_imp->m_closure;
     t->m_imp->m_closure = nullptr;

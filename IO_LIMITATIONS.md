@@ -109,11 +109,10 @@ and [the full Lean server](examples/lean-server/README.md).
 
 ## Validation still outstanding
 
-- [ ] Repeated new HTTP connections retain a growing chain of accept-loop task
-  continuations until server shutdown. Sockets/timers are released and shutdown
-  clears the tasks, but this workload does not have a constant task-heap bound.
-  Audit native Lean behavior and shorten these chains before claiming long-running
-  server memory stability. Keep-alive request workloads have separate plateau tests.
+- [ ] Extend the HTTP endurance tests beyond the verified keep-alive, aborted
+  stream, and 330 fresh-connection workload. Unique nested task continuations are
+  now fused, eliminating the observed accept-loop chain growth in that regression.
+  This bounded workload is not a general memory-leak proof.
 - [ ] Run the prepared package/ordinary-main/HTTP tests on native Linux ARM64,
   macOS Intel and Apple Silicon, and Windows x64 and ARM64.
 - [ ] Broaden browser engines and live cloud validation beyond prior Chrome and

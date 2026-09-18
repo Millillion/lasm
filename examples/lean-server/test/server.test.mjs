@@ -190,9 +190,20 @@ test('Wasm server releases request resources over a sustained workload', async (
     await new Promise(resolve => setTimeout(resolve, 100));
     const after = api.stats();
     expect(after.resources).toBeLessThanOrEqual(before.resources + 2);
-    // New connections retain accept-loop continuation tasks until shutdown.
-    // Do not confuse release of sockets/timers with constant task-heap usage.
-    expect(after.waitingTasks).toBeLessThanOrEqual(steady.waitingTasks + 32);
+    expect(after.waitingTasks).toBeLessThanOrEqual(steady.waitingTasks + 8);
+    const freshConnection = async () => {
+      const response = await fetch(base + '/health', { headers: { Connection: 'close' } });
+      expect(await response.json()).toEqual({ ok: true });
+    };
+    for (let i = 0; i < 30; i++) await freshConnection();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const warmConnections = api.stats();
+    for (let i = 0; i < 300; i++) await freshConnection();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const repeatedConnections = api.stats();
+    expect(repeatedConnections.waitingTasks).toBeLessThanOrEqual(warmConnections.waitingTasks + 4);
+    expect(repeatedConnections.resources).toBeLessThanOrEqual(warmConnections.resources + 2);
+    expect(repeatedConnections.memoryBytes).toBeLessThanOrEqual(warmConnections.memoryBytes + 2 * 1024 * 1024);
     const response = await fetch(base + '/shutdown', { method: 'POST' }); await response.arrayBuffer();
     expect(await running).toBe(0);
     expect(api.stats()).toMatchObject({ fibers: 0, waitingTasks: 0, resources: 0 });
