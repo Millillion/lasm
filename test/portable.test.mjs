@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPortableWasi } from '../src/wasi.mjs';
 import { assertPlatform } from '../src/toolchain.mjs';
+import { buildPlatforms } from '../src/platform.mjs';
 
-test('the build platform policy accepts Linux x64 and diagnoses other platforms', () => {
-  assert.doesNotThrow(() => assertPlatform('linux', 'x64'));
-  for (const pair of [['darwin', 'arm64'], ['win32', 'x64'], ['linux', 'arm64']]) {
-    assert.throws(() => assertPlatform(...pair), /currently support linux-x64/);
+test('the build platform policy accepts the intended 64-bit desktop matrix', () => {
+  for (const platform of buildPlatforms) assert.doesNotThrow(() => assertPlatform(...platform.split('-')));
+  for (const pair of [['freebsd', 'x64'], ['win32', 'ia32'], ['linux', 'riscv64']]) {
+    assert.throws(() => assertPlatform(...pair), /64-bit Linux, macOS, or Windows/);
   }
 });
 

@@ -5,8 +5,10 @@ browsers, and Cloudflare Workers. It uses Lean's actual object and arbitrary-int
 runtime, with typed JavaScript bindings and explicit asynchronous host capabilities.
 
 The experimental compiler supports normal Lake projects and a local installable
-package. Developers need Node 24+ and the exact Lean 4.32.0 toolchain on Linux x64;
-the package includes its Wasm libraries, sysroot, and optimizer. Running generated
+package. Developers need Node 24+ and the complete official Lean 4.32.0 toolchain;
+the package includes its Wasm libraries, sysroot, and optimizer. Linux x64 is
+validated. macOS and Windows adapters are implemented, with native acceptance
+still pending; see the [platform matrix](docs/RELEASE.md). Running generated
 modules requires only the application host. Nothing has been published.
 
 The initial design discussion is the

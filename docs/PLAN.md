@@ -156,8 +156,9 @@ Build PATH is restricted to Node, Lean, Lake, and ordinary shell utilities. Test
 reject unsupported platform combinations, injected mismatching Lean identities,
 and damaged target archives. Reports measure compressed/installed sizes and
 install/first/cached-build time. Shipped inputs include redistribution notices.
-These are isolated tests on the development Linux host; testing pristine machines
-or adding macOS/Windows/ARM support requires a separate platform validation pass.
+These are isolated tests on the development Linux host. macOS/Windows tool
+adapters and a native OS/architecture acceptance matrix are now implemented;
+native validation beyond Linux x64 remains open in [NEXT_STEPS.md](../NEXT_STEPS.md).
 
 ### 5. Browser and cloud adapters — tested in Chrome and local workerd
 
@@ -179,7 +180,7 @@ with KV/service bindings. Host capabilities are explicitly supplied. See
 | Callable functions versus a `main` runner | Callable functions first, with a later/simple `main` adapter | Typed callable interface implemented; runner remains an adapter to add. |
 | Existing Lean IO compatibility | Small explicit Lasm API first, then useful standard IO subsets | Full compatibility enlarges the runtime and async scope considerably. |
 | Custom-only versus hybrid internal imports | Keep the public host API custom; permit a measured minimal WASI layer internally | Final runtime reachability has not been established. |
-| Bundled compiler choice | Zig builds maintainer archives; installed Lean Clang/LLD uses the packaged sysroot | Local package installation and real Lean IO pass on Linux x64; other build platforms are rejected. |
+| Bundled compiler choice | Zig builds maintainer archives; installed Lean Clang/LLD uses the packaged sysroot | Linux x64 passes; macOS/Windows adapters are implemented but native acceptance is pending. |
 | Minimum Node/Lean versions | One exact Lean release and an explicit Node baseline initially | Versioned native/runtime ABI compatibility must be maintained and tested. |
 | Meaning of lightweight | Prioritize simple setup, then measure download and runtime footprint separately | The thread specifies convenience but no numeric size budget. |
 

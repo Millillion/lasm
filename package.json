@@ -1,6 +1,6 @@
 {
   "name": "@lasm/compiler",
-  "version": "0.1.0-experimental.1",
+  "version": "0.1.0-experimental.2",
   "private": true,
   "workspaces": [
     "examples/express"
@@ -22,6 +22,7 @@
     "test:express": "npm run build:express && vitest run --config examples/express/vitest.config.mjs",
     "package:release": "node scripts/package-release.mjs",
     "test:lake": "node --test test/lake.test.mjs",
+    "test:platform": "node --test test/platform.test.mjs test/portable.test.mjs test/toolchain.test.mjs",
     "test:release": "node --test --test-concurrency=1 integration/release.test.mjs",
     "test:hosts": "node --test --test-concurrency=1 integration/hosts.test.mjs",
     "test": "node --test --test-concurrency=1 test/*.test.mjs",

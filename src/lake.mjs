@@ -1,8 +1,9 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
+import { executableName } from './platform.mjs';
 
 /** Lake owns elaboration, dependencies, plugins, and compiler options. */
-export function loadLake(configFile, spec, { run, lean, env, hostCommit }) {
+export function findLakeProject(configFile, spec) {
   if (spec.lake !== undefined && typeof spec.lake !== 'string' && spec.lake !== false) {
     throw new Error('lake must be a project directory or false');
   }
@@ -14,9 +15,15 @@ export function loadLake(configFile, spec, { run, lean, env, hostCommit }) {
     if (parent === directory) return undefined;
     directory = parent;
   }
+  return directory;
+}
+
+export function loadLake(configFile, spec, { run, lean, env, hostCommit }) {
+  const directory = findLakeProject(configFile, spec);
+  if (!directory) return undefined;
   const prefix = run(lean, ['--print-prefix'], { cwd: directory, env });
   if (run(lean, ['--githash'], { cwd: directory, env }) !== hostCommit) throw new Error('Lake project toolchain does not match the Lasm compiler target');
-  const executable = join(prefix, 'bin/lake');
+  const executable = join(prefix, 'bin', executableName('lake'));
   const options = spec.lakeOptions ?? {};
   if (!options || typeof options !== 'object' || Array.isArray(options)) throw new Error('lakeOptions must be an object of string values');
   const flags = ['--no-cache', '--keep-toolchain'];

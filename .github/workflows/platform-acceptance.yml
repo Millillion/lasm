@@ -1,0 +1,90 @@
+name: Native package acceptance
+
+# Prepared locally. Runs only after a remote is authorized and someone dispatches it.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.13.1
+          package-manager-cache: false
+      - uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: lean
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-github-cache: false
+          use-mathlib-cache: false
+      - run: npm ci
+      - run: npm run setup
+      - run: npm run package:release
+      - uses: actions/upload-artifact@v7
+        with:
+          name: compiler-candidate
+          path: |
+            .work/release/lasm-compiler-*.tgz
+            .work/release/release.json
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: error
+
+  accept:
+    needs: package
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+          - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
+          - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
+          - { platform: win32-x64, runner: windows-2022, arch: x64 }
+          - { platform: win32-arm64, runner: windows-11-arm, arch: arm64 }
+    env:
+      LASM_TEST_MANAGERS: npm
+      LASM_TEST_PLATFORM: ${{ matrix.platform }}
+      LASM_TEST_ENVIRONMENT: native-github-runner
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.13.1
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: lean
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-github-cache: false
+          use-mathlib-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: compiler-candidate
+          path: .work/release
+      # No npm ci, SDK setup, or compiler checkout build on consumer runners.
+      - run: npm run test:platform
+      - run: npm run test:release
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: acceptance-${{ matrix.platform }}
+          path: .work/evidence/release-install.json
+          include-hidden-files: true
+          if-no-files-found: warn

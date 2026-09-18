@@ -1,6 +1,6 @@
-import { open, realpath } from 'node:fs/promises';
+import { open, realpath, lstat } from 'node:fs/promises';
 import { constants } from 'node:fs';
-import { resolve, dirname, basename, sep } from 'node:path';
+import { resolve, dirname, basename, relative, isAbsolute, sep } from 'node:path';
 
 const LIMIT = 16 * 1024 * 1024;
 /** Explicit Node capabilities. No filesystem or network access is enabled by default. */
@@ -8,9 +8,9 @@ export async function createNodeHost({ directory, fetch: fetchImpl, maxBytes = L
   if (!Number.isInteger(maxBytes) || maxBytes < 1 || maxBytes > LIMIT) throw new RangeError('maxBytes must be from 1 through 16777216');
   if (!Number.isInteger(timeoutMs) || timeoutMs < 1) throw new RangeError('timeoutMs must be positive');
   const root = directory === undefined ? undefined : await realpath(directory);
-  const rootPrefix = root?.endsWith(sep) ? root : root + sep;
   function within(path) {
-    if (path !== root && !path.startsWith(rootPrefix)) throw new Error('Filesystem path is outside the configured directory');
+    const difference = relative(root, path);
+    if (difference === '..' || difference.startsWith('..' + sep) || isAbsolute(difference)) throw new Error('Filesystem path is outside the configured directory');
     return path;
   }
   async function pathFor(key, writing = false) {
@@ -18,7 +18,13 @@ export async function createNodeHost({ directory, fetch: fetchImpl, maxBytes = L
     if (key.includes('\0')) throw new Error('Filesystem paths must not contain NUL');
     const candidate = within(resolve(root, key));
     if (!writing) return within(await realpath(candidate));
-    return within(resolve(within(await realpath(dirname(candidate))), basename(candidate)));
+    const destination = within(resolve(within(await realpath(dirname(candidate))), basename(candidate)));
+    // Windows does not expose O_NOFOLLOW. Reject an existing terminal symlink
+    // explicitly too; as documented, this is not a defense against racing writers.
+    try {
+      if ((await lstat(destination)).isSymbolicLink()) throw new Error('Filesystem writes cannot target a symlink');
+    } catch (error) { if (error.code !== 'ENOENT') throw error; }
+    return destination;
   }
   const host = {};
   if (root) {

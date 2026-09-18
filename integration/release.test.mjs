@@ -1,29 +1,46 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, symlinkSync } from 'node:fs';
-import { join, dirname, resolve } from 'node:path';
-import { root, run, sha256 } from '../src/toolchain.mjs';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, copyFileSync, existsSync } from 'node:fs';
+import { join, dirname, resolve, delimiter, basename } from 'node:path';
+import { tmpdir } from 'node:os';
+import { root, run, sha256, lean } from '../src/toolchain.mjs';
+import { executableName } from '../src/platform.mjs';
 
-const release = JSON.parse(readFileSync(join(root, '.work/release/release.json'), 'utf8'));
-const archive = join(root, '.work/release', release.compiler);
+const releaseFile = resolve(process.env.LASM_RELEASE_MANIFEST ?? join(root, '.work/release/release.json'));
+const release = JSON.parse(readFileSync(releaseFile, 'utf8'));
+if (process.env.LASM_TEST_PLATFORM) assert.equal(`${process.platform}-${process.arch}`, process.env.LASM_TEST_PLATFORM);
+const archive = join(dirname(releaseFile), release.compiler);
 assert.equal(sha256(readFileSync(archive)), release.compilerSha256);
-const leanPrefix = run('lean', ['--print-prefix']);
-const npmCli = resolve(dirname(process.execPath), '../lib/node_modules/npm/bin/npm-cli.js');
-const tools = join(root, '.work/release-tests/tools');
+const leanPrefix = run(lean, ['--print-prefix']);
+const npmCli = [process.env.npm_execpath,
+  resolve(dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js'),
+  resolve(dirname(process.execPath), '../lib/node_modules/npm/bin/npm-cli.js'),
+].find(file => file && basename(file) === 'npm-cli.js' && existsSync(file));
+assert.ok(npmCli, 'npm CLI must be installed with Node or supplied through npm_execpath');
+const tools = join(root, '.work/release-tests', `${process.platform}-${process.arch}`, 'tools');
 mkdirSync(tools, { recursive: true });
-for (const [name, path] of [['node', process.execPath], ['lean', join(leanPrefix, 'bin/lean')], ['lake', join(leanPrefix, 'bin/lake')],
-  ['sh', '/bin/sh'], ['dirname', '/usr/bin/dirname'], ['sed', '/usr/bin/sed'], ['uname', '/usr/bin/uname']]) {
+const nodeTool = join(tools, executableName('node'));
+rmSync(nodeTool, { force: true }); copyFileSync(process.execPath, nodeTool);
+const osUtilities = process.platform === 'win32' ? [] : ['sh', 'dirname', 'sed', 'uname'];
+for (const name of osUtilities) {
+  const path = ['/bin', '/usr/bin'].map(directory => join(directory, name)).find(existsSync);
+  assert.ok(path, `Missing ordinary OS utility: ${name}`);
   rmSync(join(tools, name), { force: true }); symlinkSync(path, join(tools, name));
 }
-const managers = {
+const availableManagers = {
   npm: [process.execPath, npmCli],
-  pnpm: [join(root, 'node_modules/pnpm/pnpm')],
+  pnpm: [join(root, 'node_modules/pnpm', executableName('pnpm'))],
   yarn: [process.execPath, join(root, 'node_modules/@yarnpkg/cli-dist/bin/yarn.js')],
 };
+const managers = Object.fromEntries((process.env.LASM_TEST_MANAGERS ?? 'npm,pnpm,yarn').split(',').map(name => {
+  assert.ok(availableManagers[name], `Unknown package manager: ${name}`);
+  return [name, availableManagers[name]];
+}));
+const withPath = (env, value) => ({ ...Object.fromEntries(Object.entries(env).filter(([key]) => key.toLowerCase() !== 'path')), PATH: value });
 const reports = [];
 
-for (const [name, cli] of Object.entries(managers)) test(`${name}: local package, isolated build, locked offline reinstall, standalone execution`, { timeout: 240_000 }, async t => {
-  const project = mkdtempSync(`/tmp/lasm ${name} project with spaces `);
+for (const [name, cli] of Object.entries(managers)) test(`${name}: local package, isolated build, locked offline reinstall, standalone execution`, { timeout: 600_000 }, async t => {
+  const project = mkdtempSync(join(tmpdir(), `lasm ${name} 日本語 project with spaces `));
   t.after(() => rmSync(project, { recursive: true, force: true }));
   const cache = join(project, '.package-cache');
   rmSync(project, { recursive: true, force: true });
@@ -40,6 +57,8 @@ prelude
 public import Logic
 public import Lasm.IO
 public def answer (n : Nat) : Nat := n + offset
+public def greeting (value : String) : String := value ++ "λ"
+public def request (url : String) : IO ByteArray := Lasm.fetchBytes url
 public def copy (source destination : String) : IO ByteArray := do
   let bytes ← Lasm.readBytes source
   Lasm.writeBytes destination bytes
@@ -47,6 +66,8 @@ public def copy (source destination : String) : IO ByteArray := do
 `);
   writeFileSync(join(project, 'lean/lasm.json'), JSON.stringify({ module: 'App', exports: {
     answer: { declaration: 'answer', parameters: ['Nat'], result: 'Nat' },
+    greeting: { declaration: 'greeting', parameters: ['String'], result: 'String' },
+    request: { declaration: 'request', parameters: ['String'], result: 'ByteArray', effect: 'io' },
     copy: { declaration: 'copy', parameters: ['String', 'String'], result: 'ByteArray', effect: 'io' },
   } }));
   if (name === 'yarn') {
@@ -57,13 +78,14 @@ public def copy (source destination : String) : IO ByteArray := do
     XDG_CACHE_HOME: cache, COREPACK_ENABLE_NETWORK: '0', CI: 'true' };
   // Neither a maintainer override nor a repository cache may supply the build.
   for (const key of ['LEAN', 'LEAN_SOURCE', 'ZIG', 'WASM_OPT', 'LASM_TARGET_DIR', 'LASM_CACHE_DIR', 'LEAN_PATH', 'LEAN_SRC_PATH']) delete environment[key];
-  const invoke = (args, extra = {}) => run(cli[0], [...cli.slice(1), ...args], { cwd: project, env: environment, timeout: 240_000, ...extra });
+  const invoke = (args, extra = {}) => run(cli[0], [...cli.slice(1), ...args], { cwd: project, env: environment, timeout: 600_000, ...extra });
   const installStart = performance.now();
   if (name === 'npm') invoke(['install', '--offline', '--ignore-scripts', '--no-audit', '--no-fund']);
   if (name === 'pnpm') invoke(['install', '--offline', '--no-frozen-lockfile', '--ignore-scripts', '--store-dir', join(cache, 'store')]);
   if (name === 'yarn') invoke(['install'], { env: { ...environment, YARN_ENABLE_NETWORK: '0' } });
   const installMs = performance.now() - installStart;
-  const isolated = { ...environment, PATH: tools };
+  const isolated = withPath(environment, [tools, join(leanPrefix, 'bin'),
+    ...(process.platform === 'win32' ? [join(process.env.SystemRoot ?? 'C:\\Windows', 'System32')] : [])].join(delimiter));
   const firstStart = performance.now();
   invoke(['run', 'build'], { env: isolated });
   const firstBuildMs = performance.now() - firstStart;
@@ -80,18 +102,34 @@ public def copy (source destination : String) : IO ByteArray := do
   if (name === 'pnpm') invoke(['install', '--offline', '--frozen-lockfile', '--ignore-scripts', '--store-dir', join(cache, 'store')]);
   if (name === 'yarn') invoke(['install', '--immutable', '--immutable-cache'], { env: { ...environment, YARN_ENABLE_NETWORK: '0' } });
   invoke(['run', 'build'], { env: isolated });
+  // Prove deployed output does not resolve any runtime imports from the SDK.
+  rmSync(join(project, 'node_modules'), { recursive: true, force: true });
   const bytes = Buffer.from('日本語\0🙂');
   writeFileSync(join(project, 'data/input'), bytes);
-  writeFileSync(join(project, 'run.mjs'), `import createModule from './dist/index.mjs';\nimport {createNodeHost} from './dist/host.mjs';\nconst api = await createModule({host: await createNodeHost({directory:'./data'})});\nconsole.log(JSON.stringify({answer:String(api.answer(5n)),bytes:[...await api.copy('input','output')]}));\napi.dispose();\n`);
-  const result = JSON.parse(run(process.execPath, [join(project, 'run.mjs')], { cwd: project, env: { PATH: '/no-compilers-or-packages' } }));
-  assert.deepEqual(result, { answer: '42', bytes: [...bytes] });
+  writeFileSync(join(project, 'run.mjs'), `import createModule from './dist/index.mjs';
+import {createNodeHost} from './dist/host.mjs';
+import {createServer} from 'node:http';
+const server = createServer((req,res) => res.end(new Uint8Array([0,255,37])));
+await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+const api = await createModule({host: await createNodeHost({directory:'./data', fetch:globalThis.fetch})});
+try {
+  console.log(JSON.stringify({answer:String(api.answer(5n)), big:String(api.answer(2n**128n)),
+    greeting:api.greeting('日本語\\0🙂'), bytes:[...await api.copy('input','output')],
+    http:[...await api.request('http://127.0.0.1:'+server.address().port)]}));
+} finally { api.dispose(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
+`);
+  const result = JSON.parse(run(process.execPath, [join(project, 'run.mjs')], { cwd: project, env: withPath(environment, join(project, 'empty-path')) }));
+  assert.deepEqual(result, { answer: '42', big: String(2n**128n+37n), greeting: '日本語\0🙂λ', bytes: [...bytes], http: [0,255,37] });
   assert.deepEqual(readFileSync(join(project, 'data/output')), bytes);
   reports.push({ manager: name, installMs, firstBuildMs, cachedBuildMs, wasmBytes: first.wasmBytes,
     prebuiltModules: first.prebuiltModules, emptyCacheOfflineInstall: true, offlineLockedInstall: true, isolatedCompilerPath: ['node', 'lean', 'lake'],
-    osUtilities: ['sh', 'dirname', 'sed', 'uname'], standaloneExecution: true });
+    osUtilities, compilerPackageRemovedBeforeExecution: true, standaloneExecution: true });
 });
 
 test.after(() => {
   mkdirSync(join(root, '.work/evidence'), { recursive: true });
-  writeFileSync(join(root, '.work/evidence/release-install.json'), JSON.stringify({ ...release, tests: reports }, null, 2) + '\n');
+  writeFileSync(process.env.LASM_TEST_REPORT ?? join(root, '.work/evidence/release-install.json'), JSON.stringify({ ...release,
+    testedNode: process.version, testedPlatform: `${process.platform}-${process.arch}`,
+    executionEnvironment: process.env.LASM_TEST_ENVIRONMENT ?? 'native',
+    expectedManagers: Object.keys(managers), complete: reports.length === Object.keys(managers).length, tests: reports }, null, 2) + '\n');
 });

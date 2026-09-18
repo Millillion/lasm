@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync, cpSync, copyFileSync, readdirSy
 import { join, dirname, relative } from 'node:path';
 import { build } from '../src/build.mjs';
 import { targetName, leanCommit, sha256 } from '../src/toolchain.mjs';
+import { buildPlatforms } from '../src/platform.mjs';
 import { referenceNotices } from '../src/notices.mjs';
 import * as reference from './build-runtime.mjs';
 
@@ -68,7 +69,7 @@ function fingerprint(path) {
 }
 fingerprint(target);
 writeFileSync(join(target, 'target.json'), JSON.stringify({ schema: 1, name: targetName, leanCommit,
-  buildPlatforms: ['linux-x64'], zig: '0.16.0', runtimeUnits: 15, standardModules: objects.length, linkLibraries, files }, null, 2) + '\n');
+  buildPlatforms, validatedNativePlatforms: ['linux-x64'], zig: '0.16.0', runtimeUnits: 15, standardModules: objects.length, linkLibraries, files }, null, 2) + '\n');
 targetInstalledBytes += statSync(join(target, 'target.json')).size;
 const targetArchive = join(directory, `${targetName}.tar.gz`);
 run('tar', ['--sort=name', '--mtime=@0', '--owner=0', '--group=0', '--numeric-owner', '-czf', targetArchive, '-C', join(staging, 'targets'), targetName]);
@@ -81,7 +82,9 @@ const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'
 writeFileSync(join(staging, 'README.md'), `# Lasm compiler
 
 Experimental Lean-to-WebAssembly compiler for Node.js, browsers, and Cloudflare
-Workers. Building requires Linux x64, Node 24+, and Lean 4.32.0. This local package
+Workers. Building requires Node 24+ and the full Lean 4.32.0 distribution. The
+compiler includes Linux, macOS, and Windows adapters for x64 and ARM64. Native
+macOS/Windows validation is still pending; see the release guide. This local package
 includes its versioned Wasm runtime/sysroot and standalone Binaryen optimizer;
 Zig and a separate C SDK are not required.
 
@@ -110,7 +113,7 @@ writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), referenceNotices(referen
   '\n=== Binaryen 132.0.0 standalone Node wasm-opt ===\n' + readFileSync(join(root, 'node_modules/binaryen/LICENSE'), 'utf8'));
 const packageSpec = { name: sourcePackage.name, version: sourcePackage.version, private: true, license: 'UNLICENSED',
   type: 'module', description: sourcePackage.description, bin: sourcePackage.bin,
-  files: ['bin', 'src', 'lean', 'targets', 'tools', 'docs', 'README.md', 'THIRD_PARTY_NOTICES.txt'], os: ['linux'], cpu: ['x64'],
+  files: ['bin', 'src', 'lean', 'targets', 'tools', 'docs', 'README.md', 'THIRD_PARTY_NOTICES.txt'], os: ['linux', 'darwin', 'win32'], cpu: ['x64', 'arm64'],
   engines: sourcePackage.engines };
 writeFileSync(join(staging, 'package.json'), JSON.stringify(packageSpec, null, 2) + '\n');
 const packed = JSON.parse(run('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', directory, '--cache', join(root, '.cache/npm')], { cwd: staging }))[0];

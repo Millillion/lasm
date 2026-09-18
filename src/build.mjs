@@ -1,9 +1,10 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync, realpathSync } from 'node:fs';
 import { resolve, dirname, join, relative, sep, delimiter } from 'node:path';
 import { createHash } from 'node:crypto';
-import { getToolchain, optimizeWasm, run, lean, root, env } from './toolchain.mjs';
-import { loadLake } from './lake.mjs';
+import { getToolchain, optimizeWasm, run, root, env } from './toolchain.mjs';
+import { findLakeProject, loadLake } from './lake.mjs';
 import { referenceNotices } from './notices.mjs';
+import { insideDirectory } from './platform.mjs';
 
 const types = new Set(['Nat', 'Int', 'String', 'ByteArray', 'UInt32', 'Bool', 'Unit']);
 const identifier = /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*)*$/;
@@ -44,10 +45,10 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
   const started = performance.now();
   const configFile = resolve(configPath);
   const sourceRoot = dirname(configFile);
-  const toolchain = await getToolchain(sourceRoot);
-  const { prefix, hostCommit } = toolchain;
   const inputSpec = JSON.parse(readFileSync(configFile, 'utf8'));
   const spec = validateSpec(asyncMode === undefined ? inputSpec : { ...inputSpec, async: asyncMode });
+  const toolchain = await getToolchain(findLakeProject(configFile, inputSpec) ?? sourceRoot);
+  const { prefix, hostCommit, lean } = toolchain;
   const output = resolve(outputPath ?? join(sourceRoot, 'dist'));
   mkdirSync(output, { recursive: true });
   const cache = resolve(process.env.LASM_CACHE_DIR ?? join(sourceRoot, '.lake/lasm'));
@@ -103,11 +104,11 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
     if (!isStandard) {
       // Ask Lean's parser for imports rather than parsing Lean source with a regex.
       const dependencies = run(lean, ['--src-deps', source], { cwd: sourceRoot, env: leanEnv });
-      for (const dependency of dependencies.split('\n').filter(Boolean)) {
+      for (const dependency of dependencies.split(/\r?\n/).filter(Boolean)) {
         const path = resolve(dependency);
-        if (path.startsWith(sourceRoot + sep)) compileSource(relative(sourceRoot, path).slice(0, -5).split(sep).join('.'));
-        else if (path.startsWith(libraryRoot + sep)) compileSource(relative(libraryRoot, path).slice(0, -5).split(sep).join('.'));
-        else if (!path.startsWith(standardRoot + sep) && !realpathSync(path).startsWith(standardRoot + sep)) {
+        if (insideDirectory(sourceRoot, path)) compileSource(relative(sourceRoot, path).slice(0, -5).split(sep).join('.'));
+        else if (insideDirectory(libraryRoot, path)) compileSource(relative(libraryRoot, path).slice(0, -5).split(sep).join('.'));
+        else if (!insideDirectory(standardRoot, path) && !insideDirectory(standardRoot, realpathSync(path))) {
           throw new Error(`Unsupported dependency source: ${path}`);
         }
       }
@@ -136,7 +137,7 @@ export async function build(configPath, outputPath, { asyncMode } = {}) {
   }).join('\n');
   writeFileSync(join(buildDir, `${entryName}.lean`), entrySource);
   const entryBase = join(buildDir, entryName);
-  run(lean, ['-R', buildDir, '-Dcompiler.postponeCompile=false', '-c', entryBase + '.c', entryBase + '.lean'], { env: leanEnv });
+  run(lean, ['-R', buildDir, '-Dcompiler.postponeCompile=false', '-c', entryBase + '.c', entryBase + '.lean'], { cwd: sourceRoot, env: leanEnv });
   compiled.set(entryName, { name: entryName, base: entryBase, c: readFileSync(entryBase + '.c', 'utf8') });
   // Walk actual runtime initializer calls in compiler-generated C. Meta-only
   // elaborator modules are not required in the deployed runtime.
