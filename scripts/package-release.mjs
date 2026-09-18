@@ -12,10 +12,13 @@ import * as reference from './build-runtime.mjs';
 const { root, runtimeDir, zig, run } = reference;
 const started = performance.now();
 // Prime supported workloads; other standard modules compile on demand.
+const primedModules = new Set();
 for (const name of ['basic', 'io', 'express/lean']) {
-  await build(join(root, 'examples', name, 'lasm.json'), join(root, '.work/release-builds', name));
+  const result = await build(join(root, 'examples', name, 'lasm.json'), join(root, '.work/release-builds', name));
+  for (const module of result.modules) primedModules.add(module);
 }
-await buildMain(join(root, 'examples/lean-server/Main.lean'), { output: join(root, '.work/release-builds/lean-server') });
+const main = await buildMain(join(root, 'examples/lean-server/Main.lean'), { output: join(root, '.work/release-builds/lean-server') });
+for (const module of JSON.parse(readFileSync(join(main.output, 'build-report.json'))).modules) primedModules.add(module);
 const directory = join(root, '.work/release');
 const staging = join(directory, 'compiler');
 rmSync(staging, { recursive: true, force: true });
@@ -33,6 +36,9 @@ function collect(path) {
   for (const entry of readdirSync(path, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     const file = join(path, entry.name);
     if (entry.isDirectory()) collect(file);
+    // A compatibility sweep may compile thousands of additional modules into
+    // this cache. Package exactly the primed workloads, not incidental cache state.
+    else if (!primedModules.has(relative(join(runtimeDir, 'stdlib'), file).replaceAll('\\', '/').replace(/\.(?:o|c|source)$/, '').replaceAll('/', '.'))) continue;
     else if (entry.name.endsWith('.o')) objects.push(file);
     else if (entry.name.endsWith('.c') || entry.name.endsWith('.source')) {
       const output = join(target, 'stdlib', relative(join(runtimeDir, 'stdlib'), file));
@@ -72,7 +78,7 @@ function fingerprint(path) {
 }
 fingerprint(target);
 writeFileSync(join(target, 'target.json'), JSON.stringify({ schema: 1, name: targetName, leanCommit,
-  buildPlatforms, validatedNativePlatforms: ['linux-x64'], zig: '0.16.0', runtimeUnits: 17, standardModules: objects.length, linkLibraries, files }, null, 2) + '\n');
+  buildPlatforms, validatedNativePlatforms: ['linux-x64'], zig: '0.16.0', runtimeUnits: 18, standardModules: objects.length, linkLibraries, files }, null, 2) + '\n');
 targetInstalledBytes += statSync(join(target, 'target.json')).size;
 const targetArchive = join(directory, `${targetName}.tar.gz`);
 run('tar', ['--sort=name', '--mtime=@0', '--owner=0', '--group=0', '--numeric-owner', '-czf', targetArchive, '-C', join(staging, 'targets'), targetName]);

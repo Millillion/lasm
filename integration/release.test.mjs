@@ -177,6 +177,38 @@ test('npm: ordinary Lean main and HTTP server run from the installed package', {
     toolchain: report.toolchain, wasmBytes: report.wasmBytes };
 });
 
+test('npm: installed ordinary filesystem, process and expression APIs match native Lean', { timeout: 900_000 }, async t => {
+  const project = mkdtempSync(join(tmpdir(), 'lasm native parity '));
+  t.after(() => rmSync(project, { recursive: true, force: true }));
+  writeFileSync(join(project, 'package.json'), JSON.stringify({ name: 'native-parity', private: true,
+    devDependencies: { '@lasm/compiler': `file:${archive}` } }));
+  const environment = { ...process.env, npm_config_cache: join(project, '.npm-cache'), LEAN_NUM_THREADS: '4' };
+  for (const key of ['LEAN', 'LEAN_SOURCE', 'ZIG', 'WASM_OPT', 'LASM_TARGET_DIR', 'LASM_CACHE_DIR', 'LEAN_PATH', 'LEAN_SRC_PATH']) delete environment[key];
+  run(process.execPath, [npmCli, 'install', '--offline', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: project, env: environment });
+  const isolated = withPath(environment, [tools, join(leanPrefix, 'bin'),
+    ...(process.platform === 'win32' ? [join(process.env.SystemRoot ?? 'C:\\Windows', 'System32')] : [])].join(delimiter));
+  for (const name of ['fs', 'process', 'expr']) {
+    const fixture = join(project, name);
+    mkdirSync(fixture);
+    copyFileSync(join(root, `test/fixtures/${name}-conformance/Main.lean`), join(fixture, 'Main.lean'));
+    run(process.execPath, [join(project, 'node_modules/@lasm/compiler/bin/lasm.mjs'), 'build', 'Main.lean', 'dist'], {
+      cwd: fixture, env: isolated, timeout: 600_000 });
+    for (const kind of ['native', 'wasm']) {
+      const cwd = join(fixture, kind);
+      mkdirSync(join(cwd, 'directory/inner'), { recursive: true });
+      mkdirSync(join(cwd, 'order'));
+      writeFileSync(join(cwd, 'target'), 'outside'); writeFileSync(join(cwd, 'directory/target'), 'inside');
+      for (const file of ['zeta','alpha','mu','日本語']) writeFileSync(join(cwd, 'order', file), '');
+      if (process.platform !== 'win32') symlinkSync('directory/inner', join(cwd, 'linkdir'));
+    }
+    const args = name === 'process' ? [process.execPath] : [];
+    const native = run(lean, ['--run', join(fixture, 'Main.lean'), ...args], { cwd: join(fixture, 'native'), env: environment, timeout: 60_000 });
+    const wasm = run(process.execPath, [join(fixture, 'dist/main.mjs'), ...args], { cwd: join(fixture, 'wasm'), env: environment, timeout: 60_000 });
+    assert.equal(wasm, native, `${name} differs from native Lean on ${process.platform}-${process.arch}`);
+  }
+  reports.push({ manager: 'npm', ordinaryNativeParity: ['IO.FS', 'IO.Process', 'Lean.Expr'], installedPackage: true });
+});
+
 test.after(() => {
   mkdirSync(join(root, '.work/evidence'), { recursive: true });
   writeFileSync(process.env.LASM_TEST_REPORT ?? join(root, '.work/evidence/release-install.json'), JSON.stringify({ ...release,
