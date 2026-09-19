@@ -28,6 +28,13 @@ integrity checks. No test is filtered unless `--filter` is supplied explicitly.
 for the final clean conformance run. Native control results do not count as Lean
 execution inside a JavaScript engine.
 
+The clean native control passed all 3,891 tests with all 7,267 original hashes
+unchanged. `LEAN_SRC_PATH` points to the isolated matching source tree so LSP
+locations normalize as upstream expects. `MAKEFLAGS` supplies the selected
+`llvm-ar` instead of the release builder's private path embedded in `lean.mk`.
+Neither adjustment edits a test or an expected result. See
+[the full-suite results](../../docs/FULL_SUITE_RESULTS.md).
+
 ## Full WebAssembly compiler build (in progress)
 
 The application compiler previously compiled Lean to C using native Lean and

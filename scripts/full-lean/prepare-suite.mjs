@@ -11,6 +11,7 @@ const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 
 const output = resolve(option('--output', '.work/full-suite-native'));
 const prefix = resolve(option('--prefix', resolveLean(root).prefix));
 const backend = option('--backend', 'native');
+const archiveTool = option('--archive-tool', existsSync(join(prefix, 'bin/llvm-ar')) ? join(prefix, 'bin/llvm-ar') : undefined);
 const timeout = Number(option('--timeout', '600'));
 if (!Number.isFinite(timeout) || timeout <= 0) throw new Error('Invalid timeout in seconds');
 const source = join(output, 'lean4-4.32.0');
@@ -51,14 +52,21 @@ for (const name of ['bin','lib','include','share']) if (!existsSync(join(build,n
   symlinkSync(join(prefix,name),join(build,name),'dir');
 const inventory = JSON.parse(execFileSync('ctest',['--show-only=json-v1','--test-dir',build], { encoding:'utf8',maxBuffer:32*1024*1024 }));
 writeFileSync(join(output,'upstream-registrations.json'),JSON.stringify(inventory,null,2)+'\n');
+// The release's lean.mk embeds its build machine's LLVM archive-tool path.
+// A make command-line variable fixes this relocation without editing that file.
+const makeFlags = archiveTool ? `LEAN_AR=${archiveTool.replaceAll('\\', '\\\\').replaceAll(' ', '\\ ')}` : '';
+const shellQuote = value => "'" + value.replaceAll("'", "'\\''") + "'";
+const sourcePath = [join(source, 'src/lake'), join(source, 'src')].join(':');
 const rewriteEnvironment = text => text.replaceAll(`SRC_DIR='${harness}'`, `SRC_DIR='${join(source,'src')}'`)
   .replaceAll(`SCRIPT_DIR='${harness}/../script'`, `SCRIPT_DIR='${join(source,'script')}'`);
 const originalEnvironment = join(source,'tests/with_stage1_test_env.sh');
 const environment = join(output,'with-test-environment.sh');
-writeFileSync(environment, rewriteEnvironment(readFileSync(originalEnvironment,'utf8')));
+const addEnvironment = text => rewriteEnvironment(text).replace('export ',
+  `export LEAN_SRC_PATH=${shellQuote(sourcePath)} MAKEFLAGS=${shellQuote(makeFlags)} `);
+writeFileSync(environment, addEnvironment(readFileSync(originalEnvironment,'utf8')));
 const registered = [];
 for (const entry of inventory.tests) {
-  const command = entry.command.map(part => part === originalEnvironment ? environment : rewriteEnvironment(part));
+  const command = entry.command.map(part => part === originalEnvironment ? environment : addEnvironment(part));
   registered.push({name:entry.name,command,properties:entry.properties});
 }
 const lines = registered.flatMap(entry => {
@@ -74,6 +82,9 @@ const lines = registered.flatMap(entry => {
 writeFileSync(join(execution,'CTestTestfile.cmake'),lines.join('\n')+'\n');
 writeFileSync(join(output,'parallel-suite.json'),JSON.stringify({leanCommit,backend,prefix,source,archiveSha256:expected,
   registered:registered.length,timeoutSeconds:timeout,testSourceHashes:hashesFile,
-  changes:['Generated environment points to the selected toolchain and isolated source copy.','CTest timeout is explicit; no test or expected-output source is edited.'],
+  changes:['Generated environment points to the selected toolchain and isolated source copy.',
+    'LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.',
+    ...(archiveTool ? [`MAKEFLAGS supplies LEAN_AR=${archiveTool} instead of the release builder path embedded in lean.mk.`] : []),
+    'CTest timeout is explicit; no test or expected-output source is edited.'],
   execution,tests:registered},null,2)+'\n');
 console.log(JSON.stringify({backend,registered:registered.length,execution,timeoutSeconds:timeout}));

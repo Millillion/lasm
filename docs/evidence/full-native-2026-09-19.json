@@ -1,0 +1,52 @@
+{
+  "leanVersion": "4.32.0",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "backend": "native-control",
+  "host": "linux-x64",
+  "passed": 3891,
+  "failed": 0,
+  "skipped": 0,
+  "durationSeconds": 2341.0,
+  "execution": {
+    "startedAt": "2026-09-19T01:24:54.206Z",
+    "finishedAt": "2026-09-19T02:03:55.899Z",
+    "backend": "native",
+    "registered": 3891,
+    "command": [
+      "--test-dir",
+      "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/run",
+      "-j",
+      "2",
+      "--output-on-failure",
+      "--output-junit",
+      "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/results.xml"
+    ],
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "originalSources": {
+      "before": {
+        "checked": 7267,
+        "modified": []
+      },
+      "after": {
+        "checked": 7267,
+        "modified": []
+      }
+    },
+    "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+  },
+  "artifactHashes": {
+    "results.xml": "1c74ec2741c119c446c8a0007fafcd28795bb6a51ba453306632e845853f7dcb",
+    "parallel-suite.json": "1cd96c9b470e0fb752edac894e16a0117183086e05460398d82e6a1e85a1700d",
+    "test-source-hashes.json": "5cdeebbb3b22942916b97034dc0fdc384fe4fca2cb6a29f1622250fe33ca7b28"
+  },
+  "adjustments": [
+    "600-second per-test deadline in a separate CTest registration file.",
+    "LEAN_SRC_PATH selects the matching isolated upstream source tree.",
+    "MAKEFLAGS overrides the release builder private LLVM archive-tool path."
+  ],
+  "upstreamTestsEdited": false,
+  "javascriptConformancePass": false
+}
