@@ -1,0 +1,63 @@
+{
+  "recordedAt": "2026-09-19T04:19:48.828765+00:00",
+  "scope": "Focused host API regressions only; not a full Lean suite or cross-OS validation.",
+  "nodeFocusedTests": 7,
+  "logs": [
+    {
+      "path": ".work/full-engine-probe/host-api-regression.log",
+      "sha256": "391cedede5d2503a0f65029c7a56aafd4ce1d766a49e1cb3b5beb9340a82991c",
+      "output": "\u2714 compiler response files retain quoting, empty arguments, and nested arguments (12.065829ms)\n\u2714 resolver preserves address families and protocol-specific duplicate results (21.752596ms)\n\u2714 resolver retains service errors and concurrent requests complete independently (12.353731ms)\n\u2714 OS signals reach only the child host and preserve waiter lifecycle (113.778608ms)\n\u2714 system operations expose host identities, group lookup, and consistent environment updates (29.856885ms)\n\u2714 system errors retain libuv constructors/codes and random requests support concurrent completion (4.792452ms)\n\u2714 thread IDs identify actual native threads rather than Wasm pointers (205.865424ms)\n\u2139 tests 7\n\u2139 suites 0\n\u2139 pass 7\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 339.366301\n"
+    },
+    {
+      "path": ".work/full-engine-probe/system-dns-node.log",
+      "sha256": "ca3039bcd085855ed70ce603ce9295186f85f70e1eb23efdd84c185e0c09e3a9",
+      "output": "system and DNS host checks passed\n"
+    },
+    {
+      "path": ".work/full-engine-probe/system-dns-deno.log",
+      "sha256": "ca3039bcd085855ed70ce603ce9295186f85f70e1eb23efdd84c185e0c09e3a9",
+      "output": "system and DNS host checks passed\n"
+    },
+    {
+      "path": ".work/full-engine-probe/system-dns-bun.log",
+      "sha256": "ca3039bcd085855ed70ce603ce9295186f85f70e1eb23efdd84c185e0c09e3a9",
+      "output": "system and DNS host checks passed\n"
+    },
+    {
+      "path": ".work/full-engine-probe/signal-node-test-fixed.log",
+      "sha256": "b7c7b51c3e615d0e24497a3948a54cc477ca2db43ac05b2b99beb0d8fa98b627",
+      "output": "\u2714 OS signals reach only the child host and preserve waiter lifecycle (84.001773ms)\n\u2139 tests 1\n\u2139 suites 0\n\u2139 pass 1\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 194.268415\n"
+    },
+    {
+      "path": ".work/full-engine-probe/signal-deno-fixed.log",
+      "sha256": "904faa14dbe3412fbf32aa6de3b51e3736c2601744fc0848cba4fb5fb72a106d",
+      "output": "signal delivery, cancellation, and listener cleanup passed\n"
+    },
+    {
+      "path": ".work/full-engine-probe/signal-bun-fixed.log",
+      "sha256": "904faa14dbe3412fbf32aa6de3b51e3736c2601744fc0848cba4fb5fb72a106d",
+      "output": "signal delivery, cancellation, and listener cleanup passed\n"
+    },
+    {
+      "path": ".work/full-engine-probe/thread-id-node.log",
+      "sha256": "3c8a5ff456cfbff293f84499f4165127e3556a1aad8df7560ee011d0a24d58c0",
+      "output": "\u2714 thread IDs identify actual native threads rather than Wasm pointers (465.055772ms)\n\u2139 tests 1\n\u2139 suites 0\n\u2139 pass 1\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 604.349862\n"
+    },
+    {
+      "path": ".work/full-engine-probe/thread-id-deno.log",
+      "sha256": "aafb038bb923d1e0945316bf769c61d0db5400bf8e665580055029b9ea9c9bae",
+      "output": "native thread IDs are stable and identify each live OS thread\n"
+    },
+    {
+      "path": ".work/full-engine-probe/thread-id-bun.log",
+      "sha256": "aafb038bb923d1e0945316bf769c61d0db5400bf8e665580055029b9ea9c9bae",
+      "output": "native thread IDs are stable and identify each live OS thread\n"
+    },
+    {
+      "path": ".work/full-engine-probe/directory-files-regression.log",
+      "sha256": "044735a682ca05a3f8f8a4da2bab49b5c9c18f3d83d383b2bd81642e48f8c984",
+      "output": "\u2714 directory enumeration preserves native order and invalid UTF-8 filename bytes in each installed engine (1890.374413ms)\n\u2714 Lean handles use buffered writes, flush, rewind, and the actual stream position for truncate (132.319085ms)\n\u2714 file reads exceed the former 16 MiB ceiling and return EOF correctly (291.238605ms)\n\u2714 line reading preserves embedded NUL and invalid UTF-8 for Lean string decoding (47.769161ms)\n\u2714 shared and exclusive OS locks contend, block asynchronously, and release on finalization (54.998258ms)\n\u2714 exclusive create and invalid descriptors retain native error categories (23.463989ms)\n\u2714 more lock waiters than FFI workers cannot deadlock the lock holder (53.283431ms)\n\u2139 tests 7\n\u2139 suites 0\n\u2139 pass 7\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 3375.177852\n"
+    }
+  ],
+  "directoryAndFileTests": 7
+}

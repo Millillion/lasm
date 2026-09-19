@@ -11,6 +11,17 @@
      settings.CAN_ADDRESS_2GB = 1
  
    if settings.MAX_WEBGL_VERSION >= 2:
+@@ -2914,6 +2916,10 @@
+     # main module to avoid creating new invoke functions at runtime.
+     imports = set(imports)
+     imports = {i for i in imports if not i.startswith('invoke_')}
++    # Relocation bases belong to each side module and are provided by the
++    # dynamic loader, not exported by the main module's C/JavaScript libraries.
++    imports.difference_update({'__memory_base', '__table_base',
++                               '__memory_base32', '__table_base32'})
+     weak_imports = webassembly.get_weak_imports(dylib)
+     strong_imports = sorted(imports.difference(weak_imports))
+     logger.debug('Adding symbols requirements from `%s`: %s', dylib, imports)
 --- a/src/lib/libdylink.js
 +++ b/src/lib/libdylink.js
 @@ -846,7 +846,10 @@

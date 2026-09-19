@@ -62,6 +62,7 @@ static O *metadata(O *path, uint32_t op) {
 }
 using namespace lasm;
 extern "C" {
+uint64_t lean_io_get_tid() { return Reply(37).number(); }
 O *lean_io_prim_handle_mk(O *path, uint8_t mode) {
     auto r = path_call(1, path, mode);
     return r.failed ? r.result(lean_box(0), path) : ok(wrap_handle(r.number()));

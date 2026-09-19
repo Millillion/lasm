@@ -19,9 +19,9 @@ const output = resolve(option('--output', `.work/full-toolchains/${engine}`));
 if (existsSync(output)) throw new Error('Prepare a new toolchain directory to preserve previous run configurations');
 const build = resolve(option('--build', '.work/lean-full/wasm64'));
 const source = resolve(option('--source', '.work/lean-full/lean4-4.32.0/src'));
-const sdk = resolve(process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9'));
 const native = resolveLean(root);
 const snapshot = existsSync(join(build, 'snapshot.json')) ? JSON.parse(readFileSync(join(build, 'snapshot.json'))) : undefined;
+const sdk = resolve(process.env.LASM_EMSDK ?? snapshot?.sdk ?? join(root, '.cache/emsdk-6.0.9'));
 const runtimeSupport = snapshot ? join(build, 'runtime-support') : join(root, 'scripts/full-lean');
 for (const path of [executable, join(build, 'bin/lean.js'), join(build, 'bin/lean.wasm')])
   if (!existsSync(path)) throw new Error(`Missing full compiler prerequisite: ${path}`);
@@ -53,16 +53,22 @@ exec ${[...runner, ...args].map(quote).join(' ')} "$@"
 }
 const links = {
   lib: join(build, 'lib'), include: join(build, 'include'), share: join(build, 'share'),
-  'bin/llvm-ar': join(sdk, 'upstream/emscripten/emar'),
   'bin/leanmake': join(build, 'bin/leanmake'),
 };
-for (const name of ['clang', 'clang++']) {
+for (const name of ['clang', 'clang++', 'cc', 'c++', 'gcc', 'g++']) {
   const path = join(output, 'bin', name);
   writeFileSync(path, `#!/usr/bin/env bash
 export LASM_FULL_TOOLCHAIN_CONFIG=${quote(join(output, 'toolchain.json'))}
-export LASM_CC_LANGUAGE=${quote(name === 'clang++' ? 'c++' : 'c')}
+export LASM_CC_LANGUAGE=${quote(name.endsWith('++') ? 'c++' : 'c')}
 exec ${[executable, ...engineArgs, join(runtimeSupport, 'cc-driver.mjs')].map(quote).join(' ')} "$@"
 `);
+  chmodSync(path, 0o755);
+}
+// Emscripten launchers derive their .py filename from argv[0]; a differently
+// named symlink (llvm-ar -> emar) therefore cannot work. Execute the real path.
+for (const [name, tool] of Object.entries({ 'llvm-ar': 'emar', ar: 'emar', ranlib: 'emranlib' })) {
+  const path = join(output, 'bin', name);
+  writeFileSync(path, `#!/usr/bin/env bash\nexec ${quote(join(sdk, 'upstream/emscripten', tool))} "$@"\n`);
   chmodSync(path, 0o755);
 }
 // These are upstream's external SAT/archive helpers, not Lean executables.

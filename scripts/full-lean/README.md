@@ -191,3 +191,25 @@ compiler startup and C linking. The parallel harness tags each run/test in its
 environment and reaps leftover processes only after that exact test has finished.
 It does not change process lifecycle behavior inside a running test. This avoids
 failed LSP drivers exhausting memory through orphaned servers.
+
+New snapshots also copy the selected Emscripten SDK, with its reviewed patches,
+and record its source in `build-provenance.json`. Use `LASM_EMSDK` to select a
+development SDK; changing it causes a fresh CMake configuration so cached compiler
+paths cannot silently retain the old SDK. Neither a running snapshot's host
+modules nor its compiler sources should be edited during a conformance run.
+
+The full runtime and executable adapter enable `GROWABLE_ARRAYBUFFERS=1`: use
+growable memory views when supported, with Emscripten's fixed-view fallback for
+other engines. This addresses an observed stale shared-memory view in Deno's
+full compiler. The library prelude also searches the host's library-path variable
+when loading a shared dependency before Emscripten's libc loader is initialized.
+
+`prepare-suite.mjs --include-excluded` adds the five tests that upstream explicitly
+excludes as flaky/nondeterministic: `async_select_channel`, `sync_mutex`, `signal`,
+`test_extern`, and `user_ext`. Their original files remain hashed and unchanged.
+The generated `test-extern-driver.sh` disables inherited `pipefail` and sources
+the original driver in its original directory, allowing its intentional failing
+Lake build to reach its unchanged expected-output comparison. The unadjusted
+native failure and an initial generated-wrapper cwd error are retained separately.
+Run these extra tests separately and do not add them to the standard registration
+count without identifying the harness adjustment.

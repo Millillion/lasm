@@ -4,6 +4,7 @@
 #ifdef LASM_FULL_NATIVE_THREADS
 #include "runtime/thread.h"
 #include <mutex>
+#include <condition_variable>
 #endif
 
 extern "C" LASM_HOST_IMPORT("node_start")
@@ -53,7 +54,8 @@ O *socket_address_bytes(const uint8_t *data, size_t size) {
     auto *outer = lean_alloc_ctor(v6 ? 1 : 0, 1, 0); lean_ctor_set(outer, 0, address); return outer;
 }
 O *socket_address(const Reply &r) { return socket_address_bytes(r.bytes.data(), r.bytes.size()); }
-// response kind: Unit=0, socket=1, optional bytes=2, Bool=3, timer Unit=4, datagram=5.
+// response kind: Unit=0, socket=1, optional bytes=2, Bool=3, timer Unit=4,
+// datagram=5, IP addresses=6, host/service names=7, bytes=8, signal=9.
 O *finish_request(O *promise, O *resource, O *request, O *kind, O*) {
     Reply r(90, lean_unbox(request));
     const unsigned k = lean_unbox(kind);
@@ -74,7 +76,25 @@ O *finish_request(O *promise, O *resource, O *request, O *kind, O*) {
                 if (count) memcpy(lean_sarray_cptr(data), r.bytes.data() + offset, count);
                 value = pair(data, address_size ? some(socket_address_bytes(r.bytes.data() + 8, address_size)) : lean_box(0));
             }
-            if (k != 4) value = except(false, value);
+            if (k == 6) {
+                if (r.bytes.size() % 17) __builtin_trap();
+                value = lean_mk_empty_array();
+                for (size_t offset = 0; offset < r.bytes.size(); offset += 17) {
+                    bool v6 = r.bytes[offset] == 6;
+                    auto *ip = lean_alloc_ctor(v6 ? 1 : 0, 1, 0);
+                    lean_ctor_set(ip, 0, address_array(r.bytes.data() + offset + 1, v6));
+                    value = lean_array_push(value, ip);
+                }
+            }
+            if (k == 7) {
+                auto *data = (const char*)r.bytes.data();
+                auto *separator = (const char*)memchr(data, 0, r.bytes.size());
+                if (!separator) __builtin_trap();
+                value = pair(lean_mk_string_from_bytes(data, separator - data), r.string(separator - data + 1));
+            }
+            if (k == 8) value = r.array();
+            if (k == 9) value = lean_box(r.number()); // IO.Promise Int
+            if (k != 4 && k != 9) value = except(false, value);
         }
         lean::lean_promise_resolve(value, promise);
     }
@@ -87,7 +107,17 @@ O *finish_request(O *promise, O *resource, O *request, O *kind, O*) {
 void ensure_completion_thread() {
     static std::once_flag initialized;
     std::call_once(initialized, [] {
-        lean::lthread worker([] {
+        std::mutex mutex;
+        std::condition_variable ready;
+        bool started = false;
+        lean::lthread worker([&] {
+            // Load the host and complete worker startup before Lean application
+            // timers begin. Native Lean also starts its UV loop at initialization.
+            Reply startup(23);
+            {
+                std::lock_guard<std::mutex> guard(mutex);
+                started = true; ready.notify_one();
+            }
             for (;;) {
                 Reply completion(92);
                 if (completion.failed || completion.bytes.size() != 4 * sizeof(uint64_t)) {
@@ -100,11 +130,13 @@ void ensure_completion_thread() {
                     lean_box(completion.number(24)), lean_box(0)));
             }
         }); // lthread detaches; Emscripten terminates it with the process runtime.
+        std::unique_lock<std::mutex> lock(mutex);
+        ready.wait(lock, [&] { return started; });
     });
 }
 #endif
 O *start_request(uint32_t op, O *resource, uint64_t arg, const void *data, size_t size, unsigned kind) {
-    auto id = lasm_node_start(op, handle_id(resource), arg, (const uint8_t*)data, size);
+    auto id = lasm_node_start(op, lean_is_scalar(resource) ? 0 : handle_id(resource), arg, (const uint8_t*)data, size);
     auto *promise = lean::lean_promise_new();
     lean_inc(promise); lean_inc(resource);
 #ifdef LASM_FULL_NATIVE_THREADS
@@ -143,6 +175,9 @@ void timer_foreach(void *ptr, O *fn) {
 }
 }
 extern "C" {
+#ifdef LASM_FULL_NATIVE_THREADS
+void initialize_libuv() { ensure_completion_thread(); }
+#endif
 #ifndef LASM_FULL_NATIVE_THREADS
 O *lean_io_basemutex_new() { return wrap_handle(Reply(40).number()); }
 O *lean_io_baserecmutex_new() { return wrap_handle(Reply(40, 0, 1).number()); }
@@ -231,6 +266,27 @@ O *lean_uv_udp_set_multicast_interface(O *socket, O *interface) {
     return Reply(113, handle_id(socket), 0, text.data(), text.size()).result();
 }
 O *lean_uv_udp_set_ttl(O *socket, uint32_t ttl) { return unit_call(114, socket, ttl); }
+O *lean_uv_dns_get_info(O *name, O *service, uint8_t family) {
+    auto safe = [](O *value) {
+        auto *s = lean_string_cstr(value);
+        for (size_t i = 0; i < lean_string_size(value) - 1; i++) {
+            unsigned char c = s[i];
+            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                  (c >= '0' && c <= '9') || (c && strchr("-_.:/+~@=,%", c)))) return false;
+        }
+        return true;
+    };
+    if (!safe(name)) return lean_io_result_mk_error(lean_mk_io_error_invalid_argument(22, lean_mk_string("name is not ASCII")));
+    if (!safe(service)) return lean_io_result_mk_error(lean_mk_io_error_invalid_argument(22, lean_mk_string("service is not ASCII")));
+    std::string query(lean_string_cstr(name), lean_string_size(name));
+    query.append(lean_string_cstr(service), lean_string_size(service) - 1);
+    return ok(start_request(115, lean_box(0), family, query.data(), query.size(), 6));
+}
+O *lean_uv_dns_get_name(O *address) {
+    auto bytes = address_bytes(address);
+    return ok(start_request(116, lean_box(0), 0, bytes.data(), bytes.size(), 7));
+}
+O *lean_uv_random(uint64_t size) { return ok(start_request(143, lean_box(0), size, nullptr, 0, 8)); }
 O *lean_uv_timer_mk(uint64_t timeout, uint8_t repeating) {
     auto r = Reply(70, repeating, timeout);
     if (r.failed) return r.result();
@@ -264,6 +320,29 @@ static O *stop_timer(O *timer, unsigned op) {
 }
 O *lean_uv_timer_stop(O *timer) { return stop_timer(timer, 74); }
 O *lean_uv_timer_cancel(O *timer) { return stop_timer(timer, 75); }
+O *lean_uv_signal_mk(uint32_t signum, uint8_t repeating) {
+    auto r = Reply(160, signum, repeating); if (r.failed) return r.result();
+    auto id = (uint32_t)r.number();
+    auto *state = new Timer{id, 0, nullptr, wrap_handle(id)};
+    static auto *cls = lean_register_external_class(timer_finalize, timer_foreach);
+    return ok(lean_alloc_external(cls, state));
+}
+O *lean_uv_signal_next(O *signal) {
+    auto *state = (Timer*)lean_get_external_data(signal);
+#ifdef LASM_FULL_NATIVE_THREADS
+    std::lock_guard<std::mutex> guard(state->mutex);
+#endif
+    auto r = Reply(161, state->id); if (r.failed) return r.result();
+    auto generation = r.number();
+    if (!state->promise || generation != state->generation) {
+        if (state->promise) lean_dec(state->promise);
+        state->promise = start_request(162, state->handle, generation, nullptr, 0, 9);
+        state->generation = generation;
+    }
+    lean_inc(state->promise); return ok(state->promise);
+}
+O *lean_uv_signal_stop(O *signal) { return stop_timer(signal, 163); }
+O *lean_uv_signal_cancel(O *signal) { return stop_timer(signal, 164); }
 O *lean_uv_ntop_v4(O *addr) { return lean_mk_string(ip_text(addr, false).c_str()); }
 O *lean_uv_ntop_v6(O *addr) { return lean_mk_string(ip_text(addr, true).c_str()); }
 static O *parse_ip(O *text, bool v6) {

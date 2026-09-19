@@ -5,9 +5,10 @@ import { readFileSync, writeFileSync, chmodSync, existsSync } from 'node:fs';
 import { resolve, join, extname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { expandResponseArgs } from './response-args.mjs';
 
 const config = JSON.parse(readFileSync(process.env.LASM_FULL_TOOLCHAIN_CONFIG));
-const original = process.argv.slice(2);
+const original = expandResponseArgs(process.argv.slice(2));
 const compileOnly = original.some(arg => ['-c', '-E', '-S', '-fsyntax-only', '--version', '-dumpmachine', '-print-search-dirs'].includes(arg));
 const shared = original.includes('-shared');
 const driver = join(config.sdk, 'upstream/emscripten', process.env.LASM_CC_LANGUAGE === 'c++' ? 'em++' : 'emcc');
@@ -34,7 +35,9 @@ if (!compileOnly) args.push('-sDEFAULT_TO_CXX=1', '-Wno-experimental', '-Wno-pth
 if (compileOnly) {
   if (explicitOutput) args.push('-o', output);
 } else if (shared) {
-  args.push('-sSIDE_MODULE=2', '-o', output);
+  // Dynamic Lean plugins may expose any declaration to the interpreter later.
+  // Retain their public definitions just as a native shared library does.
+  args.push('-sSIDE_MODULE=1', '-o', output);
 } else {
   const glue = resolve(output + '.cjs');
   const exportFile = resolve(output + '.exports.json');
@@ -43,7 +46,7 @@ if (compileOnly) {
   writeFileSync(exportFile, JSON.stringify(exports));
   args.push('-o', glue, '-sMAIN_MODULE=2', `-sEXPORTED_FUNCTIONS=@${exportFile}`,
     '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=4', '-sEXIT_RUNTIME=1', '-sNODERAWFS=1',
-    '-sALLOW_MEMORY_GROWTH=1', '-sINITIAL_MEMORY=134217728', '-sMAXIMUM_MEMORY=4294967296', '-sSTACK_SIZE=16777216',
+    '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=1', '-sINITIAL_MEMORY=134217728', '-sMAXIMUM_MEMORY=4294967296', '-sSTACK_SIZE=16777216',
     '-L', join(config.build, 'lib/lean'), '-llasmhost', '-llasmnative',
     '--pre-js', join(config.runtimeSupport, 'emscripten-pre.js'),
     '--pre-js', join(config.runtimeSupport, 'host-pre.js'),

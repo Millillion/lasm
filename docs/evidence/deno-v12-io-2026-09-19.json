@@ -1,0 +1,79 @@
+{
+  "startedAt": "2026-09-19T04:19:03.278Z",
+  "finishedAt": "2026-09-19T04:21:48.991Z",
+  "backend": "deno",
+  "registered": 3891,
+  "command": [
+    "--test-dir",
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v12-io/run",
+    "-j",
+    "1",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v12-io/results.xml",
+    "-R",
+    "^elab/(async_dns|async_systems_info|IO_test|tempfile|sync_shared_mutex|async_tcp_server_client|async_udp_sockets|async_select_timer)\\.lean$"
+  ],
+  "result": {
+    "code": 8,
+    "signal": null
+  },
+  "originalSources": {
+    "before": {
+      "checked": 7267,
+      "modified": []
+    },
+    "after": {
+      "checked": 7267,
+      "modified": []
+    }
+  },
+  "leftoverProcessCleanup": [],
+  "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides.",
+  "scope": "Eight original IO tests; growable buffers fixed the earlier memory failure. Two directory enumeration failures remain for the next host revision.",
+  "tests": 8,
+  "passed": 6,
+  "failed": 2,
+  "cases": [
+    {
+      "name": "elab/IO_test.lean",
+      "passed": false,
+      "seconds": 17.8838
+    },
+    {
+      "name": "elab/async_dns.lean",
+      "passed": true,
+      "seconds": 25.9724
+    },
+    {
+      "name": "elab/async_select_timer.lean",
+      "passed": true,
+      "seconds": 20.1677
+    },
+    {
+      "name": "elab/async_systems_info.lean",
+      "passed": true,
+      "seconds": 20.2474
+    },
+    {
+      "name": "elab/async_tcp_server_client.lean",
+      "passed": true,
+      "seconds": 21.4778
+    },
+    {
+      "name": "elab/async_udp_sockets.lean",
+      "passed": true,
+      "seconds": 21.2619
+    },
+    {
+      "name": "elab/sync_shared_mutex.lean",
+      "passed": true,
+      "seconds": 19.5726
+    },
+    {
+      "name": "elab/tempfile.lean",
+      "passed": false,
+      "seconds": 18.2685
+    }
+  ]
+}

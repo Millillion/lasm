@@ -1,9 +1,32 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync, statSync, writeFileSync, opendirSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createNodeRuntimeHost } from '../src/node-host.mjs';
+
+test('directory enumeration preserves native order and invalid UTF-8 filename bytes in each installed engine',
+  { skip: process.platform === 'win32' }, t => {
+    const directory = mkdtempSync(join(tmpdir(), 'lasm-directory-'));
+    t.after(() => rmSync(directory, { recursive: true, force: true }));
+    for (const name of [Buffer.from('z-last'), Buffer.from('λ'), Buffer.from('a-first'), Buffer.from([0xff, 0xfe])])
+      writeFileSync(Buffer.concat([Buffer.from(directory + '/'), name]), '');
+    const d = opendirSync(directory, { encoding: 'buffer' });
+    const bytes = [];
+    try { for (let e; (e = d.readSync());) bytes.push(e.name, Buffer.from([0])); } finally { d.closeSync(); }
+    const engines = [[process.execPath, []],
+      ['.cache/js-runtimes/deno-2.9.7/deno', ['run', '-A']],
+      ['.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []]];
+    for (const [engine, prefix] of engines) {
+      if (!existsSync(engine)) continue;
+      const result = spawnSync(engine, [...prefix, 'test/fixtures/directory-host.mjs', directory, Buffer.concat(bytes).toString('hex')],
+        { encoding: 'utf8', timeout: 20_000 });
+      assert.equal(result.status, 0, `${engine}: ${result.error?.message ?? result.stderr}`);
+      assert.equal(result.stdout, 'directory order and raw filename bytes match the native reference\n');
+      assert.equal(result.stderr, '');
+    }
+  });
 
 function setup(t) {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-native-files-'));

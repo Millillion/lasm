@@ -230,6 +230,10 @@ private unsafe def «runProgram» : IO UInt32 := do
   copyNativeBundle(root, output);
   copyFileSync(join(root, 'src/node-network.mjs'), join(output, 'node-network.mjs'));
   copyFileSync(join(root, 'src/node-udp.mjs'), join(output, 'node-udp.mjs'));
+  copyFileSync(join(root, 'src/native-dns.mjs'), join(output, 'native-dns.mjs'));
+  copyFileSync(join(root, 'src/node-system.mjs'), join(output, 'node-system.mjs'));
+  copyFileSync(join(root, 'src/node-signal.mjs'), join(output, 'node-signal.mjs'));
+  copyFileSync(join(root, 'src/thread-id.cjs'), join(output, 'thread-id.cjs'));
   copyFileSync(join(root, 'src/node-process.mjs'), join(output, 'node-process.mjs'));
   copyFileSync(join(root, 'src/host.mjs'), join(output, 'host.mjs'));
   copyFileSync(join(root, 'src/wasi.mjs'), join(output, 'wasi.mjs'));

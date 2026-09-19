@@ -15,7 +15,8 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       }
       const host = await lasmFullHost;
       let result;
-      const args = [request.operation, request.handle, request.argument, request.bytes, { fiber: request.thread }];
+      const args = [request.operation, request.handle, request.argument, request.bytes,
+        { fiber: request.thread, nativeThreadId: request.nativeThreadId }];
       if (request.kind === 'start') result = { id: host.start(...args) };
       else if (request.kind === 'release') { host.release(request.handle); result = {}; }
       else if (request.operation === 91) {

@@ -38,7 +38,7 @@ if (check(true).status !== 0) {
 }
 copyFileSync(join(root, 'scripts/full-lean/emscripten-pre.js'), join(source, 'src/lasm-emscripten-pre.js'));
 writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ leanCommit, archiveHash,
-  patchSha256: digest(patch), sdkPatchSha256, emscripten: '6.0.9', source, native, wasm,
+  patchSha256: digest(patch), sdkPatchSha256, emscripten: '6.0.9', sdk, source, native, wasm,
   bootstrapOptions: '-j2 -s8192', bootstrapEnvironment: { LEAN_STACK_SIZE_KB: '8192' }, generatedAt: new Date().toISOString(),
 }, null, 2) + '\n');
 const run = (command, argv, env = process.env) => execFileSync(command, argv, { cwd: root, env, stdio: 'inherit' });
@@ -71,9 +71,14 @@ if (stage === 'wasm' || stage === 'wasm64') {
   const gmp = resolve(process.env.LASM_GMP_WASM64 ?? join(root, '.cache/gmp-wasm64'));
   if (is64 && !existsSync(join(gmp, 'lib/libgmp.a'))) throw new Error('Missing 64-bit Emscripten GMP build; see README');
   run(process.execPath, [join(root, 'scripts/full-lean/configure-host.mjs'), join(source, 'src')]);
-  run(join(sdk, 'upstream/emscripten/emcmake'), ['cmake', '-S', join(source, 'src'), '-B', wasm, ...common,
+  const previousDriver = join(wasm, 'leanc.sh');
+  const changedSdk = existsSync(previousDriver) && !readFileSync(previousDriver, 'utf8').includes(join(sdk, 'upstream/emscripten/emcc'));
+  // CMake otherwise retains the old compiler paths even after its toolchain
+  // file changes. Clear only generated CMake configuration on an SDK switch.
+  run(join(sdk, 'upstream/emscripten/emcmake'), ['cmake', ...(changedSdk ? ['--fresh'] : []), '-S', join(source, 'src'), '-B', wasm, ...common,
     '-DSTAGE=1', `-DPREV_STAGE=${previous}`, '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
     '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG', '-DCHECK_OLEAN_VERSION=ON', '-DLEAN_EXTRA_OPTS=-j2 -s8192',
+    '-DLEAN_EXTRA_LINKER_FLAGS=-sGROWABLE_ARRAYBUFFERS=1',
     '-DLASM_HOST_BRIDGE=ON', `-DLASM_WASM_LINK_OPTIMIZATION=${linkOptimization}`,
     ...(is64 ? ['-DUSE_GMP=ON', `-DGMP_INSTALL_PREFIX=${gmp}`, '-DCMAKE_C_FLAGS=-sMEMORY64=2', '-DLASM_MEMORY64=2', '-DLASM_LINK_LAKE=ON', '-DLASM_LINK_TOOLS=ON',
       `-DEXTRA_LEANMAKE_OPTS=C_ONLY=1 C_OUT=${join(wasm, 'generated-c')} OBJS=`] : ['-DLASM_MEMORY64=0']),

@@ -26,6 +26,11 @@ addToLibrary({
     call: function (kind, operation, handle, argument, input, length) {
       if (!ENVIRONMENT_IS_PTHREAD) throw new Error('Lean host calls require PROXY_TO_PTHREAD');
       var wt = require('node:worker_threads');
+      var nativeThreadId;
+      if (operation === 37) {
+        var path = require('node:url').fileURLToPath(new URL('./thread-id.cjs', process.env.LASM_FULL_HOST_MODULE));
+        nativeThreadId = require(path)();
+      }
       var channel = new wt.MessageChannel();
       var signal = new Int32Array(new SharedArrayBuffer(4));
       var bytes = length ? HEAPU8.slice(Number(input), Number(input) + length) : new Uint8Array(0);
@@ -34,6 +39,7 @@ addToLibrary({
       wt.parentPort.postMessage({ cmd: 9, handler: 'lasmFullHostRequest', args: [{
         kind, operation, handle, argument, bytes, signal, port: channel.port2,
         thread: Number(_pthread_self()),
+        nativeThreadId,
       }] }, [channel.port2]);
       while (Atomics.load(signal, 0) === 0) Atomics.wait(signal, 0, 0);
       var packet;

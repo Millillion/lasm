@@ -1,0 +1,86 @@
+{
+  "startedAt": "2026-09-19T04:05:37.901Z",
+  "finishedAt": "2026-09-19T04:08:21.261Z",
+  "backend": "deno",
+  "registered": 3891,
+  "command": [
+    "--test-dir",
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v11-io/run",
+    "-j",
+    "1",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v11-io/results.xml",
+    "-R",
+    "^elab/(async_dns|async_systems_info|IO_test|tempfile|sync_shared_mutex|async_tcp_server_client|async_udp_sockets|async_select_timer)\\.lean$"
+  ],
+  "result": {
+    "code": 8,
+    "signal": null
+  },
+  "originalSources": {
+    "before": {
+      "checked": 7267,
+      "modified": []
+    },
+    "after": {
+      "checked": 7267,
+      "modified": []
+    }
+  },
+  "leftoverProcessCleanup": [],
+  "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides.",
+  "scope": "Eight unchanged upstream tests on v11; seven stale-memory-view failures. This is retained failure evidence, not conformance.",
+  "tests": 8,
+  "failed": 7,
+  "cases": [
+    {
+      "name": "elab/IO_test.lean",
+      "passed": false,
+      "seconds": 20.412
+    },
+    {
+      "name": "elab/async_dns.lean",
+      "passed": false,
+      "seconds": 19.9631
+    },
+    {
+      "name": "elab/async_select_timer.lean",
+      "passed": false,
+      "seconds": 22.0616
+    },
+    {
+      "name": "elab/async_systems_info.lean",
+      "passed": true,
+      "seconds": 20.0966
+    },
+    {
+      "name": "elab/async_tcp_server_client.lean",
+      "passed": false,
+      "seconds": 20.5078
+    },
+    {
+      "name": "elab/async_udp_sockets.lean",
+      "passed": false,
+      "seconds": 20.9019
+    },
+    {
+      "name": "elab/sync_shared_mutex.lean",
+      "passed": false,
+      "seconds": 19.9703
+    },
+    {
+      "name": "elab/tempfile.lean",
+      "passed": false,
+      "seconds": 18.2601
+    }
+  ],
+  "logSha256": "6def4dde2ef95d68feb8809078722248d853b879ec5d6bac3aaad9df34724fae",
+  "harness": [
+    "Generated environment points to the selected toolchain and isolated source copy.",
+    "LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.",
+    "Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.",
+    "MAKEFLAGS supplies LEAN_AR=/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v11/bin/llvm-ar instead of the release builder path embedded in lean.mk.",
+    "CTest timeout is explicit; no test or expected-output source is edited."
+  ]
+}

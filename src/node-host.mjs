@@ -7,6 +7,10 @@ import { createNodeNetwork } from './node-network.mjs';
 import { nativeFiles } from './native-files.mjs';
 import { createNodeProcesses } from './node-process.mjs';
 import { createNodeUdp } from './node-udp.mjs';
+import { nativeDns } from './native-dns.mjs';
+import { createNodeSystem } from './node-system.mjs';
+import { createNodeSignals } from './node-signal.mjs';
+import nativeThreadId from './thread-id.cjs';
 
 const empty = Buffer.alloc(0);
 export class LeanExit extends Error { constructor(code) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; } }
@@ -17,6 +21,8 @@ export function numbers(...values) {
 }
 function error(code, message) { return Object.assign(new Error(message), { code }); }
 export function encodeError(err) {
+  // node:os wraps libuv errors in SystemError; preserve the underlying code.
+  if (err.info?.code && typeof err.info.errno === 'number') err = { ...err, ...err.info };
   // Keep constructor families in sync with Lean's lean_decode_io_error and
   // lean_decode_uv_error. Libuv errors retain their signed value (UInt32 in Lean).
   const groups = [[], ['ENOENT'], ['EACCES', 'EPERM', 'EROFS', 'ECONNABORTED', 'EFBIG'], ['EEXIST', 'EINPROGRESS', 'EISCONN'],
@@ -103,9 +109,18 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   const network = createNodeNetwork({ add, get, release });
   const udp = createNodeUdp({ add, get });
   const processes = createNodeProcesses({ add, get, release, cwd: () => directory });
+  const system = createNodeSystem();
+  const signals = createNodeSignals({ add, get });
   const pending = new Map();
   let nextRequest = 1;
   function dispatch(op, id, arg, bytes, context) {
+    if (op >= 160 && op <= 164) return signals.dispatch(op, id, arg);
+    if (op >= 120 && op <= 143) return system.dispatch(op, id, arg, bytes);
+    if (op === 115) {
+      const split = bytes.indexOf(0);
+      return nativeDns().getAddrInfo(bytes.subarray(0, split).toString(), bytes.subarray(split + 1).toString(), Number(arg));
+    }
+    if (op === 116) return nativeDns().getNameInfo(Number(bytes.readBigUInt64LE()), bytes.subarray(16).toString(), Number(bytes.readBigUInt64LE(8)));
     if (op >= 100 && op < 115) return udp.dispatch(op, id, arg, bytes, context);
     if (op >= 80 && op < 90) return processes.dispatch(op, id, arg, bytes, context);
     if (op >= 40) return network.dispatch(op, id, arg, bytes, context);
@@ -135,9 +150,13 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     });
     case 13: return (async () => {
       try {
-        const dir = await fsp.opendir(path(bytes), { encoding: 'buffer' });
+        if (process.platform !== 'win32')
+          return Buffer.concat((await nativeFiles().readDirectory(path(bytes))).flatMap(name => [name, Buffer.from([0])]));
+        // Node defaults to 32 entries; Deno's Node-compatible API currently
+        // requires that default explicitly when an options object is supplied.
+        const dir = await fsp.opendir(path(bytes), { encoding: 'buffer', bufferSize: 32 });
         const names = [];
-        for await (const entry of dir) names.push(entry.name, Buffer.from([0]));
+        for await (const entry of dir) names.push(Buffer.from(entry.name), Buffer.from([0]));
         return Buffer.concat(names);
       } catch (err) { if (err.nativeMessage) throw err; throw nativeFiles().fromNodeError(err); }
     })();
@@ -188,6 +207,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       step();
     });
     case 36: throw nativeFiles().outOfMemory();
+    case 37: return numbers(context.nativeThreadId ?? nativeThreadId());
     default: throw error('ENOSYS', `Unsupported Lean runtime operation ${op}`);
     }
   }

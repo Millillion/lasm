@@ -1,5 +1,5 @@
 {
-  "testedAt": "2026-09-19T03:21:52.606Z",
+  "testedAt": "2026-09-19T04:14:11.925Z",
   "results": [
     {
       "name": "node",
@@ -504,9 +504,78 @@
       "signal": null,
       "stdout": "thread shutdown passed\n",
       "stderr": ""
+    },
+    {
+      "name": "node",
+      "variant": "dylink64",
+      "repetition": 1,
+      "expected": "shared module data and function pointers passed\n",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "version": "v24.13.1",
+      "status": 0,
+      "signal": null,
+      "stdout": "shared module data and function pointers passed\n",
+      "stderr": ""
+    },
+    {
+      "name": "deno",
+      "variant": "dylink64",
+      "repetition": 1,
+      "expected": "shared module data and function pointers passed\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "status": 0,
+      "signal": null,
+      "stdout": "shared module data and function pointers passed\n",
+      "stderr": ""
+    },
+    {
+      "name": "bun",
+      "variant": "dylink64",
+      "repetition": 1,
+      "expected": "shared module data and function pointers passed\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "version": "1.4.2",
+      "status": 0,
+      "signal": null,
+      "stdout": "shared module data and function pointers passed\n",
+      "stderr": ""
+    },
+    {
+      "name": "node",
+      "variant": "sharedgrowth64",
+      "repetition": 1,
+      "expected": "blocked worker observes shared memory growth\n",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "version": "v24.13.1",
+      "status": 0,
+      "signal": null,
+      "stdout": "blocked worker observes shared memory growth\n",
+      "stderr": ""
+    },
+    {
+      "name": "deno",
+      "variant": "sharedgrowth64",
+      "repetition": 1,
+      "expected": "blocked worker observes shared memory growth\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "status": 0,
+      "signal": null,
+      "stdout": "blocked worker observes shared memory growth\n",
+      "stderr": ""
+    },
+    {
+      "name": "bun",
+      "variant": "sharedgrowth64",
+      "repetition": 1,
+      "expected": "blocked worker observes shared memory growth\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "version": "1.4.2",
+      "status": 0,
+      "signal": null,
+      "stdout": "blocked worker observes shared memory growth\n",
+      "stderr": ""
     }
-  ],
-  "scope": "Build prerequisite and shutdown regressions; not upstream Lean conformance tests",
-  "passed": 42,
-  "total": 42
+  ]
 }

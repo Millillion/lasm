@@ -34,7 +34,10 @@ export function nativeFiles() {
   const isatty = bind(windows ? '_isatty' : 'isatty', 'int', ['int']);
   const strerror = bind('strerror', 'str', ['int']);
   const free = bind('free', 'void', ['void *']);
+  const scanDirectory = windows ? null : libc.func('int scandir(str path, _Out_ void **entries, void *filter, void *compare)');
   const getdelim = windows ? null : libc.func('intptr_t getdelim(_Inout_ void **line, _Inout_ size_t *capacity, int delimiter, void *stream)');
+  const groupRecord = windows ? null : ffi.struct({ name: 'str', password: 'str', gid: 'uint32_t', members: 'void *' });
+  const getGroup = windows ? null : libc.func('getgrgid_r', 'int', ['uint32_t', ffi.out(ffi.pointer(groupRecord)), 'void *', 'size_t', ffi.out(ffi.pointer('void *'))]);
   const fgetc = windows ? bind('fgetc', 'int', ['void *']) : null;
   const codes = Object.fromEntries(Object.entries(ffi.os.errno).map(([name, number]) => [number, name]));
   function failure(errno = ffi.errno()) {
@@ -90,6 +93,47 @@ export function nativeFiles() {
     fromNodeError,
     outOfMemory() { return failure(ffi.os.errno.ENOMEM); },
     strerror,
+    async readDirectory(path) {
+      if (!scanDirectory) throw new Error('Native directory scanning is POSIX-only');
+      // A null comparator preserves readdir order. Copy raw filename bytes
+      // before freeing libc's records; Deno's opendir ignores encoding:buffer.
+      const output = [null];
+      const { value: count, errno } = await call(scanDirectory, path, output, null, null);
+      if (count < 0) throw failure(errno);
+      const names = [];
+      try {
+        for (let i = 0; i < count; i++) {
+          const entry = ffi.decode(output[0], i * ffi.sizeof('void *'), 'void *');
+          const size = ffi.decode(entry, 16, 'uint16_t');
+          const record = Buffer.from(ffi.view(entry, size));
+          const start = process.platform === 'darwin' ? 21 : 19;
+          const end = record.indexOf(0, start);
+          const name = Buffer.from(record.subarray(start, end < 0 ? size : end));
+          if (!name.equals(Buffer.from('.')) && !name.equals(Buffer.from('..'))) names.push(name);
+        }
+      } finally {
+        for (let i = 0; i < count; i++) free(ffi.decode(output[0], i * ffi.sizeof('void *'), 'void *'));
+        free(output[0]);
+      }
+      return names;
+    },
+    async groupInfo(gid) {
+      if (windows) throw Object.assign(failure(ffi.os.errno.ENOSYS), { errno: -ffi.os.errno.ENOSYS });
+      for (let size = 1024; ; size *= 2) {
+        const group = {}, buffer = Buffer.alloc(size), output = [null];
+        const { value } = await call(getGroup, gid >>> 0, group, buffer, size, output);
+        if (value === ffi.os.errno.ERANGE) continue;
+        if (value) throw Object.assign(failure(value), { errno: -value });
+        if (!output[0]) return null;
+        const members = [];
+        for (let i = 0; ; i++) {
+          const pointer = ffi.decode(group.members, i * ffi.sizeof('void *'), 'void *');
+          if (!pointer) break;
+          members.push(ffi.decode(pointer, 'str'));
+        }
+        return { name: group.name, gid: group.gid, members };
+      }
+    },
     async open(path, mode, permissions = 0o666) {
       // Open and fdopen in the same C runtime. Windows CRT descriptors are not
       // interchangeable between libraries that maintain separate fd tables.

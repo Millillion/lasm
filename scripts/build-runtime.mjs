@@ -66,7 +66,7 @@ export function buildRuntime(log = console.log) {
       && JSON.parse(readFileSync(identityFile, 'utf8')).headersIdentity === headersIdentity) return archive;
   const units = ['object', 'mpz', 'mpn', 'utf8', 'apply', 'thread', 'alloc', 'allocprof', 'hash', 'byteslice', 'platform', 'interrupt', 'kernel-data'];
   const objects = [];
-  for (const unit of [...units, 'io-core', 'lasm-core', 'lasm-stack', 'lasm-host', 'lasm-node-io', 'lasm-node-async']) {
+  for (const unit of [...units, 'io-core', 'lasm-core', 'lasm-stack', 'lasm-host', 'lasm-node-io', 'lasm-node-async', 'lasm-node-system']) {
     let source = unit.startsWith('lasm-') ? join(root, 'runtime', `${unit.slice(5)}.cpp`) : join(leanSource, 'src/runtime', `${unit}.cpp`);
     if (unit === 'kernel-data') {
       // These three pure metadata primitives are also used by ordinary programs

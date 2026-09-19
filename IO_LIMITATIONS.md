@@ -1,6 +1,6 @@
 # Current IO limitations in Lasm
 
-Snapshot: 2026-09-18, `0.1.0-experimental.3`, Lean `4.32.0`.
+Snapshot: 2026-09-19, `0.1.0-experimental.3`, Lean `4.32.0`.
 Every checkbox below is intentionally empty and describes remaining work, a
 known difference, or a validation gap. These are Lasm limitations, not Lean
 limitations. This list does not promise that every restriction will be removed.
@@ -19,7 +19,11 @@ native control passed 3,891/3,891 tests with all 7,267 original file hashes
 unchanged; see [the full-suite results](docs/FULL_SUITE_RESULTS.md). The full Wasm
 compiler and JavaScript conformance runs remain in progress. Application checks now
 also pass in [Deno and Bun](docs/JS_ENGINES.md); full-suite conformance in all three
-engines remains unverified. No remaining implementation gap is being reclassified
+engines remains unverified. There are currently two execution paths: the packaged
+application runtime still uses a cooperative Wasm32 scheduler; the experimental
+full compiler preserves native 64-bit Lean values and runs Lean's real scheduler
+on Wasm pthreads. New DNS, UDP, system, signal, and thread-ID host implementations
+do not by themselves establish conformance of either complete path. No remaining implementation gap is being reclassified
 as fundamental merely because it needs further work.
 
 ## Standard API coverage
@@ -37,10 +41,13 @@ as fundamental merely because it needs further work.
 - [ ] Broaden native child-process, process-group, pipe, signal and thread-ID
   parity tests, especially Windows quoting and process termination. Ordinary
   spawn/output/wait/poll/PID/kill operations and file-backed pipes are implemented.
-  `IO.getTID` remains an unimplemented extern.
-- [ ] `IO.Process.setCurrentDir` changes only this instance's virtual cwd;
-  `IO.appPath` reports the containing Node executable. Audit further native context
-  differences before claiming complete process compatibility.
+  `IO.getTID` is now implemented using the executing worker's actual OS thread ID;
+  direct checks pass in Node, Deno, and Bun on Linux x64. Full Lean validation is
+  still in progress.
+- [ ] The packaged application host uses an instance cwd and reports its containing
+  executable as `IO.appPath`. The full compiler host propagates cwd changes and
+  supplies the selected Lean/tool entry point. Complete native context comparisons
+  and integrate the full behavior into the ordinary launchers.
 - [ ] Windows named time zones other than UTC return an explicit unsupported
   error. Date/time behavior beyond tested UTC HTTP dates needs broader OS coverage.
 - [ ] Native FFI dependencies still need Wasm implementations or internal host
@@ -51,8 +58,12 @@ as fundamental merely because it needs further work.
 
 ## HTTP and networking
 
-- [ ] TLS, DNS, UDP, WebSockets, and a full outbound HTTP client are outside this
-  console/filesystem/HTTP-server milestone. There is no `IO.HTTP` API to port.
+- [ ] Complete DNS, UDP, TCP, and HTTP behavioral validation across all engines.
+  DNS and UDP host implementations now exist; selected original tests pass in
+  Node. This does not establish complete networking parity. There is no `IO.HTTP`
+  API; identify the actual Lean library before making TLS/WebSocket support claims.
+- [ ] Implement remaining network-interface enumeration and UV loop configuration
+  primitives; the experimental full runtime still contains those upstream Wasm stubs.
 - [ ] Node TCP bind is performed when `listen` runs; bind-time errors and bound
   socket address queries therefore differ before listening.
 - [ ] Validate IPv6, keepalive details, transport half-close/error behavior,
@@ -67,17 +78,19 @@ as fundamental merely because it needs further work.
 
 ## Scheduling and cancellation
 
-- [ ] Lean tasks run cooperatively on one JavaScript thread. There are no native
-  worker threads, CPU parallelism, native priority scheduling, or shared heaps.
+- [ ] Integrate and validate the full compiler's real Lean scheduler/pthreads in
+  the packaged application path, which still runs tasks cooperatively on one
+  JavaScript thread.
 - [ ] Validate all task-drop/cancellation propagation behavior against the native
   scheduler, beyond explicit cooperative cancellation and tested task/promise
   lifetimes. Do not infer complete scheduling equivalence from server tests.
 - [ ] Main shutdown drains runnable and running cooperative tasks. Native Lean
   stops its ordinary worker pool before joining dedicated workers, so a dedicated
   task that spawns more ordinary work after shutdown begins can behave differently.
-- [ ] Complete `Std.Async` coverage, including unported process and signal APIs.
-  The broad sweep also exposes missing UDP/system-information primitives and
-  `Std.BaseSharedMutex` externs. Passing HTTP tests does not cover these libraries.
+- [ ] Complete `Std.Async` coverage. Process, signal, UDP and system host primitives
+  now exist; the full runtime also retains native `Std.BaseSharedMutex`. Selected
+  checks pass, but the entire scheduler, cancellation, and signal test suites have
+  not passed in all three engines. Passing HTTP tests does not cover these libraries.
 - [ ] Standard Node tasks currently require Asyncify. JSPI remains available for
   the legacy custom-host bridge only, with a separate artifact and engine support.
 - [ ] CPU-bound Lean code cannot be interrupted by an AbortSignal or a timer;
@@ -106,8 +119,9 @@ as fundamental merely because it needs further work.
   Upstream `elab/12676.lean` exhausts memory and `compile_bench/const_fold.lean`
   exceeds the runtime stack. Raising the heap limit did not fix the former.
 - [ ] `USize` and `ISize` are 32-bit in Wasm32, unlike native 64-bit Lean builds.
-  Width-sensitive upstream results therefore differ. Supporting a different
-  target width requires a separate runtime/compiler target.
+  Width-sensitive application results therefore differ. The full lowered-memory64
+  target preserves 64-bit widths but currently has a 4 GiB address-space ceiling;
+  it still needs integration and comprehensive validation.
 - [ ] Blocking native device/FIFO/pipe reads can occupy the finite FFI worker
   pool. Finalizing a buffered pipe can block while flushing, and a pending C read
   cannot be safely interrupted by disposing the Wasm instance.

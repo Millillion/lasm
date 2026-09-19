@@ -1,0 +1,73 @@
+{
+  "startedAt": "2026-09-19T04:17:25.016Z",
+  "finishedAt": "2026-09-19T04:17:41.630Z",
+  "backend": "native",
+  "registered": 3896,
+  "command": [
+    "--test-dir",
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-excluded-v3/run",
+    "-j",
+    "1",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-excluded-v3/results.xml",
+    "-R",
+    "^(elab/(async_select_channel|sync_mutex)\\.lean|pkg/(signal|test_extern|user_ext))$"
+  ],
+  "result": {
+    "code": 0,
+    "signal": null
+  },
+  "originalSources": {
+    "before": {
+      "checked": 7267,
+      "modified": []
+    },
+    "after": {
+      "checked": 7267,
+      "modified": []
+    }
+  },
+  "leftoverProcessCleanup": [],
+  "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides.",
+  "scope": "Five upstream-excluded tests using unchanged sources; explicit pipefail wrapper for expected failure in test_extern. Earlier failed native controls are retained in .work/full-suite-native-excluded and -v2.",
+  "tests": 5,
+  "failed": 0,
+  "cases": [
+    {
+      "name": "elab/async_select_channel.lean",
+      "passed": true,
+      "seconds": 0.986508
+    },
+    {
+      "name": "elab/sync_mutex.lean",
+      "passed": true,
+      "seconds": 0.658987
+    },
+    {
+      "name": "pkg/signal",
+      "passed": true,
+      "seconds": 5.73222
+    },
+    {
+      "name": "pkg/test_extern",
+      "passed": true,
+      "seconds": 2.50053
+    },
+    {
+      "name": "pkg/user_ext",
+      "passed": true,
+      "seconds": 6.08202
+    }
+  ],
+  "logSha256": "9df9c3857a7a51e6327f454889423edfd983dc53d8ea8bcb72e0b770979f1785",
+  "harness": [
+    "Generated environment points to the selected toolchain and isolated source copy.",
+    "LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.",
+    "Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.",
+    "Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.",
+    "A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.",
+    "MAKEFLAGS supplies LEAN_AR=/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/llvm-ar instead of the release builder path embedded in lean.mk.",
+    "CTest timeout is explicit; no test or expected-output source is edited."
+  ]
+}

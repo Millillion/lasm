@@ -52,6 +52,22 @@ for (const name of ['bin','lib','include','share']) if (!existsSync(join(build,n
   symlinkSync(join(prefix,name),join(build,name),'dir');
 const inventory = JSON.parse(execFileSync('ctest',['--show-only=json-v1','--test-dir',build], { encoding:'utf8',maxBuffer:32*1024*1024 }));
 writeFileSync(join(output,'upstream-registrations.json'),JSON.stringify(inventory,null,2)+'\n');
+// Upstream deliberately omits these five tests as flaky/nondeterministic. Keep
+// the default registrations exact, but allow a separate, explicitly identified
+// run of their unchanged drivers instead of silently claiming they were tested.
+const extraRegistrations = args.includes('--include-excluded') ? [
+  'elab/async_select_channel.lean', 'elab/sync_mutex.lean',
+  'pkg/signal', 'pkg/test_extern', 'pkg/user_ext',
+] : [];
+for (const name of extraRegistrations) {
+  const isFile = name.endsWith('.lean');
+  const directory = join(source, 'tests', isFile ? 'elab' : name);
+  inventory.tests.push({ name,
+    command: ['/usr/bin/bash', join(source, 'tests/with_stage1_test_env.sh'),
+      join(directory, 'run_test.sh'), ...(isFile ? [name.slice('elab/'.length)] : [])],
+    properties: [{ name: 'WORKING_DIRECTORY', value: directory }, { name: 'RUN_SERIAL', value: true }],
+  });
+}
 // The release's lean.mk embeds its build machine's LLVM archive-tool path.
 // A make command-line variable fixes this relocation without editing that file.
 const makeFlags = archiveTool ? `LEAN_AR=${archiveTool.replaceAll('\\', '\\\\').replaceAll(' ', '\\ ')}` : '';
@@ -64,9 +80,16 @@ const environment = join(output,'with-test-environment.sh');
 const addEnvironment = text => rewriteEnvironment(text).replace('export ',
   `export LEAN_SRC_PATH=${shellQuote(sourcePath)} MAKEFLAGS=${shellQuote(makeFlags)} `);
 writeFileSync(environment, addEnvironment(readFileSync(originalEnvironment,'utf8')));
+const testExternDriver = join(output, 'test-extern-driver.sh');
+if (extraRegistrations.length) writeFileSync(testExternDriver,
+  `# The original test intentionally pipes a failing Lake build into its error checker.\n` +
+  `# util.sh enables pipefail, which otherwise exits before the expected-output comparison.\n` +
+  `set +o pipefail\ncd ${shellQuote(join(source, 'tests/pkg/test_extern'))}\n` +
+  `source ${shellQuote(join(source, 'tests/pkg/test_extern/run_test.sh'))}\n`);
 const registered = [];
 for (const entry of inventory.tests) {
   const command = entry.command.map(part => part === originalEnvironment ? environment : addEnvironment(part));
+  if (extraRegistrations.includes(entry.name) && entry.name === 'pkg/test_extern') command[2] = testExternDriver;
   registered.push({name:entry.name,command,properties:entry.properties});
 }
 const lines = registered.flatMap(entry => {
@@ -86,10 +109,12 @@ const lines = registered.flatMap(entry => {
 });
 writeFileSync(join(execution,'CTestTestfile.cmake'),lines.join('\n')+'\n');
 writeFileSync(join(output,'parallel-suite.json'),JSON.stringify({leanCommit,backend,prefix,source,archiveSha256:expected,
-  registered:registered.length,timeoutSeconds:timeout,testSourceHashes:hashesFile,
+  registered:registered.length,extraRegistrations,timeoutSeconds:timeout,testSourceHashes:hashesFile,
   changes:['Generated environment points to the selected toolchain and isolated source copy.',
     'LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.',
     'Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.',
+    ...(extraRegistrations.length ? ['Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.',
+      'A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.'] : []),
     ...(archiveTool ? [`MAKEFLAGS supplies LEAN_AR=${archiveTool} instead of the release builder path embedded in lean.mk.`] : []),
     'CTest timeout is explicit; no test or expected-output source is edited.'],
   execution,tests:registered},null,2)+'\n');
