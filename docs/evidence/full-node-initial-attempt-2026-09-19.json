@@ -1,0 +1,39 @@
+{
+  "startedAt": "2026-09-19T02:09:40.867Z",
+  "finishedAt": "2026-09-19T03:03:10.380Z",
+  "backend": "node",
+  "registered": 3891,
+  "command": [
+    "--test-dir",
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v1/run",
+    "-j",
+    "4",
+    "--output-on-failure",
+    "--output-junit",
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v1/results.xml"
+  ],
+  "result": {
+    "code": null,
+    "signal": "SIGINT"
+  },
+  "originalSources": {
+    "before": {
+      "checked": 7267,
+      "modified": []
+    },
+    "after": {
+      "checked": 7267,
+      "modified": [
+        "tests/lake/tests/kinds/produced.out"
+      ]
+    }
+  },
+  "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides.",
+  "scope": "Interrupted initial full-suite attempt, superseded after repeated build and runtime defects; not a complete suite run",
+  "finishedRegistrations": 517,
+  "observedStatusCounts": {
+    "Failed": 366,
+    "Passed": 151
+  },
+  "interruptionReason": "Superseded compiler defects reproduced; stopped remaining jobs and orphaned test servers to free memory for repaired build."
+}

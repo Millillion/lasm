@@ -4,8 +4,11 @@
 #include <cerrno>
 #include <array>
 #include <unordered_map>
+#ifdef __EMSCRIPTEN__
+#include "runtime/thread.h"
+#endif
 
-extern "C" __attribute__((import_module("lasm"), import_name("fiber_current")))
+extern "C" LASM_HOST_IMPORT("fiber_current")
 uint32_t lasm_fiber_current();
 
 namespace lasm {
@@ -206,11 +209,26 @@ O *lasm_main_args() {
     }
     return ok(list);
 }
+#ifndef __EMSCRIPTEN__
 O *lean_option_get_or_block(O *option) {
     if (lean_is_scalar(option)) { lean_internal_panic("Promise was dropped without being resolved"); __builtin_trap(); }
     auto *v = lean_ctor_get(option, 0); lean_inc(v); lean_dec(option); return v;
 }
+#endif
 O *lean_stream_of_handle(O *h);
+#ifdef __EMSCRIPTEN__
+struct FullStreamContext {
+    std::array<O*, 3> streams{};
+    ~FullStreamContext() { for (auto *stream : streams) if (stream) lean_dec(stream); }
+};
+// Use Lean's finalizer ordering so stream references are released before the
+// allocator for the exiting pthread is destroyed.
+namespace full_streams {
+using lean::register_thread_finalizer;
+MK_THREAD_LOCAL_GET_DEF(FullStreamContext, current);
+}
+static auto &current_streams() { return full_streams::current().streams; }
+#else
 static std::unordered_map<uint32_t, std::array<O*, 3>> stream_contexts;
 extern "C" __attribute__((export_name("lasm_release_fiber_context")))
 void lasm_release_fiber_context(uint32_t id) {
@@ -219,14 +237,16 @@ void lasm_release_fiber_context(uint32_t id) {
     for (auto *stream : it->second) if (stream) lean_dec(stream);
     stream_contexts.erase(it);
 }
+static auto &current_streams() { return stream_contexts[lasm_fiber_current()]; }
+#endif
 static O *get_stream(uint32_t id) {
-    auto &streams = stream_contexts[lasm_fiber_current()];
+    auto &streams = current_streams();
     if (!streams[id]) streams[id] = lean_stream_of_handle(wrap_handle(id));
     lean_inc(streams[id]); return streams[id];
 }
 static O *set_stream(uint32_t id, O *stream) {
     auto *old = get_stream(id);
-    auto &streams = stream_contexts[lasm_fiber_current()];
+    auto &streams = current_streams();
     lean_dec(streams[id]); streams[id] = stream; return old;
 }
 O *lean_get_stdin() { return get_stream(0); }

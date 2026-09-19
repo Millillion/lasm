@@ -9,7 +9,8 @@ run_cmd do
   let env ← getEnv
   let mut rows : Array Json := #[]
   for (name, _) in env.constants do
-    let some _ := getExternAttrData? env name | continue
+    unless (getExternAttrData? env name).isSome ||
+        ((IR.findEnvDecl env name).any (·.isExtern)) do continue
     let stem := getSymbolStem env name
     rows := rows.push <| Json.mkObj [
       ("name", toJson name.toString),

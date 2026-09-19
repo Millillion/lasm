@@ -1,0 +1,139 @@
+{
+  "testedAt": "2026-09-19T02:36:29.637Z",
+  "results": [
+    {
+      "name": "node",
+      "variant": "threads32",
+      "expected": "caught exception\npthread joined\n",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "version": "v24.13.1",
+      "status": 0,
+      "signal": null,
+      "stdout": "caught exception\npthread joined\n",
+      "stderr": ""
+    },
+    {
+      "name": "deno",
+      "variant": "threads32",
+      "expected": "caught exception\npthread joined\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "status": 0,
+      "signal": null,
+      "stdout": "caught exception\npthread joined\n",
+      "stderr": ""
+    },
+    {
+      "name": "bun",
+      "variant": "threads32",
+      "expected": "caught exception\npthread joined\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "version": "1.4.2",
+      "status": 0,
+      "signal": null,
+      "stdout": "caught exception\npthread joined\n",
+      "stderr": ""
+    },
+    {
+      "name": "node",
+      "variant": "threads64",
+      "expected": "caught exception\npthread joined\n",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "version": "v24.13.1",
+      "status": 0,
+      "signal": null,
+      "stdout": "caught exception\npthread joined\n",
+      "stderr": ""
+    },
+    {
+      "name": "deno",
+      "variant": "threads64",
+      "expected": "caught exception\npthread joined\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "status": 0,
+      "signal": null,
+      "stdout": "caught exception\npthread joined\n",
+      "stderr": ""
+    },
+    {
+      "name": "bun",
+      "variant": "threads64",
+      "expected": "caught exception\npthread joined\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "version": "1.4.2",
+      "status": 0,
+      "signal": null,
+      "stdout": "caught exception\npthread joined\n",
+      "stderr": ""
+    },
+    {
+      "name": "node",
+      "variant": "host64",
+      "expected": "asynchronous host bridge joined four threads\n",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "version": "v24.13.1",
+      "status": 0,
+      "signal": null,
+      "stdout": "asynchronous host bridge joined four threads\n",
+      "stderr": ""
+    },
+    {
+      "name": "deno",
+      "variant": "host64",
+      "expected": "asynchronous host bridge joined four threads\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "status": 0,
+      "signal": null,
+      "stdout": "asynchronous host bridge joined four threads\n",
+      "stderr": ""
+    },
+    {
+      "name": "bun",
+      "variant": "host64",
+      "expected": "asynchronous host bridge joined four threads\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "version": "1.4.2",
+      "status": 0,
+      "signal": null,
+      "stdout": "asynchronous host bridge joined four threads\n",
+      "stderr": ""
+    },
+    {
+      "name": "node",
+      "variant": "highmemory64",
+      "expected": "pthread and host access above 2 GiB passed\n",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "version": "v24.13.1",
+      "status": 0,
+      "signal": null,
+      "stdout": "pthread and host access above 2 GiB passed\n",
+      "stderr": ""
+    },
+    {
+      "name": "deno",
+      "variant": "highmemory64",
+      "expected": "pthread and host access above 2 GiB passed\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "status": 0,
+      "signal": null,
+      "stdout": "pthread and host access above 2 GiB passed\n",
+      "stderr": ""
+    },
+    {
+      "name": "bun",
+      "variant": "highmemory64",
+      "expected": "pthread and host access above 2 GiB passed\n",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "version": "1.4.2",
+      "status": 0,
+      "signal": null,
+      "stdout": "pthread and host access above 2 GiB passed\n",
+      "stderr": ""
+    }
+  ],
+  "scope": "Full-compiler prerequisites only; not upstream suite conformance",
+  "sdkPatchSha256": "744d431a878a568d0b9f097dfeb23a249f7f82ee78bc069e0eebe4c93fa240dc"
+}

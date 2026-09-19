@@ -50,7 +50,7 @@ export async function buildMain(file, { output, rebuild = false, verbose = false
   mkdirSync(cache, { recursive: true });
   output = resolve(output ?? join(cache, 'dist'));
   const stampFile = join(output, '.main-cache.json');
-  let signature = fingerprint(directory, source, project);
+  const signature = fingerprint(directory, source, project);
   if (!rebuild && existsSync(stampFile)) {
     let previous;
     try { previous = JSON.parse(readFileSync(stampFile, 'utf8')); } catch { /* Rebuild a damaged cache. */ }
@@ -80,8 +80,9 @@ try {
   else { console.error(error.name === 'LeanIOError' ? 'uncaught exception: ' + error.message : error.message); process.exitCode = 1; }
 } finally { api?.dispose(); }
 `);
-  signature = fingerprint(directory, source, project);
-  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'node-network.mjs', 'node-process.mjs', 'native-files.mjs', 'native/manifest.json', 'wasi.mjs', 'manifest.json'];
+  // Stamp the inputs observed before compilation. If a source or runtime file
+  // changes during the build, the next invocation must invalidate this output.
+  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'node-network.mjs', 'node-process.mjs', 'node-udp.mjs', 'native-files.mjs', 'native/manifest.json', 'wasi.mjs', 'manifest.json'];
   writeFileSync(stampFile, JSON.stringify({ signature, files }) + '\n');
   return { ...result, cacheHit: false, signature };
 }

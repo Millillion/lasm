@@ -18,14 +18,30 @@ six-test rerun, and the subsequent clean full run are retained separately under
 
 This native result establishes the reference behavior. It is **not a full-suite
 pass inside Node, Deno, or Bun**. The full WebAssembly compiler now starts in all
-three engines. Basic theorem elaboration/evaluation runs in Node; broader imports
-and full host integration are still under investigation. The separate application
+three engines. Node also elaborates a theorem with `omega`, evaluates large
+natural numbers and 64-bit `USize`, runs an ordinary main with tasks, and generates
+C and serialized modules using the full compiler. An initial full Node suite
+attempt was interrupted after collecting repeated defects in the superseded
+build; it is not a completed suite run. Its
+[partial evidence](evidence/full-node-initial-attempt-2026-09-19.json) is retained,
+including a tracked `produced.out` file overwritten by an upstream Lake test
+driver during that failed attempt. No upstream source or expected output was
+edited to obtain a pass. The separate application
 runtime checks and earlier selected runtime audit retain their original scope.
 
-Nine prerequisite probes pass: Wasm32 threads, 64-bit values with lowered memory
-accesses, and asynchronous host calls from four concurrent Wasm threads, each in
+Twelve prerequisite probes pass: Wasm32 threads, 64-bit values with lowered memory
+accesses, asynchronous host calls from four concurrent Wasm threads, and pthread
+stacks plus host memory writes above 2 GiB, each in
 Node 24.13.1, Deno 2.9.7, and Bun 1.4.2. These are build prerequisites, not upstream
-test-suite passes.
+test-suite passes. See [the prerequisite evidence](evidence/full-engine-prerequisites-2026-09-19.json).
+
+The repaired frozen Node build passes **6/6 unchanged upstream IO tests**:
+`IO_test`, `tempfile`, `sync_shared_mutex`, `async_select_timer`,
+`async_tcp_server_client`, and `async_udp_sockets`. All 7,267 original file hashes
+remain unchanged for that run. See [the IO smoke evidence](evidence/full-node-io-smoke-2026-09-19.json).
+This verifies the actual Lean scheduler and ordinary TCP/UDP/timer APIs in Node;
+it is still only a subset. Lake startup and the external C compiler adapter
+remain under investigation, as do broader runtime and full-suite failures.
 
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.

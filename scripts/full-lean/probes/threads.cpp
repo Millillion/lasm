@@ -5,6 +5,10 @@
 #include <cstring>
 #include <unistd.h>
 
+#ifdef LASM_EXPECT_POINTER_BITS
+static_assert(sizeof(void *) * 8 == LASM_EXPECT_POINTER_BITS);
+#endif
+
 static const char *file_path;
 
 static void *run(void *) {

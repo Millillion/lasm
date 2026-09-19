@@ -6,6 +6,7 @@ import { randomBytes } from 'node:crypto';
 import { createNodeNetwork } from './node-network.mjs';
 import { nativeFiles } from './native-files.mjs';
 import { createNodeProcesses } from './node-process.mjs';
+import { createNodeUdp } from './node-udp.mjs';
 
 const empty = Buffer.alloc(0);
 export class LeanExit extends Error { constructor(code) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; } }
@@ -35,7 +36,7 @@ export function encodeError(err) {
 }
 
 /** Private Node implementation of Lean's runtime primitives, not a Lean API. */
-export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = {} } = {}) {
+export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = {}, appPath = process.execPath, propagateCwd = false } = {}) {
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))
     throw new TypeError('Lean main arguments must be Unicode strings without NUL characters');
   let directory = resolve(cwd);
@@ -100,10 +101,12 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     closeResource(resource);
   }
   const network = createNodeNetwork({ add, get, release });
+  const udp = createNodeUdp({ add, get });
   const processes = createNodeProcesses({ add, get, release, cwd: () => directory });
   const pending = new Map();
   let nextRequest = 1;
   function dispatch(op, id, arg, bytes, context) {
+    if (op >= 100 && op < 115) return udp.dispatch(op, id, arg, bytes, context);
     if (op >= 80 && op < 90) return processes.dispatch(op, id, arg, bytes, context);
     if (op >= 40) return network.dispatch(op, id, arg, bytes, context);
     const n = Number(arg);
@@ -153,14 +156,16 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     case 21: return fsp.mkdtemp(join(tmpdir(), 'lean-')).then(name => Buffer.from(name));
     case 22: { const value = process.env[bytes.toString()]; return value === undefined ? empty : Buffer.from('\x01' + value); }
     case 23: return Buffer.from(directory);
-    case 24: return Buffer.from(process.execPath);
+    case 24: return Buffer.from(appPath);
     case 25: return numbers(process.hrtime.bigint() / 1_000_000n);
     case 26: return numbers(process.hrtime.bigint());
     case 27: { const ms = BigInt(Date.now()); return numbers(ms / 1000n, ms % 1000n * 1_000_000n); }
     case 28: return randomBytes(n);
     case 29: return fsp.stat(path(bytes)).then(async stat => {
       if (!stat.isDirectory()) throw error('ENOTDIR', 'Working directory must be a directory');
-      directory = await fsp.realpath(path(bytes)); return empty;
+      const nextDirectory = await fsp.realpath(path(bytes));
+      if (propagateCwd) process.chdir(nextDirectory);
+      directory = nextDirectory; return empty;
     });
     case 30: throw new LeanExit(n);
     case 31: return Buffer.from(args.map(value => value + '\0').join(''));
@@ -200,6 +205,10 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   }
   return { request, release, platform: process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0,
     start(...args) { const id = nextRequest++; pending.set(id, request(...args)); return id; },
+    whenReady(id) {
+      if (!pending.has(id)) throw new Error('Unknown asynchronous host request');
+      return Promise.resolve(pending.get(id));
+    },
     close() { closed = true; for (const value of resources.values()) value.cancelled = true; for (const id of resources.keys()) release(id); for (const id of [0,1,2]) { const f = resources.get(id); if (f.stream) closeResource(f); } pending.clear(); },
     stats() { return { resources: resources.size - 3 }; },
   };

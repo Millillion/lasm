@@ -30,6 +30,22 @@ test('runtime teardown cancels sleeps and releases their Node timers', async () 
   host.close();
 });
 
+test('completion readiness preserves the result for its consuming Lean thread', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const host = createNodeRuntimeHost();
+  t.after(() => host.close());
+  const id = host.start(35, 0, 20n, new Uint8Array());
+  let completed = false;
+  const ready = host.whenReady(id).then(value => { completed = true; return value; });
+  await Promise.resolve();
+  assert.equal(completed, false);
+  t.mock.timers.tick(20);
+  const result = await ready;
+  assert.equal(result.error, false);
+  assert.deepEqual(await host.request(90, id), result);
+  assert.throws(() => host.whenReady(id), /Unknown asynchronous host request/);
+});
+
 test('Std.Async timers preserve UInt64 delays and reset without overflowing Node timeouts', async t => {
   t.mock.timers.enable({ apis: ['setTimeout'] });
   const host = createNodeRuntimeHost();

@@ -5,12 +5,18 @@
 #include <vector>
 #include <string>
 
-extern "C" __attribute__((import_module("lasm"), import_name("node_call")))
+#ifdef __EMSCRIPTEN__
+#define LASM_HOST_IMPORT(name)
+#else
+#define LASM_HOST_IMPORT(name) __attribute__((import_module("lasm"), import_name(name)))
+#endif
+
+extern "C" LASM_HOST_IMPORT("node_call")
 int32_t lasm_node_call(uint32_t operation, uint32_t handle, uint64_t argument,
                        const uint8_t *input, uint32_t length);
-extern "C" __attribute__((import_module("lasm"), import_name("node_copy")))
+extern "C" LASM_HOST_IMPORT("node_copy")
 void lasm_node_copy(uint8_t *output, uint32_t length);
-extern "C" __attribute__((import_module("lasm"), import_name("node_release")))
+extern "C" LASM_HOST_IMPORT("node_release")
 void lasm_node_release(uint32_t handle);
 
 namespace lasm {

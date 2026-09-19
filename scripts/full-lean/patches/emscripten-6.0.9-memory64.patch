@@ -1,0 +1,27 @@
+--- a/tools/link.py
++++ b/tools/link.py
+@@ -1684,7 +1684,9 @@
+   set_max_memory()
+ 
+   # check if we can address the 2GB mark and higher.
+-  if not settings.MEMORY64 and settings.MAXIMUM_MEMORY > 2 * 1024 * 1024 * 1024:
++  # Lowered memory64 still indexes wasm32 memory from JavaScript. Its heap
++  # shifts must be unsigned, just as for ordinary wasm32 above the 2GB mark.
++  if settings.MEMORY64 != 1 and settings.MAXIMUM_MEMORY > 2 * 1024 * 1024 * 1024:
+     settings.CAN_ADDRESS_2GB = 1
+ 
+   if settings.MAX_WEBGL_VERSION >= 2:
+--- a/src/lib/libdylink.js
++++ b/src/lib/libdylink.js
+@@ -846,7 +846,10 @@
+         if ('__start_em_asm' in moduleExports) {
+           var start = moduleExports['__start_em_asm'].value;
+           var stop = moduleExports['__stop_em_asm'].value;
+-#if CAN_ADDRESS_2GB
++#if MEMORY64
++          {{{ from64('start') }}}
++          {{{ from64('stop') }}}
++#elif CAN_ADDRESS_2GB
+           start >>>= 0;
+           stop >>>= 0;
+ #else
