@@ -1,0 +1,23 @@
+{
+  "testedAt": "2026-09-19T15:03:34.090Z",
+  "build": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+  "scope": "Native make dependency regression using the generated Lean build rules.",
+  "results": [
+    {
+      "value": "17",
+      "make": "cc -c -o /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1/build/temp/Sample.o.export /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1/Sample.c -I/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1 -DLEAN_EXPORTING\nln -f /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1/build/temp/Sample.o.export /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1/build/temp/Sample.o\n",
+      "objectMtime": 1789830212771.9314
+    },
+    {
+      "value": "101",
+      "make": "cc -c -o /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1/build/temp/Sample.o.export /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1/Sample.c -I/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1 -DLEAN_EXPORTING\nln -f /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1/build/temp/Sample.o.export /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-cache-v1/build/temp/Sample.o\n",
+      "objectMtime": 1789830213588.9421
+    },
+    {
+      "value": "101",
+      "make": "make: Nothing to be done for 'lib'.\n",
+      "objectMtime": 1789830213588.9421
+    }
+  ],
+  "runDirectory": ".work/full-engine-probe/build-cache-v1"
+}

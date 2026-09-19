@@ -23,7 +23,8 @@ const memory64 = /^LASM_MEMORY64:STRING=[12]$/m.test(readFileSync(join(build, 'C
 // Export the native runtime ABI too, while retaining Lean declarations in the
 // in-Wasm registry to stay within engine export-count limits. MAIN_MODULE=2
 // otherwise drops C++ exception/typeinfo and libc symbols needed by later DSOs.
-archives.push(...runtimeAbiArchives(sdk, memory64));
+const mimalloc = /^USE_MIMALLOC:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'));
+archives.push(...runtimeAbiArchives(sdk, memory64, mimalloc));
 const symbols = new Set();
 const dataSymbols = new Set();
 for (const archive of archives) {

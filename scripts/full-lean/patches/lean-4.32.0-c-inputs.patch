@@ -1,0 +1,14 @@
+--- a/src/lean.mk.in
++++ b/src/lean.mk.in
+@@ -100,3 +100,3 @@
+-$(TEMP_OUT)/%.o.export: $(BC_OUT)/%.bc
++$(TEMP_OUT)/%.o.export: $(BC_OUT)/%.bc $(LEANC_DEPS)
+ else
+-$(TEMP_OUT)/%.o.export: $(C_OUT)/%.c
++$(TEMP_OUT)/%.o.export: $(C_OUT)/%.c $(LEANC_DEPS)
+@@ -116,3 +116,3 @@
+-$(TEMP_OUT)/%.o: $(BC_OUT)/%.bc
++$(TEMP_OUT)/%.o: $(BC_OUT)/%.bc $(LEANC_DEPS)
+ else
+-$(TEMP_OUT)/%.o: $(C_OUT)/%.c
++$(TEMP_OUT)/%.o: $(C_OUT)/%.c $(LEANC_DEPS)

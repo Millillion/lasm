@@ -1,0 +1,38 @@
+{
+  "testedAt": "2026-09-19T13:22:19.441Z",
+  "scope": "Engine value-stack diagnostics, not an upstream suite pass.",
+  "results": [
+    {
+      "name": "node",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "prefix": [],
+      "status": 134,
+      "signal": null,
+      "stdout": "",
+      "stderr": "\nStack overflow detected. Aborting.\n"
+    },
+    {
+      "name": "deno",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "prefix": [
+        "run",
+        "-A",
+        "--v8-flags=--stack-size=61440"
+      ],
+      "status": 134,
+      "signal": null,
+      "stdout": "",
+      "stderr": "\nStack overflow detected. Aborting.\n"
+    },
+    {
+      "name": "bun",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "prefix": [],
+      "status": 134,
+      "signal": null,
+      "stdout": "",
+      "stderr": "\nStack overflow detected. Aborting.\n"
+    }
+  ],
+  "runDirectory": ".work/full-engine-probe/stack-diagnostics-v2"
+}

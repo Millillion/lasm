@@ -1,0 +1,35 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -704,10 +704,17 @@
+ endif()
+ configure_file("${LEAN_SOURCE_DIR}/config.h.in" "${LEAN_BINARY_DIR}/include/lean/config.h")
+ if(USE_MIMALLOC)
+-  file(
+-    COPY "${LEAN_BINARY_DIR}/../mimalloc/src/mimalloc/include/mimalloc.h"
+-    DESTINATION "${LEAN_BINARY_DIR}/include/lean"
+-  )
++  if(LASM_SDK_MIMALLOC)
++    # Emscripten supplies the allocator and its threading/linear-memory port.
++    # Compile Lean against that same header and link with -sMALLOC=mimalloc.
++    file(COPY "${LASM_MIMALLOC_INCLUDE}/mimalloc.h"
++      DESTINATION "${LEAN_BINARY_DIR}/include/lean")
++  else()
++    file(
++      COPY "${LEAN_BINARY_DIR}/../mimalloc/src/mimalloc/include/mimalloc.h"
++      DESTINATION "${LEAN_BINARY_DIR}/include/lean"
++    )
++  endif()
+ endif()
+ install(DIRECTORY "${LEAN_BINARY_DIR}/include/" DESTINATION include)
+ 
+--- a/src/runtime/CMakeLists.txt
++++ b/src/runtime/CMakeLists.txt
+@@ -35,7 +35,7 @@
+   uv/signal.cpp
+   openssl.cpp
+ )
+-if(USE_MIMALLOC)
++if(USE_MIMALLOC AND NOT LASM_SDK_MIMALLOC)
+   list(APPEND RUNTIME_OBJS ${LEAN_BINARY_DIR}/../mimalloc/src/mimalloc/src/static.c)
+   # Lean code includes it as `lean/mimalloc.h` but for compiling `static.c` itself, add original dir
+   include_directories(${LEAN_BINARY_DIR}/../mimalloc/src/mimalloc/include)

@@ -32,9 +32,12 @@ if (ENVIRONMENT_IS_NODE) {
       // Native Lean's guard aborts with this diagnostic on an exhausted stack.
       // Preserve that behavior for uncaught engine stack exhaustion in Wasm,
       // while leaving unrelated JavaScript errors and Lean exceptions intact.
+      // Bun 1.4.2 renders Wasm frames as `unknown`; structured cloning then
+      // loses that stack. CMD_UNCAUGHT_EXN still identifies its pthread failure.
       if (failure?.name === 'RangeError'
           && /call stack|stack overflow/i.test(failure.message)
-          && /wasm-function|wasm:\/\//.test(failure.stack ?? '')) lasmStackOverflow();
+          && (/wasm-function|wasm:\/\//.test(failure.stack ?? '')
+            || (process.versions.bun && event === 'message' && args[0]?.cmd === 8))) lasmStackOverflow();
       return super.emit(event, ...args);
     }
   };

@@ -143,7 +143,9 @@ links but fails at startup because the Wasm loader ignored its embedded `rpath`.
 The executable adapter now records those paths and expands `$ORIGIN`, `${ORIGIN}`,
 and macOS loader-path tokens. Linux prerequisite comparisons pass **24/24**:
 six native controls and eighteen Node/Deno/Bun executions, including Unicode
-paths and environment-path precedence. The original reverse-FFI rerun is pending.
+paths and environment-path precedence. The unchanged original reverse-FFI driver
+then passed on Node v24 in 225.10 seconds. The same two-test run still failed
+HTTP streaming; all 7,267 original hashes remained unchanged.
 See [the loader evidence](evidence/runtime-loader-paths-2026-09-19.json).
 
 Application linking now retains its actual entry point and linked shared-library
@@ -184,6 +186,48 @@ this time using the bundled JavaScript optimizer (**6/6**, 1,416.46 seconds).
 They cover source launchers, Unicode/empty arguments, filesystem round trips,
 tasks/errors, warm caches, concurrent HTTP persistence, binary bodies, streaming,
 and shutdown. This remains a separate application-runtime result.
+
+The v25 native-memory64 experiment failed both selected original Node tests:
+HTTP passed its first 21 cases but timed out on early streaming; `instances`
+stalled until the 1,800-second harness deadline. Its original-source hashes were
+unchanged. A minimized reproduction isolated the latter stall to the host bridge:
+Node 24.13.1 and Deno 2.9.7 truncate a cloned shared typed array's byte offset above
+4 GiB. An independent `structuredClone` control reproduces this without Lean or
+Emscripten. Sending the numeric offset and reconstructing the view in the receiving
+thread repairs the bridge. Synchronous requests, response copies, and asynchronous
+completion from several threads pass **5/5** checks: above 2 GiB in all three
+engines, and above 4 GiB in Node and Deno. The original `instances` rerun passed
+in Node in **190.81 seconds**, with all 7,267 original hashes unchanged. This
+uses a separate, recorded JavaScript-only derivative of frozen v25; the Wasm
+compiler bytes are identical. Deno's corresponding rerun also passed
+(199.27 seconds), with all original hashes unchanged.
+The **54/54** ABI/thread/dynamic-loading prerequisite checks also pass after this
+bridge repair; earlier and repaired runs are both retained.
+See [the host-memory evidence](evidence/host-rpc-highmemory-2026-09-19.json).
+
+The lower-memory Lean allocator experiment also exposed a build-cache defect:
+upstream `leanmake` did not rebuild generated C after changing the runtime headers.
+The build now tracks those headers and compiler inputs as an explicit prerequisite.
+A regression using the actual generated make rules verifies both rebuilding after
+a header change and retaining the cached object when inputs are unchanged.
+The full allocator rebuild remains in progress. See
+[the cache evidence](evidence/build-cache-2026-09-19.json).
+
+Bun's uncaught pthread stack errors lose their Wasm frames during error transfer.
+The prelude now preserves Lean's stack-overflow diagnostic for that failure path.
+A deliberate recursion probe exits with the exact native diagnostic and status
+in **3/3 engines**; the original Bun stack tests still need rerunning. See
+[the diagnostic evidence](evidence/stack-diagnostics-2026-09-19.json).
+
+The v27 unchanged HTTP rerun still fails case 22's early-streaming window. A
+parallel derivative multiplies every millisecond interval by ten, including the
+producer delay, consumer polling interval, connection timeouts, and watchdog
+polling cadence. All request/response bytes, functional assertions, polling
+counts, and relative timing ratios are unchanged; its 36 changed lines and input
+hash are recorded. That derivative passes all 22 cases in native Lean and Node.
+It is **not** counted as a pass of the original timing-sensitive file, and does
+not establish that every HTTP scheduling difference is resolved. See
+[the timing evidence](evidence/http-scaled-timing-2026-09-19.json).
 
 Two bounded engine investigations narrow the remaining memory/stack work:
 

@@ -1,6 +1,6 @@
 // Experimental full compiler build. Downloaded SDKs and native bootstrap
 // dependencies are maintainer prerequisites, kept outside the published runtime.
-import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync, readdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -14,8 +14,11 @@ const stage = option('--stage', 'wasm');
 const jobs = Number(option('--jobs', '8'));
 const linkOptimization = option('--link-opt', '-O1');
 const stackMb = Number(option('--stack-mb', '64'));
-const systemAllocator = option('--malloc', 'dlmalloc');
+const leanAllocator = option('--lean-allocator', 'generic');
+if (!['generic', 'mimalloc'].includes(leanAllocator)) throw new Error('Use --lean-allocator generic or mimalloc');
+const systemAllocator = option('--malloc', leanAllocator === 'mimalloc' ? 'mimalloc' : 'dlmalloc');
 if (!['dlmalloc', 'mimalloc'].includes(systemAllocator)) throw new Error('Use --malloc dlmalloc or mimalloc');
+if (leanAllocator === 'mimalloc' && systemAllocator !== 'mimalloc') throw new Error('Lean mimalloc requires the matching SDK allocator');
 const memoryMode = Number(option('--memory64', '2'));
 const maximumMemoryGb = Number(option('--max-memory-gb', '4'));
 const pthreadPoolSize = Number(option('--pthread-pool', '8'));
@@ -49,7 +52,10 @@ if (check(true).status !== 0) {
 }
 const alignmentPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-compact-alignment.patch'));
 const threadRuntimePatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-thread-runtime.patch'));
-for (const [name, input] of [['compact alignment', alignmentPatch], ['thread runtime', threadRuntimePatch]]) {
+const sdkMimallocPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-sdk-mimalloc.patch'));
+const cInputsPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-c-inputs.patch'));
+for (const [name, input] of [['compact alignment', alignmentPatch], ['thread runtime', threadRuntimePatch],
+  ['SDK mimalloc', sdkMimallocPatch], ['generated C dependencies', cInputsPatch]]) {
   const checkExtra = reverse => spawnSync('patch', ['--force', '--dry-run', reverse ? '--reverse' : '--forward', '-p1'],
     { cwd: source, input });
   if (checkExtra(true).status !== 0) {
@@ -62,7 +68,8 @@ copyFileSync(join(root, 'scripts/full-lean/emscripten-pre.js'), join(source, 'sr
 writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ leanCommit, archiveHash,
   patchSha256: digest(patch), compactAlignmentPatchSha256: digest(alignmentPatch), threadRuntimePatchSha256: digest(threadRuntimePatch), sdkPatchSha256, emscripten: '6.0.9', sdk, source, native, wasm,
   mainCStackBytes: stackMb * 1024 * 1024,
-  systemAllocator,
+  systemAllocator, leanAllocator, sdkMimallocPatchSha256: digest(sdkMimallocPatch),
+  cInputsPatchSha256: digest(cInputsPatch),
   memoryMode, maximumMemoryBytes: maximumMemoryGb * 1024 ** 3, pthreadPoolSize,
   bootstrapOptions: '-j2 -s8192', bootstrapEnvironment: { LEAN_STACK_SIZE_KB: '8192' }, generatedAt: new Date().toISOString(),
 }, null, 2) + '\n');
@@ -88,6 +95,7 @@ if (stage === 'wasm' || stage === 'wasm64') {
   // Make cannot otherwise see SDK JavaScript library changes. Include the
   // reviewed patch identity in the executable's actual link dependencies.
   const linkInputs = join(wasm, 'lasm-link-inputs.json');
+  const cInputs = join(wasm, 'lasm-c-inputs.json');
   const linkContents = JSON.stringify({ emscripten: '6.0.9', sdkPatchSha256 }) + '\n';
   if (!existsSync(linkInputs) || readFileSync(linkInputs, 'utf8') !== linkContents) writeFileSync(linkInputs, linkContents);
   const is64 = stage === 'wasm64';
@@ -102,12 +110,30 @@ if (stage === 'wasm' || stage === 'wasm64') {
   // file changes. Clear only generated CMake configuration on an SDK switch.
   run(join(sdk, 'upstream/emscripten/emcmake'), ['cmake', ...(changedSdk ? ['--fresh'] : []), '-S', join(source, 'src'), '-B', wasm, ...common,
     '-DSTAGE=1', `-DPREV_STAGE=${previous}`, '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
+    `-DUSE_MIMALLOC=${leanAllocator === 'mimalloc' ? 'ON' : 'OFF'}`,
+    `-DLASM_SDK_MIMALLOC=${leanAllocator === 'mimalloc' ? 'ON' : 'OFF'}`,
+    `-DLASM_MIMALLOC_INCLUDE=${join(sdk, 'upstream/emscripten/system/lib/mimalloc/include')}`,
     '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG', '-DCHECK_OLEAN_VERSION=ON', '-DLEAN_EXTRA_OPTS=-j2 -s8192',
     `-DLEAN_EXTRA_LINKER_FLAGS=-sMALLOC=${systemAllocator} -sMAXIMUM_MEMORY=${maximumMemoryGb * 1024 ** 3} -sPTHREAD_POOL_SIZE=${pthreadPoolSize} -sGROWABLE_ARRAYBUFFERS=1 -sSTACK_OVERFLOW_CHECK=2 -sSTACK_SIZE=${stackMb * 1024 * 1024} -Wl,--export=__cpp_exception`,
     '-DLASM_HOST_BRIDGE=ON', `-DLASM_WASM_LINK_OPTIMIZATION=${linkOptimization}`,
     ...(is64 ? ['-DUSE_GMP=ON', `-DGMP_INSTALL_PREFIX=${gmp}`, `-DCMAKE_C_FLAGS=-sMEMORY64=${memoryMode}`, `-DLASM_MEMORY64=${memoryMode}`, '-DLASM_LINK_LAKE=ON', '-DLASM_LINK_TOOLS=ON',
-      `-DEXTRA_LEANMAKE_OPTS=C_ONLY=1 C_OUT=${join(wasm, 'generated-c')} OBJS=`] : ['-DLASM_MEMORY64=0']),
+      `-DEXTRA_LEANMAKE_OPTS=C_ONLY=1 C_OUT=${join(wasm, 'generated-c')} OBJS= LEANC_DEPS=${cInputs}`]
+      : ['-DLASM_MEMORY64=0', `-DEXTRA_LEANMAKE_OPTS=LEANC_DEPS=${cInputs}`]),
   ]);
+  // Upstream leanmake tracks generated .c timestamps, but not their included
+  // runtime headers. In particular USE_MIMALLOC changes inline object layout.
+  // A stable make prerequisite rebuilds every generated C object on an ABI or
+  // compiler-input change, including after an interrupted build. Link-only
+  // tuning does not needlessly invalidate the standard library.
+  const include = join(wasm, 'include/lean');
+  const cContents = JSON.stringify({ sdk,
+    compilerVersion: execFileSync(join(sdk, 'upstream/emscripten/emcc'), ['--version'], { encoding: 'utf8' }),
+    driver: readFileSync(join(wasm, 'leanc.sh'), 'utf8').replace(/^ldflags=\([^\n]*\)$/m, 'ldflags=()'),
+    flags: '-O3 -DNDEBUG -DLEAN_EXPORTING',
+    headers: Object.fromEntries(readdirSync(include).filter(name => name.endsWith('.h')).sort()
+      .map(name => [name, digest(readFileSync(join(include, name)))])),
+  }, null, 2) + '\n';
+  if (!existsSync(cInputs) || readFileSync(cInputs, 'utf8') !== cContents) writeFileSync(cInputs, cContents);
   if (is64) {
     run(process.execPath, [join(root, 'scripts/full-lean/prepare-native64.mjs'), wasm, source]);
     // C embedding clients need the same arithmetic runtime without relying on

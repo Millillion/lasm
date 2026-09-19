@@ -4,7 +4,8 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   var lasmFullCompletions = [];
   var lasmFullCompletionWaiter;
   Module.lasmFullHostRequest = async function (request) {
-    const { port, signal } = request;
+    const { port, signalPointer } = request;
+    const signal = new Int32Array(wasmMemory.buffer, signalPointer, 1);
     try {
       if (!lasmFullHost) {
         const path = process.env.LASM_FULL_HOST_MODULE;

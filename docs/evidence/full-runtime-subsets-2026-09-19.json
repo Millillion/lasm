@@ -500,6 +500,210 @@
         "leftoverProcessCleanup": [],
         "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
       }
+    },
+    {
+      "run": ".work/full-suite-node-v24-loader-http",
+      "tested": 2,
+      "passed": 1,
+      "failures": [
+        "elab/async_http_hang_regressions.lean"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T13:11:35.011Z",
+        "finishedAt": "2026-09-19T13:17:31.990Z",
+        "backend": "node",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v24-loader-http/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v24-loader-http/results.xml",
+          "-R",
+          "^(tests/lake/examples/reverse-ffi/test.sh|elab/async_http_hang_regressions\\.lean)$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v25-memory-http",
+      "tested": 2,
+      "passed": 0,
+      "failures": [
+        "elab/async_http_hang_regressions.lean",
+        "elab/instances.lean"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T13:22:13.772Z",
+        "finishedAt": "2026-09-19T13:53:15.390Z",
+        "backend": "node",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v25-memory-http/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v25-memory-http/results.xml",
+          "-R",
+          "^elab/(instances|async_http_hang_regressions)\\.lean$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v27-rpc",
+      "tested": 1,
+      "passed": 1,
+      "failures": [],
+      "derivation": "JavaScript-only host RPC repair to frozen v25; identical Wasm binary.",
+      "execution": {
+        "startedAt": "2026-09-19T15:02:57.629Z",
+        "finishedAt": "2026-09-19T15:06:09.297Z",
+        "backend": "node",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v27-rpc/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v27-rpc/results.xml",
+          "-R",
+          "^elab/instances\\.lean$"
+        ],
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-deno-v27-rpc",
+      "tested": 1,
+      "passed": 1,
+      "failures": [],
+      "derivation": "JavaScript-only host RPC repair to frozen v25; identical Wasm binary.",
+      "execution": {
+        "startedAt": "2026-09-19T15:09:05.798Z",
+        "finishedAt": "2026-09-19T15:12:26.581Z",
+        "backend": "deno",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v27-rpc/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v27-rpc/results.xml",
+          "-R",
+          "^elab/instances\\.lean$"
+        ],
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v27-regression",
+      "tested": 7,
+      "passed": 6,
+      "failures": [
+        "elab/async_http_hang_regressions.lean"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T15:09:05.519Z",
+        "finishedAt": "2026-09-19T15:15:27.857Z",
+        "backend": "node",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v27-regression/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v27-regression/results.xml",
+          "-R",
+          "^(elab/(IO_test|tempfile|networkInterfaces|async_http_hang_regressions)\\.lean|elab_bench/(big_do|bv_decide_rewriter|simp_congr)\\.lean)$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
     }
   ]
 }

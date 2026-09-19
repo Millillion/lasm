@@ -44,7 +44,10 @@ addToLibrary({
       // CMD_CALL_HANDLER is Emscripten 6.0.9's documented-in-source dispatch to a
       // Module callback. Transfer the reply port, never the Wasm memory itself.
       wt.parentPort.postMessage({ cmd: 9, handler: 'lasmFullHostRequest', args: [{
-        kind, operation, handle, argument, bytes, signal, port: channel.port2,
+        // Send the numeric offset, not the typed view. Some engine structured
+        // cloners truncate a typed array's byteOffset above 4 GiB. The parent
+        // already owns this shared Wasm memory and can construct its own view.
+        kind, operation, handle, argument, bytes, signalPointer: Number(signalPointer), port: channel.port2,
         thread: Number(_pthread_self()),
         nativeThreadId,
       }] }, [channel.port2]);

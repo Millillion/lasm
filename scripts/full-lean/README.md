@@ -162,16 +162,36 @@ frozen builds and conformance evidence. Native memory64 engine prerequisites pas
 in Node and Deno; Bun's experimental flag currently exposes a shared-memory
 worker-transfer defect, so it is not a working Bun configuration.
 
+`--lean-allocator mimalloc` is a separate experimental option: it enables Lean's
+native mimalloc object layout and uses the SDK's matching allocator/header. It
+implies `--malloc mimalloc`. The build fingerprints runtime headers and C compiler
+inputs so this ABI change rebuilds generated objects; a link-only allocator flag
+is insufficient. Full conformance of this layout is still under investigation.
+
 Additional reproducible probes keep engine diagnostics separate from suite passes:
 
 ```sh
 node scripts/full-lean/probe-loader.mjs .work/full-toolchains/node-v24/toolchain.json .work/loader-probe
 node scripts/full-lean/probe-memory64.mjs .work/memory64-probe
 node scripts/full-lean/probes/memory64-worker.cjs
+node scripts/full-lean/probe-host-memory.mjs .work/host-memory-probe
+node scripts/full-lean/probe-build-cache.mjs .work/build-cache-probe
+node scripts/full-lean/probe-stack-diagnostics.mjs .work/stack-diagnostic-probe
+node scripts/full-lean/prepare-http-timing-probe.mjs .work/http-timing-probe 10
 ```
 
 `probe-loader.mjs` compares the native loader with all three engines on Linux.
 `probe-memory64.mjs` records stock and flagged Bun results as well as Node/Deno.
+`probe-host-memory.mjs` exercises the real synchronous/asynchronous bridge above
+2 GiB in all three engines and above 4 GiB in Node/Deno. Requests carry a numeric
+wait-signal offset: cloning a shared typed array truncates that offset in the
+pinned Node/Deno engines. `probe-build-cache.mjs` checks the actual generated
+make rules after a runtime-header change. `probe-stack-diagnostics.mjs` verifies
+the diagnostic and exit status for uncaught engine stack exhaustion.
+`prepare-http-timing-probe.mjs` creates a separate HTTP test derivative with
+uniformly scaled time intervals. It records every changed line and the original
+source hash. Run its generated Lean file with both the native control and the
+chosen Wasm facade; report those results separately from the unchanged suite.
 `probe-bun-stack.mjs` takes an existing generated `const_fold.lean.out.cjs`, a
 frozen host module, and a new output directory. It compiles a Linux-only helper
 and preloads it only into diagnostic child processes. This is not part of the

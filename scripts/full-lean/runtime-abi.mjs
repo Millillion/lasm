@@ -3,11 +3,11 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-export function runtimeAbiArchives(sdk, memory64) {
+export function runtimeAbiArchives(sdk, memory64, mimalloc = false) {
   const target = memory64 ? 'wasm64' : 'wasm32';
   const archives = ['libc-mt.a', 'libc++-mt-legacyexcept.a',
     'libc++abi-mt-legacyexcept.a', 'libunwind-mt-legacyexcept.a',
-    'libclang_rt.builtins-legacysjlj-mt.a']
+    'libclang_rt.builtins-legacysjlj-mt.a', ...(mimalloc ? ['libmimalloc-mt.a'] : [])]
     .map(name => join(sdk, `upstream/emscripten/cache/sysroot/lib/${target}-emscripten/pic`, name));
   for (const path of archives) if (!existsSync(path)) throw new Error(`Missing runtime ABI archive: ${path}`);
   return archives;
@@ -15,7 +15,10 @@ export function runtimeAbiArchives(sdk, memory64) {
 
 // These aliases are synthesized by the final executable's main wrapper. They
 // appear in archive symbol tables but cannot be requested as independent roots.
-export const isRuntimeExport = name => !['__main_argc_argv', '__main_void'].includes(name);
+export const isRuntimeExport = name => !['__main_argc_argv', '__main_void'].includes(name)
+  // Emscripten consumes these link-time metadata symbols; they do not survive
+  // as Wasm exports (mimalloc includes one for its emmalloc dependencies).
+  && !name.startsWith('__em_lib_deps_');
 
 export function definedAbiSymbols(archive, nm) {
   const result = execFileSync(nm, ['--defined-only', '--extern-only', '--format=posix', archive],
