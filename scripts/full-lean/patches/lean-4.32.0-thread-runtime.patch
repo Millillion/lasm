@@ -1,0 +1,74 @@
+--- a/src/runtime/object.cpp
++++ b/src/runtime/object.cpp
+@@ -73,11 +73,7 @@
+ namespace lean {
+ 
+ static bool should_abort_on_panic() {
+-#ifdef LEAN_EMSCRIPTEN
+-    return false;
+-#else
+     return std::getenv("LEAN_ABORT_ON_PANIC");
+-#endif
+ }
+ 
+ static void abort_on_panic() {
+@@ -941,15 +937,15 @@
+             // we can assume that `m_std_workers` will not be changed after this line
+         }
+         m_queue_cv.notify_all();
+-#ifndef LEAN_EMSCRIPTEN
++        // main runs on a pthread; the host event loop remains available while
++        // joining, unlike the old Emscripten main-thread execution path.
+         // wait for all workers to finish
+         for (auto & t : m_std_workers)
+             t->join();
+ 
+         unique_lock<mutex> lock(m_mutex);
+         m_dedicated_finished_cv.wait(lock, [&]() { return m_num_dedicated_workers == 0; });
+-        // never seems to terminate under Emscripten
+-#endif
++
+     }
+ 
+     void enqueue(lean_task_object * t) {
+@@ -1072,11 +1068,9 @@
+ }
+ 
+ static unsigned get_lean_num_threads() {
+-#ifndef LEAN_EMSCRIPTEN
+     if (char const * num_threads = std::getenv("LEAN_NUM_THREADS")) {
+         return atoi(num_threads);
+     }
+-#endif
+     return hardware_concurrency();
+ }
+ 
+--- a/src/runtime/stackinfo.cpp
++++ b/src/runtime/stackinfo.cpp
+@@ -52,11 +52,10 @@
+ }
+ #elif defined(LEAN_EMSCRIPTEN)
+ size_t get_stack_size(bool main) {
+-    if (main) {
+-        return emscripten_stack_get_end() - emscripten_stack_get_base();
+-    } else {
+-        return lthread::get_thread_stack_size();
+-    }
++    (void)main;
++    // Emscripten stacks grow downwards. Query the executing pthread's actual
++    // reservation, including the main pthread created by PROXY_TO_PTHREAD.
++    return emscripten_stack_get_base() - emscripten_stack_get_end();
+ }
+ #else
+ size_t get_stack_size(bool main) {
+@@ -79,7 +78,9 @@
+ 
+ // taken from https://github.com/llvm/llvm-project/blob/llvmorg-10.0.0-rc1/clang/lib/Basic/Stack.cpp#L24
+ static void *get_stack_pointer() {
+-#if __GNUC__ || __has_builtin(__builtin_frame_address)
++#if defined(LEAN_EMSCRIPTEN)
++    return reinterpret_cast<void *>(emscripten_stack_get_current());
++#elif __GNUC__ || __has_builtin(__builtin_frame_address)
+     return __builtin_frame_address(0);
+ #elif defined(_MSC_VER)
+     return _AddressOfReturnAddress();

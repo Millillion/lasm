@@ -1,0 +1,15 @@
+--- a/src/runtime/compact.cpp
++++ b/src/runtime/compact.cpp
+@@ -243,7 +243,11 @@
+     void * mem = alloc(sz);
+     memcpy(mem, o, sz);
+     object * r = static_cast<object*>(mem);
+-    lean_set_non_heap_header(r, sz, lean_ptr_tag(o), lean_ptr_other(o));
++    // alloc already reserves and zero-fills a whole number of pointer words.
++    // Unlike the small allocator/mimalloc, the generic allocator may report an
++    // unaligned constructor size. Compact headers must describe the padded
++    // object extent expected by native Lean and leantar.
++    lean_set_non_heap_header(r, lean_align(sz, sizeof(void*)), lean_ptr_tag(o), lean_ptr_other(o));
+     lean_assert(!lean_has_rc(r));
+     lean_assert(lean_ptr_tag(r) == lean_ptr_tag(o));
+     lean_assert(lean_ptr_other(r) == lean_ptr_other(o));

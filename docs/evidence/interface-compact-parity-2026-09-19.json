@@ -1,0 +1,254 @@
+{
+  "testedAt": "2026-09-19T11:48:08.661Z",
+  "scope": "Supplementary differential probes, not upstream tests. Exact native interface data and order matched; archive extraction preserved all bytes; native Lean imported the generated modules. Interface data is represented by hashes in this tracked evidence.",
+  "priorAttempts": [
+    ".work/full-engine-probe/v15/primitives.log: invalid synthetic trace format in the probe (fixed to documented numeric format)",
+    ".work/full-engine-probe/v16-primitives.log: compile probe exceeded 300 seconds under contention; retained separately."
+  ],
+  "results": [
+    {
+      "name": "native interfaces",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+      "args": [
+        "--run",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/Interfaces.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "status": 0,
+      "signal": null,
+      "seconds": 0.42518024099999996,
+      "stderr": "",
+      "stdoutSha256": "8ff5455017442675dd7206918c033edc1e7230a002a4ba91b638706c54cdd3cd"
+    },
+    {
+      "name": "native compact values",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+      "args": [
+        "--run",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/CompactLayout.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "status": 0,
+      "signal": null,
+      "seconds": 1.681202333,
+      "stderr": "",
+      "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc"
+    },
+    {
+      "name": "node interfaces",
+      "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v16/bin/lean",
+      "args": [
+        "--run",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/Interfaces.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "status": 0,
+      "signal": null,
+      "seconds": 19.140312273000003,
+      "stderr": "",
+      "stdoutSha256": "8ff5455017442675dd7206918c033edc1e7230a002a4ba91b638706c54cdd3cd"
+    },
+    {
+      "name": "node compact values",
+      "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v16/bin/lean",
+      "args": [
+        "-o",
+        "CompactLayout.olean",
+        "--run",
+        "CompactLayout.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/node",
+      "status": 0,
+      "signal": null,
+      "seconds": 40.249113396,
+      "stderr": "",
+      "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc"
+    },
+    {
+      "name": "node leantar encode",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar",
+      "args": [
+        "CompactLayout.ltar",
+        "CompactLayout.trace",
+        "CompactLayout.olean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/node",
+      "status": 0,
+      "signal": null,
+      "seconds": 0.11559962400000222,
+      "stderr": "",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "node leantar decode",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar",
+      "args": [
+        "-x",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/node/CompactLayout.ltar"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/node/extracted",
+      "status": 0,
+      "signal": null,
+      "seconds": 0.016121447999998054,
+      "stderr": "",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "node native module import",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+      "args": [
+        "Check.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/node/extracted",
+      "status": 0,
+      "signal": null,
+      "seconds": 1.6713320170000006,
+      "stderr": "",
+      "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc"
+    },
+    {
+      "name": "deno interfaces",
+      "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v16/bin/lean",
+      "args": [
+        "--run",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/Interfaces.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "status": 0,
+      "signal": null,
+      "seconds": 18.257468239999994,
+      "stderr": "",
+      "stdoutSha256": "8ff5455017442675dd7206918c033edc1e7230a002a4ba91b638706c54cdd3cd"
+    },
+    {
+      "name": "deno compact values",
+      "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v16/bin/lean",
+      "args": [
+        "-o",
+        "CompactLayout.olean",
+        "--run",
+        "CompactLayout.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/deno",
+      "status": 0,
+      "signal": null,
+      "seconds": 38.260931553999995,
+      "stderr": "",
+      "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc"
+    },
+    {
+      "name": "deno leantar encode",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar",
+      "args": [
+        "CompactLayout.ltar",
+        "CompactLayout.trace",
+        "CompactLayout.olean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/deno",
+      "status": 0,
+      "signal": null,
+      "seconds": 0.08259317000000738,
+      "stderr": "",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "deno leantar decode",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar",
+      "args": [
+        "-x",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/deno/CompactLayout.ltar"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/deno/extracted",
+      "status": 0,
+      "signal": null,
+      "seconds": 0.007440959999992628,
+      "stderr": "",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "deno native module import",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+      "args": [
+        "Check.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/deno/extracted",
+      "status": 0,
+      "signal": null,
+      "seconds": 1.3751072970000096,
+      "stderr": "",
+      "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc"
+    },
+    {
+      "name": "bun interfaces",
+      "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v16/bin/lean",
+      "args": [
+        "--run",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/Interfaces.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "status": 0,
+      "signal": null,
+      "seconds": 43.014151489,
+      "stderr": "",
+      "stdoutSha256": "8ff5455017442675dd7206918c033edc1e7230a002a4ba91b638706c54cdd3cd"
+    },
+    {
+      "name": "bun compact values",
+      "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v16/bin/lean",
+      "args": [
+        "-o",
+        "CompactLayout.olean",
+        "--run",
+        "CompactLayout.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/bun",
+      "status": 0,
+      "signal": null,
+      "seconds": 55.125220195000004,
+      "stderr": "",
+      "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc"
+    },
+    {
+      "name": "bun leantar encode",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar",
+      "args": [
+        "CompactLayout.ltar",
+        "CompactLayout.trace",
+        "CompactLayout.olean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/bun",
+      "status": 0,
+      "signal": null,
+      "seconds": 0.07980976600002032,
+      "stderr": "",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "bun leantar decode",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar",
+      "args": [
+        "-x",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/bun/CompactLayout.ltar"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/bun/extracted",
+      "status": 0,
+      "signal": null,
+      "seconds": 0.007483723000012105,
+      "stderr": "",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "bun native module import",
+      "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+      "args": [
+        "Check.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/v16/bun/extracted",
+      "status": 0,
+      "signal": null,
+      "seconds": 1.3216944540000113,
+      "stderr": "",
+      "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc"
+    }
+  ]
+}

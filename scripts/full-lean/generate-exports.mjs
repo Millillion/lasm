@@ -4,10 +4,12 @@ import { writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { root, resolveLean } from '../../src/toolchain.mjs';
+import { runtimeAbiArchives, isRuntimeExport, definedAbiSymbols } from './runtime-abi.mjs';
 
 const build = resolve(process.argv[2] ?? '.work/lean-full/wasm');
 const output = resolve(process.argv[3] ?? join(build, 'lasm-wasm-exports.json'));
-const nm = process.env.LASM_LLVM_NM ?? join(root, '.cache/emsdk-6.0.9/upstream/bin/llvm-nm');
+const sdk = resolve(process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9'));
+const nm = process.env.LASM_LLVM_NM ?? join(sdk, 'upstream/bin/llvm-nm');
 const stems = JSON.parse(execFileSync(resolveLean(root).lean, [join(root, 'scripts/full-lean/ExternSymbols.lean')],
   { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 }));
 const linked = new Set(['libInit.a', 'libStd.a', 'libLean.a', 'libleancpp.a', 'libleanrt.a',
@@ -16,23 +18,25 @@ if (/^LASM_HOST_BRIDGE:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'
 if (/^LASM_LINK_LAKE:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'))) linked.add('libLake.a');
 const archives = [join(build, 'lib/lean'), join(build, 'lib/temp')].flatMap(dir =>
   readdirSync(dir).filter(name => linked.has(name)).map(name => join(dir, name)));
+const memory64 = /^LASM_MEMORY64:STRING=2$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'));
+// A compiler can load C/C++ libraries that were not known when it was linked.
+// Export the native runtime ABI too, while retaining Lean declarations in the
+// in-Wasm registry to stay within engine export-count limits. MAIN_MODULE=2
+// otherwise drops C++ exception/typeinfo and libc symbols needed by later DSOs.
+archives.push(...runtimeAbiArchives(sdk, memory64));
 const symbols = new Set();
 const dataSymbols = new Set();
 for (const archive of archives) {
-  const listing = execFileSync(nm, ['--defined-only', '--extern-only', '--format=posix', archive],
-    { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 });
-  for (const line of listing.split('\n')) {
-    const match = line.match(/^(\S+) ([A-Za-z]) /);
-    if (match) {
-      symbols.add(match[1]);
-      // Initialized constants have no executable IR body to fall back to.
-      if (match[1].startsWith('l_') && 'BDGRS'.includes(match[2])) dataSymbols.add(match[1]);
-    }
+  for (const { name, type } of definedAbiSymbols(archive, nm)) {
+    symbols.add(name);
+    // Initialized constants have no executable IR body to fall back to.
+    if (name.startsWith('l_') && 'BDGRS'.includes(type)) dataSymbols.add(name);
   }
 }
 const requested = new Set(['main', 'malloc', 'free']);
 for (const symbol of dataSymbols) requested.add(symbol);
-for (const symbol of symbols) if (symbol.startsWith('lean_') || /^(?:runtime_|meta_)?initialize_/.test(symbol)) requested.add(symbol);
+for (const symbol of symbols) if (!symbol.startsWith('l_') && !symbol.startsWith('lasm_original_')
+    && isRuntimeExport(symbol)) requested.add(symbol);
 for (const entry of stems) {
   if (symbols.has(entry.stem)) requested.add(entry.stem);
   if (symbols.has(entry.boxed)) requested.add(entry.boxed);

@@ -46,6 +46,12 @@ export function nativeDns() {
     if (error) reject(error); else if (result) reject(failure(result, errno)); else resolve();
   }));
   implementation = {
+    parseAddress(family, ip) {
+      const result = Buffer.alloc(17); result[0] = family;
+      if (parseIp(family === 6 ? family6 : 2, ip.split('%')[0], result.subarray(1)) !== 1)
+        throw failure(windows ? 10022 : darwin ? 3 : -1, ffi.errno());
+      return result;
+    },
     async getAddrInfo(host, service, family = 0) {
       const result = [null];
       const hints = { flags: 0, family: family === 1 ? 2 : family === 2 ? family6 : 0, socktype: 0,

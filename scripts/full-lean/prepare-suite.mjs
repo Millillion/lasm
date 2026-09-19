@@ -11,6 +11,10 @@ const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 
 const output = resolve(option('--output', '.work/full-suite-native'));
 const prefix = resolve(option('--prefix', resolveLean(root).prefix));
 const backend = option('--backend', 'native');
+const networkLock = option('--network-lock') && resolve(option('--network-lock'));
+if (networkLock) {
+  execFileSync('flock', ['--version'], { stdio: 'ignore' });
+}
 const archiveTool = option('--archive-tool', existsSync(join(prefix, 'bin/llvm-ar')) ? join(prefix, 'bin/llvm-ar') : undefined);
 const timeout = Number(option('--timeout', '600'));
 if (!Number.isFinite(timeout) || timeout <= 0) throw new Error('Invalid timeout in seconds');
@@ -88,8 +92,11 @@ if (extraRegistrations.length) writeFileSync(testExternDriver,
   `source ${shellQuote(join(source, 'tests/pkg/test_extern/run_test.sh'))}\n`);
 const registered = [];
 for (const entry of inventory.tests) {
-  const command = entry.command.map(part => part === originalEnvironment ? environment : addEnvironment(part));
+  let command = entry.command.map(part => part === originalEnvironment ? environment : addEnvironment(part));
   if (extraRegistrations.includes(entry.name) && entry.name === 'pkg/test_extern') command[2] = testExternDriver;
+  // These original tests bind fixed loopback ports. A lock shared by separate
+  // engine runs prevents their unmodified servers from colliding with each other.
+  if (networkLock && /^elab\/async_(tcp|udp).*\.lean$/.test(entry.name)) command = ['flock', networkLock, ...command];
   registered.push({name:entry.name,command,properties:entry.properties});
 }
 const lines = registered.flatMap(entry => {
@@ -109,10 +116,11 @@ const lines = registered.flatMap(entry => {
 });
 writeFileSync(join(execution,'CTestTestfile.cmake'),lines.join('\n')+'\n');
 writeFileSync(join(output,'parallel-suite.json'),JSON.stringify({leanCommit,backend,prefix,source,archiveSha256:expected,
-  registered:registered.length,extraRegistrations,timeoutSeconds:timeout,testSourceHashes:hashesFile,
+  registered:registered.length,extraRegistrations,networkLock,timeoutSeconds:timeout,testSourceHashes:hashesFile,
   changes:['Generated environment points to the selected toolchain and isolated source copy.',
     'LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.',
     'Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.',
+    ...(networkLock ? [`A shared flock at ${networkLock} serializes the original fixed-port TCP/UDP tests across engine runs.`] : []),
     ...(extraRegistrations.length ? ['Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.',
       'A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.'] : []),
     ...(archiveTool ? [`MAKEFLAGS supplies LEAN_AR=${archiveTool} instead of the release builder path embedded in lean.mk.`] : []),

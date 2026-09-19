@@ -1,0 +1,422 @@
+{
+  "note": "Selected runs, including failures; not full-suite conformance. Source and expected-output files are unchanged. Excluded tests are additional registrations.",
+  "runs": [
+    {
+      "run": ".work/full-suite-node-v11-io",
+      "tested": 49,
+      "passed": 46,
+      "failures": [
+        "tests/lake/examples/ffi/test.sh",
+        "elab/async_dns.lean",
+        "elab/async_http_hang_regressions.lean"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T04:04:58.229Z",
+        "finishedAt": "2026-09-19T04:45:58.878Z",
+        "backend": "node",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v11-io/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v11-io/results.xml",
+          "-R",
+          "^(tests/lake/examples/ffi/test.sh|tests/lake/tests/depRenaming/test.sh|pkg/signal|elab/(IO_test|tempfile|async_.*|sync_.*|task.*|promise)\\.lean)$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-deno-v13-fs",
+      "tested": 2,
+      "passed": 2,
+      "failures": [],
+      "execution": {
+        "startedAt": "2026-09-19T04:30:06.461Z",
+        "finishedAt": "2026-09-19T04:30:57.121Z",
+        "backend": "deno",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v13-fs/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v13-fs/results.xml",
+          "-R",
+          "^elab/(IO_test|tempfile)\\.lean$"
+        ],
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-bun-v13-fs",
+      "tested": 2,
+      "passed": 2,
+      "failures": [],
+      "execution": {
+        "startedAt": "2026-09-19T04:34:38.423Z",
+        "finishedAt": "2026-09-19T04:37:07.766Z",
+        "backend": "bun",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v13-fs/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v13-fs/results.xml",
+          "-R",
+          "^elab/(IO_test|tempfile)\\.lean$"
+        ],
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v12-excluded",
+      "tested": 5,
+      "passed": 3,
+      "failures": [
+        "elab/async_select_channel.lean",
+        "pkg/test_extern"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T04:33:34.598Z",
+        "finishedAt": "2026-09-19T05:19:08.535Z",
+        "backend": "node",
+        "registered": 3896,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v12-excluded/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v12-excluded/results.xml",
+          "-R",
+          "^(elab/(async_select_channel|sync_mutex)\\.lean|pkg/(signal|test_extern|user_ext))$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v15-fixes",
+      "tested": 4,
+      "passed": 2,
+      "failures": [
+        "tests/lake/examples/ffi/test.sh",
+        "elab/async_http_hang_regressions.lean"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T04:55:50.165Z",
+        "finishedAt": "2026-09-19T05:23:03.286Z",
+        "backend": "node",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v15-fixes/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v15-fixes/results.xml",
+          "-R",
+          "^(tests/lake/examples/ffi/test.sh|tests/lake/tests/ltar/test.sh|elab/(async_dns|async_http_hang_regressions)\\.lean)$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v17-runtime",
+      "tested": 8,
+      "passed": 5,
+      "failures": [
+        "compile/StackOverflow.lean",
+        "compile/StackOverflowTask.lean",
+        "compile_bench/const_fold.lean"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T11:53:51.618Z",
+        "finishedAt": "2026-09-19T12:00:15.646Z",
+        "backend": "node",
+        "registered": 3896,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v17-runtime/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v17-runtime/results.xml",
+          "-R",
+          "^(compile/(534|StackOverflow|StackOverflowTask|wait_dedicated)\\.lean|compile_bench/const_fold\\.lean|elab/(async_select_channel|grind_11081)\\.lean|pkg/test_extern)$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v19-abi",
+      "tested": 2,
+      "passed": 2,
+      "failures": [],
+      "execution": {
+        "startedAt": "2026-09-19T12:03:33.653Z",
+        "finishedAt": "2026-09-19T12:04:48.287Z",
+        "backend": "node",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v19-abi/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v19-abi/results.xml",
+          "-R",
+          "^(compile/StackOverflow(Task)?\\.lean|lake/examples/(ffi|precompile|reverse-ffi))$"
+        ],
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v19-ffi",
+      "tested": 3,
+      "passed": 1,
+      "failures": [
+        "tests/lake/examples/ffi/test.sh",
+        "tests/lake/examples/reverse-ffi/test.sh"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T12:05:49.229Z",
+        "finishedAt": "2026-09-19T12:19:50.624Z",
+        "backend": "node",
+        "registered": 3891,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v19-ffi/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v19-ffi/results.xml",
+          "-R",
+          "^tests/lake/examples/(ffi|precompile|reverse-ffi)/test\\.sh$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v20-runtime",
+      "tested": 11,
+      "passed": 8,
+      "failures": [
+        "elab/async_http_hang_regressions.lean",
+        "elab/instances.lean",
+        "pkg/test_extern"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T12:11:40.401Z",
+        "finishedAt": "2026-09-19T12:21:49.676Z",
+        "backend": "node",
+        "registered": 3896,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v20-runtime/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v20-runtime/results.xml",
+          "-R",
+          "^(compile/(534|StackOverflow|StackOverflowTask|wait_dedicated)\\.lean|compile_bench/const_fold\\.lean|elab/(async_http_hang_regressions|async_select_channel|grind_11081|issue9018|instances)\\.lean|pkg/test_extern)$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-deno-v20-runtime",
+      "tested": 8,
+      "passed": 3,
+      "failures": [
+        "compile_bench/const_fold.lean",
+        "elab/grind_11081.lean",
+        "elab/issue9018.lean",
+        "elab/async_select_channel.lean",
+        "pkg/test_extern"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T12:11:38.825Z",
+        "finishedAt": "2026-09-19T12:24:00.837Z",
+        "backend": "deno",
+        "registered": 3896,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v20-runtime/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v20-runtime/results.xml",
+          "-R",
+          "^(compile/(StackOverflow|StackOverflowTask|wait_dedicated)\\.lean|compile_bench/const_fold\\.lean|elab/(async_select_channel|grind_11081|issue9018)\\.lean|pkg/test_extern)$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    }
+  ]
+}

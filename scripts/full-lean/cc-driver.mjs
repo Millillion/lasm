@@ -15,6 +15,8 @@ const driver = join(config.sdk, 'upstream/emscripten', process.env.LASM_CC_LANGU
 let output = 'a.out';
 let explicitOutput = false;
 const args = [];
+let embeddedLeanLibraries = false;
+let embeddedLake = false;
 const sourceBuild = config.sourceBuild ?? config.build;
 for (let i = 0; i < original.length; i++) {
   let arg = original[i];
@@ -25,6 +27,14 @@ for (let i = 0; i < original.length; i++) {
   if (/^-[IL]/.test(arg) && arg.slice(2).startsWith(sourceBuild + '/'))
     arg = arg.slice(0, 2) + config.build + arg.slice(2 + sourceBuild.length);
   if (shared && /^-l(?:leanrt|leancpp|Init|Std|Lean|Lake|Init_shared|leanshared(?:_[12])?|Lake_shared)$/.test(arg)) continue;
+  if (!compileOnly && !shared && /^-l(?:Init_shared|leanshared(?:_[12])?|Lake_shared)$/.test(arg)) {
+    // The full Wasm toolchain embeds Lean's runtime. C embedding clients still
+    // use upstream's normal shared-library flags; resolve those to the matching
+    // Wasm archives, rather than feeding CMake's empty .so placeholders to ld.
+    embeddedLeanLibraries = true;
+    embeddedLake ||= arg === '-lLake_shared';
+    continue;
+  }
   if (!compileOnly && !arg.startsWith('-') && extname(arg) === '.c' && existsSync(arg)) args.push('-x', 'c', arg, '-x', 'none');
   else args.push(arg);
 }
@@ -37,16 +47,25 @@ if (compileOnly) {
 } else if (shared) {
   // Dynamic Lean plugins may expose any declaration to the interpreter later.
   // Retain their public definitions just as a native shared library does.
-  args.push('-sSIDE_MODULE=1', '-o', output);
+  // A side module uses its caller's memory and stack. Leanc may forward the
+  // compiler executable's stack setting, which has no meaning for this link.
+  args.push('-sSIDE_MODULE=1', '-sSTACK_SIZE=0', '-o', output);
 } else {
   const glue = resolve(output + '.cjs');
   const exportFile = resolve(output + '.exports.json');
-  const exports = JSON.parse(readFileSync(join(config.build, 'lasm-wasm-exports.json')))
-    .filter(name => name !== '_lean_main'); // The compiler shell is not an application entry point.
+  // An AOT application's roots are its main and its actual shared dependencies.
+  // The full compiler's export list roots every standard-library initializer and
+  // interpreter constant, accidentally turning even `main := pure ()` into a
+  // complete compiler build. Emscripten also retains the imports of explicit
+  // side-module dependencies for FFI.
+  const exports = ['_main', '_malloc', '_free'];
   writeFileSync(exportFile, JSON.stringify(exports));
+  if (embeddedLeanLibraries) args.push('-L', join(config.build, 'lib/lean'),
+    ...(embeddedLake ? ['-lLake'] : []), '-lLean', '-lStd', '-lInit', '-lleancpp', '-lleanrt', '-lgmp');
   args.push('-o', glue, '-sMAIN_MODULE=2', `-sEXPORTED_FUNCTIONS=@${exportFile}`,
     '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=4', '-sEXIT_RUNTIME=1', '-sNODERAWFS=1',
-    '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=1', '-sINITIAL_MEMORY=134217728', '-sMAXIMUM_MEMORY=4294967296', '-sSTACK_SIZE=16777216',
+    '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=1', '-sSTACK_OVERFLOW_CHECK=2', '-Wl,--export-if-defined=__cpp_exception',
+    '-sINITIAL_MEMORY=134217728', '-sMAXIMUM_MEMORY=4294967296', '-sSTACK_SIZE=67108864',
     '-L', join(config.build, 'lib/lean'), '-llasmhost', '-llasmnative',
     '--pre-js', join(config.runtimeSupport, 'emscripten-pre.js'),
     '--pre-js', join(config.runtimeSupport, 'host-pre.js'),
@@ -64,7 +83,7 @@ if (!compileOnly && !shared) {
   writeFileSync(output, `#!/usr/bin/env bash
 export LASM_FULL_HOST_MODULE=${quote(hostUrl)}
 export LASM_FULL_APP_PATH=${quote(resolve(output))}
-export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-8192}"
+export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-65536}"
 exec ${command.map(quote).join(' ')} "$@"
 `);
   chmodSync(output, 0o755);

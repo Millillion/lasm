@@ -62,8 +62,9 @@ as fundamental merely because it needs further work.
   DNS and UDP host implementations now exist; selected original tests pass in
   Node. This does not establish complete networking parity. There is no `IO.HTTP`
   API; identify the actual Lean library before making TLS/WebSocket support claims.
-- [ ] Implement remaining network-interface enumeration and UV loop configuration
-  primitives; the experimental full runtime still contains those upstream Wasm stubs.
+- [ ] Implement remaining UV loop configuration/aliveness primitives. Network
+  interface enumeration now matches native Lean's records and ordering in Node,
+  Deno, and Bun on Linux x64; other OSs still require validation.
 - [ ] Node TCP bind is performed when `listen` runs; bind-time errors and bound
   socket address queries therefore differ before listening.
 - [ ] Validate IPv6, keepalive details, transport half-close/error behavior,

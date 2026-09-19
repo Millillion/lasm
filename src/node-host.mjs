@@ -115,7 +115,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   let nextRequest = 1;
   function dispatch(op, id, arg, bytes, context) {
     if (op >= 160 && op <= 164) return signals.dispatch(op, id, arg);
-    if (op >= 120 && op <= 143) return system.dispatch(op, id, arg, bytes);
+    if (op >= 120 && op <= 144) return system.dispatch(op, id, arg, bytes);
     if (op === 115) {
       const split = bytes.indexOf(0);
       return nativeDns().getAddrInfo(bytes.subarray(0, split).toString(), bytes.subarray(split + 1).toString(), Number(arg));

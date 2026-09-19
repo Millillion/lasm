@@ -13,6 +13,8 @@ const output = resolve(option('--output', '.work/lean-full'));
 const stage = option('--stage', 'wasm');
 const jobs = Number(option('--jobs', '8'));
 const linkOptimization = option('--link-opt', '-O1');
+const stackMb = Number(option('--stack-mb', '64'));
+if (!Number.isInteger(stackMb) || stackMb < 1 || stackMb > 1024) throw new Error('Invalid --stack-mb (1..1024)');
 if (!['-O0', '-O1', '-O2', '-O3', '-Os', '-Oz'].includes(linkOptimization)) throw new Error('Invalid --link-opt');
 if (!['prepare', 'native32', 'wasm', 'wasm64'].includes(stage)) throw new Error('Use --stage prepare, native32, wasm, or wasm64');
 if (!Number.isInteger(jobs) || jobs < 1) throw new Error('Invalid job count');
@@ -36,9 +38,21 @@ if (check(true).status !== 0) {
   if (forward.status !== 0) throw new Error(`Build source is neither pristine nor the recorded patch revision:\n${forward.stdout}\n${forward.stderr}`);
   execFileSync('patch', ['--batch', '--forward', '-p1'], { cwd: source, input: patch });
 }
+const alignmentPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-compact-alignment.patch'));
+const threadRuntimePatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-thread-runtime.patch'));
+for (const [name, input] of [['compact alignment', alignmentPatch], ['thread runtime', threadRuntimePatch]]) {
+  const checkExtra = reverse => spawnSync('patch', ['--force', '--dry-run', reverse ? '--reverse' : '--forward', '-p1'],
+    { cwd: source, input });
+  if (checkExtra(true).status !== 0) {
+    const forward = checkExtra(false);
+    if (forward.status !== 0) throw new Error(`${name} source drift:\n${forward.stdout}\n${forward.stderr}`);
+    execFileSync('patch', ['--batch', '--forward', '-p1'], { cwd: source, input });
+  }
+}
 copyFileSync(join(root, 'scripts/full-lean/emscripten-pre.js'), join(source, 'src/lasm-emscripten-pre.js'));
 writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ leanCommit, archiveHash,
-  patchSha256: digest(patch), sdkPatchSha256, emscripten: '6.0.9', sdk, source, native, wasm,
+  patchSha256: digest(patch), compactAlignmentPatchSha256: digest(alignmentPatch), threadRuntimePatchSha256: digest(threadRuntimePatch), sdkPatchSha256, emscripten: '6.0.9', sdk, source, native, wasm,
+  mainCStackBytes: stackMb * 1024 * 1024,
   bootstrapOptions: '-j2 -s8192', bootstrapEnvironment: { LEAN_STACK_SIZE_KB: '8192' }, generatedAt: new Date().toISOString(),
 }, null, 2) + '\n');
 const run = (command, argv, env = process.env) => execFileSync(command, argv, { cwd: root, env, stdio: 'inherit' });
@@ -78,12 +92,17 @@ if (stage === 'wasm' || stage === 'wasm64') {
   run(join(sdk, 'upstream/emscripten/emcmake'), ['cmake', ...(changedSdk ? ['--fresh'] : []), '-S', join(source, 'src'), '-B', wasm, ...common,
     '-DSTAGE=1', `-DPREV_STAGE=${previous}`, '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
     '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG', '-DCHECK_OLEAN_VERSION=ON', '-DLEAN_EXTRA_OPTS=-j2 -s8192',
-    '-DLEAN_EXTRA_LINKER_FLAGS=-sGROWABLE_ARRAYBUFFERS=1',
+    `-DLEAN_EXTRA_LINKER_FLAGS=-sGROWABLE_ARRAYBUFFERS=1 -sSTACK_OVERFLOW_CHECK=2 -sSTACK_SIZE=${stackMb * 1024 * 1024} -Wl,--export=__cpp_exception`,
     '-DLASM_HOST_BRIDGE=ON', `-DLASM_WASM_LINK_OPTIMIZATION=${linkOptimization}`,
     ...(is64 ? ['-DUSE_GMP=ON', `-DGMP_INSTALL_PREFIX=${gmp}`, '-DCMAKE_C_FLAGS=-sMEMORY64=2', '-DLASM_MEMORY64=2', '-DLASM_LINK_LAKE=ON', '-DLASM_LINK_TOOLS=ON',
       `-DEXTRA_LEANMAKE_OPTS=C_ONLY=1 C_OUT=${join(wasm, 'generated-c')} OBJS=`] : ['-DLASM_MEMORY64=0']),
   ]);
-  if (is64) run(process.execPath, [join(root, 'scripts/full-lean/prepare-native64.mjs'), wasm, source]);
+  if (is64) {
+    run(process.execPath, [join(root, 'scripts/full-lean/prepare-native64.mjs'), wasm, source]);
+    // C embedding clients need the same arithmetic runtime without relying on
+    // an absolute path into the maintainer's downloaded GMP build.
+    copyFileSync(join(gmp, 'lib/libgmp.a'), join(wasm, 'lib/lean/libgmp.a'));
+  }
   run('cmake', ['--build', wasm, '--target', 'make_stdlib', 'leancpp', 'leanrt', 'leanmain', 'leanshell', 'leaninitialize', 'lasmhost', '-j', String(jobs)],
     { ...process.env, LEAN_STACK_SIZE_KB: '8192' });
   run(process.execPath, [join(root, 'scripts/full-lean/generate-exports.mjs'), wasm]);

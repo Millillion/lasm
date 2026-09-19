@@ -2,6 +2,7 @@ import * as os from 'node:os';
 import { randomBytes } from 'node:crypto';
 import { numbers } from './node-host.mjs';
 import { nativeFiles } from './native-files.mjs';
+import { nativeInterfaces } from './native-interfaces.mjs';
 
 const string = value => { const bytes = Buffer.from(value); return Buffer.concat([numbers(bytes.length), bytes]); };
 const optionalString = value => value == null ? numbers(0) : Buffer.concat([numbers(1), string(value)]);
@@ -65,6 +66,7 @@ export function createNodeSystem() {
     case 141: return numbers(process.constrainedMemory());
     case 142: return numbers(process.availableMemory());
     case 143: return new Promise((resolve, reject) => randomBytes(n, (error, bytes) => error ? reject(error) : resolve(bytes)));
+    case 144: return nativeInterfaces();
     default: throw new Error(`Unknown Lean system operation ${op}`);
     }
   } };

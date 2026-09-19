@@ -175,6 +175,30 @@ void timer_foreach(void *ptr, O *fn) {
 }
 }
 extern "C" {
+O *lean_uv_interface_addresses() {
+    Reply r(144);
+    if (r.failed) return lean_io_result_mk_error(lean_mk_io_error_invalid_argument(22, lean_mk_string("failed to get interface addresses")));
+    auto *array = lean_mk_empty_array();
+    size_t offset = 8;
+    for (uint64_t i = 0, count = r.number(); i < count; i++) {
+        auto length = r.number(offset); offset += 8;
+        if (offset > r.bytes.size() || length > r.bytes.size() - offset || r.bytes.size() - offset - length < 41) __builtin_trap();
+        auto *record = lean_alloc_ctor(0, 4, 1);
+        lean_ctor_set(record, 0, lean_mk_string_from_bytes((const char*)r.bytes.data() + offset, length)); offset += length;
+        auto *mac = lean_mk_empty_array();
+        for (unsigned j = 0; j < 6; j++) mac = lean_array_push(mac, lean_box(r.bytes[offset++]));
+        lean_ctor_set(record, 1, mac);
+        lean_ctor_set_uint8(record, 4 * sizeof(void*), r.bytes[offset++]);
+        for (unsigned j = 2; j < 4; j++) {
+            bool v6 = r.bytes[offset++] == 6;
+            auto *ip = lean_alloc_ctor(v6 ? 1 : 0, 1, 0);
+            lean_ctor_set(ip, 0, address_array(r.bytes.data() + offset, v6)); offset += 16;
+            lean_ctor_set(record, j, ip);
+        }
+        array = lean_array_push(array, record);
+    }
+    return ok(array);
+}
 #ifdef LASM_FULL_NATIVE_THREADS
 void initialize_libuv() { ensure_completion_thread(); }
 #endif

@@ -6,6 +6,52 @@ if (globalThis.process?.versions?.bun && ENVIRONMENT_IS_PTHREAD) {
   globalThis.postMessage = undefined;
 }
 
+// Wasm's value/control stack belongs to the JS engine, independently of Lean's
+// C stack in linear memory. Node's default 4 MiB worker stack can overflow while
+// Lean still has ample C stack (for example, finalizing channel continuations).
+// Deno also supports this worker option. Bun does not; do not pretend otherwise.
+if (ENVIRONMENT_IS_NODE) {
+  var LasmHostWorker = globalThis.Worker;
+  var lasmVmStackMb = Number(process.env.LASM_VM_STACK_MB ?? 64);
+  if (!Number.isFinite(lasmVmStackMb) || lasmVmStackMb <= 0) throw new Error('Invalid LASM_VM_STACK_MB');
+  var lasmStackOverflow = function() {
+    require('node:fs').writeSync(2, '\nStack overflow detected. Aborting.\n');
+    process.exit(134);
+  };
+  globalThis.Worker = class extends LasmHostWorker {
+    constructor(filename, options = {}) {
+      super(filename, process.versions.bun ? options : {
+        ...options, resourceLimits: { ...options.resourceLimits, stackSizeMb: lasmVmStackMb },
+      });
+    }
+    emit(event, ...args) {
+      // Emscripten reports a caught worker exception as CMD_ONERROR (8),
+      // whereas the engine reports an uncaught worker exception as 'error'.
+      var failure = event === 'message' && args[0]?.cmd === 8 ? args[0].error
+        : event === 'error' ? args[0] : undefined;
+      // Native Lean's guard aborts with this diagnostic on an exhausted stack.
+      // Preserve that behavior for uncaught engine stack exhaustion in Wasm,
+      // while leaving unrelated JavaScript errors and Lean exceptions intact.
+      if (failure?.name === 'RangeError'
+          && /call stack|stack overflow/i.test(failure.message)
+          && /wasm-function|wasm:\/\//.test(failure.stack ?? '')) lasmStackOverflow();
+      return super.emit(event, ...args);
+    }
+  };
+  Module.lasmFatalStackOverflow = lasmStackOverflow;
+  var lasmPreviousOnAbort = Module.onAbort;
+  Module.onAbort = function(reason) {
+    if (/^stack overflow/i.test(String(reason))) {
+      if (ENVIRONMENT_IS_PTHREAD) {
+        require('node:worker_threads').parentPort.postMessage({ cmd: 9, handler: 'lasmFatalStackOverflow', args: [] });
+        throw 'unwind';
+      }
+      lasmStackOverflow();
+    }
+    lasmPreviousOnAbort?.(reason);
+  };
+}
+
 // Emscripten preloads DT_NEEDED libraries before its libc loader can search
 // LD_LIBRARY_PATH. Lake supplies that path when running an executable. Resolve
 // it from the host at this early stage, preserving normal library precedence.

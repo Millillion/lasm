@@ -231,6 +231,7 @@ private unsafe def «runProgram» : IO UInt32 := do
   copyFileSync(join(root, 'src/node-network.mjs'), join(output, 'node-network.mjs'));
   copyFileSync(join(root, 'src/node-udp.mjs'), join(output, 'node-udp.mjs'));
   copyFileSync(join(root, 'src/native-dns.mjs'), join(output, 'native-dns.mjs'));
+  copyFileSync(join(root, 'src/native-interfaces.mjs'), join(output, 'native-interfaces.mjs'));
   copyFileSync(join(root, 'src/node-system.mjs'), join(output, 'node-system.mjs'));
   copyFileSync(join(root, 'src/node-signal.mjs'), join(output, 'node-signal.mjs'));
   copyFileSync(join(root, 'src/thread-id.cjs'), join(output, 'thread-id.cjs'));

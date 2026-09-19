@@ -62,12 +62,13 @@ Emscripten's optional growable-buffer mode, with its fallback for engines withou
 that API. Full test reruns are required; the small growth probe alone also passed
 with the old setting and is not a complete reproduction of the compiler failure.
 
-The v11 FFI example now compiles and links its original C and C++ libraries, then
-fails because startup library lookup misses Lake's `LD_LIBRARY_PATH`. The new
-prelude honors the host library search path during early loading; its full-example
-rerun is pending. The earlier `depRenaming` thread-cleanup failure did not recur in
+The v11 FFI example compiled and linked its original C and C++ libraries, then
+failed because startup library lookup missed Lake's `LD_LIBRARY_PATH`. The new
+prelude honors the host library search path during early loading; the subsequent
+v15 run advanced to a separate C++ ABI failure described below. The earlier `depRenaming` thread-cleanup failure did not recur in
 v11, but a single rerun is not evidence that the intermittent defect is resolved.
-The broader v11 Node IO/HTTP run and full v6 Node run remain in progress. Internal
+The broader v11 Node IO/HTTP run finished at **46/49**: FFI, DNS, and HTTP early
+streaming failed. The full v6 Node run remains in progress. Internal
 DNS deadlines and long Lake-script harness deadlines have also failed; none is
 classified as fundamental.
 
@@ -86,8 +87,80 @@ TCP, UDP, and shared mutexes). The memory-copy failure is absent from that run.
 enumeration. The host now uses asynchronous POSIX `scandir` without sorting and
 copies raw filename bytes; direct native-order/invalid-UTF-8 checks pass in all
 three engines, along with six other filesystem/lock regressions. Full Lean reruns
-of those two files are still pending. Broader runs also exposed HTTP timing and
+of those two files subsequently passed **2/2 in Deno and 2/2 in Bun** on v13.
+The Bun v12 eight-test run also passed the other six tests. These are split
+subset results, not clean full-suite passes. Broader runs also exposed HTTP timing and
 completion failures; their source tests remain unchanged.
+
+The additional v12 Node tests passed **3/5**: dedicated signal handling,
+`sync_mutex`, and `user_ext` passed; channel selection exhausted the engine's
+worker stack and `test_extern` timed out during dynamic loading. The v15 repair
+run passed the original Lake `ltar` test and DNS; FFI advanced to a C++ exception
+tag import failure, and the HTTP early-streaming deadline failed again. See
+[the recorded subset results](evidence/full-runtime-subsets-2026-09-19.json).
+
+The archive failure came from generic-allocator constructor sizes: the compactor
+reserved aligned space but recorded an unaligned size in serialized headers.
+The reviewed runtime patch records the actual padded extent. Supplementary
+probes now pass in all three engines: network-interface records/order match
+native Lean, serialized objects with small scalar fields and large naturals
+survive a byte-identical `leantar` round trip, and native Lean imports those
+Wasm-generated modules. See [the differential evidence](evidence/interface-compact-parity-2026-09-19.json).
+An initial synthetic trace-format error and a 300-second timeout under contention
+are retained as failed probe attempts; neither changed an upstream test.
+
+The v17 Node runtime regression passed **5/8** unchanged upstream tests:
+`compile/534`, `compile/wait_dedicated`, `elab/grind_11081`, the normally excluded
+`elab/async_select_channel`, and `pkg/test_extern`. Restoring native task-manager
+joins fixes dedicated-task shutdown. Waiting through Emscripten's futex API
+instead of raw `Atomics.wait` allows its pthread mailbox to synchronize loaded
+libraries even while a Lean worker awaits host IO. A minimized old-build probe
+waited 1,949 ms for unrelated two-second IO; the repaired probe progresses before
+that IO completes in all three engines.
+
+Both original stack-overflow diagnostic tests then passed on Node v19. The
+interpreter's `const_fold` run still exhausted its configured 16 MiB C stack;
+raising only `LEAN_STACK_SIZE_KB` does not enlarge the compiler's main pthread.
+The v20 build therefore makes the main reservation configurable and defaults to
+64 MiB. The unchanged `const_fold` driver now passes in Node, including both AOT
+and interpreted execution. Deno also needs `--v8-flags=--stack-size=61440`:
+its worker option raises the OS reservation without raising V8's separate budget.
+That flag makes the exact generated benchmark executable pass. Its complete
+upstream rerun remains pending. Bun uses a fixed 4 MiB Linux worker stack in the
+pinned source and still fails this benchmark; alternative execution/compilation
+strategies have not been exhausted. None of these stack settings edits a test.
+
+The maintained prerequisite suite now passes **54/54 executions** across all three
+engines, including the concurrent host-IO/dynamic-loading reproduction and C++
+exceptions thrown by a dynamically loaded library and caught by its caller.
+The compiler retains the C/C++ runtime ABI, arithmetic helpers, and exception tag
+for plugins loaded after startup. Optional profiling archive members are not
+rooted in uninstrumented programs. See [the ABI and RPC evidence](evidence/full-engine-abi-rpc-2026-09-19.json).
+The v19 original FFI run passed precompilation, but failed C++ FFI on `__multi3`
+and reverse FFI on empty CMake shared-library placeholders. Both fixes are in v23
+and require the ongoing original-test rerun.
+
+Application linking now retains its actual entry point and linked shared-library
+imports instead of the entire compiler's export set. The unchanged `compile/534`
+program produces a 1.5 MiB Wasm executable and passes its upstream driver. The
+old build unnecessarily linked approximately 185 MiB into each application.
+
+The v20 Node regression passed **8/11**. HTTP early streaming and `instances`
+still fail. `pkg/test_extern` regressed because Leanc forwarded the larger main
+stack setting into a side-module link; v23 explicitly uses no private side-module
+stack. The v20 Deno regression passed **3/8**, with four engine-stack failures
+and that same side-module link error. All 7,267 original hashes remained unchanged
+in each run. The traced streaming derivative (kept separately under `.work`) still
+missed early response bytes; enlarging the preinitialized worker pool alone did
+not resolve it. Native `instances` used approximately 3.44 GiB RSS and passed;
+the full Wasm build's memory failure remains under investigation.
+
+Complete Deno and Bun runs on frozen v23 now cover **3,896 registrations each**
+(the standard 3,891 plus five explicitly identified exclusions). They use one
+CTest worker per engine, a 1,800-second harness deadline, and a shared file lock
+for unchanged fixed-port TCP/UDP tests. They have not completed. The earlier full
+Node v6 baseline also remains in progress; fixes in later snapshots do not alter
+its results retroactively.
 
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.

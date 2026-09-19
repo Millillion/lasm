@@ -9,7 +9,9 @@ const option = (name, fallback) => { const i = argv.indexOf(name); return i < 0 
 const engine = option('--engine', 'node');
 const defaults = {
   node: [process.execPath, []],
-  deno: [join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A']],
+  // Deno applies resourceLimits.stackSizeMb to the OS worker reservation but
+  // leaves V8's separate stack budget at its much smaller command-line default.
+  deno: [join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--stack-size=61440']],
   bun: [join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
 };
 if (!defaults[engine]) throw new Error('Use --engine node, deno, or bun');
@@ -45,7 +47,7 @@ export LASM_FULL_APP_PATH=${quote(path)}
 export LASM_FULL_ENTRYPOINT=${quote(name)}
 export LASM_FULL_TOOLCHAIN_CONFIG=${quote(join(output, 'toolchain.json'))}
 if [ -z "\${LEAN_CC+x}" ]; then export LEAN_CC=${quote(join(output, 'bin/clang'))}; fi
-export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-8192}"
+export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-65536}"
 export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-2}"
 exec ${[...runner, ...args].map(quote).join(' ')} "$@"
 `);
@@ -77,7 +79,7 @@ for (const [name, target] of Object.entries(links)) if (!existsSync(join(output,
 writeFileSync(join(output, 'toolchain.json'), JSON.stringify({ leanCommit, engine, executable, engineArgs, build, source, sdk, runtimeSupport,
   sourceBuild: snapshot?.sourceBuild ?? build,
   backend: 'full-lean-wasm64-lowered', nativeLeanFallback: false,
-  environmentAdjustments: { LEAN_SYSROOT: output, LASM_FULL_APP_PATH: 'Selected facade entry point', LEAN_STACK_SIZE_KB: '8192 unless explicitly supplied', LEAN_NUM_THREADS: '2 unless explicitly supplied' },
+  environmentAdjustments: { LEAN_SYSROOT: output, LASM_FULL_APP_PATH: 'Selected facade entry point', LEAN_STACK_SIZE_KB: '65536 unless explicitly supplied', LEAN_NUM_THREADS: '2 unless explicitly supplied' },
   externalTools: links,
 }, null, 2) + '\n');
 console.log(JSON.stringify({ engine, output, build }));

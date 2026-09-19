@@ -133,13 +133,22 @@ Lake, LeanIR, Leanc, and LeanChecker entry points all run Lean in that engine.
 They do not substitute native Lean tools on failure. External C compilation,
 archive, and SAT tools remain explicit subprocess dependencies, as in upstream.
 Full suites must run against frozen compiler builds; do not rebuild the selected
-artifact during a run. The facade defaults to two Lean workers and 8 MiB thread
-stacks unless explicitly overridden. Those resource settings belong to the parallel
+artifact during a run. The facade defaults to two Lean workers and 64 MiB application thread
+stacks unless explicitly overridden. `build.mjs --stack-mb` controls the compiler's
+main pthread reservation (default 64 MiB); changing `LEAN_STACK_SIZE_KB` alone
+does not resize that main stack. Node and Deno's separate engine worker stacks
+reserve 64 MiB through `LASM_VM_STACK_MB`. Deno additionally receives
+`--v8-flags=--stack-size=61440` to raise its separate V8 budget while leaving
+native stack headroom. Bun currently ignores the Node
+worker resource-limit option, so the shim does not pass it there. These resource settings belong to the parallel
 harness, not upstream tests. Run complete suites in sequence when their fixed-port
-network tests could otherwise collide.
+network tests could otherwise collide, or pass the same `--network-lock` path to
+`prepare-suite.mjs` for each engine. That Linux harness option serializes the
+original fixed-port TCP/UDP drivers with `flock`; it does not rewrite their ports.
 
 The host bridge transfers requests from Wasm pthreads to the JavaScript main
-thread through message ports. Waiting pthreads use Atomics while the main event
+thread through message ports. Waiting pthreads use Emscripten's futex API, which
+services dynamic-loader synchronization mailboxes while the main event
 loop continues serving asynchronous operations. `configure-host.mjs` records each
 replaced runtime definition and keeps Lean's native scheduler, mutexes, and
 thread-local finalizer ordering. This is still experimental: full-suite results,
@@ -154,6 +163,12 @@ lowered memory64 and preserves BigInt conversion for dynamically loaded symbols.
 The regression allocates a high-address pthread stack and calls the host clock
 with a high-address output buffer in all three engines. It does not change a Lean
 test or raise a test's expected limits.
+
+The maintained engine probes also load a library while another pthread waits on
+host IO, and throw/catch C++ exceptions across a dynamically loaded module
+boundary. Runtime ABI exports and the exception tag must remain available for
+plugins unknown at compiler link time. These checks distinguish ABI support from
+merely compiling a side module successfully.
 
 The compiler's generated C declarations also supply a sorted symbol-address table
 inside Wasm. This lets the interpreter find compiled Lean functions without

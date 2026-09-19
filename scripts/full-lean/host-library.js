@@ -21,6 +21,7 @@ addToLibrary({
       emit(base, LDSO.loadedLibsByHandle[key].name);
     }
   },
+  $lasmFullRPC__deps: ['malloc', 'free', 'emscripten_futex_wait'],
   $lasmFullRPC: {
     response: new Uint8Array(0),
     call: function (kind, operation, handle, argument, input, length) {
@@ -32,7 +33,13 @@ addToLibrary({
         nativeThreadId = require(path)();
       }
       var channel = new wt.MessageChannel();
-      var signal = new Int32Array(new SharedArrayBuffer(4));
+      // Wait through Emscripten's futex implementation, which also services the
+      // pthread mailbox. A raw Atomics.wait on a separate buffer starves dylink
+      // synchronization indefinitely when this thread waits for host IO.
+      var signalPointer = _malloc({{{ to64('4') }}});
+      if (!signalPointer) throw new Error('Cannot allocate Lean host wait signal');
+      var signal = new Int32Array(wasmMemory.buffer, Number(signalPointer), 1);
+      Atomics.store(signal, 0, 0);
       var bytes = length ? HEAPU8.slice(Number(input), Number(input) + length) : new Uint8Array(0);
       // CMD_CALL_HANDLER is Emscripten 6.0.9's documented-in-source dispatch to a
       // Module callback. Transfer the reply port, never the Wasm memory itself.
@@ -41,10 +48,14 @@ addToLibrary({
         thread: Number(_pthread_self()),
         nativeThreadId,
       }] }, [channel.port2]);
-      while (Atomics.load(signal, 0) === 0) Atomics.wait(signal, 0, 0);
       var packet;
-      while (!(packet = wt.receiveMessageOnPort(channel.port1))) Atomics.wait(signal, 0, 1, 1);
-      channel.port1.close();
+      try {
+        while (Atomics.load(signal, 0) === 0) _emscripten_futex_wait(signalPointer, 0, Infinity);
+        while (!(packet = wt.receiveMessageOnPort(channel.port1))) _emscripten_futex_wait(signalPointer, 1, 1);
+      } finally {
+        channel.port1.close();
+        _free(signalPointer);
+      }
       if (packet.message.failure) throw new Error(packet.message.failure);
       return packet.message;
     },
