@@ -25,23 +25,26 @@ const snapshot = existsSync(join(build, 'snapshot.json')) ? JSON.parse(readFileS
 const runtimeSupport = snapshot ? join(build, 'runtime-support') : join(root, 'scripts/full-lean');
 for (const path of [executable, join(build, 'bin/lean.js'), join(build, 'bin/lean.wasm')])
   if (!existsSync(path)) throw new Error(`Missing full compiler prerequisite: ${path}`);
+if (!/^LASM_LINK_TOOLS:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8')))
+  throw new Error('The selected compiler must include the original tool entry points (build --stage wasm64)');
 mkdirSync(join(output, 'bin'), { recursive: true });
 const quote = text => "'" + text.replaceAll("'", "'\\''") + "'";
 const runner = [executable, ...engineArgs, join(runtimeSupport, 'run-compiler.mjs'), '--prefix', build];
 const wrappers = {
   lean: [],
-  lake: ['--run', join(source, 'lake/LakeMain.lean')],
-  leanir: ['--run', join(source, 'LeanIR.lean')],
-  leanc: ['--run', join(build, 'leanc/Leanc.lean')],
-  leanchecker: ['--run', join(source, 'LeanChecker.lean')],
+  lake: [],
+  leanir: [],
+  leanc: [],
+  leanchecker: [],
 };
 for (const [name, args] of Object.entries(wrappers)) {
   const path = join(output, 'bin', name);
   writeFileSync(path, `#!/usr/bin/env bash
-export LEAN_SYSROOT=${quote(output)}
+if [ -z "\${LEAN_SYSROOT+x}" ]; then export LEAN_SYSROOT=${quote(output)}; fi
 export LASM_FULL_APP_PATH=${quote(path)}
+export LASM_FULL_ENTRYPOINT=${quote(name)}
 export LASM_FULL_TOOLCHAIN_CONFIG=${quote(join(output, 'toolchain.json'))}
-export LEAN_CC=${quote(join(output, 'bin/clang'))}
+if [ -z "\${LEAN_CC+x}" ]; then export LEAN_CC=${quote(join(output, 'bin/clang'))}; fi
 export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-8192}"
 export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-2}"
 exec ${[...runner, ...args].map(quote).join(' ')} "$@"

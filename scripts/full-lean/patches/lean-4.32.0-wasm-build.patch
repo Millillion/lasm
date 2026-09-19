@@ -1,6 +1,6 @@
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -172,8 +172,13 @@
+@@ -172,8 +172,14 @@
  
    # From https://emscripten.org/docs/compiling/WebAssembly.html#backends:
    # > The simple and safe thing is to pass all -s flags at both compile and link time.
@@ -8,6 +8,7 @@
 +  set(LASM_MEMORY64 "0" CACHE STRING "Emscripten memory mode: 0, 1, or lowered 2")
 +  option(LASM_HOST_BRIDGE "Use Lasm asynchronous host IO" OFF)
 +  option(LASM_LINK_LAKE "Link Lake into the full Wasm compiler" OFF)
++  option(LASM_LINK_TOOLS "Link original Lean tool entry points into Wasm" OFF)
 +  set(LASM_WASM_LINK_OPTIMIZATION "-O1" CACHE STRING "Wasm link optimization for development iterations")
 +  set(EMSCRIPTEN_SETTINGS "-s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=${LASM_MEMORY64} -fwasm-exceptions -pthread")
    string(APPEND LEANC_EXTRA_CC_FLAGS " -pthread")
@@ -15,7 +16,7 @@
    string(APPEND LEAN_EXTRA_CXX_FLAGS " -D LEAN_EMSCRIPTEN ${EMSCRIPTEN_SETTINGS}")
    string(APPEND LEAN_EXTRA_LINKER_FLAGS " ${EMSCRIPTEN_SETTINGS}")
  endif()
-@@ -486,6 +491,9 @@
+@@ -486,6 +492,9 @@
  endif()
  
  set(LEAN_CXX_STDLIB "-lstdc++" CACHE STRING "C++ stdlib linker flags")
@@ -25,7 +26,7 @@
  
  if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
    set(LEAN_CXX_STDLIB "-lc++")
-@@ -622,7 +630,7 @@
+@@ -622,7 +631,7 @@
  # Git HASH
  if(USE_GITHASH)
    include(GetGitRevisionDescription)
@@ -34,7 +35,7 @@
    if(GIT_SHA1 MATCHES "GITDIR-NOTFOUND")
      message(STATUS "Failed to read git_sha1")
      set(GIT_SHA1 "")
-@@ -733,6 +741,10 @@
+@@ -733,6 +742,10 @@
  add_subdirectory(initialize)
  add_subdirectory(shell)
  
@@ -45,7 +46,7 @@
  # The relative path doesn't work once the CMakeLists.txt files have been copied into the stage0 dir.
  # Since stage0 needs no tests, we just ignore them instead of fixing the path.
  if(NOT STAGE EQUAL 0)
-@@ -812,6 +824,20 @@
+@@ -812,6 +825,36 @@
    set_target_properties(leancpp PROPERTIES OUTPUT_NAME leancpp)
  endif()
  
@@ -58,6 +59,22 @@
 +  string(APPEND LEAN_EXE_LINKER_FLAGS " ${CMAKE_BINARY_DIR}/lib/lean/liblasmnative.a")
 +endif()
 +
++if(CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND LASM_LINK_TOOLS)
++  set(LASM_TOOL_SOURCES)
++  foreach(tool LakeMain Leanc LeanIR LeanChecker)
++    set(tool_source "${CMAKE_BINARY_DIR}/generated-tool-c/${tool}.c")
++    if(NOT EXISTS "${tool_source}")
++      file(WRITE "${tool_source}" "/* Filled by prepare-native64.mjs before compilation. */\n")
++    endif()
++    list(APPEND LASM_TOOL_SOURCES "${tool_source}")
++  endforeach()
++  add_library(lasmtools STATIC ${LASM_TOOL_SOURCES})
++  target_compile_options(lasmtools PRIVATE -pthread -fwasm-exceptions "-sMEMORY64=${LASM_MEMORY64}")
++  target_compile_definitions(leanmain PRIVATE LASM_FULL_TOOLS=1)
++  add_dependencies(lean lasmtools)
++  string(APPEND LEAN_EXE_LINKER_FLAGS " ${CMAKE_BINARY_DIR}/lib/lean/liblasmtools.a")
++endif()
++
 +if(CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND LASM_HOST_BRIDGE)
 +  include("${LEAN_SOURCE_DIR}/lasm/host.cmake")
 +  string(APPEND LEAN_EXE_LINKER_FLAGS " -Wl,--whole-archive ${CMAKE_BINARY_DIR}/lib/lean/liblasmhost.a -Wl,--no-whole-archive --pre-js ${LEAN_SOURCE_DIR}/lasm/host-pre.js --js-library ${LEAN_SOURCE_DIR}/lasm/host-library.js")
@@ -66,7 +83,7 @@
  if(STAGE GREATER 0 AND CADICAL AND INSTALL_CADICAL)
    add_custom_target(
      copy-cadical
-@@ -845,7 +871,7 @@
+@@ -845,7 +888,7 @@
    # in this file.
    string(
      APPEND LEAN_EXE_LINKER_FLAGS
@@ -75,7 +92,7 @@
    )
  endif()
  
-@@ -865,6 +891,9 @@
+@@ -865,6 +908,9 @@
  )
  if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
    list(APPEND STDLIBS Lake LeanChecker)
@@ -85,7 +102,7 @@
  endif()
  
  add_custom_target(
-@@ -898,7 +927,7 @@
+@@ -898,7 +944,7 @@
    add_custom_target(
      leanshared
      ALL
@@ -94,7 +111,7 @@
      COMMAND touch ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libleanshared_2${CMAKE_SHARED_LIBRARY_SUFFIX}
      COMMAND touch ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libleanshared_1${CMAKE_SHARED_LIBRARY_SUFFIX}
      COMMAND touch ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libleanshared${CMAKE_SHARED_LIBRARY_SUFFIX}
-@@ -975,8 +1004,10 @@
+@@ -975,8 +1021,10 @@
  
  # use Bash version for building, use Lean version in bin/ for tests & distribution
  configure_file("${LEAN_SOURCE_DIR}/bin/leanc.in" "${CMAKE_BINARY_DIR}/leanc.sh" @ONLY)
@@ -351,12 +368,19 @@
      );
 --- a/src/stdlib.make.in
 +++ b/src/stdlib.make.in
-@@ -185,9 +185,13 @@
+@@ -185,9 +185,20 @@
  
  lake: $(OUTBIN)/lake$(EXE)
  
 +ifeq "${CMAKE_SYSTEM_NAME}" "Emscripten"
 +$(OUTBIN)/lean$(EXE): ${LIB}/temp/libleanmain.a ${LIB}/temp/libleanshell.a $(OUTLIB)/libleancpp.a $(OUTLIB)/libInit.a $(OUTLIB)/libStd.a $(OUTLIB)/libLean.a $(OUTLIB)/libleanrt.a $(OUTLIB)/liblasmnative.a
++$(OUTBIN)/lean$(EXE): ${CMAKE_BINARY_DIR}/stdlib.make ${CMAKE_BINARY_DIR}/lasm-link-inputs.json ${CMAKE_BINARY_DIR}/lasm-wasm-exports.json ${LEAN_SOURCE_DIR}/lasm-emscripten-pre.js
++ifeq "${LASM_HOST_BRIDGE}" "ON"
++$(OUTBIN)/lean$(EXE): $(OUTLIB)/liblasmhost.a ${LEAN_SOURCE_DIR}/lasm/host-pre.js ${LEAN_SOURCE_DIR}/lasm/host-library.js
++endif
++ifeq "${LASM_LINK_TOOLS}" "ON"
++$(OUTBIN)/lean$(EXE): $(OUTLIB)/liblasmtools.a
++endif
 +else
  $(OUTBIN)/lean$(EXE): $(OUTLIB)/libInit_shared$(SO) $(OUTLIB)/libleanshared_2$(SO) $(OUTLIB)/libleanshared_1$(SO) $(OUTLIB)/libleanshared$(SO) ${LIB}/temp/libleanmain.a
 -	$(link-preamble)
@@ -499,3 +523,30 @@
      HANDLE proc = GetCurrentProcess();
      std::vector<HMODULE> mods(128);
      DWORD needed;
+--- a/src/shell/lean.cpp
++++ b/src/shell/lean.cpp
+@@ -11,6 +11,24 @@
+ 
+ extern "C" int lean_main(int argc, char ** argv);
+ 
++#ifdef LASM_FULL_TOOLS
++#include <cstdlib>
++#include <cstring>
++extern "C" int lasm_tool_lake_main(int, char **);
++extern "C" int lasm_tool_leanc_main(int, char **);
++extern "C" int lasm_tool_leanir_main(int, char **);
++extern "C" int lasm_tool_leanchecker_main(int, char **);
++#endif
++
+ int main(int argc, char ** argv) {
++#ifdef LASM_FULL_TOOLS
++    char const *tool = std::getenv("LASM_FULL_ENTRYPOINT");
++    if (tool) {
++        if (!std::strcmp(tool, "lake")) return lasm_tool_lake_main(argc, argv);
++        if (!std::strcmp(tool, "leanc")) return lasm_tool_leanc_main(argc, argv);
++        if (!std::strcmp(tool, "leanir")) return lasm_tool_leanir_main(argc, argv);
++        if (!std::strcmp(tool, "leanchecker")) return lasm_tool_leanchecker_main(argc, argv);
++    }
++#endif
+     return lean_main(argc, argv);
+ }

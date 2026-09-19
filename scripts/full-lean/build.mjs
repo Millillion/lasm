@@ -59,6 +59,12 @@ if (stage === 'native32') {
   run(join(native, 'bin/lean'), ['--version']);
 }
 if (stage === 'wasm' || stage === 'wasm64') {
+  mkdirSync(wasm, { recursive: true });
+  // Make cannot otherwise see SDK JavaScript library changes. Include the
+  // reviewed patch identity in the executable's actual link dependencies.
+  const linkInputs = join(wasm, 'lasm-link-inputs.json');
+  const linkContents = JSON.stringify({ emscripten: '6.0.9', sdkPatchSha256 }) + '\n';
+  if (!existsSync(linkInputs) || readFileSync(linkInputs, 'utf8') !== linkContents) writeFileSync(linkInputs, linkContents);
   const is64 = stage === 'wasm64';
   const previous = is64 ? resolveLean(root).prefix : native;
   if (!existsSync(join(previous, 'bin/lean'))) throw new Error('Build --stage native32 first');
@@ -69,7 +75,7 @@ if (stage === 'wasm' || stage === 'wasm64') {
     '-DSTAGE=1', `-DPREV_STAGE=${previous}`, '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
     '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG', '-DCHECK_OLEAN_VERSION=ON', '-DLEAN_EXTRA_OPTS=-j2 -s8192',
     '-DLASM_HOST_BRIDGE=ON', `-DLASM_WASM_LINK_OPTIMIZATION=${linkOptimization}`,
-    ...(is64 ? ['-DUSE_GMP=ON', `-DGMP_INSTALL_PREFIX=${gmp}`, '-DCMAKE_C_FLAGS=-sMEMORY64=2', '-DLASM_MEMORY64=2', '-DLASM_LINK_LAKE=ON',
+    ...(is64 ? ['-DUSE_GMP=ON', `-DGMP_INSTALL_PREFIX=${gmp}`, '-DCMAKE_C_FLAGS=-sMEMORY64=2', '-DLASM_MEMORY64=2', '-DLASM_LINK_LAKE=ON', '-DLASM_LINK_TOOLS=ON',
       `-DEXTRA_LEANMAKE_OPTS=C_ONLY=1 C_OUT=${join(wasm, 'generated-c')} OBJS=`] : ['-DLASM_MEMORY64=0']),
   ]);
   if (is64) run(process.execPath, [join(root, 'scripts/full-lean/prepare-native64.mjs'), wasm, source]);
@@ -77,5 +83,6 @@ if (stage === 'wasm' || stage === 'wasm64') {
     { ...process.env, LEAN_STACK_SIZE_KB: '8192' });
   run(process.execPath, [join(root, 'scripts/full-lean/generate-exports.mjs'), wasm]);
   run('cmake', ['--build', wasm, '--target', 'lasmnative', '-j', String(jobs)]);
+  if (is64) run('cmake', ['--build', wasm, '--target', 'lasmtools', '-j', String(jobs)]);
   run('cmake', ['--build', wasm, '--target', 'lean', '-j', String(jobs)], { ...process.env, LEAN_STACK_SIZE_KB: '8192' });
 }

@@ -72,10 +72,15 @@ for (const entry of inventory.tests) {
 const lines = registered.flatMap(entry => {
   const result = [`add_test(${cmakeQuote(entry.name)} ${entry.command.map(cmakeQuote).join(' ')})`];
   for (const property of entry.properties ?? []) {
-    if (!['WORKING_DIRECTORY','RUN_SERIAL','WILL_FAIL','DISABLED','PASS_REGULAR_EXPRESSION','FAIL_REGULAR_EXPRESSION','ENVIRONMENT'].includes(property.name)) continue;
+    if (!['WORKING_DIRECTORY','RUN_SERIAL','WILL_FAIL','DISABLED','PASS_REGULAR_EXPRESSION','FAIL_REGULAR_EXPRESSION'].includes(property.name)) continue;
     const value = Array.isArray(property.value) ? property.value.join(';') : String(property.value);
     result.push(`set_tests_properties(${cmakeQuote(entry.name)} PROPERTIES ${property.name} ${cmakeQuote(value)})`);
   }
+  const existingEnvironment = entry.properties?.find(property => property.name === 'ENVIRONMENT')?.value ?? [];
+  const testEnvironment = [...(Array.isArray(existingEnvironment) ? existingEnvironment : [existingEnvironment]), 'LASM_UPSTREAM_TEST=' + entry.name];
+  // CTest's script reader supports set_tests_properties, not CMake's TEST
+  // set_property registry. Preserve upstream variables in the same property.
+  result.push(`set_tests_properties(${cmakeQuote(entry.name)} PROPERTIES ENVIRONMENT ${cmakeQuote(testEnvironment.join(';'))})`);
   result.push(`set_tests_properties(${cmakeQuote(entry.name)} PROPERTIES TIMEOUT ${timeout})`);
   return result;
 });
@@ -84,6 +89,7 @@ writeFileSync(join(output,'parallel-suite.json'),JSON.stringify({leanCommit,back
   registered:registered.length,timeoutSeconds:timeout,testSourceHashes:hashesFile,
   changes:['Generated environment points to the selected toolchain and isolated source copy.',
     'LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.',
+    'Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.',
     ...(archiveTool ? [`MAKEFLAGS supplies LEAN_AR=${archiveTool} instead of the release builder path embedded in lean.mk.`] : []),
     'CTest timeout is explicit; no test or expected-output source is edited.'],
   execution,tests:registered},null,2)+'\n');

@@ -34,10 +34,26 @@ for (const { path, moduleRoot } of modules) {
   }
   audit.push({ module, sourceSha256: stamp.split('\n')[0], cSha256: hash(readFileSync(destination)) });
 }
-for (const [module, path] of [['LeanIR', join(source, 'src/LeanIR.lean')], ['Leanc', join(build, 'leanc/Leanc.lean')], ['LakeMain', join(source, 'src/lake/LakeMain.lean')]]) {
+const toolModules = [['LeanIR', join(source, 'src/LeanIR.lean')], ['Leanc', join(build, 'leanc/Leanc.lean')],
+  ['LakeMain', join(source, 'src/lake/LakeMain.lean')], ['LeanChecker', join(source, 'src/LeanChecker.lean')]];
+for (const [module, path] of toolModules) {
   const destination = join(generated, module + '.c');
   execFileSync(native.lean, ['-R', dirname(path), '-Dcompiler.postponeCompile=false', '-c', destination, path], { stdio: 'inherit' });
   audit.push({ module, sourceSha256: hash(readFileSync(path)), cSha256: hash(readFileSync(destination)) });
+  // Preserve each generated program's real main and initialization sequence.
+  // Namespacing its local exported declarations allows all tools to share one
+  // Wasm binary without colliding on their generated `_lean_main` symbols.
+  const tool = { LeanIR: 'leanir', Leanc: 'leanc', LakeMain: 'lake', LeanChecker: 'leanchecker' }[module];
+  const globals = [...readFileSync(destination, 'utf8').matchAll(/^LEAN_EXPORT\s+(?:const\s+)?(?:lean_object\s*\*|uint\d+_t|size_t|double|float|void)\s+((?:l_|_lean_main)[A-Za-z0-9_]*)/gm)]
+    .map(match => match[1]);
+  const wrapper = [`// Generated tool entry from ${module}; original generated C is unchanged.`,
+    `#define main lasm_tool_${tool}_main`,
+    `#define run_main lasm_tool_${tool}_run_main`,
+    ...[...new Set(globals)].map(name => `#define ${name} lasm_tool_${tool}_${name}`),
+    `#include ${JSON.stringify(destination)}`, ''].join('\n');
+  const toolDirectory = join(build, 'generated-tool-c'); mkdirSync(toolDirectory, { recursive: true });
+  const wrapperPath = join(toolDirectory, module + '.c');
+  if (!existsSync(wrapperPath) || readFileSync(wrapperPath, 'utf8') !== wrapper) writeFileSync(wrapperPath, wrapper);
 }
 // Keep compiler data and generated Wasm archives separate. Individual symlinks
 // leave all writes in this build directory; installed native files stay intact.

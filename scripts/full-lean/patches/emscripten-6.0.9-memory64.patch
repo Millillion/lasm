@@ -25,3 +25,15 @@
            start >>>= 0;
            stop >>>= 0;
  #else
+--- a/src/lib/libpthread.js
++++ b/src/lib/libpthread.js
+@@ -610,6 +610,9 @@
+     worker.onmessage = (e) => {
+ #if ASSERTIONS
+       var cmd = e.data.cmd;
++      // Joined/detached pthreads may finish concurrently with process exit.
++      // Their normal completion packets can already be queued at terminate().
++      if (cmd === {{{ CMD_CLEANUP_THREAD }}} || cmd === {{{ CMD_MARK_AS_FINISHED }}}) return;
+       err(`received "${cmd}" command from terminated worker: ${worker.workerID}`);
+ #endif
+     };

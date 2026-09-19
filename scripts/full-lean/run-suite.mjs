@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, existsSync, createWriteStream } from 'node
 import { resolve, join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { cleanupTestProcesses } from './cleanup-processes.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
@@ -37,18 +38,47 @@ if (args.includes('--rerun-failed')) command.push('--rerun-failed');
 const filter = option('--filter');
 if (filter) command.push('-R', filter);
 const startedAt = new Date().toISOString();
+const runId = `${directory}:${startedAt}:${process.pid}`;
+env.LASM_UPSTREAM_RUN_ID = runId;
 const log = createWriteStream(join(directory, 'execution.log'));
 const child = spawn('ctest', command, { env, stdio: ['ignore', 'pipe', 'pipe'] });
-child.stdout.on('data', bytes => { log.write(bytes); process.stdout.write(bytes); });
+let partialLine = '';
+const finishedTests = new Set();
+const cleanup = [];
+let previouslyFinished = new Set();
+child.stdout.on('data', bytes => {
+  log.write(bytes); process.stdout.write(bytes);
+  partialLine += bytes.toString();
+  const lines = partialLine.split('\n'); partialLine = lines.pop();
+  for (const line of lines) {
+    const match = line.match(/^\s*\d+\/\d+\s+Test\s+#\d+:\s+(.+?)\s+\.{2,}/);
+    if (match) finishedTests.add(match[1]);
+  }
+});
+const cleanupTimer = setInterval(() => {
+  cleanup.push(...cleanupTestProcesses(runId, previouslyFinished, 'SIGKILL'));
+  cleanup.push(...cleanupTestProcesses(runId, finishedTests));
+  previouslyFinished = new Set(finishedTests);
+}, 5000);
+for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));
 child.stderr.on('data', bytes => { log.write(bytes); process.stderr.write(bytes); });
 const result = await new Promise((resolve, reject) => {
   child.once('error', reject);
   child.once('close', (code, signal) => resolve({ code, signal }));
 });
+clearInterval(cleanupTimer);
+cleanup.push(...cleanupTestProcesses(runId));
+// Failed drivers can leave a process handling SIGTERM. Give it time to close its
+// sockets, then remove only processes still carrying this exact suite run tag.
+if (cleanup.length) {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  cleanup.push(...cleanupTestProcesses(runId, undefined, 'SIGKILL'));
+}
 await new Promise(resolve => log.end(resolve));
 const after = verify();
 writeFileSync(join(directory, 'execution.json'), JSON.stringify({ startedAt, finishedAt: new Date().toISOString(),
   backend: manifest.backend, registered: manifest.registered, command, result, originalSources: { before, after },
+  leftoverProcessCleanup: cleanup,
   environment: 'Explicit host context; Git signing disabled and test identity supplied; no compiler overrides.',
 }, null, 2) + '\n');
 if (after.modified.length) console.error(`Upstream test drivers changed original files: ${after.modified.join(', ')}`);

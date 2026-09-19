@@ -10,7 +10,7 @@ const config = JSON.parse(readFileSync(process.env.LASM_FULL_TOOLCHAIN_CONFIG));
 const original = process.argv.slice(2);
 const compileOnly = original.some(arg => ['-c', '-E', '-S', '-fsyntax-only', '--version', '-dumpmachine', '-print-search-dirs'].includes(arg));
 const shared = original.includes('-shared');
-const driver = join(config.sdk, 'upstream/emscripten', process.env.LASM_CC_LANGUAGE === 'c++' || !compileOnly ? 'em++' : 'emcc');
+const driver = join(config.sdk, 'upstream/emscripten', process.env.LASM_CC_LANGUAGE === 'c++' ? 'em++' : 'emcc');
 let output = 'a.out';
 let explicitOutput = false;
 const args = [];
@@ -28,6 +28,9 @@ for (let i = 0; i < original.length; i++) {
   else args.push(arg);
 }
 args.push('-sMEMORY64=2', '-pthread', '-fwasm-exceptions');
+// Preserve C input semantics while linking the Lean C++ runtime. Emscripten's
+// C++ driver otherwise reclassifies .c inputs, even with per-input -x flags.
+if (!compileOnly) args.push('-sDEFAULT_TO_CXX=1', '-Wno-experimental', '-Wno-pthreads-mem-growth');
 if (compileOnly) {
   if (explicitOutput) args.push('-o', output);
 } else if (shared) {

@@ -21,6 +21,7 @@ const variants = [
   { name: 'threads64', source: 'threads', memory: 2, expected: 'caught exception\npthread joined\n' },
   { name: 'host64', source: 'host', memory: 2, expected: 'asynchronous host bridge joined four threads\n' },
   { name: 'highmemory64', source: 'highmemory', memory: 2, expected: 'pthread and host access above 2 GiB passed\n' },
+  { name: 'shutdown64', source: 'shutdown', memory: 2, repeats: 10, expected: 'thread shutdown passed\n' },
 ];
 for (const variant of variants) {
   const compiled = join(output, variant.name + '.cjs');
@@ -38,16 +39,19 @@ for (const variant of variants) {
   assert.equal(build.status, 0, build.error?.message ?? build.stderr);
 for (const [name, executable, prefix] of engines) {
   const version = spawnSync(executable, ['--version'], { encoding: 'utf8' }).stdout.trim();
+for (let repetition = 1; repetition <= (variant.repeats ?? 1); repetition++) {
   const execution = spawnSync(executable, [...prefix, compiled, join(output, `${variant.name}-${name}-λ.bin`)],
     { encoding: 'utf8', timeout: 60_000, env: { ...process.env, LASM_PROBE_EMPTY: '',
       LASM_FULL_HOST_MODULE: new URL('../../src/node-host.mjs', import.meta.url).href } });
-  results.push({ name, variant: variant.name, expected: variant.expected, executable, version, status: execution.status, signal: execution.signal,
+  results.push({ name, variant: variant.name, repetition, expected: variant.expected, executable, version, status: execution.status, signal: execution.signal,
     stdout: execution.stdout, stderr: execution.stderr, error: execution.error?.message });
+}
 }
 }
 writeFileSync(join(output, 'results.json'), JSON.stringify({ testedAt: new Date().toISOString(), results }, null, 2) + '\n');
 for (const result of results) {
   assert.equal(result.status, 0, `${result.name}: ${result.error ?? result.stderr}`);
   assert.equal(result.stdout, result.expected, result.name);
+  assert.equal(result.stderr, '', `${result.name}: unexpected runtime diagnostics`);
   console.log(`${result.name}: ${result.variant} passed`);
 }

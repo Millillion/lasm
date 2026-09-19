@@ -1,13 +1,12 @@
 // Emscripten JavaScript library. A Lean pthread waits while the JavaScript main
 // thread continues serving asynchronous filesystem, process, and network calls.
 addToLibrary({
-  lasm_collect_loaded_libraries__deps: ['$LDSO', '$getWasmTableEntry', '$stringToNewUTF8', 'free'],
+  lasm_collect_loaded_libraries__deps: ['$LDSO', '$dynCall', '$stringToNewUTF8', 'free'],
   lasm_collect_loaded_libraries__sig: 'vpp',
   lasm_collect_loaded_libraries: function (context, callback) {
-    var visit = getWasmTableEntry(Number(callback));
     var emit = (base, name) => {
       var pointer = stringToNewUTF8(name);
-      visit({{{ to64('context') }}}, {{{ to64('base') }}}, {{{ to64('pointer') }}});
+      dynCall('vppp', callback, [context, base, pointer]);
       _free({{{ to64('pointer') }}});
     };
     // Wasm closures contain table indices, not ELF code addresses. Dynamic

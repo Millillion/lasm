@@ -147,8 +147,7 @@ not symbol counts or the presence of a wrapper, determine compatibility.
 
 The maintained build patch also fixes C++/Lean ABI declaration mismatches exposed
 by strict Wasm validation, retains initialized constants needed by the interpreter,
-and uses Emscripten's C++ link driver so exceptions remain available. The twelve
-engine probes use the same dynamic-module/thread settings, include exceptions,
+and links Emscripten's C++ runtime while preserving C source semantics. The engine probes use the same dynamic-module/thread settings, include exceptions,
 and check both value layouts plus concurrent asynchronous host calls and heap
 accesses above 2 GiB. The SDK patch enables unsigned JavaScript heap indexing for
 lowered memory64 and preserves BigInt conversion for dynamically loaded symbols.
@@ -166,3 +165,29 @@ ordinary task pool, so pending socket reads cannot consume every task worker.
 `freeze-build.mjs` snapshots compiler artifacts, runtime support scripts, and host
 modules before a suite run. Prepare a new toolchain output directory for each
 revision. Prior binaries and logs remain available for investigation.
+
+
+The full compiler includes the actual generated `LakeMain`, `Leanc`, `LeanIR`, and
+`LeanChecker` entry points. Each initializes its own runtime modules through its
+original compiled main. The tool facade selects an entry point with a private
+host environment value; no tool is replaced with native Lean. Reinterpreting the
+Lake entry source had exposed missing runtime initialization; the real compiled
+entry point starts correctly in all three engines.
+
+The SDK patch also ignores only normal cleanup/finished notifications already
+queued when a pthread is terminated during process exit. Unexpected late messages
+still report an error. A separate build probe repeats detached-thread shutdown ten
+times in each engine and requires exactly empty stderr. The application C adapter
+uses the C input driver with C++ runtime linking, avoiding accidental C++ treatment
+of Lean's generated C. SDK notices about the chosen experimental link configuration
+are disabled in this adapter; source diagnostics remain enabled.
+
+Executable link dependencies include host archives, tool entry archives, generated
+exports, JavaScript libraries, configured make rules, and the reviewed SDK patch
+identity. A change to those inputs now actually relinks the compiler.
+
+The v6 complete Node run has a 900-second CTest deadline to allow for full Wasm
+compiler startup and C linking. The parallel harness tags each run/test in its
+environment and reaps leftover processes only after that exact test has finished.
+It does not change process lifecycle behavior inside a running test. This avoids
+failed LSP drivers exhausting memory through orphaned servers.

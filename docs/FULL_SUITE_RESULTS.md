@@ -29,9 +29,8 @@ driver during that failed attempt. No upstream source or expected output was
 edited to obtain a pass. The separate application
 runtime checks and earlier selected runtime audit retain their original scope.
 
-Twelve prerequisite probes pass: Wasm32 threads, 64-bit values with lowered memory
-accesses, asynchronous host calls from four concurrent Wasm threads, and pthread
-stacks plus host memory writes above 2 GiB, each in
+Forty-two prerequisite executions pass (including ten shutdown stress repetitions per engine): Wasm32 threads, 64-bit values with lowered memory
+accesses, asynchronous host calls from four concurrent Wasm threads, pthread stacks plus host memory writes above 2 GiB, and detached-thread shutdown without spurious stderr, each in
 Node 24.13.1, Deno 2.9.7, and Bun 1.4.2. These are build prerequisites, not upstream
 test-suite passes. See [the prerequisite evidence](evidence/full-engine-prerequisites-2026-09-19.json).
 
@@ -40,8 +39,13 @@ The repaired frozen Node build passes **6/6 unchanged upstream IO tests**:
 `async_tcp_server_client`, and `async_udp_sockets`. All 7,267 original file hashes
 remain unchanged for that run. See [the IO smoke evidence](evidence/full-node-io-smoke-2026-09-19.json).
 This verifies the actual Lean scheduler and ordinary TCP/UDP/timer APIs in Node;
-it is still only a subset. Lake startup and the external C compiler adapter
-remain under investigation, as do broader runtime and full-suite failures.
+it is still only a subset. The real compiled Lake entry point now starts in all three engines. The Node
+compiler and Leanc also generate and execute an ordinary Lean program through
+the Wasm C toolchain without spurious runtime or compiler diagnostics. These
+checks do not establish broader tool compatibility. A new complete Node run uses
+frozen build `wasm64-v6`, three CTest workers, and a documented 900-second deadline.
+The initial registration error in the generated harness is retained separately;
+no test ran during that error.
 
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.

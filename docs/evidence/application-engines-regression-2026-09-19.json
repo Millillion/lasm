@@ -1,0 +1,14 @@
+{
+  "scope": "Application runtime regression, not full Lean compiler suite",
+  "engines": [
+    "Node 24.13.1",
+    "Deno 2.9.7",
+    "Bun 1.4.2"
+  ],
+  "passed": 6,
+  "failed": 0,
+  "originalLog": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/application-regression-final.log",
+  "logSha256": "9cbcec222cf89cec6721d5b2b2dac280b95522021780305b29074e5a7d32e642",
+  "runtimeMilestoneCommit": "669ee16",
+  "notes": "Runs after adding the UDP host module to built artifacts and fixing cache stamps for inputs changed during compilation."
+}
