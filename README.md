@@ -1,6 +1,6 @@
 # Lasm compiler
 
-Lasm compiles Lean programs to WebAssembly modules callable from Node.js,
+Lasm compiles Lean programs to WebAssembly modules callable from Node.js, Deno, Bun,
 browsers, and Cloudflare Workers. It uses Lean's actual object and arbitrary-integer
 runtime, with typed JavaScript bindings. Node applications can use ordinary Lean
 console, filesystem, async tasks, and `Std.Http.Server` APIs.
@@ -17,6 +17,7 @@ The initial design discussion is the
 The full displayed conversation has been reviewed and its key claims tested.
 
 - [Run ordinary Lean mains and HTTP servers in Node](docs/NODE_APPS.md)
+- [Node, Deno, and Bun launchers and verified scope](docs/JS_ENGINES.md)
 - [Complete Lean HTTP server and Vitest tests](examples/lean-server/README.md)
 - [Accepted implementation plan](docs/PLAN.md)
 - [Developer workflow: Lake and Node projects](docs/DEVELOPER_WORKFLOW.md)
@@ -45,7 +46,7 @@ node --input-type=module -e "import createModule from './examples/basic/dist/ind
 Run the new complete Lean application with:
 
 ```sh
-node node-shim.js examples/lean-server/Main.lean
+node lasm-node.js examples/lean-server/Main.lean
 # After installing the compiler package in your own project:
 npx lasm run Main.lean
 npx lasm build Main.lean dist

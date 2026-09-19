@@ -1,10 +1,11 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync, rmSync, mkdirSync, renameSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
 import { buildPlatforms, bundledTools, executableName, insideDirectory, responseFile } from './platform.mjs';
+import { engineName, scriptArguments } from './js-engine.mjs';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const lean = process.env.LEAN ?? executableName('lean');
@@ -22,7 +23,7 @@ export function assertPlatform(platform = process.platform, architecture = proce
   if (!buildPlatforms.includes(`${platform}-${architecture}`)) {
     throw new Error(`Lasm requires a 64-bit Linux, macOS, or Windows host; received ${platform}-${architecture}`);
   }
-  if (Number(process.versions.node.split('.')[0]) < 24) throw new Error('Lasm requires Node.js 24 or newer');
+  if (engineName() === 'node' && Number(process.versions.node.split('.')[0]) < 24) throw new Error('Lasm requires Node.js 24 or newer');
 }
 
 export function assertLeanCommit(commit) {
@@ -125,9 +126,20 @@ export function optimizeWasm(input, output) {
   if (existsSync(bundled)) {
     const metadata = JSON.parse(readFileSync(join(root, 'tools/tooling.json')));
     if (metadata.binaryen !== '132.0.0' || metadata.sha256 !== sha256(readFileSync(bundled))) throw new Error('Packaged Binaryen checksum mismatch');
-    return run(process.execPath, [bundled, ...args], options);
+    return run(process.execPath, scriptArguments(bundled, args, { commonJS: true }), options);
   }
   if (existsSync(join(root, 'targets'))) throw new Error('Packaged Binaryen optimizer is missing; reinstall the complete compiler package');
-  const binaryen = fileURLToPath(new URL('./bin/wasm-opt', import.meta.resolve('binaryen')));
-  return run(process.execPath, [binaryen, ...args], options);
+  let binaryen = fileURLToPath(new URL('./bin/wasm-opt', import.meta.resolve('binaryen')));
+  if (engineName() === 'deno') {
+    // Binaryen's extensionless CLI is CommonJS. Deno treats that package entry
+    // as ESM; the release package already gives the identical bytes a .cjs name.
+    const bytes = readFileSync(binaryen);
+    binaryen = join(root, '.cache/lasm-runtime/tools', `wasm-opt-${sha256(bytes)}.cjs`);
+    if (!existsSync(binaryen)) {
+      mkdirSync(dirname(binaryen), { recursive: true });
+      const temporary = `${binaryen}.${process.pid}.tmp`;
+      writeFileSync(temporary, bytes); renameSync(temporary, binaryen);
+    }
+  }
+  return run(process.execPath, scriptArguments(binaryen, args, { commonJS: true }), options);
 }

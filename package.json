@@ -25,10 +25,11 @@
     "test:platform": "node --test test/platform.test.mjs test/portable.test.mjs test/toolchain.test.mjs",
     "test:release": "node --test --test-concurrency=1 integration/release.test.mjs",
     "test:hosts": "node --test --test-concurrency=1 integration/hosts.test.mjs",
+    "test:engines": "node --test --test-concurrency=1 integration/engines.test.mjs",
     "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "test:jspi": "node --experimental-wasm-jspi test/io.test.mjs jspi",
     "build:lean-server": "node bin/lasm.mjs build examples/lean-server/Main.lean examples/lean-server/dist",
-    "start:lean-server": "node node-shim.js examples/lean-server/Main.lean",
+    "start:lean-server": "node lasm-node.js examples/lean-server/Main.lean",
     "test:lean-server": "vitest run --config examples/lean-server/vitest.config.mjs",
     "test:upstream": "node scripts/upstream-tests.mjs --suite http"
   },

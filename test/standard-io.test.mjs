@@ -35,7 +35,7 @@ test('standalone files need no module header, manifest, annotations or Lasm impo
   catch (error) { result = error; }
   assert.equal(result.code, 7);
   assert.equal(result.stdout, 'λ 日本語||a b\n');
-  await assert.rejects(exec(process.execPath, [join(root, 'node-shim.js'), file, 'λ 日本語', '', 'a b'], {
+  await assert.rejects(exec(process.execPath, [join(root, 'lasm-node.js'), file, 'λ 日本語', '', 'a b'], {
     cwd: root, timeout: 30_000,
   }), error => {
     assert.equal(error.code, 7);

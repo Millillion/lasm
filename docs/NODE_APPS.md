@@ -16,11 +16,12 @@ npx lasm build Main.lean dist
 node dist/main.mjs argument1 "argument two"
 ```
 
-In this repository, the same runner is `node node-shim.js Main.lean`.
+In this repository, the same runner is `node lasm-node.js Main.lean`.
+The [Deno and Bun launchers](JS_ENGINES.md) use the same application runtime.
 For a complete server, run:
 
 ```sh
-node node-shim.js examples/lean-server/Main.lean
+node lasm-node.js examples/lean-server/Main.lean
 ```
 
 A standalone file can be as small as:

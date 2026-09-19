@@ -7,7 +7,7 @@ The app uses `Std.Http.Server`, `Std.Async`, `Std.Mutex`, `IO.FS`, and an ordina
 From the compiler checkout (after `npm ci` and `npm run setup`):
 
 ```sh
-node node-shim.js examples/lean-server/Main.lean
+node lasm-node.js examples/lean-server/Main.lean
 ```
 
 Visit `http://127.0.0.1:3000/health`. The first run builds the application; later
@@ -16,7 +16,7 @@ The default data directory is `./data`, relative to the working directory.
 You can choose a port and directory:
 
 ```sh
-node node-shim.js examples/lean-server/Main.lean 3001 .work/todos
+node lasm-node.js examples/lean-server/Main.lean 3001 .work/todos
 ```
 
 With the compiler package installed in your project:

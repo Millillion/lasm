@@ -89,7 +89,7 @@ for (const path of ['bin', 'src', 'lean', 'docs']) cpSync(join(root, path), join
 });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 copyNativeBundle(root, join(staging, 'src'));
-copyFileSync(join(root, 'node-shim.js'), join(staging, 'node-shim.js'));
+for (const engine of ['node', 'deno', 'bun']) copyFileSync(join(root, `lasm-${engine}.js`), join(staging, `lasm-${engine}.js`));
 copyFileSync(join(root, 'IO_LIMITATIONS.md'), join(staging, 'IO_LIMITATIONS.md'));
 cpSync(join(root, 'examples/lean-server'), join(staging, 'examples/lean-server'), {
   recursive: true, filter: source => !relative(join(root, 'examples/lean-server'), source).split('/').some(part => ['.lake', 'dist', 'data', 'test'].includes(part)),
@@ -135,7 +135,7 @@ writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), referenceNotices(referen
   '\n=== Koffi 3.3.0 Node-API host adapters ===\n' + readFileSync(join(root, '.cache/native-host/node_modules/koffi/LICENSE.txt'), 'utf8'));
 const packageSpec = { name: sourcePackage.name, version: sourcePackage.version, private: true, license: 'UNLICENSED',
   type: 'module', description: sourcePackage.description, bin: sourcePackage.bin,
-  files: ['bin', 'src', 'lean', 'targets', 'tools', 'docs', 'examples', 'node-shim.js', 'README.md', 'IO_LIMITATIONS.md', 'THIRD_PARTY_NOTICES.txt'], os: ['linux', 'darwin', 'win32'], cpu: ['x64', 'arm64'],
+  files: ['bin', 'src', 'lean', 'targets', 'tools', 'docs', 'examples', 'lasm-node.js', 'lasm-deno.js', 'lasm-bun.js', 'README.md', 'IO_LIMITATIONS.md', 'THIRD_PARTY_NOTICES.txt'], os: ['linux', 'darwin', 'win32'], cpu: ['x64', 'arm64'],
   engines: sourcePackage.engines };
 writeFileSync(join(staging, 'package.json'), JSON.stringify(packageSpec, null, 2) + '\n');
 const packed = JSON.parse(run('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', directory, '--cache', join(root, '.cache/npm')], { cwd: staging }))[0];

@@ -6,7 +6,7 @@ needs no `Lasm.IO` imports. Start with [ordinary Node applications](NODE_APPS.md
 and the [complete Lean server](../examples/lean-server/README.md).
 
 ```sh
-node node-shim.js examples/lean-server/Main.lean
+node lasm-node.js examples/lean-server/Main.lean
 ```
 
 | Application | Interface | Backend |

@@ -6,6 +6,7 @@ import { build } from './build.mjs';
 import { findLakeProject } from './lake.mjs';
 import { root, targetName, resolveLean, run } from './toolchain.mjs';
 import { executableName } from './platform.mjs';
+import { engineName } from './js-engine.mjs';
 
 function fingerprint(directory, source, project) {
   const hash = createHash('sha256');
@@ -56,7 +57,7 @@ export async function buildMain(file, { output, rebuild = false, verbose = false
     if (previous?.signature === signature && Array.isArray(previous.files) && previous.files.every(name => existsSync(join(output, name))))
       return { output, cacheHit: true, signature };
   }
-  console.error(`Building ${relative(process.cwd(), source) || source} for Node…`);
+  console.error(`Building ${relative(process.cwd(), source) || source} for ${engineName()}…`);
   const config = join(cache, 'main.json');
   let module = 'LasmUserMain';
   if (project) {
