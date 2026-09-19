@@ -13,6 +13,12 @@ and [the full Lean server](examples/lean-server/README.md).
 The [upstream audit](docs/UPSTREAM_RESULTS.md) records all 620 selected runtime
 candidates, including every failure or unfinished compatibility gate. Lean's full
 native compiler/LSP/Lake test suite has not been ported to this Node runtime.
+The full-suite effort now has a [parallel upstream CTest harness](scripts/full-lean/README.md)
+with all 3,891 registrations and original-source integrity checks. Its native
+control run and full Wasm compiler build are in progress. Application checks now
+also pass in [Deno and Bun](docs/JS_ENGINES.md); full-suite conformance in all three
+engines remains unverified. No remaining implementation gap is being reclassified
+as fundamental merely because it needs further work.
 
 ## Standard API coverage
 
