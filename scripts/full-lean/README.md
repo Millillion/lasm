@@ -185,7 +185,7 @@ node scripts/full-lean/prepare-http-timing-probe.mjs .work/http-timing-probe 10
 `probe-host-memory.mjs` exercises the real synchronous/asynchronous bridge above
 2 GiB in all three engines and above 4 GiB in Node/Deno. Requests carry a numeric
 wait-signal offset: cloning a shared typed array truncates that offset in the
-pinned Node/Deno engines. `probe-build-cache.mjs` checks the actual generated
+pinned Node engine; Deno's corresponding control preserves it. `probe-build-cache.mjs` checks the actual generated
 make rules after a runtime-header change. `probe-stack-diagnostics.mjs` verifies
 the diagnostic and exit status for uncaught engine stack exhaustion.
 `prepare-http-timing-probe.mjs` creates a separate HTTP test derivative with

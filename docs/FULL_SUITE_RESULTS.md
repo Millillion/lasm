@@ -191,9 +191,10 @@ The v25 native-memory64 experiment failed both selected original Node tests:
 HTTP passed its first 21 cases but timed out on early streaming; `instances`
 stalled until the 1,800-second harness deadline. Its original-source hashes were
 unchanged. A minimized reproduction isolated the latter stall to the host bridge:
-Node 24.13.1 and Deno 2.9.7 truncate a cloned shared typed array's byte offset above
-4 GiB. An independent `structuredClone` control reproduces this without Lean or
-Emscripten. Sending the numeric offset and reconstructing the view in the receiving
+Node 24.13.1 truncates a cloned shared typed array's byte offset above 4 GiB.
+An independent `structuredClone` control reproduces this without Lean or
+Emscripten; Deno 2.9.7 preserves the same offset correctly. Sending the numeric
+offset and reconstructing the view in the receiving
 thread repairs the bridge. Synchronous requests, response copies, and asynchronous
 completion from several threads pass **5/5** checks: above 2 GiB in all three
 engines, and above 4 GiB in Node and Deno. The original `instances` rerun passed
