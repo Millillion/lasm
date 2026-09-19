@@ -137,8 +137,14 @@ The compiler retains the C/C++ runtime ABI, arithmetic helpers, and exception ta
 for plugins loaded after startup. Optional profiling archive members are not
 rooted in uninstrumented programs. See [the ABI and RPC evidence](evidence/full-engine-abi-rpc-2026-09-19.json).
 The v19 original FFI run passed precompilation, but failed C++ FFI on `__multi3`
-and reverse FFI on empty CMake shared-library placeholders. Both fixes are in v23
-and require the ongoing original-test rerun.
+and reverse FFI on empty CMake shared-library placeholders. The v23 rerun passed
+the unchanged C/C++ FFI example and `pkg/test_extern` (**2/3**). Reverse FFI now
+links but fails at startup because the Wasm loader ignored its embedded `rpath`.
+The executable adapter now records those paths and expands `$ORIGIN`, `${ORIGIN}`,
+and macOS loader-path tokens. Linux prerequisite comparisons pass **24/24**:
+six native controls and eighteen Node/Deno/Bun executions, including Unicode
+paths and environment-path precedence. The original reverse-FFI rerun is pending.
+See [the loader evidence](evidence/runtime-loader-paths-2026-09-19.json).
 
 Application linking now retains its actual entry point and linked shared-library
 imports instead of the entire compiler's export set. The unchanged `compile/534`
@@ -161,6 +167,37 @@ CTest worker per engine, a 1,800-second harness deadline, and a shared file lock
 for unchanged fixed-port TCP/UDP tests. They have not completed. The earlier full
 Node v6 baseline also remains in progress; fixes in later snapshots do not alter
 its results retroactively.
+
+The v24 allocator experiment passed **10/12** selected original Node tests,
+including both stack diagnostics, AOT/interpreted `const_fold`, filesystem,
+channel selection, and dedicated-task shutdown. Replacing the system allocator
+with the SDK's mimalloc did not fix `instances`. Forcing only two Lean compiler
+workers also regressed the HTTP test: all 22 cases timed out. A native control
+with `-j2` likewise fails 21 cases, whereas the unchanged file passes with both
+`-j4` and `-j8`. New facades therefore use four workers and explicit ordinary
+`-j`/`-s` shell options; later user options retain precedence. The next compiler
+build also preinitializes eight pthread workers. These are harness resource
+settings, not test edits or evidence of a fundamental scheduling difference.
+
+The six packaged application integration tests passed again in all three engines,
+this time using the bundled JavaScript optimizer (**6/6**, 1,416.46 seconds).
+They cover source launchers, Unicode/empty arguments, filesystem round trips,
+tasks/errors, warm caches, concurrent HTTP persistence, binary bodies, streaming,
+and shutdown. This remains a separate application-runtime result.
+
+Two bounded engine investigations narrow the remaining memory/stack work:
+
+- The unchanged generated `const_fold` executable passes in Bun when a Linux-only
+  diagnostic helper reserves 64 MiB OS worker stacks **and** JSC's stack budget
+  is raised. Stock Bun, a 3 MiB JSC-only setting, and an OS-reservation-only setting
+  fail. The helper is not installed globally or used in the stock full-suite run;
+  portable integration remains open. See [the stack evidence](evidence/bun-stack-isolation-2026-09-19.json).
+- Native Wasm memory64 supports sparse pthread stacks and host access above
+  4 GiB in Node and Deno. Stock Bun disables that feature. Enabling its experimental
+  flag exposes a worker-transfer defect: the shared memory loses its 64-bit
+  address type. A separate 64 KiB reproduction with no Lean or Emscripten passes
+  in Node and Deno; in Bun, fresh worker memory works and cloned memory fails.
+  This does not establish a fundamental limit. See [the memory64 evidence](evidence/native-memory64-2026-09-19.json).
 
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.

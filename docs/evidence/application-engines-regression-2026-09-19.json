@@ -10,5 +10,15 @@
   "originalLog": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/application-regression-final.log",
   "logSha256": "9cbcec222cf89cec6721d5b2b2dac280b95522021780305b29074e5a7d32e642",
   "runtimeMilestoneCommit": "669ee16",
-  "notes": "Runs after adding the UDP host module to built artifacts and fixing cache stamps for inputs changed during compilation."
+  "notes": "Runs after adding the UDP host module to built artifacts and fixing cache stamps for inputs changed during compilation.",
+  "additionalRuns": [
+    {
+      "log": ".work/full-engine-probe/application-regression-current.log",
+      "logSha256": "879735fe2c4d5babe2372267233dcd9e1a5e0b027d7377887f08ced3729dee72",
+      "passed": 6,
+      "failed": 0,
+      "durationMs": 1416461.027824,
+      "optimizer": "Bundled JavaScript Binaryen; no native optimizer override"
+    }
+  ]
 }

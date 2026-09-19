@@ -1,0 +1,185 @@
+{
+  "testedAt": "2026-09-19T12:57:54.034Z",
+  "scope": "Sparse memory64 and pthread experiment, not complete Lean compatibility.",
+  "sdk": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev",
+  "flags": [
+    "-O1",
+    "-pthread",
+    "-fwasm-exceptions",
+    "-sMEMORY64=1",
+    "-sMAIN_MODULE=2",
+    "-sALLOW_MEMORY_GROWTH=1",
+    "-sGROWABLE_ARRAYBUFFERS=1",
+    "-sMAXIMUM_MEMORY=8589934592",
+    "-sPROXY_TO_PTHREAD=1",
+    "-sPTHREAD_POOL_SIZE=2",
+    "-sEXIT_RUNTIME=1",
+    "--pre-js",
+    "/home/lastmjs/development/lasm/compiler/scripts/full-lean/emscripten-pre.js",
+    "-DLASM_HIGH_MEMORY_BASE=0x100000000ULL",
+    "-DLASM_HIGH_MEMORY_LABEL=\"4 GiB\""
+  ],
+  "files": {
+    "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/highmemory.cpp": "0cd436d2da04b09c01ea3ef1ffd7971e26dada275c81160843f06451071b7540",
+    "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-memory64-v2/above4gb.cjs": "604618fa403707592e71e80bdf47fbaa911a5f26ad1949166c7247df4e33fcac",
+    "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-memory64-v2/above4gb.wasm": "57b324a7bc28fb2848daf81944efd09a084630014319721c87bd92925b1a92c6"
+  },
+  "results": [
+    {
+      "name": "node",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "prefix": [],
+      "environment": {},
+      "status": 0,
+      "signal": null,
+      "seconds": 0.19155480899999974,
+      "stdout": "pthread and host access above 4 GiB passed\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "deno",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "prefix": [
+        "run",
+        "-A"
+      ],
+      "environment": {},
+      "status": 0,
+      "signal": null,
+      "seconds": 0.36742302800000015,
+      "stdout": "pthread and host access above 4 GiB passed\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "bun-stock",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "prefix": [],
+      "environment": {},
+      "status": 1,
+      "signal": null,
+      "seconds": 0.06605635699999994,
+      "stdout": "",
+      "stderrBytes": 608,
+      "stderrSha256": "049c1cc2ae2e0b63e2570137610d2dce2bab93bae616ba519d17794833b6c02b",
+      "diagnosticFile": ".work/full-engine-probe/native-memory64-v2/bun-stock.err"
+    },
+    {
+      "name": "bun-memory64",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "prefix": [],
+      "environment": {
+        "BUN_JSC_useWasmMemory64": "true"
+      },
+      "status": 1,
+      "signal": null,
+      "seconds": 0.10760065299999996,
+      "stdout": "",
+      "stderrBytes": 1162,
+      "stderrSha256": "7f06d91dc25533d186c49ca0c759da82d5ff4cfff46e958b6273f6ebe6e0e6a8",
+      "diagnosticFile": ".work/full-engine-probe/native-memory64-v2/bun-memory64.err"
+    }
+  ],
+  "localEvidence": ".work/full-engine-probe/native-memory64-v2",
+  "earlierAttempt": {
+    "directory": ".work/full-engine-probe/native-memory64-v1",
+    "limitation": "Bun flagged run timed out because the probe omitted the required pthread message bridge; retained as an invalid Bun diagnostic."
+  },
+  "minimalWorkerReproduction": {
+    "source": "scripts/full-lean/probes/memory64-worker.cjs",
+    "sourceSha256": "f58f857962684986377d27480cf27d2eb66d6dc7afb1b409b6f210c67f43d4f3",
+    "localEvidence": ".work/full-engine-probe/memory64-worker",
+    "results": [
+      {
+        "name": "node",
+        "command": [
+          "node",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/memory64-worker.cjs"
+        ],
+        "environment": {},
+        "code": 0,
+        "checks": [
+          {
+            "name": "parent original",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and memory",
+            "passed": true
+          },
+          {
+            "name": "worker cloned module and fresh memory",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and cloned memory",
+            "passed": true
+          }
+        ],
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/memory64-worker.cjs"
+        ],
+        "environment": {},
+        "code": 0,
+        "checks": [
+          {
+            "name": "parent original",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and memory",
+            "passed": true
+          },
+          {
+            "name": "worker cloned module and fresh memory",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and cloned memory",
+            "passed": true
+          }
+        ],
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/memory64-worker.cjs"
+        ],
+        "environment": {
+          "BUN_JSC_useWasmMemory64": "true"
+        },
+        "code": 0,
+        "checks": [
+          {
+            "name": "parent original",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and memory",
+            "passed": true
+          },
+          {
+            "name": "worker cloned module and fresh memory",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and cloned memory",
+            "passed": false,
+            "error": "LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')"
+          }
+        ],
+        "stderr": ""
+      }
+    ]
+  }
+}

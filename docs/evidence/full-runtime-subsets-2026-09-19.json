@@ -417,6 +417,89 @@
         "leftoverProcessCleanup": [],
         "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
       }
+    },
+    {
+      "run": ".work/full-suite-node-v23-ffi",
+      "tested": 3,
+      "passed": 2,
+      "failures": [
+        "tests/lake/examples/reverse-ffi/test.sh"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T12:30:17.252Z",
+        "finishedAt": "2026-09-19T12:50:04.926Z",
+        "backend": "node",
+        "registered": 3896,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v23-ffi/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v23-ffi/results.xml",
+          "-R",
+          "^(tests/lake/examples/(ffi|reverse-ffi)/test\\.sh|pkg/test_extern)$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
+    },
+    {
+      "run": ".work/full-suite-node-v24-runtime",
+      "tested": 12,
+      "passed": 10,
+      "failures": [
+        "elab/async_http_hang_regressions.lean",
+        "elab/instances.lean"
+      ],
+      "execution": {
+        "startedAt": "2026-09-19T12:55:07.761Z",
+        "finishedAt": "2026-09-19T13:09:09.703Z",
+        "backend": "node",
+        "registered": 3896,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v24-runtime/run",
+          "-j",
+          "1",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v24-runtime/results.xml",
+          "-R",
+          "^(compile/(534|StackOverflow|StackOverflowTask|wait_dedicated)\\.lean|compile_bench/const_fold\\.lean|elab/(IO_test|tempfile|instances|async_http_hang_regressions|async_select_channel|grind_11081|issue9018)\\.lean)$"
+        ],
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      }
     }
   ]
 }

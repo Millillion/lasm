@@ -1,0 +1,26 @@
+{
+  "source": ".cache/lean4-4.32.0/tests/elab/async_http_hang_regressions.lean",
+  "sourceSha256": "95f84ab7b65cf9ce638bbe62c1106f99be68ffad65a2cb60bd2b9aa1f36e8ac7",
+  "nativeTwoWorkerControl": {
+    "code": 1,
+    "failedCases": 21,
+    "stdout": ".work/full-engine-probe/http-native-j2.out",
+    "stdoutSha256": "e9d6ffc64b1fc77adb8afd8de3235dcb7069397183c2018e1d7dcc5a9fb1f295"
+  },
+  "nativeControls": [
+    {
+      "threads": 4,
+      "code": 0,
+      "seconds": 9.069845671998337,
+      "stdoutBytes": 0,
+      "stderrBytes": 0
+    },
+    {
+      "threads": 8,
+      "code": 0,
+      "seconds": 7.092383175040595,
+      "stdoutBytes": 0,
+      "stderrBytes": 0
+    }
+  ]
+}

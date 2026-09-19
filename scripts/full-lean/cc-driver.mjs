@@ -15,11 +15,29 @@ const driver = join(config.sdk, 'upstream/emscripten', process.env.LASM_CC_LANGU
 let output = 'a.out';
 let explicitOutput = false;
 const args = [];
+const runtimePaths = [];
 let embeddedLeanLibraries = false;
 let embeddedLake = false;
 const sourceBuild = config.sourceBuild ?? config.build;
 for (let i = 0; i < original.length; i++) {
   let arg = original[i];
+  // wasm-ld accepts native rpath flags but does not implement an ELF loader.
+  // Preserve their runtime meaning in the executable's startup prelude.
+  if (arg.startsWith('-Wl,')) {
+    const parts = arg.slice(4).split(',');
+    const remaining = [];
+    for (let n = 0; n < parts.length; n++) {
+      if (['-rpath', '--rpath', '-R'].includes(parts[n])) {
+        const value = parts[++n];
+        if (value === undefined) throw new Error('Missing linker rpath');
+        runtimePaths.push(...value.split(':'));
+      } else if (/^(?:--?rpath=|-R.)/.test(parts[n])) {
+        runtimePaths.push(...parts[n].replace(/^(?:--?rpath=|-R)/, '').split(':'));
+      } else remaining.push(parts[n]);
+    }
+    if (!remaining.length) continue;
+    arg = '-Wl,' + remaining.join(',');
+  }
   if (arg === '-o') { output = original[++i]; explicitOutput = true; continue; }
   if (arg.startsWith('-o') && arg.length > 2 && !arg.startsWith('-object')) { output = arg.slice(2); explicitOutput = true; continue; }
   // Relocate CMake's absolute build paths into the frozen artifact.
@@ -38,7 +56,7 @@ for (let i = 0; i < original.length; i++) {
   if (!compileOnly && !arg.startsWith('-') && extname(arg) === '.c' && existsSync(arg)) args.push('-x', 'c', arg, '-x', 'none');
   else args.push(arg);
 }
-args.push('-sMEMORY64=2', '-pthread', '-fwasm-exceptions');
+args.push(`-sMEMORY64=${config.memoryMode ?? 2}`, '-pthread', '-fwasm-exceptions');
 // Preserve C input semantics while linking the Lean C++ runtime. Emscripten's
 // C++ driver otherwise reclassifies .c inputs, even with per-input -x flags.
 if (!compileOnly) args.push('-sDEFAULT_TO_CXX=1', '-Wno-experimental', '-Wno-pthreads-mem-growth');
@@ -53,6 +71,8 @@ if (compileOnly) {
 } else {
   const glue = resolve(output + '.cjs');
   const exportFile = resolve(output + '.exports.json');
+  const searchPathsFile = resolve(output + '.rpaths.js');
+  writeFileSync(searchPathsFile, `Module.lasmRuntimeLibraryPaths = ${JSON.stringify(runtimePaths)};\n`);
   // An AOT application's roots are its main and its actual shared dependencies.
   // The full compiler's export list roots every standard-library initializer and
   // interpreter constant, accidentally turning even `main := pure ()` into a
@@ -63,10 +83,12 @@ if (compileOnly) {
   if (embeddedLeanLibraries) args.push('-L', join(config.build, 'lib/lean'),
     ...(embeddedLake ? ['-lLake'] : []), '-lLean', '-lStd', '-lInit', '-lleancpp', '-lleanrt', '-lgmp');
   args.push('-o', glue, '-sMAIN_MODULE=2', `-sEXPORTED_FUNCTIONS=@${exportFile}`,
-    '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=4', '-sEXIT_RUNTIME=1', '-sNODERAWFS=1',
+    `-sMALLOC=${config.systemAllocator ?? 'dlmalloc'}`,
+    '-sPROXY_TO_PTHREAD=1', `-sPTHREAD_POOL_SIZE=${config.pthreadPoolSize ?? 4}`, '-sEXIT_RUNTIME=1', '-sNODERAWFS=1',
     '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=1', '-sSTACK_OVERFLOW_CHECK=2', '-Wl,--export-if-defined=__cpp_exception',
-    '-sINITIAL_MEMORY=134217728', '-sMAXIMUM_MEMORY=4294967296', '-sSTACK_SIZE=67108864',
+    '-sINITIAL_MEMORY=134217728', `-sMAXIMUM_MEMORY=${config.maximumMemoryBytes ?? 4294967296}`, '-sSTACK_SIZE=67108864',
     '-L', join(config.build, 'lib/lean'), '-llasmhost', '-llasmnative',
+    '--pre-js', searchPathsFile,
     '--pre-js', join(config.runtimeSupport, 'emscripten-pre.js'),
     '--pre-js', join(config.runtimeSupport, 'host-pre.js'),
     '--js-library', join(config.runtimeSupport, 'host-library.js'));
@@ -84,6 +106,8 @@ if (!compileOnly && !shared) {
 export LASM_FULL_HOST_MODULE=${quote(hostUrl)}
 export LASM_FULL_APP_PATH=${quote(resolve(output))}
 export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-65536}"
+export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-4}"
+${Object.entries(config.engineEnvironment ?? {}).map(([key, value]) => `export ${key}=${quote(value)}`).join('\n')}
 exec ${command.map(quote).join(' ')} "$@"
 `);
   chmodSync(output, 0o755);

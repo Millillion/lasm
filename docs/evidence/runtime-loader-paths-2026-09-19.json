@@ -1,0 +1,640 @@
+{
+  "testedAt": "2026-09-19T12:53:59.262Z",
+  "scope": "C loader prerequisite comparisons; not upstream suite results.",
+  "results": [
+    {
+      "name": "native library 42",
+      "command": "cc",
+      "args": [
+        "-shared",
+        "-fPIC",
+        "-DLIBRARY_VALUE=42",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader-library.c",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e/libnativevalue.so"
+      ],
+      "environment": {},
+      "seconds": 0.073973678,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "Wasm library 42",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/cc-driver.mjs",
+        "-shared",
+        "-O1",
+        "-DLIBRARY_VALUE=42",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader-library.c",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e/libwasmvalue.so"
+      ],
+      "environment": {
+        "LASM_FULL_TOOLCHAIN_CONFIG": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/toolchain.json",
+        "LASM_CC_LANGUAGE": "c"
+      },
+      "seconds": 0.489797914,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "native library 84",
+      "command": "cc",
+      "args": [
+        "-shared",
+        "-fPIC",
+        "-DLIBRARY_VALUE=84",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader-library.c",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override/libnativevalue.so"
+      ],
+      "environment": {},
+      "seconds": 0.055193964000000054,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "Wasm library 84",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/cc-driver.mjs",
+        "-shared",
+        "-O1",
+        "-DLIBRARY_VALUE=84",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader-library.c",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override/libwasmvalue.so"
+      ],
+      "environment": {
+        "LASM_FULL_TOOLCHAIN_CONFIG": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/toolchain.json",
+        "LASM_CC_LANGUAGE": "c"
+      },
+      "seconds": 0.42837335199999993,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute native link",
+      "command": "cc",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader.c",
+        "-L",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e",
+        "-lnativevalue",
+        "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-native"
+      ],
+      "environment": {},
+      "seconds": 0.10395243499999993,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute Wasm link",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/cc-driver.mjs",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader.c",
+        "-O1",
+        "-L",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e",
+        "-lwasmvalue",
+        "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-wasm"
+      ],
+      "environment": {
+        "LASM_FULL_TOOLCHAIN_CONFIG": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/toolchain.json",
+        "LASM_CC_LANGUAGE": "c"
+      },
+      "seconds": 4.386067833,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute native 42",
+      "command": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-native",
+      "args": [
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.0033059299999995346,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute node 42",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-wasm.cjs",
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.26421370600000044,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute deno 42",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "args": [
+        "run",
+        "-A",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-wasm.cjs",
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.6783011180000004,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute bun 42",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-wasm.cjs",
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.28638743499999963,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute native 84",
+      "command": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-native",
+      "args": [
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.003935069999999542,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute node 84",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-wasm.cjs",
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.4403565179999996,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute deno 84",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "args": [
+        "run",
+        "-A",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-wasm.cjs",
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.6659253669999998,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "absolute bun 84",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/absolute-wasm.cjs",
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.26456855999999973,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin native link",
+      "command": "cc",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader.c",
+        "-L",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e",
+        "-lnativevalue",
+        "-Wl,-rpath,$ORIGIN/../libraries with \u65e5\u672c\u8a9e",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-native"
+      ],
+      "environment": {},
+      "seconds": 0.15685389799999938,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin Wasm link",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/cc-driver.mjs",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader.c",
+        "-O1",
+        "-L",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e",
+        "-lwasmvalue",
+        "-Wl,-rpath,$ORIGIN/../libraries with \u65e5\u672c\u8a9e",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-wasm"
+      ],
+      "environment": {
+        "LASM_FULL_TOOLCHAIN_CONFIG": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/toolchain.json",
+        "LASM_CC_LANGUAGE": "c"
+      },
+      "seconds": 5.004152883999999,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin native 42",
+      "command": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-native",
+      "args": [
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.0032772210000002813,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin node 42",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-wasm.cjs",
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.3322406819999997,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin deno 42",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "args": [
+        "run",
+        "-A",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-wasm.cjs",
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.6656449260000008,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin bun 42",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-wasm.cjs",
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.2595274279999994,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin native 84",
+      "command": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-native",
+      "args": [
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.005806899000001067,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin node 84",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-wasm.cjs",
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.36554993900000043,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin deno 84",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "args": [
+        "run",
+        "-A",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-wasm.cjs",
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.8199222339999996,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin bun 84",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-wasm.cjs",
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.27175869799999963,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces native link",
+      "command": "cc",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader.c",
+        "-L",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e",
+        "-lnativevalue",
+        "-Wl,-rpath,${ORIGIN}/../libraries with \u65e5\u672c\u8a9e",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-native"
+      ],
+      "environment": {},
+      "seconds": 0.09722951900000043,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces Wasm link",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/cc-driver.mjs",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/loader.c",
+        "-O1",
+        "-L",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/libraries with \u65e5\u672c\u8a9e",
+        "-lwasmvalue",
+        "-Wl,-rpath,${ORIGIN}/../libraries with \u65e5\u672c\u8a9e",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-wasm"
+      ],
+      "environment": {
+        "LASM_FULL_TOOLCHAIN_CONFIG": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/toolchain.json",
+        "LASM_CC_LANGUAGE": "c"
+      },
+      "seconds": 3.970393494000002,
+      "status": 0,
+      "signal": null,
+      "stdout": "",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces native 42",
+      "command": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-native",
+      "args": [
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.0030230499999997847,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces node 42",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-wasm.cjs",
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.2525478660000008,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces deno 42",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "args": [
+        "run",
+        "-A",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-wasm.cjs",
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.6327466720000011,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces bun 42",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-wasm.cjs",
+        "42"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": ""
+      },
+      "seconds": 0.27431762000000165,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 42\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces native 84",
+      "command": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-native",
+      "args": [
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.004569143000000622,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces node 84",
+      "command": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-wasm.cjs",
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.3194193689999993,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces deno 84",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "args": [
+        "run",
+        "-A",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-wasm.cjs",
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.610213197000001,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "origin-braces bun 84",
+      "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "args": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/bin/origin-braces-wasm.cjs",
+        "84"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/loader-paths-v1/override"
+      },
+      "seconds": 0.26397201700000006,
+      "status": 0,
+      "signal": null,
+      "stdout": "library value: 84\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "localEvidence": ".work/full-engine-probe/loader-paths-v1"
+}

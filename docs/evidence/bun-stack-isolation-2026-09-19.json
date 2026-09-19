@@ -1,0 +1,72 @@
+{
+  "testedAt": "2026-09-19T12:50:12.911Z",
+  "platform": "linux",
+  "architecture": "x64",
+  "version": "1.4.2",
+  "scope": "Diagnostic stack isolation; the upstream suite and stock Bun are unchanged.",
+  "program": "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v20-runtime/lean4-4.32.0/tests/compile_bench/const_fold.lean.out.cjs",
+  "host": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v20/host/node-host.mjs",
+  "inputs": {
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v20-runtime/lean4-4.32.0/tests/compile_bench/const_fold.lean.out.cjs": "3aa4d9508df376c1c66d9fcd4f79903c9574d4a6610a4eb1aeab27ddea8250dd",
+    "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v20-runtime/lean4-4.32.0/tests/compile_bench/const_fold.lean.out.wasm": "2aaee32b6adea2653c218f441148908303e067ec93620a2cfacbe8aad2584385",
+    "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/bun-stack-reservation.c": "d9f56a1d6d6a447baa4e218ffb19a7802227fcdd1614f7a47d67cf3eaa3ba599",
+    "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-stack-isolation-v2/stack-reservation.so": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32"
+  },
+  "results": [
+    {
+      "name": "stock",
+      "overrides": {},
+      "status": 1,
+      "signal": null,
+      "seconds": 0.565937029,
+      "stdout": "",
+      "stderrBytes": 1747,
+      "stderrSha256": "7176dec2ba64ecbded2899da4fc0b69c3175aacffb38b488eefd22a003f60170",
+      "diagnosticFile": ".work/full-engine-probe/bun-stack-isolation-v2/stock.err"
+    },
+    {
+      "name": "jsc-only-3mb",
+      "overrides": {
+        "BUN_JSC_maxPerThreadStackUsage": "3145728"
+      },
+      "status": 1,
+      "signal": null,
+      "seconds": 0.5520009560000001,
+      "stdout": "",
+      "stderrBytes": 1747,
+      "stderrSha256": "7176dec2ba64ecbded2899da4fc0b69c3175aacffb38b488eefd22a003f60170",
+      "diagnosticFile": ".work/full-engine-probe/bun-stack-isolation-v2/jsc-only-3mb.err"
+    },
+    {
+      "name": "os-only-64mb",
+      "overrides": {
+        "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-stack-isolation-v2/stack-reservation.so"
+      },
+      "status": 1,
+      "signal": null,
+      "seconds": 0.4338778199999999,
+      "stdout": "",
+      "stderrBytes": 1747,
+      "stderrSha256": "7176dec2ba64ecbded2899da4fc0b69c3175aacffb38b488eefd22a003f60170",
+      "diagnosticFile": ".work/full-engine-probe/bun-stack-isolation-v2/os-only-64mb.err"
+    },
+    {
+      "name": "both-64mb",
+      "overrides": {
+        "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-stack-isolation-v2/stack-reservation.so",
+        "BUN_JSC_maxPerThreadStackUsage": "62914560"
+      },
+      "status": 0,
+      "signal": null,
+      "seconds": 0.6060335599999999,
+      "stdout": "93011 93011\n",
+      "stderrBytes": 0,
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "localEvidence": ".work/full-engine-probe/bun-stack-isolation-v2",
+  "sources": [
+    "https://github.com/oven-sh/bun/blob/bun-v1.4.2/src/jsc/web_worker.rs",
+    "https://github.com/oven-sh/bun/blob/bun-v1.4.2/src/threading/ThreadPool.rs"
+  ]
+}

@@ -27,7 +27,11 @@ const sdk = resolve(process.env.LASM_EMSDK ?? snapshot?.sdk ?? join(root, '.cach
 const runtimeSupport = snapshot ? join(build, 'runtime-support') : join(root, 'scripts/full-lean');
 for (const path of [executable, join(build, 'bin/lean.js'), join(build, 'bin/lean.wasm')])
   if (!existsSync(path)) throw new Error(`Missing full compiler prerequisite: ${path}`);
-if (!/^LASM_LINK_TOOLS:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8')))
+const buildConfig = readFileSync(join(build, 'CMakeCache.txt'), 'utf8');
+const memoryMode = Number(buildConfig.match(/^LASM_MEMORY64:STRING=([12])$/m)?.[1]);
+if (![1, 2].includes(memoryMode)) throw new Error('The full suite requires a 64-bit Lean value layout');
+const engineEnvironment = engine === 'bun' && memoryMode === 1 ? { BUN_JSC_useWasmMemory64: 'true' } : {};
+if (!/^LASM_LINK_TOOLS:BOOL=ON$/m.test(buildConfig))
   throw new Error('The selected compiler must include the original tool entry points (build --stage wasm64)');
 mkdirSync(join(output, 'bin'), { recursive: true });
 const quote = text => "'" + text.replaceAll("'", "'\\''") + "'";
@@ -41,15 +45,21 @@ const wrappers = {
 };
 for (const [name, args] of Object.entries(wrappers)) {
   const path = join(output, 'bin', name);
+  // Unlike generated application mains, Lean's C++ shell initializes its task
+  // manager directly and does not read the application environment defaults.
+  // Supply its ordinary CLI options before user arguments so explicit later
+  // -j/-s options still win.
+  const resourceArgs = name === 'lean' ? ' -j"${LEAN_NUM_THREADS}" -s"${LEAN_STACK_SIZE_KB}"' : '';
   writeFileSync(path, `#!/usr/bin/env bash
 if [ -z "\${LEAN_SYSROOT+x}" ]; then export LEAN_SYSROOT=${quote(output)}; fi
 export LASM_FULL_APP_PATH=${quote(path)}
 export LASM_FULL_ENTRYPOINT=${quote(name)}
 export LASM_FULL_TOOLCHAIN_CONFIG=${quote(join(output, 'toolchain.json'))}
+${Object.entries(engineEnvironment).map(([key, value]) => `export ${key}=${quote(value)}`).join('\n')}
 if [ -z "\${LEAN_CC+x}" ]; then export LEAN_CC=${quote(join(output, 'bin/clang'))}; fi
 export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-65536}"
-export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-2}"
-exec ${[...runner, ...args].map(quote).join(' ')} "$@"
+export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-4}"
+exec ${[...runner, ...args].map(quote).join(' ')}${resourceArgs} "$@"
 `);
   chmodSync(path, 0o755);
 }
@@ -78,8 +88,13 @@ for (const name of ['cadical', 'leantar']) if (existsSync(join(native.prefix, 'b
 for (const [name, target] of Object.entries(links)) if (!existsSync(join(output, name))) symlinkSync(target, join(output, name));
 writeFileSync(join(output, 'toolchain.json'), JSON.stringify({ leanCommit, engine, executable, engineArgs, build, source, sdk, runtimeSupport,
   sourceBuild: snapshot?.sourceBuild ?? build,
-  backend: 'full-lean-wasm64-lowered', nativeLeanFallback: false,
-  environmentAdjustments: { LEAN_SYSROOT: output, LASM_FULL_APP_PATH: 'Selected facade entry point', LEAN_STACK_SIZE_KB: '65536 unless explicitly supplied', LEAN_NUM_THREADS: '2 unless explicitly supplied' },
+  systemAllocator: buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMALLOC=(\w+)/m)?.[1] ?? 'dlmalloc',
+  memoryMode, engineEnvironment,
+  maximumMemoryBytes: Number(buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMAXIMUM_MEMORY=(\d+)/m)?.[1] ?? 4294967296),
+  pthreadPoolSize: Number(buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sPTHREAD_POOL_SIZE=(\d+)/m)?.[1] ?? 4),
+  backend: memoryMode === 1 ? 'full-lean-wasm64-native' : 'full-lean-wasm64-lowered', nativeLeanFallback: false,
+  environmentAdjustments: { LEAN_SYSROOT: output, LASM_FULL_APP_PATH: 'Selected facade entry point', LEAN_STACK_SIZE_KB: '65536 unless explicitly supplied', LEAN_NUM_THREADS: '4 unless explicitly supplied',
+    leanShell: 'Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence.' },
   externalTools: links,
 }, null, 2) + '\n');
 console.log(JSON.stringify({ engine, output, build }));

@@ -18,7 +18,7 @@ if (/^LASM_HOST_BRIDGE:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'
 if (/^LASM_LINK_LAKE:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'))) linked.add('libLake.a');
 const archives = [join(build, 'lib/lean'), join(build, 'lib/temp')].flatMap(dir =>
   readdirSync(dir).filter(name => linked.has(name)).map(name => join(dir, name)));
-const memory64 = /^LASM_MEMORY64:STRING=2$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'));
+const memory64 = /^LASM_MEMORY64:STRING=[12]$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'));
 // A compiler can load C/C++ libraries that were not known when it was linked.
 // Export the native runtime ABI too, while retaining Lean declarations in the
 // in-Wasm registry to stay within engine export-count limits. MAIN_MODULE=2

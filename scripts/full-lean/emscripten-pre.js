@@ -62,8 +62,10 @@ if (ENVIRONMENT_IS_NODE) {
     if (!path.isAbsolute(name) && /\.(so(?:\.\d+)*|dylib|dll)$/.test(name)) {
       var variable = process.platform === 'win32' ? 'PATH'
         : process.platform === 'darwin' ? 'DYLD_LIBRARY_PATH' : 'LD_LIBRARY_PATH';
-      for (var base of (process.env[variable] ?? '').split(path.delimiter)) {
-        if (!base) continue;
+      var searchPaths = [...(process.env[variable] ?? '').split(path.delimiter).filter(Boolean),
+        ...(Module.lasmRuntimeLibraryPaths ?? [])];
+      for (var base of searchPaths) {
+        base = base.replace(/\$\{ORIGIN\}|\$ORIGIN\b|@(?:executable|loader)_path/g, __dirname);
         var candidate = path.resolve(base, name);
         try { if (require('node:fs').statSync(candidate).isFile()) return candidate; } catch {}
       }

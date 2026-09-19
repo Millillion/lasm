@@ -133,7 +133,7 @@ Lake, LeanIR, Leanc, and LeanChecker entry points all run Lean in that engine.
 They do not substitute native Lean tools on failure. External C compilation,
 archive, and SAT tools remain explicit subprocess dependencies, as in upstream.
 Full suites must run against frozen compiler builds; do not rebuild the selected
-artifact during a run. The facade defaults to two Lean workers and 64 MiB application thread
+artifact during a run. New facades default to four Lean workers and 64 MiB application thread
 stacks unless explicitly overridden. `build.mjs --stack-mb` controls the compiler's
 main pthread reservation (default 64 MiB); changing `LEAN_STACK_SIZE_KB` alone
 does not resize that main stack. Node and Deno's separate engine worker stacks
@@ -145,6 +145,37 @@ harness, not upstream tests. Run complete suites in sequence when their fixed-po
 network tests could otherwise collide, or pass the same `--network-lock` path to
 `prepare-suite.mjs` for each engine. That Linux harness option serializes the
 original fixed-port TCP/UDP drivers with `flock`; it does not rewrite their ports.
+
+Lean's C++ shell does not read the generated application main's thread/stack
+environment defaults. The facade supplies its ordinary `-j` and `-s` options
+before user arguments. Explicit later options win. Two workers are insufficient
+for the pinned HTTP regression even in native Lean; four and eight both pass
+the native control. `build.mjs --pthread-pool` selects the number of preinitialized
+Wasm workers (default eight), independently of the Lean task-pool size.
+
+`build.mjs --malloc mimalloc` selects the SDK's multithreaded system allocator;
+it does not enable Lean's separate `LEAN_MIMALLOC` object layout. The v24 subset
+still fails the memory-intensive `instances` test with this option. The alternative
+`--memory64 1 --max-memory-gb 8` selects actual 64-bit Wasm addressing; the default
+remains lowered `--memory64 2 --max-memory-gb 4`. These variants need separate
+frozen builds and conformance evidence. Native memory64 engine prerequisites pass
+in Node and Deno; Bun's experimental flag currently exposes a shared-memory
+worker-transfer defect, so it is not a working Bun configuration.
+
+Additional reproducible probes keep engine diagnostics separate from suite passes:
+
+```sh
+node scripts/full-lean/probe-loader.mjs .work/full-toolchains/node-v24/toolchain.json .work/loader-probe
+node scripts/full-lean/probe-memory64.mjs .work/memory64-probe
+node scripts/full-lean/probes/memory64-worker.cjs
+```
+
+`probe-loader.mjs` compares the native loader with all three engines on Linux.
+`probe-memory64.mjs` records stock and flagged Bun results as well as Node/Deno.
+`probe-bun-stack.mjs` takes an existing generated `const_fold.lean.out.cjs`, a
+frozen host module, and a new output directory. It compiles a Linux-only helper
+and preloads it only into diagnostic child processes. This is not part of the
+published launcher or the stock Bun conformance run.
 
 The host bridge transfers requests from Wasm pthreads to the JavaScript main
 thread through message ports. Waiting pthreads use Emscripten's futex API, which
