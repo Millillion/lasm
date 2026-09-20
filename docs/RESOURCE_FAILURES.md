@@ -128,3 +128,12 @@ stops immediately when needed. Two tiny guarded CTest controls confirmed that
 the active test passes, the next test remains unstarted, and resumption preserves
 the first test's evidence byte-for-byte. They recorded no OOM or throttling;
 see [the orderly-pause evidence](evidence/campaign-pause-2026-09-20.json).
+
+The original guard's CPU setting (`Nice=5`) caused a separate compatibility
+problem: even native Lean failed the unchanged `async_systems_info` test when
+it tried to set its own and its parent's priority to 3. An unprivileged process
+cannot raise priority from 5 to 3. At normal priority (`Nice=0`) the native
+control passes. The guard now records and preserves that normal CPU setting;
+all memory limits, pressure thresholds, swap restrictions, and concurrency
+limits are unchanged. This was a harness-induced failure, not a fundamental
+Lean or Wasm limit. See [the priority comparison](evidence/guard-priority-2026-09-20.json).

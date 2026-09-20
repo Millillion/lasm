@@ -76,6 +76,10 @@ four tiny synthetic CTest controls to check checkpoint/resume, interruption
 cleanup, and failure accounting without compiler workloads or intentional
 memory exhaustion.
 
+The guard preserves normal CPU priority (`Nice=0`). Lowering it to 5 prevented
+even native Lean's unchanged process-priority test from setting priority to 3.
+CPU niceness is recorded separately from the unchanged memory protection limits.
+
 `probe-http-timing.mjs --toolchain FROZEN_FACADE --output NEW_DIRECTORY --scale 10
 --repetitions 3` guards a native control, repeated original HTTP executions, and
 native/engine executions of the uniformly scaled parallel derivative. It keeps

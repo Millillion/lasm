@@ -388,6 +388,14 @@ The unchanged `file_read_overflow`, `IO_test`, and `tempfile` registrations also
 pass on v36 in each engine: **9/9**, with all 7,267 original hashes intact. Their
 combined preparation/run peaked at 5.56 GiB with zero OOM, throttling, or swap.
 
+The memory guard's initial CPU-priority setting caused an independent harness
+failure in `async_systems_info`: native Lean itself could not change priority
+from 5 to 3 without elevated privileges. Preserving normal priority fixes that
+control and the unchanged test passes in v36 Node, Deno, and Linux stack-adjusted
+Bun (**3/3**). All 7,267 source hashes remained intact. The memory cap and stop
+thresholds are unchanged; the engine comparison peaked at 3.44 GiB with no OOM,
+throttling, or swap. See [the priority evidence](evidence/guard-priority-2026-09-20.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

@@ -64,7 +64,7 @@ if (args[0] === '--capture') {
   if (existsSync(report) || existsSync(report + '.service.json')) throw new Error(`Refusing to overwrite resource evidence: ${report}`);
   mkdirSync(dirname(report), { recursive: true });
   const evidence = { startedAt: new Date().toISOString(), command, cwd: process.cwd(), unit, id,
-    limits: { memoryMax: limit, memoryHigh: 'infinity', stopMemoryBytes: Math.floor(limit * 0.8), memorySwapMax: 0, tasksMax: 1024 },
+    limits: { memoryMax: limit, memoryHigh: 'infinity', stopMemoryBytes: Math.floor(limit * 0.8), memorySwapMax: 0, tasksMax: 1024, nice: 0 },
     hostAtStart: memory, minimumHostAvailable: memory.available, peakMemoryBytes: 0, peakTasks: 0,
     report, status: 'starting' };
   const save = () => writeFileSync(report, JSON.stringify(evidence, null, 2) + '\n');
@@ -82,9 +82,12 @@ if (args[0] === '--capture') {
   // MemoryHigh throttling raises PSI for ancestor cgroups. On desktops monitored
   // by systemd-oomd that can kill unrelated applications despite abundant RAM.
   // Terminate proactively instead; keep MemoryMax only as the final backstop.
+  // Preserve normal CPU priority. Starting at nice 5 makes Lean's ordinary
+  // setPriority 3 test fail even natively: an unprivileged process cannot raise
+  // its priority again. Memory protection is independent of this CPU setting.
   const properties = { MemoryAccounting: 'yes', MemoryMax: limit, MemoryHigh: 'infinity',
     MemorySwapMax: 0, TasksMax: 1024, OOMPolicy: 'kill', KillMode: 'control-group',
-    TimeoutStopSec: '5s', Nice: 5, ExecStopPost: capture };
+    TimeoutStopSec: '5s', Nice: evidence.limits.nice, ExecStopPost: capture };
   const invocation = ['--user', '--wait', '--pipe', '--collect', '--expand-environment=no', `--unit=${unit}`, `--description=${description}`,
     `--working-directory=${process.cwd()}`, ...Object.entries(properties).flatMap(([key, value]) => ['-p', `${key}=${value}`]),
     '/usr/bin/env', '-i', ...Object.entries(env).map(([key, value]) => `${key}=${value}`), ...command];
