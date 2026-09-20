@@ -1,0 +1,125 @@
+{
+  "scope": "Beginning of the complete Node campaign; resource-aborted tests are not Lean conformance failures.",
+  "counts": {
+    "passed": 0,
+    "failed": 0,
+    "resource-aborted": 2,
+    "harness-failed": 1,
+    "pending": 3893
+  },
+  "records": [
+    {
+      "name": "tests/lake/examples/deps/test.sh",
+      "status": "resource-aborted",
+      "resourceReport": ".work/full-campaign-node-v33/00001-56e3ea99/resources.json",
+      "resourceLimited": true,
+      "peakMemoryBytes": 8712638464,
+      "stoppedBecause": "Workload reached its proactive memory budget",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "result": {
+        "code": 1,
+        "signal": null
+      }
+    },
+    {
+      "name": "tests/lake/examples/ffi/test.sh",
+      "status": "resource-aborted",
+      "resourceReport": ".work/full-campaign-node-v33/00002-b2912792/resources.json",
+      "resourceLimited": true,
+      "peakMemoryBytes": 8765476864,
+      "stoppedBecause": "Workload reached its proactive memory budget",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "result": {
+        "code": 1,
+        "signal": null
+      }
+    },
+    {
+      "name": "tests/lake/examples/hello/test.sh",
+      "status": "harness-failed",
+      "resourceReport": ".work/full-campaign-node-v33/00003-f11e109b/resources.json",
+      "resourceLimited": false,
+      "peakMemoryBytes": 0,
+      "stoppedBecause": null,
+      "memoryEvents": null,
+      "result": {
+        "code": 1,
+        "signal": null
+      }
+    }
+  ],
+  "sourceIntegrityAfterStops": {
+    "checked": 7267,
+    "modified": []
+  },
+  "cleanupIssue": "systemd-run returned before its --collect transient unit was released; the third launch was rejected. The runner now waits for its owned unit to disappear, and the tiny campaign controls passed again.",
+  "guardControls": {
+    "passed": true,
+    "scope": "Synthetic CTest controls for distinct guarded attempts, checkpoint/resume, signal cleanup, preserved interrupted evidence, failure accounting, and source hashes.",
+    "results": [
+      {
+        "step": 1,
+        "state": "paused",
+        "counts": {
+          "passed": 1,
+          "failed": 0,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 3
+        },
+        "peakMemoryBytes": 25747456
+      },
+      {
+        "step": 2,
+        "state": "paused",
+        "counts": {
+          "passed": 1,
+          "failed": 1,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 2
+        },
+        "peakMemoryBytes": 25497600
+      },
+      {
+        "step": 3,
+        "state": "paused",
+        "counts": {
+          "passed": 2,
+          "failed": 1,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 1
+        },
+        "peakMemoryBytes": 25894912
+      },
+      {
+        "step": "interrupt and resume",
+        "state": "complete",
+        "counts": {
+          "passed": 3,
+          "failed": 1,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 0
+        },
+        "interruptedAttemptsPreserved": 1,
+        "peakMemoryBytes": 25395200
+      }
+    ]
+  }
+}

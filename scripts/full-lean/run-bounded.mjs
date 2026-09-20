@@ -24,6 +24,18 @@ function usage(path) {
     pressureSomeAvg10: Number(readFileSync(join(path, 'memory.pressure'), 'utf8').match(/^some avg10=([\d.]+)/m)?.[1] ?? 0),
     memoryEvents: counters(join(path, 'memory.events')) };
 }
+function processMemory(path) {
+  // Capture process sizes once near the high-water mark, without command lines
+  // or unrelated desktop processes. RSS can include pages shared by processes.
+  return readFileSync(join(path, 'cgroup.procs'), 'utf8').trim().split('\n').slice(0, 128).flatMap(pid => {
+    try {
+      const status = readFileSync(`/proc/${pid}/status`, 'utf8');
+      return [{ pid: Number(pid), name: status.match(/^Name:\s+(.+)$/m)?.[1],
+        residentBytes: Number(status.match(/^VmRSS:\s+(\d+) kB$/m)?.[1] ?? 0) * 1024,
+        threads: Number(status.match(/^Threads:\s+(\d+)$/m)?.[1] ?? 0) }];
+    } catch { return []; }
+  }).sort((a, b) => b.residentBytes - a.residentBytes);
+}
 if (args[0] === '--capture') {
   // systemd runs this after stopping all workload descendants, including on OOM.
   const result = { serviceResult: process.env.SERVICE_RESULT, exitCode: process.env.EXIT_CODE,
@@ -107,6 +119,8 @@ if (args[0] === '--capture') {
       if (sample.memoryBytes >= evidence.limits.stopMemoryBytes) stop('Workload reached its proactive memory budget');
       if (sample.pressureSomeAvg10 >= 5) stop('Workload memory pressure reached 5 percent');
       if (evidence.minimumHostAvailable < 8 * GiB) stop('Host available memory fell below 8 GiB');
+      if (!stopping && !evidence.highWaterProcesses && sample.memoryBytes >= limit * 0.6)
+        evidence.highWaterProcesses = { at: sample.at ?? new Date().toISOString(), processes: processMemory(cgroup) };
       save();
     } catch (error) {
       if (error.code !== 'ENOENT') { evidence.monitorError = error.message; stop('Resource monitor failed'); }
@@ -118,6 +132,16 @@ if (args[0] === '--capture') {
   });
   clearInterval(timer);
   for (const [signal, handler] of handlers) process.off(signal, handler);
+  // systemd-run can exit just before --collect releases the transient unit.
+  // Wait only for our own completed unit; never wait on or reset a contender's
+  // running job. Otherwise a valid sequential launch can spuriously hit EEXIST.
+  const releaseStarted = Date.now();
+  if (cgroup || existsSync(report + '.service.json')) {
+    while (show('Description').stdout?.trim() === description && Date.now() - releaseStarted < 5000)
+      await new Promise(resolve => setTimeout(resolve, 100));
+    evidence.unitReleased = show('Description').stdout?.trim() !== description;
+    if (!evidence.unitReleased) evidence.monitorError = 'Completed transient unit was not released within five seconds';
+  }
   if (existsSync(report + '.service.json')) {
     evidence.service = JSON.parse(readFileSync(report + '.service.json', 'utf8'));
     evidence.peakMemoryBytes = Math.max(evidence.peakMemoryBytes, evidence.service.peakMemoryBytes || 0);
@@ -128,5 +152,5 @@ if (args[0] === '--capture') {
   evidence.memoryThrottled = (evidence.service?.memoryEvents?.high ?? 0) > 0;
   save();
   console.error(`[lasm] Peak ${(evidence.peakMemoryBytes / GiB).toFixed(2)} GiB; ${evidence.service?.serviceResult ?? 'launch failed'}${evidence.resourceLimited ? '; resource-limited run, not a conformance result' : ''}`);
-  process.exitCode = evidence.resourceLimited ? 125 : result.code ?? 1;
+  process.exitCode = evidence.resourceLimited || evidence.monitorError ? 125 : result.code ?? 1;
 }

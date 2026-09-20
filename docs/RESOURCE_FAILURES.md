@@ -90,3 +90,15 @@ process interruption and cleanup, preserved prior evidence, and failed-test
 accounting. The intentional failing control remains failed; it was not turned
 into a pass. These controls used about 25 MiB per guarded run and induced no
 memory pressure or OOM. See [the checkpoint evidence](evidence/campaign-checkpoints-2026-09-20.json).
+
+The new full Node campaign exposed aggregate memory growth inside individual
+Lake tests: `deps` and `ffi` started compiler children and reached the proactive
+budget at 8.11 and 8.16 GiB. Both were stopped with zero kernel OOM, high, or max
+events; all 7,267 source hashes still matched afterward. The next launch was
+rejected because systemd had not yet collected the prior transient unit. The
+runner now waits for its own completed unit to disappear before returning.
+The tiny checkpoint/interruption controls passed again after that correction.
+It also records bounded per-process RSS snapshots near the memory high-water
+mark, excluding command lines and unrelated desktop processes. See
+[the Lake budget evidence](evidence/lake-memory-budget-2026-09-20.json). The host
+cap remains unchanged while lower-worker configurations are investigated.

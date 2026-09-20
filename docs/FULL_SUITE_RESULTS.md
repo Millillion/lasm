@@ -315,6 +315,14 @@ fundamental scheduler limitation or count the derivative as an unchanged-suite
 pass. See [the repeated timing evidence](evidence/http-timing-deno-2026-09-20.json)
 and `scripts/full-lean/probe-http-timing.mjs` for reproduction.
 
+The fresh 3,896-registration Node campaign stopped near its beginning: the
+`deps` and `ffi` Lake examples hit the proactive aggregate memory budget, and
+the next launch exposed a transient-unit cleanup race. These are **two resource
+aborts and one harness launch failure**, with no Lean conformance result from
+those three attempts. All original hashes remained intact and no host OOM
+occurred. Guard cleanup is repaired; a separate worker-pool comparison is in
+progress. See [the budget evidence](evidence/lake-memory-budget-2026-09-20.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
