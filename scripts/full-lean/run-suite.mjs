@@ -5,11 +5,14 @@ import { resolve, join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { cleanupTestProcesses } from './cleanup-processes.mjs';
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const directory = resolve(option('--suite', '.work/full-suite-native'));
-const jobs = Number(option('--jobs', '2'));
+const jobs = Number(option('--jobs', '1'));
 if (!Number.isInteger(jobs) || jobs < 1) throw new Error('Invalid job count');
 const manifest = JSON.parse(readFileSync(join(directory, 'parallel-suite.json')));
 const hashes = JSON.parse(readFileSync(manifest.testSourceHashes));
@@ -24,7 +27,8 @@ const before = verify();
 if (before.modified.length) throw new Error(`Upstream test sources changed before execution: ${before.modified.join(', ')}`);
 // Supply ordinary host context without forwarding unrelated service credentials
 // or user compiler overrides into third-party test drivers.
-const env = Object.fromEntries(['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR', 'SYSTEMROOT', 'COMSPEC', 'PATHEXT']
+const env = Object.fromEntries(['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR', 'SYSTEMROOT', 'COMSPEC', 'PATHEXT',
+  'LASM_RESOURCE_UNIT', 'LASM_RESOURCE_REPORT', 'BINARYEN_CORES', 'CMAKE_BUILD_PARALLEL_LEVEL']
   .filter(key => process.env[key] !== undefined).map(key => [key, process.env[key]]));
 Object.assign(env, {
   GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null',
@@ -38,6 +42,8 @@ if (args.includes('--rerun-failed')) command.push('--rerun-failed');
 const filter = option('--filter');
 if (filter) command.push('-R', filter);
 const startedAt = new Date().toISOString();
+writeFileSync(join(directory, 'execution-started.json'), JSON.stringify({ startedAt, command,
+  resourceReport: process.env.LASM_RESOURCE_REPORT, originalSources: { before } }, null, 2) + '\n');
 const runId = `${directory}:${startedAt}:${process.pid}`;
 env.LASM_UPSTREAM_RUN_ID = runId;
 const log = createWriteStream(join(directory, 'execution.log'));
@@ -79,6 +85,7 @@ const after = verify();
 writeFileSync(join(directory, 'execution.json'), JSON.stringify({ startedAt, finishedAt: new Date().toISOString(),
   backend: manifest.backend, registered: manifest.registered, command, result, originalSources: { before, after },
   leftoverProcessCleanup: cleanup,
+  resourceReport: process.env.LASM_RESOURCE_REPORT,
   environment: 'Explicit host context; Git signing disabled and test identity supplied; no compiler overrides.',
 }, null, 2) + '\n');
 if (after.modified.length) console.error(`Upstream test drivers changed original files: ${after.modified.join(', ')}`);

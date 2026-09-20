@@ -6,6 +6,15 @@
 - Separate experimentally verified behavior from design proposals and open questions.
 - Keep downloaded toolchains, third-party source trees, caches, and generated
   experiment artifacts in ignored `.cache/` or `.work/` directories.
+- Run heavy builds, compiler probes, and upstream suites through
+  `scripts/full-lean/run-bounded.mjs`. The build/suite entry points apply it
+  automatically. Run only one heavy workload at a time, with one CTest job and
+  at most two build jobs on this host. The cap covers all descendants. Do not
+  bypass it or overlap engine suites; previous overlaps caused confirmed host
+  OOM kills of ChatGPT. Record resource aborts separately from test failures.
+  Do not induce OOM or use `MemoryHigh` throttling to test the guard: ancestor
+  `systemd-oomd` policy killed ChatGPT even with ample free RAM. Use proactive
+  termination below the 10 GiB kernel cap and verify only below-cap allocations.
 - The user approved the recommendations in `docs/PLAN.md`; proceed through the
   implementation milestones. Do not present a limited implementation as a
   complete Lean runtime port or production compiler.

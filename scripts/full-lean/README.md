@@ -4,11 +4,44 @@ This harness registers the complete pinned Lean 4.32.0 CTest suite, including
 compiler, kernel, elaborator, Lake, runtime, and interactive tests. The older
 `scripts/upstream-tests.mjs` runtime adapter is a separate, narrower experiment.
 
+## Resource protection on the maintainer desktop
+
+Heavy work must run one workload at a time through `run-bounded.mjs`. The full
+build and suite runners apply it automatically. Other compiler probes use:
+
+```sh
+node scripts/full-lean/run-bounded.mjs -- node scripts/full-lean/probe-primitives.mjs v26
+```
+
+The Linux systemd/cgroup-v2 runner includes every descendant in one 10 GiB
+kernel memory cap, stops the workload proactively at 8 GiB, and stops on low
+host headroom or rising memory pressure. Smaller hosts/budgets receive a lower
+cap. A fixed service name prevents overlapping workloads in this checkout.
+CTest defaults to one job; builds and Binaryen default to two. Keep those
+settings on this host, including when a test itself starts several compilers.
+Missing cgroup support fails closed; this is a Linux maintainer tool, not an
+application runtime installation requirement.
+
+Do **not** use `MemoryHigh` throttling or deliberately induce OOM to verify this
+guard. The desktop's ancestor `systemd-oomd` policy killed ChatGPT during the
+first throttled guard probe despite roughly 27 GiB remaining available. The
+corrected guard leaves `MemoryHigh=infinity` and samples usage/pressure every
+200 ms. `probe-resource-limits.mjs` verifies proactive termination using an
+allocation below the kernel cap, mutual exclusion, cleanup, and reuse. Its
+verified run recorded zero OOM and throttling events.
+
+Resource reports and systemd exit evidence live in `.work/resource-runs/` (or an
+explicit `--report` path). Exit 125 denotes a resource stop or interruption,
+not a Lean conformance failure. `execution-started.json` links suite runs to
+their resource report even if the run is interrupted. Preserve incomplete logs;
+do not count their unfinished registrations as passes. See
+[the crash diagnosis](../../docs/RESOURCE_FAILURES.md).
+
 ## Unchanged tests and the native control
 
 ```sh
 node scripts/full-lean/prepare-suite.mjs --output .work/full-suite-native --backend native --timeout 600
-node scripts/full-lean/run-suite.mjs --suite .work/full-suite-native --jobs 2
+node scripts/full-lean/run-suite.mjs --suite .work/full-suite-native --jobs 1
 ```
 
 Preparation verifies the pinned source archive, extracts an isolated source tree,
@@ -75,9 +108,9 @@ With those local prerequisites present:
 
 ```sh
 node scripts/full-lean/build.mjs --stage prepare
-node scripts/full-lean/build.mjs --stage native32 --jobs 8
-node scripts/full-lean/build.mjs --stage wasm --jobs 8
-node scripts/full-lean/probe-engines.mjs
+node scripts/full-lean/build.mjs --stage native32 --jobs 2
+node scripts/full-lean/build.mjs --stage wasm --jobs 2
+node scripts/full-lean/run-bounded.mjs -- node scripts/full-lean/probe-engines.mjs
 ```
 
 `LASM_EMSDK` and `LASM_LEAN32_DEPS` override the cached SDK and dependency roots.
@@ -125,7 +158,7 @@ node scripts/full-lean/build.mjs --stage wasm64 --jobs 6 --link-opt -O1
 LEAN_STACK_SIZE_KB=8192 node scripts/full-lean/run-compiler.mjs --prefix .work/lean-full/wasm64 --version
 node scripts/full-lean/prepare-toolchain.mjs --engine node
 node scripts/full-lean/prepare-suite.mjs --output .work/full-suite-node --backend node --prefix .work/full-toolchains/node
-node scripts/full-lean/run-suite.mjs --suite .work/full-suite-node --jobs 4
+node scripts/full-lean/run-suite.mjs --suite .work/full-suite-node --jobs 1
 ```
 
 `prepare-toolchain.mjs` also accepts `--engine deno` and `--engine bun`. Its Lean,
@@ -196,6 +229,13 @@ chosen Wasm facade; report those results separately from the unchanged suite.
 frozen host module, and a new output directory. It compiles a Linux-only helper
 and preloads it only into diagnostic child processes. This is not part of the
 published launcher or the stock Bun conformance run.
+
+For a separate Linux resource-adjusted suite, `prepare-toolchain.mjs --engine bun
+--bun-stack-helper <compiled-stack-reservation.so>` copies and hashes that helper
+into the new facade, reserves 64 MiB for Bun workers, and sets JSC's budget to
+60 MiB. The facade and its generated programs record/use that environment.
+Keep these results separate from stock Bun; this option is not a portable
+packaged solution and must never be used to relabel an existing run.
 
 The host bridge transfers requests from Wasm pthreads to the JavaScript main
 thread through message ports. Waiting pthreads use Emscripten's futex API, which

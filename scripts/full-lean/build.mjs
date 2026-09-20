@@ -6,12 +6,15 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { root, leanCommit, resolveLean } from '../../src/toolchain.mjs';
 import { patchSdk } from './patch-sdk.mjs';
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const output = resolve(option('--output', '.work/lean-full'));
 const stage = option('--stage', 'wasm');
-const jobs = Number(option('--jobs', '8'));
+const jobs = Number(option('--jobs', '2'));
 const linkOptimization = option('--link-opt', '-O1');
 const stackMb = Number(option('--stack-mb', '64'));
 const leanAllocator = option('--lean-allocator', 'generic');

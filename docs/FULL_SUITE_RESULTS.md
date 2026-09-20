@@ -211,7 +211,9 @@ upstream `leanmake` did not rebuild generated C after changing the runtime heade
 The build now tracks those headers and compiler inputs as an explicit prerequisite.
 A regression using the actual generated make rules verifies both rebuilding after
 a header change and retaining the cached object when inputs are unchanged.
-The full allocator rebuild remains in progress. See
+The full allocator rebuild completed, including 2,432 generated C objects, and
+its Node version smoke test passed. Frozen v26's allocator behavior still needs
+the targeted memory and serialization checks. See
 [the cache evidence](evidence/build-cache-2026-09-19.json).
 
 Bun's uncaught pthread stack errors lose their Wasm frames during error transfer.
@@ -226,9 +228,23 @@ producer delay, consumer polling interval, connection timeouts, and watchdog
 polling cadence. All request/response bytes, functional assertions, polling
 counts, and relative timing ratios are unchanged; its 36 changed lines and input
 hash are recorded. That derivative passes all 22 cases in native Lean and Node.
+Deno still fails the early-streaming case; the separate Linux stack-adjusted Bun
+run times out on cases 1 and 18. A factor-50 native control passes; its engine
+comparisons are pending. These runs overlapped other work before resource
+isolation was added, so fresh low-contention comparisons remain necessary.
 It is **not** counted as a pass of the original timing-sensitive file, and does
 not establish that every HTTP scheduling difference is resolved. See
 [the timing evidence](evidence/http-scaled-timing-2026-09-19.json).
+
+The old full Node v6 and Deno/Bun v23 runs were interrupted by desktop OOM
+failures. Earlier references to them being in progress are historical; they are
+not still running and have no complete result. The Deno/Bun trees retain all
+7,267 original hashes. Node retains 7,266; its Lake `kinds` driver overwrote the
+originally empty `produced.out` scratch file with `dynlib`. That alteration is
+recorded and preserved, not silently repaired. New runs use one workload at a time,
+one CTest job, and the proactive resource guard. Resource-aborted runs are
+reported separately from Lean failures. See [the diagnosis](RESOURCE_FAILURES.md)
+and [the recorded partial results](evidence/resource-protection-2026-09-19.json).
 
 Two bounded engine investigations narrow the remaining memory/stack work:
 

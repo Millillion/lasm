@@ -1,0 +1,756 @@
+{
+  "recordedAt": "2026-09-20T00:16:34.546015+00:00",
+  "kernelEpisodes": [
+    {
+      "trigger": "2026-09-19T01:06:52-04:00 lastmjs-G7-7790 kernel: em-pthread invoked oom-killer: gfp_mask=0x140dca(GFP_HIGHUSER_MOVABLE|__GFP_COMP|__GFP_ZERO), order=0, oom_score_adj=0",
+      "topProcesses": [
+        {
+          "pid": 1352587,
+          "rssMiB": 3551.31,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1340213,
+          "rssMiB": 3545.06,
+          "swapMiB": 16.62,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1350532,
+          "rssMiB": 2978.95,
+          "swapMiB": 0.0,
+          "name": "wasm-opt",
+          "oomScore": 0
+        },
+        {
+          "pid": 1350538,
+          "rssMiB": 2963.25,
+          "swapMiB": 0.0,
+          "name": "wasm-opt",
+          "oomScore": 0
+        },
+        {
+          "pid": 1351653,
+          "rssMiB": 2841.14,
+          "swapMiB": 0.0,
+          "name": "wasm-opt",
+          "oomScore": 0
+        },
+        {
+          "pid": 1353201,
+          "rssMiB": 2226.15,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1353275,
+          "rssMiB": 1558.82,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1353287,
+          "rssMiB": 1539.82,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1340604,
+          "rssMiB": 1171.82,
+          "swapMiB": 2.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1350575,
+          "rssMiB": 1123.3,
+          "swapMiB": 1.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1350309,
+          "rssMiB": 1118.72,
+          "swapMiB": 7.88,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1350298,
+          "rssMiB": 1112.57,
+          "swapMiB": 22.88,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 6345,
+          "rssMiB": 399.15,
+          "swapMiB": 265.31,
+          "name": "codex",
+          "oomScore": 0
+        },
+        {
+          "pid": 5941,
+          "rssMiB": 214.59,
+          "swapMiB": 50.16,
+          "name": "ChatGPT",
+          "oomScore": 0
+        },
+        {
+          "pid": 3803,
+          "rssMiB": 206.93,
+          "swapMiB": 32.13,
+          "name": "chrome",
+          "oomScore": 0
+        }
+      ],
+      "memoryEvidence": [
+        "Free swap  = 0kB",
+        "Total swap = 2097148kB",
+        "8340696 pages RAM",
+        "Out of memory: Killed process 483610 (chrome) total-vm:1518426308kB, anon-rss:20920kB, file-rss:768kB, shmem-rss:384kB, UID:1000 pgtables:876kB oom_score_adj:300"
+      ]
+    },
+    {
+      "trigger": "2026-09-19T08:36:13-04:00 lastmjs-G7-7790 kernel: Compositor invoked oom-killer: gfp_mask=0x140cca(GFP_HIGHUSER_MOVABLE|__GFP_COMP), order=0, oom_score_adj=300",
+      "topProcesses": [
+        {
+          "pid": 1491939,
+          "rssMiB": 5206.32,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1488024,
+          "rssMiB": 3846.76,
+          "swapMiB": 108.38,
+          "name": "bun",
+          "oomScore": 0
+        },
+        {
+          "pid": 1491450,
+          "rssMiB": 3143.21,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1487953,
+          "rssMiB": 2830.05,
+          "swapMiB": 425.38,
+          "name": "deno",
+          "oomScore": 0
+        },
+        {
+          "pid": 1492161,
+          "rssMiB": 1650.38,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1492198,
+          "rssMiB": 1597.79,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1489357,
+          "rssMiB": 1580.25,
+          "swapMiB": 1.0,
+          "name": "bun",
+          "oomScore": 0
+        },
+        {
+          "pid": 1489611,
+          "rssMiB": 1567.48,
+          "swapMiB": 0.0,
+          "name": "bun",
+          "oomScore": 0
+        },
+        {
+          "pid": 1490925,
+          "rssMiB": 1510.18,
+          "swapMiB": 0.0,
+          "name": "deno",
+          "oomScore": 0
+        },
+        {
+          "pid": 1491012,
+          "rssMiB": 1499.96,
+          "swapMiB": 0.0,
+          "name": "deno",
+          "oomScore": 0
+        },
+        {
+          "pid": 1492246,
+          "rssMiB": 1343.18,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1492222,
+          "rssMiB": 1334.84,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1492257,
+          "rssMiB": 1141.04,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1441825,
+          "rssMiB": 483.25,
+          "swapMiB": 171.75,
+          "name": "ChatGPT",
+          "oomScore": 300
+        },
+        {
+          "pid": 1491657,
+          "rssMiB": 153.24,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        }
+      ],
+      "memoryEvidence": [
+        "Free swap  = 0kB",
+        "Total swap = 2097148kB",
+        "8340696 pages RAM",
+        "Out of memory: Killed process 1441825 (ChatGPT) total-vm:1526385172kB, anon-rss:488912kB, file-rss:384kB, shmem-rss:5552kB, UID:1000 pgtables:3968kB oom_score_adj:300"
+      ]
+    },
+    {
+      "trigger": "2026-09-19T11:37:31-04:00 lastmjs-G7-7790 kernel: cinnamon-screen invoked oom-killer: gfp_mask=0x140cca(GFP_HIGHUSER_MOVABLE|__GFP_COMP), order=0, oom_score_adj=200",
+      "topProcesses": [
+        {
+          "pid": 1602026,
+          "rssMiB": 4284.81,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1601766,
+          "rssMiB": 3214.04,
+          "swapMiB": 0.75,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1601897,
+          "rssMiB": 3000.58,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1600744,
+          "rssMiB": 2880.97,
+          "swapMiB": 28.62,
+          "name": "deno",
+          "oomScore": 0
+        },
+        {
+          "pid": 1601373,
+          "rssMiB": 2787.29,
+          "swapMiB": 364.88,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1601697,
+          "rssMiB": 2260.37,
+          "swapMiB": 4.5,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1602275,
+          "rssMiB": 1846.72,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1602302,
+          "rssMiB": 1710.64,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1601919,
+          "rssMiB": 1689.91,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1602003,
+          "rssMiB": 1554.96,
+          "swapMiB": 0.0,
+          "name": "deno",
+          "oomScore": 0
+        },
+        {
+          "pid": 1602121,
+          "rssMiB": 1500.13,
+          "swapMiB": 0.0,
+          "name": "bun",
+          "oomScore": 0
+        },
+        {
+          "pid": 1602241,
+          "rssMiB": 1275.77,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1602386,
+          "rssMiB": 699.67,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1602367,
+          "rssMiB": 539.62,
+          "swapMiB": 0.0,
+          "name": "MainThread",
+          "oomScore": 0
+        },
+        {
+          "pid": 1492281,
+          "rssMiB": 193.88,
+          "swapMiB": 59.54,
+          "name": "ChatGPT",
+          "oomScore": 300
+        }
+      ],
+      "memoryEvidence": [
+        "Free swap  = 0kB",
+        "Total swap = 2097148kB",
+        "8340696 pages RAM",
+        "Out of memory: Killed process 1492281 (ChatGPT) total-vm:1518472604kB, anon-rss:196932kB, file-rss:896kB, shmem-rss:708kB, UID:1000 pgtables:2688kB oom_score_adj:300"
+      ]
+    }
+  ],
+  "additionalDesktopFailure": {
+    "time": "2026-09-19T19:50:37-04:00",
+    "cause": "systemd-oomd ancestor pressure policy killed both the 256 MiB probe and the ChatGPT app scope. MemoryHigh throttling generated pressure despite abundant free RAM.",
+    "lastMonitor": {
+      "startedAt": "2026-09-19T23:50:06.155Z",
+      "command": [
+        "python3",
+        "-c",
+        "import subprocess,sys,time,pathlib\np=subprocess.Popen([sys.executable,'-c','import time; x=bytearray(384*1024*1024); time.sleep(30)'],start_new_session=True)\npathlib.Path(\"/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v2/descendant.pid\").write_text(str(p.pid))\np.wait(timeout=240)\n"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "fd7a6b7d-e827-4fe4-ad40-e3ab50bb7076",
+      "limits": {
+        "memoryMax": 268435456,
+        "memoryHigh": 234881024,
+        "memorySwapMax": 0,
+        "tasksMax": 1024
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 29593198592
+      },
+      "minimumHostAvailable": 29320785920,
+      "peakMemoryBytes": 251432960,
+      "peakTasks": 2,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v2/memory-exhaustion.json",
+      "status": "running",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-19T23:50:37.196Z",
+        "memoryBytes": 251174912,
+        "peakMemoryBytes": 251432960,
+        "swapBytes": 0,
+        "tasks": 2,
+        "memoryEvents": {
+          "low": 0,
+          "high": 2955,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    },
+    "serviceResult": {
+      "serviceResult": "oom-kill",
+      "exitCode": "killed",
+      "exitStatus": "KILL",
+      "capturedAt": "2026-09-19T23:50:37.994Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 11403264,
+      "peakMemoryBytes": 251441152,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryEvents": {
+        "low": 0,
+        "high": 2989,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "journal": ".work/resource-diagnostics/oomd-2026-09-19-1950.log"
+  },
+  "correctedProtection": {
+    "kernelCapGiB": 10,
+    "proactiveStopGiB": 8,
+    "memoryHigh": "disabled (infinity)",
+    "hostHeadroomGiB": 8,
+    "pressureStopSomeAvg10Percent": 5,
+    "samplingMilliseconds": 200,
+    "maxHeavyWorkloads": 1,
+    "ctestJobs": 1,
+    "buildJobs": 2,
+    "noIntentionalOomTesting": true,
+    "verification": {
+      "testedAt": "2026-09-20T00:14:33.390Z",
+      "checks": [
+        "nested guard",
+        "mutual exclusion",
+        "signal cleanup",
+        "proactive descendant memory stop",
+        "zero OOM and throttling events",
+        "reuse after stop"
+      ],
+      "results": [
+        {
+          "name": "contender",
+          "code": 1,
+          "signal": null,
+          "report": {
+            "startedAt": "2026-09-20T00:14:32.546Z",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "-e",
+              "process.exit(77)"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "10e19b7c-570e-4856-ae67-e8c86626eceb",
+            "limits": {
+              "memoryMax": 268435456,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 214748364,
+              "memorySwapMax": 0,
+              "tasksMax": 1024
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 29702803456
+            },
+            "minimumHostAvailable": 29702803456,
+            "peakMemoryBytes": 0,
+            "peakTasks": 0,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v3/contender.json",
+            "status": "finished",
+            "finishedAt": "2026-09-20T00:14:32.561Z",
+            "result": {
+              "code": 1,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          }
+        },
+        {
+          "name": "owner",
+          "code": 125,
+          "signal": null,
+          "report": {
+            "startedAt": "2026-09-20T00:14:32.386Z",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "--input-type=module",
+              "-e",
+              "import {writeFileSync} from 'node:fs'; import {ensureResourceGuard} from './scripts/full-lean/resource-guard.mjs';\n   await ensureResourceGuard(); writeFileSync(\"/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v3/owner.ready\", String(process.pid)); setInterval(() => {}, 1000);"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "f55cdb42-27c7-49c6-926e-1bb2bde3996d",
+            "limits": {
+              "memoryMax": 268435456,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 214748364,
+              "memorySwapMax": 0,
+              "tasksMax": 1024
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 29734338560
+            },
+            "minimumHostAvailable": 29725548544,
+            "peakMemoryBytes": 11780096,
+            "peakTasks": 6,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v3/owner.json",
+            "status": "finished",
+            "stoppedBecause": "SIGTERM",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-20T00:14:32.617Z",
+              "memoryBytes": 5984256,
+              "peakMemoryBytes": 11395072,
+              "swapBytes": 0,
+              "tasks": 6,
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "killed",
+              "exitStatus": "TERM",
+              "capturedAt": "2026-09-20T00:14:32.644Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 11780096,
+              "peakMemoryBytes": 11780096,
+              "swapBytes": 0,
+              "tasks": 7,
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-20T00:14:32.657Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": true,
+            "memoryThrottled": false
+          }
+        },
+        {
+          "name": "proactive-stop",
+          "code": 125,
+          "signal": null,
+          "report": {
+            "startedAt": "2026-09-20T00:14:32.706Z",
+            "command": [
+              "python3",
+              "-c",
+              "import subprocess,sys,time,pathlib\np=subprocess.Popen([sys.executable,'-c','import time; x=bytearray(208*1024*1024); time.sleep(30)'],start_new_session=True)\npathlib.Path(\"/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v3/descendant.pid\").write_text(str(p.pid))\np.wait(timeout=35)\n"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "0f47c27f-67c1-41d0-be41-25ca3b933b8c",
+            "limits": {
+              "memoryMax": 268435456,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 214748364,
+              "memorySwapMax": 0,
+              "tasksMax": 1024
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 29739163648
+            },
+            "minimumHostAvailable": 29489262592,
+            "peakMemoryBytes": 228642816,
+            "peakTasks": 2,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v3/proactive-stop.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-20T00:14:33.112Z",
+              "memoryBytes": 228388864,
+              "peakMemoryBytes": 228642816,
+              "swapBytes": 0,
+              "tasks": 2,
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "stoppedBecause": "Workload reached its proactive memory budget",
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "killed",
+              "exitStatus": "TERM",
+              "capturedAt": "2026-09-20T00:14:33.195Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 11980800,
+              "peakMemoryBytes": 228642816,
+              "swapBytes": 0,
+              "tasks": 7,
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-20T00:14:33.208Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": true,
+            "memoryThrottled": false
+          }
+        },
+        {
+          "name": "after-stop",
+          "code": 0,
+          "signal": null,
+          "report": {
+            "startedAt": "2026-09-20T00:14:33.259Z",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "-e",
+              "process.exit(0)"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "85ce2a82-1d49-4a86-9926-fbcfe4e96d56",
+            "limits": {
+              "memoryMax": 268435456,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 214748364,
+              "memorySwapMax": 0,
+              "tasksMax": 1024
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 29528768512
+            },
+            "minimumHostAvailable": 29528768512,
+            "peakMemoryBytes": 11866112,
+            "peakTasks": 0,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v3/after-stop.json",
+            "status": "finished",
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-20T00:14:33.372Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 11866112,
+              "peakMemoryBytes": 11866112,
+              "swapBytes": 0,
+              "tasks": 7,
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-20T00:14:33.383Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          }
+        }
+      ]
+    }
+  },
+  "interruptedSuites": [
+    {
+      "suite": ".work/full-suite-node-v6",
+      "registered": 3891,
+      "lastCompletedProgress": [
+        "3726",
+        "3891",
+        "server_interactive/builtinCodeactions.lean",
+        "Passed   89.25 sec"
+      ],
+      "recordedCompletions": 3726,
+      "completionFileExists": false,
+      "originalSources": {
+        "checked": 7267,
+        "modified": [
+          "tests/lake/tests/kinds/produced.out"
+        ],
+        "explanation": "The unchanged Lake kinds driver/common.sh writes query output to produced.out; it is empty in the archive and now contains dynlib. Preserve this observed driver mutation."
+      },
+      "status": "interrupted; partial log is not a complete conformance result",
+      "recordedFailures": 32
+    },
+    {
+      "suite": ".work/full-suite-deno-v23",
+      "registered": 3896,
+      "lastCompletedProgress": [
+        "9",
+        "3896",
+        "tests/lake/tests/api/test.sh",
+        "Passed  331.67 sec"
+      ],
+      "recordedCompletions": 9,
+      "completionFileExists": false,
+      "originalSources": {
+        "checked": 7267,
+        "modified": []
+      },
+      "status": "interrupted; partial log is not a complete conformance result",
+      "recordedFailures": 3
+    },
+    {
+      "suite": ".work/full-suite-bun-v23",
+      "registered": 3896,
+      "lastCompletedProgress": [
+        "9",
+        "3896",
+        "tests/lake/tests/api/test.sh",
+        "Passed  452.27 sec"
+      ],
+      "recordedCompletions": 9,
+      "completionFileExists": false,
+      "originalSources": {
+        "checked": 7267,
+        "modified": []
+      },
+      "status": "interrupted; partial log is not a complete conformance result",
+      "recordedFailures": 3
+    }
+  ]
+}

@@ -215,6 +215,244 @@
       ],
       "startedAt": "2026-09-19T15:11:46Z",
       "finishedAt": "2026-09-19T15:13:19Z"
+    },
+    {
+      "engine": "deno",
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v27-rpc/bin/lean",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/http-timing-10-v2/HttpTiming.lean"
+      ],
+      "startedAt": "2026-09-19T15:20:24.742Z",
+      "finishedAt": "2026-09-19T15:21:25.545Z",
+      "seconds": 60.803,
+      "exitCode": 1,
+      "signal": null,
+      "stdout": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/http-timing-10-v2/HttpTiming.lean:309:0: error: Test '22_keepalive_unknown_size_flushes_early' failed:\nExpected early streamed bytes before producer EOF\n",
+      "stderr": ""
+    },
+    {
+      "engine": "bun-stack64",
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v24-stack64/bin/lean",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/http-timing-10-v2/HttpTiming.lean"
+      ],
+      "startedAt": "2026-09-19T15:21:25.550Z",
+      "finishedAt": "2026-09-19T15:26:46.305Z",
+      "seconds": 320.755,
+      "exitCode": 1,
+      "signal": null,
+      "stdout": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/http-timing-10-v2/HttpTiming.lean:117:0: error: Test '01_ignore_fixed_length_body' timed out after 20000ms (possible hang/loop)\n/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/http-timing-10-v2/HttpTiming.lean:268:0: error: Test '18_stress_streaming_active_client/send' timed out after 20000ms (possible hang/loop)\n",
+      "stderr": ""
     }
-  ]
+  ],
+  "scale50Control": {
+    "derivation": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/elab/async_http_hang_regressions.lean",
+      "sourceSha256": "95f84ab7b65cf9ce638bbe62c1106f99be68ffad65a2cb60bd2b9aa1f36e8ac7",
+      "output": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/http-timing-50/HttpTiming.lean",
+      "outputSha256": "fceec2a754172ce2121f9d011e0c9c9ede477e1383a5ae8c7b9f7426c130ca36",
+      "scale": 50,
+      "changes": [
+        {
+          "line": 8,
+          "before": "def runWithTimeout {\u03b1 : Type} (name : String) (timeoutMs : Nat := 2000) (action : IO \u03b1) : IO \u03b1 := do",
+          "after": "def runWithTimeout {\u03b1 : Type} (name : String) (timeoutMs : Nat := 100000) (action : IO \u03b1) : IO \u03b1 := do"
+        },
+        {
+          "line": 10,
+          "before": "  let ticks := (timeoutMs + 9) / 10",
+          "after": "  let ticks := (timeoutMs + 499) / 500"
+        },
+        {
+          "line": 23,
+          "before": "        IO.sleep 10",
+          "after": "        IO.sleep 500"
+        },
+        {
+          "line": 29,
+          "before": "    (handler : TestHandler) (config : Config := { lingeringTimeout := 500, generateDate := false }) : IO ByteArray := Async.block do",
+          "after": "    (handler : TestHandler) (config : Config := { lingeringTimeout := 25000, generateDate := false }) : IO ByteArray := Async.block do"
+        },
+        {
+          "line": 37,
+          "before": "    (handler : TestHandler) (config : Config := { lingeringTimeout := 500, generateDate := false }) : IO ByteArray :=",
+          "after": "    (handler : TestHandler) (config : Config := { lingeringTimeout := 25000, generateDate := false }) : IO ByteArray :="
+        },
+        {
+          "line": 38,
+          "before": "  runWithTimeout name 2000 do",
+          "after": "  runWithTimeout name 100000 do"
+        },
+        {
+          "line": 43,
+          "before": "    (handler : TestHandler) (config : Config := { lingeringTimeout := 500, generateDate := false }) : IO Unit :=",
+          "after": "    (handler : TestHandler) (config : Config := { lingeringTimeout := 25000, generateDate := false }) : IO Unit :="
+        },
+        {
+          "line": 44,
+          "before": "  runWithTimeout name 2000 do",
+          "after": "  runWithTimeout name 100000 do"
+        },
+        {
+          "line": 117,
+          "before": "#eval runWithTimeout \"01_ignore_fixed_length_body\" 2000 do",
+          "after": "#eval runWithTimeout \"01_ignore_fixed_length_body\" 100000 do"
+        },
+        {
+          "line": 123,
+          "before": "#eval runWithTimeout \"02_ignore_chunked_body\" 2000 do",
+          "after": "#eval runWithTimeout \"02_ignore_chunked_body\" 100000 do"
+        },
+        {
+          "line": 129,
+          "before": "#eval runWithTimeout \"03_ignore_large_fixed_body\" 2000 do",
+          "after": "#eval runWithTimeout \"03_ignore_large_fixed_body\" 100000 do"
+        },
+        {
+          "line": 136,
+          "before": "#eval runWithTimeout \"04_echo_full_body\" 2000 do",
+          "after": "#eval runWithTimeout \"04_echo_full_body\" 100000 do"
+        },
+        {
+          "line": 142,
+          "before": "#eval runWithTimeout \"05_read_first_chunk_only\" 2000 do",
+          "after": "#eval runWithTimeout \"05_read_first_chunk_only\" 100000 do"
+        },
+        {
+          "line": 149,
+          "before": "#eval runWithTimeout \"06_stream_many_response_chunks\" 2000 do",
+          "after": "#eval runWithTimeout \"06_stream_many_response_chunks\" 100000 do"
+        },
+        {
+          "line": 157,
+          "before": "#eval runWithTimeout \"07_stream_known_size\" 2000 do",
+          "after": "#eval runWithTimeout \"07_stream_known_size\" 100000 do"
+        },
+        {
+          "line": 173,
+          "before": "#eval runWithTimeout \"08_interest_selector_gating\" 2000 do",
+          "after": "#eval runWithTimeout \"08_interest_selector_gating\" 100000 do"
+        },
+        {
+          "line": 190,
+          "before": "#eval runWithTimeout \"09_incomplete_send_collapse\" 2000 do",
+          "after": "#eval runWithTimeout \"09_incomplete_send_collapse\" 100000 do"
+        },
+        {
+          "line": 205,
+          "before": "#eval runWithTimeout \"10_pipeline_fixed_then_get\" 2000 do",
+          "after": "#eval runWithTimeout \"10_pipeline_fixed_then_get\" 100000 do"
+        },
+        {
+          "line": 214,
+          "before": "#eval runWithTimeout \"11_pipeline_chunked_then_get\" 2000 do",
+          "after": "#eval runWithTimeout \"11_pipeline_chunked_then_get\" 100000 do"
+        },
+        {
+          "line": 223,
+          "before": "#eval runWithTimeout \"12_malformed_closes_connection\" 2000 do",
+          "after": "#eval runWithTimeout \"12_malformed_closes_connection\" 100000 do"
+        },
+        {
+          "line": 231,
+          "before": "#eval runWithTimeout \"13_client_close_while_streaming\" 2000 do",
+          "after": "#eval runWithTimeout \"13_client_close_while_streaming\" 100000 do"
+        },
+        {
+          "line": 236,
+          "before": "#eval runWithTimeout \"14_client_close_mid_body\" 2000 do",
+          "after": "#eval runWithTimeout \"14_client_close_mid_body\" 100000 do"
+        },
+        {
+          "line": 241,
+          "before": "#eval runWithTimeout \"15_handler_throw_unread_body\" 2000 do",
+          "after": "#eval runWithTimeout \"15_handler_throw_unread_body\" 100000 do"
+        },
+        {
+          "line": 247,
+          "before": "#eval runWithTimeout \"16_many_tiny_chunked_ignored\" 2000 do",
+          "after": "#eval runWithTimeout \"16_many_tiny_chunked_ignored\" 100000 do"
+        },
+        {
+          "line": 254,
+          "before": "#eval runWithTimeout \"17_many_tiny_chunked_consumed\" 2000 do",
+          "after": "#eval runWithTimeout \"17_many_tiny_chunked_consumed\" 100000 do"
+        },
+        {
+          "line": 268,
+          "before": "#eval runWithTimeout \"18_stress_streaming_active_client\" 2000 do",
+          "after": "#eval runWithTimeout \"18_stress_streaming_active_client\" 100000 do"
+        },
+        {
+          "line": 276,
+          "before": "#eval runWithTimeout \"19_pipeline_large_unread_then_get\" 2000 do",
+          "after": "#eval runWithTimeout \"19_pipeline_large_unread_then_get\" 100000 do"
+        },
+        {
+          "line": 286,
+          "before": "#eval runWithTimeout \"20_triple_pipeline_mixed\" 2000 do",
+          "after": "#eval runWithTimeout \"20_triple_pipeline_mixed\" 100000 do"
+        },
+        {
+          "line": 297,
+          "before": "#eval runWithTimeout \"21_incomplete_slow_post_times_out\" 2000 do",
+          "after": "#eval runWithTimeout \"21_incomplete_slow_post_times_out\" 100000 do"
+        },
+        {
+          "line": 305,
+          "before": "    (config := { lingeringTimeout := 200, generateDate := false })",
+          "after": "    (config := { lingeringTimeout := 10000, generateDate := false })"
+        },
+        {
+          "line": 309,
+          "before": "#eval runWithTimeout \"22_keepalive_unknown_size_flushes_early\" 3000 do",
+          "after": "#eval runWithTimeout \"22_keepalive_unknown_size_flushes_early\" 150000 do"
+        },
+        {
+          "line": 316,
+          "before": "        let sleep \u2190 Sleep.mk 300",
+          "after": "        let sleep \u2190 Sleep.mk 15000"
+        },
+        {
+          "line": 324,
+          "before": "      lingeringTimeout := 800",
+          "after": "      lingeringTimeout := 40000"
+        },
+        {
+          "line": 325,
+          "before": "      keepAliveTimeout := \u27e81500, by decide\u27e9",
+          "after": "      keepAliveTimeout := \u27e875000, by decide\u27e9"
+        },
+        {
+          "line": 334,
+          "before": "        let sleep \u2190 Sleep.mk 40",
+          "after": "        let sleep \u2190 Sleep.mk 2000"
+        },
+        {
+          "line": 346,
+          "before": "    let sleep \u2190 Sleep.mk 420",
+          "after": "    let sleep \u2190 Sleep.mk 21000"
+        }
+      ],
+      "explanation": "Multiply all millisecond intervals and deadlines by the same factor, including timeout polling cadence. Preserve every functional assertion, request/response byte, retry count, and relative streaming deadline. This is a parallel timing probe, not a pass of the unchanged upstream test."
+    },
+    "result": {
+      "engine": "native",
+      "command": [
+        "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "-j4",
+        "-s65536",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/http-timing-50/HttpTiming.lean"
+      ],
+      "startedAt": "2026-09-19T15:30:25.030Z",
+      "finishedAt": "2026-09-19T15:31:18.516Z",
+      "seconds": 53.486,
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    "engineComparisons": "pending"
+  }
 }
