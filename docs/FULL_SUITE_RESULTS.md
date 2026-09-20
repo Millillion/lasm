@@ -272,6 +272,20 @@ Two bounded engine investigations narrow the remaining memory/stack work:
   in Node and Deno; in Bun, fresh worker memory works and cloned memory fails.
   This does not establish a fundamental limit. See [the memory64 evidence](evidence/native-memory64-2026-09-19.json).
 
+The native-allocator capacity comparison now isolates an unchecked allocation:
+the same native-memory64 Wasm passes `instances` with an 8 GiB guest limit and
+fails with a 4 GiB limit. The module reader used a null `malloc` result as a file
+destination, corrupting Wasm address zero. The runtime patch checks that buffer
+and the compactor's initial/growing allocations, including capacity overflow.
+The checked 4 GiB build now reports `INTERNAL PANIC: out of memory`; this is still
+an upstream test failure. The checked native-memory64 8 GiB build passes the
+unchanged test in **50.41 seconds**. All four capacity/comparison runs preserve
+all 7,267 upstream hashes and record zero host OOM or throttling events. The
+largest guarded run, including suite preparation, peaked at **7.16 GiB**. See
+[the allocation evidence](evidence/region-allocation-2026-09-20.json). This fixes
+one corrupting failure path; it does not establish complete low-memory handling
+or remove the lowered-memory64 address-space ceiling.
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

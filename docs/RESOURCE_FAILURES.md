@@ -65,3 +65,13 @@ Raw diagnostic logs remain ignored under `.work/resource-diagnostics/`.
 [Structured evidence](evidence/resource-protection-2026-09-19.json) includes the
 kernel task summaries, failed first guard, corrected checks, and interrupted
 suite/source-integrity records. No interrupted full suite counts as a pass.
+
+Subsequent guarded builds and original-test comparisons completed without host
+OOM or throttling. The checked allocation comparison peaked at 7.16 GiB including
+suite preparation; its 8 GiB guest configuration passed the original `instances`
+test. Guest capacity is an address-space limit, not permission to consume that
+much host memory outside the guard. The 4 GiB guest reports a clean Lean
+allocation failure. This is distinct from either a host OOM or a supervisor stop.
+Kernel and systemd-oomd journals checked after that run contained no memory-kill
+entries since the desktop restart at 20:10 Eastern. See
+[the allocation evidence](evidence/region-allocation-2026-09-20.json).

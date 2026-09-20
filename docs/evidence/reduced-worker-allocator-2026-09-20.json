@@ -385,5 +385,100 @@
       "resourceLimited": false,
       "memoryThrottled": false
     }
+  },
+  "diagnosticImportLookup": {
+    "source": ".work/full-engine-probe/import-lookup/Instances.lean",
+    "changes": "Unchanged test copy; add a separate empty _private search-path directory to expose the full missing module path. This is a diagnostic, not an upstream-suite result.",
+    "result": "Heap corruption instead of a full missing module path",
+    "stderr": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/import-lookup/resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 31bdcb83d23f4f99823d6d27296411aa\nINTERNAL PANIC: 84\nAborted(Runtime error: The application has corrupted its heap memory area (address zero)!)\nwasm://wasm/lean.wasm-2e32d3d2:1\n\n\nRuntimeError: unreachable\n    at lean.wasm.__trap (wasm://wasm/lean.wasm-2e32d3d2:wasm-function[278589]:0x7826ea0)\n    at abort (/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/bin/lean.cjs:746:5)\n    at checkStackCookie (/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/bin/lean.cjs:435:5)\n    at exitRuntime (/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/bin/lean.cjs:692:3)\n    at exitJS (/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/bin/lean.cjs:1097:5)\n    at exitOnMainThread (/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/bin/lean.cjs:1082:3)\n    at __emscripten_receive_on_main_thread_js (/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/bin/lean.cjs:8879:13)\n    at lean.wasm.run_js_func (wasm://wasm/lean.wasm-2e32d3d2:wasm-function[275491]:0x778fc98)\n    at lean.wasm.em_task_queue_execute (wasm://wasm/lean.wasm-2e32d3d2:wasm-function[275443]:0x778e8bf)\n    at lean.wasm.receive_notification (wasm://wasm/lean.wasm-2e32d3d2:wasm-function[275452]:0x778eca6)\n\nNode.js v24.13.1\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 38.594s\nCPU time consumed: 56.794s\nMemory peak: 5.5G\nMemory swap peak: 0B\n[lasm] Peak 5.56 GiB; exit-code\n",
+    "resources": {
+      "startedAt": "2026-09-20T00:31:15.882Z",
+      "command": [
+        ".work/full-toolchains/node-v29/bin/lean",
+        "-Dcompiler.postponeCompile=false",
+        ".work/full-engine-probe/import-lookup/Instances.lean"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "716944fd-c7a7-4bc5-b8da-37be9a9621af",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 29662105600
+      },
+      "minimumHostAvailable": 23700508672,
+      "peakMemoryBytes": 5966905344,
+      "peakTasks": 19,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/import-lookup/resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-20T00:31:54.322Z",
+        "memoryBytes": 1777758208,
+        "peakMemoryBytes": 5966905344,
+        "swapBytes": 0,
+        "tasks": 2,
+        "memoryBreakdown": {
+          "anon": 1694830592,
+          "file": 28672,
+          "kernel": 53227520,
+          "shmem": 0,
+          "file_mapped": 28672,
+          "inactive_file": 0,
+          "slab": 2286528
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-20T00:31:54.496Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 12091392,
+        "peakMemoryBytes": 5966905344,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10207232,
+          "file": 28672,
+          "kernel": 950272,
+          "shmem": 0,
+          "file_mapped": 90112,
+          "inactive_file": 0,
+          "slab": 129376
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-20T00:31:54.506Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
   }
 }

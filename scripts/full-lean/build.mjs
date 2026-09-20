@@ -57,8 +57,9 @@ const alignmentPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4
 const threadRuntimePatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-thread-runtime.patch'));
 const sdkMimallocPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-sdk-mimalloc.patch'));
 const cInputsPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-c-inputs.patch'));
+const regionAllocationPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-region-allocation.patch'));
 for (const [name, input] of [['compact alignment', alignmentPatch], ['thread runtime', threadRuntimePatch],
-  ['SDK mimalloc', sdkMimallocPatch], ['generated C dependencies', cInputsPatch]]) {
+  ['SDK mimalloc', sdkMimallocPatch], ['generated C dependencies', cInputsPatch], ['region allocation', regionAllocationPatch]]) {
   const checkExtra = reverse => spawnSync('patch', ['--force', '--dry-run', reverse ? '--reverse' : '--forward', '-p1'],
     { cwd: source, input });
   if (checkExtra(true).status !== 0) {
@@ -73,6 +74,7 @@ writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ leanCommit
   mainCStackBytes: stackMb * 1024 * 1024,
   systemAllocator, leanAllocator, sdkMimallocPatchSha256: digest(sdkMimallocPatch),
   cInputsPatchSha256: digest(cInputsPatch),
+  regionAllocationPatchSha256: digest(regionAllocationPatch),
   memoryMode, maximumMemoryBytes: maximumMemoryGb * 1024 ** 3, pthreadPoolSize,
   bootstrapOptions: '-j2 -s8192', bootstrapEnvironment: { LEAN_STACK_SIZE_KB: '8192' }, generatedAt: new Date().toISOString(),
 }, null, 2) + '\n');

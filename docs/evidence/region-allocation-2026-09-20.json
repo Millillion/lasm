@@ -1,0 +1,229 @@
+{
+  "scope": "Controlled guest-capacity comparison and checked module/compactor allocations. These are one-test subsets, not complete suites. No host OOM was induced.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "patch": "scripts/full-lean/patches/lean-4.32.0-region-allocation.patch",
+  "patchSha256": "d8584427270436c68bdcbaaa75da56e74a572983a585022fb84923c979ae1787",
+  "reproduction": "Build with scripts/full-lean/build.mjs --stage wasm64 --jobs 2 --link-opt -O1 --lean-allocator mimalloc --memory64 2 --max-memory-gb 4 --pthread-pool 8; compare native memory64 1 / max-memory-gb 8. Prepare separate frozen toolchains and unchanged suites, filter ^elab/instances\\.lean$. All heavy operations use run-bounded.mjs.",
+  "comparison": "v30 and v31 share identical Wasm; v31 adjusts the imported memory maximum and glue heap limit to 4 GiB. v33 relinks the same checked Lean archives as v32 for native memory64 and 8 GiB. Full commands and archive hashes are in each snapshot relink.json.",
+  "findings": [
+    "Unchecked module-buffer allocation can write to address zero in WebAssembly. The separate compactor has unchecked initial/growth allocations too.",
+    "At 4 GiB the checked loader reports INTERNAL PANIC: out of memory instead of the misleading _private import failure. This remains a failed upstream test.",
+    "The unchanged test passes with native memory64 and an 8 GiB guest both before and after the checks.",
+    "The above results do not establish that all other low-memory failure paths or all engines are correct."
+  ],
+  "cases": [
+    {
+      "version": 30,
+      "build": "wasm64-v30-native-mi",
+      "guestMemoryGiB": 8,
+      "memoryMode": 1,
+      "regionAllocationChecks": false,
+      "suite": ".work/full-suite-node-v30-memory",
+      "wasmSha256": "21aba28a8473d587483d1af3d798eb9f3ca72cc143880a11948d1af33485ac79",
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "tests": [
+        {
+          "name": "elab/instances.lean",
+          "status": "run",
+          "seconds": 55.7423,
+          "output": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false instances.lean\n(WeaklyLawfulMonadAttach => (node\n  (* => (node\n    (* => (node\n      (* => (node #[LawfulMonadAttach.toWeaklyLawfulMonadAttach.{u, v},\n         instWeaklyLawfulMonadAttachOfLawfulMonad.{u_1, u_2}]))))))\n  (OptionT => (node\n    (* => (node (* => (node (* => (node #[OptionT.instWeaklyLawfulMonadAttachOfLawfulMonad.{u_1, u_2}]))))))))\n  (ReaderT => (node\n    (* => (node\n      (* => (node (* => (node (* => (node #[instWeaklyLawfulMonadAttachReaderTOfLawfulMonad.{u_1, u_2}]))))))))))\n  (ExceptT => (node\n    (* => (node\n      (* => (node (* => (node (* => (node #[instWeaklyLawfulMonadAttachExceptTOfLawfulMonad.{u_1, u_2, u_3}]))))))))))\n  (StateRefT' => (node\n    (* => (node\n      (* => (node (* => (node (* => (node (* => (node #[instWeaklyLawfulMonadAttachStateRefT'OfLawfulMonad]))))))))))))\n  (EStateM => (node (* => (node (* => (node (* => (node (* => (node #[instWeaklyLawfulMonadAt...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        }
+      ],
+      "resources": {
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024
+        },
+        "peakMemoryBytes": 6977359872,
+        "minimumHostAvailable": 22586822656,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        }
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceReport": ".work/resource-runs/2026-09-20T00-42-49.015Z-ff57c8e8-b951-475b-95b5-6d98dec1a53d.json"
+    },
+    {
+      "version": 31,
+      "build": "wasm64-v31-native-mi-4gb",
+      "guestMemoryGiB": 4,
+      "memoryMode": 1,
+      "regionAllocationChecks": false,
+      "suite": ".work/full-suite-node-v31-memory",
+      "wasmSha256": "21aba28a8473d587483d1af3d798eb9f3ca72cc143880a11948d1af33485ac79",
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "tests": [
+        {
+          "name": "elab/instances.lean",
+          "status": "fail",
+          "seconds": 26.6566,
+          "output": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false instances.lean\ninstances.lean:18:0-18:5: error: unknown module prefix '_private'\n\nNo directory '_private' or file '_private.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v31/lib/lean\nOutput ignored, skipping check\nTEST FAILED: Expected command to succeed, got exit code 1\n"
+        }
+      ],
+      "resources": {
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024
+        },
+        "peakMemoryBytes": 5990932480,
+        "minimumHostAvailable": 23608860672,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "result": {
+          "code": 8,
+          "signal": null
+        }
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceReport": ".work/resource-runs/2026-09-20T00-46-13.090Z-66caeb46-58a8-4505-ad17-89405e58f920.json"
+    },
+    {
+      "version": 32,
+      "build": "wasm64-v32-region",
+      "guestMemoryGiB": 4,
+      "memoryMode": 2,
+      "regionAllocationChecks": true,
+      "suite": ".work/full-suite-node-v32-memory",
+      "wasmSha256": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e",
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "tests": [
+        {
+          "name": "elab/instances.lean",
+          "status": "fail",
+          "seconds": 26.799,
+          "output": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false instances.lean\nINTERNAL PANIC: out of memory\nOutput ignored, skipping check\nTEST FAILED: Expected command to succeed, got exit code 1\n"
+        }
+      ],
+      "resources": {
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024
+        },
+        "peakMemoryBytes": 6727823360,
+        "minimumHostAvailable": 23562080256,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "result": {
+          "code": 8,
+          "signal": null
+        }
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceReport": ".work/full-engine-probe/node-v32-memory-resources.json"
+    },
+    {
+      "version": 33,
+      "build": "wasm64-v33-region-native-mi",
+      "guestMemoryGiB": 8,
+      "memoryMode": 1,
+      "regionAllocationChecks": true,
+      "suite": ".work/full-suite-node-v33-memory",
+      "wasmSha256": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1",
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "tests": [
+        {
+          "name": "elab/instances.lean",
+          "status": "run",
+          "seconds": 50.4094,
+          "output": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false instances.lean\n(WeaklyLawfulMonadAttach => (node\n  (* => (node\n    (* => (node\n      (* => (node #[LawfulMonadAttach.toWeaklyLawfulMonadAttach.{u, v},\n         instWeaklyLawfulMonadAttachOfLawfulMonad.{u_1, u_2}]))))))\n  (OptionT => (node\n    (* => (node (* => (node (* => (node #[OptionT.instWeaklyLawfulMonadAttachOfLawfulMonad.{u_1, u_2}]))))))))\n  (ReaderT => (node\n    (* => (node\n      (* => (node (* => (node (* => (node #[instWeaklyLawfulMonadAttachReaderTOfLawfulMonad.{u_1, u_2}]))))))))))\n  (ExceptT => (node\n    (* => (node\n      (* => (node (* => (node (* => (node #[instWeaklyLawfulMonadAttachExceptTOfLawfulMonad.{u_1, u_2, u_3}]))))))))))\n  (StateRefT' => (node\n    (* => (node\n      (* => (node (* => (node (* => (node (* => (node #[instWeaklyLawfulMonadAttachStateRefT'OfLawfulMonad]))))))))))))\n  (EStateM => (node (* => (node (* => (node (* => (node (* => (node #[instWeaklyLawfulMonadAt...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        }
+      ],
+      "resources": {
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024
+        },
+        "peakMemoryBytes": 7688724480,
+        "minimumHostAvailable": 22467710976,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        }
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceReport": ".work/full-engine-probe/node-v33-memory-resources.json",
+      "preservedResult": ".work/full-suite-node-v33-memory/memory-result-preserved"
+    }
+  ]
+}

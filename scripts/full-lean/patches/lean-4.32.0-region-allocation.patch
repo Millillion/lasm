@@ -1,0 +1,32 @@
+--- a/src/library/module.cpp
++++ b/src/library/module.cpp
+@@ -545,6 +545,7 @@
+ 
+         if (!buffer) {
+             buffer = static_cast<char *>(malloc(size));
++            if (!buffer) lean_internal_panic_out_of_memory();
+             lseek(fd.get(), 0, SEEK_SET);
+             ssize_t r = readn(fd.get(), buffer, size);
+             if (r < 0 || r != static_cast<ssize_t>(size)) {
+--- a/src/runtime/compact.cpp
++++ b/src/runtime/compact.cpp
+@@ -152,6 +152,8 @@
+     m_begin(malloc(LEAN_COMPACTOR_INIT_SZ)),
+     m_end(m_begin),
+-    m_capacity(static_cast<char*>(m_begin) + LEAN_COMPACTOR_INIT_SZ) {
++    m_capacity(m_begin) {
++    if (!m_begin) lean_internal_panic_out_of_memory();
++    m_capacity = static_cast<char*>(m_begin) + LEAN_COMPACTOR_INIT_SZ;
+     // Sort dep regions by `begin` address for binary search in `to_offset`.
+     std::sort(m_dep_regions.begin(), m_dep_regions.end(),
+               [](region_view const & a, region_view const & b) { return a.begin < b.begin; });
+@@ -174,7 +176,9 @@
+         sz = sz + sizeof(void*) - rem;
+     while (static_cast<char*>(m_end) + sz > m_capacity) {
+         size_t new_capacity = capacity()*2;
++        if (new_capacity < capacity()) lean_internal_panic_out_of_memory();
+         void * new_begin = malloc(new_capacity);
++        if (!new_begin) lean_internal_panic_out_of_memory();
+         memcpy(new_begin, m_begin, size());
+         m_end      = static_cast<char*>(new_begin) + size();
+         m_capacity = static_cast<char*>(new_begin) + new_capacity;
