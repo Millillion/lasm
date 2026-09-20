@@ -120,3 +120,11 @@ entry points refused an overlapping launch before their bodies ran while a real
 upstream test continued unaffected. All harness scripts passed syntax checks.
 These checks used no memory exhaustion; see
 [the entry-point evidence](evidence/automatic-guard-entrypoints-2026-09-20.json).
+
+The campaign supervisor now accepts `SIGUSR2` to finish and checkpoint the
+current test, then pause before launching another. This makes room for a
+diagnostic without interrupting an upstream driver's cleanup. `SIGTERM` still
+stops immediately when needed. Two tiny guarded CTest controls confirmed that
+the active test passes, the next test remains unstarted, and resumption preserves
+the first test's evidence byte-for-byte. They recorded no OOM or throttling;
+see [the orderly-pause evidence](evidence/campaign-pause-2026-09-20.json).

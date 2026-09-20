@@ -92,19 +92,26 @@ const save = () => {
 const here = fileURLToPath(new URL('.', import.meta.url));
 const runner = join(here, 'run-bounded.mjs');
 const suiteRunner = join(here, 'run-suite.mjs');
-let child, interrupted;
+let child, interrupted, pauseRequested;
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
   interrupted = signal;
   child?.kill(signal);
+});
+// Finish the current immutable attempt before yielding the single workload
+// slot to a diagnostic. SIGTERM remains available for immediate cancellation.
+process.on('SIGUSR2', () => {
+  pauseRequested = new Date().toISOString();
+  console.log('Pause requested; the current test will finish and be checkpointed.');
 });
 const json = path => existsSync(path) ? JSON.parse(readFileSync(path)) : null;
 const escaped = name => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 let executed = 0;
 state.status = 'running';
+delete state.pauseRequestedAt;
 save();
 for (const [index, test] of state.tests.entries()) {
   if (test.status && test.status !== 'pending') continue;
-  if (executed >= maximum || interrupted) break;
+  if (executed >= maximum || interrupted || pauseRequested) break;
   // A previous desktop interruption may have left a running attempt. Keep its
   // evidence and retry only that unfinished test, never overwrite its files.
   for (const attempt of test.attempts) if (attempt.status === 'running') attempt.status = 'interrupted';
@@ -155,6 +162,7 @@ for (const [index, test] of state.tests.entries()) {
 }
 state.status = interrupted ? 'interrupted' : state.stoppedBecause ? 'stopped'
   : state.tests.every(test => test.status && test.status !== 'pending') ? 'complete' : 'paused';
+if (pauseRequested) state.pauseRequestedAt = pauseRequested;
 save();
 console.log(JSON.stringify({ status: state.status, counts: state.counts, evidence: statePath }));
 process.exitCode = state.status === 'stopped' || interrupted ? 125

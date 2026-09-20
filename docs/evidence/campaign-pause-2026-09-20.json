@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "scope": "Synthetic CTest controls. SIGUSR2 finishes the current test, prevents the next launch, and resumes without repeating or overwriting completed work.",
+  "counts": {
+    "passed": 2,
+    "failed": 0,
+    "resource-aborted": 0,
+    "harness-failed": 0,
+    "pending": 0
+  },
+  "peakMemoryBytes": 25866240,
+  "evidence": ".work/full-engine-probe/campaign-pause-v1/verification.json",
+  "originalEvidencePreserved": true
+}
