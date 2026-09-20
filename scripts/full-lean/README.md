@@ -37,6 +37,31 @@ their resource report even if the run is interrupted. Preserve incomplete logs;
 do not count their unfinished registrations as passes. See
 [the crash diagnosis](../../docs/RESOURCE_FAILURES.md).
 
+For a long suite, use the checkpointed supervisor directly (it guards each test):
+
+```sh
+node scripts/full-lean/run-campaign.mjs --suite .work/full-suite-node --output .work/full-campaign-node
+```
+
+It runs one unchanged CTest registration at a time, gives every attempt a fresh
+resource cgroup and result directory, and saves progress after every test. Run
+the identical command to resume pending tests. `--max-tests N` bounds a batch;
+`--filter REGEX` selects a documented subset and must remain identical when
+resuming that campaign. Frozen input hashes are verified before starting.
+Completed failures are retained and require a separate rerun after a fix.
+A proactive workload-budget stop is recorded as `resource-aborted`, never as a
+test failure or pass. Host pressure, actual OOM, monitoring failures, and source
+drift stop the campaign for investigation. Do not wrap this small supervisor in
+another guard: its child test runs each apply the guard. Do not overlap campaigns
+with another heavy workload.
+
+`run-suite.mjs --results NEW_DIRECTORY` preserves a separate result for a subset
+or retry. Its `progress.json` is atomically updated on every completed CTest row,
+even if a subsequent test stops the run. `probe-campaign.mjs NEW_DIRECTORY` uses
+four tiny synthetic CTest controls to check checkpoint/resume, interruption
+cleanup, and failure accounting without compiler workloads or intentional
+memory exhaustion.
+
 ## Unchanged tests and the native control
 
 ```sh
@@ -154,8 +179,8 @@ recipe uses Emscripten's `emconfigure`, `--host=none --disable-assembly
 --disable-shared --enable-cxx`, and `-O2 -sMEMORY64=2 -pthread` for C and C++.
 
 ```sh
-node scripts/full-lean/build.mjs --stage wasm64 --jobs 6 --link-opt -O1
-LEAN_STACK_SIZE_KB=8192 node scripts/full-lean/run-compiler.mjs --prefix .work/lean-full/wasm64 --version
+node scripts/full-lean/build.mjs --stage wasm64 --jobs 2 --link-opt -O1
+LEAN_STACK_SIZE_KB=8192 node scripts/full-lean/run-bounded.mjs -- node scripts/full-lean/run-compiler.mjs --prefix .work/lean-full/wasm64 --version
 node scripts/full-lean/prepare-toolchain.mjs --engine node
 node scripts/full-lean/prepare-suite.mjs --output .work/full-suite-node --backend node --prefix .work/full-toolchains/node
 node scripts/full-lean/run-suite.mjs --suite .work/full-suite-node --jobs 1

@@ -286,6 +286,16 @@ largest guarded run, including suite preparation, peaked at **7.16 GiB**. See
 one corrupting failure path; it does not establish complete low-memory handling
 or remove the lowered-memory64 address-space ceiling.
 
+The checked native-allocator build then passed **11/11** selected unchanged Node
+regressions: filesystem, TCP/UDP, timers, network interfaces, HTTP hang/streaming
+checks, and four previous stack failures. The complete HTTP file passed in
+19.81 seconds, including the previously failing early-streaming case. Peak host
+memory was 3.24 GiB. Deno passed **11/12**, including `instances`, but still failed
+HTTP early streaming; its run including suite preparation peaked at 7.10 GiB.
+Both runs preserved all upstream hashes with zero OOM or throttling events.
+These are subset results and one successful Node timing run, not proof of timing
+stability or full engine parity. See [the guarded regressions](evidence/guarded-runtime-regressions-2026-09-20.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

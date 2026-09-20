@@ -75,3 +75,18 @@ allocation failure. This is distinct from either a host OOM or a supervisor stop
 Kernel and systemd-oomd journals checked after that run contained no memory-kill
 entries since the desktop restart at 20:10 Eastern. See
 [the allocation evidence](evidence/region-allocation-2026-09-20.json).
+
+Long suites can now use `run-campaign.mjs`, a small supervisor outside the
+workload cgroup. It starts one independently guarded test at a time and retains
+each attempt's logs, source-integrity result, and resource report. Completed
+results are checkpointed, interrupted attempts remain alongside their retries,
+and separate supervisors cannot overwrite the same campaign. A proactive
+workload-budget stop is recorded separately; actual OOM, host pressure, lost
+monitoring, or source drift stops the campaign for investigation. Build and suite
+entry points also reject more than two build jobs or one CTest job.
+
+Four tiny synthetic CTest controls verified batch resume, deliberate ordinary
+process interruption and cleanup, preserved prior evidence, and failed-test
+accounting. The intentional failing control remains failed; it was not turned
+into a pass. These controls used about 25 MiB per guarded run and induced no
+memory pressure or OOM. See [the checkpoint evidence](evidence/campaign-checkpoints-2026-09-20.json).

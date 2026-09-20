@@ -1,0 +1,215 @@
+{
+  "scope": "Selected unchanged upstream regressions after allocator and region-allocation fixes; not complete suites.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "configuration": "Native memory64, 8 GiB guest maximum, Lean/SDK mimalloc, eight preinitialized pthread workers, four Lean workers, 64 MiB worker stacks. One guarded CTest job.",
+  "runs": [
+    {
+      "engine": "node",
+      "toolchain": ".work/full-toolchains/node-v33",
+      "build": ".work/full-artifacts/wasm64-v33-region-native-mi",
+      "suite": ".work/full-suite-node-v33-memory",
+      "sourceIntegrity": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "passed": 11,
+      "total": 11,
+      "tests": [
+        {
+          "name": "elab/IO_test.lean",
+          "passed": true,
+          "seconds": 9.87056,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "passed": true,
+          "seconds": 19.8087,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/async_select_timer.lean",
+          "passed": true,
+          "seconds": 12.8499,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/async_tcp_server_client.lean",
+          "passed": true,
+          "seconds": 14.4391,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/async_udp_sockets.lean",
+          "passed": true,
+          "seconds": 13.0088,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/issue9018.lean",
+          "passed": true,
+          "seconds": 14.1637,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/networkInterfaces.lean",
+          "passed": true,
+          "seconds": 10.2418,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "passed": true,
+          "seconds": 11.29,
+          "failureOutput": null
+        },
+        {
+          "name": "elab_bench/big_do.lean",
+          "passed": true,
+          "seconds": 17.5033,
+          "failureOutput": null
+        },
+        {
+          "name": "elab_bench/bv_decide_rewriter.lean",
+          "passed": true,
+          "seconds": 15.4886,
+          "failureOutput": null
+        },
+        {
+          "name": "elab_bench/simp_congr.lean",
+          "passed": true,
+          "seconds": 13.4226,
+          "failureOutput": null
+        }
+      ],
+      "resources": {
+        "peakMemoryBytes": 3479429120,
+        "minimumHostAvailable": 26018955264,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceReport": ".work/resource-runs/2026-09-20T01-02-00.469Z-b585d687-bc24-421b-ad41-1cc9d9dc06bb.json"
+    },
+    {
+      "engine": "deno",
+      "toolchain": ".work/full-toolchains/deno-v33",
+      "build": ".work/full-artifacts/wasm64-v33-region-native-mi",
+      "suite": ".work/full-suite-deno-v33-regression",
+      "sourceIntegrity": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "passed": 11,
+      "total": 12,
+      "tests": [
+        {
+          "name": "elab/IO_test.lean",
+          "passed": true,
+          "seconds": 9.65353,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "passed": false,
+          "seconds": 18.442,
+          "failureOutput": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false async_http_hang_regressions.lean\nasync_http_hang_regressions.lean:309:0-309:5: error: Test '22_keepalive_unknown_size_flushes_early' failed:\nExpected early streamed bytes before producer EOF\n[NON-XML-CHAR-0x1B][1m--- -\t2026-09-19 21:06:34.646258027 -0400[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][1m+++ async_http_hang_regressions.lean.out.produced\t2026-09-19 21:06:34.643063333 -0400[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][36m@@ -0,0 +1,2 @@[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][32m+async_http_hang_regressions.lean:309:0-309:5: error: Test '22_keepalive_unknown_size_flushes_early' failed:[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][32m+Expected early streamed bytes before producer EOF[NON-XML-CHAR-0x1B][0m\nTEST FAILED: Unexpected output\n"
+        },
+        {
+          "name": "elab/async_select_timer.lean",
+          "passed": true,
+          "seconds": 12.7385,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/async_tcp_server_client.lean",
+          "passed": true,
+          "seconds": 13.579,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/async_udp_sockets.lean",
+          "passed": true,
+          "seconds": 12.5686,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/instances.lean",
+          "passed": true,
+          "seconds": 48.157,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/issue9018.lean",
+          "passed": true,
+          "seconds": 13.839,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/networkInterfaces.lean",
+          "passed": true,
+          "seconds": 9.98282,
+          "failureOutput": null
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "passed": true,
+          "seconds": 10.9265,
+          "failureOutput": null
+        },
+        {
+          "name": "elab_bench/big_do.lean",
+          "passed": true,
+          "seconds": 17.3222,
+          "failureOutput": null
+        },
+        {
+          "name": "elab_bench/bv_decide_rewriter.lean",
+          "passed": true,
+          "seconds": 15.8752,
+          "failureOutput": null
+        },
+        {
+          "name": "elab_bench/simp_congr.lean",
+          "passed": true,
+          "seconds": 12.5772,
+          "failureOutput": null
+        }
+      ],
+      "resources": {
+        "peakMemoryBytes": 7626330112,
+        "minimumHostAvailable": 22851907584,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceReport": ".work/full-engine-probe/deno-v33-regression-resources.json"
+    }
+  ]
+}

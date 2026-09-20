@@ -32,7 +32,7 @@ if (!Number.isInteger(pthreadPoolSize) || pthreadPoolSize < 1 || pthreadPoolSize
 if (!Number.isInteger(stackMb) || stackMb < 1 || stackMb > 1024) throw new Error('Invalid --stack-mb (1..1024)');
 if (!['-O0', '-O1', '-O2', '-O3', '-Os', '-Oz'].includes(linkOptimization)) throw new Error('Invalid --link-opt');
 if (!['prepare', 'native32', 'wasm', 'wasm64'].includes(stage)) throw new Error('Use --stage prepare, native32, wasm, or wasm64');
-if (!Number.isInteger(jobs) || jobs < 1) throw new Error('Invalid job count');
+if (!Number.isInteger(jobs) || jobs < 1 || jobs > 2) throw new Error('This host permits one or two build jobs');
 if (process.platform !== 'linux' || process.arch !== 'x64') throw new Error('This experimental bootstrap recipe currently targets a Linux x64 maintainer host');
 const sdk = resolve(process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9'));
 const sdkPatchSha256 = patchSdk(sdk);

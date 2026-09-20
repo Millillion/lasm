@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "scope": "Synthetic CTest controls for distinct guarded attempts, checkpoint/resume, signal cleanup, preserved interrupted evidence, failure accounting, and source hashes.",
+  "results": [
+    {
+      "step": 1,
+      "state": "paused",
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 3
+      },
+      "peakMemoryBytes": 25432064
+    },
+    {
+      "step": 2,
+      "state": "paused",
+      "counts": {
+        "passed": 1,
+        "failed": 1,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 2
+      },
+      "peakMemoryBytes": 25739264
+    },
+    {
+      "step": 3,
+      "state": "paused",
+      "counts": {
+        "passed": 2,
+        "failed": 1,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 1
+      },
+      "peakMemoryBytes": 25628672
+    },
+    {
+      "step": "interrupt and resume",
+      "state": "complete",
+      "counts": {
+        "passed": 3,
+        "failed": 1,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "interruptedAttemptsPreserved": 1,
+      "peakMemoryBytes": 25452544
+    }
+  ]
+}

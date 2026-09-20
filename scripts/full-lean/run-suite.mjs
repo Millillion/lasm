@@ -1,6 +1,6 @@
 // Execute the unchanged upstream registrations and verify original test bytes
 // both before and after. This is also used for the native control run.
-import { readFileSync, writeFileSync, existsSync, createWriteStream } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, createWriteStream, mkdirSync, renameSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -12,8 +12,11 @@ await ensureResourceGuard();
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const directory = resolve(option('--suite', '.work/full-suite-native'));
+const results = resolve(option('--results', directory));
+if (results !== directory && existsSync(results)) throw new Error('Use a new --results directory to preserve previous attempts');
+mkdirSync(results, { recursive: true });
 const jobs = Number(option('--jobs', '1'));
-if (!Number.isInteger(jobs) || jobs < 1) throw new Error('Invalid job count');
+if (jobs !== 1) throw new Error('This host permits one CTest job');
 const manifest = JSON.parse(readFileSync(join(directory, 'parallel-suite.json')));
 const hashes = JSON.parse(readFileSync(manifest.testSourceHashes));
 function verify() {
@@ -37,19 +40,26 @@ Object.assign(env, {
   GIT_CONFIG_KEY_2: 'user.email', GIT_CONFIG_VALUE_2: 'upstream-tests@localhost',
   CTEST_OUTPUT_ON_FAILURE: '1',
 });
-const command = ['--test-dir', manifest.execution, '-j', String(jobs), '--output-on-failure', '--output-junit', join(directory, 'results.xml')];
+const command = ['--test-dir', manifest.execution, '-j', String(jobs), '--output-on-failure', '--output-junit', join(results, 'results.xml')];
 if (args.includes('--rerun-failed')) command.push('--rerun-failed');
 const filter = option('--filter');
 if (filter) command.push('-R', filter);
 const startedAt = new Date().toISOString();
-writeFileSync(join(directory, 'execution-started.json'), JSON.stringify({ startedAt, command,
+writeFileSync(join(results, 'execution-started.json'), JSON.stringify({ startedAt, command,
   resourceReport: process.env.LASM_RESOURCE_REPORT, originalSources: { before } }, null, 2) + '\n');
 const runId = `${directory}:${startedAt}:${process.pid}`;
 env.LASM_UPSTREAM_RUN_ID = runId;
-const log = createWriteStream(join(directory, 'execution.log'));
+const log = createWriteStream(join(results, 'execution.log'));
 const child = spawn('ctest', command, { env, stdio: ['ignore', 'pipe', 'pipe'] });
 let partialLine = '';
 const finishedTests = new Set();
+const completed = [];
+function checkpoint() {
+  const path = join(results, 'progress.json');
+  writeFileSync(path + '.tmp', JSON.stringify({ startedAt, command, completed }, null, 2) + '\n');
+  renameSync(path + '.tmp', path);
+}
+checkpoint();
 const cleanup = [];
 let previouslyFinished = new Set();
 child.stdout.on('data', bytes => {
@@ -58,7 +68,11 @@ child.stdout.on('data', bytes => {
   const lines = partialLine.split('\n'); partialLine = lines.pop();
   for (const line of lines) {
     const match = line.match(/^\s*\d+\/\d+\s+Test\s+#\d+:\s+(.+?)\s+\.{2,}/);
-    if (match) finishedTests.add(match[1]);
+    if (match) {
+      finishedTests.add(match[1]);
+      completed.push({ name: match[1], result: line.match(/\.{2,}\s+(.*?)\s+[\d.]+ sec$/)?.[1] ?? 'unknown', line });
+      checkpoint();
+    }
   }
 });
 const cleanupTimer = setInterval(() => {
@@ -82,7 +96,7 @@ if (cleanup.length) {
 }
 await new Promise(resolve => log.end(resolve));
 const after = verify();
-writeFileSync(join(directory, 'execution.json'), JSON.stringify({ startedAt, finishedAt: new Date().toISOString(),
+writeFileSync(join(results, 'execution.json'), JSON.stringify({ startedAt, finishedAt: new Date().toISOString(),
   backend: manifest.backend, registered: manifest.registered, command, result, originalSources: { before, after },
   leftoverProcessCleanup: cleanup,
   resourceReport: process.env.LASM_RESOURCE_REPORT,
