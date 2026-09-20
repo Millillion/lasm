@@ -28,7 +28,7 @@ const oldPrelude = readFileSync(join(source, 'runtime-support/host-pre.js'), 'ut
 if (oldPrelude.replace(oldCall, 'await host.releaseAsync(request.handle);') !== prelude)
   throw new Error('The current prelude has changes beyond the isolated finalizer fix');
 mkdirSync(output);
-const changed = ['host/node-host.mjs', 'host/native-files.mjs', 'host/handle-table.mjs', 'runtime-support/host-pre.js'];
+const changed = ['host/node-host.mjs', 'host/native-files.mjs', 'host/native-file-worker.mjs', 'host/native-file-worker-pool.mjs', 'host/handle-table.mjs', 'runtime-support/host-pre.js'];
 for (const directory of ['bin', 'host', 'runtime-support']) {
   mkdirSync(join(output, directory));
   for (const name of readdirSync(join(source, directory))) {

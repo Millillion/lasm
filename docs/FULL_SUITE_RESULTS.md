@@ -368,6 +368,26 @@ run peaked at 3.24 GiB with no swap, OOM, or throttling, but does not measure
 per-variant peaks or establish full conformance. See
 [the startup comparison](evidence/bun-startup-2026-09-20.json).
 
+A separate filesystem comparison found a shared-worker-pool deadlock: four
+blocking reads could prevent their dependent writes from starting in the Node
+and Bun host adapters. Native Lean and Deno completed the same small control.
+The first full-Lean fixture lacked a task-readiness barrier and passed on the
+old runtime; those results are retained. Adding ordinary `IO.Promise` readiness
+barriers exposed the old full Node runtime's timeout while native Lean passed.
+
+Blocking file operations now lease independent host workers, with at most two
+idle workers retained briefly. The synchronized ordinary-Lean fixture passes
+in full Node, Deno, and Linux stack-adjusted Bun, and all three still pass the
+buffered-finalizer regression. Nineteen host/application checks and a separate
+open-handle lifetime check passed. The full differential run peaked at 3.38 GiB
+with no OOM, throttling, or swap use. Frozen v36 contains these host changes and
+the handle-ID fix while preserving the exact v35 Wasm and embedded dispatch.
+The ongoing v35 campaign remains a separate older-runtime result. See
+[the retained comparisons](evidence/fifo-workers-2026-09-20.json).
+The unchanged `file_read_overflow`, `IO_test`, and `tempfile` registrations also
+pass on v36 in each engine: **9/9**, with all 7,267 original hashes intact. Their
+combined preparation/run peaked at 5.56 GiB with zero OOM, throttling, or swap.
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

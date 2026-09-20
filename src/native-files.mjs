@@ -1,13 +1,15 @@
 import { createRequire } from 'node:module';
 import { existsSync, constants } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { callNativeFile } from './native-file-worker-pool.mjs';
 
 // Only the Node host loads this private adapter. No Lean declaration or user
 // annotation depends on the FFI library, and no native compiler runs on install.
 const require = createRequire(import.meta.url);
-let implementation;
-export function nativeFiles() {
-  if (implementation) return implementation;
+let implementation, synchronousImplementation;
+export function nativeFiles({ synchronous = false } = {}) {
+  const cached = synchronous ? synchronousImplementation : implementation;
+  if (cached) return cached;
   const bundled = new URL('./native/node_modules/koffi/index.cjs', import.meta.url);
   const ffi = existsSync(bundled) ? require(fileURLToPath(bundled)) : require('koffi');
   const windows = process.platform === 'win32';
@@ -46,7 +48,10 @@ export function nativeFiles() {
   const fromNodeError = error => failure(ffi.os.errno[error.code] ?? ffi.os.errno.EIO);
   // Capture errno in the callback, before another asynchronous result can
   // overwrite the calling thread's errno. Koffi propagates the worker's errno.
-  const call = (fn, ...args) => new Promise((resolve, reject) => fn.async(...args, (error, value) => {
+  const call = synchronous ? async (fn, ...args) => {
+    const value = fn(...args);
+    return { value, errno: ffi.errno() };
+  } : (fn, ...args) => new Promise((resolve, reject) => fn.async(...args, (error, value) => {
     const errno = ffi.errno();
     if (error) reject(error); else resolve({ value, errno });
   }));
@@ -88,7 +93,7 @@ export function nativeFiles() {
       throw failure(result.errno);
     };
   }
-  implementation = {
+  const adapter = {
     error: failure,
     fromNodeError,
     outOfMemory() { return failure(ffi.os.errno.ENOMEM); },
@@ -153,7 +158,7 @@ export function nativeFiles() {
         // Node does not expose O_CLOEXEC on every supported OS.
         fd = await checked(openFile, path, flags | (process.platform === 'darwin' ? 0x1000000 : 0x80000), permissions);
       }
-      try { return implementation.openDescriptor(fd, ['r','w','w','r+','a','r+'][mode]); }
+      try { return adapter.openDescriptor(fd, ['r','w','w','r+','a','r+'][mode]); }
       catch (error) { closeFd(fd); throw error; }
     },
     pipe() {
@@ -174,7 +179,7 @@ export function nativeFiles() {
       const owned = dup(fd);
       if (owned < 0) throw failure();
       if (!windows && fcntl(owned, 2, 1) < 0) { const error = failure(); closeFd(owned); throw error; }
-      return implementation.openDescriptor(owned, mode);
+      return adapter.openDescriptor(owned, mode);
     },
     close(file) {
       const stream = file.stream;
@@ -246,5 +251,30 @@ export function nativeFiles() {
       }
     },
   };
+  if (synchronous) return synchronousImplementation = adapter;
+  const reference = file => ({ stream: file.stream, fd: file.fd });
+  const buffer = bytes => Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  implementation = { ...adapter,
+    async open(...args) {
+      return { ...await callNativeFile('open', args), tail: Promise.resolve() };
+    },
+    async closeAsync(file) {
+      const stream = file.stream;
+      file.stream = null;
+      if (stream) await callNativeFile('closeAsync', [{ stream }]);
+    },
+    async read(file, count) {
+      if (!count) return Buffer.alloc(0);
+      return buffer(await callNativeFile('read', [reference(file), count]));
+    },
+    async write(file, bytes) {
+      if (bytes.length) await callNativeFile('write', [reference(file), bytes]);
+    },
+    async getLine(file) { return buffer(await callNativeFile('getLine', [reference(file)])); },
+    async readDirectory(path) { return (await callNativeFile('readDirectory', [path])).map(buffer); },
+    groupInfo(gid) { return callNativeFile('groupInfo', [gid]); },
+  };
+  for (const name of ['flush', 'rewind', 'truncate'])
+    implementation[name] = file => callNativeFile(name, [reference(file)]);
   return implementation;
 }

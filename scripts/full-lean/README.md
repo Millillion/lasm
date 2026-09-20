@@ -63,6 +63,12 @@ drift stop the campaign for investigation. Do not wrap this small supervisor in
 another guard: its child test runs each apply the guard. Do not overlap campaigns
 with another heavy workload.
 
+Send `SIGUSR2` to the verified supervisor PID in its `supervisor.lock` to request
+an orderly pause: the current test finishes and is checkpointed before another
+can start. Verify that the PID still belongs to this campaign before signaling
+it. `SIGTERM` and `SIGINT` interrupt immediately. `probe-campaign-pause.mjs
+NEW_DIRECTORY` validates orderly pause/resume with two tiny guarded CTest cases.
+
 `run-suite.mjs --results NEW_DIRECTORY` preserves a separate result for a subset
 or retry. Its `progress.json` is atomically updated on every completed CTest row,
 even if a subsequent test stops the run. `probe-campaign.mjs NEW_DIRECTORY` uses
@@ -103,6 +109,21 @@ embedded finalizer dispatch and matching link-time prelude, freezes the changed
 host modules, and retains the exact Wasm bytes. The full-runtime RPC awaits
 `fclose` completion while other Lean threads can dispatch host operations. The
 packaged cooperative runtime's synchronous finalizer is a separate remaining gap.
+
+`probe-fifo-workers.mjs --output NEW_DIRECTORY --toolchains FACADE[,FACADE]`
+checks four independent blocking reads followed by their dependent writes. The
+ordinary Lean fixture uses readiness promises before the delayed write, avoiding
+false passes caused by slow Wasm thread startup. A smaller private-host fixture
+isolates the shared native worker pool. Both retain external deadlines and an
+explicit `UV_THREADPOOL_SIZE=4`; `--host-only --host-module MODULE` selects a
+source adapter. The source fixture is copied into each fresh result directory.
+These are supplementary differential checks, not modified upstream tests.
+
+`derive-host-files.mjs FROZEN_SOURCE NEW_OUTPUT` freezes current private host
+modules while retaining the exact compiler Wasm, embedded dispatch, and Lean
+inputs. It first verifies all parent hashes and rejects changes to the host
+prelude or import ABI. This permits testing a host-only fix without recompiling
+the toolchain or silently changing an ongoing campaign's inputs.
 
 ## Unchanged tests and the native control
 

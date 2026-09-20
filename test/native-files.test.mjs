@@ -1,10 +1,38 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, readFileSync, statSync, writeFileSync, opendirSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync, statSync, writeFileSync, opendirSync, existsSync, openSync, closeSync, constants } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { createNodeRuntimeHost } from '../src/node-host.mjs';
+
+test('four blocked FIFO readers leave dependent writes able to run in each installed engine',
+  { skip: process.platform === 'win32' }, t => {
+    const directory = mkdtempSync(join(tmpdir(), 'lasm-fifo-workers-'));
+    const descriptors = [];
+    t.after(() => {
+      for (const fd of descriptors) closeSync(fd);
+      rmSync(directory, { recursive: true, force: true });
+    });
+    for (let i = 0; i < 4; i++) {
+      const path = join(directory, i + '.fifo');
+      const result = spawnSync('mkfifo', [path], { encoding: 'utf8' });
+      assert.equal(result.status, 0, result.stderr);
+      descriptors.push(openSync(path, constants.O_RDWR | constants.O_NONBLOCK));
+    }
+    const engines = [[process.execPath, []],
+      ['.cache/js-runtimes/deno-2.9.7/deno', ['run', '-A']],
+      ['.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []]];
+    for (const [engine, prefix] of engines) {
+      if (!existsSync(engine)) continue;
+      const result = spawnSync(engine, [...prefix, 'test/fixtures/fifo-workers-host.mjs',
+        resolve('src/node-host.mjs'), directory], { encoding: 'utf8', timeout: 10_000,
+        killSignal: 'SIGKILL', env: { ...process.env, UV_THREADPOOL_SIZE: '4' } });
+      assert.equal(result.status, 0, `${engine}: ${result.error?.message ?? result.stderr}`);
+      assert.equal(result.stdout, 'four readers started\nconcurrent FIFO reads and writes completed\n');
+      assert.equal(result.stderr, '');
+    }
+  });
 
 test('directory enumeration preserves native order and invalid UTF-8 filename bytes in each installed engine',
   { skip: process.platform === 'win32' }, t => {
@@ -53,6 +81,17 @@ test('Lean handles use buffered writes, flush, rewind, and the actual stream pos
   assert.equal(readFileSync(file, 'utf8'), 'first\n');
   host.release(h);
   assert.equal(host.stats().resources, 0);
+});
+
+test('open buffered handles remain valid after idle IO workers exit', async t => {
+  const { directory, host, ok, open } = setup(t);
+  const h = await open('idle-handle', 1);
+  await ok(3, h, 0, 'buffer survives worker exit');
+  assert.equal(statSync(join(directory, 'idle-handle')).size, 0);
+  await new Promise(resolve => setTimeout(resolve, 1200));
+  await ok(4, h);
+  await host.releaseAsync(h);
+  assert.equal(readFileSync(join(directory, 'idle-handle'), 'utf8'), 'buffer survives worker exit');
 });
 
 test('file reads exceed the former 16 MiB ceiling and return EOF correctly', async t => {

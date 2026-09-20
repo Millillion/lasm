@@ -228,6 +228,8 @@ private unsafe def «runProgram» : IO UInt32 := do
   copyFileSync(join(root, 'src/node-host.mjs'), join(output, 'node-host.mjs'));
   copyFileSync(join(root, 'src/handle-table.mjs'), join(output, 'handle-table.mjs'));
   copyFileSync(join(root, 'src/native-files.mjs'), join(output, 'native-files.mjs'));
+  copyFileSync(join(root, 'src/native-file-worker.mjs'), join(output, 'native-file-worker.mjs'));
+  copyFileSync(join(root, 'src/native-file-worker-pool.mjs'), join(output, 'native-file-worker-pool.mjs'));
   copyNativeBundle(root, output);
   copyFileSync(join(root, 'src/node-network.mjs'), join(output, 'node-network.mjs'));
   copyFileSync(join(root, 'src/node-udp.mjs'), join(output, 'node-udp.mjs'));

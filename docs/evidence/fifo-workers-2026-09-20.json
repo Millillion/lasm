@@ -1,0 +1,779 @@
+{
+  "scope": "Additional ordinary-Lean and private-host FIFO regressions, followed by unchanged upstream filesystem checks. No upstream source or expected output is changed. Full-suite and cross-platform parity are still unproven.",
+  "mechanism": "Each in-flight blocking stdio operation leases an independent JavaScript worker that makes synchronous C calls. A blocked read cannot fill the shared N-API pool and queue its dependent writer. At most two idle workers are retained for one second and do not keep the process alive. Stream operations remain serialized by the host.",
+  "testCorrection": "The first full Lean fixture did not wait for its reader tasks to start and passed on the old runtime despite the private-host deadlock. Those results are retained. A revised supplementary fixture waits on four ordinary IO.Promise readiness barriers; its native control passes and the old full Node runtime times out. The fixed runtime uses that same revised source hash.",
+  "bunQualification": "Full Bun checks retain the explicit Linux 64 MiB OS worker-stack reservation and 60 MiB JSC stack budget. They are not stock Bun or cross-OS results.",
+  "comparisons": {
+    "initialPrivateHost": {
+      "evidence": ".work/full-engine-probe/fifo-workers-before/comparison.json",
+      "sourceSha256": "e541d325f34e02afa1744b10e9d9a27d8f45edacebff3f37f1f5a9447039081a",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "-s65536",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoWorkers.lean"
+          ],
+          "seconds": 0.543053118,
+          "code": 0,
+          "signal": null,
+          "stdout": "concurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-host",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/src/node-host.mjs"
+          ],
+          "seconds": 5.035256215,
+          "code": null,
+          "signal": "SIGKILL",
+          "error": "spawnSync /home/lastmjs/.nvm/versions/node/v24.13.1/bin/node ETIMEDOUT",
+          "stdout": "four readers started\n",
+          "stderr": "",
+          "passed": false
+        },
+        {
+          "name": "deno-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "command": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440",
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/src/node-host.mjs"
+          ],
+          "seconds": 0.4078501839999999,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/src/node-host.mjs"
+          ],
+          "seconds": 5.028870164999999,
+          "code": null,
+          "signal": "SIGKILL",
+          "error": "spawnSync /home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun ETIMEDOUT",
+          "stdout": "four readers started\n",
+          "stderr": "",
+          "passed": false
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T03-23-38.972Z-8f0f1806-7e50-4b4c-b1db-6b35fe3563ec.json",
+        "peakMemoryBytes": 91262976,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    "initialFullFixtureWithoutReadinessBarrier": {
+      "evidence": ".work/full-engine-probe/fifo-workers-full-before/comparison.json",
+      "sourceSha256": "e541d325f34e02afa1744b10e9d9a27d8f45edacebff3f37f1f5a9447039081a",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "-s65536",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoWorkers.lean"
+          ],
+          "seconds": 0.55032224,
+          "code": 0,
+          "signal": null,
+          "stdout": "concurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-host",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v35-finalizer/host/node-host.mjs"
+          ],
+          "seconds": 5.030033468,
+          "code": null,
+          "signal": "SIGKILL",
+          "error": "spawnSync /home/lastmjs/.nvm/versions/node/v24.13.1/bin/node ETIMEDOUT",
+          "stdout": "four readers started\n",
+          "stderr": "",
+          "passed": false
+        },
+        {
+          "name": "node-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v35-finalizer/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoWorkers.lean"
+          ],
+          "seconds": 11.186761254,
+          "code": 0,
+          "signal": null,
+          "stdout": "concurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v35-finalizer-lowered/host/node-host.mjs"
+          ],
+          "seconds": 5.030029886,
+          "code": null,
+          "signal": "SIGKILL",
+          "error": "spawnSync /home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun ETIMEDOUT",
+          "stdout": "four readers started\n",
+          "stderr": "",
+          "passed": false
+        },
+        {
+          "name": "bun-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v35-finalizer/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoWorkers.lean"
+          ],
+          "seconds": 80.409519807,
+          "code": 0,
+          "signal": null,
+          "stdout": "concurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T03-24-09.750Z-1246eb21-c527-46c2-998b-16381ad21e95.json",
+        "peakMemoryBytes": 3993522176,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    "fixedPrivateHost": {
+      "evidence": ".work/full-engine-probe/fifo-workers-host-after-1/comparison.json",
+      "sourceSha256": "e541d325f34e02afa1744b10e9d9a27d8f45edacebff3f37f1f5a9447039081a",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "-s65536",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoWorkers.lean"
+          ],
+          "seconds": 0.5784591,
+          "code": 0,
+          "signal": null,
+          "stdout": "concurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-host",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/src/node-host.mjs"
+          ],
+          "seconds": 0.47587953900000013,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "command": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440",
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/src/node-host.mjs"
+          ],
+          "seconds": 0.500240452,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/src/node-host.mjs"
+          ],
+          "seconds": 0.40807005899999965,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T03-27-40.094Z-28617c6a-1dde-4d6a-a0bd-f7f9aac1654f.json",
+        "peakMemoryBytes": 92803072,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    "unfixedFullNodeWithReadinessBarrier": {
+      "evidence": ".work/full-engine-probe/fifo-workers-barrier-before/comparison.json",
+      "sourceSha256": "3d02a305b35ac331accded7e9860ffcb99dbc6e45551d04ae8c2c581c861a66a",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "-s65536",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoWorkers.lean"
+          ],
+          "seconds": 0.590518743,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-host",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v35-finalizer/host/node-host.mjs"
+          ],
+          "seconds": 5.030011418,
+          "code": null,
+          "signal": "SIGKILL",
+          "error": "spawnSync /home/lastmjs/.nvm/versions/node/v24.13.1/bin/node ETIMEDOUT",
+          "stdout": "four readers started\n",
+          "stderr": "",
+          "passed": false
+        },
+        {
+          "name": "node-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v35-finalizer/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoWorkers.lean"
+          ],
+          "seconds": 180.280059308,
+          "code": null,
+          "signal": "SIGKILL",
+          "error": "spawnSync /home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v35-finalizer/bin/lean ETIMEDOUT",
+          "stdout": "four readers started\n",
+          "stderr": "",
+          "passed": false
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T03-28-24.154Z-3211dba0-8248-43ed-83ff-eae21f043e00.json",
+        "peakMemoryBytes": 3514392576,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    "fixedWithReadinessBarrier": {
+      "evidence": ".work/full-engine-probe/fifo-workers-barrier-after-v36/comparison.json",
+      "sourceSha256": "3d02a305b35ac331accded7e9860ffcb99dbc6e45551d04ae8c2c581c861a66a",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "-s65536",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/fifo-workers-barrier-after-v36/FifoWorkers.lean"
+          ],
+          "seconds": 0.5669623429999999,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-host",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v36-file-workers/host/node-host.mjs"
+          ],
+          "seconds": 0.522089959,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v36-file-workers/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/fifo-workers-barrier-after-v36/FifoWorkers.lean"
+          ],
+          "seconds": 11.892416217,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "command": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440",
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v36-file-workers/host/node-host.mjs"
+          ],
+          "seconds": 0.5600653380000004,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v36-file-workers/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/fifo-workers-barrier-after-v36/FifoWorkers.lean"
+          ],
+          "seconds": 11.396881886000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-workers-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v36-file-workers-lowered/host/node-host.mjs"
+          ],
+          "seconds": 0.4024898140000005,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v36-file-workers/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/fifo-workers-barrier-after-v36/FifoWorkers.lean"
+          ],
+          "seconds": 80.647847762,
+          "code": 0,
+          "signal": null,
+          "stdout": "four readers started\nconcurrent FIFO reads and writes completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/file-workers-v36-resources.json",
+        "peakMemoryBytes": 3627151360,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    "bufferedFinalizerRegression": {
+      "evidence": ".work/full-engine-probe/fifo-finalizer-file-workers-v36/comparison.json",
+      "sourceSha256": "e0a211628b060824182bf564dbd82e69b05caab424b93c251f0b2697945a31e9",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "-s65536",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 0.519054756,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-host",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v36-file-workers/host/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.25639230899999993,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v36-file-workers/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 11.0841606,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "command": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440",
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v36-file-workers/host/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.2949766949999994,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v36-file-workers/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 10.405446302,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v36-file-workers-lowered/host/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.22052001799999926,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v36-file-workers/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 72.23869647499998,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/file-workers-v36-resources.json",
+        "peakMemoryBytes": 3627151360,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    }
+  },
+  "unitTests": {
+    "passed": 19,
+    "failed": 0,
+    "log": ".work/full-engine-probe/fifo-workers-units.log",
+    "resourceReport": ".work/full-engine-probe/fifo-workers-unit-resources.json",
+    "peakMemoryBytes": 556220416,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "additionalLifetimeTest": {
+    "passed": 1,
+    "description": "An open buffered handle remains valid after the idle IO worker exits.",
+    "log": ".work/full-engine-probe/validate-file-workers-v36.log",
+    "resourceReport": ".work/full-engine-probe/file-workers-v36-resources.json"
+  },
+  "snapshots": {
+    "wasm64-v36-file-workers": {
+      "derivedFrom": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v35-finalizer",
+      "derivation": {
+        "scope": "Private host modules only; unchanged Lean sources, Wasm, and embedded/link-time dispatch.",
+        "changed": [
+          "host/node-host.mjs",
+          "host/handle-table.mjs",
+          "host/native-files.mjs",
+          "host/native-file-worker.mjs",
+          "host/native-file-worker-pool.mjs"
+        ],
+        "parentDerivation": {
+          "scope": "Host finalizer dispatch and asynchronous C close; unchanged Lean sources and Wasm.",
+          "parentDerivation": {
+            "scope": "Resource-adjusted preinitialized worker count; unchanged Wasm and Lean sources.",
+            "from": 8,
+            "to": 5,
+            "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot.",
+            "wasmSha256": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1"
+          },
+          "wasmSha256": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1",
+          "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot."
+        },
+        "wasmSha256": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1",
+        "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot."
+      }
+    },
+    "wasm64-v36-file-workers-lowered": {
+      "derivedFrom": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v35-finalizer-lowered",
+      "derivation": {
+        "scope": "Private host modules only; unchanged Lean sources, Wasm, and embedded/link-time dispatch.",
+        "changed": [
+          "host/node-host.mjs",
+          "host/handle-table.mjs",
+          "host/native-files.mjs",
+          "host/native-file-worker.mjs",
+          "host/native-file-worker-pool.mjs"
+        ],
+        "parentDerivation": {
+          "scope": "Host finalizer dispatch and asynchronous C close; unchanged Lean sources and Wasm.",
+          "wasmSha256": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e",
+          "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot."
+        },
+        "wasmSha256": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e",
+        "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot."
+      }
+    }
+  },
+  "remaining": "Pending C reads cannot yet be safely cancelled by instance disposal; the packaged cooperative runtime still has synchronous finalization. Active operations consume OS thread resources. Complete device, platform, and suite coverage remain open.",
+  "upstreamFilesystem": {
+    "passed": 9,
+    "failed": 0,
+    "runs": [
+      {
+        "engine": "node",
+        "evidence": ".work/full-suite-node-v36-fs/execution.json",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "completed": [
+          {
+            "name": "compile/file_read_overflow.lean",
+            "result": "Passed",
+            "line": "1/3 Test   #93: compile/file_read_overflow.lean ...   Passed   34.45 sec"
+          },
+          {
+            "name": "elab/IO_test.lean",
+            "result": "Passed",
+            "line": "2/3 Test  #976: elab/IO_test.lean .................   Passed   10.73 sec"
+          },
+          {
+            "name": "elab/tempfile.lean",
+            "result": "Passed",
+            "line": "3/3 Test #3160: elab/tempfile.lean ................   Passed   11.64 sec"
+          }
+        ]
+      },
+      {
+        "engine": "deno",
+        "evidence": ".work/full-suite-deno-v36-fs/execution.json",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "completed": [
+          {
+            "name": "compile/file_read_overflow.lean",
+            "result": "Passed",
+            "line": "1/3 Test   #93: compile/file_read_overflow.lean ...   Passed   33.06 sec"
+          },
+          {
+            "name": "elab/IO_test.lean",
+            "result": "Passed",
+            "line": "2/3 Test  #976: elab/IO_test.lean .................   Passed    9.65 sec"
+          },
+          {
+            "name": "elab/tempfile.lean",
+            "result": "Passed",
+            "line": "3/3 Test #3160: elab/tempfile.lean ................   Passed   10.58 sec"
+          }
+        ]
+      },
+      {
+        "engine": "bun",
+        "evidence": ".work/full-suite-bun-v36-fs/execution.json",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "completed": [
+          {
+            "name": "compile/file_read_overflow.lean",
+            "result": "Passed",
+            "line": "1/3 Test   #93: compile/file_read_overflow.lean ...   Passed  222.92 sec"
+          },
+          {
+            "name": "elab/IO_test.lean",
+            "result": "Passed",
+            "line": "2/3 Test  #976: elab/IO_test.lean .................   Passed   70.77 sec"
+          },
+          {
+            "name": "elab/tempfile.lean",
+            "result": "Passed",
+            "line": "3/3 Test #3160: elab/tempfile.lean ................   Passed   72.22 sec"
+          }
+        ]
+      }
+    ],
+    "resourceReport": ".work/full-engine-probe/file-workers-upstream-resources.json",
+    "peakMemoryBytes": 5969649664,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0,
+    "scope": "Three unchanged registrations in each engine; the resource peak covers preparation and all nine sequential executions."
+  }
+}

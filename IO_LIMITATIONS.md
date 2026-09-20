@@ -133,13 +133,19 @@ close the full-suite or cross-platform gates. See the
   Node and Deno with an 8 GiB guest maximum. Bun's shared-memory cloning issue
   remains open. These full-runtime paths still need integration and comprehensive
   validation.
-- [ ] Blocking native device/FIFO/pipe reads can occupy the finite FFI worker
-  pool, and a pending C read cannot be safely interrupted by disposing the Wasm
-  instance. The full runtime now finalizes buffered files without blocking the
+- [ ] A pending C read cannot be safely interrupted by disposing the Wasm
+  instance. Blocking file calls now use independent host workers, so reads do
+  not fill the shared N-API pool and prevent their dependent writes from running.
+  A synchronized four-reader FIFO regression passes in the full Node, Deno,
+  and Linux stack-adjusted Bun runtimes; broader device and platform coverage
+  remains open. Idle workers are released promptly; active calls still consume
+  OS thread resources. The full runtime also finalizes buffered files without blocking the
   host event loop: an ordinary Lean FIFO regression matches native Lean in Node,
   Deno, and the Linux stack-adjusted Bun configuration. The packaged cooperative
   path still has synchronous finalization and needs the same behavior integrated.
   See [the FIFO evidence](docs/evidence/fifo-finalizer-2026-09-20.json).
+  The shared-pool deadlock and its separate fix are recorded in
+  [the worker evidence](docs/evidence/fifo-workers-2026-09-20.json).
 - [ ] Traps, panics, native heartbeat/interrupt traps, and failed ABI conversion
   poison the instance rather than providing native recovery semantics.
 - [ ] Complete source-level stack traces and mapped diagnostics are missing;
