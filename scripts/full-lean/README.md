@@ -76,6 +76,15 @@ native/engine executions of the uniformly scaled parallel derivative. It keeps
 every failure and verifies the original source hash afterward. A derivative
 pass never counts as a pass of the original timing-sensitive registration.
 
+`probe-bun-startup.mjs --toolchain FROZEN_BUN_FACADE --output NEW_DIRECTORY`
+compares four sequential startup smoke runs under one resource guard. It checks
+the pinned engine's option dump before executing each variant and retains a
+native control. Explicitly enabling IPInt may repeat the default; the recorded
+effective options determine whether a variant actually changes anything.
+The first comparison found no startup improvement from that setting or from
+reducing Wasm compiler threads to two. Its resource peak covers the entire
+comparison, so it cannot establish a per-variant memory improvement.
+
 `probe-fifo-finalizer.mjs --output NEW_DIRECTORY --toolchains FACADE[,FACADE]`
 compares a supplementary ordinary Lean fixture against native Lean and the
 selected engines. On Linux it measures a FIFO's capacity, fills it plus a partial

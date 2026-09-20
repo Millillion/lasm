@@ -360,6 +360,14 @@ tests passed, using only three slots near the real boundary rather than billions
 of allocations. This later change is not present in the frozen v35 campaign;
 see [the separate handle-ID evidence](evidence/handle-ids-2026-09-20.json).
 
+A sequential Bun startup diagnostic passed its native control and four smoke
+runs. The engine already enables IPInt by default; explicitly enabling it repeats
+the baseline settings. Reducing Wasm compiler threads from eleven to two also
+left startup at roughly 70 seconds. No tested setting was adopted. The combined
+run peaked at 3.24 GiB with no swap, OOM, or throttling, but does not measure
+per-variant peaks or establish full conformance. See
+[the startup comparison](evidence/bun-startup-2026-09-20.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
