@@ -11,6 +11,7 @@ import { nativeDns } from './native-dns.mjs';
 import { createNodeSystem } from './node-system.mjs';
 import { createNodeSignals } from './node-signal.mjs';
 import nativeThreadId from './thread-id.cjs';
+import { HandleTable } from './handle-table.mjs';
 
 const empty = Buffer.alloc(0);
 export class LeanExit extends Error { constructor(code) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; } }
@@ -46,8 +47,8 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))
     throw new TypeError('Lean main arguments must be Unicode strings without NUL characters');
   let directory = resolve(cwd);
-  const resources = new Map([0, 1, 2].map(fd => [fd, { type: 'file', fd, standardId: fd, tail: Promise.resolve() }]));
-  let nextId = 10;
+  const resources = new HandleTable({ first: 10,
+    entries: [0, 1, 2].map(fd => [fd, { type: 'file', fd, standardId: fd, tail: Promise.resolve() }]) });
   let closed = false;
   function closeResource(resource, asynchronous = false) {
     if (resource.type === 'file') {
@@ -62,7 +63,8 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   }
   const add = resource => {
     if (closed) { closeResource(resource); throw error('ECANCELED', 'Lean runtime disposed'); }
-    const id = nextId++; resources.set(id, resource); return id;
+    try { return resources.allocate(resource); }
+    catch (failure) { closeResource(resource); throw failure; }
   };
   function get(id, type) {
     const resource = resources.get(id);
@@ -116,8 +118,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   const processes = createNodeProcesses({ add, get, release, cwd: () => directory });
   const system = createNodeSystem();
   const signals = createNodeSignals({ add, get });
-  const pending = new Map();
-  let nextRequest = 1;
+  const pending = new HandleTable();
   function dispatch(op, id, arg, bytes, context) {
     if (op >= 160 && op <= 164) return signals.dispatch(op, id, arg);
     if (op >= 120 && op <= 144) return system.dispatch(op, id, arg, bytes);
@@ -232,7 +233,11 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     // Internal full-runtime RPC: the Lean caller waits for this promise while
     // other threads can continue issuing host operations, including pipe reads.
     releaseAsync(id) { return release(id, true); },
-    start(...args) { const id = nextRequest++; pending.set(id, request(...args)); return id; },
+    start(...args) {
+      const id = pending.allocate(undefined);
+      try { pending.set(id, request(...args)); return id; }
+      catch (failure) { pending.delete(id); throw failure; }
+    },
     whenReady(id) {
       if (!pending.has(id)) throw new Error('Unknown asynchronous host request');
       return Promise.resolve(pending.get(id));

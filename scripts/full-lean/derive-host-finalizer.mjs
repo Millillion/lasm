@@ -28,7 +28,7 @@ const oldPrelude = readFileSync(join(source, 'runtime-support/host-pre.js'), 'ut
 if (oldPrelude.replace(oldCall, 'await host.releaseAsync(request.handle);') !== prelude)
   throw new Error('The current prelude has changes beyond the isolated finalizer fix');
 mkdirSync(output);
-const changed = ['host/node-host.mjs', 'host/native-files.mjs', 'runtime-support/host-pre.js'];
+const changed = ['host/node-host.mjs', 'host/native-files.mjs', 'host/handle-table.mjs', 'runtime-support/host-pre.js'];
 for (const directory of ['bin', 'host', 'runtime-support']) {
   mkdirSync(join(output, directory));
   for (const name of readdirSync(join(source, directory))) {
@@ -39,6 +39,9 @@ for (const directory of ['bin', 'host', 'runtime-support']) {
     else symlinkSync(join(source, relative), join(output, relative));
   }
 }
+// A newer host can add a private dependency absent from the source snapshot.
+for (const relative of changed) if (!existsSync(join(output, relative)))
+  copyFileSync(join(root, relative.startsWith('host/') ? 'src' : 'scripts/full-lean', relative.split('/').at(-1)), join(output, relative));
 for (const name of readdirSync(source)) {
   if (['bin', 'host', 'runtime-support', 'snapshot.json', 'build-provenance.json'].includes(name)) continue;
   symlinkSync(join(source, name), join(output, name));
@@ -48,7 +51,7 @@ writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ ...provena
   hostFinalization: 'The calling Lean thread waits for asynchronous fclose while the host event loop remains available.' }, null, 2) + '\n');
 metadata.derivedFrom = source;
 metadata.createdAt = new Date().toISOString();
-metadata.derivation = { scope: 'Host finalizer dispatch and asynchronous C close; unchanged Lean sources and Wasm.',
+metadata.derivation = { scope: 'Host finalizer dispatch plus current private host modules; unchanged Lean sources and Wasm.',
   parentDerivation: metadata.derivation, wasmSha256: await hash(join(source, 'bin/lean.wasm')),
   sharedFrozenInputs: 'Unchanged inputs are symlinked to the immutable source snapshot.' };
 for (const name of ['bin/lean.js', 'bin/lean.cjs', 'build-provenance.json', ...changed])

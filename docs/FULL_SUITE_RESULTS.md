@@ -348,6 +348,18 @@ passed in each fixed engine: **9/9** executions, all 7,267 source hashes intact
 before and after each run. Their shared guarded process tree peaked at 5.19 GiB
 including preparation, with no OOM, throttling, or swap use.
 
+The earlier v34 campaign retained ten unchanged Lake passes before a controlled
+interruption. A fresh 3,896-registration Node campaign now uses the frozen v35
+finalizer fix and the same one-thread Lake/five-worker-pool configuration. Its
+results are separate from v34; earlier passes are not transferred across changed
+runtime hashes.
+
+A subsequent private host change recycles resource/request IDs before they
+cross the signed i32 import boundary, retaining occupied handles. Seven focused
+tests passed, using only three slots near the real boundary rather than billions
+of allocations. This later change is not present in the frozen v35 campaign;
+see [the separate handle-ID evidence](evidence/handle-ids-2026-09-20.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

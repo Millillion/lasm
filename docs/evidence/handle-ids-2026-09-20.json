@@ -1,0 +1,22 @@
+{
+  "scope": "Private host resource/request IDs must stay within the positive signed i32 Wasm import range. Released IDs are reusable; occupied IDs and reserved standard streams remain intact. No Lean API was added.",
+  "boundary": 2147483647,
+  "boundaryControlSlots": 3,
+  "stressPolicy": "The boundary is exercised by a three-slot table near INT32_MAX, not by allocating billions of resources.",
+  "tests": {
+    "passed": 7,
+    "failed": 0,
+    "command": "node --test --test-concurrency=1 --test-reporter=tap test/handle-table.test.mjs test/node-host.test.mjs",
+    "names": [
+      "host IDs reach the signed Wasm boundary and wrap without losing live resources",
+      "reserved standard handles survive repeated resource and request ID reuse",
+      "IO.sleep preserves durations beyond one Node timeout instead of clamping to 1ms",
+      "runtime teardown cancels sleeps and releases their Node timers",
+      "completion readiness preserves the result for its consuming Lean thread",
+      "Std.Async timers preserve UInt64 delays and reset without overflowing Node timeouts",
+      "a synchronous exit during request startup leaves no pending result"
+    ],
+    "log": ".work/full-engine-probe/handle-table-tests.log"
+  },
+  "integration": "The helper is included by application output copying, cache required-file validation, full-runtime freezing, and host-derivative creation. The ongoing frozen v35 full campaign predates this counter change and must not be counted as testing it."
+}

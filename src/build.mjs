@@ -226,6 +226,7 @@ private unsafe def «runProgram» : IO UInt32 := do
   copyFileSync(join(root, 'src/runtime.mjs'), join(output, 'runtime.mjs'));
   copyFileSync(join(root, 'src/scheduler.mjs'), join(output, 'scheduler.mjs'));
   copyFileSync(join(root, 'src/node-host.mjs'), join(output, 'node-host.mjs'));
+  copyFileSync(join(root, 'src/handle-table.mjs'), join(output, 'handle-table.mjs'));
   copyFileSync(join(root, 'src/native-files.mjs'), join(output, 'native-files.mjs'));
   copyNativeBundle(root, output);
   copyFileSync(join(root, 'src/node-network.mjs'), join(output, 'node-network.mjs'));
