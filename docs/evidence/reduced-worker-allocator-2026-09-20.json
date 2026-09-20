@@ -1,0 +1,389 @@
+{
+  "scope": "Resource adjustment and allocator investigation, not complete engine conformance.",
+  "derivation": {
+    "scope": "Resource-adjusted preinitialized worker count; unchanged Wasm and Lean sources.",
+    "from": 16,
+    "to": 8,
+    "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot.",
+    "wasmSha256": "2fad262994198910da80032f9b1b45e728afde7c6d65355053b9746ba9e5557c"
+  },
+  "toolchain": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "engine": "node",
+    "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+    "engineArgs": [],
+    "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+    "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v26/sdk",
+    "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/runtime-support",
+    "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+    "systemAllocator": "mimalloc",
+    "leanAllocator": "mimalloc",
+    "memoryMode": 2,
+    "engineEnvironment": {},
+    "maximumMemoryBytes": 4294967296,
+    "pthreadPoolSize": 8,
+    "backend": "full-lean-wasm64-lowered",
+    "nativeLeanFallback": false,
+    "environmentAdjustments": {
+      "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v29",
+      "LASM_FULL_APP_PATH": "Selected facade entry point",
+      "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+      "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+      "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+    },
+    "externalTools": {
+      "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/lib",
+      "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/include",
+      "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/share",
+      "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v28-pool8/bin/leanmake",
+      "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+      "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+    }
+  },
+  "instances": {
+    "execution": {
+      "startedAt": "2026-09-20T00:23:10.180Z",
+      "finishedAt": "2026-09-20T00:23:44.922Z",
+      "backend": "node",
+      "registered": 3891,
+      "command": [
+        "--test-dir",
+        "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v29-memory/run",
+        "-j",
+        "1",
+        "--output-on-failure",
+        "--output-junit",
+        "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v29-memory/results.xml",
+        "-R",
+        "^elab/instances\\.lean$"
+      ],
+      "result": {
+        "code": 8,
+        "signal": null
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "leftoverProcessCleanup": [],
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T00-23-09.854Z-ddd73b21-6f45-4aeb-b524-b4553a083674.json",
+      "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+    },
+    "resources": {
+      "startedAt": "2026-09-20T00:23:09.854Z",
+      "command": [
+        "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+        "--suite",
+        ".work/full-suite-node-v29-memory",
+        "--jobs",
+        "1",
+        "--filter",
+        "^elab/instances\\.lean$"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "ddd73b21-6f45-4aeb-b524-b4553a083674",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 29430743040
+      },
+      "minimumHostAvailable": 23672881152,
+      "peakMemoryBytes": 5963882496,
+      "peakTasks": 34,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T00-23-09.854Z-ddd73b21-6f45-4aeb-b524-b4553a083674.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-20T00:23:44.910Z",
+        "memoryBytes": 88440832,
+        "peakMemoryBytes": 5963882496,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 32636928,
+          "file": 53420032,
+          "kernel": 2142208,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 50380800,
+          "slab": 655888
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "8",
+        "capturedAt": "2026-09-20T00:23:44.988Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 65810432,
+        "peakMemoryBytes": 5963882496,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10207232,
+          "file": 53424128,
+          "kernel": 1396736,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 50384896,
+          "slab": 590736
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-20T00:23:45.000Z",
+      "result": {
+        "code": 8,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "stdout": "Internal ctest changing into directory: /home/lastmjs/development/lasm/compiler/.work/full-suite-node-v29-memory/run\nTest project /home/lastmjs/development/lasm/compiler/.work/full-suite-node-v29-memory/run\n    Start 2173: elab/instances.lean\n1/1 Test #2173: elab/instances.lean ..............***Failed   34.32 sec\n++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false instances.lean\ninstances.lean:18:0-18:5: error: unknown module prefix '_private'\n\nNo directory '_private' or file '_private.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v29/lib/lean\nOutput ignored, skipping check\nTEST FAILED: Expected command to succeed, got exit code 1\n\n\n0% tests passed, 1 tests failed out of 1\n\nTotal Test time (real) =  34.53 sec\n\nThe following tests FAILED:\n\t2173 - elab/instances.lean (Failed)\nErrors while running CTest\n"
+  },
+  "primitiveParity": {
+    "testedAt": "2026-09-20T00:29:48.865Z",
+    "scope": "Native controls and all three engines; source results retained in ignored .work/full-engine-probe/v29/primitives.json. Interface values include live host addresses and are represented here by hashes.",
+    "executions": [
+      {
+        "name": "native interfaces",
+        "status": 0,
+        "seconds": 0.311271581,
+        "stdoutSha256": "8ff5455017442675dd7206918c033edc1e7230a002a4ba91b638706c54cdd3cd",
+        "stderr": ""
+      },
+      {
+        "name": "native compact values",
+        "status": 0,
+        "seconds": 1.0431126469999998,
+        "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc",
+        "stderr": ""
+      },
+      {
+        "name": "node interfaces",
+        "status": 0,
+        "seconds": 13.755685818999998,
+        "stdoutSha256": "8ff5455017442675dd7206918c033edc1e7230a002a4ba91b638706c54cdd3cd",
+        "stderr": ""
+      },
+      {
+        "name": "node compact values",
+        "status": 0,
+        "seconds": 29.976735367,
+        "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc",
+        "stderr": ""
+      },
+      {
+        "name": "node leantar encode",
+        "status": 0,
+        "seconds": 0.061544198000003235,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": ""
+      },
+      {
+        "name": "node leantar decode",
+        "status": 0,
+        "seconds": 0.005915119999997841,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": ""
+      },
+      {
+        "name": "node native module import",
+        "status": 0,
+        "seconds": 0.954496321999999,
+        "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc",
+        "stderr": ""
+      },
+      {
+        "name": "deno interfaces",
+        "status": 0,
+        "seconds": 13.902249478999998,
+        "stdoutSha256": "8ff5455017442675dd7206918c033edc1e7230a002a4ba91b638706c54cdd3cd",
+        "stderr": ""
+      },
+      {
+        "name": "deno compact values",
+        "status": 0,
+        "seconds": 29.842798088000002,
+        "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc",
+        "stderr": ""
+      },
+      {
+        "name": "deno leantar encode",
+        "status": 0,
+        "seconds": 0.059829341000004206,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": ""
+      },
+      {
+        "name": "deno leantar decode",
+        "status": 0,
+        "seconds": 0.005498915999996825,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": ""
+      },
+      {
+        "name": "deno native module import",
+        "status": 0,
+        "seconds": 0.9568424180000001,
+        "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc",
+        "stderr": ""
+      },
+      {
+        "name": "bun interfaces",
+        "status": 0,
+        "seconds": 103.498130919,
+        "stdoutSha256": "8ff5455017442675dd7206918c033edc1e7230a002a4ba91b638706c54cdd3cd",
+        "stderr": ""
+      },
+      {
+        "name": "bun compact values",
+        "status": 0,
+        "seconds": 112.94549256900002,
+        "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc",
+        "stderr": ""
+      },
+      {
+        "name": "bun leantar encode",
+        "status": 0,
+        "seconds": 0.06473664899996948,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": ""
+      },
+      {
+        "name": "bun leantar decode",
+        "status": 0,
+        "seconds": 0.005812904999998864,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": ""
+      },
+      {
+        "name": "bun native module import",
+        "status": 0,
+        "seconds": 0.9491466639999999,
+        "stdoutSha256": "96613500789853500f938868ee3d51a00b7dbc19995069bcc4d3f3cd1c70abfc",
+        "stderr": ""
+      }
+    ],
+    "resources": {
+      "startedAt": "2026-09-20T00:24:40.301Z",
+      "command": [
+        "node",
+        "scripts/full-lean/probe-primitives.mjs",
+        "v29"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "4a093acd-4c82-4b83-906b-2bef8a485f25",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 29638422528
+      },
+      "minimumHostAvailable": 22755381248,
+      "peakMemoryBytes": 6934040576,
+      "peakTasks": 54,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T00-24-40.301Z-4a093acd-4c82-4b83-906b-2bef8a485f25.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-20T00:29:48.931Z",
+        "memoryBytes": 165367808,
+        "peakMemoryBytes": 6934040576,
+        "swapBytes": 0,
+        "tasks": 2,
+        "memoryBreakdown": {
+          "anon": 4227072,
+          "file": 159350784,
+          "kernel": 1007616,
+          "shmem": 0,
+          "file_mapped": 28672,
+          "inactive_file": 20869120,
+          "slab": 621888
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-20T00:29:48.927Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 171814912,
+        "peakMemoryBytes": 6934040576,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10203136,
+          "file": 159346688,
+          "kernel": 1454080,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 20865024,
+          "slab": 622176
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-20T00:29:48.939Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  }
+}

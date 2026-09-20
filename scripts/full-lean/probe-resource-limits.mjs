@@ -69,9 +69,11 @@ if (existsSync(`/proc/${pid}/stat`)) {
   // A killed orphan may briefly remain a zombie until the init process reaps it.
   assert.equal(readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1][0], 'Z');
 }
-const after = await run('after-stop', [process.execPath, '-e', 'process.exit(0)']).done;
+const literal = '${engine} $HOME %n spaces "quoted"';
+const after = await run('after-stop', [process.execPath, '-e',
+  `process.exit(process.argv[1] === String.fromCharCode(${[...literal].map(c => c.charCodeAt(0)).join(',')}) ? 0 : 44)`, literal]).done;
 assert.equal(after.code, 0, 'The unit must be reusable after a resource stop');
 assert.equal(after.report.resourceLimited, false);
 writeFileSync(join(output, 'results.json'), JSON.stringify({ testedAt: new Date().toISOString(),
-  checks: ['nested guard', 'mutual exclusion', 'signal cleanup', 'proactive descendant memory stop', 'zero OOM and throttling events', 'reuse after stop'], results }, null, 2) + '\n');
-console.log('6 resource protection checks passed');
+  checks: ['nested guard', 'mutual exclusion', 'signal cleanup', 'proactive descendant memory stop', 'zero OOM and throttling events', 'reuse after stop', 'literal argument preservation'], results }, null, 2) + '\n');
+console.log('7 resource protection checks passed');

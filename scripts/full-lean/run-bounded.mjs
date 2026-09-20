@@ -73,7 +73,7 @@ if (args[0] === '--capture') {
   const properties = { MemoryAccounting: 'yes', MemoryMax: limit, MemoryHigh: 'infinity',
     MemorySwapMax: 0, TasksMax: 1024, OOMPolicy: 'kill', KillMode: 'control-group',
     TimeoutStopSec: '5s', Nice: 5, ExecStopPost: capture };
-  const invocation = ['--user', '--wait', '--pipe', '--collect', `--unit=${unit}`, `--description=${description}`,
+  const invocation = ['--user', '--wait', '--pipe', '--collect', '--expand-environment=no', `--unit=${unit}`, `--description=${description}`,
     `--working-directory=${process.cwd()}`, ...Object.entries(properties).flatMap(([key, value]) => ['-p', `${key}=${value}`]),
     '/usr/bin/env', '-i', ...Object.entries(env).map(([key, value]) => `${key}=${value}`), ...command];
   console.error(`[lasm] One workload, ${(limit / GiB).toFixed(2)} GiB memory cap; resource log: ${report}`);

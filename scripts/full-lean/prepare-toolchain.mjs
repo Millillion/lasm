@@ -1,7 +1,8 @@
 // A parallel-suite toolchain facade. Every Lean entry point executes the full
 // Wasm compiler in the selected engine; there is no native Lean fallback.
-import { mkdirSync, writeFileSync, readFileSync, symlinkSync, existsSync, chmodSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, symlinkSync, existsSync, chmodSync, copyFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
+import { createHash } from 'node:crypto';
 import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 
 const argv = process.argv.slice(2);
@@ -28,12 +29,35 @@ const runtimeSupport = snapshot ? join(build, 'runtime-support') : join(root, 's
 for (const path of [executable, join(build, 'bin/lean.js'), join(build, 'bin/lean.wasm')])
   if (!existsSync(path)) throw new Error(`Missing full compiler prerequisite: ${path}`);
 const buildConfig = readFileSync(join(build, 'CMakeCache.txt'), 'utf8');
+// A recorded worker-pool derivative changes generated JavaScript without
+// rebuilding the Wasm. Use its actual pool size for generated applications too.
+const poolMatches = [...readFileSync(join(build, 'bin/lean.js'), 'utf8').matchAll(/var pthreadPoolSize = (\d+);/g)];
+if (poolMatches.length !== 1) throw new Error('Cannot determine the compiled worker-pool size');
+const pthreadPoolSize = Number(poolMatches[0][1]);
 const memoryMode = Number(buildConfig.match(/^LASM_MEMORY64:STRING=([12])$/m)?.[1]);
 if (![1, 2].includes(memoryMode)) throw new Error('The full suite requires a 64-bit Lean value layout');
 const engineEnvironment = engine === 'bun' && memoryMode === 1 ? { BUN_JSC_useWasmMemory64: 'true' } : {};
+// This is an explicit Linux harness resource adjustment, not an implicit change
+// to stock Bun or a portable launcher feature. Preserve a local copy and hash.
+const stackHelper = option('--bun-stack-helper');
+if (stackHelper && (engine !== 'bun' || process.platform !== 'linux'))
+  throw new Error('--bun-stack-helper is only supported by the Linux Bun test facade');
+const stackHelperBytes = stackHelper ? readFileSync(resolve(stackHelper)) : undefined;
+if (stackHelperBytes && !stackHelperBytes.subarray(0, 4).equals(Buffer.from([0x7f, 0x45, 0x4c, 0x46])))
+  throw new Error('--bun-stack-helper must be the compiled Linux stack-reservation library');
 if (!/^LASM_LINK_TOOLS:BOOL=ON$/m.test(buildConfig))
   throw new Error('The selected compiler must include the original tool entry points (build --stage wasm64)');
 mkdirSync(join(output, 'bin'), { recursive: true });
+let stackAdjustment;
+if (stackHelperBytes) {
+  const localHelper = join(output, 'bun-stack-reservation.so');
+  copyFileSync(resolve(stackHelper), localHelper);
+  Object.assign(engineEnvironment, { LD_PRELOAD: localHelper, BUN_JSC_maxPerThreadStackUsage: '62914560' });
+  stackAdjustment = { helper: localHelper,
+    sha256: createHash('sha256').update(stackHelperBytes).digest('hex'),
+    osThreadStackBytes: 64 * 1024 * 1024, jscStackBudgetBytes: 60 * 1024 * 1024,
+    scope: 'Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result.' };
+}
 const quote = text => "'" + text.replaceAll("'", "'\\''") + "'";
 const runner = [executable, ...engineArgs, join(runtimeSupport, 'run-compiler.mjs'), '--prefix', build];
 const wrappers = {
@@ -90,9 +114,9 @@ writeFileSync(join(output, 'toolchain.json'), JSON.stringify({ leanCommit, engin
   sourceBuild: snapshot?.sourceBuild ?? build,
   systemAllocator: buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMALLOC=(\w+)/m)?.[1] ?? 'dlmalloc',
   leanAllocator: /^USE_MIMALLOC:BOOL=ON$/m.test(buildConfig) ? 'mimalloc' : 'generic',
-  memoryMode, engineEnvironment,
+  memoryMode, engineEnvironment, stackAdjustment,
   maximumMemoryBytes: Number(buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMAXIMUM_MEMORY=(\d+)/m)?.[1] ?? 4294967296),
-  pthreadPoolSize: Number(buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sPTHREAD_POOL_SIZE=(\d+)/m)?.[1] ?? 4),
+  pthreadPoolSize,
   backend: memoryMode === 1 ? 'full-lean-wasm64-native' : 'full-lean-wasm64-lowered', nativeLeanFallback: false,
   environmentAdjustments: { LEAN_SYSROOT: output, LASM_FULL_APP_PATH: 'Selected facade entry point', LEAN_STACK_SIZE_KB: '65536 unless explicitly supplied', LEAN_NUM_THREADS: '4 unless explicitly supplied',
     leanShell: 'Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence.' },

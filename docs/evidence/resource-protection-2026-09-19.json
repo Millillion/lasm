@@ -692,6 +692,319 @@
           }
         }
       ]
+    },
+    "argumentFidelityRegression": {
+      "testedAt": "2026-09-20T00:21:37.081Z",
+      "checks": [
+        "nested guard",
+        "mutual exclusion",
+        "signal cleanup",
+        "proactive descendant memory stop",
+        "zero OOM and throttling events",
+        "reuse after stop",
+        "literal argument preservation"
+      ],
+      "results": [
+        {
+          "name": "contender",
+          "code": 1,
+          "signal": null,
+          "report": {
+            "startedAt": "2026-09-20T00:21:36.435Z",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "-e",
+              "process.exit(77)"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "c4ce88aa-ebed-401a-ab17-03f0c637688b",
+            "limits": {
+              "memoryMax": 268435456,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 214748364,
+              "memorySwapMax": 0,
+              "tasksMax": 1024
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 29554388992
+            },
+            "minimumHostAvailable": 29554388992,
+            "peakMemoryBytes": 0,
+            "peakTasks": 0,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v4/contender.json",
+            "status": "finished",
+            "finishedAt": "2026-09-20T00:21:36.446Z",
+            "result": {
+              "code": 1,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          }
+        },
+        {
+          "name": "owner",
+          "code": 125,
+          "signal": null,
+          "report": {
+            "startedAt": "2026-09-20T00:21:36.260Z",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "--input-type=module",
+              "-e",
+              "import {writeFileSync} from 'node:fs'; import {ensureResourceGuard} from './scripts/full-lean/resource-guard.mjs';\n   await ensureResourceGuard(); writeFileSync(\"/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v4/owner.ready\", String(process.pid)); setInterval(() => {}, 1000);"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "8a00ad30-f7c7-4f79-ac88-40fe8da516d4",
+            "limits": {
+              "memoryMax": 268435456,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 214748364,
+              "memorySwapMax": 0,
+              "tasksMax": 1024
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 29577506816
+            },
+            "minimumHostAvailable": 29560754176,
+            "peakMemoryBytes": 11988992,
+            "peakTasks": 6,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v4/owner.json",
+            "status": "finished",
+            "stoppedBecause": "SIGTERM",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-20T00:21:36.504Z",
+              "memoryBytes": 6217728,
+              "peakMemoryBytes": 10944512,
+              "swapBytes": 0,
+              "tasks": 6,
+              "memoryBreakdown": {
+                "anon": 5140480,
+                "file": 4096,
+                "kernel": 675840,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 4096,
+                "slab": 112304
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "killed",
+              "exitStatus": "TERM",
+              "capturedAt": "2026-09-20T00:21:36.532Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 11784192,
+              "peakMemoryBytes": 11988992,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10203136,
+                "file": 4096,
+                "kernel": 937984,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 4096,
+                "slab": 138064
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-20T00:21:36.543Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": true,
+            "memoryThrottled": false
+          }
+        },
+        {
+          "name": "proactive-stop",
+          "code": 125,
+          "signal": null,
+          "report": {
+            "startedAt": "2026-09-20T00:21:36.593Z",
+            "command": [
+              "python3",
+              "-c",
+              "import subprocess,sys,time,pathlib\np=subprocess.Popen([sys.executable,'-c','import time; x=bytearray(208*1024*1024); time.sleep(30)'],start_new_session=True)\npathlib.Path(\"/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v4/descendant.pid\").write_text(str(p.pid))\np.wait(timeout=35)\n"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "43744de5-4a82-42ae-a43c-a44a70c859f1",
+            "limits": {
+              "memoryMax": 268435456,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 214748364,
+              "memorySwapMax": 0,
+              "tasksMax": 1024
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 29591597056
+            },
+            "minimumHostAvailable": 29357858816,
+            "peakMemoryBytes": 228548608,
+            "peakTasks": 2,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v4/proactive-stop.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-20T00:21:36.823Z",
+              "memoryBytes": 228548608,
+              "peakMemoryBytes": 228548608,
+              "swapBytes": 0,
+              "tasks": 2,
+              "memoryBreakdown": {
+                "anon": 227713024,
+                "file": 4096,
+                "kernel": 667648,
+                "shmem": 0,
+                "file_mapped": 0,
+                "inactive_file": 0,
+                "slab": 57072
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "stoppedBecause": "Workload reached its proactive memory budget",
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "killed",
+              "exitStatus": "TERM",
+              "capturedAt": "2026-09-20T00:21:36.895Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 11948032,
+              "peakMemoryBytes": 228548608,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 9695232,
+                "file": 4096,
+                "kernel": 905216,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 4096,
+                "slab": 130072
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-20T00:21:36.908Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": true,
+            "memoryThrottled": false
+          }
+        },
+        {
+          "name": "after-stop",
+          "code": 0,
+          "signal": null,
+          "report": {
+            "startedAt": "2026-09-20T00:21:36.955Z",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "-e",
+              "process.exit(process.argv[1] === String.fromCharCode(36,123,101,110,103,105,110,101,125,32,36,72,79,77,69,32,37,110,32,115,112,97,99,101,115,32,34,113,117,111,116,101,100,34) ? 0 : 44)",
+              "${engine} $HOME %n spaces \"quoted\""
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "57a0f0d1-6c60-434e-80db-822a8f3e1a53",
+            "limits": {
+              "memoryMax": 268435456,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 214748364,
+              "memorySwapMax": 0,
+              "tasksMax": 1024
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 29353353216
+            },
+            "minimumHostAvailable": 29353353216,
+            "peakMemoryBytes": 11800576,
+            "peakTasks": 0,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/resource-diagnostics/guard-verification-v4/after-stop.json",
+            "status": "finished",
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-20T00:21:37.063Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 11632640,
+              "peakMemoryBytes": 11800576,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10203136,
+                "file": 0,
+                "kernel": 942080,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 0,
+                "slab": 143832
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-20T00:21:37.075Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          }
+        }
+      ]
     }
   },
   "interruptedSuites": [
@@ -752,5 +1065,119 @@
       "status": "interrupted; partial log is not a complete conformance result",
       "recordedFailures": 3
     }
-  ]
+  ],
+  "firstGuardedLeanRun": {
+    "execution": {
+      "startedAt": "2026-09-20T00:17:05.063Z",
+      "finishedAt": "2026-09-20T00:17:25.396Z",
+      "backend": "node",
+      "registered": 3891,
+      "command": [
+        "--test-dir",
+        "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v26-memory/run",
+        "-j",
+        "1",
+        "--output-on-failure",
+        "--output-junit",
+        "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v26-memory/results.xml",
+        "-R",
+        "^elab/instances\\.lean$"
+      ],
+      "result": {
+        "code": null,
+        "signal": "SIGTERM"
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "leftoverProcessCleanup": [],
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T00-17-04.681Z-a89c40ac-98d1-4ec4-b719-7f24bba9d6f7.json",
+      "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+    },
+    "resourceReport": {
+      "startedAt": "2026-09-20T00:17:04.682Z",
+      "command": [
+        "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+        "--suite",
+        ".work/full-suite-node-v26-memory",
+        "--jobs",
+        "1",
+        "--filter",
+        "^elab/instances\\.lean$"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "a89c40ac-98d1-4ec4-b719-7f24bba9d6f7",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 29680168960
+      },
+      "minimumHostAvailable": 23208218624,
+      "peakMemoryBytes": 8663015424,
+      "peakTasks": 42,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T00-17-04.681Z-a89c40ac-98d1-4ec4-b719-7f24bba9d6f7.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-20T00:17:25.325Z",
+        "memoryBytes": 6623145984,
+        "peakMemoryBytes": 8663015424,
+        "swapBytes": 0,
+        "tasks": 13,
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "stoppedBecause": "Workload reached its proactive memory budget",
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-20T00:17:25.462Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 4869234688,
+        "peakMemoryBytes": 8663015424,
+        "swapBytes": 0,
+        "tasks": 9,
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-20T00:17:25.474Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": true,
+      "memoryThrottled": false
+    },
+    "interpretation": "Proactively stopped before completion; no OOM/throttling event. All original test hashes remained unchanged. Not a Lean failure or pass."
+  }
 }

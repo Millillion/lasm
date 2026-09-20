@@ -185,6 +185,10 @@ before user arguments. Explicit later options win. Two workers are insufficient
 for the pinned HTTP regression even in native Lean; four and eight both pass
 the native control. `build.mjs --pthread-pool` selects the number of preinitialized
 Wasm workers (default eight), independently of the Lean task-pool size.
+`derive-worker-pool.mjs FROZEN_SOURCE NEW_OUTPUT WORKERS` creates a separately
+recorded JavaScript-only pool adjustment with unchanged Wasm bytes. It reuses
+other frozen inputs through symlinks; it never changes the source snapshot.
+The facade reads the effective generated pool size for application builds too.
 
 `build.mjs --malloc mimalloc` selects the SDK's multithreaded system allocator;
 it does not enable Lean's separate `LEAN_MIMALLOC` object layout. The v24 subset

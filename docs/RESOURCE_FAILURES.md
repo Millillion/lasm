@@ -45,11 +45,21 @@ experiment, not a successful protection check.
 - Stop all descendants on exit and distinguish resource stops from Lean failures.
 - Never deliberately induce OOM or sustained memory pressure on this desktop.
 
-The corrected probe passed six checks, including rejecting a simultaneous
+The corrected probe passed seven checks, including rejecting a simultaneous
 launch, cleaning up descendants, and proactively stopping a below-cap allocation.
-It recorded zero kernel OOM events and zero throttling events. This verifies the
+It also preserves literal command arguments, including dollar signs, quotes,
+and percent signs, without systemd environment expansion. It recorded zero
+kernel OOM events and zero throttling events. This verifies the
 implemented controls; it does not guarantee against unrelated desktop failures.
 No global OOM-daemon policy, swap configuration, or app settings were changed.
+
+The first real Lean retry (v26, `elab/instances.lean`, 16 prestarted workers)
+was proactively stopped after about 21 seconds at 8.07 GiB peak. It recorded
+zero OOM/throttling events and left all 7,267 original test hashes unchanged.
+This is a resource-aborted run, not a Lean conformance result. The eight-worker
+derivative retained identical Wasm bytes and completed at 5.55 GiB peak, with
+zero OOM/throttling events. It exposed an ordinary `_private` module lookup
+failure in the allocator experiment, recorded separately from memory protection.
 
 Raw diagnostic logs remain ignored under `.work/resource-diagnostics/`.
 [Structured evidence](evidence/resource-protection-2026-09-19.json) includes the

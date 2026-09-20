@@ -246,6 +246,18 @@ one CTest job, and the proactive resource guard. Resource-aborted runs are
 reported separately from Lean failures. See [the diagnosis](RESOURCE_FAILURES.md)
 and [the recorded partial results](evidence/resource-protection-2026-09-19.json).
 
+The first guarded v26 `instances` retry stopped at the proactive memory budget;
+it is not a conformance result. A separate eight-worker derivative retained the
+same Wasm bytes and completed the original test at **5.55 GiB** peak, but failed
+with an unexpected `_private` module lookup. Both attempts preserved all original
+test hashes. The reduced-worker native-allocator build then passed **17/17**
+primitive/control executions across native Lean, Node, Deno, and Bun: interface
+enumeration, small scalar fields, large naturals, archive round trips, and native
+imports of Wasm-produced modules. Its guarded sequence peaked at **6.46 GiB**;
+no OOM, swap, or memory-throttling event occurred. These checks narrow the
+allocator investigation but do not establish full compatibility. See
+[the allocator and resource evidence](evidence/reduced-worker-allocator-2026-09-20.json).
+
 Two bounded engine investigations narrow the remaining memory/stack work:
 
 - The unchanged generated `const_fold` executable passes in Bun when a Linux-only
