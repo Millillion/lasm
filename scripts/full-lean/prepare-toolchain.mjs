@@ -8,6 +8,9 @@ import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 const argv = process.argv.slice(2);
 const option = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };
 const engine = option('--engine', 'node');
+const lakeThreads = Number(option('--lake-threads', '4'));
+if (!Number.isInteger(lakeThreads) || lakeThreads < 1 || lakeThreads > 4)
+  throw new Error('--lake-threads must be 1..4 on this maintainer host');
 const defaults = {
   node: [process.execPath, []],
   // Deno applies resourceLimits.stackSizeMb to the OS worker reservation but
@@ -82,7 +85,7 @@ export LASM_FULL_TOOLCHAIN_CONFIG=${quote(join(output, 'toolchain.json'))}
 ${Object.entries(engineEnvironment).map(([key, value]) => `export ${key}=${quote(value)}`).join('\n')}
 if [ -z "\${LEAN_CC+x}" ]; then export LEAN_CC=${quote(join(output, 'bin/clang'))}; fi
 export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-65536}"
-export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-4}"
+export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-${name === 'lake' ? lakeThreads : 4}}"
 exec ${[...runner, ...args].map(quote).join(' ')}${resourceArgs} "$@"
 `);
   chmodSync(path, 0o755);
@@ -111,6 +114,7 @@ for (const [name, tool] of Object.entries({ 'llvm-ar': 'emar', ar: 'emar', ranli
 for (const name of ['cadical', 'leantar']) if (existsSync(join(native.prefix, 'bin', name))) links['bin/' + name] = join(native.prefix, 'bin', name);
 for (const [name, target] of Object.entries(links)) if (!existsSync(join(output, name))) symlinkSync(target, join(output, name));
 writeFileSync(join(output, 'toolchain.json'), JSON.stringify({ leanCommit, engine, executable, engineArgs, build, source, sdk, runtimeSupport,
+  lakeThreads,
   sourceBuild: snapshot?.sourceBuild ?? build,
   systemAllocator: buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMALLOC=(\w+)/m)?.[1] ?? 'dlmalloc',
   leanAllocator: /^USE_MIMALLOC:BOOL=ON$/m.test(buildConfig) ? 'mimalloc' : 'generic',

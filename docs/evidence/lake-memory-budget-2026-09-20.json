@@ -121,5 +121,362 @@
         "peakMemoryBytes": 25395200
       }
     ]
+  },
+  "fiveWorkerComparison": {
+    "build": ".work/full-artifacts/wasm64-v34-pool5",
+    "scope": "Identical Wasm to v33, reducing only the preinitialized pool from 8 to 5; four Lean workers remain. Dynamic pthread creation is still available.",
+    "wasmSha256": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1",
+    "counts": {
+      "passed": 1,
+      "failed": 0,
+      "resource-aborted": 2,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "records": [
+      {
+        "name": "tests/lake/examples/deps/test.sh",
+        "status": "resource-aborted",
+        "peakMemoryBytes": 8626622464,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-20T01:40:54.821Z",
+          "processes": [
+            {
+              "pid": 1635794,
+              "name": "MainThread",
+              "residentBytes": 3943174144,
+              "threads": 21
+            },
+            {
+              "pid": 1635904,
+              "name": "MainThread",
+              "residentBytes": 1708281856,
+              "threads": 12
+            },
+            {
+              "pid": 1635917,
+              "name": "MainThread",
+              "residentBytes": 950857728,
+              "threads": 12
+            },
+            {
+              "pid": 1635769,
+              "name": "MainThread",
+              "residentBytes": 80220160,
+              "threads": 11
+            },
+            {
+              "pid": 1635778,
+              "name": "ctest",
+              "residentBytes": 33800192,
+              "threads": 2
+            },
+            {
+              "pid": 1635788,
+              "name": "bash",
+              "residentBytes": 3796992,
+              "threads": 1
+            }
+          ]
+        },
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resourceReport": ".work/full-campaign-node-v34-lake/00001-08bd4570/resources.json"
+      },
+      {
+        "name": "tests/lake/examples/ffi/test.sh",
+        "status": "resource-aborted",
+        "peakMemoryBytes": 8596938752,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-20T01:41:23.354Z",
+          "processes": [
+            {
+              "pid": 1636069,
+              "name": "MainThread",
+              "residentBytes": 4431081472,
+              "threads": 23
+            },
+            {
+              "pid": 1636215,
+              "name": "MainThread",
+              "residentBytes": 1443807232,
+              "threads": 12
+            },
+            {
+              "pid": 1636228,
+              "name": "MainThread",
+              "residentBytes": 871903232,
+              "threads": 12
+            },
+            {
+              "pid": 1636023,
+              "name": "MainThread",
+              "residentBytes": 80314368,
+              "threads": 11
+            },
+            {
+              "pid": 1636059,
+              "name": "ctest",
+              "residentBytes": 33931264,
+              "threads": 2
+            },
+            {
+              "pid": 1636065,
+              "name": "bash",
+              "residentBytes": 3821568,
+              "threads": 1
+            }
+          ]
+        },
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resourceReport": ".work/full-campaign-node-v34-lake/00002-4ae23152/resources.json"
+      },
+      {
+        "name": "tests/lake/examples/hello/test.sh",
+        "status": "passed",
+        "peakMemoryBytes": 6185889792,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "highWaterProcesses": null,
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resourceReport": ".work/full-campaign-node-v34-lake/00003-fda85d91/resources.json"
+      }
+    ]
+  },
+  "singleLakeThreadNativeControl": {
+    "scope": "Native Lake wrapper defaults LEAN_NUM_THREADS to 1; descendants inherit the ordinary environment variable. No upstream source changes.",
+    "tests": [
+      {
+        "name": "tests/lake/examples/deps/test.sh",
+        "passed": true,
+        "seconds": 10.3676
+      },
+      {
+        "name": "tests/lake/examples/ffi/test.sh",
+        "passed": true,
+        "seconds": 7.99598
+      },
+      {
+        "name": "tests/lake/examples/hello/test.sh",
+        "passed": true,
+        "seconds": 4.67272
+      }
+    ],
+    "sourceIntegrity": {
+      "before": {
+        "checked": 7267,
+        "modified": []
+      },
+      "after": {
+        "checked": 7267,
+        "modified": []
+      }
+    },
+    "peakMemoryBytesIncludingPreparation": 2247475200,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "singleLakeThreadNodeComparison": {
+    "scope": "Same checked native-memory64 Wasm and five-worker preinitialized pool; Lake defaults LEAN_NUM_THREADS to 1, inherited by its children. Direct Lean invocations outside Lake keep four workers. Native controls above use the same ordinary environment setting. No upstream tests modified.",
+    "toolchain": ".work/full-toolchains/node-v34-lake1",
+    "passed": 3,
+    "total": 3,
+    "records": [
+      {
+        "name": "tests/lake/examples/deps/test.sh",
+        "status": "passed",
+        "seconds": 340.911,
+        "peakMemoryBytes": 5736448000,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resourceReport": ".work/full-campaign-node-v34-lake1/00001-5604c06e/resources.json"
+      },
+      {
+        "name": "tests/lake/examples/ffi/test.sh",
+        "status": "passed",
+        "seconds": 215.156,
+        "peakMemoryBytes": 5918736384,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resourceReport": ".work/full-campaign-node-v34-lake1/00002-075f27fd/resources.json"
+      },
+      {
+        "name": "tests/lake/examples/hello/test.sh",
+        "status": "passed",
+        "seconds": 153.64,
+        "peakMemoryBytes": 5349609472,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resourceReport": ".work/full-campaign-node-v34-lake1/00003-409d7a64/resources.json"
+      }
+    ]
+  },
+  "checkpointExtensionControl": {
+    "passed": true,
+    "scope": "Synthetic CTest controls for distinct guarded attempts, checkpoint/resume, signal cleanup, preserved interrupted evidence, failure accounting, and source hashes.",
+    "results": [
+      {
+        "step": 1,
+        "state": "paused",
+        "counts": {
+          "passed": 1,
+          "failed": 0,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 3
+        },
+        "peakMemoryBytes": 25812992
+      },
+      {
+        "step": 2,
+        "state": "paused",
+        "counts": {
+          "passed": 1,
+          "failed": 1,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 2
+        },
+        "peakMemoryBytes": 25751552
+      },
+      {
+        "step": 3,
+        "state": "paused",
+        "counts": {
+          "passed": 2,
+          "failed": 1,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 1
+        },
+        "peakMemoryBytes": 25661440
+      },
+      {
+        "step": "interrupt and resume",
+        "state": "complete",
+        "counts": {
+          "passed": 3,
+          "failed": 1,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 0
+        },
+        "interruptedAttemptsPreserved": 1,
+        "peakMemoryBytes": 25509888
+      },
+      {
+        "step": "append registrations without rerunning prior pass",
+        "state": "paused",
+        "counts": {
+          "passed": 1,
+          "failed": 1,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 2
+        }
+      }
+    ]
   }
 }

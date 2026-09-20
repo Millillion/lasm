@@ -9,8 +9,11 @@ import { spawn } from 'node:child_process';
 if (process.env.LASM_RESOURCE_UNIT) throw new Error('Run this supervisor directly; each test applies its own resource guard');
 const args = process.argv.slice(2);
 const allowed = new Set(['--suite', '--output', '--filter', '--max-tests']);
-for (let i = 0; i < args.length; i += 2)
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--extend-selection') continue;
   if (!allowed.has(args[i]) || args[i + 1] === undefined) throw new Error(`Invalid option: ${args[i]}`);
+  i++;
+}
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const suite = resolve(option('--suite', '.work/full-suite-node'));
 const output = resolve(option('--output', join(suite, 'campaign')));
@@ -38,7 +41,8 @@ if (config) {
     if (hash.digest('hex') !== expected) throw new Error(`Frozen input changed: ${name}`);
   }
 }
-const identity = digest(JSON.stringify({ manifest: digest(manifestBytes), filter, config, snapshot }));
+const identityFor = filter => digest(JSON.stringify({ manifest: digest(manifestBytes), filter, config, snapshot }));
+const identity = identityFor(filter);
 mkdirSync(output, { recursive: true });
 // The workload guard prevents concurrent compilers; this separate lock prevents
 // two supervisors from overwriting the same campaign checkpoint. A crashed
@@ -67,7 +71,16 @@ const state = existsSync(statePath) ? JSON.parse(readFileSync(statePath)) : {
   registered: manifest.registered, selected: selected.length,
   tests: selected.map(name => ({ name, attempts: [] })),
 };
-if (state.identity !== identity) throw new Error('Campaign inputs changed; use a new output directory');
+if (state.identity !== identity) {
+  if (!args.includes('--extend-selection') || state.identity !== identityFor(state.filter))
+    throw new Error('Campaign inputs changed; use a new output directory');
+  if (selected.length <= state.tests.length || state.tests.some((test, i) => test.name !== selected[i]))
+    throw new Error('Selection extension must retain all earlier tests in the same prefix order');
+  (state.selectionHistory ??= []).push({ at: new Date().toISOString(), filter: state.filter,
+    selected: state.selected, priorCheckpointSha256: digest(readFileSync(statePath)) });
+  state.tests.push(...selected.slice(state.tests.length).map(name => ({ name, attempts: [] })));
+  Object.assign(state, { identity, filter, selected: selected.length });
+}
 if (state.stoppedBecause) throw new Error(`This campaign stopped for review: ${state.stoppedBecause}. Preserve it and use a new output after resolving the cause.`);
 const save = () => {
   state.updatedAt = new Date().toISOString();

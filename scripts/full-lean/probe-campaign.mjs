@@ -87,6 +87,23 @@ assert.equal(state.tests[3].attempts.length, 2, 'Interrupted evidence remains be
 assert.equal(hash(readFileSync(join(state.tests[0].attempts[0].directory, 'results/execution.json'))), firstEvidenceHash);
 results.push({ step: 'interrupt and resume', state: state.status, counts: state.counts,
   interruptedAttemptsPreserved: 1, peakMemoryBytes: stopped.peakMemoryBytes });
+// Extend an initial registration prefix without repeating completed work or
+// accepting a different runtime/source manifest. This is useful when expanding
+// a successful resource pilot to the entire unchanged registration sequence.
+const extended = join(output, 'extended');
+const prefixRun = spawnSync(process.execPath, ['scripts/full-lean/run-campaign.mjs', '--suite', output,
+  '--output', extended, '--filter', '^first-pass$'], { encoding: 'utf8', timeout: 30000 });
+assert.equal(prefixRun.status, 0, prefixRun.stderr);
+const prefixState = JSON.parse(readFileSync(join(extended, 'campaign.json')));
+const extendedRun = spawnSync(process.execPath, ['scripts/full-lean/run-campaign.mjs', '--suite', output,
+  '--output', extended, '--filter', '.*', '--extend-selection', '--max-tests', '1'], { encoding: 'utf8', timeout: 30000 });
+assert.equal(extendedRun.status, 1, extendedRun.stderr);
+const extendedState = JSON.parse(readFileSync(join(extended, 'campaign.json')));
+assert.equal(extendedState.selected, 4);
+assert.equal(extendedState.selectionHistory.length, 1);
+assert.deepEqual(extendedState.tests[0], prefixState.tests[0]);
+assert.equal(extendedState.tests[1].status, 'failed');
+results.push({ step: 'append registrations without rerunning prior pass', state: extendedState.status, counts: extendedState.counts });
 writeFileSync(join(output, 'verification.json'), JSON.stringify({ passed: true,
   scope: 'Synthetic CTest controls for distinct guarded attempts, checkpoint/resume, signal cleanup, preserved interrupted evidence, failure accounting, and source hashes.',
   results }, null, 2) + '\n');

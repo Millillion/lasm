@@ -102,3 +102,13 @@ It also records bounded per-process RSS snapshots near the memory high-water
 mark, excluding command lines and unrelated desktop processes. See
 [the Lake budget evidence](evidence/lake-memory-budget-2026-09-20.json). The host
 cap remains unchanged while lower-worker configurations are investigated.
+
+Reducing only the preinitialized pthread pool from eight to five was insufficient:
+`deps` and `ffi` still stopped at 8.03 and 8.01 GiB, though `hello` passed at
+5.76 GiB. A separate facade then set Lake's ordinary `LEAN_NUM_THREADS` default
+to one, inherited by its compiler children. All three unchanged examples passed
+with that setting both natively and in Node. Node peaks fell to 4.98–5.51 GiB,
+with all source hashes intact and zero OOM/throttling events. Direct Lean tests
+outside Lake retain four workers. This is a disclosed harness resource
+adjustment; the cap was not raised. The complete Node campaign now continues
+from these three recorded passes, using append-only selection history.

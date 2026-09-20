@@ -48,6 +48,11 @@ resource cgroup and result directory, and saves progress after every test. Run
 the identical command to resume pending tests. `--max-tests N` bounds a batch;
 `--filter REGEX` selects a documented subset and must remain identical when
 resuming that campaign. Frozen input hashes are verified before starting.
+To expand a successful initial prefix to all registrations, use `--filter '.*'
+with `--extend-selection`. The existing names must remain the exact beginning
+of the expanded sequence, all runtime/source-manifest inputs must match, and
+the prior selection is retained in checkpoint history. Completed results and
+their evidence are preserved without rerunning them.
 Completed failures are retained and require a separate rerun after a fix.
 A proactive workload-budget stop is recorded as `resource-aborted`, never as a
 test failure or pass. Host pressure, actual OOM, monitoring failures, and source
@@ -209,6 +214,14 @@ harness, not upstream tests. Run complete suites in sequence when their fixed-po
 network tests could otherwise collide, or pass the same `--network-lock` path to
 `prepare-suite.mjs` for each engine. That Linux harness option serializes the
 original fixed-port TCP/UDP drivers with `flock`; it does not rewrite their ports.
+
+`prepare-toolchain.mjs --lake-threads 1` creates a separately recorded resource
+configuration in which Lake defaults the ordinary `LEAN_NUM_THREADS` variable
+to one. Its child processes inherit that setting, as with native Lake. Other
+direct tool invocations keep the four-worker default, and an explicit existing
+environment value still wins. This is a disclosed parallel-suite resource
+adjustment, not a public runtime default or a source-test edit. Native control
+examples must accompany comparisons that use it.
 
 Lean's C++ shell does not read the generated application main's thread/stack
 environment defaults. The facade supplies its ordinary `-j` and `-s` options

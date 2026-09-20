@@ -323,6 +323,16 @@ those three attempts. All original hashes remained intact and no host OOM
 occurred. Guard cleanup is repaired; a separate worker-pool comparison is in
 progress. See [the budget evidence](evidence/lake-memory-budget-2026-09-20.json).
 
+The five-worker preinitialization change alone still resource-aborted `deps` and
+`ffi`; `hello` passed. Adding an explicit one-thread Lake default then passed
+**3/3** native controls and **3/3** unchanged Node examples. Node peaks were
+4.98–5.51 GiB, with all original hashes intact and no OOM/throttling events.
+Only Lake and its inheriting children use this ordinary environment setting;
+direct Lean tests retain four workers. The 3,896-registration Node campaign is
+continuing on this recorded resource configuration. Its first three passes are
+retained in the same campaign, with the expanded registration selection recorded
+in history. This is not yet a completed full-suite result.
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
