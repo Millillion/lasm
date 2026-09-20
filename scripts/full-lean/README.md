@@ -76,6 +76,25 @@ native/engine executions of the uniformly scaled parallel derivative. It keeps
 every failure and verifies the original source hash afterward. A derivative
 pass never counts as a pass of the original timing-sensitive registration.
 
+`probe-fifo-finalizer.mjs --output NEW_DIRECTORY --toolchains FACADE[,FACADE]`
+compares a supplementary ordinary Lean fixture against native Lean and the
+selected engines. On Linux it measures a FIFO's capacity, fills it plus a partial
+stdio buffer, and checks that a delayed reader can run while the writer's
+finalizer flushes. Each child has an external deadline so a blocked host event
+loop cannot also disable its timeout. The compiler deadline defaults to 180
+seconds to accommodate Bun's measured startup, and can be set with
+`--timeout-seconds`; the host-only deadline is five seconds.
+`--host-only --host-module MODULE` isolates
+the private host adapter. These are additional differential checks, not edited
+upstream tests or full-suite passes.
+
+`derive-host-finalizer.mjs FROZEN_SOURCE NEW_OUTPUT` creates an immutable
+comparison artifact for this fix. It verifies the original hashes, changes the
+embedded finalizer dispatch and matching link-time prelude, freezes the changed
+host modules, and retains the exact Wasm bytes. The full-runtime RPC awaits
+`fclose` completion while other Lean threads can dispatch host operations. The
+packaged cooperative runtime's synchronous finalizer is a separate remaining gap.
+
 ## Unchanged tests and the native control
 
 ```sh

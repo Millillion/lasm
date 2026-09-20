@@ -19,7 +19,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       const args = [request.operation, request.handle, request.argument, request.bytes,
         { fiber: request.thread, nativeThreadId: request.nativeThreadId }];
       if (request.kind === 'start') result = { id: host.start(...args) };
-      else if (request.kind === 'release') { host.release(request.handle); result = {}; }
+      else if (request.kind === 'release') { await host.releaseAsync(request.handle); result = {}; }
       else if (request.operation === 91) {
         // Completion registration carries opaque Lean pointers. JavaScript only
         // queues their bytes; the dedicated Lean thread owns and resolves them.

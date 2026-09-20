@@ -49,11 +49,16 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   const resources = new Map([0, 1, 2].map(fd => [fd, { type: 'file', fd, standardId: fd, tail: Promise.resolve() }]));
   let nextId = 10;
   let closed = false;
-  function closeResource(resource) {
+  function closeResource(resource, asynchronous = false) {
     if (resource.type === 'file') {
-      const close = () => { try { nativeFiles().close(resource); } catch { /* finalizers cannot report IO errors */ } };
-      if (resource.pending) resource.tail.then(close); else close();
-    } else resource.close?.();
+      const close = () => {
+        try {
+          if (asynchronous) return nativeFiles().closeAsync(resource).catch(() => {});
+          nativeFiles().close(resource);
+        } catch { /* finalizers cannot report IO errors */ }
+      };
+      return resource.pending ? resource.tail.then(close) : close();
+    } else return resource.close?.();
   }
   const add = resource => {
     if (closed) { closeResource(resource); throw error('ECANCELED', 'Lean runtime disposed'); }
@@ -97,14 +102,14 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     await nativeFiles().write(file, bytes);
     return empty;
   }
-  function release(id) {
+  function release(id, asynchronous = false) {
     if (id < 3) return;
     const resource = resources.get(id);
     if (!resource) return;
     resources.delete(id);
     // Normal Lean finalization runs after pending operations release the handle.
     // Fatal teardown may also close resources while host promises are settling.
-    closeResource(resource);
+    return closeResource(resource, asynchronous);
   }
   const network = createNodeNetwork({ add, get, release });
   const udp = createNodeUdp({ add, get });
@@ -224,6 +229,9 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     } catch (err) { if (err instanceof LeanExit) throw err; return encodeError(err); }
   }
   return { request, release, platform: process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0,
+    // Internal full-runtime RPC: the Lean caller waits for this promise while
+    // other threads can continue issuing host operations, including pipe reads.
+    releaseAsync(id) { return release(id, true); },
     start(...args) { const id = nextRequest++; pending.set(id, request(...args)); return id; },
     whenReady(id) {
       if (!pending.has(id)) throw new Error('Unknown asynchronous host request');

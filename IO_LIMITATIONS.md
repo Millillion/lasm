@@ -1,6 +1,6 @@
 # Current IO limitations in Lasm
 
-Snapshot: 2026-09-19, `0.1.0-experimental.3`, Lean `4.32.0`.
+Snapshot: 2026-09-20, `0.1.0-experimental.3`, Lean `4.32.0`.
 Every checkbox below is intentionally empty and describes remaining work, a
 known difference, or a validation gap. These are Lasm limitations, not Lean
 limitations. This list does not promise that every restriction will be removed.
@@ -129,10 +129,17 @@ close the full-suite or cross-platform gates. See the
 - [ ] `USize` and `ISize` are 32-bit in Wasm32, unlike native 64-bit Lean builds.
   Width-sensitive application results therefore differ. The full lowered-memory64
   target preserves 64-bit widths but currently has a 4 GiB address-space ceiling;
-  it still needs integration and comprehensive validation.
+  the alternative native-memory64 target passes the original `instances` test in
+  Node and Deno with an 8 GiB guest maximum. Bun's shared-memory cloning issue
+  remains open. These full-runtime paths still need integration and comprehensive
+  validation.
 - [ ] Blocking native device/FIFO/pipe reads can occupy the finite FFI worker
-  pool. Finalizing a buffered pipe can block while flushing, and a pending C read
-  cannot be safely interrupted by disposing the Wasm instance.
+  pool, and a pending C read cannot be safely interrupted by disposing the Wasm
+  instance. The full runtime now finalizes buffered files without blocking the
+  host event loop: an ordinary Lean FIFO regression matches native Lean in Node,
+  Deno, and the Linux stack-adjusted Bun configuration. The packaged cooperative
+  path still has synchronous finalization and needs the same behavior integrated.
+  See [the FIFO evidence](docs/evidence/fifo-finalizer-2026-09-20.json).
 - [ ] Traps, panics, native heartbeat/interrupt traps, and failed ABI conversion
   poison the instance rather than providing native recovery semantics.
 - [ ] Complete source-level stack traces and mapped diagnostics are missing;

@@ -333,6 +333,21 @@ continuing on this recorded resource configuration. Its first three passes are
 retained in the same campaign, with the expanded registration selection recorded
 in history. This is not yet a completed full-suite result.
 
+A supplementary ordinary-Lean FIFO fixture exposed a full-runtime finalizer
+deadlock: native Lean passed, while the frozen Node host and full compiler timed
+out. File finalization now waits for asynchronous C `fclose` through the existing
+host RPC, allowing another Lean thread's delayed reader to run. The unchanged
+fixture then passed in Node, Deno, and Linux stack-adjusted Bun. Seventeen related
+host/application checks passed. The first Bun attempt's 60-second deadline was
+insufficient; its retained retry passed in 71 seconds with a 180-second external
+deadline. These are additional differential checks, not upstream-suite passes,
+and do not fix the packaged cooperative path's synchronous finalization. See
+[the original and fixed comparisons](evidence/fifo-finalizer-2026-09-20.json).
+The unchanged upstream `file_read_overflow`, `IO_test`, and `tempfile` tests then
+passed in each fixed engine: **9/9** executions, all 7,267 source hashes intact
+before and after each run. Their shared guarded process tree peaked at 5.19 GiB
+including preparation, with no OOM, throttling, or swap use.
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

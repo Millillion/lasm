@@ -176,7 +176,19 @@ export function nativeFiles() {
       if (!windows && fcntl(owned, 2, 1) < 0) { const error = failure(); closeFd(owned); throw error; }
       return implementation.openDescriptor(owned, mode);
     },
-    close(file) { fclose(file.stream); file.stream = null; },
+    close(file) {
+      const stream = file.stream;
+      file.stream = null;
+      if (stream) fclose(stream);
+    },
+    async closeAsync(file) {
+      const stream = file.stream;
+      file.stream = null;
+      // fclose can flush a buffered pipe and wait for its reader. The full
+      // runtime blocks only the calling Lean thread while this worker runs.
+      // Like Lean's native handle finalizer, ignore fclose's return value.
+      if (stream) await call(fclose, stream);
+    },
     async read(file, count) {
       if (!count) return Buffer.alloc(0);
       let bytes;

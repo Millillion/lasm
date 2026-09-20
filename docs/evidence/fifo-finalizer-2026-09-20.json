@@ -1,0 +1,510 @@
+{
+  "scope": "Linux differential regression for buffered FIFO finalization. This is a supplementary ordinary-Lean fixture, not an edited upstream test or a full-suite pass. The packaged cooperative path still uses synchronous finalization.",
+  "mechanism": "A full-runtime file finalizer now awaits asynchronous C fclose through the existing host RPC. Its calling Lean thread waits for the flush; the host event loop can dispatch a delayed reader from another Lean thread.",
+  "deadlineAdjustment": "The first Bun full-runtime attempt timed out at 60 seconds. The unchanged fixture then passed in about 71 seconds with an external 180-second deadline. Both attempts are retained; only the completed attempt is a pass.",
+  "bunQualification": "The full Bun result uses the existing explicit Linux 64 MiB worker-stack reservation and 60 MiB JSC stack budget. It is not a stock Bun portability result.",
+  "comparisons": {
+    "unfixed": {
+      "evidence": ".work/full-engine-probe/fifo-finalizer-before-v34/comparison.json",
+      "sourceSha256": "e0a211628b060824182bf564dbd82e69b05caab424b93c251f0b2697945a31e9",
+      "timeoutSeconds": 60,
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "-s65536",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 0.537602436,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-host",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v34-pool5/host/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 5.031576373,
+          "code": null,
+          "signal": "SIGKILL",
+          "error": "spawnSync /home/lastmjs/.nvm/versions/node/v24.13.1/bin/node ETIMEDOUT",
+          "stdout": "writer buffered\n",
+          "stderr": "",
+          "passed": false
+        },
+        {
+          "name": "node-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v34-lake1/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 60.194608601000006,
+          "code": null,
+          "signal": "SIGKILL",
+          "error": "spawnSync /home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v34-lake1/bin/lean ETIMEDOUT",
+          "stdout": "",
+          "stderr": "",
+          "passed": false
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T02-22-48.569Z-c91af0c4-0090-4a6d-b7c9-a2816d7777ea.json",
+        "peakMemoryBytes": 2745737216,
+        "memoryThrottled": false,
+        "resourceLimited": false,
+        "stoppedBecause": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "fixedHosts": {
+      "evidence": ".work/full-engine-probe/fifo-finalizer-host-after/comparison.json",
+      "sourceSha256": "e0a211628b060824182bf564dbd82e69b05caab424b93c251f0b2697945a31e9",
+      "timeoutSeconds": 60,
+      "results": [
+        {
+          "name": "node-host",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/src/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.16945660499999998,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "command": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440",
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/src/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.23101086899999998,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/src/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.18118241900000004,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T02-24-51.276Z-a267456b-6e91-46a9-a7a1-b47677bef2fe.json",
+        "peakMemoryBytes": 35409920,
+        "memoryThrottled": false,
+        "resourceLimited": false,
+        "stoppedBecause": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "fixedRuntimeFirstAttempt": {
+      "evidence": ".work/full-engine-probe/fifo-finalizer-after-v35/comparison.json",
+      "sourceSha256": "e0a211628b060824182bf564dbd82e69b05caab424b93c251f0b2697945a31e9",
+      "timeoutSeconds": 60,
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "-s65536",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 0.5258255380000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-host",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v35-finalizer/host/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.17770892000000005,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v35-finalizer/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 11.065650798999998,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "command": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440",
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v35-finalizer/host/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.2593113260000009,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v35-finalizer/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 10.557278848,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v35-finalizer-lowered/host/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.14124743099999978,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v35-finalizer/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 60.209139047,
+          "code": null,
+          "signal": "SIGKILL",
+          "error": "spawnSync /home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v35-finalizer/bin/lean ETIMEDOUT",
+          "stdout": "",
+          "stderr": "",
+          "passed": false
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/fifo-finalizer-after-resources.json",
+        "peakMemoryBytes": 2822078464,
+        "memoryThrottled": false,
+        "resourceLimited": false,
+        "stoppedBecause": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "fixedBunExtendedDeadline": {
+      "evidence": ".work/full-engine-probe/fifo-finalizer-bun-v35/comparison.json",
+      "sourceSha256": "e0a211628b060824182bf564dbd82e69b05caab424b93c251f0b2697945a31e9",
+      "timeoutSeconds": 180,
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "-s65536",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 0.528903281,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-host",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/test/fixtures/fifo-finalizer-host.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v35-finalizer-lowered/host/node-host.mjs"
+          ],
+          "capacity": 65536,
+          "seconds": 0.14752477299999997,
+          "code": 0,
+          "signal": null,
+          "stdout": "writer buffered\nbuffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun-lean",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v35-finalizer/bin/lean",
+          "command": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/FifoFinalizer.lean"
+          ],
+          "capacity": 65536,
+          "seconds": 71.02867995899999,
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered FIFO finalizer and delayed reader completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T02-29-29.971Z-d8dd850f-4a46-4d01-9a13-ee759fa2614f.json",
+        "peakMemoryBytes": 3338891264,
+        "memoryThrottled": false,
+        "resourceLimited": false,
+        "stoppedBecause": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "unitAndApplicationRegressions": {
+    "command": "node --test --test-concurrency=1 test/native-files.test.mjs test/node-host.test.mjs test/node-network.test.mjs test/node-platform.test.mjs",
+    "passed": 17,
+    "failed": 0,
+    "log": ".work/full-engine-probe/fifo-finalizer-units.log",
+    "peakMemoryBytes": 760229888,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "frozenArtifacts": {
+    "wasm64-v35-finalizer": {
+      "derivation": {
+        "scope": "Host finalizer dispatch and asynchronous C close; unchanged Lean sources and Wasm.",
+        "parentDerivation": {
+          "scope": "Resource-adjusted preinitialized worker count; unchanged Wasm and Lean sources.",
+          "from": 8,
+          "to": 5,
+          "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot.",
+          "wasmSha256": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1"
+        },
+        "wasmSha256": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1",
+        "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot."
+      },
+      "files": {
+        "bin/lean.js": "a155a0997585c32aa20625e2f42a0690b484085fbaaa831026e9391331e153bc",
+        "bin/lean.wasm": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1",
+        "host/node-host.mjs": "a2b9b71d5e20bb0c1446e0cd9623928ee0c7b4c956e16afb6c40c1ab98d8a30f",
+        "host/native-files.mjs": "fa78cf32c2834c563e9e636ec88857c00f3e660083ff4d190ed476aebec12983",
+        "runtime-support/host-pre.js": "0a1b5899c36d4cdca6cd09353844e7112283ec1c2223de11c37f650ca0d71409"
+      }
+    },
+    "wasm64-v35-finalizer-lowered": {
+      "derivation": {
+        "scope": "Host finalizer dispatch and asynchronous C close; unchanged Lean sources and Wasm.",
+        "wasmSha256": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e",
+        "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot."
+      },
+      "files": {
+        "bin/lean.js": "f3dfe10d553aa87f64e089ff81524f6c1dfbf5c70a6aaca38790217fa31713d8",
+        "bin/lean.wasm": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e",
+        "host/node-host.mjs": "a2b9b71d5e20bb0c1446e0cd9623928ee0c7b4c956e16afb6c40c1ab98d8a30f",
+        "host/native-files.mjs": "fa78cf32c2834c563e9e636ec88857c00f3e660083ff4d190ed476aebec12983",
+        "runtime-support/host-pre.js": "0a1b5899c36d4cdca6cd09353844e7112283ec1c2223de11c37f650ca0d71409"
+      }
+    }
+  },
+  "upstreamFilesystemRegression": {
+    "scope": "Three unchanged upstream tests per engine, run sequentially. Bun retains the documented Linux stack adjustment. Preparation and all tests share one bounded process tree.",
+    "peakMemoryBytesIncludingPreparation": 5568626688,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "runs": [
+      {
+        "engine": "node",
+        "suite": ".work/full-suite-node-v35-fs",
+        "tests": [
+          {
+            "name": "compile/file_read_overflow.lean",
+            "seconds": 34.3093,
+            "passed": true
+          },
+          {
+            "name": "elab/IO_test.lean",
+            "seconds": 10.1925,
+            "passed": true
+          },
+          {
+            "name": "elab/tempfile.lean",
+            "seconds": 11.1795,
+            "passed": true
+          }
+        ],
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        }
+      },
+      {
+        "engine": "deno",
+        "suite": ".work/full-suite-deno-v35-fs",
+        "tests": [
+          {
+            "name": "compile/file_read_overflow.lean",
+            "seconds": 32.5301,
+            "passed": true
+          },
+          {
+            "name": "elab/IO_test.lean",
+            "seconds": 9.6392,
+            "passed": true
+          },
+          {
+            "name": "elab/tempfile.lean",
+            "seconds": 10.6519,
+            "passed": true
+          }
+        ],
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        }
+      },
+      {
+        "engine": "bun",
+        "suite": ".work/full-suite-bun-v35-fs",
+        "tests": [
+          {
+            "name": "compile/file_read_overflow.lean",
+            "seconds": 220.263,
+            "passed": true
+          },
+          {
+            "name": "elab/IO_test.lean",
+            "seconds": 70.7115,
+            "passed": true
+          },
+          {
+            "name": "elab/tempfile.lean",
+            "seconds": 71.0378,
+            "passed": true
+          }
+        ],
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        }
+      }
+    ]
+  }
+}

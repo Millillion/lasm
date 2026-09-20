@@ -66,6 +66,20 @@ test('file reads exceed the former 16 MiB ceiling and return EOF correctly', asy
   assert.equal((await ok(2, h, 1))[0], 0x5a);
 });
 
+test('full-runtime finalization waits for pending writes and flushes before completing', async t => {
+  const { directory, host, ok, open } = setup(t);
+  const h = await open('queued-close', 1);
+  const bytes = Buffer.alloc(2048, 120);
+  const writing = ok(3, h, 0, bytes);
+  const closing = host.releaseAsync(h);
+  assert.equal(host.stats().resources, 0);
+  await closing;
+  await writing;
+  assert.deepEqual(readFileSync(join(directory, 'queued-close')), bytes);
+  // A repeated release must not pass a freed FILE pointer to fclose again.
+  await host.releaseAsync(h);
+});
+
 test('line reading preserves embedded NUL and invalid UTF-8 for Lean string decoding', async t => {
   const { directory, ok, open } = setup(t);
   const bytes = Buffer.from([0x61,0,0xff,0x0a,0x62]);
