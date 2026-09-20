@@ -112,3 +112,11 @@ with all source hashes intact and zero OOM/throttling events. Direct Lean tests
 outside Lake retain four workers. This is a disclosed harness resource
 adjustment; the cap was not raised. The complete Node campaign now continues
 from these three recorded passes, using append-only selection history.
+
+Older compiler probes, native-C preparation, export generation, suite preparation,
+and artifact freezing now apply the same guard automatically. Previously those
+commands required the caller to remember the wrapper. Three representative
+entry points refused an overlapping launch before their bodies ran while a real
+upstream test continued unaffected. All harness scripts passed syntax checks.
+These checks used no memory exhaustion; see
+[the entry-point evidence](evidence/automatic-guard-entrypoints-2026-09-20.json).

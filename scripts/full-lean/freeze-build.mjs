@@ -3,6 +3,10 @@ import { resolve, join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { root, leanCommit } from '../../src/toolchain.mjs';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 const build = resolve(process.argv[2] ?? '.work/lean-full/wasm64');
 const output = process.argv[3] && resolve(process.argv[3]);
 if (!output || existsSync(output)) throw new Error('Supply a new snapshot directory as the second argument');

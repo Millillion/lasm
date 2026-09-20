@@ -8,6 +8,10 @@ import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 import { root } from '../../src/toolchain.mjs';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 if (process.platform !== 'linux') throw new Error('This diagnostic currently requires Linux');
 const [programArg, hostArg, outputArg] = process.argv.slice(2);
 if (!programArg || !hostArg || !outputArg) throw new Error('Supply generated const_fold .cjs, frozen host module, and new output directory');

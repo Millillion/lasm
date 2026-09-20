@@ -6,6 +6,10 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 const build = resolve(process.argv[2] ?? '.work/lean-full/wasm64');
 const source = resolve(process.argv[3] ?? '.work/lean-full/lean4-4.32.0');
 const native = resolveLean(root);

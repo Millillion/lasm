@@ -5,6 +5,10 @@ import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { root } from '../../src/toolchain.mjs';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 const [configuration, destination] = process.argv.slice(2);
 if (!configuration || !destination) throw new Error('Supply a full toolchain.json and a new output directory');
 const config = JSON.parse(readFileSync(resolve(configuration)));

@@ -6,6 +6,10 @@ import { execFileSync } from 'node:child_process';
 import { root, resolveLean } from '../../src/toolchain.mjs';
 import { runtimeAbiArchives, isRuntimeExport, definedAbiSymbols } from './runtime-abi.mjs';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 const build = resolve(process.argv[2] ?? '.work/lean-full/wasm');
 const output = resolve(process.argv[3] ?? join(build, 'lasm-wasm-exports.json'));
 const sdk = resolve(process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9'));

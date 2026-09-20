@@ -1024,7 +1024,14 @@
         "modified": [
           "tests/lake/tests/kinds/produced.out"
         ],
-        "explanation": "The unchanged Lake kinds driver/common.sh writes query output to produced.out; it is empty in the archive and now contains dynlib. Preserve this observed driver mutation."
+        "explanation": "The unchanged Lake kinds driver/common.sh writes query output to produced.out. The pinned archive contains dynlib followed by a newline; the interrupted v6 tree contains an empty file. Preserve this observed driver mutation.",
+        "explanationCorrection": {
+          "verifiedAt": "2026-09-20",
+          "note": "Earlier prose reversed the original and observed contents. Corrected by reading the pinned archive and preserved v6 file; the modified-file count is unchanged.",
+          "archiveBytesHex": "64796e6c69620a",
+          "expectedSha256": "17656418b13bf87bf6633b7395700040ef03180dfa67e6235137656813df5c9b",
+          "observedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
       },
       "status": "interrupted; partial log is not a complete conformance result",
       "recordedFailures": 32

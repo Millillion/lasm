@@ -1,0 +1,57 @@
+{
+  "scope": "Older compiler probes and preparatory entry points now automatically require the existing bounded runner. Three representative commands were rejected before their bodies ran while a real upstream test held the unit. No memory exhaustion was induced.",
+  "checkedAt": "2026-09-20T02:13:50.446Z",
+  "entryChecks": [
+    {
+      "name": "probe-loader",
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T02-13-23.117Z-6d40f521-3c8c-48ab-9e02-634d883037ad.json\nFailed to start transient service unit: Unit lasm-heavy-a79a4e3ab9f2.service was already loaded or has a fragment file.\n[lasm] Peak 0.00 GiB; launch failed\n"
+    },
+    {
+      "name": "probe-primitives",
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T02-13-23.215Z-dd13fd78-0091-4778-8c8b-383fc800cefd.json\nFailed to start transient service unit: Unit lasm-heavy-a79a4e3ab9f2.service was already loaded or has a fragment file.\n[lasm] Peak 0.00 GiB; launch failed\n"
+    },
+    {
+      "name": "freeze-build",
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/resource-runs/2026-09-20T02-13-23.308Z-e2dca439-dfd3-41b9-9a03-f8452fcf694f.json\nFailed to start transient service unit: Unit lasm-heavy-a79a4e3ab9f2.service was already loaded or has a fragment file.\n[lasm] Peak 0.00 GiB; launch failed\n"
+    }
+  ],
+  "activeWorkloadUnaffected": {
+    "name": "tests/lake/tests/8448/test.sh",
+    "sample": {
+      "at": "2026-09-20T02:13:50.446Z",
+      "memoryBytes": 2764455936,
+      "peakMemoryBytes": 5403316224,
+      "swapBytes": 0,
+      "tasks": 30,
+      "memoryBreakdown": {
+        "anon": 2720468992,
+        "file": 565248,
+        "kernel": 43323392,
+        "shmem": 0,
+        "file_mapped": 352256,
+        "inactive_file": 565248,
+        "slab": 2576400
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v34-lake1/00008-6e4fb6bb/resources.json"
+  },
+  "syntaxChecks": "All scripts/full-lean/*.mjs parsed with node --check."
+}

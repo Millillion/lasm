@@ -5,6 +5,10 @@ import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 const output = resolve(process.argv[2] ?? '.work/full-engine-probe/build-cache');
 const build = resolve(process.argv[3] ?? '.work/lean-full/wasm64');
 mkdirSync(output);

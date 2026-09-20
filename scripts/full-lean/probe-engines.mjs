@@ -7,6 +7,10 @@ import { root } from '../../src/toolchain.mjs';
 import { patchSdk } from './patch-sdk.mjs';
 import { runtimeAbiExports } from './runtime-abi.mjs';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 const output = resolve(process.argv[2] ?? join(root, '.work/full-engine-probe'));
 mkdirSync(output, { recursive: true });
 const sdk = process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9');

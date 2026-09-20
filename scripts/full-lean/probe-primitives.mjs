@@ -5,6 +5,10 @@ import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { root, resolveLean } from '../../src/toolchain.mjs';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 const revision = process.argv[2];
 if (!revision || !/^v[0-9]+$/.test(revision)) throw new Error('Supply a frozen toolchain revision, such as v15');
 const output = join(root, '.work/full-engine-probe', revision);

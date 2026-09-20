@@ -6,11 +6,14 @@ compiler, kernel, elaborator, Lake, runtime, and interactive tests. The older
 
 ## Resource protection on the maintainer desktop
 
-Heavy work must run one workload at a time through `run-bounded.mjs`. The full
-build and suite runners apply it automatically. Other compiler probes use:
+Heavy work must run one workload at a time through `run-bounded.mjs`. Full
+builds, suite preparation/execution, artifact freezing, native-C preparation,
+export generation, and compiler probes apply it automatically. The lightweight
+campaign supervisors stay outside and guard each child workload separately.
+Use an explicit wrapper for other experimental commands:
 
 ```sh
-node scripts/full-lean/run-bounded.mjs -- node scripts/full-lean/probe-primitives.mjs v26
+node scripts/full-lean/run-bounded.mjs -- COMMAND ARGUMENTS
 ```
 
 The Linux systemd/cgroup-v2 runner includes every descendant in one 10 GiB

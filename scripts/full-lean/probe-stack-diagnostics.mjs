@@ -4,6 +4,10 @@ import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { root } from '../../src/toolchain.mjs';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 const output = resolve(process.argv[2] ?? '.work/full-engine-probe/stack-diagnostics');
 mkdirSync(output);
 const sdk = resolve(process.env.LASM_EMSDK ?? '.cache/emsdk-6.0.9-dev');

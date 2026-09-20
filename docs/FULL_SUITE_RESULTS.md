@@ -240,7 +240,7 @@ The old full Node v6 and Deno/Bun v23 runs were interrupted by desktop OOM
 failures. Earlier references to them being in progress are historical; they are
 not still running and have no complete result. The Deno/Bun trees retain all
 7,267 original hashes. Node retains 7,266; its Lake `kinds` driver overwrote the
-originally empty `produced.out` scratch file with `dynlib`. That alteration is
+original `dynlib\n` scratch output with an empty file. That alteration is
 recorded and preserved, not silently repaired. New runs use one workload at a time,
 one CTest job, and the proactive resource guard. Resource-aborted runs are
 reported separately from Lean failures. See [the diagnosis](RESOURCE_FAILURES.md)

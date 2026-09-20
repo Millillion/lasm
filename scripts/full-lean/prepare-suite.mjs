@@ -6,6 +6,10 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 
+import { ensureResourceGuard } from './resource-guard.mjs';
+
+await ensureResourceGuard();
+
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const output = resolve(option('--output', '.work/full-suite-native'));
