@@ -1,7 +1,6 @@
 {
   "scope": "Selected unchanged upstream regressions after allocator and region-allocation fixes; not complete suites.",
   "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
-  "configuration": "Native memory64, 8 GiB guest maximum, Lean/SDK mimalloc, eight preinitialized pthread workers, four Lean workers, 64 MiB worker stacks. One guarded CTest job.",
   "runs": [
     {
       "engine": "node",
@@ -210,6 +209,315 @@
         "oom_group_kill": 0
       },
       "resourceReport": ".work/full-engine-probe/deno-v33-regression-resources.json"
+    },
+    {
+      "engine": "bun",
+      "toolchain": ".work/full-toolchains/bun-v32-stack64",
+      "build": ".work/full-artifacts/wasm64-v32-region",
+      "configuration": "Lowered memory64 / 4 GiB guest; same checked Lean archives and native mimalloc layout, eight pthread workers, four Lean workers. Explicit Linux-only 64 MiB worker stack reservation helper and 60 MiB JSC stack budget. Not a stock Bun result.",
+      "campaign": ".work/full-campaign-bun-v32-regression/campaign.json",
+      "passed": 11,
+      "total": 11,
+      "tests": [
+        {
+          "name": "elab/IO_test.lean",
+          "passed": true,
+          "seconds": 70.6628,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 3028185088,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00001-3ba5d8cb/resources.json"
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "passed": true,
+          "seconds": 76.5967,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 4344791040,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00002-529158eb/resources.json"
+        },
+        {
+          "name": "elab/async_select_timer.lean",
+          "passed": true,
+          "seconds": 71.888,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 3480502272,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00003-0e0a62d1/resources.json"
+        },
+        {
+          "name": "elab/async_tcp_server_client.lean",
+          "passed": true,
+          "seconds": 72.8906,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 4051718144,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00004-02d9cac1/resources.json"
+        },
+        {
+          "name": "elab/async_udp_sockets.lean",
+          "passed": true,
+          "seconds": 71.5813,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 3966541824,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00005-5f2ee1cb/resources.json"
+        },
+        {
+          "name": "elab/issue9018.lean",
+          "passed": true,
+          "seconds": 74.0913,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 3334963200,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00006-c36b509d/resources.json"
+        },
+        {
+          "name": "elab/networkInterfaces.lean",
+          "passed": true,
+          "seconds": 69.9985,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 3497938944,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00007-c5e706a2/resources.json"
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "passed": true,
+          "seconds": 72.3148,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 3287937024,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00008-98f120a8/resources.json"
+        },
+        {
+          "name": "elab_bench/big_do.lean",
+          "passed": true,
+          "seconds": 77.92,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 3597930496,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00009-4c029ac0/resources.json"
+        },
+        {
+          "name": "elab_bench/bv_decide_rewriter.lean",
+          "passed": true,
+          "seconds": 75.0848,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 3909287936,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00010-b0b9a0ea/resources.json"
+        },
+        {
+          "name": "elab_bench/simp_congr.lean",
+          "passed": true,
+          "seconds": 72.9665,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "peakMemoryBytes": 3451916288,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false,
+          "resourceReport": ".work/full-campaign-bun-v32-regression/00011-29702c35/resources.json"
+        }
+      ]
     }
-  ]
+  ],
+  "nodeDenoConfiguration": "Native memory64, 8 GiB guest maximum, Lean/SDK mimalloc, eight preinitialized pthread workers, four Lean workers, 64 MiB worker stacks. One guarded CTest job."
 }

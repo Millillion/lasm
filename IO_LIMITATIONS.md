@@ -26,6 +26,13 @@ on Wasm pthreads. New DNS, UDP, system, signal, and thread-ID host implementatio
 do not by themselves establish conformance of either complete path. No remaining implementation gap is being reclassified
 as fundamental merely because it needs further work.
 
+The latest guarded full-runtime subsets pass 11/11 checks in Node and in Bun
+with an explicit Linux stack adjustment. Deno passes 11/12, with an intermittent
+early-streaming deadline still under investigation. These cover ordinary
+filesystem, TCP/UDP, timers, HTTP, and previous stack regressions; they do not
+close the full-suite or cross-platform gates. See the
+[recorded configurations and results](docs/evidence/guarded-runtime-regressions-2026-09-20.json).
+
 ## Standard API coverage
 
 - [ ] Complete a declaration-by-declaration compatibility audit; the implemented

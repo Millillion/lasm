@@ -296,6 +296,25 @@ Both runs preserved all upstream hashes with zero OOM or throttling events.
 These are subset results and one successful Node timing run, not proof of timing
 stability or full engine parity. See [the guarded regressions](evidence/guarded-runtime-regressions-2026-09-20.json).
 
+The corresponding Bun campaign passed **11/11**, each test in its own guarded
+process tree. This uses lowered memory64 with a 4 GiB guest limit and the explicit
+Linux stack adjustment; it is **not a stock Bun result**. Its original HTTP file
+passed in 76.60 seconds, including early streaming. All 7,267 hashes stayed
+unchanged in each test; peak host usage was 4.05 GiB, with no resource aborts,
+OOM, or throttling. The run also exercised the checkpointed supervisor on actual
+upstream tests. Bun's native-memory64 transfer defect and portable stack
+integration remain open.
+
+A quiet Deno timing comparison subsequently passed **2/3** repetitions of the
+original HTTP file; the remaining run again missed only case 22's early window.
+Native Lean passed the original control. The factor-10 parallel derivative
+passed in both native Lean and Deno, retaining all 22 functional cases and all
+relative timing ratios. Peak memory was 3.10 GiB with no OOM or throttling.
+This demonstrates intermittent timing sensitivity; it does not establish a
+fundamental scheduler limitation or count the derivative as an unchanged-suite
+pass. See [the repeated timing evidence](evidence/http-timing-deno-2026-09-20.json)
+and `scripts/full-lean/probe-http-timing.mjs` for reproduction.
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

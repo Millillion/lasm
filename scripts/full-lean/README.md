@@ -62,6 +62,12 @@ four tiny synthetic CTest controls to check checkpoint/resume, interruption
 cleanup, and failure accounting without compiler workloads or intentional
 memory exhaustion.
 
+`probe-http-timing.mjs --toolchain FROZEN_FACADE --output NEW_DIRECTORY --scale 10
+--repetitions 3` guards a native control, repeated original HTTP executions, and
+native/engine executions of the uniformly scaled parallel derivative. It keeps
+every failure and verifies the original source hash afterward. A derivative
+pass never counts as a pass of the original timing-sensitive registration.
+
 ## Unchanged tests and the native control
 
 ```sh
