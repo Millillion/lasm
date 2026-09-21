@@ -822,3 +822,11 @@ parent compiler snapshot.
 The unchanged Lake FFI and reverse-FFI examples, dedicated-thread compilation,
 and external boxing also pass in each engine, twelve registrations total. See
 [the original failure and full validation](../../docs/evidence/cc-inputs-2026-09-21.json).
+
+`probes/buffer-width.cjs` checks 40 buffer operations using a three-byte input
+and boundary offsets, including values above 4 GiB. It allocates no large
+buffer. Run inside the guard with Node, `deno run -A`, or Bun and compare the
+recorded results. Node and Deno agree; released and locally patched Bun differ
+on three `StringDecoder.text` cases. These engine findings inform the separate
+large-buffer audit and are not Lean suite failures. See
+[the offset comparisons](../../docs/evidence/buffer-width-2026-09-21.json).

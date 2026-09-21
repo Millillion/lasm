@@ -277,6 +277,12 @@ load, and suite conformance still need validation. See
   paths retain 32-bit lengths. A one-page capacity query confirms this cap without
   attempting large memory growth. This remaining implementation restriction is
   not fundamental; see [the release and capacity evidence](docs/evidence/bun-memory64-release-2026-09-21.json).
+  A separate three-byte buffer probe confirms a Bun offset-narrowing issue:
+  `StringDecoder.text` wraps offsets at 4 GiB and differs on negative indexing.
+  Node and Deno agree on all 40 controls; released and locally patched Bun
+  each differ on the same three cases. This is engine evidence for the remaining
+  buffer audit, not an observed Lean test failure; see
+  [the small-buffer comparisons](docs/evidence/buffer-width-2026-09-21.json).
   Broader Lean validation on both local builds remains in progress.
   These full-runtime paths still need integration and comprehensive validation.
 - [ ] A pending C read cannot be safely interrupted by disposing the Wasm
