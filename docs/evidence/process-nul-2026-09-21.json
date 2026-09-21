@@ -1,0 +1,780 @@
+{
+  "recordedAt": "2026-09-21T10:27:03.657614+00:00",
+  "scope": "Linux x64 native differential tests for POSIX process strings, getenv, setCurrentDir, and four filesystem NUL rejection controls. Not entire-suite or cross-platform conformance.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "nativeSources": {
+    ".cache/lean4-4.32.0/src/runtime/process.cpp": "POSIX spawn and setCurrentDir pass strings to C interfaces without embedded-NUL rejection.",
+    ".cache/lean4-4.32.0/src/runtime/io.cpp": "getenv returns none for names containing NUL; filesystem primitives return mk_embedded_nul_error."
+  },
+  "correction": [
+    "Use C-string truncation for POSIX spawn command, arguments, cwd, and environment entries before constructing the environment map.",
+    "Return none for getEnv names containing NUL before calling the JavaScript environment API.",
+    "Apply C-string truncation only to POSIX setCurrentDir; preserve original strings in structured IO errors.",
+    "Retain existing IO.FS NUL rejection. The fixture confirms reads, metadata, and both rename operands reject NUL without changing sentinel contents."
+  ],
+  "before": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-nul/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/fixture.lean",
+    "sourceSha256": "bbffb350e381b0e4a9c9f4e6f2e1265e1daec2d27a0222970c85a0b24cd6d4fd",
+    "scope": "Supplementary POSIX process, environment and filesystem NUL comparison; not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before-resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.412036157,
+        "code": 0,
+        "signal": null,
+        "stdout": "command NUL: \"0: \\\"command\\\", \\\"\\\"\"\nargument NUL: \"0: \\\"prefix:tail\\\", \\\"\\\"\"\nchild cwd NUL: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before\\\\n\\\", \\\"\\\"\"\nmissing command NUL: \"255: \\\"\\\", \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/missing'\\\\n\\\"\"\nempty command NUL: \"255: \\\"\\\", \\\"could not execute external process ''\\\\n\\\"\"\nenvironment NUL: \"0: \\\"last:prefix\\\", \\\"\\\"\"\nenvironment removal NUL: \"0: \\\"unset\\\", \\\"\\\"\"\nenvironment invalid keys: \"0: \\\"valid\\\", \\\"\\\"\"\ngetEnv ordinary: \"some \\\"present\\\"\"\ngetEnv NUL: \"none\"\nsetCurrentDir NUL: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before\"\nsetCurrentDir missing NUL: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/missing\\x00ignored\"\n  2\n  \"No such file or directory\"\nreadFile still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nmetadata still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename source still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename target still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nprocess NUL comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v69-spawn-flags/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v69-spawn-flags",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 11.480771289,
+        "code": 0,
+        "signal": null,
+        "stdout": "command NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nargument NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nchild cwd NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nmissing command NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nempty command NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nenvironment NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nenvironment removal NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nenvironment invalid keys: \"0: \\\"valid\\\", \\\"\\\"\"\ngetEnv ordinary: \"some \\\"present\\\"\"\ngetEnv NUL: \"some \\\"present\\\"\"\nsetCurrentDir NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nsetCurrentDir missing NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/missing\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nreadFile still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nmetadata still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename source still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename target still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nprocess NUL comparison completed\n",
+        "stderr": "",
+        "passed": false
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v69-spawn-flags/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v69-spawn-flags",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 11.053958785,
+        "code": 0,
+        "signal": null,
+        "stdout": "command NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nargument NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nchild cwd NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nmissing command NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nempty command NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nenvironment NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nenvironment removal NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nenvironment invalid keys: \"0: \\\"valid\\\", \\\"\\\"\"\ngetEnv ordinary: \"some \\\"present\\\"\"\ngetEnv NUL: \"none\"\nsetCurrentDir NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nsetCurrentDir missing NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/missing\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nreadFile still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nmetadata still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename source still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename target still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nprocess NUL comparison completed\n",
+        "stderr": "",
+        "passed": false
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v70-spawn-flags-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v70-spawn-flags-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v70-spawn-flags-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v70-spawn-flags-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 71.729642084,
+        "code": 0,
+        "signal": null,
+        "stdout": "command NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nargument NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nchild cwd NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nmissing command NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nempty command NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nenvironment NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nenvironment removal NUL: IO.Error.invalidArgument none 22 \"string contains NUL bytes\"\nenvironment invalid keys: \"0: \\\"valid\\\", \\\"\\\"\"\ngetEnv ordinary: \"some \\\"present\\\"\"\ngetEnv NUL: \"none\"\nsetCurrentDir NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nsetCurrentDir missing NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/missing\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nreadFile still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nmetadata still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename source still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename target still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nprocess NUL comparison completed\n",
+        "stderr": "",
+        "passed": false
+      }
+    ],
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T10:20:29.198Z"
+  },
+  "beforeResources": {
+    "startedAt": "2026-09-21T10:18:52.429Z",
+    "command": [
+      "node",
+      "scripts/full-lean/probe-process-nul.mjs",
+      ".work/full-engine-probe/process-nul-before",
+      ".work/full-toolchains/node-v69-spawn-flags",
+      ".work/full-toolchains/deno-v69-spawn-flags",
+      ".work/full-toolchains/bun-v70-spawn-flags-lowered"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "e42f79a4-c98d-431f-b7f4-78c920230469",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 29164302336
+    },
+    "minimumHostAvailable": 26195591168,
+    "peakMemoryBytes": 2805702656,
+    "peakTasks": 54,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-before-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-21T10:20:29.226Z",
+      "memoryBytes": 2019328,
+      "peakMemoryBytes": 2805702656,
+      "swapBytes": 0,
+      "tasks": 1,
+      "memoryBreakdown": {
+        "anon": 4096,
+        "file": 716800,
+        "kernel": 106496,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 671744,
+        "slab": 39928
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "exit-code",
+      "exitCode": "exited",
+      "exitStatus": "1",
+      "capturedAt": "2026-09-21T10:20:29.263Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 13688832,
+      "peakMemoryBytes": 2805702656,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10219520,
+        "file": 716800,
+        "kernel": 999424,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 671744,
+        "slab": 154344
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-21T10:20:29.287Z",
+    "result": {
+      "code": 1,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "after": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-nul/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/fixture.lean",
+    "sourceSha256": "bbffb350e381b0e4a9c9f4e6f2e1265e1daec2d27a0222970c85a0b24cd6d4fd",
+    "scope": "Supplementary POSIX process, environment and filesystem NUL comparison; not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after-resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.420259528,
+        "code": 0,
+        "signal": null,
+        "stdout": "command NUL: \"0: \\\"command\\\", \\\"\\\"\"\nargument NUL: \"0: \\\"prefix:tail\\\", \\\"\\\"\"\nchild cwd NUL: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after\\\\n\\\", \\\"\\\"\"\nmissing command NUL: \"255: \\\"\\\", \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/missing'\\\\n\\\"\"\nempty command NUL: \"255: \\\"\\\", \\\"could not execute external process ''\\\\n\\\"\"\nenvironment NUL: \"0: \\\"last:prefix\\\", \\\"\\\"\"\nenvironment removal NUL: \"0: \\\"unset\\\", \\\"\\\"\"\nenvironment invalid keys: \"0: \\\"valid\\\", \\\"\\\"\"\ngetEnv ordinary: \"some \\\"present\\\"\"\ngetEnv NUL: \"none\"\nsetCurrentDir NUL: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after\"\nsetCurrentDir missing NUL: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/missing\\x00ignored\"\n  2\n  \"No such file or directory\"\nreadFile still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nmetadata still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename source still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename target still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nprocess NUL comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v71-process-nul/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v71-process-nul",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 11.816101079,
+        "code": 0,
+        "signal": null,
+        "stdout": "command NUL: \"0: \\\"command\\\", \\\"\\\"\"\nargument NUL: \"0: \\\"prefix:tail\\\", \\\"\\\"\"\nchild cwd NUL: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after\\\\n\\\", \\\"\\\"\"\nmissing command NUL: \"255: \\\"\\\", \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/missing'\\\\n\\\"\"\nempty command NUL: \"255: \\\"\\\", \\\"could not execute external process ''\\\\n\\\"\"\nenvironment NUL: \"0: \\\"last:prefix\\\", \\\"\\\"\"\nenvironment removal NUL: \"0: \\\"unset\\\", \\\"\\\"\"\nenvironment invalid keys: \"0: \\\"valid\\\", \\\"\\\"\"\ngetEnv ordinary: \"some \\\"present\\\"\"\ngetEnv NUL: \"none\"\nsetCurrentDir NUL: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after\"\nsetCurrentDir missing NUL: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/missing\\x00ignored\"\n  2\n  \"No such file or directory\"\nreadFile still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nmetadata still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename source still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename target still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nprocess NUL comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v71-process-nul/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v71-process-nul",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 11.29813834,
+        "code": 0,
+        "signal": null,
+        "stdout": "command NUL: \"0: \\\"command\\\", \\\"\\\"\"\nargument NUL: \"0: \\\"prefix:tail\\\", \\\"\\\"\"\nchild cwd NUL: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after\\\\n\\\", \\\"\\\"\"\nmissing command NUL: \"255: \\\"\\\", \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/missing'\\\\n\\\"\"\nempty command NUL: \"255: \\\"\\\", \\\"could not execute external process ''\\\\n\\\"\"\nenvironment NUL: \"0: \\\"last:prefix\\\", \\\"\\\"\"\nenvironment removal NUL: \"0: \\\"unset\\\", \\\"\\\"\"\nenvironment invalid keys: \"0: \\\"valid\\\", \\\"\\\"\"\ngetEnv ordinary: \"some \\\"present\\\"\"\ngetEnv NUL: \"none\"\nsetCurrentDir NUL: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after\"\nsetCurrentDir missing NUL: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/missing\\x00ignored\"\n  2\n  \"No such file or directory\"\nreadFile still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nmetadata still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename source still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename target still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nprocess NUL comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v72-process-nul-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v72-process-nul-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v72-process-nul-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v72-process-nul-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 72.546037413,
+        "code": 0,
+        "signal": null,
+        "stdout": "command NUL: \"0: \\\"command\\\", \\\"\\\"\"\nargument NUL: \"0: \\\"prefix:tail\\\", \\\"\\\"\"\nchild cwd NUL: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after\\\\n\\\", \\\"\\\"\"\nmissing command NUL: \"255: \\\"\\\", \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/missing'\\\\n\\\"\"\nempty command NUL: \"255: \\\"\\\", \\\"could not execute external process ''\\\\n\\\"\"\nenvironment NUL: \"0: \\\"last:prefix\\\", \\\"\\\"\"\nenvironment removal NUL: \"0: \\\"unset\\\", \\\"\\\"\"\nenvironment invalid keys: \"0: \\\"valid\\\", \\\"\\\"\"\ngetEnv ordinary: \"some \\\"present\\\"\"\ngetEnv NUL: \"none\"\nsetCurrentDir NUL: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after\"\nsetCurrentDir missing NUL: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/missing\\x00ignored\"\n  2\n  \"No such file or directory\"\nreadFile still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nmetadata still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename source still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nrename target still rejects NUL: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after/sentinel\\x00ignored\")\n  22\n  \"string contains NUL bytes\"\nprocess NUL comparison completed\n",
+        "stderr": "",
+        "passed": true
+      }
+    ],
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T10:22:52.462Z"
+  },
+  "afterResources": {
+    "startedAt": "2026-09-21T10:21:14.461Z",
+    "command": [
+      "node",
+      "scripts/full-lean/probe-process-nul.mjs",
+      ".work/full-engine-probe/process-nul-after",
+      ".work/full-toolchains/node-v71-process-nul",
+      ".work/full-toolchains/deno-v71-process-nul",
+      ".work/full-toolchains/bun-v72-process-nul-lowered"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "cae29a2b-71df-4965-abc6-35acd1632108",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 29151821824
+    },
+    "minimumHostAvailable": 26127335424,
+    "peakMemoryBytes": 2897502208,
+    "peakTasks": 52,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-after-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-21T10:22:52.457Z",
+      "memoryBytes": 140361728,
+      "peakMemoryBytes": 2897502208,
+      "swapBytes": 0,
+      "tasks": 13,
+      "memoryBreakdown": {
+        "anon": 90308608,
+        "file": 294912,
+        "kernel": 8933376,
+        "shmem": 0,
+        "file_mapped": 114688,
+        "inactive_file": 294912,
+        "slab": 365784
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-21T10:22:52.521Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 12918784,
+      "peakMemoryBytes": 2897502208,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10219520,
+        "file": 303104,
+        "kernel": 995328,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 303104,
+        "slab": 156568
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-21T10:22:52.546Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "preparationResources": {
+    "startedAt": "2026-09-21T10:20:40.930Z",
+    "command": [
+      "python3",
+      ".work/full-engine-probe/prepare-process-nul.py"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "0405b4ed-1164-470f-b383-d16703b3ebca",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 28859727872
+    },
+    "minimumHostAvailable": 28825382912,
+    "peakMemoryBytes": 63676416,
+    "peakTasks": 12,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-preparation-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-21T10:20:43.940Z",
+      "memoryBytes": 6586368,
+      "peakMemoryBytes": 63676416,
+      "swapBytes": 0,
+      "tasks": 6,
+      "memoryBreakdown": {
+        "anon": 3751936,
+        "file": 995328,
+        "kernel": 946176,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 995328,
+        "slab": 413064
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-21T10:20:43.970Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 13647872,
+      "peakMemoryBytes": 63676416,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10211328,
+        "file": 995328,
+        "kernel": 1277952,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 995328,
+        "slab": 436272
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-21T10:20:43.994Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "packaged": {
+    "log": ".work/full-engine-probe/process-nul-packaged-regressions.log",
+    "sha256": "89c1a3746082e9a092623ac7ee9e1e486a52671fc58b2144a6d14271c855e862",
+    "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-packaged-regressions-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 4b2d8feaabdb4988a03039ac8d7558c2\nBuilding test/fixtures/cwd-errors/Main.lean for node\u2026\n\u25b6 ordinary Lean chdir preserves native error constructors and search permissions\n  \u2714 node (232.079002ms)\n  \u2714 deno (299.563804ms)\n  \u2714 bun (124.234063ms)\n\u2714 ordinary Lean chdir preserves native error constructors and search permissions (68987.934881ms)\nBuilding test/fixtures/process-nul/Main.lean for node\u2026\n\u25b6 ordinary Lean preserves native POSIX process NUL behavior and filesystem rejection\n  \u2714 node (529.506528ms)\n  \u2714 deno (749.698924ms)\n  \u2714 bun (291.025625ms)\n\u2714 ordinary Lean preserves native POSIX process NUL behavior and filesystem rejection (71180.743918ms)\nBuilding test/fixtures/process-spawn-errors/Main.lean for node\u2026\n\u25b6 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean\n  \u2714 node (840.824862ms)\n  \u2714 deno (1126.016838ms)\n  \u2714 bun (440.050422ms)\n\u2714 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean (72070.956276ms)\n\u2139 tests 12\n\u2139 suites 0\n\u2139 pass 12\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 212473.137362\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 3min 32.567s\nCPU time consumed: 3min 44.660s\nMemory peak: 454.5M\nMemory swap peak: 0B\n[lasm] Peak 0.44 GiB; success\n",
+    "passed": 12,
+    "resources": {
+      "startedAt": "2026-09-21T10:23:04.086Z",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/node-process-nul.test.mjs",
+        "test/node-cwd.test.mjs",
+        "test/node-spawn.test.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "7be6a87f-0d5a-4d8b-b72e-2bd44a2b3464",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 28985319424
+      },
+      "minimumHostAvailable": 28613840896,
+      "peakMemoryBytes": 476577792,
+      "peakTasks": 47,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-nul-packaged-regressions-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T10:26:36.568Z",
+        "memoryBytes": 296902656,
+        "peakMemoryBytes": 476577792,
+        "swapBytes": 0,
+        "tasks": 47,
+        "memoryBreakdown": {
+          "anon": 234905600,
+          "file": 50896896,
+          "kernel": 9682944,
+          "shmem": 0,
+          "file_mapped": 880640,
+          "inactive_file": 45404160,
+          "slab": 2877840
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T10:26:36.667Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 64688128,
+        "peakMemoryBytes": 476577792,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 50888704,
+          "kernel": 2801664,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 45395968,
+          "slab": 1989736
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T10:26:36.696Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "separateFullNodeCheckpoint": {
+    "identity": "e24b49fa6e8bec52798d53e22a6da488d23cc052fe4c81091783956da685dfb9",
+    "suite": "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v52-compiled-driver",
+    "backend": "node",
+    "status": "paused",
+    "selected": 3896,
+    "counts": {
+      "passed": 31,
+      "failed": 0,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 3865
+    },
+    "updatedAt": "2026-09-21T10:18:21.724Z",
+    "scope": "Separate v52 compiled-driver checkpoint before supplementary process NUL comparisons; no results imported into other snapshots.",
+    "campaign": ".work/full-campaign-node-v52-compiled-driver-priority/campaign.json"
+  },
+  "sourceSha256": {
+    "src/node-process.mjs": "4bdd2a1942f3057d3013522b37a79da4b0787cf326625931d58ef7304e50b4b1",
+    "src/node-host.mjs": "4c0da2a0852308138790263dcc3a27b26c890edacc1f29bb174227c21591026f",
+    "scripts/full-lean/probe-process-nul.mjs": "ad999fff62e18e4b12513c18e6cf6915874ab27797bd76589d8c13e2d7e3f7e4",
+    "test/node-process-nul.test.mjs": "0f501450fddd10eefb996667abb3d89412a9472d519667d484f2f13b7b510089",
+    "test/fixtures/process-nul/Main.lean": "bbffb350e381b0e4a9c9f4e6f2e1265e1daec2d27a0222970c85a0b24cd6d4fd",
+    "test/node-cwd.test.mjs": "18badc01b9ec25dfc96e2dbc2973b1622615cf5ea0d34a505ea1b2acc8d8a8c1",
+    "test/fixtures/cwd-errors/Main.lean": "cf7e6ec5fc2e9a69fc7c35e18063177964797c7be48e00f0420e4a4bfcccaace",
+    "test/node-spawn.test.mjs": "c2137783d40d8dbd41481656af1ca17e1ff39f1e6f27fa66c8d5b76a9981017a",
+    "test/fixtures/process-spawn-errors/Main.lean": "edcb8a4ff751aa2f0d931f63fd1a8a125a5b51a5eb424662e12c65e9d031ddfe"
+  },
+  "remaining": [
+    "Native macOS and Windows validation is pending. The POSIX truncation change deliberately leaves Windows spawn/chdir handling unchanged.",
+    "The full Bun comparison retains the existing explicit Linux stack adjustment and lowered Memory64; packaged tests run in stock engines.",
+    "Other string-boundary cases, concurrent cwd changes, and full-suite completion remain open. No remaining difference is classified as fundamental."
+  ]
+}

@@ -623,6 +623,23 @@ validation remain open. The launcher adds startup overhead; these comparisons
 do not establish complete process or full-suite conformance. See
 [the retained process and worker evidence](evidence/process-spawn-2026-09-21.json).
 
+A separate ordinary Lean fixture verifies embedded-NUL behavior. The native
+runtime passes POSIX process strings and `setCurrentDir` directly to C interfaces,
+returns `none` for NUL-containing `getEnv` names, and rejects NULs in filesystem
+paths. Lasm had rejected process strings too and Node truncated environment
+lookup names. The private host now preserves these API-specific behaviors.
+Sixteen comparisons match native Lean in Node, Deno, and Bun full compilers,
+including environment key collisions/removal and structured directory errors.
+Filesystem read, metadata, and both rename-operand controls retain their errors
+and leave the sentinel contents unchanged. This final full comparison peaked
+at 2.70 GiB with zero OOM, throttling, or swap. The same immutable fixture was
+used for the retained failing baseline and passing rerun; no upstream test was
+changed. Twelve packaged checks also pass across the three engines: the new
+fixture plus the existing cwd-error and spawn comparisons. The separate v52
+Node campaign is checkpointed at 31 passes, zero failures/resource aborts, and
+3,865 pending registrations. Native non-Linux validation and other string-boundary cases remain
+open. See [the NUL evidence](evidence/process-nul-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

@@ -48,7 +48,11 @@ close the full-suite or cross-platform gates. See the
   validates search permission for the packaged instance cwd. Seven ordinary
   Lean cases match native Linux in Node, Deno, and Bun, in both packaged and
   full-compiler paths; see [the directory-error comparison](docs/evidence/cwd-errors-2026-09-21.json).
-  Renamed/deleted cwd tracking, embedded-NUL behavior, and macOS/Windows
+  POSIX process strings and `setCurrentDir` now use native C-string truncation
+  at embedded NULs; `getEnv` returns `none` for NUL-containing names, while
+  filesystem primitives retain their explicit rejection. Targeted ordinary
+  Lean comparisons match native Linux; see [the NUL comparisons](docs/evidence/process-nul-2026-09-21.json).
+  Renamed/deleted cwd tracking, other string-boundary cases, and macOS/Windows
   execution remain open.
 - [ ] Expand stdin, terminal, redirected-console, and interactive backpressure tests.
 - [ ] Broaden native child-process, process-group, pipe, signal and thread-ID

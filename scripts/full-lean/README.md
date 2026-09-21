@@ -429,6 +429,14 @@ The additional FIFO regression starts four blocked readers from a removed cwd
 and then performs their dependent writes. Native macOS/Windows validation and
 concurrent rename/removal races remain outside these controls.
 
+`probe-process-nul.mjs NEW_OUTPUT TOOLCHAIN...` compares an immutable ordinary
+Lean fixture against native Lean for POSIX process command/argument/cwd strings,
+environment entries and lookup, and `setCurrentDir`. It separately checks that
+filesystem operations still reject embedded NULs and preserve file contents.
+Lean uses different behavior in these APIs: the process C interfaces truncate,
+`getEnv` returns `none`, and filesystem primitives return structured errors.
+`test/node-process-nul.test.mjs` exercises the packaged application path.
+
 Lean's C++ shell does not read the generated application main's thread/stack
 environment defaults. The facade supplies its ordinary `-j` and `-s` options
 before user arguments. Explicit later options win. Two workers are insufficient

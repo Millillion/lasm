@@ -12,7 +12,14 @@ export function createNodeProcesses({ add, get, release, cwd }) {
     const string = () => {
       const length = number();
       const value = bytes.subarray(offset, offset += length).toString();
-      if (value.includes('\0')) throw Object.assign(new Error('string contains NUL bytes'), { code: 'EINVAL', errno: 22, nativeMessage: true });
+      const nul = value.indexOf('\0');
+      if (nul >= 0) {
+        // Lean's POSIX process implementation passes these strings directly to
+        // chdir/execvp/setenv. Keep their C-string semantics; IO.FS separately
+        // rejects embedded NULs and must retain that behavior.
+        if (process.platform !== 'win32') return value.slice(0, nul);
+        throw Object.assign(new Error('string contains NUL bytes'), { code: 'EINVAL', errno: 22, nativeMessage: true });
+      }
       return value;
     };
     const modes = [number(), number(), number()];
