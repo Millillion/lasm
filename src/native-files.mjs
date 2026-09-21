@@ -97,6 +97,12 @@ export function nativeFiles({ synchronous = false } = {}) {
   const adapter = {
     error: failure,
     fromNodeError,
+    descriptorFlags(fd) {
+      if (!fcntl) throw failure(ffi.os.errno.ENOSYS);
+      const flags = fcntl(fd, 3 /* F_GETFL */, 0);
+      if (flags < 0) throw failure();
+      return flags;
+    },
     outOfMemory() { return failure(ffi.os.errno.ENOMEM); },
     strerror,
     async checkDirectorySearch(path) {

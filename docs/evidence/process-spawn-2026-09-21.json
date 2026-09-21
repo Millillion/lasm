@@ -1,0 +1,2601 @@
+{
+  "recordedAt": "2026-09-21T10:13:44.629707+00:00",
+  "scope": "Linux x64 supplementary native comparisons and nine unchanged upstream process/compiled-program registrations. Not full-suite or cross-platform conformance.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "cause": "Node-compatible spawn reports POSIX exec/chdir failures to the parent; native Lean returns a child that prints a diagnostic and exits 255. Empty cwd was also normalized to the parent directory.",
+  "correction": [
+    "Use a private same-engine child which calls libc execvp, preserving the real PID and native PATH/executable-text behavior. No fork is executed within the JavaScript engine.",
+    "Transfer command/environment through a private descriptor; restore standard descriptor inheritance and apply environment and raw cwd inside the child.",
+    "Do not consume target NODE_OPTIONS during helper startup; use an environment map without a prototype.",
+    "An absolute requested cwd skips a stale parent path; the helper starts from the POSIX root directory."
+  ],
+  "before": {
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-spawn-errors/Main.lean",
+    "sourceSha256": "e5a62324c106bddbcb22611263de66cf89028041641cc5be45f9ed76b7caac6f",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "status": 0,
+        "signal": null,
+        "output": [
+          null,
+          "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nprocess spawn error comparison completed\n",
+          ""
+        ],
+        "pid": 1812129,
+        "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-flushed/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nprocess spawn error comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": ".work/full-toolchains/node-v55-cwd-errors",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v55-cwd-errors/bin/lean",
+        "status": 0,
+        "signal": null,
+        "output": [
+          null,
+          "missing executable: parent error IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nnonexecutable file: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory executable: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\nempty command: parent error IO.Error.invalidArgument none 0 \"The argument 'file' cannot be empty. Received ''\"\nmissing cwd: parent error IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nfile cwd: parent error IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndenied cwd: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\nloop cwd: parent error IO.Error.invalidArgument none 4294967256 \"too many symbolic links encountered\"\nempty cwd: child 0, stdout \"\", stderr \"\"\nvalid process: child 0, stdout \"\", stderr \"\"\nprocess spawn error comparison completed\n",
+          ""
+        ],
+        "pid": 1812165,
+        "stdout": "missing executable: parent error IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nnonexecutable file: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory executable: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\nempty command: parent error IO.Error.invalidArgument none 0 \"The argument 'file' cannot be empty. Received ''\"\nmissing cwd: parent error IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nfile cwd: parent error IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndenied cwd: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\nloop cwd: parent error IO.Error.invalidArgument none 4294967256 \"too many symbolic links encountered\"\nempty cwd: child 0, stdout \"\", stderr \"\"\nvalid process: child 0, stdout \"\", stderr \"\"\nprocess spawn error comparison completed\n",
+        "stderr": "",
+        "passed": false
+      }
+    ]
+  },
+  "unflushedNativeObservation": {
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-spawn-errors/Main.lean",
+    "sourceSha256": "ef560715ee15b35514cf8109726016eb8ffc5ee4eb2f1143f016ba316acfa70c",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "status": 0,
+        "signal": null,
+        "output": [
+          null,
+          "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\n\"\nnonexecutable file: child 255, stdout \"missing executable: child 255, stdout \\\"\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\n\\\"\\n\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\n\"\ndirectory executable: child 255, stdout \"missing executable: child 255, stdout \\\"\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\n\\\"\\nnonexecutable file: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\n\\\"\\n\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\n\"\nempty command: child 255, stdout \"missing executable: child 255, stdout \\\"\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\n\\\"\\nnonexecutable file: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\n\\\"\\ndirectory executable: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\nnonexecutable file: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\n\\\"\\n\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"missing executable: child 255, stdout \\\"\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\n\\\"\\nnonexecutable file: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\n\\\"\\ndirectory executable: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\nnonexecutable file: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\n\\\"\\nempty command: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\nnonexecutable file: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\n\\\\\\\"\\\\ndirectory executable: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\nnonexecutable file: child 255, stdout \\\\\\\\\\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process ''\\\\n\\\"\\n\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\n\"\nfile cwd: child 255, stdout \"/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\n\\\\\\\"\\\\nempty command: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\nnonexecutable file: child 255, stdout \\\\\\\\\\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\ndirectory executable: child 255, stdout \\\\\\\\\\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\nnonexecutable file: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process ''\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\n\\\"\\n\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\n\"\ndenied cwd: child 255, stdout \"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\n\\\"\\n\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/denied\\n\"\nloop cwd: child 255, stdout \"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\n\\\"\\ndenied cwd: child 255, stdout \\\"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/denied\\\\n\\\"\\n\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/loop\\n\"\nempty cwd: child 255, stdout \"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\n\\\"\\ndenied cwd: child 255, stdout \\\"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/denied\\\\n\\\"\\nloop cwd: child 255, stdout \\\"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\\\\\n\\\\\\\"\\\\ndenied cwd: child 255, stdout \\\\\\\"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/denied\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/loop\\\\n\\\"\\n\", stderr \"could not change directory to \\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nprocess spawn error comparison completed\n",
+          ""
+        ],
+        "pid": 1810946,
+        "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\n\"\nnonexecutable file: child 255, stdout \"missing executable: child 255, stdout \\\"\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\n\\\"\\n\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\n\"\ndirectory executable: child 255, stdout \"missing executable: child 255, stdout \\\"\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\n\\\"\\nnonexecutable file: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\n\\\"\\n\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\n\"\nempty command: child 255, stdout \"missing executable: child 255, stdout \\\"\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\n\\\"\\nnonexecutable file: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\n\\\"\\ndirectory executable: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\nnonexecutable file: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\n\\\"\\n\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"missing executable: child 255, stdout \\\"\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\n\\\"\\nnonexecutable file: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\n\\\"\\ndirectory executable: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\nnonexecutable file: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\n\\\"\\nempty command: child 255, stdout \\\"missing executable: child 255, stdout \\\\\\\"\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\n\\\\\\\"\\\\nnonexecutable file: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\n\\\\\\\"\\\\ndirectory executable: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\nnonexecutable file: child 255, stdout \\\\\\\\\\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not execute external process ''\\\\n\\\"\\n\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\n\"\nfile cwd: child 255, stdout \"/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\n\\\\\\\"\\\\nempty command: child 255, stdout \\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\nnonexecutable file: child 255, stdout \\\\\\\\\\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\ndirectory executable: child 255, stdout \\\\\\\\\\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\nnonexecutable file: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"missing executable: child 255, stdout \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not execute external process ''\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\n\\\"\\n\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\n\"\ndenied cwd: child 255, stdout \"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\n\\\"\\n\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/denied\\n\"\nloop cwd: child 255, stdout \"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\n\\\"\\ndenied cwd: child 255, stdout \\\"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/denied\\\\n\\\"\\n\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/loop\\n\"\nempty cwd: child 255, stdout \"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\n\\\"\\ndenied cwd: child 255, stdout \\\"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/denied\\\\n\\\"\\nloop cwd: child 255, stdout \\\"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\\\\\n\\\\\\\"\\\\ndenied cwd: child 255, stdout \\\\\\\"js/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not execute external process ''\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/missing\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\", stderr \\\\\\\\\\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/file\\\\\\\\\\\\\\\\n\\\\\\\\\\\\\\\"\\\\\\\\n\\\\\\\", stderr \\\\\\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/denied\\\\\\\\n\\\\\\\"\\\\n\\\", stderr \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-spawn-errors-before/loop\\\\n\\\"\\n\", stderr \"could not change directory to \\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nprocess spawn error comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": ".work/full-toolchains/node-v55-cwd-errors",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v55-cwd-errors/bin/lean",
+        "status": 0,
+        "signal": null,
+        "output": [
+          null,
+          "missing executable: parent error IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nnonexecutable file: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory executable: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\nempty command: parent error IO.Error.invalidArgument none 0 \"The argument 'file' cannot be empty. Received ''\"\nmissing cwd: parent error IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nfile cwd: parent error IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndenied cwd: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\nloop cwd: parent error IO.Error.invalidArgument none 4294967256 \"too many symbolic links encountered\"\nempty cwd: child 0, stdout \"\", stderr \"\"\nvalid process: child 0, stdout \"\", stderr \"\"\nprocess spawn error comparison completed\n",
+          ""
+        ],
+        "pid": 1810982,
+        "stdout": "missing executable: parent error IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nnonexecutable file: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory executable: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\nempty command: parent error IO.Error.invalidArgument none 0 \"The argument 'file' cannot be empty. Received ''\"\nmissing cwd: parent error IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nfile cwd: parent error IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndenied cwd: parent error IO.Error.permissionDenied none 4294967283 \"permission denied\"\nloop cwd: parent error IO.Error.invalidArgument none 4294967256 \"too many symbolic links encountered\"\nempty cwd: child 0, stdout \"\", stderr \"\"\nvalid process: child 0, stdout \"\", stderr \"\"\nprocess spawn error comparison completed\n",
+        "stderr": "",
+        "passed": false
+      }
+    ]
+  },
+  "preliminaryPackagedRegressions": {
+    "log": ".work/full-engine-probe/spawn-packaged-v1.log",
+    "sha256": "0785a454cab93b3a00a9445a024fcfbd93b199b2caec347e7b4b9c1e7999aeb7",
+    "passed": 12,
+    "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-packaged-v1-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 414dd8e560c044518d2cd3248e9cbac3\nBuilding test/fixtures/process-cwd/Main.lean for node\u2026\n\u25b6 ordinary Lean child cwd preserves OS symlink and dot-segment resolution\n  \u2714 node (290.40755ms)\n  \u2714 deno (400.524447ms)\n  \u2714 bun (159.163391ms)\n\u2714 ordinary Lean child cwd preserves OS symlink and dot-segment resolution (70132.140914ms)\n\u2139 native Lean: absolute and relative child cwd preserve symlink/..\n\u2139 node: absolute and relative child cwd preserve symlink/..\n\u2139 deno: absolute and relative child cwd preserve symlink/..\n\u2139 bun: absolute and relative child cwd preserve symlink/..\nBuilding test/fixtures/process-lifetime/Main.lean for node\u2026\n\u2714 POSIX wait and tryWait both reap a child before a subsequent kill (83.731884ms)\n\u2714 dropping a child permits host exit while the child is still alive in each engine (286.020627ms)\n\u2139 node: host exited without terminating its dropped child\n\u2139 deno: host exited without terminating its dropped child\n\u2139 bun: host exited without terminating its dropped child\nBuilding test/fixtures/process-lifetime/Drop.lean for node\u2026\n\u2714 ordinary Lean process lifetimes and errors match native Lean in every installed engine (69722.371782ms)\n\u2139 node: matched native process lifecycle and error constructors\n\u2139 deno: matched native process lifecycle and error constructors\n\u2139 bun: matched native process lifecycle and error constructors\n\u2714 an ordinary Lean main can exit with a dropped, still-running child (66536.503745ms)\n\u2139 node: ordinary main exits while its dropped child lives\n\u2139 deno: ordinary main exits while its dropped child lives\n\u2139 bun: ordinary main exits while its dropped child lives\nBuilding test/fixtures/process-spawn-errors/Main.lean for node\u2026\n\u25b6 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean\n  \u2714 node (719.683462ms)\n  \u2714 deno (977.675246ms)\n  \u2714 bun (371.982616ms)\n\u2714 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean (71731.049658ms)\n\u2139 tests 12\n\u2139 suites 0\n\u2139 pass 12\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 278736.491484\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 4min 38.822s\nCPU time consumed: 4min 53.604s\nMemory peak: 461.5M\nMemory swap peak: 0B\n[lasm] Peak 0.45 GiB; success\n",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-packaged-v1-resources.json",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/node-spawn.test.mjs",
+        "test/node-process.test.mjs",
+        "test/node-process-cwd.test.mjs"
+      ],
+      "startedAt": "2026-09-21T09:22:14.193Z",
+      "finishedAt": "2026-09-21T09:26:53.060Z",
+      "peakMemoryBytes": 484020224,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T09:26:53.034Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 81104896,
+        "peakMemoryBytes": 484020224,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 65982464,
+          "kernel": 3321856,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 58920960,
+          "slab": 2469480
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "excludedMixedFixtureAttempt": {
+    "explanation": {
+      "classification": "invalid mixed-fixture probe, not an upstream Lean failure",
+      "reason": "The supplementary fixture was expanded while the Bun compiler was starting. The runner used the live source rather than its saved copy. A clean rerun now executes the immutable copied fixture.",
+      "recordedSourceSha256": "22cc0288b1f3428a5a982a904e237eb03107f5d9fcbd33d7a7be4a28d0210de5",
+      "sourceAfterSha256": "168b744388738d1e7e353a2768a85b57598371c9bafec8f173b27996dfd12a33",
+      "originalEvidence": ".work/full-engine-probe/spawn-errors-full/comparison.json",
+      "scope": "Earlier native/Node/Deno results belong only to the old fixture; the Bun result cannot be compared with them."
+    },
+    "rawResults": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-spawn-errors/Main.lean",
+      "sourceSha256": "22cc0288b1f3428a5a982a904e237eb03107f5d9fcbd33d7a7be4a28d0210de5",
+      "scope": "Supplementary POSIX child errors, PID, environment, and execvp comparison, not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-full-v1-resources.json",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.43718719300000003,
+          "code": 0,
+          "signal": null,
+          "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nprocess spawn error comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v57-spawn-errors/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v57-spawn-errors",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 11.159168465,
+          "code": 0,
+          "signal": null,
+          "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nprocess spawn error comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v57-spawn-errors/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v57-spawn-errors",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v57-spawn-errors/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 11.980503043000002,
+          "code": 0,
+          "signal": null,
+          "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nprocess spawn error comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v58-spawn-errors-lowered/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v58-spawn-errors-lowered",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v58-spawn-errors-lowered/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 2,
+            "engineEnvironment": {
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v58-spawn-errors-lowered/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v58-spawn-errors-lowered/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 4294967296,
+            "pthreadPoolSize": 8,
+            "backend": "full-lean-wasm64-lowered",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v58-spawn-errors-lowered",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v58-spawn-errors-lowered/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v58-spawn-errors-lowered/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v58-spawn-errors-lowered/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v58-spawn-errors-lowered/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 70.80035961,
+          "code": 1,
+          "signal": null,
+          "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\n",
+          "stderr": "uncaught exception: PID or literal environment mismatch: \"1822190\\n--lasm-not-a-node-option\\nliteral $HOME `echo no` \\\"quote\\\"\\n\\n\"\n",
+          "passed": false
+        }
+      ],
+      "finishedAt": "2026-09-21T09:29:11.726Z"
+    },
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-full-v1-resources.json",
+      "command": [
+        "python3",
+        ".work/full-engine-probe/prepare-spawn-errors.py"
+      ],
+      "startedAt": "2026-09-21T09:27:32.352Z",
+      "finishedAt": "2026-09-21T09:29:11.894Z",
+      "peakMemoryBytes": 2701103104,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-21T09:29:11.867Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 14356480,
+        "peakMemoryBytes": 2701103104,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10219520,
+          "file": 1556480,
+          "kernel": 1277952,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 1556480,
+          "slab": 449352
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "packagedBeforeWorkerFix": {
+    "log": ".work/full-engine-probe/spawn-packaged-v2.log",
+    "sha256": "e448e2f3d14c6a12d7c25cc623ea2a0304dc30a208df414d8bfbe09d0e7896e0",
+    "passed": 4,
+    "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-packaged-v2-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 33b614b13ef34d2bb97456fe78f8e823\nBuilding test/fixtures/process-spawn-errors/Main.lean for node\u2026\n\u25b6 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean\n  \u2714 node (783.770997ms)\n  \u2714 deno (1121.976311ms)\n  \u2714 bun (399.17249ms)\n\u2714 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean (71869.875845ms)\n\u2139 tests 4\n\u2139 suites 0\n\u2139 pass 4\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 71952.291847\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 1min 12.058s\nCPU time consumed: 1min 16.195s\nMemory peak: 433.9M\nMemory swap peak: 0B\n[lasm] Peak 0.42 GiB; success\n",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-packaged-v2-resources.json",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/node-spawn.test.mjs"
+      ],
+      "startedAt": "2026-09-21T09:30:26.773Z",
+      "finishedAt": "2026-09-21T09:31:38.871Z",
+      "peakMemoryBytes": 455028736,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T09:31:38.845Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 29974528,
+        "peakMemoryBytes": 455028736,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10211328,
+          "file": 17170432,
+          "kernel": 1519616,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 15544320,
+          "slab": 699720
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "packagedBeforeFlagsFix": {
+    "log": ".work/full-engine-probe/spawn-packaged-v3.log",
+    "sha256": "0ae41a049ddbe0dbdb6fa80e6c1583e4680fe48a906f7d92f3445f816c2bea7e",
+    "passed": 4,
+    "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-packaged-v3-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 32db967e63ae4793bdb68fa2b5b1baec\nBuilding test/fixtures/process-spawn-errors/Main.lean for node\u2026\n\u25b6 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean\n  \u2714 node (760.469012ms)\n  \u2714 deno (1124.904646ms)\n  \u2714 bun (432.36603ms)\n\u2714 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean (70799.507272ms)\n\u2139 tests 4\n\u2139 suites 0\n\u2139 pass 4\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 70887.676169\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 1min 10.981s\nCPU time consumed: 1min 15.091s\nMemory peak: 428.9M\nMemory swap peak: 0B\n[lasm] Peak 0.42 GiB; success\n",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-packaged-v3-resources.json",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/node-spawn.test.mjs"
+      ],
+      "startedAt": "2026-09-21T09:52:23.834Z",
+      "finishedAt": "2026-09-21T09:53:34.865Z",
+      "peakMemoryBytes": 449814528,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T09:53:34.841Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 29585408,
+        "peakMemoryBytes": 449814528,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10211328,
+          "file": 16478208,
+          "kernel": 1511424,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 14852096,
+          "slab": 675728
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "packagedFinal": {
+    "log": ".work/full-engine-probe/spawn-packaged-v4.log",
+    "sha256": "b756216a8ef7e621357dfa2a01869c117550ab63b8e6090691e75fae75ceacd2",
+    "passed": 4,
+    "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-packaged-v4-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 7c0d7b13a71f45fc9d53873a2a7ded80\nBuilding test/fixtures/process-spawn-errors/Main.lean for node\u2026\n\u25b6 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean\n  \u2714 node (835.187499ms)\n  \u2714 deno (1163.261426ms)\n  \u2714 bun (443.115002ms)\n\u2714 ordinary Lean POSIX spawn errors, PID, environment, PATH and text execution match native Lean (73295.308744ms)\n\u2139 tests 4\n\u2139 suites 0\n\u2139 pass 4\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 73377.859372\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 1min 13.473s\nCPU time consumed: 1min 17.834s\nMemory peak: 446.9M\nMemory swap peak: 0B\n[lasm] Peak 0.44 GiB; success\n",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-packaged-v4-resources.json",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/node-spawn.test.mjs"
+      ],
+      "startedAt": "2026-09-21T10:12:22.642Z",
+      "finishedAt": "2026-09-21T10:13:36.163Z",
+      "peakMemoryBytes": 468676608,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T10:13:36.137Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 30535680,
+        "peakMemoryBytes": 468676608,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 9740288,
+          "file": 17260544,
+          "kernel": 1499136,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 15626240,
+          "slab": 696072
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "nativeWorkerRegressions": {
+    "log": ".work/full-engine-probe/spawn-workers-regressions.log",
+    "sha256": "da2878bffe9a1fa624c971b2602d5eaa48535d3f45f3a1e5fc6cd750cbff69c9",
+    "passed": 11,
+    "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-workers-regressions-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 306fae3f775447eea3178e646cd4f643\n\u2714 four blocked FIFO readers leave dependent writes able to run in each installed engine (1417.83807ms)\n\u2714 four blocked FIFO readers leave dependent writes able to run in each installed engine after cwd removal (5656.39691ms)\n\u2714 directory enumeration preserves native order and invalid UTF-8 filename bytes in each installed engine (305.607459ms)\n\u2714 Lean handles use buffered writes, flush, rewind, and the actual stream position for truncate (66.611363ms)\n\u2714 open buffered handles remain valid after idle IO workers exit (1251.032766ms)\n\u2714 file reads exceed the former 16 MiB ceiling and return EOF correctly (40.193965ms)\n\u2714 full-runtime finalization waits for pending writes and flushes before completing (2.094318ms)\n\u2714 line reading preserves embedded NUL and invalid UTF-8 for Lean string decoding (2.733946ms)\n\u2714 shared and exclusive OS locks contend, block asynchronously, and release on finalization (32.320762ms)\n\u2714 exclusive create and invalid descriptors retain native error categories (2.266384ms)\n\u2714 more lock waiters than FFI workers cannot deadlock the lock holder (157.091164ms)\n\u2139 tests 11\n\u2139 suites 0\n\u2139 pass 11\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 9021.074401\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 9.122s\nCPU time consumed: 5.105s\nMemory peak: 154.0M\nMemory swap peak: 0B\n[lasm] Peak 0.15 GiB; success\n",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-workers-regressions-resources.json",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/native-files.test.mjs"
+      ],
+      "startedAt": "2026-09-21T09:44:18.275Z",
+      "finishedAt": "2026-09-21T09:44:27.444Z",
+      "peakMemoryBytes": 161558528,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T09:44:27.416Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 12390400,
+        "peakMemoryBytes": 161558528,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10219520,
+          "file": 94208,
+          "kernel": 987136,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 94208,
+          "slab": 151136
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "concurrentPipeConformance": {
+    "log": ".work/full-engine-probe/spawn-pipe-conformance.log",
+    "sha256": "3298557b9881f2d0dff5e295d41ecb55c474e4bb93182b41833d73df10417163",
+    "passed": 1,
+    "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-pipe-conformance-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: abaa048e3dda4184bcdf9f134340eb85\nBuilding test/fixtures/process-conformance/Main.lean for node\u2026\n\u2714 process: ordinary Lean agrees with the native runtime (67002.57975ms)\n\u2139 tests 1\n\u2139 suites 0\n\u2139 pass 1\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 67202.47441\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 1min 7.309s\nCPU time consumed: 1min 10.797s\nMemory peak: 432.2M\nMemory swap peak: 0B\n[lasm] Peak 0.42 GiB; success\n",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-pipe-conformance-resources.json",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "--test-name-pattern=^process:",
+        "test/conformance.test.mjs"
+      ],
+      "startedAt": "2026-09-21T09:54:23.866Z",
+      "finishedAt": "2026-09-21T09:55:31.220Z",
+      "peakMemoryBytes": 453271552,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T09:55:31.196Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 29708288,
+        "peakMemoryBytes": 453271552,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 16191488,
+          "kernel": 1716224,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 14503936,
+          "slab": 873088
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "fullFinal": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-spawn-errors/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/fixture.lean",
+    "sourceSha256": "edcb8a4ff751aa2f0d931f63fd1a8a125a5b51a5eb424662e12c65e9d031ddfe",
+    "scope": "Supplementary POSIX child errors, PID, environment, and execvp comparison, not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-full-v5-resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.477971814,
+        "code": 0,
+        "signal": null,
+        "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nraw shell output exceeds both pipe capacities without truncation\nabsolute child cwd recovers from a removed parent directory\nprocess spawn error comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v69-spawn-flags/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v69-spawn-flags",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 12.335876461,
+        "code": 0,
+        "signal": null,
+        "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nraw shell output exceeds both pipe capacities without truncation\nabsolute child cwd recovers from a removed parent directory\nprocess spawn error comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v69-spawn-flags/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v69-spawn-flags",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v69-spawn-flags/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 12.550754893999999,
+        "code": 0,
+        "signal": null,
+        "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nraw shell output exceeds both pipe capacities without truncation\nabsolute child cwd recovers from a removed parent directory\nprocess spawn error comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v70-spawn-flags-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v70-spawn-flags-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v70-spawn-flags-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v70-spawn-flags-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v70-spawn-flags-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 71.712556838,
+        "code": 0,
+        "signal": null,
+        "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v5/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nraw shell output exceeds both pipe capacities without truncation\nabsolute child cwd recovers from a removed parent directory\nprocess spawn error comparison completed\n",
+        "stderr": "",
+        "passed": true
+      }
+    ],
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T10:12:08.247Z"
+  },
+  "fullFinalResources": {
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-full-v5-resources.json",
+    "command": [
+      "node",
+      "scripts/full-lean/probe-spawn-errors.mjs",
+      ".work/full-engine-probe/spawn-errors-full-v5",
+      ".work/full-toolchains/node-v69-spawn-flags",
+      ".work/full-toolchains/deno-v69-spawn-flags",
+      ".work/full-toolchains/bun-v70-spawn-flags-lowered"
+    ],
+    "startedAt": "2026-09-21T10:10:29.086Z",
+    "finishedAt": "2026-09-21T10:12:08.337Z",
+    "peakMemoryBytes": 2662088704,
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "unitReleased": true,
+    "resourceLimited": false,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-21T10:12:08.310Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 12894208,
+      "peakMemoryBytes": 2662088704,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10219520,
+        "file": 167936,
+        "kernel": 987136,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 167936,
+        "slab": 152176
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "upstream": {
+    "node": {
+      "path": ".work/full-campaign-node-v69-spawn-flags",
+      "identity": "4c808788702f64c685d64e26574e63c03c813b548db236ae347b98106702100f",
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "records": [
+        {
+          "name": "compile/wait_dedicated.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00001-047e423e",
+            "status": "passed",
+            "startedAt": "2026-09-21T10:00:52.178Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T10:01:25.552Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00001-047e423e/resources.json",
+            "peakMemoryBytes": 1941094400,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00001-047e423e/resources.json",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v69-spawn-flags",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00001-047e423e/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/wait_dedicated\\.lean$"
+            ],
+            "startedAt": "2026-09-21T10:00:52.221Z",
+            "finishedAt": "2026-09-21T10:01:25.545Z",
+            "peakMemoryBytes": 1941094400,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "unitReleased": true,
+            "resourceLimited": false,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-21T10:01:25.516Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 14393344,
+              "peakMemoryBytes": 1941094400,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10211328,
+                "file": 1892352,
+                "kernel": 1064960,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 1892352,
+                "slab": 235104
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "elab/Process.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00002-74b255d5",
+            "status": "passed",
+            "startedAt": "2026-09-21T10:01:25.552Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T10:01:47.887Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00002-74b255d5/resources.json",
+            "peakMemoryBytes": 3527438336,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00002-74b255d5/resources.json",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v69-spawn-flags",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00002-74b255d5/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/Process\\.lean$"
+            ],
+            "startedAt": "2026-09-21T10:01:25.594Z",
+            "finishedAt": "2026-09-21T10:01:47.881Z",
+            "peakMemoryBytes": 3527438336,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "unitReleased": true,
+            "resourceLimited": false,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-21T10:01:47.849Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12566528,
+              "peakMemoryBytes": 3527438336,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10219520,
+                "file": 32768,
+                "kernel": 987136,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 32768,
+                "slab": 152064
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "elab/emptyEnvVar.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00003-3e3bac72",
+            "status": "passed",
+            "startedAt": "2026-09-21T10:01:47.888Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T10:01:58.277Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00003-3e3bac72/resources.json",
+            "peakMemoryBytes": 2026045440,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00003-3e3bac72/resources.json",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v69-spawn-flags",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v69-spawn-flags/00003-3e3bac72/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/emptyEnvVar\\.lean$"
+            ],
+            "startedAt": "2026-09-21T10:01:47.936Z",
+            "finishedAt": "2026-09-21T10:01:58.272Z",
+            "peakMemoryBytes": 2026045440,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "unitReleased": true,
+            "resourceLimited": false,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-21T10:01:58.248Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12210176,
+              "peakMemoryBytes": 2026045440,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10223616,
+                "file": 32768,
+                "kernel": 991232,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 32768,
+                "slab": 155376
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "deno": {
+      "path": ".work/full-campaign-deno-v69-spawn-flags",
+      "identity": "46f6feeb80441ad46950fb8bd4a3ef74f53653c7f7778c0089e45caa597e97c1",
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "records": [
+        {
+          "name": "compile/wait_dedicated.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00001-e495df15",
+            "status": "passed",
+            "startedAt": "2026-09-21T10:01:58.998Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T10:02:31.251Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00001-e495df15/resources.json",
+            "peakMemoryBytes": 2134781952,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00001-e495df15/resources.json",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v69-spawn-flags",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00001-e495df15/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/wait_dedicated\\.lean$"
+            ],
+            "startedAt": "2026-09-21T10:01:59.036Z",
+            "finishedAt": "2026-09-21T10:02:31.244Z",
+            "peakMemoryBytes": 2134781952,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "unitReleased": true,
+            "resourceLimited": false,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-21T10:02:31.219Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 16916480,
+              "peakMemoryBytes": 2134781952,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10215424,
+                "file": 4247552,
+                "kernel": 1142784,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 4247552,
+                "slab": 302152
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "elab/Process.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00002-a9a9472c",
+            "status": "passed",
+            "startedAt": "2026-09-21T10:02:31.251Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T10:02:52.518Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00002-a9a9472c/resources.json",
+            "peakMemoryBytes": 3813810176,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00002-a9a9472c/resources.json",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v69-spawn-flags",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00002-a9a9472c/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/Process\\.lean$"
+            ],
+            "startedAt": "2026-09-21T10:02:31.290Z",
+            "finishedAt": "2026-09-21T10:02:52.512Z",
+            "peakMemoryBytes": 3813810176,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "unitReleased": true,
+            "resourceLimited": false,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-21T10:02:52.487Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12447744,
+              "peakMemoryBytes": 3813810176,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10219520,
+                "file": 204800,
+                "kernel": 991232,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 204800,
+                "slab": 152240
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "elab/emptyEnvVar.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00003-f88df176",
+            "status": "passed",
+            "startedAt": "2026-09-21T10:02:52.518Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T10:03:02.702Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00003-f88df176/resources.json",
+            "peakMemoryBytes": 2295693312,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00003-f88df176/resources.json",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v69-spawn-flags",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v69-spawn-flags/00003-f88df176/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/emptyEnvVar\\.lean$"
+            ],
+            "startedAt": "2026-09-21T10:02:52.560Z",
+            "finishedAt": "2026-09-21T10:03:02.697Z",
+            "peakMemoryBytes": 2295693312,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "unitReleased": true,
+            "resourceLimited": false,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-21T10:03:02.670Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12627968,
+              "peakMemoryBytes": 2295693312,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10219520,
+                "file": 114688,
+                "kernel": 983040,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 114688,
+                "slab": 164592
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "bun": {
+      "path": ".work/full-campaign-bun-v70-spawn-flags-lowered",
+      "identity": "f83fcc9d98c0f220ba7c754ca602ccba9ecf7f807c5faf859220c70d4f65018f",
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "records": [
+        {
+          "name": "compile/wait_dedicated.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00001-0d0398ea",
+            "status": "passed",
+            "startedAt": "2026-09-21T10:03:03.397Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T10:06:40.098Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00001-0d0398ea/resources.json",
+            "peakMemoryBytes": 2648768512,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00001-0d0398ea/resources.json",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v70-spawn-flags-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00001-0d0398ea/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/wait_dedicated\\.lean$"
+            ],
+            "startedAt": "2026-09-21T10:03:03.439Z",
+            "finishedAt": "2026-09-21T10:06:40.091Z",
+            "peakMemoryBytes": 2648768512,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "unitReleased": true,
+            "resourceLimited": false,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-21T10:06:40.066Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 14577664,
+              "peakMemoryBytes": 2648768512,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 9961472,
+                "file": 2244608,
+                "kernel": 1064960,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 2244608,
+                "slab": 258464
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "elab/Process.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00002-91ce75dc",
+            "status": "passed",
+            "startedAt": "2026-09-21T10:06:40.099Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T10:09:03.065Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00002-91ce75dc/resources.json",
+            "peakMemoryBytes": 5091401728,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00002-91ce75dc/resources.json",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v70-spawn-flags-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00002-91ce75dc/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/Process\\.lean$"
+            ],
+            "startedAt": "2026-09-21T10:06:40.140Z",
+            "finishedAt": "2026-09-21T10:09:03.059Z",
+            "peakMemoryBytes": 5091401728,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "unitReleased": true,
+            "resourceLimited": false,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-21T10:09:03.033Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12886016,
+              "peakMemoryBytes": 5091401728,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10215424,
+                "file": 36864,
+                "kernel": 983040,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 36864,
+                "slab": 164536
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            }
+          }
+        },
+        {
+          "name": "elab/emptyEnvVar.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00003-e5efe946",
+            "status": "passed",
+            "startedAt": "2026-09-21T10:09:03.065Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T10:10:14.481Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00003-e5efe946/resources.json",
+            "peakMemoryBytes": 2679721984,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00003-e5efe946/resources.json",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v70-spawn-flags-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v70-spawn-flags-lowered/00003-e5efe946/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/emptyEnvVar\\.lean$"
+            ],
+            "startedAt": "2026-09-21T10:09:03.105Z",
+            "finishedAt": "2026-09-21T10:10:14.475Z",
+            "peakMemoryBytes": 2679721984,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "unitReleased": true,
+            "resourceLimited": false,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-21T10:10:14.447Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12460032,
+              "peakMemoryBytes": 2679721984,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10219520,
+                "file": 28672,
+                "kernel": 987136,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 28672,
+                "slab": 155928
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "separateFullNodeCheckpoint": {
+    "identity": "e24b49fa6e8bec52798d53e22a6da488d23cc052fe4c81091783956da685dfb9",
+    "suite": "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v52-compiled-driver",
+    "backend": "node",
+    "status": "paused",
+    "selected": 3896,
+    "counts": {
+      "passed": 26,
+      "failed": 0,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 3870
+    },
+    "updatedAt": "2026-09-21T09:21:36.643Z",
+    "scope": "Unchanged separate v52 compiled-driver campaign checkpoint before spawn/worker regressions; no results imported into other snapshots.",
+    "campaign": ".work/full-campaign-node-v52-compiled-driver-priority/campaign.json"
+  },
+  "workerFailures": [
+    {
+      "comparison": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-spawn-errors/Main.lean",
+        "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/fixture.lean",
+        "sourceSha256": "168b744388738d1e7e353a2768a85b57598371c9bafec8f173b27996dfd12a33",
+        "scope": "Supplementary POSIX child errors, PID, environment, and execvp comparison, not an upstream-suite result.",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-full-v2-resources.json",
+        "results": [
+          {
+            "name": "native",
+            "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "seconds": 0.433517934,
+            "code": 0,
+            "signal": null,
+            "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nabsolute child cwd recovers from a removed parent directory\nprocess spawn error comparison completed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "name": "node",
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v59-spawn-errors/bin/lean",
+            "config": {
+              "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+              "engine": "node",
+              "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "engineArgs": [],
+              "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors",
+              "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+              "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+              "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/runtime-support",
+              "leanThreads": 4,
+              "lakeThreads": 1,
+              "bunSmol": false,
+              "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+              "systemAllocator": "mimalloc",
+              "leanAllocator": "mimalloc",
+              "memoryMode": 1,
+              "engineEnvironment": {},
+              "maximumMemoryBytes": 8589934592,
+              "pthreadPoolSize": 5,
+              "backend": "full-lean-wasm64-native",
+              "nativeLeanFallback": false,
+              "environmentAdjustments": {
+                "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v59-spawn-errors",
+                "LASM_FULL_APP_PATH": "Selected facade entry point",
+                "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+                "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+                "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+              },
+              "externalTools": {
+                "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/lib",
+                "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/include",
+                "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/share",
+                "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/bin/leanmake",
+                "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+                "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+              }
+            },
+            "seconds": 11.503463151,
+            "code": 1,
+            "signal": null,
+            "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\n",
+            "stderr": "uncaught exception: no such file or directory (error code: 4294967294)\n  file: \n",
+            "passed": false
+          },
+          {
+            "name": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v59-spawn-errors/bin/lean",
+            "config": {
+              "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+              "engine": "deno",
+              "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+              "engineArgs": [
+                "run",
+                "-A",
+                "--v8-flags=--stack-size=61440"
+              ],
+              "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors",
+              "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+              "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+              "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/runtime-support",
+              "leanThreads": 4,
+              "lakeThreads": 1,
+              "bunSmol": false,
+              "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+              "systemAllocator": "mimalloc",
+              "leanAllocator": "mimalloc",
+              "memoryMode": 1,
+              "engineEnvironment": {},
+              "maximumMemoryBytes": 8589934592,
+              "pthreadPoolSize": 5,
+              "backend": "full-lean-wasm64-native",
+              "nativeLeanFallback": false,
+              "environmentAdjustments": {
+                "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v59-spawn-errors",
+                "LASM_FULL_APP_PATH": "Selected facade entry point",
+                "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+                "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+                "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+              },
+              "externalTools": {
+                "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/lib",
+                "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/include",
+                "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/share",
+                "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v59-spawn-errors/bin/leanmake",
+                "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+                "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+              }
+            },
+            "seconds": 11.680837885999999,
+            "code": 1,
+            "signal": null,
+            "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\n",
+            "stderr": "\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Uncaught (in worker \"lasm-file-io\") NotFound: No such file or directory (os error 2)\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mObject.cwd\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mext:deno_fs/30_fs.js\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m2555\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mmainModuleArgv\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mnode:process\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m19798\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mObject.t.__bootstrapNodeProcess\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mnode:process\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m20100\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245minitialize\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mnode:module\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m6\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m2008\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mbootstrapWorkerRuntime\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mext:runtime_main/js/99_main.js\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m18417\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\nuncaught exception: no such file or directory (os error 2) (error code: 0)\n",
+            "passed": false
+          },
+          {
+            "name": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v60-spawn-errors-lowered/bin/lean",
+            "config": {
+              "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+              "engine": "bun",
+              "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+              "engineArgs": [],
+              "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v60-spawn-errors-lowered",
+              "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+              "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+              "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v60-spawn-errors-lowered/runtime-support",
+              "leanThreads": 4,
+              "lakeThreads": 1,
+              "bunSmol": false,
+              "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+              "systemAllocator": "mimalloc",
+              "leanAllocator": "mimalloc",
+              "memoryMode": 2,
+              "engineEnvironment": {
+                "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v60-spawn-errors-lowered/bun-stack-reservation.so",
+                "BUN_JSC_maxPerThreadStackUsage": "62914560"
+              },
+              "stackAdjustment": {
+                "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v60-spawn-errors-lowered/bun-stack-reservation.so",
+                "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+                "osThreadStackBytes": 67108864,
+                "jscStackBudgetBytes": 62914560,
+                "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+              },
+              "maximumMemoryBytes": 4294967296,
+              "pthreadPoolSize": 8,
+              "backend": "full-lean-wasm64-lowered",
+              "nativeLeanFallback": false,
+              "environmentAdjustments": {
+                "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v60-spawn-errors-lowered",
+                "LASM_FULL_APP_PATH": "Selected facade entry point",
+                "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+                "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+                "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+              },
+              "externalTools": {
+                "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v60-spawn-errors-lowered/lib",
+                "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v60-spawn-errors-lowered/include",
+                "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v60-spawn-errors-lowered/share",
+                "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v60-spawn-errors-lowered/bin/leanmake",
+                "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+                "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+              }
+            },
+            "seconds": 71.831092401,
+            "code": 0,
+            "signal": null,
+            "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v2/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nabsolute child cwd recovers from a removed parent directory\nprocess spawn error comparison completed\n",
+            "stderr": "",
+            "passed": true
+          }
+        ],
+        "executedSourceUnchanged": true,
+        "finishedAt": "2026-09-21T09:34:10.486Z"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-full-v2-resources.json",
+        "command": [
+          "python3",
+          ".work/full-engine-probe/prepare-spawn-errors-v2.py"
+        ],
+        "startedAt": "2026-09-21T09:32:30.240Z",
+        "finishedAt": "2026-09-21T09:34:10.651Z",
+        "peakMemoryBytes": 2795892736,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T09:34:10.625Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 14020608,
+          "peakMemoryBytes": 2795892736,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10223616,
+            "file": 1355776,
+            "kernel": 1277952,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1355776,
+            "slab": 460576
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        }
+      }
+    },
+    {
+      "comparison": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-spawn-errors/Main.lean",
+        "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/fixture.lean",
+        "sourceSha256": "168b744388738d1e7e353a2768a85b57598371c9bafec8f173b27996dfd12a33",
+        "scope": "Supplementary POSIX child errors, PID, environment, and execvp comparison, not an upstream-suite result.",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-full-v3-resources.json",
+        "results": [
+          {
+            "name": "native",
+            "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "seconds": 0.43776358400000004,
+            "code": 0,
+            "signal": null,
+            "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nabsolute child cwd recovers from a removed parent directory\nprocess spawn error comparison completed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "name": "node",
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v61-spawn-workers/bin/lean",
+            "config": {
+              "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+              "engine": "node",
+              "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "engineArgs": [],
+              "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers",
+              "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+              "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+              "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/runtime-support",
+              "leanThreads": 4,
+              "lakeThreads": 1,
+              "bunSmol": false,
+              "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+              "systemAllocator": "mimalloc",
+              "leanAllocator": "mimalloc",
+              "memoryMode": 1,
+              "engineEnvironment": {},
+              "maximumMemoryBytes": 8589934592,
+              "pthreadPoolSize": 5,
+              "backend": "full-lean-wasm64-native",
+              "nativeLeanFallback": false,
+              "environmentAdjustments": {
+                "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v61-spawn-workers",
+                "LASM_FULL_APP_PATH": "Selected facade entry point",
+                "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+                "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+                "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+              },
+              "externalTools": {
+                "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/lib",
+                "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/include",
+                "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/share",
+                "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/bin/leanmake",
+                "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+                "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+              }
+            },
+            "seconds": 11.551681274999998,
+            "code": 0,
+            "signal": null,
+            "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nabsolute child cwd recovers from a removed parent directory\nprocess spawn error comparison completed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "name": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v61-spawn-workers/bin/lean",
+            "config": {
+              "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+              "engine": "deno",
+              "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+              "engineArgs": [
+                "run",
+                "-A",
+                "--v8-flags=--stack-size=61440"
+              ],
+              "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers",
+              "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+              "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+              "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/runtime-support",
+              "leanThreads": 4,
+              "lakeThreads": 1,
+              "bunSmol": false,
+              "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+              "systemAllocator": "mimalloc",
+              "leanAllocator": "mimalloc",
+              "memoryMode": 1,
+              "engineEnvironment": {},
+              "maximumMemoryBytes": 8589934592,
+              "pthreadPoolSize": 5,
+              "backend": "full-lean-wasm64-native",
+              "nativeLeanFallback": false,
+              "environmentAdjustments": {
+                "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v61-spawn-workers",
+                "LASM_FULL_APP_PATH": "Selected facade entry point",
+                "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+                "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+                "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+              },
+              "externalTools": {
+                "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/lib",
+                "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/include",
+                "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/share",
+                "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v61-spawn-workers/bin/leanmake",
+                "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+                "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+              }
+            },
+            "seconds": 11.788833384000002,
+            "code": 1,
+            "signal": null,
+            "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\n",
+            "stderr": "\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Uncaught (in worker \"lasm-file-io\") NotFound: No such file or directory (os error 2)\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mObject.cwd\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mext:deno_fs/30_fs.js\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m2555\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mmainModuleArgv\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mnode:process\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m19798\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mObject.t.__bootstrapNodeProcess\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mnode:process\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m20100\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245minitialize\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mnode:module\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m6\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m2008\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mbootstrapWorkerRuntime\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mext:runtime_main/js/99_main.js\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m18417\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\nuncaught exception: worker.addEventListener is not a function (error code: 0)\n",
+            "passed": false
+          },
+          {
+            "name": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v62-spawn-workers-lowered/bin/lean",
+            "config": {
+              "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+              "engine": "bun",
+              "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+              "engineArgs": [],
+              "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v62-spawn-workers-lowered",
+              "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+              "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+              "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v62-spawn-workers-lowered/runtime-support",
+              "leanThreads": 4,
+              "lakeThreads": 1,
+              "bunSmol": false,
+              "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+              "systemAllocator": "mimalloc",
+              "leanAllocator": "mimalloc",
+              "memoryMode": 2,
+              "engineEnvironment": {
+                "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v62-spawn-workers-lowered/bun-stack-reservation.so",
+                "BUN_JSC_maxPerThreadStackUsage": "62914560"
+              },
+              "stackAdjustment": {
+                "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v62-spawn-workers-lowered/bun-stack-reservation.so",
+                "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+                "osThreadStackBytes": 67108864,
+                "jscStackBudgetBytes": 62914560,
+                "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+              },
+              "maximumMemoryBytes": 4294967296,
+              "pthreadPoolSize": 8,
+              "backend": "full-lean-wasm64-lowered",
+              "nativeLeanFallback": false,
+              "environmentAdjustments": {
+                "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v62-spawn-workers-lowered",
+                "LASM_FULL_APP_PATH": "Selected facade entry point",
+                "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+                "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+                "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+              },
+              "externalTools": {
+                "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v62-spawn-workers-lowered/lib",
+                "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v62-spawn-workers-lowered/include",
+                "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v62-spawn-workers-lowered/share",
+                "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v62-spawn-workers-lowered/bin/leanmake",
+                "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+                "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+              }
+            },
+            "seconds": 71.61650601099998,
+            "code": 0,
+            "signal": null,
+            "stdout": "missing executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/missing'\\n\"\nnonexecutable file: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/file'\\n\"\ndirectory executable: child 255, stdout \"\", stderr \"could not execute external process '/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3'\\n\"\nempty command: child 255, stdout \"\", stderr \"could not execute external process ''\\n\"\nmissing cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/missing\\n\"\nfile cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/file\\n\"\ndenied cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/denied\\n\"\nloop cwd: child 255, stdout \"\", stderr \"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-errors-full-v3/loop\\n\"\nempty cwd: child 255, stdout \"\", stderr \"could not change directory to \\n\"\nrelative missing cwd: child 255, stdout \"\", stderr \"could not change directory to lasm-missing-relative-spawn-directory\\n\"\nvalid process: child 0, stdout \"\", stderr \"\"\nreal PID and literal environment matched\nnative PATH search and executable-text fallback matched\nabsolute child cwd recovers from a removed parent directory\nprocess spawn error comparison completed\n",
+            "stderr": "",
+            "passed": true
+          }
+        ],
+        "executedSourceUnchanged": true,
+        "finishedAt": "2026-09-21T09:46:51.352Z"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-full-v3-resources.json",
+        "command": [
+          "python3",
+          ".work/full-engine-probe/prepare-spawn-errors-v3.py"
+        ],
+        "startedAt": "2026-09-21T09:45:11.027Z",
+        "finishedAt": "2026-09-21T09:46:51.509Z",
+        "peakMemoryBytes": 2690523136,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T09:46:51.481Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 13918208,
+          "peakMemoryBytes": 2690523136,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10219520,
+            "file": 1118208,
+            "kernel": 1273856,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1118208,
+            "slab": 465688
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        }
+      }
+    }
+  ],
+  "workerBootstrapSources": [
+    "https://raw.githubusercontent.com/denoland/deno/v2.9.7/ext/node/polyfills/process.ts",
+    "Node 24.13.1 bundled internal/main/worker_thread source, cwd diagnostic before user script"
+  ],
+  "workerCorrection": "Node preloads a private worker-only cwd lookup fallback. Deno uses a private Web Worker with its own mainModule URL when its cwd has been removed. Emscripten must preserve the native Web Worker before installing its pthread shim. Real OS cwd is unchanged.",
+  "preparationResources": {
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/spawn-flags-preparation-resources.json",
+    "command": [
+      "python3",
+      ".work/full-engine-probe/prepare-spawn-flags.py"
+    ],
+    "startedAt": "2026-09-21T09:59:52.753Z",
+    "finishedAt": "2026-09-21T10:00:10.338Z",
+    "peakMemoryBytes": 2347364352,
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "unitReleased": true,
+    "resourceLimited": false,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-21T10:00:10.310Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 2249056256,
+      "peakMemoryBytes": 2347364352,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10219520,
+        "file": 2102210560,
+        "kernel": 135450624,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 2102210560,
+        "slab": 134619656
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "upstreamBeforeFlagsFix": {
+    "identity": "acf39e2f330de03d0f516f91ffe972b5e5c395235723258fc15ca3898fb580b2",
+    "suite": "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v67-spawn-workers",
+    "filter": "^(elab/(Process|emptyEnvVar)\\.lean|compile/wait_dedicated\\.lean)$",
+    "backend": "node",
+    "createdAt": "2026-09-21T09:56:55.419Z",
+    "registered": 3896,
+    "selected": 3,
+    "tests": [
+      {
+        "name": "compile/wait_dedicated.lean",
+        "attempts": [
+          {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v67-spawn-workers/00001-ea10e9d0",
+            "status": "passed",
+            "startedAt": "2026-09-21T09:56:55.420Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T09:57:28.979Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v67-spawn-workers/00001-ea10e9d0/resources.json",
+            "peakMemoryBytes": 1932042240,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          }
+        ],
+        "status": "passed"
+      },
+      {
+        "name": "elab/Process.lean",
+        "attempts": [
+          {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v67-spawn-workers/00002-86f9aed5",
+            "status": "failed",
+            "startedAt": "2026-09-21T09:57:28.980Z",
+            "exit": {
+              "code": 8,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T09:57:50.916Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v67-spawn-workers/00002-86f9aed5/resources.json",
+            "peakMemoryBytes": 3581829120,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          }
+        ],
+        "status": "failed"
+      },
+      {
+        "name": "elab/emptyEnvVar.lean",
+        "attempts": [
+          {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v67-spawn-workers/00003-2e894eb7",
+            "status": "passed",
+            "startedAt": "2026-09-21T09:57:50.916Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-21T09:58:01.727Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v67-spawn-workers/00003-2e894eb7/resources.json",
+            "peakMemoryBytes": 1998864384,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          }
+        ],
+        "status": "passed"
+      }
+    ],
+    "status": "complete",
+    "updatedAt": "2026-09-21T09:58:01.727Z",
+    "counts": {
+      "passed": 2,
+      "failed": 1,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 0
+    }
+  },
+  "upstreamFlagFailureDetails": [
+    {
+      "test": "elab/Process.lean",
+      "log": "Internal ctest changing into directory: /home/lastmjs/development/lasm/compiler/.work/full-suite-node-v67-spawn-workers/run\nTest project /home/lastmjs/development/lasm/compiler/.work/full-suite-node-v67-spawn-workers/run\n    Start 990: elab/Process.lean\n1/1 Test #990: elab/Process.lean ................***Failed   21.24 sec\n++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false Process.lean\n1\n0\n\"ho!\\n\"\n\"hu!\\n\"\n100001\n65536\n0\n0\n0\n\"<stdin>:1:0: warning: using 'exit' to interrupt Lean\\n\"\nnone\nsome 0\n\u001b[1m--- Process.lean.out.expected\t2026-06-21 07:16:11.000000000 -0400\u001b[0m\n\u001b[1m+++ Process.lean.out.produced\t2026-09-21 05:57:50.673238480 -0400\u001b[0m\n\u001b[36m@@ -3,7 +3,7 @@\u001b[0m\n \"ho!\\n\"\n \"hu!\\n\"\n 100001\n\u001b[31m-100000\u001b[0m\n\u001b[32m+65536\u001b[0m\n 0\n 0\n 0\nTEST FAILED: Unexpected output\n\n\n0% tests passed, 1 tests failed out of 1\n\nTotal Test time (real) =  21.39 sec\n\nThe following tests FAILED:\n\t990 - elab/Process.lean (Failed)\nErrors while running CTest\n",
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v67-spawn-workers/00002-86f9aed5/resources.json",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+          "--suite",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v67-spawn-workers",
+          "--results",
+          "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v67-spawn-workers/00002-86f9aed5/results",
+          "--jobs",
+          "1",
+          "--filter",
+          "^elab/Process\\.lean$"
+        ],
+        "startedAt": "2026-09-21T09:57:29.019Z",
+        "finishedAt": "2026-09-21T09:57:50.910Z",
+        "peakMemoryBytes": 3581829120,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "8",
+          "capturedAt": "2026-09-21T09:57:50.885Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12615680,
+          "peakMemoryBytes": 3581829120,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10219520,
+            "file": 40960,
+            "kernel": 978944,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 40960,
+            "slab": 158744
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        }
+      }
+    }
+  ],
+  "pipeFlagCorrection": "Node startup sets O_NONBLOCK on stderr. Preserve the pre-spawn F_GETFL values and restore them with F_SETFL before exec. The unchanged upstream Process test exposed a shell write truncated to 65536 bytes.",
+  "sourceSha256": {
+    "scripts/full-lean/preserve-web-worker.mjs": "f9d9b82f2c593beab41aa1dff6d461ecc4539e3b21741a720ae23edf399a9fd6",
+    "scripts/full-lean/derive-worker-bootstrap.mjs": "b7d362c3e919bbe6a40cfc5f895078e1a32af0a263c385838cca655d93561ff8",
+    "scripts/full-lean/cc-driver.mjs": "f45e85b4952d77d8831cf778bda42ff08b7154fe49e96942555d3a005b9fa794",
+    "src/native-file-worker-pool.mjs": "9d20ee320f468b5f6709ea7fdfb430c8debc665af1b53092e76237fc3b15b8d8",
+    "src/native-file-worker.mjs": "ec20b0fb19bc69822266de1486799dd4ddd3ca16438b41cde2b2658a49f5ee75",
+    "src/native-file-worker-deno.mjs": "c80058f1ced5dbaffabf21515e68015e7d97400334d724aff320ae05a133e544",
+    "src/native-worker-cwd.cjs": "69080ceea6aeac63baf9da1839c4e95913c7e9e893b93e036c4bdca82b09512b",
+    "test/native-files.test.mjs": "29f0208680e4bec2f5a08f53f9bccf8d471d48b56d713ba3200bc3bc1a2aa70b",
+    "test/fixtures/fifo-workers-host.mjs": "98b960f497a386b4b68a96b9aff27151b69dab5b429f0fc0f69e14c14cacd195",
+    "src/native-files.mjs": "85fcf23a41e70cf4f95b6cd956774ac9811be3863e212a49a8150af132ceb303",
+    "src/node-process.mjs": "abee1491584457811b1e5bea843c2666f4d5a05d5444ae665a403a57a3f054d6",
+    "src/process-exec.mjs": "4016164e3abd91a7ebb38ec945f281708d0ede4c9ffeb3912564861ddee1e9c7",
+    "src/build.mjs": "bdb134d9aca6372bf297dafab5fb327c0a62709556bde57f91aefeed854e63c3",
+    "src/main.mjs": "56e4ffe16da26f200031ff9b02b2598673744104998e65559ca5bba630e6e899",
+    "scripts/full-lean/derive-host-files.mjs": "137a4877a3ae7d17e73c3684e58a98ecf8679bcfb70d9604ed0b16b94ec6bc6e",
+    "scripts/full-lean/freeze-build.mjs": "8ef35568609931b995d77d381878f73a15efca541a7b933d3bf0c700b42d50b6",
+    "scripts/full-lean/probe-spawn-errors.mjs": "f744846ab1369628c91ec3a6f7ba543588b2c053f33f5f07934be82bf0147a85",
+    "test/node-spawn.test.mjs": "c2137783d40d8dbd41481656af1ca17e1ff39f1e6f27fa66c8d5b76a9981017a",
+    "test/fixtures/process-spawn-errors/Main.lean": "edcb8a4ff751aa2f0d931f63fd1a8a125a5b51a5eb424662e12c65e9d031ddfe"
+  },
+  "remaining": [
+    "Native failed-fork-child output can duplicate unflushed parent stdout. The error fixture explicitly flushes to isolate exec/chdir semantics; this quirk remains unresolved.",
+    "Virtual cwd rename/deletion tracking, embedded NUL strings, descriptor edge cases, and broader signal/platform behavior still need work.",
+    "The same-engine helper adds startup overhead and uses the existing bundled Koffi adapter. Native macOS/Windows/ARM validation is pending.",
+    "Full Bun uses its existing explicit Linux stack adjustment and lowered Memory64; the packaged comparisons use stock engines.",
+    "All full-suite campaigns remain incomplete; no remaining difference is classified as fundamental."
+  ]
+}

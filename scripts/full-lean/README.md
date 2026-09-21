@@ -408,6 +408,27 @@ in packaged engines, also using spaces and Unicode in the fixture directory.
 These additional POSIX controls do not validate concurrent directory renames or
 native child-side spawn failures.
 
+`probe-spawn-errors.mjs NEW_OUTPUT TOOLCHAIN...` executes an immutable copy of a
+supplementary ordinary Lean fixture in native Lean and each frozen full compiler.
+It compares child-side exec/chdir failures, real PIDs, literal environment values,
+PATH/executable-text handling, and an absolute child cwd after removal of the
+parent directory. `test/node-spawn.test.mjs` covers packaged applications.
+The fixture flushes parent stdout before failing spawns; native duplication of
+unflushed fork buffers is a separate, still-open behavior.
+
+The private POSIX launcher uses the same JS engine and existing native adapter
+to call libc `execvp`; it is replaced by the actual requested executable. Its
+configuration travels over a private pipe, and target environment settings are
+applied after launcher startup. Standard Lean declarations are unchanged.
+File workers have separate startup handling for removed working directories:
+Node uses a worker-local JS cwd fallback during bootstrap, and Deno can create
+a worker with an explicit module URL before Node compatibility initializes.
+Both preserve the OS cwd. The Deno fallback retires after one operation because
+the Web Worker API lacks `unref`; the normal reusable pool is retained otherwise.
+The additional FIFO regression starts four blocked readers from a removed cwd
+and then performs their dependent writes. Native macOS/Windows validation and
+concurrent rename/removal races remain outside these controls.
+
 Lean's C++ shell does not read the generated application main's thread/stack
 environment defaults. The facade supplies its ordinary `-j` and `-s` options
 before user arguments. Explicit later options win. Two workers are insufficient

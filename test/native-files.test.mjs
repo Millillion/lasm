@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { createNodeRuntimeHost } from '../src/node-host.mjs';
 
-test('four blocked FIFO readers leave dependent writes able to run in each installed engine',
+for (const removedCwd of [false, true]) test(`four blocked FIFO readers leave dependent writes able to run in each installed engine${removedCwd ? ' after cwd removal' : ''}`,
   { skip: process.platform === 'win32' }, t => {
     const directory = mkdtempSync(join(tmpdir(), 'lasm-fifo-workers-'));
     const descriptors = [];
@@ -26,7 +26,7 @@ test('four blocked FIFO readers leave dependent writes able to run in each insta
     for (const [engine, prefix] of engines) {
       if (!existsSync(engine)) continue;
       const result = spawnSync(engine, [...prefix, 'test/fixtures/fifo-workers-host.mjs',
-        resolve('src/node-host.mjs'), directory], { encoding: 'utf8', timeout: 10_000,
+        resolve('src/node-host.mjs'), directory, ...(removedCwd ? ['--removed-cwd'] : [])], { encoding: 'utf8', timeout: 10_000,
         killSignal: 'SIGKILL', env: { ...process.env, UV_THREADPOOL_SIZE: '4' } });
       assert.equal(result.status, 0, `${engine}: ${result.error?.message ?? result.stderr}`);
       assert.equal(result.stdout, 'four readers started\nconcurrent FIFO reads and writes completed\n');

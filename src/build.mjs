@@ -230,6 +230,8 @@ private unsafe def «runProgram» : IO UInt32 := do
   copyFileSync(join(root, 'src/native-files.mjs'), join(output, 'native-files.mjs'));
   copyFileSync(join(root, 'src/native-file-worker.mjs'), join(output, 'native-file-worker.mjs'));
   copyFileSync(join(root, 'src/native-file-worker-pool.mjs'), join(output, 'native-file-worker-pool.mjs'));
+  copyFileSync(join(root, 'src/native-file-worker-deno.mjs'), join(output, 'native-file-worker-deno.mjs'));
+  copyFileSync(join(root, 'src/native-worker-cwd.cjs'), join(output, 'native-worker-cwd.cjs'));
   copyNativeBundle(root, output);
   copyFileSync(join(root, 'src/node-network.mjs'), join(output, 'node-network.mjs'));
   copyFileSync(join(root, 'src/native-tcp.mjs'), join(output, 'native-tcp.mjs'));
@@ -240,6 +242,7 @@ private unsafe def «runProgram» : IO UInt32 := do
   copyFileSync(join(root, 'src/node-signal.mjs'), join(output, 'node-signal.mjs'));
   copyFileSync(join(root, 'src/thread-id.cjs'), join(output, 'thread-id.cjs'));
   copyFileSync(join(root, 'src/node-process.mjs'), join(output, 'node-process.mjs'));
+  copyFileSync(join(root, 'src/process-exec.mjs'), join(output, 'process-exec.mjs'));
   copyFileSync(join(root, 'src/host.mjs'), join(output, 'host.mjs'));
   copyFileSync(join(root, 'src/wasi.mjs'), join(output, 'wasi.mjs'));
   copyFileSync(join(root, 'src/web-host.mjs'), join(output, 'web-host.mjs'));

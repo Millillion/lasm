@@ -62,9 +62,16 @@ close the full-suite or cross-platform gates. See the
   [the lifecycle evidence](docs/evidence/process-lifetime-2026-09-21.json).
   Absolute and relative child working directories containing `symlink/..` now
   also match native Linux in both execution paths and all three engines; see
-  [the cwd comparisons](docs/evidence/process-cwd-2026-09-21.json). Concurrent
-  directory renames and native POSIX child-side `chdir`/`exec` failure behavior
-  still need separate comparisons and corrections.
+  [the cwd comparisons](docs/evidence/process-cwd-2026-09-21.json). POSIX
+  `chdir`/`exec` failures now return a real child with native diagnostics and
+  exit status 255. Ordinary Lean comparisons also cover literal environments,
+  PATH/executable-text behavior, and recovery via an absolute child cwd after
+  removal of the parent directory, in both execution paths and all three engines.
+  Private file-worker startup now handles that removed-cwd case without changing
+  OS cwd; four blocked FIFO readers still permit their dependent writes.
+  Concurrent rename/removal races, virtual cwd tracking, and native duplication
+  of unflushed parent output on failed forks remain open. The private launcher
+  also adds engine startup overhead. See [the retained process comparisons](docs/evidence/process-spawn-2026-09-21.json).
   `IO.getTID` is now implemented using the executing worker's actual OS thread ID;
   direct checks pass in Node, Deno, and Bun on Linux x64. Full Lean validation is
   still in progress.

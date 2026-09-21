@@ -86,7 +86,7 @@ try {
 `);
   // Stamp the inputs observed before compilation. If a source or runtime file
   // changes during the build, the next invocation must invalidate this output.
-  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native/manifest.json', 'wasi.mjs', 'manifest.json'];
+  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'process-exec.mjs', 'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-worker-cwd.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native/manifest.json', 'wasi.mjs', 'manifest.json'];
   writeFileSync(stampFile, JSON.stringify({ signature, files }) + '\n');
   return { ...result, cacheHit: false, signature };
 }

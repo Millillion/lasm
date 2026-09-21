@@ -6,6 +6,7 @@ import { resolve, join, extname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { expandResponseArgs } from './response-args.mjs';
+import { preserveWebWorker } from './preserve-web-worker.mjs';
 
 const config = JSON.parse(readFileSync(process.env.LASM_FULL_TOOLCHAIN_CONFIG));
 const original = expandResponseArgs(process.argv.slice(2));
@@ -97,6 +98,7 @@ const execution = spawnSync(driver, args, { stdio: 'inherit' });
 if (execution.error) throw execution.error;
 if (execution.status !== 0) process.exit(execution.status ?? 1);
 if (!compileOnly && !shared) {
+  preserveWebWorker(resolve(output + '.cjs'));
   const quote = text => "'" + text.replaceAll("'", "'\\''") + "'";
   const frozenHost = join(config.build, 'host/node-host.mjs');
   const host = existsSync(frozenHost) ? frozenHost : resolve(config.runtimeSupport, '../../src/node-host.mjs');

@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
-import { realpath } from 'node:fs/promises';
 import { constants } from 'node:os';
-import { resolve, isAbsolute, sep } from 'node:path';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { nativeFiles } from './native-files.mjs';
 import { numbers } from './node-host.mjs';
 
@@ -18,26 +18,23 @@ export function createNodeProcesses({ add, get, release, cwd }) {
     const modes = [number(), number(), number()];
     const inherit = !!number(), setsid = !!number(), argc = number(), envc = number(), hasCwd = number();
     const command = string(), args = Array.from({ length: argc }, string);
-    let directory = cwd();
+    let directory = cwd(), requestedCwd;
     if (hasCwd) {
       const value = string();
-      // POSIX chdir resolves symlinks before subsequent '..' components. Keep
-      // that resolution in the OS, as for ordinary Lean filesystem paths.
-      directory = process.platform === 'win32' ? resolve(directory, value)
-        : isAbsolute(value) ? value : directory + sep + value;
+      // Retain even an empty path: native chdir("") fails in the child. The
+      // OS also resolves symlinks and '..', without JS path normalization.
+      if (process.platform === 'win32') directory = resolve(directory, value);
+      else requestedCwd = value;
     }
-    const env = inherit ? { ...process.env } : {};
+    const env = Object.assign(Object.create(null), inherit ? process.env : {});
     for (let i = 0; i < envc; i++) {
       const key = string(), present = number();
       if (present) env[key] = string(); else delete env[key];
     }
-    return { modes, command, args, directory, env, setsid };
+    return { modes, command, args, directory, requestedCwd, env, setsid };
   }
   async function start(bytes) {
     const options = decode(bytes), native = nativeFiles();
-    // Deno's Node-compatible spawn normalizes cwd lexically. Resolve it with
-    // the OS first so a symlink followed by '..' retains native Lean behavior.
-    if (process.versions.deno && process.platform !== 'win32') options.directory = await realpath(options.directory);
     const ours = [], theirs = [];
     try {
       const stdio = options.modes.map((mode, index) => {
@@ -48,19 +45,34 @@ export function createNodeProcesses({ add, get, release, cwd }) {
         ours.push(add(native.openDescriptor(parentFd, index === 0 ? 'w' : 'r')));
         return childFd;
       });
-      const child = spawn(options.command, options.args, { cwd: options.directory, env: options.env, stdio,
-        detached: options.setsid && process.platform !== 'win32', windowsHide: false });
+      const posix = process.platform !== 'win32';
+      const stdioFlags = posix ? stdio.map((fd, index) => fd === 'ignore' ? 0
+        : native.descriptorFlags(typeof fd === 'number' ? fd : index)) : undefined;
+      const helper = fileURLToPath(new URL('./process-exec.mjs', import.meta.url));
+      const child = posix
+        ? spawn(process.execPath, [...(process.versions.deno ? ['run', '--no-config', '-A'] : []), helper],
+          { cwd: '/', env: {}, stdio: [...stdio, 'pipe'] })
+        : spawn(options.command, options.args, { cwd: options.directory, env: options.env, stdio, windowsHide: false });
       const resource = { type: 'process', child, setsid: options.setsid, reaped: false };
       resource.exit = new Promise(resolve => {
         child.once('exit', (code, signal) => { resource.code = code ?? 128 + (constants.signals[signal] ?? 0); resolve(resource.code); });
       });
       await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
+      if (posix) {
+        // A killed/exited child may close the transport before consuming it.
+        // The ordinary exit status remains observable through Child.wait.
+        child.stdio[3].on('error', () => {});
+        child.stdio[3].end(JSON.stringify({ ...options, stdioFlags }));
+      }
       // Dropping a native Child does not kill its process. Its own exit listener
       // still reaps the OS child while the host is alive, but the dropped handle
       // must not prevent the JavaScript process from exiting.
       resource.close = () => child.unref();
       return numbers(add(resource), child.pid, ...ours);
-    } catch (err) { for (const id of ours) if (id) release(id); throw err; }
+    } catch (err) {
+      for (const id of ours) if (id) release(id);
+      throw process.platform === 'win32' ? err : native.fromNodeError(err);
+    }
     finally { for (const fd of theirs) native.closeDescriptor(fd); }
   }
   function reap(resource, code) {

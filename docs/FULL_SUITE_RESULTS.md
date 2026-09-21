@@ -584,6 +584,45 @@ the subset results nor this harness change closes the original-driver resource
 gap or establishes complete conformance. See
 [the configurations and retained outcomes](evidence/compiled-server-driver-2026-09-21.json).
 
+Supplementary process comparisons found that the host reported POSIX exec/chdir
+failures to the parent, while native Lean returns a real child that prints a
+diagnostic and exits 255. A private same-engine launcher now calls libc `execvp`
+and is replaced by the requested executable. It preserves the PID, raw cwd,
+PATH search, executable-text fallback, and literal environment values without
+adding Lean APIs or an installation-time compiler requirement.
+
+The expanded ordinary Lean fixture matches native Linux in all three packaged
+engines and all three full compilers. It includes ten child-error cases,
+environment keys such as `__proto__`, and an absolute child cwd after removal of
+the parent's directory. That last case exposed separate Node/Deno worker-startup
+failures. Private worker bootstrap handling now preserves the OS cwd and permits
+file operations there. The full compiler must additionally retain Deno's native
+Web Worker before Emscripten installs its pthread constructor. The final full
+comparison peaked at 2.48 GiB, with zero OOM, throttling, or swap.
+
+Eleven native-file checks pass, including four blocked FIFO readers followed by
+their dependent writes after cwd removal in each engine. The larger process
+comparison also matches native behavior for stdin EOF, simultaneous 1 MiB output
+pipes, and process-group termination. Earlier lifecycle controls remain recorded.
+The first unchanged upstream `Process` rerun caught a further launcher regression:
+Node startup set stderr nonblocking, truncating a raw shell write at 65,536 bytes.
+The host now saves each standard descriptor's status flags before launching and
+restores them before `exec`. The expanded supplementary fixture also retains
+that raw-shell regression; the earlier 1 MiB check used a Node child whose own
+stream implementation handled nonblocking writes and did not expose this defect.
+After the correction, the unchanged `elab/Process.lean`,
+`elab/emptyEnvVar.lean`, and `compile/wait_dedicated.lean` registrations pass
+in each engine: 9/9 runs, with all 7,267 original file hashes unchanged before
+and after every run. Their largest observed peak was 4.74 GiB, with zero OOM,
+throttling, or swap.
+One mixed-fixture diagnostic was excluded: the source was expanded while Bun
+was starting. The maintained full probe now executes and verifies an immutable
+copy. The actual worker failures and their passing reruns are retained separately.
+Unflushed fork-buffer duplication, concurrent cwd changes, and native non-Linux
+validation remain open. The launcher adds startup overhead; these comparisons
+do not establish complete process or full-suite conformance. See
+[the retained process and worker evidence](evidence/process-spawn-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
