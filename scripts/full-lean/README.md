@@ -744,5 +744,23 @@ Deno uses `deno run -A`.
 Node and Deno pass all 18 variants. Stable Bun and the tested canary each pass
 six; zero-capacity variants crash, and the remaining memory64 variants lose
 the address type across worker transfer. These tiny engine cases allocate at
-most two 64 KiB pages. A source-patch candidate is under investigation; stock
-Bun remains unchanged. See [the complete matrix](../../docs/evidence/bun-shared-memory-matrix-2026-09-21.json).
+most two 64 KiB pages. Stock Bun remains unchanged. See
+[the complete matrix](../../docs/evidence/bun-shared-memory-matrix-2026-09-21.json).
+
+The local [Bun 1.4.2 patch](patches/bun-1.4.2-shared-memory-address.patch)
+preserves the address type alongside the shared-memory handle and avoids
+dereferencing a null handle for zero-capacity memory. It applies to commit
+`744846f844374847c902b5e7fd59b4342a51ef99`. A Linux x64 debug build with ASAN
+passes all 18 added checks, 15 existing neighboring worker-transfer tests, and
+the original four-check one-page memory64 probe. The added tests first reproduce
+all 12 expected failures on the released binary. This is an opt-in engine repair;
+full Lean validation, release builds, and other platforms remain separate gates.
+
+Use Bun's ordinary `bun bd` build-then-exec workflow in an ignored source tree,
+inside `run-bounded.mjs` and `base-pages.py`, with one build job on this host.
+Keep its build cache inside this repository's ignored cache. For the ASAN debug
+binary, `ASAN_OPTIONS=allow_user_segv_handler=1` is required for shared Wasm,
+as in Bun's own test harness; this does not disable sanitizer checks. The full
+compile stopped safely at the proactive budget during linking; an unchanged
+incremental link completed under the same guard. Preserve those attempts
+separately. See [the patch, validation, and resource evidence](../../docs/evidence/bun-memory64-local-fix-2026-09-21.json).

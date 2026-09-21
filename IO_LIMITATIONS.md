@@ -255,9 +255,12 @@ load, and suite conformance still need validation. See
   Width-sensitive application results therefore differ. The full lowered-memory64
   target preserves 64-bit widths but currently has a 4 GiB address-space ceiling;
   the alternative native-memory64 target passes the original `instances` test in
-  Node and Deno with an 8 GiB guest maximum. Bun's shared-memory cloning issue
-  remains open. These full-runtime paths still need integration and comprehensive
-  validation.
+  Node and Deno with an 8 GiB guest maximum. Released Bun still has shared-memory
+  transfer defects. A local ASAN debug build with a small engine patch now passes
+  18 cloning controls, 15 neighboring worker tests, and the original memory64
+  probe; full Lean validation on that build remains in progress. See
+  [the local engine repair](docs/evidence/bun-memory64-local-fix-2026-09-21.json).
+  These full-runtime paths still need integration and comprehensive validation.
 - [ ] A pending C read cannot be safely interrupted by disposing the Wasm
   instance. Blocking file calls now use independent host workers, so reads do
   not fill the shared N-API pool and prevent their dependent writes from running.

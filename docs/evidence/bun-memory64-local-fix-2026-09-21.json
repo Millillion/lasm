@@ -1,0 +1,976 @@
+{
+  "recordedAt": "2026-09-21T20:02:15.610153+00:00",
+  "scope": "Local Linux x64 ASAN debug Bun repair, not a released runtime, package-default change, or full Lean-suite pass.",
+  "bunCommit": "744846f844374847c902b5e7fd59b4342a51ef99",
+  "webkitCommit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+  "patch": {
+    "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/patches/bun-1.4.2-shared-memory-address.patch",
+    "sha256": "05099c2842c3c4b8008929ffc481961d1207242eb7046110cebbd65cf200028f"
+  },
+  "files": [
+    {
+      "path": "src/jsc/bindings/webcore/SerializedScriptValue.h",
+      "originalSha256": "f68d6d7b77c2fa45679f87229dec52be91f53c2d3f76e86878aefffefe70c355",
+      "patchedSha256": "45f00832e2b3ea4649c57222e629276d1c048010d02090384b11d184f46ffb75"
+    },
+    {
+      "path": "src/jsc/bindings/webcore/SerializedScriptValue.cpp",
+      "originalSha256": "d87e27801c49af29b98877a2d3f59392aec9632213a6d17037b11359ec18f708",
+      "patchedSha256": "92f188c29d59b8a41f585caec223f04e2fde029891130920ddc86b5370a9d112"
+    },
+    {
+      "path": "test/js/node/worker_threads/worker_threads.test.ts",
+      "originalSha256": "5eea76f822708481a3717be38b8525f0ae06e8f293d7a96d2ea3571f3e444796",
+      "patchedSha256": "16d4e3b4eb5a85588fed139e064da62a529585dd0257dd4aacd416090ad59908"
+    },
+    {
+      "path": "test/js/node/worker_threads/worker-memory-address-fixture.cjs",
+      "originalSha256": null,
+      "patchedSha256": "15fa490de9d05987103e8c2738eba071c4db9931fe026a468c7ac029542abaaa"
+    }
+  ],
+  "frozenRuntime": {
+    "scope": "Opt-in local ASAN debug build, not a released Bun or package default.",
+    "bunCommit": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "binary": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-debug-2026-09-21/bun-debug",
+    "binarySha256": "a3f8fc3c4c1c6a9125288b1f297689e5ddbb0731eced59d752d79786e12e4885",
+    "wrapper": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-debug-2026-09-21/bun",
+    "wrapperSha256": "f9095f3f2538e24344b5e935145ed44de1f9f86696576cf2acb2746d07f2dce1",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2",
+    "profile": "debug with address and null sanitizers",
+    "asanOptions": "allow_user_segv_handler=1, as in the pinned Bun test harness; sanitizers remain enabled",
+    "patchSha256": "05099c2842c3c4b8008929ffc481961d1207242eb7046110cebbd65cf200028f"
+  },
+  "changes": [
+    "Carry the original i32/i64 address type alongside the ref-counted shared-memory contents when cloning between workers; serialized bytes are unchanged.",
+    "Do not dereference the null shared-contents handle while computing the cost of a zero-capacity memory.",
+    "Append 18 tests to Bun's existing worker_threads test file and add the same tiny fixture used for Node/Deno controls. Original Lean sources are unchanged."
+  ],
+  "baseline": {
+    "passed": 6,
+    "failed": 12,
+    "filtered": 140,
+    "cases": [
+      {
+        "name": "i32 initial=0 maximum=0 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.130473",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i32 initial=0 maximum=0 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.130275",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i32 initial=0 maximum=0 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.152163",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i32 initial=0 maximum=2 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.040487",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=0 maximum=2 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.047127",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=0 maximum=2 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.041794",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=1 maximum=2 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.043844",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=1 maximum=2 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.046061",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=1 maximum=2 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.04403",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=0 maximum=0 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.137696",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i64 initial=0 maximum=0 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.152488",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i64 initial=0 maximum=0 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.129252",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i64 initial=0 maximum=2 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.054083",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i64 initial=0 maximum=2 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.054926",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i64 initial=0 maximum=2 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.049766",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i64 initial=1 maximum=2 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.051244",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i64 initial=1 maximum=2 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.052514",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      },
+      {
+        "name": "i64 initial=1 maximum=2 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "0.056413",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": false
+      }
+    ],
+    "junit": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-baseline-tests.xml",
+      "sha256": "aad17715ebaaa310a14e3ae916c4d0ea513d114781261a811f7412e768309b8e"
+    },
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-baseline-tests.log",
+      "sha256": "733f6b09c3285ca9621dc2f0b9a42665c8b467403a29eb19b736519c24f12d02"
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-baseline-tests.resources.json",
+      "sha256": "5c81d953aad04089df20e58947340e5ac8cfd0fcb3fc7dfa74e9007fe073d90f",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 36511744,
+      "minimumHostAvailable": 27755458560,
+      "resourceLimited": false,
+      "stoppedBecause": null,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  },
+  "patched": {
+    "passed": 18,
+    "failed": 0,
+    "filtered": 140,
+    "cases": [
+      {
+        "name": "i32 initial=0 maximum=0 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.070583",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=0 maximum=0 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "1.990687",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=0 maximum=0 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.011851",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=0 maximum=2 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.142269",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=0 maximum=2 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.011355",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=0 maximum=2 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.00238",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=1 maximum=2 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.191389",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=1 maximum=2 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.67208",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i32 initial=1 maximum=2 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "1.998778",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=0 maximum=0 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "1.969223",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=0 maximum=0 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.001434",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=0 maximum=0 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.002753",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=0 maximum=2 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.523315",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=0 maximum=2 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.176322",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=0 maximum=2 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "2.185274",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=1 maximum=2 through workerData",
+        "classname": "shared WebAssembly memory address type",
+        "time": "1.933376",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=1 maximum=2 through postMessage",
+        "classname": "shared WebAssembly memory address type",
+        "time": "1.957778",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "i64 initial=1 maximum=2 through messageChannel",
+        "classname": "shared WebAssembly memory address type",
+        "time": "1.978853",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2891",
+        "assertions": "1",
+        "passed": true
+      }
+    ],
+    "junit": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-patched-tests.xml",
+      "sha256": "e98cf673edcbfe0a03e16dc4034a0c4650c8accac7c24cce79a5573b84f40074"
+    },
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-patched-tests.log",
+      "sha256": "494a378098346df3a0a748d6d4be0eed52665211e72cb64bce8aa108c87dbc26"
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-patched-tests.resources.json",
+      "sha256": "07744994764c42ffa21bec47c4e9d6b51aa99c7bd4547e7cc6352642deb8447f",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 441778176,
+      "minimumHostAvailable": 27345084416,
+      "resourceLimited": false,
+      "stoppedBecause": null,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  },
+  "neighboringOriginalTests": {
+    "passed": 15,
+    "failed": 0,
+    "filtered": 143,
+    "cases": [
+      {
+        "name": "receiveMessageOnPort works across threads",
+        "classname": "",
+        "time": "1.281362",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "211",
+        "assertions": "3",
+        "passed": true
+      },
+      {
+        "name": "receiveMessageOnPort works as FIFO",
+        "classname": "",
+        "time": "0.012411",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "228",
+        "assertions": "11",
+        "passed": true
+      },
+      {
+        "name": "array, number throws DataCloneError",
+        "classname": "postMessage transfer list",
+        "time": "0.011496",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1381",
+        "assertions": "2",
+        "passed": true
+      },
+      {
+        "name": "array, string throws DataCloneError",
+        "classname": "postMessage transfer list",
+        "time": "0.003161",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1381",
+        "assertions": "2",
+        "passed": true
+      },
+      {
+        "name": "array, plain object throws DataCloneError",
+        "classname": "postMessage transfer list",
+        "time": "0.002895",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1381",
+        "assertions": "2",
+        "passed": true
+      },
+      {
+        "name": "bag, number throws DataCloneError",
+        "classname": "postMessage transfer list",
+        "time": "0.002981",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1381",
+        "assertions": "2",
+        "passed": true
+      },
+      {
+        "name": "bag, plain object throws DataCloneError",
+        "classname": "postMessage transfer list",
+        "time": "0.003618",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1381",
+        "assertions": "2",
+        "passed": true
+      },
+      {
+        "name": "bag, Set throws DataCloneError",
+        "classname": "postMessage transfer list",
+        "time": "0.00415",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1381",
+        "assertions": "2",
+        "passed": true
+      },
+      {
+        "name": "bag, generator throws DataCloneError",
+        "classname": "postMessage transfer list",
+        "time": "0.011801",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1381",
+        "assertions": "2",
+        "passed": true
+      },
+      {
+        "name": "second arg throws ERR_INVALID_ARG_TYPE",
+        "classname": "postMessage transfer list",
+        "time": "0.005699",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1394",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "bag number throws ERR_INVALID_ARG_TYPE",
+        "classname": "postMessage transfer list",
+        "time": "0.00273",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1394",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "bag plain object throws ERR_INVALID_ARG_TYPE",
+        "classname": "postMessage transfer list",
+        "time": "0.002931",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1394",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "an iterable that throws propagates the user error unchanged",
+        "classname": "postMessage transfer list",
+        "time": "0.008041",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1401",
+        "assertions": "1",
+        "passed": true
+      },
+      {
+        "name": "valid transferables still transfer",
+        "classname": "postMessage transfer list",
+        "time": "0.017088",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "1419",
+        "assertions": "2",
+        "passed": true
+      },
+      {
+        "name": "receiveMessageOnPort distinguishes an undefined message from an empty queue",
+        "classname": "",
+        "time": "0.004144",
+        "file": "test/js/node/worker_threads/worker_threads.test.ts",
+        "line": "2033",
+        "assertions": "3",
+        "passed": true
+      }
+    ],
+    "junit": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-neighbor-tests.xml",
+      "sha256": "d60f81895a9cae7dd444f6cdeea4f254791c0db02d6be4852cbf075eb1b8bee9"
+    },
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-neighbor-tests.log",
+      "sha256": "862b5893f2290f22479b854dc542ce884f981607e00f906bf8453fccc641ea55"
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-neighbor-tests.resources.json",
+      "sha256": "c2613cde520150845cc5c4bcf141076024aab21bd57616cbdee59b279ccde6d4",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 254431232,
+      "minimumHostAvailable": 27584782336,
+      "resourceLimited": false,
+      "stoppedBecause": null,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  },
+  "originalOnePageProbe": {
+    "checks": [
+      {
+        "name": "parent original",
+        "passed": true
+      },
+      {
+        "name": "worker fresh module and memory",
+        "passed": true
+      },
+      {
+        "name": "worker cloned module and fresh memory",
+        "passed": true
+      },
+      {
+        "name": "worker fresh module and cloned memory",
+        "passed": true
+      }
+    ],
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-original-probe-r2.log",
+      "sha256": "965b04bf13d7d6d4bd23f69b363c327d98500b896c60c5cae472ecc765a6e60c"
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-original-probe-r2.resources.json",
+      "sha256": "28f365d8e4633875e91a7752b63f351167ba77ac28ce718c80822a19e1a83e54",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 250687488,
+      "minimumHostAvailable": 27642699776,
+      "resourceLimited": false,
+      "stoppedBecause": null,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "environment": {
+      "BUN_JSC_useWasmMemory64": "true",
+      "ASAN_OPTIONS": "allow_user_segv_handler=1"
+    }
+  },
+  "fullLeanStartup": {
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-full-version.log",
+      "sha256": "cdbed20c398a02881802ad80bfb897d05faa49d3e6fe31c3ed965f38eede3c8a"
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-full-version.resources.json",
+      "sha256": "a0f8feeeb0194bfb13cbba712ff1e06c7eb0bf540da555aadce1fe43f481feec",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 2063663104,
+      "minimumHostAvailable": 25692700672,
+      "resourceLimited": false,
+      "stoppedBecause": null,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "observed": "Lean 4.32.0 --version exits 0 using the native-memory64 compiler; elapsed 175.596 seconds, peak 1.92 GiB.",
+    "toolchain": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "engine": "bun",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-debug-2026-09-21/bun",
+      "engineArgs": [],
+      "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native",
+      "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+      "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk",
+      "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/runtime-support",
+      "leanThreads": 4,
+      "lakeThreads": 1,
+      "bunSmol": false,
+      "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+      "systemAllocator": "mimalloc",
+      "leanAllocator": "mimalloc",
+      "memoryMode": 1,
+      "engineEnvironment": {
+        "BUN_JSC_useWasmMemory64": "true",
+        "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v114-memory64-patched-debug/bun-stack-reservation.so",
+        "BUN_JSC_maxPerThreadStackUsage": "62914560"
+      },
+      "stackAdjustment": {
+        "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v114-memory64-patched-debug/bun-stack-reservation.so",
+        "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+        "osThreadStackBytes": 67108864,
+        "jscStackBudgetBytes": 62914560,
+        "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+      },
+      "maximumMemoryBytes": 8589934592,
+      "pthreadPoolSize": 5,
+      "backend": "full-lean-wasm64-native",
+      "nativeLeanFallback": false,
+      "environmentAdjustments": {
+        "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v114-memory64-patched-debug",
+        "LASM_FULL_APP_PATH": "Selected facade entry point",
+        "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+        "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+        "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+      },
+      "externalTools": {
+        "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/lib",
+        "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/include",
+        "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/share",
+        "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/bin/leanmake",
+        "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+        "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+      }
+    },
+    "scope": "Compiler startup only, not an upstream test or full-suite result."
+  },
+  "patchRoundTrip": "Applying this patch to the four original/new paths reconstructs every recorded patched SHA256 exactly.",
+  "initialProbeConfigurationFailure": {
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-original-probe.log",
+      "sha256": "2aa9137071eec5a79dea95559ea2675fe652bf57d6b1f203c1cf08854abd8224"
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-original-probe.resources.json",
+      "sha256": "ac8f0554f20c37bbd660d7a872c7c8697261d55ad647c748c7c8339f7acb96ad",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 243007488,
+      "minimumHostAvailable": 27711164416,
+      "resourceLimited": false,
+      "stoppedBecause": null,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "explanation": "The ASAN debug binary disables shared Wasm unless its signal handler is allowed. Bun's own test harness sets allow_user_segv_handler=1 for ASAN child processes. Applying that same option lets the unchanged probe pass; sanitizer checks remain enabled."
+  },
+  "build": {
+    "toolchains": {
+      "llvm": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64",
+      "ninja": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/bin/ninja",
+      "rustupHome": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/rustup",
+      "cargoHome": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/cargo",
+      "llvmVersion": "clang version 21.1.8 (https://github.com/llvm/llvm-project 2078da43e25a4623cab2d0d60decddf709aaea28)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin\n",
+      "extractedFiles": 10525,
+      "extractedBytes": 11223351859,
+      "elapsedSeconds": 197.8991358790081
+    },
+    "completedCompilationAndStoppedLink": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-build-r2.resources.json",
+      "sha256": "5bba92d6ebfe814e0e95b468297e46d5124561b95594b586895e33c95c554d38",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 8667205632,
+      "minimumHostAvailable": 24859389952,
+      "resourceLimited": true,
+      "stoppedBecause": "Workload reached its proactive memory budget",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "incrementalLink": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-build-r3.resources.json",
+      "sha256": "85988d078a1a7540dd672414905d9abe67f3c9cc94ae3aa2529dd65c0d9373ca",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 3320479744,
+      "minimumHostAvailable": 25244983296,
+      "resourceLimited": false,
+      "stoppedBecause": null,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "freeze": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-freeze.resources.json",
+      "sha256": "dddf0daf8b27e08563de37a63e85f155e68b1f3c7e3336e2a320320a24d0e836",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 1694363648,
+      "minimumHostAvailable": 27539877888,
+      "resourceLimited": false,
+      "stoppedBecause": null,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "notes": [
+      "One build job, two-CPU affinity, and one workload at a time. The fixed guard was unchanged.",
+      "The full compile reached the proactive 8 GiB budget while linking with accumulated filesystem cache. It stopped before any hard-limit or OOM event. The unchanged incremental link then passed at 3.09 GiB.",
+      "Completed artifacts were fsynced and advised with POSIX_FADV_DONTNEED to release reusable cache, without deleting/changing file contents or dropping global caches.",
+      "An earlier attempt was intentionally stopped to relocate 18 newly downloaded build-cache archives into this repository's ignored cache. No pre-existing user cache files were removed."
+    ],
+    "initialOperatorStop": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-build.resources.json",
+      "sha256": "21beb5e33114e40f5e8701f01b294b0a09b4a3697baefc983a4d2baf04de02b4",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 837689344,
+      "minimumHostAvailable": 27515203584,
+      "resourceLimited": true,
+      "stoppedBecause": "SIGTERM",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "cacheRelocation": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-cache-relocation.json",
+      "sha256": "0d80abb66d6925f40cd7238ec0afb36bfbd57de3ed706f68203061bf326bc6f2"
+    },
+    "cacheAdvice": [
+      {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-cache-advice.json",
+        "sha256": "675c3833ed1bb3457be7e7a77bacb2f9f5680ad62fb0d57c1a9840e63dd12133"
+      },
+      {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-cache-advice-r2.json",
+        "sha256": "3f2a10ce7b3dcd566c755fc60731be967af336e5afc8e090897565911ff30ce2"
+      },
+      {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-cache-advice-r3.json",
+        "sha256": "f24b90a1e589cf2e8f947cb478b8987e608bdf8e2ce72d47b1472823792e6386"
+      }
+    ]
+  },
+  "sourceReferences": [
+    "https://github.com/oven-sh/bun/blob/744846f844374847c902b5e7fd59b4342a51ef99/src/jsc/bindings/webcore/SerializedScriptValue.cpp",
+    "https://github.com/oven-sh/bun/blob/744846f844374847c902b5e7fd59b4342a51ef99/test/harness.ts",
+    "https://github.com/oven-sh/WebKit/blob/2e2aa2290fac856d6f451ceacb58f7f5b44dd057/Source/JavaScriptCore/wasm/WasmSectionParser.cpp"
+  ]
+}

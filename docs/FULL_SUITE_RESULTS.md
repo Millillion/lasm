@@ -1031,3 +1031,29 @@ memory. A local source candidate addresses both; it has not yet been compiled
 or validated. These are engine implementation defects, not fundamental limits.
 The original Lean suite remains unchanged. See
 [the cases, first-probe cleanup correction, and source references](evidence/bun-shared-memory-matrix-2026-09-21.json).
+
+## Local Bun memory64 repair, September 21
+
+The candidate above is now compiled and validated in a local Linux x64 ASAN
+debug build. The same added test matrix reproduces **6 passes / 12 failures**
+on released Bun, then passes **18/18** on the patched build. Fifteen existing
+neighboring worker-transfer tests also pass. The unchanged original one-page
+probe with an 8 GiB maximum passes all four checks. ASAN requires Bun's documented
+`allow_user_segv_handler=1` setting for shared Wasm; the initial probe without
+that setting is retained as a configuration failure. Sanitizers remain enabled.
+
+The patch retains the original memory address type beside its reference-counted
+contents, without changing the serialized byte format. Memory accounting now
+handles the null contents of a zero-capacity memory. The patch and original
+input hashes are retained; no original Lean test changed.
+
+The full compile completed its object files, then stopped at the proactive
+8 GiB budget during linking with accumulated filesystem cache. Reusing those
+objects, the unchanged incremental link completed at 3.09 GiB under the same
+guard. All hard-limit, OOM, throttling, and swap counters remained zero. The
+resource abort is separate from conformance results. The frozen patched binary
+now starts the full native-memory64 Lean compiler: `--version` exits successfully
+after 175.6 seconds, peaking at 1.92 GiB. These startup and engine controls do
+not establish full Lean compatibility, released Bun
+support, or cross-platform behavior. Package defaults are unchanged. See
+[the patch and all controls](evidence/bun-memory64-local-fix-2026-09-21.json).

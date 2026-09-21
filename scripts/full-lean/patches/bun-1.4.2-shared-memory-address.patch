@@ -1,0 +1,193 @@
+diff --git a/src/jsc/bindings/webcore/SerializedScriptValue.h b/src/jsc/bindings/webcore/SerializedScriptValue.h
+--- a/src/jsc/bindings/webcore/SerializedScriptValue.h
++++ b/src/jsc/bindings/webcore/SerializedScriptValue.h
+@@ -97,7 +97,11 @@
+ using ArrayBufferContentsArray = Vector<JSC::ArrayBufferContents>;
+ #if ENABLE(WEBASSEMBLY)
+ using WasmModuleArray = Vector<RefPtr<JSC::Wasm::Module>>;
+-using WasmMemoryHandleArray = Vector<RefPtr<JSC::SharedArrayBufferContents>>;
++struct WasmMemoryHandle {
++    RefPtr<JSC::SharedArrayBufferContents> contents;
++    bool isMemory64;
++};
++using WasmMemoryHandleArray = Vector<WasmMemoryHandle>;
+ #endif
+ 
+ // worker_threads.markAsUncloneable() / markAsUntransferable(): create() rejects a tagged object.
+diff --git a/src/jsc/bindings/webcore/SerializedScriptValue.cpp b/src/jsc/bindings/webcore/SerializedScriptValue.cpp
+--- a/src/jsc/bindings/webcore/SerializedScriptValue.cpp
++++ b/src/jsc/bindings/webcore/SerializedScriptValue.cpp
+@@ -1389,7 +1389,7 @@
+                     return true;
+                 }
+                 uint32_t index = m_wasmMemoryHandles.size();
+-                m_wasmMemoryHandles.append(memory->memory().shared());
++                m_wasmMemoryHandles.append(WasmMemoryHandle { memory->memory().shared(), memory->memory().addressType() == Wasm::AddressType::I64 });
+                 write(WasmMemoryTag);
+                 write(agentClusterIDFromGlobalObject(*m_lexicalGlobalObject));
+                 write(index);
+@@ -3804,12 +3804,10 @@
+ 
+             RefPtr<Wasm::Memory> memory;
+             auto handler = [&vm, result](Wasm::Memory::GrowSuccess, PageCount oldPageCount, PageCount newPageCount) { result->growSuccessCallback(vm, oldPageCount, newPageCount); };
+-            // Memory64 is not yet serialized in WasmMemoryTag, so we only
+-            // support I32 address type for structured clone. Upstream WebKit
+-            // has the same limitation (it calls result->memory().addressType()
+-            // on an uninitialized stub here, which happens to return I32).
+-            constexpr auto addressType = Wasm::AddressType::I32;
+-            if (RefPtr<SharedArrayBufferContents> contents = m_wasmMemoryHandles->at(index)) {
++            // The address type travels beside the shared contents, including zero-size memories.
++            const auto& handle = m_wasmMemoryHandles->at(index);
++            auto addressType = handle.isMemory64 ? Wasm::AddressType::I64 : Wasm::AddressType::I32;
++            if (RefPtr<SharedArrayBufferContents> contents = handle.contents) {
+                 if (!contents->memoryHandle()) {
+                     fail();
+                     return JSValue();
+@@ -4272,8 +4270,10 @@
+ #if ENABLE(WEBASSEMBLY)
+     // We are not supporting WebAssembly Module memory estimation yet.
+     if (m_wasmMemoryHandlesArray) {
+-        for (auto& content : *m_wasmMemoryHandlesArray)
+-            cost += content->sizeInBytes(std::memory_order_relaxed);
++        for (const auto& handle : *m_wasmMemoryHandlesArray) {
++            if (handle.contents)
++                cost += handle.contents->sizeInBytes(std::memory_order_relaxed);
++        }
+     }
+ #endif
+ 
+diff --git a/test/js/node/worker_threads/worker_threads.test.ts b/test/js/node/worker_threads/worker_threads.test.ts
+--- a/test/js/node/worker_threads/worker_threads.test.ts
++++ b/test/js/node/worker_threads/worker_threads.test.ts
+@@ -2880,3 +2880,36 @@
+     });
+   }
+ });
++describe("shared WebAssembly memory address type", () => {
++  const cases = ["i32", "i64"].flatMap(address =>
++    [[0, 0], [0, 2], [1, 2]].flatMap(([initial, maximum]) =>
++      ["workerData", "postMessage", "messageChannel"].map(transport => ({ address, initial, maximum, transport })),
++    ),
++  );
++
++  test.each(cases)(
++    "$address initial=$initial maximum=$maximum through $transport",
++    async ({ address, initial, maximum, transport }) => {
++      await using proc = Bun.spawn({
++        cmd: [
++          bunExe(),
++          join(import.meta.dir, "worker-memory-address-fixture.cjs"),
++          address,
++          String(initial),
++          String(maximum),
++          transport,
++        ],
++        env: { ...bunEnv, BUN_JSC_useWasmMemory64: "true" },
++        stdout: "pipe",
++        stderr: "pipe",
++      });
++      const [stdout, stderr, exitCode] = await Promise.all([proc.stdout.text(), proc.stderr.text(), proc.exited]);
++      const pages = Math.min(initial + 1, maximum);
++      expect({ stdout, stderr, exitCode }).toEqual({
++        stdout: JSON.stringify({ address, initial, maximum, transport, pages, byte: pages ? 92 : null }) + "\n",
++        stderr: "",
++        exitCode: 0,
++      });
++    },
++  );
++});
+diff --git a/test/js/node/worker_threads/worker-memory-address-fixture.cjs b/test/js/node/worker_threads/worker-memory-address-fixture.cjs
+new file mode 100644
+--- /dev/null
++++ b/test/js/node/worker_threads/worker-memory-address-fixture.cjs
+@@ -0,0 +1,90 @@
++const assert = require('node:assert/strict');
++const { Worker, MessageChannel, isMainThread, parentPort, workerData } = require('node:worker_threads');
++
++function makeModule(address, initial, maximum) {
++  const imports = [1, 3, 101, 110, 118, 6, 109, 101, 109, 111, 114, 121, 2,
++    address === 'i64' ? 7 : 3, initial, maximum];
++  return new WebAssembly.Module(Uint8Array.from([
++    0, 97, 115, 109, 1, 0, 0, 0, 2, imports.length, ...imports,
++  ]));
++}
++
++function check({ address, initial, maximum, memory, module }) {
++  const amount = value => address === 'i64' ? BigInt(value) : value;
++  new WebAssembly.Instance(module, { env: { memory } });
++  new WebAssembly.Instance(makeModule(address, initial, maximum), { env: { memory } });
++  assert.equal(memory.grow(amount(0)), amount(initial));
++  if (initial) assert.equal(Atomics.load(new Int32Array(memory.buffer), 0), 41);
++  if (maximum > initial) assert.equal(memory.grow(amount(1)), amount(initial));
++  else assert.throws(() => memory.grow(amount(1)), RangeError);
++  const pages = Math.min(initial + 1, maximum);
++  assert.equal(memory.buffer.byteLength, pages * 65536);
++  if (pages) Atomics.store(new Int32Array(memory.buffer), 0, 78);
++  return { memory, pages, byte: pages ? Atomics.load(new Int32Array(memory.buffer), 0) : null };
++}
++
++if (!isMainThread) {
++  const run = (data, port) => {
++    try { port.postMessage({ ok: true, ...check(data) }); }
++    catch (error) { port.postMessage({ ok: false, error: String(error), stack: error.stack }); }
++    if (port !== parentPort) port.close();
++  };
++  if (workerData.transport === 'workerData') run(workerData, parentPort);
++  else parentPort.once('message', data => {
++    if (data.port) data.port.once('message', payload => run(payload, data.port));
++    else run(data, parentPort);
++  });
++} else {
++  (async () => {
++    const [address, initialArg, maximumArg, transport] = process.argv.slice(2);
++    assert.ok(['i32', 'i64'].includes(address));
++    assert.ok(['workerData', 'postMessage', 'messageChannel'].includes(transport));
++    const initial = Number(initialArg), maximum = Number(maximumArg);
++    const amount = value => address === 'i64' ? BigInt(value) : value;
++    const memory = new WebAssembly.Memory({ initial: amount(initial), maximum: amount(maximum), shared: true, address });
++    const module = makeModule(address, initial, maximum);
++    new WebAssembly.Instance(module, { env: { memory } });
++    if (initial) Atomics.store(new Int32Array(memory.buffer), 0, 41);
++    const payload = { address, initial, maximum, memory, module };
++    const worker = new Worker(__filename, { workerData: transport === 'workerData' ? { ...payload, transport } : { transport } });
++    let channel;
++    try {
++      let received = false;
++      const response = new Promise((resolve, reject) => {
++        worker.once('error', reject);
++        worker.once('exit', code => { if (!received) reject(new Error(`Worker exited before reply: ${code}`)); });
++        const onMessage = data => { received = true; resolve(data); };
++        if (transport === 'messageChannel') {
++          channel = new MessageChannel();
++          channel.port1.once('message', onMessage);
++          channel.port1.once('messageerror', reject);
++          channel.port1.once('close', () => { if (!received) reject(new Error('Message port closed before reply')); });
++          worker.postMessage({ port: channel.port2 }, [channel.port2]);
++          channel.port1.postMessage(payload);
++        } else {
++          worker.once('message', onMessage);
++          worker.once('messageerror', reject);
++          if (transport === 'postMessage') worker.postMessage(payload);
++        }
++      });
++      const result = await response;
++      assert.equal(result.ok, true, result.error);
++      const pages = Math.min(initial + 1, maximum);
++      assert.equal(result.pages, pages);
++      assert.equal(result.byte, pages ? 78 : null);
++      new WebAssembly.Instance(module, { env: { memory: result.memory } });
++      assert.equal(result.memory.grow(amount(0)), amount(pages));
++      assert.equal(memory.buffer.byteLength, pages * 65536);
++      if (pages) {
++        assert.equal(Atomics.load(new Int32Array(memory.buffer), 0), 78);
++        Atomics.store(new Int32Array(result.memory.buffer), 0, 92);
++        assert.equal(Atomics.load(new Int32Array(memory.buffer), 0), 92);
++      }
++      console.log(JSON.stringify({ address, initial, maximum, transport, pages, byte: pages ? 92 : null }));
++    } finally {
++      channel?.port1.close();
++      channel?.port2.close();
++      await worker.terminate();
++    }
++  })().catch(error => { console.error(error); process.exitCode = 1; });
++}
