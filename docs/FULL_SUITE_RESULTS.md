@@ -1014,3 +1014,20 @@ and swap counters were zero; the largest repaired upstream run peaked at
 3.65 GiB. These are Linux x64 results; complete campaigns, embedded forced-exit
 disposal, and other platforms remain unfinished. See
 [the failures, debugger trace, repaired snapshots, and comparisons](evidence/engine-exit-shutdown-2026-09-21.json).
+
+## Expanded Bun shared-memory controls, September 21
+
+An 18-case supplementary engine matrix covers both address types, zero-capacity
+and growable memories, three worker-message paths, shared atomic writes, and
+round-trip transfer. Node and Deno pass **18/18** each. Stable Bun and the tested
+canary pass **6/18** each: six zero-capacity cases crash and six other memory64
+cases fail module import with an address-type mismatch. Each case allocates at
+most two 64 KiB pages; the entire sequential comparison peaked at 0.20 GiB,
+with zero OOM, throttling, cap-hit, or swap events.
+
+The pinned Bun source hardcodes I32 when reconstructing worker memories and
+also dereferences null shared-contents handles when accounting for zero-capacity
+memory. A local source candidate addresses both; it has not yet been compiled
+or validated. These are engine implementation defects, not fundamental limits.
+The original Lean suite remains unchanged. See
+[the cases, first-probe cleanup correction, and source references](evidence/bun-shared-memory-matrix-2026-09-21.json).

@@ -1,0 +1,1962 @@
+{
+  "recordedAt": "2026-09-21T19:20:47.025266+00:00",
+  "scope": "Supplementary tiny engine-only shared-memory cloning matrix; no Lean compiler, large memory, or full-suite claim. Original Lean tests remain unchanged.",
+  "fixture": {
+    "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/shared-memory-address.cjs",
+    "sha256": "15fa490de9d05987103e8c2738eba071c4db9931fe026a468c7ac029542abaaa"
+  },
+  "cases": "i32/i64 x (initial/maximum: 0/0, 0/2, 1/2) x workerData/postMessage/MessageChannel; at most two 64 KiB pages per case.",
+  "checks": [
+    "Instantiate both transferred and freshly constructed modules using the transferred memory.",
+    "Preserve grow(0) result type and page count, valid growth, and maximum enforcement.",
+    "Preserve shared atomic writes and memory size across the worker boundary and a return transfer."
+  ],
+  "findings": [
+    "Node 24.13.1 and Deno 2.9.7 pass all 18 variants. Stable Bun 1.4.2 and the measured 1.4.3-canary.1+a2b69f7b0 each pass six and fail twelve.",
+    "All six zero-capacity Bun variants crash with SIGSEGV. The pinned Bun source stores a null shared-contents handle for zero-capacity Wasm memory, but computeMemoryCost dereferences every handle. A local candidate guards this null case; a compiled fix is not yet validated.",
+    "The other six Bun failures are i64 memory/module address mismatches. The decoder hardcodes I32. The local candidate carries the address type beside the shared-contents handle, without changing serialized bytes.",
+    "The first supplemental probe called parentPort.close, absent from Deno 2.9.7. Its results are retained separately; v2 removes that redundant cleanup on all engines because the parent already terminates each worker in finally. This was a probe cleanup issue, not a Deno memory-cloning failure.",
+    "All resource counters for OOM, cap hits, throttling, and swap are zero. Child engine crashes are distinct from memory aborts."
+  ],
+  "baseline": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory-address-baseline-v2.json",
+    "sha256": "b01505ae1255fc2839bcb8634f3b1b351178142fab7dceccb758c94308f78bb3",
+    "results": [
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "binarySha256": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f",
+        "environment": {},
+        "cases": [
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":0,\"transport\":\"workerData\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 81.76144499999998
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":0,\"transport\":\"postMessage\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 78.361446
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":0,\"transport\":\"messageChannel\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 68.02121599999998
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"workerData\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 78.70518200000004
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 72.63301200000001
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 68.74343699999997
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"workerData\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 77.45449100000008
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 75.14956500000005
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 68.65157199999999
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":0,\"transport\":\"workerData\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 80.79060100000015
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":0,\"transport\":\"postMessage\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 79.58398499999998
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":0,\"transport\":\"messageChannel\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 80.91292999999996
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":2,\"transport\":\"workerData\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 69.29330600000003
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 75.07178599999997
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 74.49604999999997
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":1,\"maximum\":2,\"transport\":\"workerData\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 80.06014900000014
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":1,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 73.18949900000007
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":1,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 70.79419899999994
+          }
+        ]
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "binarySha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+        "environment": {},
+        "cases": [
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":0,\"transport\":\"workerData\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 99.4501879999998
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":0,\"transport\":\"postMessage\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 87.56978499999968
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":0,\"transport\":\"messageChannel\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 93.27911400000039
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"workerData\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 81.77620200000001
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 91.72168899999997
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 90.49610900000016
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"workerData\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 83.00855700000011
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 84.82693699999982
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 90.74284099999977
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":0,\"transport\":\"workerData\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 90.16724799999974
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":0,\"transport\":\"postMessage\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 83.95428300000003
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":0,\"transport\":\"messageChannel\",\"pages\":0,\"byte\":null}\n",
+            "stderr": "",
+            "elapsedMs": 82.54498599999988
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":2,\"transport\":\"workerData\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 91.03784199999973
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 94.02612599999975
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":0,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 90.98366100000021
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":1,\"maximum\":2,\"transport\":\"workerData\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 97.51593300000013
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":1,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 90.93660600000021
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i64\",\"initial\":1,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 97.44091500000013
+          }
+        ]
+      },
+      {
+        "name": "bun-stable",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2+744846f84",
+        "binarySha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+        "environment": {
+          "BUN_JSC_useWasmMemory64": "true"
+        },
+        "cases": [
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "workerData",
+            "passed": false,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun v1.4.2 (744846f84) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs\" \"i32\" \"0\" \"0\" \"work\"...\nFeatures: jsc \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 13ms | User: 9ms | Sys: 6ms\nRSS: 24.76 MB | Peak: 24.25 MB | Commit: 42.67 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.2/la1744846fAggggCkngvsCyghwsC8zqwsCouv+3C_4y23vB4y23vBi903vBi903vBms1vvBsgyk2B4uv66Byj+56B2xpryByv+oyB6t8oyBmrpsxBq50oyBmwwoyB46uoyBA2AgC\n\n",
+            "elapsedMs": 151.81517699999995
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "postMessage",
+            "passed": false,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun v1.4.2 (744846f84) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs\" \"i32\" \"0\" \"0\" \"post\"...\nFeatures: jsc transpiler_cache workers_spawned \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 16ms | User: 14ms | Sys: 9ms\nRSS: 28.77 MB | Peak: 28.18 MB | Commit: 55.38 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.2/la1744846fgRggggCkngvsCyghwsCsr5/3Ck2nh4Csxkh4C_mz93vBmz93vB4y23vBi903vBi903vBms1vvBsgyk2B4uv66Byj+56B2xpryByv+oyB6t8oyBmrpsxBq50oyBA2AgC\n\n",
+            "elapsedMs": 125.94600400000036
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "messageChannel",
+            "passed": false,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun v1.4.2 (744846f84) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs\" \"i32\" \"0\" \"0\" \"mess\"...\nFeatures: jsc transpiler_cache workers_spawned \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 15ms | User: 16ms | Sys: 7ms\nRSS: 28.79 MB | Peak: 28.0 MB | Commit: 54.73 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.2/la1744846fgRggggCkngvsCyghwsCsr5/3Ck2nh4Csxkh4C_mz93vBmz93vB4y23vBi903vBi903vBms1vvBsgyk2B4uv66Byj+56B2xpryByv+oyB6t8oyBmrpsxBq50oyBA2AgC\n\n",
+            "elapsedMs": 123.2671749999995
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"workerData\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 39.04215899999963
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 46.01825699999972
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 39.614825000000565
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"workerData\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 43.95183999999972
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 41.93221799999992
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 50.25270999999975
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "workerData",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun v1.4.2 (744846f84) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs\" \"i64\" \"0\" \"0\" \"work\"...\nFeatures: jsc transpiler_cache \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 14ms | User: 11ms | Sys: 5ms\nRSS: 24.59 MB | Peak: 23.99 MB | Commit: 42.86 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.2/la1744846fgBggggCkngvsCyghwsC8zqwsCouv+3C_4y23vB4y23vBi903vBi903vBms1vvBsgyk2B4uv66Byj+56B2xpryByv+oyB6t8oyBmrpsxBq50oyBmwwoyB46uoyBA2AgC\n\n",
+            "elapsedMs": 127.69649300000037
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "postMessage",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun v1.4.2 (744846f84) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs\" \"i64\" \"0\" \"0\" \"post\"...\nFeatures: jsc transpiler_cache workers_spawned \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 17ms | User: 20ms | Sys: 4ms\nRSS: 28.64 MB | Peak: 28.0 MB | Commit: 54.66 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.2/la1744846fgRggggCkngvsCyghwsCsr5/3Ck2nh4Csxkh4C_mz93vBmz93vB4y23vBi903vBi903vBms1vvBsgyk2B4uv66Byj+56B2xpryByv+oyB6t8oyBmrpsxBq50oyBA2AgC\n\n",
+            "elapsedMs": 141.1545040000001
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "messageChannel",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun v1.4.2 (744846f84) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs\" \"i64\" \"0\" \"0\" \"mess\"...\nFeatures: jsc transpiler_cache workers_spawned \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 16ms | User: 19ms | Sys: 5ms\nRSS: 28.92 MB | Peak: 28.18 MB | Commit: 55.12 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.2/la1744846fgRggggCkngvsCyghwsCsr5/3Ck2nh4Csxkh4C_mz93vBmz93vB4y23vBi903vBi903vBms1vvBsgyk2B4uv66Byj+56B2xpryByv+oyB6t8oyBmrpsxBq50oyBA2AgC\n\n",
+            "elapsedMs": 130.43734399999994
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 47.21642900000006
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 52.5424409999996
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 60.098941000000195
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 62.5785249999999
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 54.08380899999975
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 58.44412800000009
+          }
+        ]
+      },
+      {
+        "name": "bun-canary",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-canary-2026-09-21/bun-linux-x64/bun",
+        "version": "1.4.3-canary.1+a2b69f7b0",
+        "binarySha256": "67bca10c3fc78d4592fdd7fe7be8347b1e889090b2e8cf5ddf62a190681faf77",
+        "environment": {
+          "BUN_JSC_useWasmMemory64": "true"
+        },
+        "cases": [
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "workerData",
+            "passed": false,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun Canary v1.4.3-canary.1 (a2b69f7b0) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-canary-2026-09-21/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.\"...\nFeatures: jsc \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 10ms | User: 10ms | Sys: 3ms\nRSS: 24.90 MB | Peak: 24.90 MB | Commit: 43.1 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.3/la2a2b69f7AggggCkzu/1Cu40g2C824g2C87vr2C_00i3vB00i3vB4/g3vB4/g3vBms8uvB2q2+1B8xqs6Byk4r6B4k0r3B+k5qyB+qvoyB66soyBml/rxBqqloyB8m/nyBA2AgC\n\n",
+            "elapsedMs": 277.2040219999999
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "postMessage",
+            "passed": false,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun Canary v1.4.3-canary.1 (a2b69f7b0) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-canary-2026-09-21/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.\"...\nFeatures: jsc transpiler_cache workers_spawned \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 18ms | User: 20ms | Sys: 9ms\nRSS: 29.23 MB | Peak: 29.23 MB | Commit: 55.97 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.3/la2a2b69f7gRggggCkzu/1Cu40g2Cso7s2Ck/ou2Cs7lu2C_67p3vB67p3vB00i3vB4/g3vB4/g3vBms8uvB2q2+1B8xqs6Byk4r6B4k0r3B+k5qyB+qvoyB66soyBml/rxBA2AgC\n\n",
+            "elapsedMs": 430.00073900000007
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "messageChannel",
+            "passed": false,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun Canary v1.4.3-canary.1 (a2b69f7b0) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-canary-2026-09-21/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.\"...\nFeatures: jsc transpiler_cache workers_spawned \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 16ms | User: 15ms | Sys: 8ms\nRSS: 29.36 MB | Peak: 29.36 MB | Commit: 55.90 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.3/la2a2b69f7gRggggCkzu/1Cu40g2Cso7s2Ck/ou2Cs7lu2C_67p3vB67p3vB00i3vB4/g3vB4/g3vBms8uvB2q2+1B8xqs6Byk4r6B4k0r3B+k5qyB+qvoyB66soyBml/rxBA2AgC\n\n",
+            "elapsedMs": 251.71037499999966
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"workerData\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 58.37732000000051
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 38.7481029999999
+          },
+          {
+            "address": "i32",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":0,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":1,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 40.18100900000081
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"workerData\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 43.614329
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"postMessage\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 44.50911900000028
+          },
+          {
+            "address": "i32",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": true,
+            "expected": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "observation": {
+              "address": "i32",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 0,
+            "signal": null,
+            "stdout": "{\"address\":\"i32\",\"initial\":1,\"maximum\":2,\"transport\":\"messageChannel\",\"pages\":2,\"byte\":92}\n",
+            "stderr": "",
+            "elapsedMs": 42.880307999999786
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "workerData",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "workerData",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun Canary v1.4.3-canary.1 (a2b69f7b0) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-canary-2026-09-21/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.\"...\nFeatures: jsc transpiler_cache \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 14ms | User: 11ms | Sys: 5ms\nRSS: 24.51 MB | Peak: 24.51 MB | Commit: 42.99 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.3/la2a2b69f7gBggggCkzu/1Cu40g2C824g2C87vr2C_00i3vB00i3vB4/g3vB4/g3vBms8uvB2q2+1B8xqs6Byk4r6B4k0r3B+k5qyB+qvoyB66soyBml/rxBqqloyB8m/nyBA2AgC\n\n",
+            "elapsedMs": 266.01810000000023
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "postMessage",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "postMessage",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun Canary v1.4.3-canary.1 (a2b69f7b0) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-canary-2026-09-21/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.\"...\nFeatures: jsc transpiler_cache workers_spawned \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 44ms | User: 38ms | Sys: 17ms\nRSS: 28.97 MB | Peak: 28.97 MB | Commit: 55.90 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.3/la2a2b69f7gRggggCkzu/1Cu40g2Cso7s2Ck/ou2Cs7lu2C_67p3vB67p3vB00i3vB4/g3vB4/g3vBms8uvB2q2+1B8xqs6Byk4r6B4k0r3B+k5qyB+qvoyB66soyBml/rxBA2AgC\n\n",
+            "elapsedMs": 465.6572420000002
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 0,
+            "transport": "messageChannel",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 0,
+              "transport": "messageChannel",
+              "pages": 0,
+              "byte": null
+            },
+            "exitCode": null,
+            "signal": "SIGSEGV",
+            "stdout": "",
+            "stderr": "============================================================\nBun Canary v1.4.3-canary.1 (a2b69f7b0) Linux x64\nLinux Kernel v6.8.0 | glibc v2.39\nCPU: sse42 popcnt avx avx2\nArgs: \"/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-canary-2026-09-21/bun-linux-x64/bun\" \"/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.\"...\nFeatures: jsc transpiler_cache workers_spawned \nBuiltins: \"bun:main\" \"node:assert/strict\" \"node:worker_threads\" \n\nElapsed: 18ms | User: 17ms | Sys: 8ms\nRSS: 28.97 MB | Peak: 28.97 MB | Commit: 56.16 MB | Faults: 0 | Machine: 10.74 GB\n\npanic(main thread): Segmentation fault at address 0x20\noh no: Bun has crashed. This indicates a bug in Bun, not your code.\n\nTo send a redacted crash report to Bun's team,\nplease file a GitHub issue using the link below:\n\n https://bun.report/1.4.3/la2a2b69f7gRggggCkzu/1Cu40g2Cso7s2Ck/ou2Cs7lu2C_67p3vB67p3vB00i3vB4/g3vB4/g3vBms8uvB2q2+1B8xqs6Byk4r6B4k0r3B+k5qyB+qvoyB66soyBml/rxBA2AgC\n\n",
+            "elapsedMs": 284.33705800000007
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 91.13704599999983
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 54.57056399999965
+          },
+          {
+            "address": "i64",
+            "initial": 0,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 0,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 1,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 60.908752999999706
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "workerData",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "workerData",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 50.659342000000834
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "postMessage",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "postMessage",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 55.213236999999936
+          },
+          {
+            "address": "i64",
+            "initial": 1,
+            "maximum": 2,
+            "transport": "messageChannel",
+            "passed": false,
+            "expected": {
+              "address": "i64",
+              "initial": 1,
+              "maximum": 2,
+              "transport": "messageChannel",
+              "pages": 2,
+              "byte": 92
+            },
+            "exitCode": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "AssertionError [ERR_ASSERTION]: LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\n\nfalse !== true\n\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture-v2.cjs:71:14)\n    at processTicksAndRejections (native:7:39) {\n  generatedMessage: false,\n  actual: false,\n  expected: true,\n  operator: 'strictEqual',\n  code: 'ERR_ASSERTION',\n  diff: 'simple'\n}\n",
+            "elapsedMs": 49.25661099999979
+          }
+        ]
+      }
+    ],
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory-address-baseline-v2.resources.json",
+      "sha256": "3757c9ff136d45f0660bf409013e8e180dd0be809c0983ed856c30353a0160ef",
+      "peakMemoryBytes": 155111424,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  },
+  "earlierProbe": {
+    "evidence": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory-address-baseline.json",
+      "sha256": "f34e165e0cfd8a0883360dce5f768568b2df255c6f895ae3d55cd6f1bcf2b085"
+    },
+    "fixture": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-patch/worker-memory-address-fixture.cjs",
+      "sha256": "dbb2d6056fefc085e9078fe951f089ffdef7a3eb2b07dde403429d9b43454ab9"
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory-address-baseline.resources.json",
+      "sha256": "26c7935f7cc80dfc8a90cd4df407320c5d4e52d929132c16df07252c0a4e7429",
+      "peakMemoryBytes": 209928192,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  },
+  "source": {
+    "bunCommit": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "webkitCommit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+    "urls": [
+      "https://github.com/oven-sh/bun/blob/744846f844374847c902b5e7fd59b4342a51ef99/src/jsc/bindings/webcore/SerializedScriptValue.cpp",
+      "https://github.com/oven-sh/WebKit/blob/2e2aa2290fac856d6f451ceacb58f7f5b44dd057/Source/JavaScriptCore/wasm/WasmMemory.cpp"
+    ]
+  },
+  "status": "Both Bun issues remain open pending a built and validated candidate. The installed Bun defaults are unchanged."
+}

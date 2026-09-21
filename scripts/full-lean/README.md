@@ -730,3 +730,19 @@ stderr, and an open buffered file. The source and every frozen input are
 verified; upstream tests and expectations are unchanged. The resource guard
 applies automatically. Packaged runners and embedded host lifetime are covered
 separately by `test/node-process-exit.test.mjs`.
+
+### Shared memory address and zero-capacity control
+
+`node scripts/full-lean/probes/shared-memory-address.cjs i64 0 2 workerData`
+checks transferred and freshly constructed modules, the memory address type,
+growth, maximum enforcement, shared atomic writes, and a return transfer.
+Use `i32`/`i64`, initial/maximum pairs `0 0`, `0 2`, `1 2`, and transports
+`workerData`, `postMessage`, `messageChannel`. Run these probes through the
+resource guard. Bun also needs `BUN_JSC_useWasmMemory64=true` inside the guard;
+Deno uses `deno run -A`.
+
+Node and Deno pass all 18 variants. Stable Bun and the tested canary each pass
+six; zero-capacity variants crash, and the remaining memory64 variants lose
+the address type across worker transfer. These tiny engine cases allocate at
+most two 64 KiB pages. A source-patch candidate is under investigation; stock
+Bun remains unchanged. See [the complete matrix](../../docs/evidence/bun-shared-memory-matrix-2026-09-21.json).
