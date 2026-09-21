@@ -1,0 +1,2426 @@
+{
+  "recordedAt": "2026-09-21T22:47:36.717615+00:00",
+  "scope": "Local Bun 1.4.2 engine prerequisite repair for native Node decoder semantics and 4 GiB buffer widths. No Lean suite tests were changed. The 4 GiB Wasm capacity limit remains in place; this is not a complete buffer audit or a full Lean suite result.",
+  "sourceCommit": "744846f844374847c902b5e7fd59b4342a51ef99",
+  "webkitCommit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+  "nodeReference": "https://github.com/nodejs/node/blob/v24.13.1/lib/string_decoder.js",
+  "patch": {
+    "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/patches/bun-1.4.2-string-decoder-width.patch",
+    "sha256": "5b0ed7d44ec1d629132381b4afab5f8a9ca4469f0df217711382c2d39273f221"
+  },
+  "existingBunTestsUnchanged": {
+    "originalSha256": "7f8a806d6af73d2992921a6149af0518e85f3d5c5ac0b1990db529057ecea837",
+    "modifiedSha256": "60f84ccf4178026dad8f46f48203a44e1eb5e21e0b474dbf965826c73c9d8822",
+    "verification": "Removing only the added 22-case group reproduces the original test file byte for byte."
+  },
+  "baseline": {
+    "phase": "baseline",
+    "startedAt": "2026-09-21T22:34:22.308382+00:00",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-baseline.resources.json",
+    "results": [
+      {
+        "label": "bun-decoder-native-wide",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-width.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-native-wide.log",
+        "seconds": 8.888691,
+        "checks": {
+          "scope": "One sparse 4 GiB memory32 buffer; one byte written, no giant string produced.",
+          "byteLength": 4294967296,
+          "versions": {
+            "node": "24.13.1",
+            "acorn": "8.15.0",
+            "ada": "3.4.2",
+            "amaro": "1.1.5",
+            "ares": "1.34.6",
+            "brotli": "1.2.0",
+            "cjs_module_lexer": "2.2.0",
+            "cldr": "48.0",
+            "icu": "78.2",
+            "llhttp": "9.3.0",
+            "modules": "137",
+            "napi": "10",
+            "nbytes": "0.1.1",
+            "ncrypto": "0.0.1",
+            "nghttp2": "1.68.0",
+            "openssl": "3.5.5",
+            "simdjson": "4.2.4",
+            "simdutf": "6.4.0",
+            "sqlite": "3.51.2",
+            "tz": "2025c",
+            "undici": "7.18.2",
+            "unicode": "17.0",
+            "uv": "1.51.0",
+            "uvwasi": "0.0.23",
+            "v8": "13.6.233.17-node.40",
+            "zlib": "1.3.1-e00f703",
+            "zstd": "1.5.7"
+          },
+          "results": [
+            {
+              "label": "write rejects oversized hex output",
+              "error": "Error",
+              "code": "ERR_STRING_TOO_LONG",
+              "passed": true
+            },
+            {
+              "label": "end rejects oversized hex output",
+              "error": "Error",
+              "code": "ERR_STRING_TOO_LONG",
+              "passed": true
+            },
+            {
+              "label": "text offset -1",
+              "actual": "A",
+              "expected": "A",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967295",
+              "actual": "A",
+              "expected": "A",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967296",
+              "actual": "",
+              "expected": "",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967297",
+              "actual": "",
+              "expected": "",
+              "passed": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-stock-wide",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-width.cjs"
+        ],
+        "code": 1,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-stock-wide.log",
+        "seconds": 0.017264,
+        "checks": {
+          "scope": "One sparse 4 GiB memory32 buffer; one byte written, no giant string produced.",
+          "byteLength": 4294967296,
+          "versions": {
+            "node": "26.3.0",
+            "bun": "1.4.2",
+            "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+            "openssl": "1.1.0",
+            "llhttp": "9.3.0",
+            "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+            "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+            "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+            "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+            "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+            "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+            "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+            "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+            "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+            "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+            "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+            "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+            "v8": "14.6.202.34-node.20",
+            "uv": "1.48.0",
+            "napi": "10",
+            "icu": "78.3",
+            "unicode": "17.0",
+            "sqlite": "3.53.2",
+            "modules": "147"
+          },
+          "results": [
+            {
+              "label": "write rejects oversized hex output",
+              "returnedLength": 0,
+              "passed": false
+            },
+            {
+              "label": "end rejects oversized hex output",
+              "returnedLength": 0,
+              "passed": false
+            },
+            {
+              "label": "text offset -1",
+              "actual": "",
+              "expected": "A",
+              "passed": false
+            },
+            {
+              "label": "text offset 4294967295",
+              "actual": "",
+              "expected": "A",
+              "passed": false
+            },
+            {
+              "label": "text offset 4294967296",
+              "actual": "",
+              "expected": "",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967297",
+              "actual": "",
+              "expected": "",
+              "passed": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-stock-tests",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "test",
+          "test/js/node/string_decoder/string-decoder.test.js",
+          "--test-name-pattern",
+          "StringDecoder.text offset width and reset",
+          "--max-concurrency",
+          "1",
+          "--reporter=junit",
+          "--reporter-outfile",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-stock-tests.xml"
+        ],
+        "code": 1,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-stock-tests.log",
+        "seconds": 0.055074,
+        "junit": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-stock-tests.xml",
+        "executed": 22,
+        "failures": 14
+      }
+    ],
+    "validationCorrection": "The original harness expected 13 failures; the retained JUnit and log show 14 intended incompatibility failures among 22 executed tests. No tests were changed or rerun for this count correction.",
+    "originalSummarySha256": "e7fb73d01b95ab8c10ae604356895ddd22787842641e3aa4019f159fe0da12d5",
+    "reviewedAt": "2026-09-21T22:35:19.917723+00:00",
+    "passed": true
+  },
+  "release": {
+    "mode": "release",
+    "startedAt": "2026-09-21T22:39:33.721705+00:00",
+    "results": [
+      {
+        "label": "bun-decoder-release-native-small",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "--expose-gc",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/decoder-native-small.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-native-small.log",
+        "seconds": 2.726893,
+        "checks": {
+          "versions": {
+            "node": "24.13.1",
+            "acorn": "8.15.0",
+            "ada": "3.4.2",
+            "amaro": "1.1.5",
+            "ares": "1.34.6",
+            "brotli": "1.2.0",
+            "cjs_module_lexer": "2.2.0",
+            "cldr": "48.0",
+            "icu": "78.2",
+            "llhttp": "9.3.0",
+            "modules": "137",
+            "napi": "10",
+            "nbytes": "0.1.1",
+            "ncrypto": "0.0.1",
+            "nghttp2": "1.68.0",
+            "openssl": "3.5.5",
+            "simdjson": "4.2.4",
+            "simdutf": "6.4.0",
+            "sqlite": "3.51.2",
+            "tz": "2025c",
+            "undici": "7.18.2",
+            "unicode": "17.0",
+            "uv": "1.51.0",
+            "uvwasi": "0.0.23",
+            "v8": "13.6.233.17-node.40",
+            "zlib": "1.3.1-e00f703",
+            "zstd": "1.5.7"
+          },
+          "blockSha256": "e074f27f44d449c2a11a9744dd5c6912694d4ce0786ccd8a25548ae41fbddd3c",
+          "cases": [
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "slices offset %s without narrowing",
+              "passed": true
+            },
+            {
+              "name": "accepts an omitted offset",
+              "passed": true
+            },
+            {
+              "name": "resets incomplete %s input before text",
+              "passed": true
+            },
+            {
+              "name": "resets incomplete %s input before text",
+              "passed": true
+            },
+            {
+              "name": "resets incomplete %s input before text",
+              "passed": true
+            },
+            {
+              "name": "resets state before an offset coercion throws",
+              "passed": true
+            },
+            {
+              "name": "preserves public method lookup and callback order",
+              "passed": true
+            },
+            {
+              "name": "keeps a getter-produced write callback alive across slice GC",
+              "passed": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-release-native-negative",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-text-negative.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-native-negative.log",
+        "seconds": 0.028284,
+        "checks": {
+          "byteLength": 2147483664,
+          "versions": {
+            "node": "24.13.1",
+            "acorn": "8.15.0",
+            "ada": "3.4.2",
+            "amaro": "1.1.5",
+            "ares": "1.34.6",
+            "brotli": "1.2.0",
+            "cjs_module_lexer": "2.2.0",
+            "cldr": "48.0",
+            "icu": "78.2",
+            "llhttp": "9.3.0",
+            "modules": "137",
+            "napi": "10",
+            "nbytes": "0.1.1",
+            "ncrypto": "0.0.1",
+            "nghttp2": "1.68.0",
+            "openssl": "3.5.5",
+            "simdjson": "4.2.4",
+            "simdutf": "6.4.0",
+            "sqlite": "3.51.2",
+            "tz": "2025c",
+            "undici": "7.18.2",
+            "unicode": "17.0",
+            "uv": "1.51.0",
+            "uvwasi": "0.0.23",
+            "v8": "13.6.233.17-node.40",
+            "zlib": "1.3.1-e00f703",
+            "zstd": "1.5.7"
+          },
+          "results": [
+            {
+              "label": "ordinary positive offset",
+              "actual": "world",
+              "passed": true
+            },
+            {
+              "label": "original negative-offset input follows Node slicing",
+              "error": "Error",
+              "code": "ERR_STRING_TOO_LONG",
+              "passed": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-release-stock-negative",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-text-negative.cjs"
+        ],
+        "code": 1,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-stock-negative.log",
+        "seconds": 0.01706,
+        "checks": {
+          "byteLength": 2147483664,
+          "versions": {
+            "node": "26.3.0",
+            "bun": "1.4.2",
+            "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+            "openssl": "1.1.0",
+            "llhttp": "9.3.0",
+            "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+            "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+            "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+            "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+            "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+            "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+            "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+            "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+            "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+            "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+            "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+            "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+            "v8": "14.6.202.34-node.20",
+            "uv": "1.48.0",
+            "napi": "10",
+            "icu": "78.3",
+            "unicode": "17.0",
+            "sqlite": "3.53.2",
+            "modules": "147"
+          },
+          "results": [
+            {
+              "label": "ordinary positive offset",
+              "actual": "world",
+              "passed": true
+            },
+            {
+              "label": "original negative-offset input follows Node slicing",
+              "returnedLength": 0,
+              "passed": false
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-release-buffer-width",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/buffer-width.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-buffer-width.log",
+        "seconds": 1.486995,
+        "checks": {
+          "versions": {
+            "node": "26.3.0",
+            "bun": "1.4.2",
+            "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+            "openssl": "1.1.0",
+            "llhttp": "9.3.0",
+            "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+            "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+            "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+            "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+            "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+            "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+            "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+            "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+            "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+            "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+            "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+            "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+            "v8": "14.6.202.34-node.20",
+            "uv": "1.48.0",
+            "napi": "10",
+            "icu": "78.3",
+            "unicode": "17.0",
+            "sqlite": "3.53.2",
+            "modules": "147"
+          },
+          "inputBytes": 3,
+          "results": [
+            {
+              "operation": "StringDecoder.text",
+              "offset": -1,
+              "value": "c"
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": -1,
+              "value": "63"
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": -1,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": -1,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 0,
+              "value": "abc"
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 0,
+              "value": "616263"
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 0,
+              "value": 97
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 0,
+              "value": 3
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 1,
+              "value": "bc"
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 1,
+              "value": "6263"
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 1,
+              "value": 98
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 1,
+              "value": 2
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 3,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 3,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 3,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 3,
+              "value": 0
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 4,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 4,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 4,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 4,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 2147483647,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 2147483647,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 2147483647,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 2147483647,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 2147483648,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 2147483648,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 2147483648,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 2147483648,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 4294967295,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 4294967295,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 4294967295,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 4294967295,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 4294967296,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 4294967296,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 4294967296,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 4294967296,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 4294967297,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 4294967297,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 4294967297,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 4294967297,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-release-decoder-width",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-width.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-decoder-width.log",
+        "seconds": 1.655643,
+        "checks": {
+          "scope": "One sparse 4 GiB memory32 buffer; one byte written, no giant string produced.",
+          "byteLength": 4294967296,
+          "versions": {
+            "node": "26.3.0",
+            "bun": "1.4.2",
+            "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+            "openssl": "1.1.0",
+            "llhttp": "9.3.0",
+            "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+            "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+            "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+            "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+            "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+            "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+            "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+            "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+            "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+            "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+            "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+            "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+            "v8": "14.6.202.34-node.20",
+            "uv": "1.48.0",
+            "napi": "10",
+            "icu": "78.3",
+            "unicode": "17.0",
+            "sqlite": "3.53.2",
+            "modules": "147"
+          },
+          "results": [
+            {
+              "label": "write rejects oversized hex output",
+              "error": "Error",
+              "code": "ERR_STRING_TOO_LONG",
+              "passed": true
+            },
+            {
+              "label": "end rejects oversized hex output",
+              "error": "Error",
+              "code": "ERR_STRING_TOO_LONG",
+              "passed": true
+            },
+            {
+              "label": "text offset -1",
+              "actual": "A",
+              "expected": "A",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967295",
+              "actual": "A",
+              "expected": "A",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967296",
+              "actual": "",
+              "expected": "",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967297",
+              "actual": "",
+              "expected": "",
+              "passed": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-release-decoder-text-negative",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-text-negative.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-decoder-text-negative.log",
+        "seconds": 2.106362,
+        "checks": {
+          "byteLength": 2147483664,
+          "versions": {
+            "node": "26.3.0",
+            "bun": "1.4.2",
+            "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+            "openssl": "1.1.0",
+            "llhttp": "9.3.0",
+            "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+            "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+            "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+            "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+            "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+            "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+            "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+            "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+            "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+            "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+            "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+            "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+            "v8": "14.6.202.34-node.20",
+            "uv": "1.48.0",
+            "napi": "10",
+            "icu": "78.3",
+            "unicode": "17.0",
+            "sqlite": "3.53.2",
+            "modules": "147"
+          },
+          "results": [
+            {
+              "label": "ordinary positive offset",
+              "actual": "world",
+              "passed": true
+            },
+            {
+              "label": "original negative-offset input follows Node slicing",
+              "error": "Error",
+              "code": "ERR_STRING_TOO_LONG",
+              "passed": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-release-shared-memory",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+          "test",
+          "test/js/node/worker_threads/worker_threads.test.ts",
+          "--test-name-pattern",
+          "shared WebAssembly memory address type",
+          "--max-concurrency",
+          "1",
+          "--reporter=junit",
+          "--reporter-outfile",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-shared-memory.xml"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-shared-memory.log",
+        "seconds": 1.947502,
+        "executed": 18,
+        "failures": 0,
+        "junit": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-shared-memory.xml"
+      },
+      {
+        "label": "bun-decoder-release-neighbor",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+          "test",
+          "test/js/node/worker_threads/worker_threads.test.ts",
+          "--test-name-pattern",
+          "receiveMessageOnPort|postMessage transfer list",
+          "--max-concurrency",
+          "1",
+          "--reporter=junit",
+          "--reporter-outfile",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-neighbor.xml"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-neighbor.log",
+        "seconds": 1.621263,
+        "executed": 15,
+        "failures": 0,
+        "junit": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-neighbor.xml"
+      },
+      {
+        "label": "bun-decoder-release-memory64-original",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/memory64-worker.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-memory64-original.log",
+        "seconds": 1.548126,
+        "checks": [
+          {
+            "name": "parent original",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and memory",
+            "passed": true
+          },
+          {
+            "name": "worker cloned module and fresh memory",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and cloned memory",
+            "passed": true
+          }
+        ]
+      }
+    ],
+    "binarySha256": "a7b46404eb936bfc78d57b246b37859613c7cedd28dad37eb459e8af51d3ccb6",
+    "binary": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release/bun-profile",
+    "finishedAt": "2026-09-21T22:39:47.422295+00:00",
+    "passed": true
+  },
+  "releaseWholeFile": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-repaired-r2-tests.xml",
+    "sha256": "4b1d610254de0a13d88be72204a5f6d3d759fb9835e29e8ea5813e28162e917f",
+    "executed": 120,
+    "passed": 119,
+    "failures": [
+      "text() with a negative offset on a 2 GiB buffer returns an empty string"
+    ]
+  },
+  "debug": {
+    "mode": "debug",
+    "startedAt": "2026-09-21T22:43:20.273088+00:00",
+    "results": [
+      {
+        "label": "bun-decoder-debug-r2-tests",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64.py",
+          "test",
+          "test/js/node/string_decoder/string-decoder.test.js",
+          "--max-concurrency",
+          "1",
+          "--timeout",
+          "90000",
+          "--reporter=junit",
+          "--reporter-outfile",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-tests.xml"
+        ],
+        "code": 1,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-tests.log",
+        "seconds": 81.872468,
+        "junit": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-tests.xml",
+        "executed": 120,
+        "failed": [
+          "text() with a negative offset on a 2 GiB buffer returns an empty string"
+        ]
+      },
+      {
+        "label": "bun-decoder-debug-r2-buffer-width",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64.py",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/buffer-width.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-buffer-width.log",
+        "seconds": 2.351411,
+        "checks": {
+          "versions": {
+            "node": "26.3.0",
+            "bun": "1.4.2-debug",
+            "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+            "openssl": "1.1.0",
+            "llhttp": "9.3.0",
+            "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+            "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+            "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+            "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+            "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+            "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+            "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+            "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+            "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+            "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+            "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+            "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+            "v8": "14.6.202.34-node.20",
+            "uv": "1.48.0",
+            "napi": "10",
+            "icu": "78.3",
+            "unicode": "17.0",
+            "sqlite": "3.53.2",
+            "modules": "147"
+          },
+          "inputBytes": 3,
+          "results": [
+            {
+              "operation": "StringDecoder.text",
+              "offset": -1,
+              "value": "c"
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": -1,
+              "value": "63"
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": -1,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": -1,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 0,
+              "value": "abc"
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 0,
+              "value": "616263"
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 0,
+              "value": 97
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 0,
+              "value": 3
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 1,
+              "value": "bc"
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 1,
+              "value": "6263"
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 1,
+              "value": 98
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 1,
+              "value": 2
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 3,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 3,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 3,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 3,
+              "value": 0
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 4,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 4,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 4,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 4,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 2147483647,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 2147483647,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 2147483647,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 2147483647,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 2147483648,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 2147483648,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 2147483648,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 2147483648,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 4294967295,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 4294967295,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 4294967295,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 4294967295,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 4294967296,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 4294967296,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 4294967296,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 4294967296,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "StringDecoder.text",
+              "offset": 4294967297,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.subarray",
+              "offset": 4294967297,
+              "value": ""
+            },
+            {
+              "operation": "Buffer.readUInt8",
+              "offset": 4294967297,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            },
+            {
+              "operation": "Buffer.copy sourceStart",
+              "offset": 4294967297,
+              "error": "RangeError",
+              "code": "ERR_OUT_OF_RANGE"
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-debug-r2-decoder-width",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64.py",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-width.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-decoder-width.log",
+        "seconds": 2.74856,
+        "checks": {
+          "scope": "One sparse 4 GiB memory32 buffer; one byte written, no giant string produced.",
+          "byteLength": 4294967296,
+          "versions": {
+            "node": "26.3.0",
+            "bun": "1.4.2-debug",
+            "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+            "openssl": "1.1.0",
+            "llhttp": "9.3.0",
+            "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+            "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+            "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+            "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+            "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+            "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+            "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+            "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+            "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+            "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+            "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+            "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+            "v8": "14.6.202.34-node.20",
+            "uv": "1.48.0",
+            "napi": "10",
+            "icu": "78.3",
+            "unicode": "17.0",
+            "sqlite": "3.53.2",
+            "modules": "147"
+          },
+          "results": [
+            {
+              "label": "write rejects oversized hex output",
+              "error": "Error",
+              "code": "ERR_STRING_TOO_LONG",
+              "passed": true
+            },
+            {
+              "label": "end rejects oversized hex output",
+              "error": "Error",
+              "code": "ERR_STRING_TOO_LONG",
+              "passed": true
+            },
+            {
+              "label": "text offset -1",
+              "actual": "A",
+              "expected": "A",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967295",
+              "actual": "A",
+              "expected": "A",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967296",
+              "actual": "",
+              "expected": "",
+              "passed": true
+            },
+            {
+              "label": "text offset 4294967297",
+              "actual": "",
+              "expected": "",
+              "passed": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-debug-r2-decoder-text-negative",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64.py",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-text-negative.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-decoder-text-negative.log",
+        "seconds": 11.068517,
+        "checks": {
+          "byteLength": 2147483664,
+          "versions": {
+            "node": "26.3.0",
+            "bun": "1.4.2-debug",
+            "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+            "openssl": "1.1.0",
+            "llhttp": "9.3.0",
+            "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+            "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+            "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+            "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+            "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+            "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+            "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+            "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+            "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+            "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+            "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+            "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+            "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+            "v8": "14.6.202.34-node.20",
+            "uv": "1.48.0",
+            "napi": "10",
+            "icu": "78.3",
+            "unicode": "17.0",
+            "sqlite": "3.53.2",
+            "modules": "147"
+          },
+          "results": [
+            {
+              "label": "ordinary positive offset",
+              "actual": "world",
+              "passed": true
+            },
+            {
+              "label": "original negative-offset input follows Node slicing",
+              "error": "Error",
+              "code": "ERR_STRING_TOO_LONG",
+              "passed": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "bun-decoder-debug-r2-shared-memory",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64.py",
+          "test",
+          "test/js/node/worker_threads/worker_threads.test.ts",
+          "--test-name-pattern",
+          "shared WebAssembly memory address type",
+          "--max-concurrency",
+          "1",
+          "--timeout",
+          "90000",
+          "--reporter=junit",
+          "--reporter-outfile",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-shared-memory.xml"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-shared-memory.log",
+        "seconds": 41.762487,
+        "executed": 18,
+        "failures": 0,
+        "junit": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-shared-memory.xml"
+      },
+      {
+        "label": "bun-decoder-debug-r2-neighbor",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64.py",
+          "test",
+          "test/js/node/worker_threads/worker_threads.test.ts",
+          "--test-name-pattern",
+          "receiveMessageOnPort|postMessage transfer list",
+          "--max-concurrency",
+          "1",
+          "--timeout",
+          "90000",
+          "--reporter=junit",
+          "--reporter-outfile",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-neighbor.xml"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-neighbor.log",
+        "seconds": 5.479674,
+        "executed": 15,
+        "failures": 0,
+        "junit": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-neighbor.xml"
+      },
+      {
+        "label": "bun-decoder-debug-r2-memory64-original",
+        "command": [
+          "python3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64.py",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/memory64-worker.cjs"
+        ],
+        "code": 0,
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-memory64-original.log",
+        "seconds": 4.147336,
+        "checks": [
+          {
+            "name": "parent original",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and memory",
+            "passed": true
+          },
+          {
+            "name": "worker cloned module and fresh memory",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and cloned memory",
+            "passed": true
+          }
+        ]
+      }
+    ],
+    "binarySha256": "70e361b3e151b05601dec00727fad58ed387486eb8239879610fa2af29039218",
+    "binary": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/debug/bun-debug",
+    "finishedAt": "2026-09-21T22:45:51.388879+00:00",
+    "passed": true
+  },
+  "debugWholeFile": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-tests.xml",
+    "sha256": "9fa7b22796075cbedaad6a9ece0a0530f31e6548fee21567321b3d512f540658",
+    "executed": 120,
+    "passed": 119,
+    "failures": [
+      "text() with a negative offset on a 2 GiB buffer returns an empty string"
+    ]
+  },
+  "retainedAttempts": {
+    "baselineCountMismatch": {
+      "phase": "baseline",
+      "startedAt": "2026-09-21T22:34:22.308382+00:00",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-baseline.resources.json",
+      "results": [
+        {
+          "label": "bun-decoder-native-wide",
+          "command": [
+            "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-width.cjs"
+          ],
+          "code": 0,
+          "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-native-wide.log",
+          "seconds": 8.888691,
+          "checks": {
+            "scope": "One sparse 4 GiB memory32 buffer; one byte written, no giant string produced.",
+            "byteLength": 4294967296,
+            "versions": {
+              "node": "24.13.1",
+              "acorn": "8.15.0",
+              "ada": "3.4.2",
+              "amaro": "1.1.5",
+              "ares": "1.34.6",
+              "brotli": "1.2.0",
+              "cjs_module_lexer": "2.2.0",
+              "cldr": "48.0",
+              "icu": "78.2",
+              "llhttp": "9.3.0",
+              "modules": "137",
+              "napi": "10",
+              "nbytes": "0.1.1",
+              "ncrypto": "0.0.1",
+              "nghttp2": "1.68.0",
+              "openssl": "3.5.5",
+              "simdjson": "4.2.4",
+              "simdutf": "6.4.0",
+              "sqlite": "3.51.2",
+              "tz": "2025c",
+              "undici": "7.18.2",
+              "unicode": "17.0",
+              "uv": "1.51.0",
+              "uvwasi": "0.0.23",
+              "v8": "13.6.233.17-node.40",
+              "zlib": "1.3.1-e00f703",
+              "zstd": "1.5.7"
+            },
+            "results": [
+              {
+                "label": "write rejects oversized hex output",
+                "error": "Error",
+                "code": "ERR_STRING_TOO_LONG",
+                "passed": true
+              },
+              {
+                "label": "end rejects oversized hex output",
+                "error": "Error",
+                "code": "ERR_STRING_TOO_LONG",
+                "passed": true
+              },
+              {
+                "label": "text offset -1",
+                "actual": "A",
+                "expected": "A",
+                "passed": true
+              },
+              {
+                "label": "text offset 4294967295",
+                "actual": "A",
+                "expected": "A",
+                "passed": true
+              },
+              {
+                "label": "text offset 4294967296",
+                "actual": "",
+                "expected": "",
+                "passed": true
+              },
+              {
+                "label": "text offset 4294967297",
+                "actual": "",
+                "expected": "",
+                "passed": true
+              }
+            ]
+          }
+        },
+        {
+          "label": "bun-decoder-stock-wide",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-width.cjs"
+          ],
+          "code": 1,
+          "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-stock-wide.log",
+          "seconds": 0.017264,
+          "checks": {
+            "scope": "One sparse 4 GiB memory32 buffer; one byte written, no giant string produced.",
+            "byteLength": 4294967296,
+            "versions": {
+              "node": "26.3.0",
+              "bun": "1.4.2",
+              "boringssl": "41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f",
+              "openssl": "1.1.0",
+              "llhttp": "9.3.0",
+              "libarchive": "ded82291ab41d5e355831b96b0e1ff49e24d8939",
+              "mimalloc": "6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a",
+              "picohttpparser": "066d2b1e9ab820703db0837a7255d92d30f0c9f5",
+              "uwebsockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+              "webkit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+              "zig": "04e7f6ac1e009525bc00934f20199c68f04e0a24",
+              "zlib": "12731092979c6d07f42da27da673a9f6c7b13586",
+              "tinycc": "05f0fafaa3be31e31d7b4b5c17dc60f62c991171",
+              "lolhtml": "725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e",
+              "ares": "c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab",
+              "libdeflate": "c8c56a20f8f621e6a966b716b31f1dedab6a41e3",
+              "usockets": "744846f844374847c902b5e7fd59b4342a51ef99",
+              "lshpack": "8905c024b6d052f083a3d11d0a169b3c2735c8a1",
+              "zstd": "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+              "v8": "14.6.202.34-node.20",
+              "uv": "1.48.0",
+              "napi": "10",
+              "icu": "78.3",
+              "unicode": "17.0",
+              "sqlite": "3.53.2",
+              "modules": "147"
+            },
+            "results": [
+              {
+                "label": "write rejects oversized hex output",
+                "returnedLength": 0,
+                "passed": false
+              },
+              {
+                "label": "end rejects oversized hex output",
+                "returnedLength": 0,
+                "passed": false
+              },
+              {
+                "label": "text offset -1",
+                "actual": "",
+                "expected": "A",
+                "passed": false
+              },
+              {
+                "label": "text offset 4294967295",
+                "actual": "",
+                "expected": "A",
+                "passed": false
+              },
+              {
+                "label": "text offset 4294967296",
+                "actual": "",
+                "expected": "",
+                "passed": true
+              },
+              {
+                "label": "text offset 4294967297",
+                "actual": "",
+                "expected": "",
+                "passed": true
+              }
+            ]
+          }
+        },
+        {
+          "label": "bun-decoder-stock-tests",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "test",
+            "test/js/node/string_decoder/string-decoder.test.js",
+            "--test-name-pattern",
+            "StringDecoder.text offset width and reset",
+            "--max-concurrency",
+            "1",
+            "--reporter=junit",
+            "--reporter-outfile",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-stock-tests.xml"
+          ],
+          "code": 1,
+          "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-stock-tests.log",
+          "seconds": 0.055074
+        }
+      ]
+    },
+    "workingDirectoryFailure": {
+      "phase": "repaired",
+      "startedAt": "2026-09-21T22:35:29.784443+00:00",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-repaired.resources.json",
+      "results": [
+        {
+          "label": "bun-decoder-repaired-tests",
+          "command": [
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+            "test",
+            "test/js/node/string_decoder/string-decoder.test.js",
+            "--max-concurrency",
+            "1",
+            "--reporter=junit",
+            "--reporter-outfile",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-repaired-tests.xml"
+          ],
+          "code": 1,
+          "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-repaired-tests.log",
+          "seconds": 0.110476
+        }
+      ]
+    },
+    "debugDefaultDeadline": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-tests.xml",
+      "sha256": "6479366c44771a9d88dce8415fe092ae0aba2ea70fbf7b07465a23b060804ed0",
+      "executed": 120,
+      "passed": 118,
+      "failures": [
+        "keeps a getter-produced write callback alive across slice GC",
+        "text() with a negative offset on a 2 GiB buffer returns an empty string"
+      ]
+    },
+    "parallelDebugExplanation": {
+      "source": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/test/js/node/string_decoder/string-decoder.test.js",
+      "sha256": "60f84ccf4178026dad8f46f48203a44e1eb5e21e0b474dbf965826c73c9d8822",
+      "sourceChangesForRetry": false,
+      "parallelProfile": "debug-r2",
+      "defaultTestTimeoutMs": 90000,
+      "unchangedExplicitTimeoutMs": 60000,
+      "reason": "The 1000 forced-GC iterations passed every assertion but took 50.322 seconds with ASAN; the original 5000 ms run timed out. Increase only the parallel debug harness default. Keep the original result and the unrelated existing negative-offset expectation failure."
+    }
+  },
+  "existingTestConflict": {
+    "name": "text() with a negative offset on a 2 GiB buffer returns an empty string",
+    "reason": "The unchanged Bun regression expects empty output for a negative offset. Native Node and repaired Bun both slice relative to the end and throw ERR_STRING_TOO_LONG on the same input. The original failure remains recorded; decoder-text-negative.cjs tests the Node behavior separately."
+  },
+  "probes": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/buffer-width.cjs",
+      "sha256": "7a58c98137c7ab79468905ca7f807896929bbb0fc54fc764d0cea0143bbf883a"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-width.cjs",
+      "sha256": "bf56acbc2abf081debbc563199d8dfd684a294d732911127015e3872d55496ec"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/decoder-text-negative.cjs",
+      "sha256": "09d8c2c90494e75ad93b924ee8d6407fc09fda50cfbc54b25be6580986d12b8e"
+    }
+  ],
+  "frozenEngines": [
+    {
+      "mode": "release",
+      "frozenAt": "2026-09-21T22:46:35.934473+00:00",
+      "sourceCommit": "744846f844374847c902b5e7fd59b4342a51ef99",
+      "webkitCommit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+      "binary": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-decoder-release-2026-09-21/bun",
+      "binarySha256": "a7b46404eb936bfc78d57b246b37859613c7cedd28dad37eb459e8af51d3ccb6",
+      "patches": [
+        {
+          "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/patches/bun-1.4.2-shared-memory-address.patch",
+          "sha256": "05099c2842c3c4b8008929ffc481961d1207242eb7046110cebbd65cf200028f"
+        },
+        {
+          "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/patches/bun-1.4.2-string-decoder-width.patch",
+          "sha256": "5b0ed7d44ec1d629132381b4afab5f8a9ca4469f0df217711382c2d39273f221"
+        }
+      ],
+      "validation": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-controls.json",
+      "limitation": "4 GiB ArrayBuffer/Wasm capacity remains unchanged. The existing Bun negative-offset test is retained and fails because Node returns ERR_STRING_TOO_LONG for its input; the separate Node comparison passes."
+    },
+    {
+      "mode": "debug",
+      "frozenAt": "2026-09-21T22:46:40.178006+00:00",
+      "sourceCommit": "744846f844374847c902b5e7fd59b4342a51ef99",
+      "webkitCommit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+      "binary": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-decoder-debug-2026-09-21/bun-debug",
+      "binarySha256": "70e361b3e151b05601dec00727fad58ed387486eb8239879610fa2af29039218",
+      "patches": [
+        {
+          "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/patches/bun-1.4.2-shared-memory-address.patch",
+          "sha256": "05099c2842c3c4b8008929ffc481961d1207242eb7046110cebbd65cf200028f"
+        },
+        {
+          "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/patches/bun-1.4.2-string-decoder-width.patch",
+          "sha256": "5b0ed7d44ec1d629132381b4afab5f8a9ca4469f0df217711382c2d39273f221"
+        }
+      ],
+      "validation": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-controls.json",
+      "limitation": "4 GiB ArrayBuffer/Wasm capacity remains unchanged. The existing Bun negative-offset test is retained and fails because Node returns ERR_STRING_TOO_LONG for its input; the separate Node comparison passes."
+    }
+  ],
+  "resources": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-baseline.resources.json",
+      "sha256": "258e5faffa2feb55ca8e47d5c74624985fa7045a2a6df486ff20c831867f03c1",
+      "report": {
+        "startedAt": "2026-09-21T22:34:22.218Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          ".work/full-engine-probe/validate-bun-decoder.py",
+          "baseline"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "f4e663e7-404d-448b-91e1-8e7eaa7ade9a",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 27179425792
+        },
+        "minimumHostAvailable": 22812254208,
+        "peakMemoryBytes": 4324773888,
+        "peakTasks": 8,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-baseline.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T22:34:31.237Z",
+          "memoryBytes": 13406208,
+          "peakMemoryBytes": 4324773888,
+          "swapBytes": 0,
+          "tasks": 4,
+          "memoryBreakdown": {
+            "anon": 11939840,
+            "file": 20480,
+            "kernel": 561152,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 20480,
+            "slab": 138864
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T22:34:31.380Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12980224,
+          "peakMemoryBytes": 4324773888,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 372736,
+            "kernel": 987136,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 204800,
+            "slab": 149392
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T22:34:31.405Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-repaired.resources.json",
+      "sha256": "cafb30ad3767b8ff30c2f5b338c45f7ddca5e195aa515dee6a4031f3927ee042",
+      "report": {
+        "startedAt": "2026-09-21T22:35:29.690Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          ".work/full-engine-probe/validate-bun-decoder.py",
+          "repaired"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "c779e095-f8f1-4cb0-a4d0-7ce5eabc2fb0",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 27297951744
+        },
+        "minimumHostAvailable": 27272663040,
+        "peakMemoryBytes": 24829952,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-repaired.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T22:35:29.912Z",
+          "memoryBytes": 9252864,
+          "peakMemoryBytes": 24829952,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 8830976,
+            "file": 61440,
+            "kernel": 155648,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 61440,
+            "slab": 39696
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T22:35:30.025Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12423168,
+          "peakMemoryBytes": 24829952,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 61440,
+            "kernel": 950272,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 61440,
+            "slab": 133712
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T22:35:30.050Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-repaired-r2.resources.json",
+      "sha256": "08240b2cad930e9f05edb05bd13b19ebaf4ff0dc37e312a8554c39a3ceb93a9b",
+      "report": {
+        "startedAt": "2026-09-21T22:36:09.591Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          ".work/full-engine-probe/validate-bun-decoder.py",
+          "repaired",
+          "r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "d7787f2b-a378-468a-a7d7-d7db080b3488",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 27352604672
+        },
+        "minimumHostAvailable": 26152644608,
+        "peakMemoryBytes": 2017918976,
+        "peakTasks": 20,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-repaired-r2.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T22:37:07.877Z",
+          "memoryBytes": 1262026752,
+          "peakMemoryBytes": 2017918976,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 16564224,
+            "file": 1232412672,
+            "kernel": 12738560,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 147963904,
+            "slab": 12602088
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T22:37:07.992Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 1256710144,
+          "peakMemoryBytes": 2017918976,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10219520,
+            "file": 1232412672,
+            "kernel": 13496320,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 147963904,
+            "slab": 12659888
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T22:37:08.034Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-controls.resources.json",
+      "sha256": "6846dc9335e653edda71c59f4de49bb063cf681fa269149bdbb7a8be99e5ed0b",
+      "report": {
+        "startedAt": "2026-09-21T22:39:33.613Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          ".work/full-engine-probe/validate-bun-decoder-controls.py",
+          "release"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "2b481f7b-6653-48aa-9a0a-ca3c245636f8",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 27156733952
+        },
+        "minimumHostAvailable": 27040333824,
+        "peakMemoryBytes": 106360832,
+        "peakTasks": 27,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-release-controls.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T22:39:47.444Z",
+          "memoryBytes": 1302528,
+          "peakMemoryBytes": 106360832,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 208896,
+            "file": 364544,
+            "kernel": 139264,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 299008,
+            "slab": 61776
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T22:39:47.473Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12304384,
+          "peakMemoryBytes": 106360832,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 364544,
+            "kernel": 974848,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 299008,
+            "slab": 167400
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T22:39:47.499Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-controls.resources.json",
+      "sha256": "555c373e4097693651a54cb4ab6a955f9a2f5940b8793f76a803da95c3e36135",
+      "report": {
+        "startedAt": "2026-09-21T22:40:09.332Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          ".work/full-engine-probe/validate-bun-decoder-controls.py",
+          "debug"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "e01539c7-36cd-4ae8-b421-ec6d73efb15e",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 27176808448
+        },
+        "minimumHostAvailable": 24442003456,
+        "peakMemoryBytes": 3733385216,
+        "peakTasks": 20,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-controls.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T22:42:08.686Z",
+          "memoryBytes": 1724383232,
+          "peakMemoryBytes": 3733385216,
+          "swapBytes": 0,
+          "tasks": 15,
+          "memoryBreakdown": {
+            "anon": 425754624,
+            "file": 1260859392,
+            "kernel": 37548032,
+            "shmem": 0,
+            "file_mapped": 228204544,
+            "inactive_file": 51400704,
+            "slab": 25828192
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T22:42:08.876Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 1298313216,
+          "peakMemoryBytes": 3733385216,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10219520,
+            "file": 1260896256,
+            "kernel": 26202112,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 51437568,
+            "slab": 25363616
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T22:42:08.904Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-controls.resources.json",
+      "sha256": "7a4dc8b81e161c7c0bc5c1f5decefb76d24622ee131918856ce56bd946149d2a",
+      "report": {
+        "startedAt": "2026-09-21T22:43:20.180Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          ".work/full-engine-probe/validate-bun-decoder-controls.py",
+          "debug",
+          "r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "da9db8c4-4941-4ace-8e56-3e949a198200",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 27264655360
+        },
+        "minimumHostAvailable": 26630414336,
+        "peakMemoryBytes": 449236992,
+        "peakTasks": 30,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-debug-r2-controls.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T22:45:51.375Z",
+          "memoryBytes": 9433088,
+          "peakMemoryBytes": 449236992,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 8224768,
+            "file": 765952,
+            "kernel": 184320,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 765952,
+            "slab": 80816
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T22:45:51.436Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12947456,
+          "peakMemoryBytes": 449236992,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 770048,
+            "kernel": 1007616,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 770048,
+            "slab": 182784
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T22:45:51.463Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-freeze.resources.json",
+      "sha256": "993631b0a92644cd39d68effb01376b355268afddf700826b38483007c95b8ce",
+      "report": {
+        "startedAt": "2026-09-21T22:46:34.589Z",
+        "command": [
+          "python3",
+          ".work/full-engine-probe/freeze-bun-decoder.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "c92d2cb2-1210-42bc-8da8-e908dd83b662",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 27197362176
+        },
+        "minimumHostAvailable": 27176484864,
+        "peakMemoryBytes": 1131331584,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-decoder-freeze.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T22:46:41.801Z",
+          "memoryBytes": 1126240256,
+          "peakMemoryBytes": 1126240256,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 6873088,
+            "file": 1086865408,
+            "kernel": 32362496,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 1086857216,
+            "slab": 32258080
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T22:46:41.893Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 1131331584,
+          "peakMemoryBytes": 1131331584,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10219520,
+            "file": 1086873600,
+            "kernel": 33193984,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1086873600,
+            "slab": 32355840
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T22:46:41.919Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "maximumPeakBytes": 4324773888,
+  "remaining": [
+    "Bun ArrayBuffer/Wasm capacity is still capped at 4 GiB.",
+    "Audit other engine buffer boundaries before a matching WebKit source build changes capacity.",
+    "Full unchanged Lean suite completion and packaged-runtime integration remain open.",
+    "Native Windows, macOS, and ARM64 validation remains open."
+  ]
+}

@@ -1117,6 +1117,25 @@ fundamental. The patched engine remains opt-in; stock Bun, package defaults,
 cross-platform conformance, and full-suite completion remain separate gates. See
 [the release build, all five outcomes, and capacity evidence](evidence/bun-memory64-release-2026-09-21.json).
 
+A later local engine patch repairs `StringDecoder` lengths and Node-compatible
+offset/reset behavior before further capacity work. Released Bun fails 14 of
+22 added small-input cases and four of six 4 GiB boundary checks. The repaired
+release and ASAN profiles pass those controls, match all 40 existing small-buffer
+comparisons, and retain all 37 worker/memory passes. Native Node independently
+passes the 22 small cases and the boundary comparisons.
+
+The complete Bun decoder file yields 119 passes and one retained failure in
+release and in a parallel debug run. That existing test expects an empty string
+for a negative offset; Node and repaired Bun instead throw `ERR_STRING_TOO_LONG`
+on its original input. A separate comparison records that behavior without
+editing the existing test. The first ASAN run also timed out after the 1,000
+forced-GC case took 50 seconds; the parallel debug harness raises its default
+deadline to 90 seconds, preserving the source and original result. No sanitizer,
+OOM, hard-limit, throttling, or swap error was observed. All guarded attempts are
+retained, including two validation-helper mistakes. These are engine prerequisite
+checks, not Lean registrations or removal of the 4 GiB capacity limit. See
+[the decoder repair and retained disagreements](evidence/bun-decoder-width-2026-09-21.json).
+
 ## Host platform and compilation target, September 21
 
 The full runtime now answers `System.Platform.isWindows` and `isOSX` using

@@ -1,0 +1,261 @@
+--- a/src/jsc/bindings/JSStringDecoder.cpp
++++ b/src/jsc/bindings/JSStringDecoder.cpp
+@@ -10,6 +10,8 @@
+ #include "JSDOMConvertEnumeration.h"
+ #include "JSBufferEncodingType.h"
+ #include <JavaScriptCore/JSArrayBufferView.h>
++#include <JavaScriptCore/CallData.h>
++#include <JavaScriptCore/Strong.h>
+ #include "BunClientData.h"
+ #include "wtf/text/ASCIILiteral.h"
+ #include "wtf/text/StringImpl.h"
+@@ -113,9 +115,9 @@
+ // Checks at most 3 bytes at the end of a Buffer in order to detect an
+ // incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
+ // needed to complete the UTF-8 character (if applicable) are returned.
+-uint8_t JSStringDecoder::utf8CheckIncomplete(uint8_t* bufPtr, uint32_t length, uint32_t i)
+-{
+-    uint32_t j = length - 1;
++uint8_t JSStringDecoder::utf8CheckIncomplete(uint8_t* bufPtr, size_t length, size_t i)
++{
++    size_t j = length - 1;
+     if (j < i)
+         return 0;
+     int8_t nb = utf8CheckByte(bufPtr[j]);
+@@ -147,7 +149,7 @@
+     return 0;
+ }
+ 
+-JSC::JSString* JSStringDecoder::fillLast(JSC::VM& vm, JSC::JSGlobalObject* globalObject, uint8_t* bufPtr, uint32_t length)
++JSC::JSString* JSStringDecoder::fillLast(JSC::VM& vm, JSC::JSGlobalObject* globalObject, uint8_t* bufPtr, size_t length)
+ {
+     auto throwScope = DECLARE_THROW_SCOPE(vm);
+ 
+@@ -162,8 +164,8 @@
+         // The first byte is not known to be an error until the second chunk
+         // comes in, to which the error is just the first 0xcc, and then
+         // the second two bytes are seen as the valid code point.
+-        uint32_t max = std::min<uint32_t>(length, m_lastNeed);
+-        for (uint32_t i = 0; i < max; i++) {
++        size_t max = std::min<size_t>(length, m_lastNeed);
++        for (size_t i = 0; i < max; i++) {
+             if (!isContinuation(bufPtr[i])) {
+                 // copy the continuation bytes to lastChar, then run it through
+                 // originally this had an abridged version of the utf-8 decoder,
+@@ -202,7 +204,7 @@
+ }
+ 
+ // This is not the exposed text
+-JSC::JSString* JSStringDecoder::text(JSC::VM& vm, JSC::JSGlobalObject* globalObject, uint8_t* bufPtr, uint32_t length, uint32_t offset)
++JSC::JSString* JSStringDecoder::text(JSC::VM& vm, JSC::JSGlobalObject* globalObject, uint8_t* bufPtr, size_t length, size_t offset)
+ {
+     auto throwScope = DECLARE_THROW_SCOPE(vm);
+ 
+@@ -232,9 +234,9 @@
+         if (!m_lastNeed)
+             RELEASE_AND_RETURN(throwScope, encodingToString(bufPtr + offset, length - offset, globalObject, m_encoding));
+         m_lastTotal = total;
+-        uint32_t end = length - (total - m_lastNeed);
++        size_t end = length - (total - m_lastNeed);
+         if (end < length)
+-            memmove(m_lastChar, bufPtr + end, std::min(4U, length - end));
++            memmove(m_lastChar, bufPtr + end, std::min<size_t>(4, length - end));
+         RELEASE_AND_RETURN(throwScope, encodingToString(bufPtr + offset, end - offset, globalObject, m_encoding));
+     }
+     case BufferEncodingType::base64:
+@@ -262,7 +264,7 @@
+     __builtin_unreachable();
+ }
+ 
+-JSC::JSString* JSStringDecoder::write(JSC::VM& vm, JSC::JSGlobalObject* globalObject, uint8_t* bufPtr, uint32_t length)
++JSC::JSString* JSStringDecoder::write(JSC::VM& vm, JSC::JSGlobalObject* globalObject, uint8_t* bufPtr, size_t length)
+ {
+     auto throwScope = DECLARE_THROW_SCOPE(vm);
+     if (length == 0)
+@@ -274,7 +276,7 @@
+     case BufferEncodingType::utf8:
+     case BufferEncodingType::base64:
+     case BufferEncodingType::base64url: {
+-        uint32_t offset = 0;
++        size_t offset = 0;
+         if (m_lastNeed) {
+             JSString* firstHalf = fillLast(vm, globalObject, bufPtr, length);
+             RETURN_IF_EXCEPTION(throwScope, nullptr);
+@@ -325,7 +327,7 @@
+ }
+ 
+ JSC::JSString*
+-JSStringDecoder::end(JSC::VM& vm, JSC::JSGlobalObject* globalObject, uint8_t* bufPtr, uint32_t length)
++JSStringDecoder::end(JSC::VM& vm, JSC::JSGlobalObject* globalObject, uint8_t* bufPtr, size_t length)
+ {
+     auto throwScope = DECLARE_THROW_SCOPE(vm);
+     auto resetScope = ResetScope(this);
+@@ -442,23 +444,39 @@
+ {
+     auto& vm = JSC::getVM(lexicalGlobalObject);
+     auto throwScope = DECLARE_THROW_SCOPE(vm);
+-    if (callFrame->argumentCount() < 2) {
+-        throwVMError(lexicalGlobalObject, throwScope, createNotEnoughArgumentsError(lexicalGlobalObject));
++
++    // https://github.com/nodejs/node/blob/v24.13.1/lib/string_decoder.js
++    castedThis->m_lastNeed = 0;
++    castedThis->m_lastTotal = 0;
++
++    JSValue thisValue = callFrame->thisValue();
++    JSValue writeFunction = thisValue.get(lexicalGlobalObject, WebCore::clientData(vm)->builtinNames().writePublicName());
++    RETURN_IF_EXCEPTION(throwScope, {});
++    Strong<Unknown> retainedWrite(vm, writeFunction);
++
++    JSValue buffer = callFrame->argument(0);
++    JSValue sliceFunction = buffer.get(lexicalGlobalObject, vm.propertyNames->slice);
++    RETURN_IF_EXCEPTION(throwScope, {});
++    auto sliceCallData = getCallData(sliceFunction);
++    if (sliceCallData.type == CallData::Type::None) [[unlikely]] {
++        throwVMTypeError(lexicalGlobalObject, throwScope, "buf.slice is not a function"_s);
+         return {};
+     }
+ 
+-    auto buffer = callFrame->uncheckedArgument(0);
+-    JSC::JSArrayBufferView* view = dynamicDowncast<JSC::JSArrayBufferView>(buffer);
+-    if (!view || view->isDetached()) [[unlikely]] {
+-        throwVMTypeError(lexicalGlobalObject, throwScope, "Expected Uint8Array"_s);
++    MarkedArgumentBuffer sliceArguments;
++    sliceArguments.append(callFrame->argument(1));
++    JSValue sliced = profiledCall(lexicalGlobalObject, ProfilingReason::API, sliceFunction, sliceCallData, buffer, sliceArguments);
++    RETURN_IF_EXCEPTION(throwScope, {});
++
++    auto writeCallData = getCallData(retainedWrite.get());
++    if (writeCallData.type == CallData::Type::None) [[unlikely]] {
++        throwVMTypeError(lexicalGlobalObject, throwScope, "this.write is not a function"_s);
+         return {};
+     }
+-    int32_t offset = callFrame->uncheckedArgument(1).toInt32(lexicalGlobalObject);
+-    RETURN_IF_EXCEPTION(throwScope, JSC::JSValue::encode(JSC::jsUndefined()));
+-    uint32_t byteLength = view->byteLength();
+-    if (offset < 0 || static_cast<uint32_t>(offset) > byteLength)
+-        RELEASE_AND_RETURN(throwScope, JSC::JSValue::encode(JSC::jsEmptyString(vm)));
+-    RELEASE_AND_RETURN(throwScope, JSC::JSValue::encode(castedThis->write(vm, lexicalGlobalObject, reinterpret_cast<uint8_t*>(view->vector()) + offset, byteLength - offset)));
++    MarkedArgumentBuffer writeArguments;
++    writeArguments.append(sliced);
++    RELEASE_AND_RETURN(throwScope, JSValue::encode(profiledCall(lexicalGlobalObject, ProfilingReason::API,
++                                       retainedWrite.get(), writeCallData, thisValue, writeArguments)));
+ }
+ 
+ JSC_DEFINE_HOST_FUNCTION(jsStringDecoderPrototypeFunction_write,
+--- a/src/jsc/bindings/JSStringDecoder.h
++++ b/src/jsc/bindings/JSStringDecoder.h
+@@ -51,8 +51,8 @@
+     }
+ 
+     // These return nullptr with an exception pending on failure.
+-    JSC::JSString* write(JSC::VM&, JSC::JSGlobalObject*, uint8_t*, uint32_t);
+-    JSC::JSString* end(JSC::VM&, JSC::JSGlobalObject*, uint8_t*, uint32_t);
++    JSC::JSString* write(JSC::VM&, JSC::JSGlobalObject*, uint8_t*, size_t);
++    JSC::JSString* end(JSC::VM&, JSC::JSGlobalObject*, uint8_t*, size_t);
+ 
+     uint8_t m_lastNeed = 0;
+     uint8_t m_lastTotal = 0;
+@@ -60,9 +60,9 @@
+     BufferEncodingType m_encoding = BufferEncodingType::utf8;
+ 
+ private:
+-    JSC::JSString* fillLast(JSC::VM&, JSC::JSGlobalObject*, uint8_t*, uint32_t);
+-    JSC::JSString* text(JSC::VM&, JSC::JSGlobalObject*, uint8_t*, uint32_t, uint32_t);
+-    uint8_t utf8CheckIncomplete(uint8_t*, uint32_t, uint32_t);
++    JSC::JSString* fillLast(JSC::VM&, JSC::JSGlobalObject*, uint8_t*, size_t);
++    JSC::JSString* text(JSC::VM&, JSC::JSGlobalObject*, uint8_t*, size_t, size_t);
++    uint8_t utf8CheckIncomplete(uint8_t*, size_t, size_t);
+ };
+ 
+ class JSStringDecoderPrototype : public JSC::JSNonFinalObject {
+--- a/test/js/node/string_decoder/string-decoder.test.js
++++ b/test/js/node/string_decoder/string-decoder.test.js
+@@ -2,6 +2,88 @@
+ import { bunEnv, bunExe, isASAN, isDebug, withoutAggressiveGC } from "harness";
+ 
+ const RealStringDecoder = require("string_decoder").StringDecoder;
++
++describe("StringDecoder.text offset width and reset", () => {
++  it.each([
++    [-4, "abc"], [-2, "bc"], [-1, "c"], [0, "abc"], [1, "bc"], [3, ""],
++    [2 ** 31, ""], [2 ** 32 - 1, ""], [2 ** 32, ""], [2 ** 32 + 1, ""],
++    [Infinity, ""], [-Infinity, "abc"], [NaN, "abc"], [1.9, "bc"], [-1.9, "c"],
++  ])("slices offset %s without narrowing", (offset, expected) => {
++    expect(new RealStringDecoder("utf8").text(Buffer.from("abc"), offset)).toBe(expected);
++  });
++
++  it("accepts an omitted offset", () => {
++    expect(new RealStringDecoder("utf8").text(Buffer.from("abc"))).toBe("abc");
++  });
++
++  it.each([
++    ["utf8", [0xe2, 0x82], Buffer.from("abc"), "abc"],
++    ["utf16le", [0x61], Buffer.from("bc", "utf16le"), "bc"],
++    ["base64", [0x61, 0x62], Buffer.from("abc"), "YWJj"],
++  ])("resets incomplete %s input before text", (encoding, partial, input, expected) => {
++    const decoder = new RealStringDecoder(encoding);
++    expect(decoder.write(Buffer.from(partial))).toBe("");
++    expect(decoder.text(input, 0)).toBe(expected);
++    expect([decoder.lastNeed, decoder.lastTotal]).toEqual([0, 0]);
++  });
++
++  it("resets state before an offset coercion throws", () => {
++    const decoder = new RealStringDecoder("utf8");
++    expect(decoder.write(Buffer.from([0xe2, 0x82]))).toBe("");
++    const error = new Error("offset failed");
++    expect(() => decoder.text(Buffer.from("abc"), {
++      valueOf() {
++        expect([decoder.lastNeed, decoder.lastTotal]).toEqual([0, 0]);
++        throw error;
++      },
++    })).toThrow(error);
++    expect([decoder.lastNeed, decoder.lastTotal]).toEqual([0, 0]);
++  });
++
++  it("preserves public method lookup and callback order", () => {
++    const decoder = new RealStringDecoder("utf8");
++    const events = [];
++    const offset = { marker: true };
++    Object.defineProperty(decoder, "write", {
++      get() {
++        events.push("get write");
++        return function (value) {
++          expect(this).toBe(decoder);
++          expect(value).toBe("slice result");
++          events.push("call write");
++          return "write result";
++        };
++      },
++    });
++    const input = {
++      get slice() {
++        events.push("get slice");
++        return function (value) {
++          expect(this).toBe(input);
++          expect(value).toBe(offset);
++          events.push("call slice");
++          return "slice result";
++        };
++      },
++    };
++    expect(decoder.text(input, offset)).toBe("write result");
++    expect(events).toEqual(["get write", "get slice", "call slice", "call write"]);
++  });
++
++  it("keeps a getter-produced write callback alive across slice GC", () => {
++    const decoder = new RealStringDecoder("utf8");
++    Object.defineProperty(decoder, "write", {
++      get() {
++        const retained = { result: "alive" };
++        return value => retained.result + value;
++      },
++    });
++    const input = { slice() { Bun.gc(true); return "!"; } };
++    for (let i = 0; i < 1000; i++) {
++      expect(decoder.text(input, 0)).toBe("alive!");
++    }
++  });
++});
+ 
+ it("require('string_decoder')", async () => {
+   expect((await import("string_decoder")).StringDecoder).toBe(RealStringDecoder);

@@ -830,3 +830,27 @@ recorded results. Node and Deno agree; released and locally patched Bun differ
 on three `StringDecoder.text` cases. These engine findings inform the separate
 large-buffer audit and are not Lean suite failures. See
 [the offset comparisons](../../docs/evidence/buffer-width-2026-09-21.json).
+
+The subsequent `patches/bun-1.4.2-string-decoder-width.patch` retains `size_t`
+decoder lengths and follows Node's public `text` slicing/reset behavior. Apply
+it to the same pinned Bun source after the shared-memory patch, then use Bun's
+official build-then-execute workflow inside `run-bounded.mjs` with one build job.
+Separate frozen release and ASAN artifacts are recorded in
+[the decoder evidence](../../docs/evidence/bun-decoder-width-2026-09-21.json).
+The patch adds 22 tests without changing existing test bodies.
+
+`probes/decoder-width.cjs` checks a 4 GiB buffer's final byte and rejection of
+oversized hex output. Run it only inside the guard: although the probe explicitly
+writes one byte, the native Node baseline peaked at about 4.03 GiB for the guarded
+run. `probes/decoder-text-negative.cjs` preserves the input of Bun's existing
+negative-offset test and checks Node's `ERR_STRING_TOO_LONG` result. The original
+Bun test remains a recorded failure because it expects an empty string. Both
+repaired profiles pass the separate comparison and all six width checks.
+
+The default ASAN run records a timeout for the 1,000 forced-GC case. A parallel
+run supplies `bun test --timeout 90000`; the test source and its other explicit
+deadlines remain unchanged. Both release and that debug profile pass 119 of 120
+decoder cases, with only the documented Node-semantics disagreement remaining.
+All 18 cloning controls, 15 neighboring worker tests, and four original memory
+checks pass again. The WebKit capacity constant is unchanged at 4 GiB; these
+engine checks are neither a capacity repair nor full Lean-suite results.
