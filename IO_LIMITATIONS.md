@@ -267,7 +267,13 @@ load, and suite conformance still need validation. See
   probe. The full compiler also passes the unchanged upstream `IO_test` on that
   build. See [the local engine repair](docs/evidence/bun-memory64-local-fix-2026-09-21.json)
   and [isolated full-runtime IO result](docs/evidence/bun-memory64-io-2026-09-21.json).
-  Broader Lean validation on that build remains in progress.
+  A separate patched release build now also passes ordinary upstream IO,
+  cancellation, and HTTP controls. `instances` still fails: Bun's WebKit fork
+  deliberately caps ArrayBuffers and Wasm memory at 4 GiB while some Bun buffer
+  paths retain 32-bit lengths. A one-page capacity query confirms this cap without
+  attempting large memory growth. This remaining implementation restriction is
+  not fundamental; see [the release and capacity evidence](docs/evidence/bun-memory64-release-2026-09-21.json).
+  Broader Lean validation on both local builds remains in progress.
   These full-runtime paths still need integration and comprehensive validation.
 - [ ] A pending C read cannot be safely interrupted by disposing the Wasm
   instance. Blocking file calls now use independent host workers, so reads do

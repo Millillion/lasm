@@ -1080,3 +1080,37 @@ artifacts remained unchanged; no resource abort, OOM, hard-limit, throttling,
 or swap event occurred. This is one full-runtime IO test, not a complete Bun
 suite or a practical release configuration. See
 [the isolated IO result](evidence/bun-memory64-io-2026-09-21.json).
+
+## Patched Bun release build and remaining capacity limit, September 21
+
+The same engine patch now has a separate Linux x64 release build. Its 18 added
+memory-transfer controls, 15 existing neighboring worker tests, and four original
+memory64 checks all pass. Building with one job peaked at 6.40 GiB; no resource
+abort, hard-limit, OOM, throttling, or swap event occurred. The full Lean startup
+control took 2.51 seconds, compared with 175.60 seconds on the ASAN debug build.
+These are individual runs, not general performance guarantees.
+
+Five unchanged Lean registrations then produced **four passes and one failure**:
+
+| Registration | Result | Seconds | Workload peak |
+| --- | --- | ---: | ---: |
+| `elab/IO_test.lean` | Passed | 5.37 | 2.00 GiB |
+| `elab/async_cancellation.lean` | Passed | 8.14 | 2.29 GiB |
+| `elab/async_cancellation_reasons.lean` | Passed | 6.88 | 2.28 GiB |
+| `elab/async_http_hang_regressions.lean` | Passed | 10.92 | 2.40 GiB |
+| `elab/instances.lean` | Internal allocation failure | 15.23 | 4.59 GiB |
+
+All 7,267 original source hashes remained unchanged. The failed test was not a
+host OOM or resource abort: host available memory stayed above 21 GiB and all
+guard counters remained clear. Bun's pinned WebKit fork deliberately limits
+ArrayBuffers, and therefore Wasm memory, to 4 GiB because some Bun buffer paths
+still use 32-bit lengths. A probe with only one initial 64 KiB page and no positive
+growth confirms that patched Bun exposes a 4 GiB growable maximum for an 8 GiB
+declaration, for both shared and unshared memory. Deno reports 8 GiB; the pinned
+Node lacks this capacity-query API, so that query makes no claim about Node.
+
+The cloning repair is working, but removing Bun's separate capacity restriction
+still requires implementation work and validation. Neither limit is being called
+fundamental. The patched engine remains opt-in; stock Bun, package defaults,
+cross-platform conformance, and full-suite completion remain separate gates. See
+[the release build, all five outcomes, and capacity evidence](evidence/bun-memory64-release-2026-09-21.json).

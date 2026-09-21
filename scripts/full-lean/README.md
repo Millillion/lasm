@@ -754,7 +754,7 @@ dereferencing a null handle for zero-capacity memory. It applies to commit
 passes all 18 added checks, 15 existing neighboring worker-transfer tests, and
 the original four-check one-page memory64 probe. The added tests first reproduce
 all 12 expected failures on the released binary. This is an opt-in engine repair;
-full Lean validation, release builds, and other platforms remain separate gates.
+full Lean validation and other platforms remain separate gates.
 
 Use Bun's ordinary `bun bd` build-then-exec workflow in an ignored source tree,
 inside `run-bounded.mjs` and `base-pages.py`, with one build job on this host.
@@ -764,3 +764,18 @@ as in Bun's own test harness; this does not disable sanitizer checks. The full
 compile stopped safely at the proactive budget during linking; an unchanged
 incremental link completed under the same guard. Preserve those attempts
 separately. See [the patch, validation, and resource evidence](../../docs/evidence/bun-memory64-local-fix-2026-09-21.json).
+
+A separate local `build:release` build passes the same 18 + 15 + 4 engine controls
+and starts the full Lean compiler in 2.51 seconds. Four unchanged IO, cancellation,
+and HTTP registrations pass. `instances` still reports an internal allocation
+failure because Bun's fork retains a separate 4 GiB ArrayBuffer/Wasm capacity
+limit. Its source explains that some Bun buffer paths still use 32-bit lengths.
+Do not remove that limit without addressing and validating those paths.
+
+`probes/memory64-capacity.cjs` queries exposed resizable capacity with just one
+initial 64 KiB page per memory and no positive growth. Run it inside the resource
+guard, using `BUN_JSC_useWasmMemory64=true` for Bun and `deno run -A` for Deno.
+Patched Bun reports 4 GiB for an 8 GiB declaration; Deno reports 8 GiB. The pinned
+Node lacks this query, which is recorded explicitly. This is an engine diagnosis,
+not an upstream test or a fundamental-limit claim. The release build and all five
+Lean outcomes are preserved in [the release evidence](../../docs/evidence/bun-memory64-release-2026-09-21.json).

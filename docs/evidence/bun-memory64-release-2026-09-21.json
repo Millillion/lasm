@@ -1,0 +1,778 @@
+{
+  "recordedAt": "2026-09-21T21:00:58.375292+00:00",
+  "scope": "Local Linux x64 patched Bun release build. Five unchanged upstream Lean controls: four pass, instances reports an internal allocation failure;  not full-suite, stock Bun, package-default, or cross-platform conformance.",
+  "frozenRuntime": {
+    "scope": "Opt-in local release build; not a released Bun or package default.",
+    "bunCommit": "744846f844374847c902b5e7fd59b4342a51ef99",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2",
+    "binary": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-release-2026-09-21/bun",
+    "binarySha256": "0738b4d669e96994339baea4bdea5f826a187b629a6d570ee66c463d97d4d7ff",
+    "profile": "release, without ASAN or LTO",
+    "validation": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-validation.json",
+    "validationSha256": "8528dd9b1216dfc9a6bc4072f07ff1dea068ed67cc250c099b9d9d0ce26854e8",
+    "configureSha256": "e2471d871defec8f0a60bfd7b6d189089e8ce9ccb337dfe57c8df0d1df1dc0cc",
+    "patchSha256": "05099c2842c3c4b8008929ffc481961d1207242eb7046110cebbd65cf200028f"
+  },
+  "patch": {
+    "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/patches/bun-1.4.2-shared-memory-address.patch",
+    "sha256": "05099c2842c3c4b8008929ffc481961d1207242eb7046110cebbd65cf200028f"
+  },
+  "configuration": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "engine": "bun",
+    "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-release-2026-09-21/bun",
+    "engineArgs": [],
+    "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+    "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk",
+    "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/runtime-support",
+    "leanThreads": 4,
+    "lakeThreads": 1,
+    "bunSmol": false,
+    "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+    "systemAllocator": "mimalloc",
+    "leanAllocator": "mimalloc",
+    "memoryMode": 1,
+    "engineEnvironment": {
+      "BUN_JSC_useWasmMemory64": "true",
+      "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v114-memory64-patched-release/bun-stack-reservation.so",
+      "BUN_JSC_maxPerThreadStackUsage": "62914560"
+    },
+    "stackAdjustment": {
+      "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v114-memory64-patched-release/bun-stack-reservation.so",
+      "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+      "osThreadStackBytes": 67108864,
+      "jscStackBudgetBytes": 62914560,
+      "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+    },
+    "maximumMemoryBytes": 8589934592,
+    "pthreadPoolSize": 5,
+    "backend": "full-lean-wasm64-native",
+    "nativeLeanFallback": false,
+    "environmentAdjustments": {
+      "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v114-memory64-patched-release",
+      "LASM_FULL_APP_PATH": "Selected facade entry point",
+      "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+      "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+      "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+    },
+    "externalTools": {
+      "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/lib",
+      "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/include",
+      "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/share",
+      "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v114-engine-exit-native/bin/leanmake",
+      "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+      "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+    }
+  },
+  "build": {
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-build.resources.json",
+      "sha256": "b8a3811243a402e4031f91395f865395944a96469aa5837f1d54ba2923e71b26",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 6867062784,
+      "startedAt": "2026-09-21T20:31:07.349Z",
+      "finishedAt": "2026-09-21T20:55:33.491Z",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "resourceLimited": false
+    },
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-build.log",
+      "sha256": "d56ece1018da43f2c711c70cd7304c547984b83fe01c2bc1c7381867f5a7bcbb"
+    },
+    "tools": {
+      "llvm": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64",
+      "ninja": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/bin/ninja",
+      "rustupHome": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/rustup",
+      "cargoHome": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/cargo",
+      "llvmVersion": "clang version 21.1.8 (https://github.com/llvm/llvm-project 2078da43e25a4623cab2d0d60decddf709aaea28)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin\n",
+      "extractedFiles": 10525,
+      "extractedBytes": 11223351859,
+      "elapsedSeconds": 197.8991358790081
+    },
+    "cacheAdvice": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-release-cache-advice.json",
+      "sha256": "ab755987cec6b74b3d74aa5b4b1d674a7cd35a276644856b10b0b0b258e8e311"
+    },
+    "conditions": "One heavy workload, one build job, two-CPU affinity, base pages, unchanged 8 GiB proactive and 10 GiB hard caps. Completed build-file cache advised without changing file contents or global settings."
+  },
+  "engineValidation": {
+    "summary": {
+      "startedAt": "2026-09-21T20:55:54.777815+00:00",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-validation.resources.json",
+      "results": [
+        {
+          "label": "bun-memory64-release-patched-tests",
+          "command": [
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+            "test",
+            "test/js/node/worker_threads/worker_threads.test.ts",
+            "--test-name-pattern",
+            "shared WebAssembly memory address type",
+            "--max-concurrency",
+            "1",
+            "--reporter=junit",
+            "--reporter-outfile",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-patched-tests.xml"
+          ],
+          "exitCode": 0,
+          "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-patched-tests.log",
+          "elapsedSeconds": 2.344547,
+          "passed": 18,
+          "junit": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-patched-tests.xml",
+          "logHash": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-patched-tests.log",
+            "sha256": "b17a8150b4c6ade925d385b8d72242c50bff50e097b8919ba378b8ed8ab96e8a"
+          },
+          "junitHash": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-patched-tests.xml",
+            "sha256": "424ba48b783e0166228c0a9bca85e6e6cbe9c5155c710588b02e9e9aab5ff8f0"
+          }
+        },
+        {
+          "label": "bun-memory64-release-neighbor-tests",
+          "command": [
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+            "test",
+            "test/js/node/worker_threads/worker_threads.test.ts",
+            "--test-name-pattern",
+            "receiveMessageOnPort|postMessage transfer list",
+            "--max-concurrency",
+            "1",
+            "--reporter=junit",
+            "--reporter-outfile",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-neighbor-tests.xml"
+          ],
+          "exitCode": 0,
+          "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-neighbor-tests.log",
+          "elapsedSeconds": 1.768786,
+          "passed": 15,
+          "junit": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-neighbor-tests.xml",
+          "logHash": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-neighbor-tests.log",
+            "sha256": "b93c08b257650503e94162178d0a153f225784cd05c99d3608b0d760cb324ef4"
+          },
+          "junitHash": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-neighbor-tests.xml",
+            "sha256": "015c1bc4e14733044a3667c643ee20f7d102dd8ce413b5e6863296de5fc1a748"
+          }
+        },
+        {
+          "label": "bun-memory64-release-original-probe",
+          "command": [
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/build-bun-memory64-release.py",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/memory64-worker.cjs"
+          ],
+          "exitCode": 0,
+          "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-original-probe.log",
+          "elapsedSeconds": 1.527685,
+          "passed": 4,
+          "checks": [
+            {
+              "name": "parent original",
+              "passed": true
+            },
+            {
+              "name": "worker fresh module and memory",
+              "passed": true
+            },
+            {
+              "name": "worker cloned module and fresh memory",
+              "passed": true
+            },
+            {
+              "name": "worker fresh module and cloned memory",
+              "passed": true
+            }
+          ],
+          "logHash": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-original-probe.log",
+            "sha256": "aa0184cd3e2c026a1b204daff9e9ce90e1faa109fa734e08c6b70e8825916086"
+          }
+        }
+      ],
+      "binarySha256": "0738b4d669e96994339baea4bdea5f826a187b629a6d570ee66c463d97d4d7ff",
+      "binary": "/home/lastmjs/development/lasm/compiler/.work/bun-memory64-source/bun-bun-v1.4.2/build/release/bun-profile",
+      "finishedAt": "2026-09-21T20:56:01.006116+00:00",
+      "passed": true
+    },
+    "summaryFile": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-validation.json",
+      "sha256": "8528dd9b1216dfc9a6bc4072f07ff1dea068ed67cc250c099b9d9d0ce26854e8"
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-validation.resources.json",
+      "sha256": "21f56914003d21f59aa788625f1ba13a252a23262eedd1750b10d26efa53d3a7",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 105476096,
+      "startedAt": "2026-09-21T20:55:54.694Z",
+      "finishedAt": "2026-09-21T20:56:01.091Z",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "resourceLimited": false
+    }
+  },
+  "freeze": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-freeze.resources.json",
+    "sha256": "d67dd05570c335a20745748277d6e659b157512bd333ac8390507159c6f5d7bf",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "peakMemoryBytes": 1197060096,
+    "startedAt": "2026-09-21T20:56:22.307Z",
+    "finishedAt": "2026-09-21T20:56:29.805Z",
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0,
+    "resourceLimited": false
+  },
+  "startup": {
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-full-version.resources.json",
+      "sha256": "040bc4d88f9da9723b93a02749b14f64f906d58cb052f2997e9bf6c01c1a478d",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 1471766528,
+      "startedAt": "2026-09-21T20:56:44.882Z",
+      "finishedAt": "2026-09-21T20:56:47.435Z",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "resourceLimited": false
+    },
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-memory64-release-full-version.log",
+      "sha256": "13aae6b6ea151fd9919e6a3702eed6b38fff5ccdd758d0b7070b09712ac93412"
+    },
+    "observedServiceSeconds": 2.511,
+    "scope": "One full Lean --version execution; not a general performance benchmark."
+  },
+  "upstreamControls": {
+    "campaign": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/campaign.json",
+      "sha256": "e5dceb846b3e10cf0a7fdc527faba891575a65d56be3518c0cc51186f9552dec"
+    },
+    "counts": {
+      "passed": 4,
+      "failed": 1,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "tests": [
+      {
+        "name": "elab/IO_test.lean",
+        "passed": true,
+        "seconds": 5.37123,
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessIntegrity": {
+          "before": {
+            "checked": 0,
+            "modified": []
+          },
+          "after": {
+            "checked": 0,
+            "modified": []
+          }
+        },
+        "resources": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00001-d7b71426/resources.json",
+          "sha256": "f1d9b87be069d39549a934feb04c516cd614ac9b52c84705288d1328a4318388",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 2151251968,
+          "startedAt": "2026-09-21T20:57:33.793Z",
+          "finishedAt": "2026-09-21T20:57:39.862Z",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "resourceLimited": false
+        },
+        "execution": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00001-d7b71426/results/execution.json",
+          "sha256": "08d836b0fe9b4ee9faa093a0c70c5ff59939d6f54c0c9fcdb064782f83df92d1"
+        },
+        "junit": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00001-d7b71426/results/results.xml",
+          "sha256": "feacbd422e6b3ee0ba8a9d6de7e28d948dd720dc7629825ca3421b5ddd4a1c22"
+        }
+      },
+      {
+        "name": "elab/async_cancellation.lean",
+        "passed": true,
+        "seconds": 8.13719,
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessIntegrity": {
+          "before": {
+            "checked": 0,
+            "modified": []
+          },
+          "after": {
+            "checked": 0,
+            "modified": []
+          }
+        },
+        "resources": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00002-7797c3ee/resources.json",
+          "sha256": "3ca7284976511d2a2a0a686f01f758eacb90a04e68319abe0adcf2d3d56fed97",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 2462842880,
+          "startedAt": "2026-09-21T20:57:39.903Z",
+          "finishedAt": "2026-09-21T20:57:48.676Z",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "resourceLimited": false
+        },
+        "execution": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00002-7797c3ee/results/execution.json",
+          "sha256": "2d950a2104d73b13df5196b4ec955da5ff624ed7bcb6010703237c657a60278e"
+        },
+        "junit": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00002-7797c3ee/results/results.xml",
+          "sha256": "bacbf3eee5dec8922a642d7b2190784bc0764804ba40aafe6b3c3175a90a6992"
+        }
+      },
+      {
+        "name": "elab/async_cancellation_reasons.lean",
+        "passed": true,
+        "seconds": 6.88475,
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessIntegrity": {
+          "before": {
+            "checked": 0,
+            "modified": []
+          },
+          "after": {
+            "checked": 0,
+            "modified": []
+          }
+        },
+        "resources": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00003-5246c32d/resources.json",
+          "sha256": "2ae5d9e66bb0e0de61e9bef4e35f8c22121ec31384ca3ec9b4811f77e98aa436",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 2452115456,
+          "startedAt": "2026-09-21T20:57:48.726Z",
+          "finishedAt": "2026-09-21T20:57:56.240Z",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "resourceLimited": false
+        },
+        "execution": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00003-5246c32d/results/execution.json",
+          "sha256": "a4e89037db7ddd5964e9eebeffb53d8f06e19c04af12dd1e7fafdc5facd40007"
+        },
+        "junit": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00003-5246c32d/results/results.xml",
+          "sha256": "24aa146954c735283e0113a85f98cb44477ff55b8c71105cd22476d93ab0e9e0"
+        }
+      },
+      {
+        "name": "elab/async_http_hang_regressions.lean",
+        "passed": true,
+        "seconds": 10.9202,
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessIntegrity": {
+          "before": {
+            "checked": 0,
+            "modified": []
+          },
+          "after": {
+            "checked": 0,
+            "modified": []
+          }
+        },
+        "resources": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00004-c94cf327/resources.json",
+          "sha256": "6f95d31c36a568bcbc31c79b894a8980eb9417bd6a1b2e7f31b4f13f3c751cbd",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 2572038144,
+          "startedAt": "2026-09-21T20:57:56.283Z",
+          "finishedAt": "2026-09-21T20:58:07.869Z",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "resourceLimited": false
+        },
+        "execution": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00004-c94cf327/results/execution.json",
+          "sha256": "8fb1fba47098a626b9944802e2ad1ff403fba5de413030413cf2e7ec0c0fda45"
+        },
+        "junit": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00004-c94cf327/results/results.xml",
+          "sha256": "b802ae935cf634081f92ae33566039c7aea82a92327687bd99c9faf312233167"
+        }
+      },
+      {
+        "name": "elab/instances.lean",
+        "passed": false,
+        "seconds": 15.2259,
+        "sourceIntegrity": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessIntegrity": {
+          "before": {
+            "checked": 0,
+            "modified": []
+          },
+          "after": {
+            "checked": 0,
+            "modified": []
+          }
+        },
+        "resources": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00005-7fe0207a/resources.json",
+          "sha256": "eefa28a8a2b0d3839cb7f84a726db3f5c50479126dbcbb492c4201bbcd11360b",
+          "result": {
+            "code": 8,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 4926144512,
+          "startedAt": "2026-09-21T20:58:07.914Z",
+          "finishedAt": "2026-09-21T20:58:23.816Z",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "resourceLimited": false
+        },
+        "execution": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00005-7fe0207a/results/execution.json",
+          "sha256": "6b46aedc2e889e4603b83c03d86f756d0bea9c9014b2569a139b88e0bbf194b3"
+        },
+        "junit": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v114-memory64-patched-release-controls/00005-7fe0207a/results/results.xml",
+          "sha256": "2c379b48803e1ceda7c60a988fe0ff6003816f66ae4746684ffb8be3d4b0fdb1"
+        }
+      }
+    ]
+  },
+  "priorDebugEvidence": "docs/evidence/bun-memory64-local-fix-2026-09-21.json",
+  "limitations": [
+    "Released Bun still fails the memory64 cloning controls.",
+    "The unchanged instances test still reports INTERNAL PANIC: out of memory at a 4.59 GiB workload peak. It is a test failure, not a host OOM or guard abort.",
+    "The Linux stack adjustment and experimental memory64 engine option remain explicit.",
+    "The full Lean suite and native Windows, macOS, and ARM64 checks remain incomplete."
+  ],
+  "remainingCapacityLimit": {
+    "probe": {
+      "recordedAt": "2026-09-21T21:04:37.095873+00:00",
+      "source": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/memory64-capacity.cjs",
+      "sourceSha256": "184801672fe854f17618ecbcc21db21052d14d67f5f0612bd6a177772181033e",
+      "scope": "One 64 KiB initial page per memory, no positive growth or high-address access. This inspects the engine API, not host memory exhaustion.",
+      "results": [
+        {
+          "engine": "node",
+          "command": [
+            "node"
+          ],
+          "exitCode": 0,
+          "stdout": "[\n  {\n    \"shared\": false,\n    \"initialBytes\": 65536,\n    \"requestedMaximumBytes\": 8589934592,\n    \"supportsResizableBuffer\": false,\n    \"exposedMaximumBytes\": null,\n    \"scope\": \"Capacity query unavailable; no conclusion about maximum.\"\n  },\n  {\n    \"shared\": true,\n    \"initialBytes\": 65536,\n    \"requestedMaximumBytes\": 8589934592,\n    \"supportsResizableBuffer\": false,\n    \"exposedMaximumBytes\": null,\n    \"scope\": \"Capacity query unavailable; no conclusion about maximum.\"\n  }\n]\n",
+          "stderr": "",
+          "capacities": [
+            {
+              "shared": false,
+              "initialBytes": 65536,
+              "requestedMaximumBytes": 8589934592,
+              "supportsResizableBuffer": false,
+              "exposedMaximumBytes": null,
+              "scope": "Capacity query unavailable; no conclusion about maximum."
+            },
+            {
+              "shared": true,
+              "initialBytes": 65536,
+              "requestedMaximumBytes": 8589934592,
+              "supportsResizableBuffer": false,
+              "exposedMaximumBytes": null,
+              "scope": "Capacity query unavailable; no conclusion about maximum."
+            }
+          ]
+        },
+        {
+          "engine": "deno",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "run",
+            "-A"
+          ],
+          "exitCode": 0,
+          "stdout": "[\n  {\n    \"shared\": false,\n    \"initialBytes\": 65536,\n    \"requestedMaximumBytes\": 8589934592,\n    \"supportsResizableBuffer\": true,\n    \"exposedMaximumBytes\": 8589934592,\n    \"scope\": \"Reported growable capacity; no growth attempt.\"\n  },\n  {\n    \"shared\": true,\n    \"initialBytes\": 65536,\n    \"requestedMaximumBytes\": 8589934592,\n    \"supportsResizableBuffer\": true,\n    \"exposedMaximumBytes\": 8589934592,\n    \"scope\": \"Reported growable capacity; no growth attempt.\"\n  }\n]\n",
+          "stderr": "",
+          "capacities": [
+            {
+              "shared": false,
+              "initialBytes": 65536,
+              "requestedMaximumBytes": 8589934592,
+              "supportsResizableBuffer": true,
+              "exposedMaximumBytes": 8589934592,
+              "scope": "Reported growable capacity; no growth attempt."
+            },
+            {
+              "shared": true,
+              "initialBytes": 65536,
+              "requestedMaximumBytes": 8589934592,
+              "supportsResizableBuffer": true,
+              "exposedMaximumBytes": 8589934592,
+              "scope": "Reported growable capacity; no growth attempt."
+            }
+          ]
+        },
+        {
+          "engine": "bun-patched-release",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-release-2026-09-21/bun"
+          ],
+          "exitCode": 0,
+          "stdout": "[\n  {\n    \"shared\": false,\n    \"initialBytes\": 65536,\n    \"requestedMaximumBytes\": 8589934592,\n    \"supportsResizableBuffer\": true,\n    \"exposedMaximumBytes\": 4294967296,\n    \"scope\": \"Reported growable capacity; no growth attempt.\"\n  },\n  {\n    \"shared\": true,\n    \"initialBytes\": 65536,\n    \"requestedMaximumBytes\": 8589934592,\n    \"supportsResizableBuffer\": true,\n    \"exposedMaximumBytes\": 4294967296,\n    \"scope\": \"Reported growable capacity; no growth attempt.\"\n  }\n]\n",
+          "stderr": "",
+          "capacities": [
+            {
+              "shared": false,
+              "initialBytes": 65536,
+              "requestedMaximumBytes": 8589934592,
+              "supportsResizableBuffer": true,
+              "exposedMaximumBytes": 4294967296,
+              "scope": "Reported growable capacity; no growth attempt."
+            },
+            {
+              "shared": true,
+              "initialBytes": 65536,
+              "requestedMaximumBytes": 8589934592,
+              "supportsResizableBuffer": true,
+              "exposedMaximumBytes": 4294967296,
+              "scope": "Reported growable capacity; no growth attempt."
+            }
+          ]
+        }
+      ]
+    },
+    "probeFile": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/memory64-capacity.json",
+      "sha256": "67ed55c6e8da8eadd781ef030daf6266cf8821ca4a003de23f7ac25163bc1937"
+    },
+    "resources": {
+      "file": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/memory64-capacity.resources.json",
+        "sha256": "cff878ec0478742f5e26ce63bf8acf7e7977f1dd2e6dd8034505f519d70f606b"
+      },
+      "peakMemoryBytes": 22913024,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "webkitCommit": "2e2aa2290fac856d6f451ceacb58f7f5b44dd057",
+    "sourceArtifacts": [
+      {
+        "path": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/build-cache/webkit-2e2aa2290fac856d/include/JavaScriptCore/PageCount.h",
+        "sha256": "8966e546c2b5c77471d3f6b6ac429a9eb1ca83d74d0035b34018f2894603278a"
+      },
+      {
+        "path": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/build-cache/webkit-2e2aa2290fac856d/include/JavaScriptCore/WasmLimits.h",
+        "sha256": "2f059fe48d9eaa0ec7a1c398f26038b0fcddd2a863ffc30fb3d51183b4691e0c"
+      }
+    ],
+    "explanation": "Bun-specific WebKit additions keep MAX_ARRAY_BUFFER_SIZE at 2^32 because some Bun buffer paths retain 32-bit lengths. Wasm memory capacity uses that maximum. The one-page probe confirms a 4 GiB exposed maximum for an 8 GiB declaration in both shared and unshared patched Bun memories. This is a remaining implementation limit, not a fundamental JavaScript restriction. No positive memory growth was attempted."
+  }
+}
