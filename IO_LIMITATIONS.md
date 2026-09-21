@@ -51,6 +51,13 @@ load, and suite conformance still need validation. See
   the native call sequence even when querying the stream position fails; Linux
   regular-file and pipe comparisons match native Lean in all three packaged and
   full engines. See [the truncate evidence](docs/evidence/truncate-errors-2026-09-21.json).
+  Line reads now clear EOF after an unterminated final line, preserve partial-read
+  errors, and consume the same bytes when an earlier stream error remains set.
+  Byte reads also retain native Lean's different EOF/error-check order. Six
+  ordinary Lean cases match native in all three packaged and full engines;
+  independent C controls and existing filesystem regressions pass too. This is
+  Linux x64 evidence, not complete device or platform coverage; see
+  [the stream-state comparisons](docs/evidence/getline-state-2026-09-21.json).
 - [ ] Refine exact error mappings and platform-specific errno behavior beyond
   tested missing-file, exclusive-create, invalid-path, and UTF-8 cases.
   POSIX `IO.Process.setCurrentDir` now uses native errno/message values and

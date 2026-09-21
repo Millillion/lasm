@@ -269,6 +269,17 @@ Use a fresh output directory. The probe records the SDK patch and source hashes;
 it does not replace any upstream Lean test. The retained profile and comparisons
 are in [the symbol-lookup evidence](../../docs/evidence/symbol-lookup-2026-09-21.json).
 
+`probe-getline-state.mjs NEW_OUTPUT FULL_TOOLCHAIN...` compares an unchanged
+supplementary ordinary-Lean program with the pinned native runtime and each
+selected full compiler. It covers reading appended data after a final partial
+line, newline and empty-file controls, mixed line/byte reads, repeated EOF, and
+a long partial line. Source copies, hashes, outputs, and resource reports remain
+separate from upstream-suite results. `test/getline-native-state.test.mjs` adds
+an independent C control for nonblocking partial errors, retained FILE errors,
+consumed bytes, and EOF/error ordering. Run it through the resource guard; it
+executes serially in each installed engine. `test/node-getline-state.test.mjs`
+checks the packaged ordinary-Lean path.
+
 ## Unchanged tests and the native control
 
 ```sh

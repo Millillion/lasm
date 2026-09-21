@@ -32,6 +32,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const ftell = bind(windows ? '_ftelli64' : 'ftello', 'int64_t', ['void *']);
   const ftruncate = bind(windows ? '_chsize_s' : 'ftruncate', 'int', ['int', 'int64_t']);
   const ferror = bind('ferror', 'int', ['void *']);
+  const feof = bind('feof', 'int', ['void *']);
   const clearerr = bind('clearerr', 'void', ['void *']);
   const isatty = bind(windows ? '_isatty' : 'isatty', 'int', ['int']);
   const strerror = bind('strerror', 'str', ['int']);
@@ -41,7 +42,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const getdelim = windows ? null : libc.func('intptr_t getdelim(_Inout_ void **line, _Inout_ size_t *capacity, int delimiter, void *stream)');
   const groupRecord = windows ? null : ffi.struct({ name: 'str', password: 'str', gid: 'uint32_t', members: 'void *' });
   const getGroup = windows ? null : libc.func('getgrgid_r', 'int', ['uint32_t', ffi.out(ffi.pointer(groupRecord)), 'void *', 'size_t', ffi.out(ffi.pointer('void *'))]);
-  const fgetc = windows ? bind('fgetc', 'int', ['void *']) : null;
+  const fgetc = bind('fgetc', 'int', ['void *']);
   const codes = Object.fromEntries(Object.entries(ffi.os.errno).map(([name, number]) => [number, name]));
   function failure(errno = ffi.errno()) {
     return Object.assign(new Error(strerror(errno)), { code: codes[errno] ?? 'EIO', errno, nativeMessage: true });
@@ -221,9 +222,9 @@ export function nativeFiles({ synchronous = false } = {}) {
       try { bytes = Buffer.allocUnsafe(count); } catch { throw failure(ffi.os.errno.ENOMEM); }
       const { value, errno } = await call(fread, bytes, 1, count, file.stream);
       if (value) return bytes.subarray(0, Number(value));
-      if (ferror(file.stream)) throw failure(errno);
-      clearerr(file.stream);
-      return bytes.subarray(0, 0);
+      // Lean checks EOF before the sticky error flag and clears both flags.
+      if (feof(file.stream)) { clearerr(file.stream); return bytes.subarray(0, 0); }
+      throw failure(errno);
     },
     async write(file, bytes) {
       if (!bytes.length) return;
@@ -241,25 +242,32 @@ export function nativeFiles({ synchronous = false } = {}) {
       if (value !== 0) throw failure(windows ? value : errno);
     },
     async getLine(file) {
-      if (getdelim) {
+      // getdelim refuses to consume bytes when an earlier stream error is
+      // still set. Lean's getc loop does consume them before checking ferror.
+      if (getdelim && !ferror(file.stream)) {
         const pointer = [null], capacity = [0];
         try {
           const { value, errno } = await call(getdelim, pointer, capacity, 10, file.stream);
-          if (value >= 0) return Buffer.from(new Uint8Array(ffi.view(pointer[0], Number(value))));
           if (ferror(file.stream)) throw failure(errno);
-          clearerr(file.stream); return Buffer.alloc(0);
+          // A final unterminated line can return bytes and also set EOF.
+          // Clear it now, so subsequent reads can see newly appended data.
+          if (feof(file.stream)) clearerr(file.stream);
+          if (value >= 0) return Buffer.from(new Uint8Array(ffi.view(pointer[0], Number(value))));
+          return Buffer.alloc(0);
         } finally { if (pointer[0]) free(pointer[0]); }
       }
       const bytes = [];
+      let errno;
       for (;;) {
-        const { value, errno } = await call(fgetc, file.stream);
-        if (value < 0) {
-          if (ferror(file.stream)) throw failure(errno);
-          clearerr(file.stream); break;
-        }
+        const result = await call(fgetc, file.stream);
+        const value = result.value;
+        errno = result.errno;
+        if (value < 0) break;
         bytes.push(value);
         if (value === 10) break;
       }
+      if (ferror(file.stream)) throw failure(errno);
+      if (feof(file.stream)) clearerr(file.stream);
       return Buffer.from(bytes);
     },
     isTty: terminal,

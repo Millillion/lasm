@@ -810,6 +810,23 @@ zero OOM, throttling, cap-hit, or swap events. Bun retains the disclosed Linux
 stack adjustment. This focused result does not close the complete-suite or
 packaged-runtime gates. See [the upstream regression evidence](evidence/native-launcher-upstream-2026-09-21.json).
 
+Supplementary filesystem comparisons exposed further stream-state defects in
+all three engines. A final unterminated `Handle.getLine` left EOF set, hiding
+appended data on the next read. The optimized reader also mishandled partial
+errors and consumed different bytes when a previous error remained set. Finally,
+`Handle.read` checked a sticky error before EOF, unlike native Lean. The adapter
+now preserves each native operation's check order and uses a character loop when
+the optimized reader cannot preserve error-state behavior.
+
+The same six ordinary-Lean cases now match native in all three full compilers
+and all three packaged runtimes. Nineteen reported packaged/host regression
+tests pass, including an independent C control for partial reads, retained errors,
+byte consumption, and subsequent EOF. Both failing baselines remain recorded;
+the refined C fixture isolates the EOF check in a separate pipe. The original
+upstream tests and expected outputs are unchanged. Validation peaked at **1.98 GiB**,
+without OOM, throttling, cap hits, or swap. Native non-Linux behavior and complete
+suites remain open. See [the stream-state evidence](evidence/getline-state-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

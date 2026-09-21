@@ -1,0 +1,910 @@
+{
+  "recordedAt": "2026-09-21T15:10:48.679269+00:00",
+  "scope": "Supplementary Linux x64 FILE stream-state comparisons and existing filesystem regressions. Not a full upstream-suite or cross-platform result. No original upstream test or expected output was edited.",
+  "findings": [
+    "A final unterminated getLine left EOF set and concealed appended data on the next line or byte read.",
+    "getdelim can return partial data with ferror set, and refuses to consume further bytes when a prior stream error remains set; native Lean consumes through its getc loop and then reports the error.",
+    "Native Handle.read prioritizes EOF over a sticky error when fread returns zero and clears both flags."
+  ],
+  "implementation": "Preserve native per-operation error/EOF ordering. Keep getdelim for ordinary streams and use getc behavior when an earlier error remains set. No Lean API or syntax changes.",
+  "ordinaryLeanBefore": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/getline-state/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-full-before/fixture.lean",
+    "sourceSha256": "7bc6293b979c3df900e803f0514d6b40fe4aefa8799a185ce5d88934d60b586a",
+    "scope": "Supplementary Handle.getLine EOF and append comparison; not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-full-before.resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.23133445099999997,
+        "code": 0,
+        "signal": null,
+        "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v86-worker-cwd-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v86-worker-cwd-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 5.016248992,
+        "code": 0,
+        "signal": null,
+        "stdout": "partial initial bytes: 5\npartial appended: \"\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\"\ngetLine stream-state comparison completed\n",
+        "stderr": "",
+        "passed": false
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v86-worker-cwd-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v86-worker-cwd-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 5.920494911,
+        "code": 0,
+        "signal": null,
+        "stdout": "partial initial bytes: 5\npartial appended: \"\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\"\ngetLine stream-state comparison completed\n",
+        "stderr": "",
+        "passed": false
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 71.151859536,
+        "code": 0,
+        "signal": null,
+        "stdout": "partial initial bytes: 5\npartial appended: \"\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\"\ngetLine stream-state comparison completed\n",
+        "stderr": "",
+        "passed": false
+      }
+    ],
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T15:03:52.393Z"
+  },
+  "ordinaryLeanAfter": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/getline-state/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-full-after/fixture.lean",
+    "sourceSha256": "7bc6293b979c3df900e803f0514d6b40fe4aefa8799a185ce5d88934d60b586a",
+    "scope": "Supplementary Handle.getLine EOF and append comparison; not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-after.resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.235647611,
+        "code": 0,
+        "signal": null,
+        "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v89-getline-state-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v89-getline-state-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 5.105699069,
+        "code": 0,
+        "signal": null,
+        "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v89-getline-state-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v89-getline-state-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v89-getline-state-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 5.565200852,
+        "code": 0,
+        "signal": null,
+        "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v90-getline-state-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v90-getline-state-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v90-getline-state-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v90-getline-state-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v90-getline-state-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v90-getline-state-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v90-getline-state-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v90-getline-state-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v90-getline-state-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v90-getline-state-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 69.765788097,
+        "code": 0,
+        "signal": null,
+        "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+        "stderr": "",
+        "passed": true
+      }
+    ],
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T15:07:50.831Z"
+  },
+  "fixtureNotes": [
+    "Six ordinary Lean cases cover final unterminated lines, newline-terminated lines, empty files, a following byte read, repeated EOF, and a 65537-byte final line.",
+    "The first native C fixture coupled its final EOF check to earlier line results. Its failures are retained. The refined fixture uses an independent pipe for byte-reader EOF ordering; it fails before and passes after the repair in all three engines.",
+    "The C control follows the operation order in pinned Lean runtime/io.cpp. It also verifies which bytes remain after the sticky-error call, not only whether an error is returned."
+  ],
+  "logs": [
+    {
+      "path": ".work/full-engine-probe/getline-native-before.log",
+      "counts": {
+        "tests": 4,
+        "pass": 0,
+        "fail": 4,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-native-before.resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 456100c12a4f4bdb9293960260c032c7\n\u25b6 line and byte reads preserve partial-read, sticky-error, and EOF ordering like native Lean\n  \u2716 node (108.345954ms)\n  \u2716 deno (175.924309ms)\n  \u2716 bun (59.810062ms)\n\u2716 line and byte reads preserve partial-read, sticky-error, and EOF ordering like native Lean (448.543131ms)\n\u2139 tests 4\n\u2139 suites 0\n\u2139 pass 0\n\u2139 fail 4\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 517.01558\n\n\u2716 failing tests:\n\ntest at test/getline-native-state.test.mjs:26:15\n\u2716 node (108.345954ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n  +   clearedLine: 'next\\n',\n  -   clearedLine: 'done\\n',\n      eofBytes: 0,\n      eofErrorCleared: true,\n      eofReadError: false,\n  +   partialErrno: null,\n  +   partialError: false,\n  -   partialErrno: 11,\n  -   partialError: true,\n      stickyError: true\n    }\n  \n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:31:16)\n      at Test.runInAsyncScope (node:async_hooks:214:14)\n      at Test.run (node:internal/test_runner/test:1103:25)\n      at Test.start (node:internal/test_runner/test:1000:17)\n      at TestContext.test (node:internal/test_runner/test:367:20)\n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:26:15)\n      at Test.runInAsyncScope (node:async_hooks:214:14)\n      at Test.run (node:internal/test_runner/test:1103:25)\n      at Test.start (node:internal/test_runner/test:1000:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { partialError: false, partialErrno: null, stickyError: true, clearedLine: 'next\\n', eofReadError: false, eofBytes: 0, eofErrorCleared: true },\n    expected: { partialError: true, partialErrno: 11, stickyError: true, clearedLine: 'done\\n', eofReadError: false, eofBytes: 0, eofErrorCleared: true },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n\ntest at test/getline-native-state.test.mjs:26:15\n\u2716 deno (175.924309ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n  +   clearedLine: 'next\\n',\n  -   clearedLine: 'done\\n',\n      eofBytes: 0,\n      eofErrorCleared: true,\n      eofReadError: false,\n  +   partialErrno: null,\n  +   partialError: false,\n  -   partialErrno: 11,\n  -   partialError: true,\n      stickyError: true\n    }\n  \n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:31:16)\n      at Test.runInAsyncScope (node:async_hooks:214:14)\n      at Test.run (node:internal/test_runner/test:1103:25)\n      at Test.start (node:internal/test_runner/test:1000:17)\n      at TestContext.test (node:internal/test_runner/test:367:20)\n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:26:15)\n      at async Test.run (node:internal/test_runner/test:1110:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { partialError: false, partialErrno: null, stickyError: true, clearedLine: 'next\\n', eofReadError: false, eofBytes: 0, eofErrorCleared: true },\n    expected: { partialError: true, partialErrno: 11, stickyError: true, clearedLine: 'done\\n', eofReadError: false, eofBytes: 0, eofErrorCleared: true },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n\ntest at test/getline-native-state.test.mjs:26:15\n\u2716 bun (59.810062ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n  +   clearedLine: 'next\\n',\n  -   clearedLine: 'done\\n',\n      eofBytes: 0,\n      eofErrorCleared: true,\n      eofReadError: false,\n  +   partialErrno: null,\n  +   partialError: false,\n  -   partialErrno: 11,\n  -   partialError: true,\n      stickyError: true\n    }\n  \n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:31:16)\n      at Test.runInAsyncScope (node:async_hooks:214:14)\n      at Test.run (node:internal/test_runner/test:1103:25)\n      at Test.start (node:internal/test_runner/test:1000:17)\n      at TestContext.test (node:internal/test_runner/test:367:20)\n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:26:15)\n      at async Test.run (node:internal/test_runner/test:1110:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { partialError: false, partialErrno: null, stickyError: true, clearedLine: 'next\\n', eofReadError: false, eofBytes: 0, eofErrorCleared: true },\n    expected: { partialError: true, partialErrno: 11, stickyError: true, clearedLine: 'done\\n', eofReadError: false, eofBytes: 0, eofErrorCleared: true },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 627ms\nCPU time consumed: 641ms\nMemory peak: 55.3M\nMemory swap peak: 0B\n[lasm] Peak 0.05 GiB; exit-code\n"
+    },
+    {
+      "path": ".work/full-engine-probe/getline-native-before-r2.log",
+      "counts": {
+        "tests": 4,
+        "pass": 0,
+        "fail": 4,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-native-before-r2.resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 3498d373177049f48ea5d1577c76bf2c\n\u25b6 line and byte reads preserve partial-read, sticky-error, and EOF ordering like native Lean\n  \u2716 node (104.738972ms)\n  \u2716 deno (125.19605ms)\n  \u2716 bun (55.015973ms)\n\u2716 line and byte reads preserve partial-read, sticky-error, and EOF ordering like native Lean (356.553895ms)\n\u2139 tests 4\n\u2139 suites 0\n\u2139 pass 0\n\u2139 fail 4\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 422.649054\n\n\u2716 failing tests:\n\ntest at test/getline-native-state.test.mjs:26:15\n\u2716 node (104.738972ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n  +   clearedLine: 'next\\n',\n  +   eofBytes: null,\n  +   eofErrorCleared: false,\n  +   eofReadError: true,\n  +   partialErrno: null,\n  +   partialError: false,\n  -   clearedLine: 'done\\n',\n  -   eofBytes: 0,\n  -   eofErrorCleared: true,\n  -   eofReadError: false,\n  -   partialErrno: 11,\n  -   partialError: true,\n      stickyError: true\n    }\n  \n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:31:16)\n      at Test.runInAsyncScope (node:async_hooks:214:14)\n      at Test.run (node:internal/test_runner/test:1103:25)\n      at Test.start (node:internal/test_runner/test:1000:17)\n      at TestContext.test (node:internal/test_runner/test:367:20)\n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:26:15)\n      at Test.runInAsyncScope (node:async_hooks:214:14)\n      at Test.run (node:internal/test_runner/test:1103:25)\n      at Test.start (node:internal/test_runner/test:1000:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { partialError: false, partialErrno: null, stickyError: true, clearedLine: 'next\\n', eofReadError: true, eofBytes: null, eofErrorCleared: false },\n    expected: { partialError: true, partialErrno: 11, stickyError: true, clearedLine: 'done\\n', eofReadError: false, eofBytes: 0, eofErrorCleared: true },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n\ntest at test/getline-native-state.test.mjs:26:15\n\u2716 deno (125.19605ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n  +   clearedLine: 'next\\n',\n  +   eofBytes: null,\n  +   eofErrorCleared: false,\n  +   eofReadError: true,\n  +   partialErrno: null,\n  +   partialError: false,\n  -   clearedLine: 'done\\n',\n  -   eofBytes: 0,\n  -   eofErrorCleared: true,\n  -   eofReadError: false,\n  -   partialErrno: 11,\n  -   partialError: true,\n      stickyError: true\n    }\n  \n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:31:16)\n      at Test.runInAsyncScope (node:async_hooks:214:14)\n      at Test.run (node:internal/test_runner/test:1103:25)\n      at Test.start (node:internal/test_runner/test:1000:17)\n      at TestContext.test (node:internal/test_runner/test:367:20)\n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:26:15)\n      at async Test.run (node:internal/test_runner/test:1110:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { partialError: false, partialErrno: null, stickyError: true, clearedLine: 'next\\n', eofReadError: true, eofBytes: null, eofErrorCleared: false },\n    expected: { partialError: true, partialErrno: 11, stickyError: true, clearedLine: 'done\\n', eofReadError: false, eofBytes: 0, eofErrorCleared: true },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n\ntest at test/getline-native-state.test.mjs:26:15\n\u2716 bun (55.015973ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n  +   clearedLine: 'next\\n',\n  +   eofBytes: null,\n  +   eofErrorCleared: false,\n  +   eofReadError: true,\n  +   partialErrno: null,\n  +   partialError: false,\n  -   clearedLine: 'done\\n',\n  -   eofBytes: 0,\n  -   eofErrorCleared: true,\n  -   eofReadError: false,\n  -   partialErrno: 11,\n  -   partialError: true,\n      stickyError: true\n    }\n  \n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:31:16)\n      at Test.runInAsyncScope (node:async_hooks:214:14)\n      at Test.run (node:internal/test_runner/test:1103:25)\n      at Test.start (node:internal/test_runner/test:1000:17)\n      at TestContext.test (node:internal/test_runner/test:367:20)\n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/getline-native-state.test.mjs:26:15)\n      at async Test.run (node:internal/test_runner/test:1110:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { partialError: false, partialErrno: null, stickyError: true, clearedLine: 'next\\n', eofReadError: true, eofBytes: null, eofErrorCleared: false },\n    expected: { partialError: true, partialErrno: 11, stickyError: true, clearedLine: 'done\\n', eofReadError: false, eofBytes: 0, eofErrorCleared: true },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 528ms\nCPU time consumed: 576ms\nMemory peak: 51.7M\nMemory swap peak: 0B\n[lasm] Peak 0.05 GiB; exit-code\n"
+    },
+    {
+      "path": ".work/full-engine-probe/getline-native-after.log",
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "text": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-native-after.resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: fc0078de80f34968ab8a29c6a807e182\n\u25b6 line and byte reads preserve partial-read, sticky-error, and EOF ordering like native Lean\n  \u2714 node (102.060896ms)\n  \u2714 deno (113.971332ms)\n  \u2714 bun (55.668844ms)\n\u2714 line and byte reads preserve partial-read, sticky-error, and EOF ordering like native Lean (342.076693ms)\n\u2139 tests 4\n\u2139 suites 0\n\u2139 pass 4\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 406.203036\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 492ms\nCPU time consumed: 552ms\nMemory peak: 51.8M\nMemory swap peak: 0B\n[lasm] Peak 0.05 GiB; success\n"
+    },
+    {
+      "path": ".work/full-engine-probe/getline-packaged-after.log",
+      "counts": {
+        "tests": 15,
+        "pass": 15,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "text": "\u2714 four blocked FIFO readers leave dependent writes able to run in each installed engine (1481.726831ms)\n\u2714 four blocked FIFO readers leave dependent writes able to run in each installed engine after cwd removal (5875.78774ms)\n\u2714 directory enumeration preserves native order and invalid UTF-8 filename bytes in each installed engine (297.68544ms)\n\u2714 Lean handles use buffered writes, flush, rewind, and the actual stream position for truncate (65.831167ms)\n\u2714 open buffered handles remain valid after idle IO workers exit (1251.941651ms)\n\u2714 file reads exceed the former 16 MiB ceiling and return EOF correctly (41.133889ms)\n\u2714 full-runtime finalization waits for pending writes and flushes before completing (7.928244ms)\n\u2714 line reading preserves embedded NUL and invalid UTF-8 for Lean string decoding (2.415621ms)\n\u2714 shared and exclusive OS locks contend, block asynchronously, and release on finalization (28.726882ms)\n\u2714 exclusive create and invalid descriptors retain native error categories (2.099238ms)\n\u2714 more lock waiters than FFI workers cannot deadlock the lock holder (157.529018ms)\nBuilding test/fixtures/getline-state/Main.lean for node\u2026\n\u25b6 ordinary Lean getLine clears EOF before subsequent appended-data reads\n  \u2714 node (246.484967ms)\n  \u2714 deno (329.255629ms)\n  \u2714 bun (168.188161ms)\n\u2714 ordinary Lean getLine clears EOF before subsequent appended-data reads (72217.489674ms)\n\u2139 tests 15\n\u2139 suites 0\n\u2139 pass 15\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 81590.286428\n"
+    }
+  ],
+  "resources": [
+    {
+      "path": ".work/full-engine-probe/getline-full-before.resources.json",
+      "report": {
+        "startedAt": "2026-09-21T15:02:28.128Z",
+        "command": [
+          "node",
+          "scripts/full-lean/probe-getline-state.mjs",
+          ".work/full-engine-probe/getline-full-before",
+          ".work/full-toolchains/node-v86-worker-cwd-native",
+          ".work/full-toolchains/deno-v86-worker-cwd-native",
+          ".work/full-toolchains/bun-v88-worker-cwd-lowered"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "764d3b3b-6ec3-4d96-a5ab-f6dc25c9ef6f",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28620689408
+        },
+        "minimumHostAvailable": 26492018688,
+        "peakMemoryBytes": 2117730304,
+        "peakTasks": 51,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-full-before.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T15:03:52.356Z",
+          "memoryBytes": 680697856,
+          "peakMemoryBytes": 2117730304,
+          "swapBytes": 0,
+          "tasks": 13,
+          "memoryBreakdown": {
+            "anon": 652640256,
+            "file": 106496,
+            "kernel": 7516160,
+            "shmem": 0,
+            "file_mapped": 114688,
+            "inactive_file": 106496,
+            "slab": 343624
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T15:03:52.442Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12673024,
+          "peakMemoryBytes": 2117730304,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 110592,
+            "kernel": 983040,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 110592,
+            "slab": 146248
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T15:03:52.469Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": ".work/full-engine-probe/getline-native-before.resources.json",
+      "report": {
+        "startedAt": "2026-09-21T15:03:52.512Z",
+        "command": [
+          "node",
+          "--test",
+          "--test-concurrency=1",
+          "test/getline-native-state.test.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "f66b00d6-2ce8-4dca-88bb-2dbeffed6b6a",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28638617600
+        },
+        "minimumHostAvailable": 28581392384,
+        "peakMemoryBytes": 57995264,
+        "peakTasks": 21,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-native-before.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T15:03:53.118Z",
+          "memoryBytes": 4366336,
+          "peakMemoryBytes": 57995264,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 4096,
+            "file": 3579904,
+            "kernel": 126976,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 991232,
+            "slab": 74792
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T15:03:53.161Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 15843328,
+          "peakMemoryBytes": 57995264,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 3579904,
+            "kernel": 1024000,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 991232,
+            "slab": 191592
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T15:03:53.185Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": ".work/full-engine-probe/getline-native-before-r2.resources.json",
+      "report": {
+        "startedAt": "2026-09-21T15:05:10.944Z",
+        "command": [
+          "node",
+          "--test",
+          "--test-concurrency=1",
+          "test/getline-native-state.test.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "88ce85ad-2ec6-4ec4-9042-3441e406f3e6",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28613177344
+        },
+        "minimumHostAvailable": 28565159936,
+        "peakMemoryBytes": 54243328,
+        "peakTasks": 21,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-native-before-r2.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T15:05:11.349Z",
+          "memoryBytes": 27303936,
+          "peakMemoryBytes": 54243328,
+          "swapBytes": 0,
+          "tasks": 14,
+          "memoryBreakdown": {
+            "anon": 23375872,
+            "file": 106496,
+            "kernel": 2482176,
+            "shmem": 0,
+            "file_mapped": 200704,
+            "inactive_file": 106496,
+            "slab": 509208
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T15:05:11.491Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12836864,
+          "peakMemoryBytes": 54243328,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10219520,
+            "file": 90112,
+            "kernel": 978944,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 90112,
+            "slab": 138264
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T15:05:11.516Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": ".work/full-engine-probe/getline-native-after.resources.json",
+      "report": {
+        "startedAt": "2026-09-21T15:05:56.254Z",
+        "command": [
+          "node",
+          "--test",
+          "--test-concurrency=1",
+          "test/getline-native-state.test.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "06e204a5-2c05-460b-b354-6dfc85269563",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28604751872
+        },
+        "minimumHostAvailable": 28566339584,
+        "peakMemoryBytes": 54333440,
+        "peakTasks": 21,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-native-after.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T15:05:56.661Z",
+          "memoryBytes": 31719424,
+          "peakMemoryBytes": 54333440,
+          "swapBytes": 0,
+          "tasks": 19,
+          "memoryBreakdown": {
+            "anon": 28139520,
+            "file": 126976,
+            "kernel": 2596864,
+            "shmem": 0,
+            "file_mapped": 200704,
+            "inactive_file": 106496,
+            "slab": 452560
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T15:05:56.766Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12713984,
+          "peakMemoryBytes": 54333440,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10211328,
+            "file": 106496,
+            "kernel": 970752,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 106496,
+            "slab": 142240
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T15:05:56.793Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": ".work/full-engine-probe/getline-after.resources.json",
+      "report": {
+        "startedAt": "2026-09-21T15:06:25.179Z",
+        "command": [
+          "node",
+          ".work/full-engine-probe/validate-getline-after.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "94ab568d-6a33-4df1-a583-e756be703e75",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28640268288
+        },
+        "minimumHostAvailable": 26458079232,
+        "peakMemoryBytes": 2119315456,
+        "peakTasks": 59,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/getline-after.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T15:09:12.478Z",
+          "memoryBytes": 28590080,
+          "peakMemoryBytes": 2119315456,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 237568,
+            "file": 25608192,
+            "kernel": 1540096,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 24023040,
+            "slab": 1450552
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T15:09:12.513Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 39518208,
+          "peakMemoryBytes": 2119315456,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10219520,
+            "file": 25608192,
+            "kernel": 2375680,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 24023040,
+            "slab": 1549544
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T15:09:12.537Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "currentSourceHashes": {
+    "src/native-files.mjs": "125adbceffbcc32c6991ca990df260bbc0c93bf6577afc2f53c1a8664afefb38",
+    "test/fixtures/getline-state/Main.lean": "7bc6293b979c3df900e803f0514d6b40fe4aefa8799a185ce5d88934d60b586a",
+    "test/fixtures/getline-state/native.c": "1f45a1a883172ed51db5fb1962f6e3a67fdd9dae99c3d4c133f8ed6d5bb1ef8f",
+    "test/fixtures/getline-state/host.mjs": "2554d365a81d308db64f4f0530d616ee064e877cbcba2e4f356738d5ecb1f7f4",
+    "test/getline-native-state.test.mjs": "e2b5e5598da48bb4d643f584d7598f851176e74b8764c5558c46de4bc73e8c24",
+    "test/node-getline-state.test.mjs": "d36da11fb277600060006b6658ef5c27303d49bba45f21ffa843238957c40d55",
+    "scripts/full-lean/probe-getline-state.mjs": "e4a0d85cf2d3394cff1eaec849242602b955266c3889f062e065ab87693eec8c"
+  },
+  "limitations": [
+    "Native Linux x64 evidence only; macOS, Windows, ARM64, musl hosts and wider device/race behavior remain unverified.",
+    "Full Bun comparisons use the disclosed Linux stack adjustment; packaged/host checks use stock installed engines.",
+    "The original full upstream suites remain incomplete; the full-compiler and cooperative packaged runtime remain distinct paths."
+  ]
+}
