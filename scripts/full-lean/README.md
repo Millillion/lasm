@@ -38,10 +38,10 @@ stopped on allocation pressure at 1.80 and 2.26 GiB despite ample host headroom.
 Disabling transparent huge pages for the build and its descendants allowed both
 compiler variants and their frozen snapshots to finish at 6.95 GiB, with no
 measured compaction/allocation stalls or resource events. Keep one build and
-Binaryen worker for these links:
+Binaryen worker for these links, including Emscripten's internal cache builds:
 
 ```sh
-node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py env BINARYEN_CORES=1 cmake --build .work/lean-full/wasm64 --target lean -j 1
+node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py env BINARYEN_CORES=1 EMCC_CORES=1 cmake --build .work/lean-full/wasm64 --target lean -j 1
 ```
 
 The wrapper requires an active guard, verifies the Linux process flag, and
@@ -55,6 +55,13 @@ not a Lean conformance failure. `execution-started.json` links suite runs to
 their resource report even if the run is interrupted. Preserve incomplete logs;
 do not count their unfinished registrations as passes. See
 [the crash diagnosis](../../docs/RESOURCE_FAILURES.md).
+
+The guard caps Emscripten cache builds at two jobs using `EMCC_CORES`; suite
+children retain that setting. CMake and Binaryen limits alone do not constrain
+Emscripten's internally generated Ninja builds. Full links use one as shown above.
+When preparing a frozen compiler, its recorded SDK takes precedence over the
+builder's inherited `LASM_EMSDK`. The development SDK setting still applies to
+an unfrozen build.
 
 For a long suite, use the checkpointed supervisor directly (it guards each test):
 

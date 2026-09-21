@@ -977,3 +977,12 @@ test. The build and checks had zero OOM, cap-hit, throttle, or swap events.
 These are Linux x64 results. Embedded forced-exit buffer disposal and native
 macOS/Windows validation remain open. See
 [the baseline, repair, and resource evidence](evidence/process-exit-2026-09-21.json).
+
+The initial exit-repaired facades inherited the builder's `LASM_EMSDK`, so their
+external C tools used that development SDK despite the frozen compiler and host.
+Their recorded configurations preserve this fact. Follow-up facades now select
+the captured SDK first, even with the builder environment still present. All
+three engines pass four unchanged C/FFI controls with these corrected settings,
+including Lake's FFI and reverse-FFI examples. The guard also explicitly caps
+Emscripten's internal cache-build jobs. See
+[the separate SDK and job-limit validation](evidence/frozen-sdk-build-jobs-2026-09-21.json).

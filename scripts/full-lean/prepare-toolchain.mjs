@@ -33,7 +33,9 @@ const build = resolve(option('--build', '.work/lean-full/wasm64'));
 const source = resolve(option('--source', '.work/lean-full/lean4-4.32.0/src'));
 const native = resolveLean(root);
 const snapshot = existsSync(join(build, 'snapshot.json')) ? JSON.parse(readFileSync(join(build, 'snapshot.json'))) : undefined;
-const sdk = resolve(process.env.LASM_EMSDK ?? snapshot?.sdk ?? join(root, '.cache/emsdk-6.0.9'));
+// LASM_EMSDK selects the builder's development SDK. A frozen compiler must
+// keep its captured external toolchain even when preparation shares that env.
+const sdk = resolve(snapshot?.sdk ?? process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9'));
 const runtimeSupport = snapshot ? join(build, 'runtime-support') : join(root, 'scripts/full-lean');
 for (const path of [executable, join(build, 'bin/lean.js'), join(build, 'bin/lean.wasm')])
   if (!existsSync(path)) throw new Error(`Missing full compiler prerequisite: ${path}`);

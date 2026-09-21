@@ -78,7 +78,7 @@ if (args[0] === '--capture') {
     'LEAN_SYSROOT', 'LEAN_STACK_SIZE_KB', 'LEAN_NUM_THREADS', 'LASM_VM_STACK_MB'];
   const env = Object.fromEntries(keys.filter(key => process.env[key] !== undefined).map(key => [key, process.env[key]]));
   Object.assign(env, { LASM_RESOURCE_UNIT: unit, LASM_RESOURCE_REPORT: report,
-    BINARYEN_CORES: '2', CMAKE_BUILD_PARALLEL_LEVEL: '2', CTEST_PARALLEL_LEVEL: '1' });
+    BINARYEN_CORES: '2', EMCC_CORES: '2', CMAKE_BUILD_PARALLEL_LEVEL: '2', CTEST_PARALLEL_LEVEL: '1' });
   // MemoryHigh throttling raises PSI for ancestor cgroups. On desktops monitored
   // by systemd-oomd that can kill unrelated applications despite abundant RAM.
   // Terminate proactively instead; keep MemoryMax only as the final backstop.

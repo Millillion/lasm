@@ -34,7 +34,7 @@ if (harnessBefore.modified.length) throw new Error(`Harness artifacts changed be
 // Supply ordinary host context without forwarding unrelated service credentials
 // or user compiler overrides into third-party test drivers.
 const env = Object.fromEntries(['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR', 'SYSTEMROOT', 'COMSPEC', 'PATHEXT',
-  'LASM_RESOURCE_UNIT', 'LASM_RESOURCE_REPORT', 'BINARYEN_CORES', 'CMAKE_BUILD_PARALLEL_LEVEL']
+  'LASM_RESOURCE_UNIT', 'LASM_RESOURCE_REPORT', 'BINARYEN_CORES', 'EMCC_CORES', 'CMAKE_BUILD_PARALLEL_LEVEL']
   .filter(key => process.env[key] !== undefined).map(key => [key, process.env[key]]));
 Object.assign(env, {
   GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null',

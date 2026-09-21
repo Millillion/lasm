@@ -1,0 +1,1065 @@
+{
+  "recordedAt": "2026-09-21T18:47:00.867063+00:00",
+  "scope": "Maintainer harness SDK isolation and Emscripten build concurrency. Twelve unchanged Linux x64 C/Lake FFI registrations across Node, Deno, and Bun; no full-suite claim.",
+  "findings": [
+    "An inherited LASM_EMSDK setting overrode the captured SDK while preparing the earlier exit-repaired facades. Those exact configurations remain recorded; their full compiler and host modules were frozen, but external C tools used the developer SDK.",
+    "A frozen snapshot now takes precedence over the builder environment. New facades select their captured SDK even when the developer setting is deliberately present. The compiler Wasm and host implementation are unchanged.",
+    "Emscripten internal cache builds use EMCC_CORES independently of CMake and Binaryen. The guard now sets it to two and the suite environment preserves it. Full links explicitly use one.",
+    "Each engine passed the unchanged Lake FFI and reverse-FFI examples, dedicated-thread compilation, and external boxing. All 7267 original source hashes were unchanged before and after each attempt.",
+    "All OOM, cap-hit, throttling, and swap counters remain zero. Memory caps were not raised."
+  ],
+  "preparation": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/frozen-sdk-preparation.json",
+    "sha256": "a8f0707a3c5f5953c4dbace68bd6fcf75a7a055f1fb3189cea47fbfc8aa4280a",
+    "results": [
+      {
+        "engine": "node",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v113-frozen-sdk",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "requestedBuilderSdk": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev",
+        "selectedSdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk"
+      },
+      {
+        "engine": "deno",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v113-frozen-sdk",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "requestedBuilderSdk": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev",
+        "selectedSdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk"
+      },
+      {
+        "engine": "bun",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v112-frozen-sdk/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v112-frozen-sdk/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v112-frozen-sdk",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "requestedBuilderSdk": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev",
+        "selectedSdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk"
+      }
+    ],
+    "jobs": {
+      "EMCC_CORES": "2",
+      "actualEmscriptenBuildJobs": 2
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/frozen-sdk-preparation.resources.json",
+      "sha256": "636fbb2321b80dc309dba1fefc82ff01b61a2d8b9418239b0c9061b63976a1b4",
+      "command": [
+        "node",
+        ".work/full-engine-probe/prepare-frozen-sdk.mjs"
+      ],
+      "peakMemoryBytes": 2360467456,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  },
+  "upstream": {
+    "node": {
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v113-frozen-sdk",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "snapshot": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/snapshot.json",
+        "sha256": "40e0d52ddf7c1781db20637fb8392218885dc2a7b090e6ec2283b20c7099c9cf"
+      },
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/campaign.json",
+        "sha256": "7894297362602c72c38d0f320b9768a868f97840e4bb32dc9ef5cbb7720c92b9"
+      },
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "tests": [
+        {
+          "name": "tests/lake/examples/ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00001-bc797a30/results/execution.json",
+            "sha256": "82c872ae3f5f323c9999c94bb5b91b368f418b5fb4f0479137ebd7172c2bc103"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00001-bc797a30/resources.json",
+            "sha256": "f61388aaf07326f4bc2dda976b3f119abfd99ff6204c6fa514a34c8520fe9a28",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v113-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00001-bc797a30/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/ffi/test\\.sh$"
+            ],
+            "peakMemoryBytes": 4690534400,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/reverse-ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00002-4be144d2/results/execution.json",
+            "sha256": "c806a2d29cef80909f1dc7e57b2d548a3235e3e3e441759fb27d70d8c9859601"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00002-4be144d2/resources.json",
+            "sha256": "36e983000a41c823f1defc34bb63451fa250ef4dc5ff2e5ff869b6d8ab7fec47",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v113-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00002-4be144d2/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/reverse-ffi/test\\.sh$"
+            ],
+            "peakMemoryBytes": 3922104320,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00003-5e3b5850/results/execution.json",
+            "sha256": "188f24eec29eb3530b6874015cbbf9b2a7252d997908ca821b4b5bcd961fb863"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00003-5e3b5850/resources.json",
+            "sha256": "f563639f2e02fd4954eaec77564e6ab29872fa674acc842143df9de8deae47f6",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v113-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00003-5e3b5850/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/wait_dedicated\\.lean$"
+            ],
+            "peakMemoryBytes": 1885839360,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00004-7d60cab5/results/execution.json",
+            "sha256": "af741ab08cbcc190dfba610e858372e5d84ac3d1ea5183ccb52f70860a2a4a5a"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00004-7d60cab5/resources.json",
+            "sha256": "6ddc2f13c2606911122c516a2b22f0ecd40154b39d01acc1b11e55f1798a6f83",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v113-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v113-frozen-sdk-controls/00004-7d60cab5/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/externBoxing\\.lean$"
+            ],
+            "peakMemoryBytes": 1735680000,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    },
+    "deno": {
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "engineArgs": [
+          "run",
+          "-A",
+          "--v8-flags=--stack-size=61440"
+        ],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v113-frozen-sdk",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "snapshot": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v113-exit-native/snapshot.json",
+        "sha256": "40e0d52ddf7c1781db20637fb8392218885dc2a7b090e6ec2283b20c7099c9cf"
+      },
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/campaign.json",
+        "sha256": "2349fc0c0aed1ab2b92c54bf1ece7dac04ec79dfecc2243c71cf6229abaf4cf3"
+      },
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "tests": [
+        {
+          "name": "tests/lake/examples/ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00001-6af5f489/results/execution.json",
+            "sha256": "1cd6e6358849635c81e0871b69958878f20a7127be00160b2afc37480943f28c"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00001-6af5f489/resources.json",
+            "sha256": "b8dab4b7f36a87f991d0be364fd45d1a71216f349accf3040010ecbdea0cc725",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v113-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00001-6af5f489/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/ffi/test\\.sh$"
+            ],
+            "peakMemoryBytes": 4846231552,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/reverse-ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00002-1034d5c4/results/execution.json",
+            "sha256": "a39a95992c956a14f318bc743b81d24eda4f8afc95e2cd443f3a45a3fc723460"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00002-1034d5c4/resources.json",
+            "sha256": "58e79a09a48ede6d0a66bcd99d3cce48c9a0b3024b56c0d7d357d20bb69ffe48",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v113-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00002-1034d5c4/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/reverse-ffi/test\\.sh$"
+            ],
+            "peakMemoryBytes": 4326080512,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00003-1fdf7399/results/execution.json",
+            "sha256": "3e312a3dc79507d046b061dd1e6ed6f5cb18b4e4f2bb5b1727f4cac8b66c7755"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00003-1fdf7399/resources.json",
+            "sha256": "db2790206f47cf2d146f6f029a9ddcdec62161c87bdf836903fcdce6c3a730c5",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v113-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00003-1fdf7399/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/wait_dedicated\\.lean$"
+            ],
+            "peakMemoryBytes": 2129756160,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00004-70cd6380/results/execution.json",
+            "sha256": "2ffa64451cb40a87d8faeb275caeec5edbe2bed9b06d72e3cedd5c91f88256da"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00004-70cd6380/resources.json",
+            "sha256": "f484a89f908d06364c850e3cf0dc88d57a0a082bd16a3eda2b15c46fd6b2298e",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v113-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v113-frozen-sdk-controls/00004-70cd6380/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/externBoxing\\.lean$"
+            ],
+            "peakMemoryBytes": 1969590272,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    },
+    "bun": {
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 2,
+        "engineEnvironment": {
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v112-frozen-sdk/bun-stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "stackAdjustment": {
+          "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v112-frozen-sdk/bun-stack-reservation.so",
+          "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+          "osThreadStackBytes": 67108864,
+          "jscStackBudgetBytes": 62914560,
+          "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+        },
+        "maximumMemoryBytes": 4294967296,
+        "pthreadPoolSize": 8,
+        "backend": "full-lean-wasm64-lowered",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v112-frozen-sdk",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "snapshot": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/snapshot.json",
+        "sha256": "9b0834d81c8404103820937a145ba5461c4cc7c8ff7a85b1c0cfefde3c6be1c1"
+      },
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/campaign.json",
+        "sha256": "42f4864a5baeff01b1736dc897d4fe7e063eaf463df009c497eebee52e28fabf"
+      },
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "tests": [
+        {
+          "name": "tests/lake/examples/ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00001-a38aa337/results/execution.json",
+            "sha256": "3e95a3df576b787321cc6da5dcee88295acc576e46de66329f4d5cf7e21f5e40"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00001-a38aa337/resources.json",
+            "sha256": "c3282d0de0851f437cb3d27f1903d238e88e46a55c0e721ee116c063f3c51472",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v112-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00001-a38aa337/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/ffi/test\\.sh$"
+            ],
+            "peakMemoryBytes": 5423443968,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/reverse-ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00002-24e6c3c7/results/execution.json",
+            "sha256": "996f32329489d24a8baebbf5c40bc17d729d154e11d9b458349998b07c48df01"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00002-24e6c3c7/resources.json",
+            "sha256": "53a1817bcd77e60ff0cc4356c36dc12234b3218dc40810e2fb5b38945dc9a833",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v112-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00002-24e6c3c7/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/reverse-ffi/test\\.sh$"
+            ],
+            "peakMemoryBytes": 4893384704,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00003-f214051c/results/execution.json",
+            "sha256": "561be78ebaf1a8ad15d4f19b152e278842803aff4d61433031a15a244c41f2a4"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00003-f214051c/resources.json",
+            "sha256": "fda6a9f15102c5e7fc67c9eda99993a2195ec244be04e9600e142a81b8e0cf5b",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v112-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00003-f214051c/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/wait_dedicated\\.lean$"
+            ],
+            "peakMemoryBytes": 2365329408,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00004-64c8da1a/results/execution.json",
+            "sha256": "26fd9ebbe95405c665b6c96d22692b6e53d4c60761214dfbc1213ae8d7ada918"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00004-64c8da1a/resources.json",
+            "sha256": "87ab808dbde4bfa3875fc377799b17797cf6c7ccee502b3738a50f7ea16a66d2",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v112-frozen-sdk",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v112-frozen-sdk-controls/00004-64c8da1a/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/externBoxing\\.lean$"
+            ],
+            "peakMemoryBytes": 2252337152,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    }
+  },
+  "implementationInputs": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/prepare-toolchain.mjs",
+      "sha256": "15f0aa779b8432a9073b50bea0fcc9ecd12816e3e747f509c81a841b02f9e6b5"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-bounded.mjs",
+      "sha256": "b5795936130ae1447a5d8a66a41fd304b7b4f760d5bee467dff53bbcd26b894c"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+      "sha256": "9130c049337bf882f9a2f346fe299703fc89bd9e1a7e89175b1de94ddc5f6cb4"
+    }
+  ],
+  "remainingGaps": [
+    "Full Lean-suite conformance, macOS/Windows validation and packaged full-runtime integration remain unfinished.",
+    "Bun native memory64 shared-memory transfer remains an engine defect, including the tested canary."
+  ]
+}
