@@ -44,9 +44,9 @@ Default console streams follow native buffering: redirected stdout can retain
 output until it is flushed, while stderr is unbuffered. When another process
 must see a message immediately, call `(← IO.getStdout).flush` after printing it.
 The Lean server example does this for its listening address. Normal main
-completion flushes console output. Standalone runners use the native C runtime's
-`exit` and `_Exit`: ordinary exit flushes open files, while forced exit discards
-their buffered output. Comparisons with native Lean pass in all three engines
+completion flushes console output. Standalone runners flush native C streams
+before the engine coordinates ordinary process shutdown. Forced exit uses
+`_Exit` to discard buffered output. Comparisons with native Lean pass in all three engines
 on Linux x64. Embedded modules preserve their host process by throwing
 `LeanExit`; their forced-exit disposal still needs buffer-discard parity. Broader
 platform validation remains tracked in [IO limitations](../IO_LIMITATIONS.md).

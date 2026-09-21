@@ -207,7 +207,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       return directory.change(value, state).then(() => empty);
     }
     case 30:
-      if (processExit) nativeFiles().exitProcess(n, id !== 0);
+      if (processExit) return nativeFiles().exitProcess(n, id !== 0);
       throw new LeanExit(n, id !== 0);
     case 31: return Buffer.from(args.map(value => value + '\0').join(''));
     case 32: case 33: case 34: {

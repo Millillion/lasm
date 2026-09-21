@@ -967,7 +967,8 @@ from forced exit. The same ordinary Lean fixture matches native status,
 stdout, stderr, and open-file contents for normal return, `IO.Process.exit`,
 and `IO.Process.forceExit`. The previous Bun full-runtime ordinary exit lost
 buffered file data, and all three engines incorrectly flushed stdout on forced
-exit. Standalone launchers now call native C `exit`/`_Exit` before JS cleanup.
+exit. This revision called native C `exit`/`_Exit` before JS cleanup. The later
+broad campaign exposed an unsafe ordinary-exit path, repaired below.
 
 The expanded packaged checks passed 51/51, including generated and source
 launchers, embedded-host survival, console buffering, worker diagnostics, and
@@ -986,3 +987,30 @@ three engines pass four unchanged C/FFI controls with these corrected settings,
 including Lake's FFI and reverse-FFI examples. The guard also explicitly caps
 Emscripten's internal cache-build jobs. See
 [the separate SDK and job-limit validation](evidence/frozen-sdk-build-jobs-2026-09-21.json).
+
+## Engine shutdown regression repair, September 21
+
+A fresh Node campaign with the frozen SDK passed 59 of its first 62 tests and
+failed `elab/445.lean`, `elab/452.lean`, and `elab/4534.lean`. The campaign is
+preserved with 3,834 registrations pending. GDB traced `452` to an abort in
+Node's `uv_mutex_destroy` during libc exit handlers: directly calling libc
+`exit` bypassed the engine's shutdown coordination while worker threads were
+still active. This was a Lasm regression from the preceding exit repair.
+
+Ordinary standalone exit now awaits native `fflush(NULL)` and then calls the
+engine's `process.exit`. Forced exit retains native `_Exit`, preserving buffer
+discard. Two private host modules changed; the derived snapshots retain the
+same Wasm, Lean, dispatcher, and frozen SDK inputs.
+
+All three unchanged upstream regressions pass in each engine: **9/9**. Native
+Lean and all three full runtimes match status, stdout, stderr, and open-file
+contents for return, ordinary exit, and forced exit. The packaged exit,
+console, host, and worker checks pass **33/33**. A small background-compilation
+probe passed both old and new implementations, so it is retained as a
+non-reproducing control, not proof of the repair.
+
+All 7,267 original hashes remained unchanged. All OOM, cap-hit, throttling,
+and swap counters were zero; the largest repaired upstream run peaked at
+3.65 GiB. These are Linux x64 results; complete campaigns, embedded forced-exit
+disposal, and other platforms remain unfinished. See
+[the failures, debugger trace, repaired snapshots, and comparisons](evidence/engine-exit-shutdown-2026-09-21.json).

@@ -114,11 +114,16 @@ load, and suite conformance still need validation. See
   compilers. Small full-pipe controls also verify that flush and disposal leave
   the JavaScript event loop available. Terminal behavior, already nonblocking
   descriptors, and cross-platform process-exit behavior remain open. Standalone
-  runners now distinguish `IO.Process.exit` from `IO.Process.forceExit` and use
-  native C termination before JavaScript teardown can flush streams. Ordinary
+  runners now distinguish `IO.Process.exit` from `IO.Process.forceExit`: ordinary
+  exit flushes native C streams before engine shutdown, while forced exit uses
+  native `_Exit` before JavaScript teardown can flush streams. Ordinary
   Lean exit/status/console/open-file comparisons match native Linux in the
   packaged and full Node, Deno, and Bun runtimes; see
-  [the exit comparison](docs/evidence/process-exit-2026-09-21.json).
+  [the exit comparison](docs/evidence/process-exit-2026-09-21.json). The subsequent broad campaign
+  exposed an engine shutdown race in the direct libc exit path; the repaired
+  engine-coordinated path passes all three affected upstream tests in each
+  engine and 33 packaged checks. See
+  [the shutdown repair](docs/evidence/engine-exit-shutdown-2026-09-21.json).
 - [ ] Preserve forced-exit buffer discard for an embedded module without
   terminating its host process. Embedded exits still throw `LeanExit` and dispose
   the guest; closing its file streams currently flushes buffered output even on
