@@ -582,7 +582,11 @@ still fails the memory-intensive `instances` test with this option. The alternat
 remains lowered `--memory64 2 --max-memory-gb 4`. These variants need separate
 frozen builds and conformance evidence. Native memory64 engine prerequisites pass
 in Node and Deno; Bun's experimental flag currently exposes a shared-memory
-worker-transfer defect, so it is not a working Bun configuration.
+worker-transfer defect, so it is not a working Bun configuration. A separately
+downloaded and SHA-verified `1.4.3-canary.1+a2b69f7b0` retains that defect in the
+same one-page reproduction; Node and Deno controls pass. This remains an engine
+defect, not a proven fundamental restriction. See
+[the canary comparison](../../docs/evidence/bun-canary-memory64-2026-09-21.json).
 
 `--lean-allocator mimalloc` is a separate experimental option: it enables Lean's
 native mimalloc object layout and uses the SDK's matching allocator/header. It

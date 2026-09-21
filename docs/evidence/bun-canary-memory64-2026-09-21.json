@@ -1,0 +1,183 @@
+{
+  "recordedAt": "2026-09-21T18:33:09.323150+00:00",
+  "scope": "Small Linux x64 engine-only worker transfer comparison; each memory initially has one 64 KiB page. This is not an upstream Lean-suite result.",
+  "finding": "The downloaded 1.4.3-canary.1+a2b69f7b0 binary retains stable 1.4.2 shared memory64 worker-transfer failure. Fresh memory and transferred modules succeed; transferred memory reports a mismatched address type. Node and Deno controls pass.",
+  "classification": "Observed Bun engine defect, not an established fundamental JavaScript restriction. Keep the stable runtime and lowered-memory workaround.",
+  "download": {
+    "metadata": {
+      "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-canary-2026-09-21/release.json",
+      "sha256": "082c83c0c486c6f69daf4bdd3da81daf29061d14fd6329930b8a49c9b0c22b4b"
+    },
+    "source": "https://api.github.com/repos/oven-sh/bun/releases/tags/canary",
+    "asset": {
+      "id": 579060842,
+      "name": "bun-linux-x64.zip",
+      "size": 37107716,
+      "digest": "sha256:0e38dcfd8ba0a0ad384ede201e7e9a8013459f71f91bf87077b90a9aec35ce6a",
+      "updated_at": "2026-09-21T13:05:54Z",
+      "browser_download_url": "https://github.com/oven-sh/bun/releases/download/canary/bun-linux-x64.zip"
+    },
+    "note": "The actual executed version/revision and binary hashes are recorded in the comparison; a rolling release title is not used as its identity."
+  },
+  "comparison": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-canary-memory64.json",
+    "sha256": "249c9f1805575e6bdfd96849963b97952bfeaf9946af6ccc0ca83dc702e1e68f",
+    "fixture": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/memory64-worker.cjs",
+    "fixtureSha256": "f58f857962684986377d27480cf27d2eb66d6dc7afb1b409b6f210c67f43d4f3",
+    "scope": "Small shared-memory engine control; one 64 KiB page, no full Lean compiler or upstream-suite run.",
+    "results": [
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "binarySha256": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f",
+        "version": "v24.13.1",
+        "environment": {},
+        "status": 0,
+        "signal": null,
+        "stdout": "[\n  {\n    \"name\": \"parent original\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker fresh module and memory\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker cloned module and fresh memory\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker fresh module and cloned memory\",\n    \"passed\": true\n  }\n]\n",
+        "stderr": "",
+        "observations": [
+          {
+            "name": "parent original",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and memory",
+            "passed": true
+          },
+          {
+            "name": "worker cloned module and fresh memory",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and cloned memory",
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "binarySha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "environment": {},
+        "status": 0,
+        "signal": null,
+        "stdout": "[\n  {\n    \"name\": \"parent original\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker fresh module and memory\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker cloned module and fresh memory\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker fresh module and cloned memory\",\n    \"passed\": true\n  }\n]\n",
+        "stderr": "",
+        "observations": [
+          {
+            "name": "parent original",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and memory",
+            "passed": true
+          },
+          {
+            "name": "worker cloned module and fresh memory",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and cloned memory",
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "name": "bun-stable",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "binarySha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+        "version": "1.4.2+744846f84",
+        "environment": {
+          "BUN_JSC_useWasmMemory64": "true"
+        },
+        "status": 0,
+        "signal": null,
+        "stdout": "[\n  {\n    \"name\": \"parent original\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker fresh module and memory\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker cloned module and fresh memory\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker fresh module and cloned memory\",\n    \"passed\": false,\n    \"error\": \"LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\"\n  }\n]\n",
+        "stderr": "",
+        "observations": [
+          {
+            "name": "parent original",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and memory",
+            "passed": true
+          },
+          {
+            "name": "worker cloned module and fresh memory",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and cloned memory",
+            "passed": false,
+            "error": "LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')"
+          }
+        ],
+        "passed": false
+      },
+      {
+        "name": "bun-canary",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-canary-2026-09-21/bun-linux-x64/bun",
+        "binarySha256": "67bca10c3fc78d4592fdd7fe7be8347b1e889090b2e8cf5ddf62a190681faf77",
+        "version": "1.4.3-canary.1+a2b69f7b0",
+        "environment": {
+          "BUN_JSC_useWasmMemory64": "true"
+        },
+        "status": 0,
+        "signal": null,
+        "stdout": "[\n  {\n    \"name\": \"parent original\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker fresh module and memory\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker cloned module and fresh memory\",\n    \"passed\": true\n  },\n  {\n    \"name\": \"worker fresh module and cloned memory\",\n    \"passed\": false,\n    \"error\": \"LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')\"\n  }\n]\n",
+        "stderr": "",
+        "observations": [
+          {
+            "name": "parent original",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and memory",
+            "passed": true
+          },
+          {
+            "name": "worker cloned module and fresh memory",
+            "passed": true
+          },
+          {
+            "name": "worker fresh module and cloned memory",
+            "passed": false,
+            "error": "LinkError: Memory import env:memory provided an 'address' that is different from the module's declared 'address' import memory attribute (evaluating 'new WebAssembly.Instance(module, { env: { memory } })')"
+          }
+        ],
+        "passed": false
+      }
+    ]
+  },
+  "resources": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-canary-memory64.resources.json",
+    "sha256": "1bb801d4aac0cfabe9d3d65c5a7625d9850492f4aa3747c06ff62e56756ccaa5",
+    "peakMemoryBytes": 226779136,
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0
+  }
+}
