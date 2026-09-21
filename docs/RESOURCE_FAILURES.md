@@ -205,3 +205,12 @@ The driver's sampled linear memory reached 1.83 GiB and its RSS reached
 3.72 GiB. These counters do not fully attribute the remaining engine/native
 overhead, but they rule out a recurrence of the full-scan path in this attempt.
 See [the complete numeric trace](evidence/bun-memory-trace-2026-09-21.json).
+
+Reducing Lean's actual worker count to three, with six prestarted Bun workers,
+also leaves the parallel-cancellation gate open: Bun passed the unchanged HTTP
+registration at 3.32 GiB but stopped parallel cancellation at 8.09 GiB. Native
+Lean passed both original registrations with three workers. The Wasm and host
+snapshot matched the earlier six-worker experiment; source hashes remained
+intact, and the guard released every unit with zero OOM/throttling/swap events.
+The compiler-shell setting was validated here, not AOT-generated launchers.
+See [the retained comparison](evidence/bun-three-workers-2026-09-21.json).
