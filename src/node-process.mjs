@@ -44,8 +44,9 @@ export function createNodeProcesses({ add, get, release, cwd }) {
       });
       await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
       // Dropping a native Child does not kill its process. Its own exit listener
-      // still reaps the OS child; dropping the public handle only releases state.
-      resource.close = () => {};
+      // still reaps the OS child while the host is alive, but the dropped handle
+      // must not prevent the JavaScript process from exiting.
+      resource.close = () => child.unref();
       return numbers(add(resource), child.pid, ...ours);
     } catch (err) { for (const id of ours) if (id) release(id); throw err; }
     finally { for (const fd of theirs) native.closeDescriptor(fd); }
@@ -63,7 +64,16 @@ export function createNodeProcesses({ add, get, release, cwd }) {
     case 82: return p.exit.then(code => numbers(reap(p, code)));
     case 83: return p.code === undefined ? numbers(0) : numbers(1, reap(p, p.code));
     case 84:
-      if (p.setsid && process.platform !== 'win32') process.kill(-p.child.pid, 'SIGKILL');
+      if (p.setsid && process.platform !== 'win32') {
+        // A group can outlive its leader, even after wait reaps that leader.
+        try { process.kill(-p.child.pid, 'SIGKILL'); }
+        catch (error) { throw nativeFiles().fromNodeError(error); }
+      }
+      else if (process.platform !== 'win32' && p.reaped) {
+        // ChildProcess.kill silently returns false after its exit event. Lean's
+        // ordinary wait/tryWait consume the child and subsequent kill is ESRCH.
+        throw nativeFiles().error(constants.errno.ESRCH);
+      }
       else p.child.kill('SIGKILL');
       return Buffer.alloc(0);
     default: throw new Error(`Unknown process operation ${op}`);

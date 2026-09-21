@@ -1,0 +1,1969 @@
+{
+  "recordedAt": "2026-09-21T07:21:41.328933+00:00",
+  "scope": "Linux x64 child-process lifetime corrections; targeted native comparisons and unchanged upstream regressions, not complete Lean/OS/engine parity.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "causes": [
+    "Node ChildProcess.kill silently returns false after exit; the host lost native ESRCH after Lean wait or tryWait.",
+    "The process-group branch exposed signed libuv errno/text where native Lean uses positive POSIX errno/libc text.",
+    "A dropped Child retained a referenced Node process handle and could keep an otherwise finished host running."
+  ],
+  "fixes": [
+    "Return native ESRCH after a non-group child has been reaped.",
+    "Map POSIX process-group kill errors through native errno; retain group termination when surviving members outlive their reaped leader.",
+    "Unreference a dropped child without killing it. Its exit listener still reaps it while the parent remains alive."
+  ],
+  "before": [
+    {
+      "name": "baseline",
+      "classification": "Fixture construction error: missing Repr IO.Error instance",
+      "comparison": {
+        "scope": "Supplementary ordinary Lean process lifetime comparison; not an upstream suite result.",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-lifetime/ProcessLifetime.lean",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-lifetime/baseline-resources.json",
+        "results": [
+          {
+            "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "seconds": 0.224468727,
+            "code": 1,
+            "signal": null,
+            "stdout": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-lifetime/ProcessLifetime.lean:7:41: error(lean.synthInstanceFailed): failed to synthesize instance of type class\n  Repr IO.Error\n\nHint: Adding the command `deriving instance Repr for IO.Error` may allow Lean to derive the missing instance.\n",
+            "stderr": "",
+            "passed": false
+          }
+        ]
+      },
+      "fixtureSha256": "6bd9aa6782928db56fd67d2ac94dbc7ea5ed7515d0f56d38f72e05ab8b28fd70",
+      "resources": {
+        "report": ".work/full-engine-probe/process-lifetime/baseline-resources.json",
+        "peakMemoryBytes": 84267008,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true,
+        "exitStatus": "1",
+        "serviceResult": "exit-code",
+        "stoppedBecause": null
+      }
+    },
+    {
+      "name": "baseline2",
+      "classification": "Native control passed; old full Node output differs",
+      "comparison": {
+        "scope": "Supplementary ordinary Lean process lifetime comparison; not an upstream suite result.",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-lifetime/ProcessLifetime.lean",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-lifetime/baseline2-resources.json",
+        "results": [
+          {
+            "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "seconds": 0.35432331499999997,
+            "code": 0,
+            "signal": null,
+            "stdout": "wait: 7\nwait again: IO.Error.noSuchThing none 10 \"No child processes\"\ntryWait again: IO.Error.noSuchThing none 10 \"No child processes\"\nkill after wait: IO.Error.noSuchThing none 3 \"No such process\"\nkill before wait: ok\nzombie wait: 0\nkill after reaping zombie: IO.Error.noSuchThing none 3 \"No such process\"\nprocess lifetime comparison completed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v46-table-index/bin/lean",
+            "seconds": 9.951663955,
+            "code": 0,
+            "signal": null,
+            "stdout": "wait: 7\nwait again: IO.Error.noSuchThing none 10 \"No child processes\"\ntryWait again: IO.Error.noSuchThing none 10 \"No child processes\"\nkill after wait: ok\nkill before wait: ok\nzombie wait: 0\nkill after reaping zombie: ok\nprocess lifetime comparison completed\n",
+            "stderr": "",
+            "passed": false
+          }
+        ]
+      },
+      "fixtureSha256": "32ccafea379e2e1ce9d2ef42806acb150a442a5da57b367f29f70fe7e73ce819",
+      "resources": {
+        "report": ".work/full-engine-probe/process-lifetime/baseline2-resources.json",
+        "peakMemoryBytes": 1726992384,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true,
+        "exitStatus": "1",
+        "serviceResult": "exit-code",
+        "stoppedBecause": null
+      }
+    },
+    {
+      "name": "baseline3",
+      "classification": "Native control passed; old full Node output differs",
+      "comparison": {
+        "scope": "Supplementary ordinary Lean process lifetime comparison; not an upstream suite result.",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-lifetime/ProcessLifetime.lean",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-lifetime/baseline3-resources.json",
+        "results": [
+          {
+            "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "seconds": 0.379120193,
+            "code": 0,
+            "signal": null,
+            "stdout": "wait: 7\nwait again: IO.Error.noSuchThing none 10 \"No child processes\"\ntryWait again: IO.Error.noSuchThing none 10 \"No child processes\"\nkill after wait: IO.Error.noSuchThing none 3 \"No such process\"\nkill before wait: ok\nzombie wait: 0\nkill after reaping zombie: IO.Error.noSuchThing none 3 \"No such process\"\ngroup wait: 0\nkill reaped empty group: IO.Error.noSuchThing none 3 \"No such process\"\nprocess lifetime comparison completed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v46-table-index/bin/lean",
+            "seconds": 10.227401972,
+            "code": 0,
+            "signal": null,
+            "stdout": "wait: 7\nwait again: IO.Error.noSuchThing none 10 \"No child processes\"\ntryWait again: IO.Error.noSuchThing none 10 \"No child processes\"\nkill after wait: ok\nkill before wait: ok\nzombie wait: 0\nkill after reaping zombie: ok\ngroup wait: 0\nkill reaped empty group: IO.Error.noSuchThing none 4294967293 \"no such process\"\nprocess lifetime comparison completed\n",
+            "stderr": "",
+            "passed": false
+          }
+        ]
+      },
+      "fixtureSha256": "1bedb2950bb81249a24a8dd68530965658ee2bd229ad9e049302d9f9e0b6aef4",
+      "resources": {
+        "report": ".work/full-engine-probe/process-lifetime/baseline3-resources.json",
+        "peakMemoryBytes": 1770786816,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true,
+        "exitStatus": "1",
+        "serviceResult": "exit-code",
+        "stoppedBecause": null
+      }
+    }
+  ],
+  "directHostBefore": [
+    {
+      "classification": "Initial direct control had omitted empty request arguments; its separate drop control timed out",
+      "log": ".work/full-engine-probe/process-lifetime/host-before.log",
+      "resources": {
+        "report": ".work/full-engine-probe/process-lifetime/host-before-resources.json",
+        "peakMemoryBytes": 43528192,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true,
+        "exitStatus": "1",
+        "serviceResult": "exit-code",
+        "stoppedBecause": null
+      }
+    },
+    {
+      "classification": "Corrected controls both reproduce the host defects",
+      "log": ".work/full-engine-probe/process-lifetime/host-before2.log",
+      "resources": {
+        "report": ".work/full-engine-probe/process-lifetime/host-before2-resources.json",
+        "peakMemoryBytes": 44535808,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true,
+        "exitStatus": "1",
+        "serviceResult": "exit-code",
+        "stoppedBecause": null
+      }
+    }
+  ],
+  "directHostAfter": {
+    "passed": 2,
+    "log": ".work/full-engine-probe/process-lifetime/host-after.log",
+    "resources": {
+      "report": ".work/full-engine-probe/process-lifetime/host-after-resources.json",
+      "peakMemoryBytes": 50262016,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true,
+      "exitStatus": "0",
+      "serviceResult": "success",
+      "stoppedBecause": null
+    }
+  },
+  "packagedApplicationsAndHost": {
+    "passed": 10,
+    "log": ".work/full-engine-probe/process-lifetime/applications.log",
+    "resources": {
+      "report": ".work/full-engine-probe/process-lifetime/applications-resources.json",
+      "peakMemoryBytes": 487919616,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true,
+      "exitStatus": "0",
+      "serviceResult": "success",
+      "stoppedBecause": null
+    },
+    "ordinaryLeanFixtures": [
+      "test/fixtures/process-lifetime/Main.lean",
+      "test/fixtures/process-lifetime/Drop.lean"
+    ],
+    "engineChecks": [
+      "Native and Node/Deno/Bun lifecycle output and IO.Error constructors match.",
+      "Native and Node/Deno/Bun ordinary mains exit while the dropped child remains alive; the fixture cleans up its own child afterward."
+    ]
+  },
+  "fullCompilers": {
+    "comparison": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-lifetime/Main.lean",
+      "sourceSha256": "ad46a85c9c00fef3886edccb401f39e7027a0b97dbbc9d274348d213abec2440",
+      "scope": "Supplementary ordinary Lean process lifetime comparison; not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-lifetime/full-engines-resources.json",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.34958142600000003,
+          "code": 0,
+          "signal": null,
+          "stdout": "wait: 7\nwait again: IO.Error.noSuchThing none 10 \"No child processes\"\ntryWait again: IO.Error.noSuchThing none 10 \"No child processes\"\nkill after wait: IO.Error.noSuchThing none 3 \"No such process\"\nkill before wait: ok\nzombie wait: 0\nkill after reaping zombie: IO.Error.noSuchThing none 3 \"No such process\"\ngroup wait: 0\nkill reaped empty group: IO.Error.noSuchThing none 3 \"No such process\"\ngroup leader wait: 0\nkill live group after leader wait: ok\nprocess lifetime comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v48-process-lifetime/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v48-process-lifetime",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 10.899823325,
+          "code": 0,
+          "signal": null,
+          "stdout": "wait: 7\nwait again: IO.Error.noSuchThing none 10 \"No child processes\"\ntryWait again: IO.Error.noSuchThing none 10 \"No child processes\"\nkill after wait: IO.Error.noSuchThing none 3 \"No such process\"\nkill before wait: ok\nzombie wait: 0\nkill after reaping zombie: IO.Error.noSuchThing none 3 \"No such process\"\ngroup wait: 0\nkill reaped empty group: IO.Error.noSuchThing none 3 \"No such process\"\ngroup leader wait: 0\nkill live group after leader wait: ok\nprocess lifetime comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v48-process-lifetime/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v48-process-lifetime",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v48-process-lifetime/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 9.992500079999997,
+          "code": 0,
+          "signal": null,
+          "stdout": "wait: 7\nwait again: IO.Error.noSuchThing none 10 \"No child processes\"\ntryWait again: IO.Error.noSuchThing none 10 \"No child processes\"\nkill after wait: IO.Error.noSuchThing none 3 \"No such process\"\nkill before wait: ok\nzombie wait: 0\nkill after reaping zombie: IO.Error.noSuchThing none 3 \"No such process\"\ngroup wait: 0\nkill reaped empty group: IO.Error.noSuchThing none 3 \"No such process\"\ngroup leader wait: 0\nkill live group after leader wait: ok\nprocess lifetime comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v49-process-lifetime/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 2,
+            "engineEnvironment": {
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v49-process-lifetime/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v49-process-lifetime/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 4294967296,
+            "pthreadPoolSize": 8,
+            "backend": "full-lean-wasm64-lowered",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v49-process-lifetime",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 69.758909698,
+          "code": 0,
+          "signal": null,
+          "stdout": "wait: 7\nwait again: IO.Error.noSuchThing none 10 \"No child processes\"\ntryWait again: IO.Error.noSuchThing none 10 \"No child processes\"\nkill after wait: IO.Error.noSuchThing none 3 \"No such process\"\nkill before wait: ok\nzombie wait: 0\nkill after reaping zombie: IO.Error.noSuchThing none 3 \"No such process\"\ngroup wait: 0\nkill reaped empty group: IO.Error.noSuchThing none 3 \"No such process\"\ngroup leader wait: 0\nkill live group after leader wait: ok\nprocess lifetime comparison completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "finishedAt": "2026-09-21T07:06:47.892Z"
+    },
+    "resources": {
+      "report": ".work/full-engine-probe/process-lifetime/full-engines-resources.json",
+      "peakMemoryBytes": 4955668480,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true,
+      "exitStatus": "0",
+      "serviceResult": "success",
+      "stoppedBecause": null
+    }
+  },
+  "originalUpstreamRegressions": {
+    "node": {
+      "path": ".work/full-campaign-node-v48-process-lifetime-regressions",
+      "identity": "3ffd5044e52de82c16be23bff747476e1e615174395ff3895d4c07af9ccd5134",
+      "status": "complete",
+      "selected": 3,
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "completed": [
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "startedAt": "2026-09-21T07:08:00.062Z",
+          "finishedAt": "2026-09-21T07:08:21.029Z",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "report": ".work/full-campaign-node-v48-process-lifetime-regressions/00001-ae623e1a/resources.json",
+            "peakMemoryBytes": 3583315968,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true,
+            "exitStatus": "0",
+            "serviceResult": "success",
+            "stoppedBecause": null
+          }
+        },
+        {
+          "name": "elab/emptyEnvVar.lean",
+          "status": "passed",
+          "startedAt": "2026-09-21T07:08:21.029Z",
+          "finishedAt": "2026-09-21T07:08:31.696Z",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "report": ".work/full-campaign-node-v48-process-lifetime-regressions/00002-066717b5/resources.json",
+            "peakMemoryBytes": 2010533888,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true,
+            "exitStatus": "0",
+            "serviceResult": "success",
+            "stoppedBecause": null
+          }
+        },
+        {
+          "name": "server_interactive/cancellation_par.lean",
+          "status": "passed",
+          "startedAt": "2026-09-21T07:08:31.696Z",
+          "finishedAt": "2026-09-21T07:09:45.107Z",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "report": ".work/full-campaign-node-v48-process-lifetime-regressions/00003-ecf6763c/resources.json",
+            "peakMemoryBytes": 7709753344,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true,
+            "exitStatus": "0",
+            "serviceResult": "success",
+            "stoppedBecause": null
+          }
+        }
+      ]
+    },
+    "deno": {
+      "path": ".work/full-campaign-deno-v48-process-lifetime-regressions",
+      "identity": "d94b13020fb5d20d682de37c1a3d98b0d8bf6b4e105ff43932c010fb3e2b56ec",
+      "status": "complete",
+      "selected": 3,
+      "counts": {
+        "passed": 3,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "completed": [
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "startedAt": "2026-09-21T07:09:45.811Z",
+          "finishedAt": "2026-09-21T07:10:06.510Z",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "report": ".work/full-campaign-deno-v48-process-lifetime-regressions/00001-6fb28080/resources.json",
+            "peakMemoryBytes": 3825156096,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true,
+            "exitStatus": "0",
+            "serviceResult": "success",
+            "stoppedBecause": null
+          }
+        },
+        {
+          "name": "elab/emptyEnvVar.lean",
+          "status": "passed",
+          "startedAt": "2026-09-21T07:10:06.511Z",
+          "finishedAt": "2026-09-21T07:10:16.686Z",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "report": ".work/full-campaign-deno-v48-process-lifetime-regressions/00002-a7534371/resources.json",
+            "peakMemoryBytes": 2295021568,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true,
+            "exitStatus": "0",
+            "serviceResult": "success",
+            "stoppedBecause": null
+          }
+        },
+        {
+          "name": "server_interactive/cancellation_par.lean",
+          "status": "passed",
+          "startedAt": "2026-09-21T07:10:16.686Z",
+          "finishedAt": "2026-09-21T07:11:33.532Z",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "report": ".work/full-campaign-deno-v48-process-lifetime-regressions/00003-2f183c0d/resources.json",
+            "peakMemoryBytes": 8506490880,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true,
+            "exitStatus": "0",
+            "serviceResult": "success",
+            "stoppedBecause": null
+          }
+        }
+      ]
+    },
+    "bun": {
+      "path": ".work/full-campaign-bun-v49-process-lifetime-regressions",
+      "identity": "947e0002c0e231d831e51bcb1f635bb795aec185aa8f95e2d11c052445ec880c",
+      "status": "complete",
+      "selected": 3,
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "resource-aborted": 1,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "completed": [
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "startedAt": "2026-09-21T07:11:34.226Z",
+          "finishedAt": "2026-09-21T07:13:55.602Z",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "report": ".work/full-campaign-bun-v49-process-lifetime-regressions/00001-67a8ed67/resources.json",
+            "peakMemoryBytes": 5048283136,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true,
+            "exitStatus": "0",
+            "serviceResult": "success",
+            "stoppedBecause": null
+          }
+        },
+        {
+          "name": "elab/emptyEnvVar.lean",
+          "status": "passed",
+          "startedAt": "2026-09-21T07:13:55.602Z",
+          "finishedAt": "2026-09-21T07:15:06.251Z",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "report": ".work/full-campaign-bun-v49-process-lifetime-regressions/00002-606a20cd/resources.json",
+            "peakMemoryBytes": 2493403136,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true,
+            "exitStatus": "0",
+            "serviceResult": "success",
+            "stoppedBecause": null
+          }
+        },
+        {
+          "name": "server_interactive/cancellation_par.lean",
+          "status": "resource-aborted",
+          "startedAt": "2026-09-21T07:15:06.252Z",
+          "finishedAt": "2026-09-21T07:18:39.810Z",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "report": ".work/full-campaign-bun-v49-process-lifetime-regressions/00003-3c613060/resources.json",
+            "peakMemoryBytes": 8728322048,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true,
+            "exitStatus": "1",
+            "serviceResult": "exit-code",
+            "stoppedBecause": "Workload reached its proactive memory budget"
+          }
+        }
+      ]
+    }
+  },
+  "priorFunctionTableCampaign": {
+    "path": ".work/full-campaign-node-v46-priority",
+    "identity": "245f1d3ff3c7463647a437e6a942ff0b71cc96acd2696b55315049d723b30357",
+    "status": "paused",
+    "selected": 3896,
+    "counts": {
+      "passed": 25,
+      "failed": 0,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 3871
+    },
+    "completed": [
+      {
+        "name": "lint.py",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:38:14.633Z",
+        "finishedAt": "2026-09-21T06:38:16.561Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00001-180578cc/resources.json",
+          "peakMemoryBytes": 60346368,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "elab/async_cancellation.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:38:16.565Z",
+        "finishedAt": "2026-09-21T06:38:33.546Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00002-1efec54c/resources.json",
+          "peakMemoryBytes": 2174717952,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "elab/async_dns.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:38:33.549Z",
+        "finishedAt": "2026-09-21T06:38:48.261Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00003-4ee8e7b0/resources.json",
+          "peakMemoryBytes": 2024022016,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "elab/async_http_fuzz.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:38:48.265Z",
+        "finishedAt": "2026-09-21T06:39:08.367Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00004-80c94fbd/resources.json",
+          "peakMemoryBytes": 2251485184,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "elab/async_http_fuzz_limits.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:39:08.370Z",
+        "finishedAt": "2026-09-21T06:39:25.960Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00005-618f07a7/resources.json",
+          "peakMemoryBytes": 2197213184,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "elab/async_http_fuzz_random.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:39:25.964Z",
+        "finishedAt": "2026-09-21T06:39:43.312Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00006-ed30d851/resources.json",
+          "peakMemoryBytes": 2206535680,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "elab/async_http_hang_regressions.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:39:43.316Z",
+        "finishedAt": "2026-09-21T06:40:03.116Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00007-37a39197/resources.json",
+          "peakMemoryBytes": 2179289088,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "elab/async_select_socket.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:40:03.121Z",
+        "finishedAt": "2026-09-21T06:40:18.378Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00008-97ef5817/resources.json",
+          "peakMemoryBytes": 1834246144,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "elab/async_select_timer.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:40:18.382Z",
+        "finishedAt": "2026-09-21T06:40:31.467Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00009-0a4a1a25/resources.json",
+          "peakMemoryBytes": 1907335168,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/cancellation.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:40:31.471Z",
+        "finishedAt": "2026-09-21T06:44:19.876Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00010-3645f8f2/resources.json",
+          "peakMemoryBytes": 7597727744,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_empty_by.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:44:19.880Z",
+        "finishedAt": "2026-09-21T06:45:03.360Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00011-a39fe120/resources.json",
+          "peakMemoryBytes": 7772643328,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_par.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:45:03.364Z",
+        "finishedAt": "2026-09-21T06:46:15.036Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00012-17056994/resources.json",
+          "peakMemoryBytes": 7679201280,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_try_plain.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:46:15.041Z",
+        "finishedAt": "2026-09-21T06:47:02.387Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00013-a8d20dea/resources.json",
+          "peakMemoryBytes": 8223236096,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/catHover.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:47:02.391Z",
+        "finishedAt": "2026-09-21T06:47:36.512Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00014-ed0af0eb/resources.json",
+          "peakMemoryBytes": 6686593024,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/codeActions.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:47:36.517Z",
+        "finishedAt": "2026-09-21T06:48:15.902Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00015-3cee3ba7/resources.json",
+          "peakMemoryBytes": 7334789120,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/codeaction.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:48:15.906Z",
+        "finishedAt": "2026-09-21T06:49:05.337Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00016-fa5ce01f/resources.json",
+          "peakMemoryBytes": 8555814912,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/compHeader.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:49:05.345Z",
+        "finishedAt": "2026-09-21T06:49:38.746Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00017-36da1a27/resources.json",
+          "peakMemoryBytes": 6779035648,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/compNamespace.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:49:38.751Z",
+        "finishedAt": "2026-09-21T06:50:12.373Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00018-cd24572e/resources.json",
+          "peakMemoryBytes": 6948790272,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/completion.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:50:12.378Z",
+        "finishedAt": "2026-09-21T06:50:46.048Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00019-6d227dc9/resources.json",
+          "peakMemoryBytes": 6718828544,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/completion2.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:50:46.053Z",
+        "finishedAt": "2026-09-21T06:51:20.606Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00020-0c253e62/resources.json",
+          "peakMemoryBytes": 6706950144,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/completion3.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:51:20.610Z",
+        "finishedAt": "2026-09-21T06:51:55.725Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00021-cd34a45c/resources.json",
+          "peakMemoryBytes": 6738669568,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/completion4.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:51:55.731Z",
+        "finishedAt": "2026-09-21T06:52:29.509Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00022-33d16973/resources.json",
+          "peakMemoryBytes": 6759972864,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/completion5.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:52:29.514Z",
+        "finishedAt": "2026-09-21T06:53:03.612Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00023-e780673c/resources.json",
+          "peakMemoryBytes": 6761893888,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/completion6.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:53:03.615Z",
+        "finishedAt": "2026-09-21T06:53:37.459Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00024-fe9b0ef0/resources.json",
+          "peakMemoryBytes": 6730764288,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      },
+      {
+        "name": "server_interactive/completion7.lean",
+        "status": "passed",
+        "startedAt": "2026-09-21T06:53:37.464Z",
+        "finishedAt": "2026-09-21T06:54:01.833Z",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "report": ".work/full-campaign-node-v46-priority/00025-d157e71c/resources.json",
+          "peakMemoryBytes": 6706528256,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true,
+          "exitStatus": "0",
+          "serviceResult": "success",
+          "stoppedBecause": null
+        }
+      }
+    ]
+  },
+  "sourceSha256": {
+    "src/node-process.mjs": "f4d5db8008a3232f363f5b7de53c091cd62abe120aa08019878786fb4f44afe1",
+    "test/fixtures/process-lifetime/Main.lean": "ad46a85c9c00fef3886edccb401f39e7027a0b97dbbc9d274348d213abec2440",
+    "test/fixtures/process-lifetime/Drop.lean": "9f8aaaa81db0b866fcaf77ad6e6bb4a6e0bc99cd113da82babdb7eed64fe8f12",
+    "test/fixtures/process-detach-host.mjs": "e65a0daea9311a987fd3fb3d642fab539956c12b3db3ccf5a7c3fc93aafe40e8",
+    "test/node-process.test.mjs": "ca42425e90ebe1d5f66d442a396e4af7a193eb4874463ac7bbb31ee4cc1ccbbe",
+    "scripts/full-lean/probe-process-lifetime.mjs": "ae7c13564b545fc8e1b5900856c6102d345611e57ce2b7dfdc6647a0f892758d"
+  },
+  "remaining": [
+    "The Bun parallel-cancellation regression stopped safely at the proactive memory threshold, with no conformance result. Its eight-worker configuration needs further memory work.",
+    "The complete 3896-registration engine campaigns are unfinished. Prior-runtime passes are not imported into changed-runtime checkpoints.",
+    "Windows termination semantics and native macOS/ARM64 process validation remain open.",
+    "Bun full-compiler checks retain lowered Memory64, eight prestarted workers, and the explicit Linux stack helper.",
+    "Broader process-group, spawn-error, cancellation, and race behavior still needs native comparisons; these results do not prove all remaining differences fundamental."
+  ]
+}

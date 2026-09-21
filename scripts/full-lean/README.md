@@ -347,6 +347,15 @@ function-table optimization allows the original four-worker Node configuration
 to pass those tests without raising the memory cap. Keep these failed resource
 and concurrency experiments separate from passing conformance results.
 
+`probe-process-lifetime.mjs NEW_OUTPUT TOOLCHAIN...` compares a supplemental
+ordinary Lean fixture with the native compiler before running each full engine.
+It covers reaped-child errors, an exited child before wait, and process groups
+whose leader has exited. It verifies frozen inputs and preserves every result.
+`test/node-process.test.mjs` additionally builds ordinary Lean applications for
+the installed engines and verifies that a dropped live child does not prevent
+the parent from exiting. These Linux controls do not establish Windows or macOS
+process parity and are separate from the unchanged upstream suite.
+
 Lean's C++ shell does not read the generated application main's thread/stack
 environment defaults. The facade supplies its ordinary `-j` and `-s` options
 before user arguments. Explicit later options win. Two workers are insufficient

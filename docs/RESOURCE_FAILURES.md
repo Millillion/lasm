@@ -177,3 +177,11 @@ Five focused lookup tests and 54 cross-engine ABI/thread/library checks pass.
 Broader server and engine campaigns remain necessary. The memory cap, proactive
 stop, pressure monitor, swap restriction, and single-workload policy are unchanged.
 See [the complete comparisons](evidence/function-table-index-2026-09-21.json).
+
+The indexed Bun compiler still exceeds the proactive process-tree budget in
+the original parallel-cancellation server test: 8.13 GiB with eight prestarted
+workers per compiler process. The guard stopped and released the workload;
+all 7,267 source hashes remained intact, and high/max/OOM counters and swap
+were zero. The same original registration passed in Node and Deno. This is
+a remaining resource result, not a Bun conformance failure or a fundamental
+limit. See [the process comparison](evidence/process-lifetime-2026-09-21.json).

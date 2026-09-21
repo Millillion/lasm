@@ -498,6 +498,28 @@ is continuing. No memory cap was raised, and these comparisons recorded no OOM,
 throttling, or swap use. See
 [the full comparisons](evidence/function-table-index-2026-09-21.json).
 
+The v46 Node campaign subsequently passed 25 unchanged registrations, including
+all four cancellation tests, hover, code actions, and the first completion tests.
+It is checkpointed with 3,871 pending, zero test failures, and zero resource
+aborts. Its largest process tree reached 7.97 GiB; all 7,267 source hashes stayed
+intact and no OOM or throttling occurred. These results belong to that snapshot.
+
+Supplementary process comparisons exposed three host differences: killing a
+reaped child silently succeeded, empty-group errors used a signed libuv code
+instead of native errno, and a dropped child kept the JavaScript host alive.
+The private adapter now preserves the native errors and releases the child's
+event-loop reference without terminating it. A live process group can still be
+killed after its leader has been reaped. Ordinary Lean fixtures match the native
+control in all three packaged engines and all three full compilers; ten related
+application/host tests pass. The full snapshots are v48 for Node/Deno and v49 for
+Bun, with unchanged Wasm bytes. The unchanged upstream process, environment, and
+parallel-cancellation regressions pass 3/3 in Node and 3/3 in Deno. Bun passes
+the first two; its parallel-cancellation test stops safely at the 8.13 GiB
+process-tree peak before producing a conformance result. All original hashes
+remain intact, with no OOM, throttling, or swap use. Broader upstream validation
+and Bun server-memory work remain in progress; see
+[the retained comparisons](evidence/process-lifetime-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

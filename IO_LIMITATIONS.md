@@ -48,6 +48,12 @@ close the full-suite or cross-platform gates. See the
 - [ ] Broaden native child-process, process-group, pipe, signal and thread-ID
   parity tests, especially Windows quoting and process termination. Ordinary
   spawn/output/wait/poll/PID/kill operations and file-backed pipes are implemented.
+  Linux comparisons now cover killing reaped children, native process-group
+  errors, groups that outlive their leader, and exiting with a dropped live
+  child. Both packaged applications and full compilers match native Lean in
+  Node, Deno, and Bun on those controls. Windows termination semantics and
+  native macOS validation remain open; see
+  [the lifecycle evidence](docs/evidence/process-lifetime-2026-09-21.json).
   `IO.getTID` is now implemented using the executing worker's actual OS thread ID;
   direct checks pass in Node, Deno, and Bun on Linux x64. Full Lean validation is
   still in progress.
