@@ -356,6 +356,14 @@ the installed engines and verifies that a dropped live child does not prevent
 the parent from exiting. These Linux controls do not establish Windows or macOS
 process parity and are separate from the unchanged upstream suite.
 
+`probe-process-cwd.mjs NEW_OUTPUT TOOLCHAIN...` creates a directory and symlink
+fixture and compares ordinary child cwd resolution with native Lean before
+running the frozen full compilers. Both absolute and relative `symlink/..` paths
+must resolve in the OS. `test/node-process-cwd.test.mjs` runs the same comparison
+in packaged engines, also using spaces and Unicode in the fixture directory.
+These additional POSIX controls do not validate concurrent directory renames or
+native child-side spawn failures.
+
 Lean's C++ shell does not read the generated application main's thread/stack
 environment defaults. The facade supplies its ordinary `-j` and `-s` options
 before user arguments. Explicit later options win. Two workers are insufficient

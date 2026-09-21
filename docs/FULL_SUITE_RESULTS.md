@@ -520,6 +520,17 @@ remain intact, with no OOM, throttling, or swap use. Broader upstream validation
 and Bun server-memory work remain in progress; see
 [the retained comparisons](evidence/process-lifetime-2026-09-21.json).
 
+A separate ordinary Lean comparison caught child working-directory paths being
+normalized before the OS could follow a symlink and subsequent `..`. Preserving
+those components fixes Node and Bun; Deno additionally needs the physical path
+because its process launcher normalizes cwd again. Native Lean, all three stock
+packaged engines, and all three full compilers now pass absolute and relative
+cwd controls. The full comparison peaked at 2.43 GiB with no resource abort,
+OOM, throttling, or swap. Its snapshots are v52 for Node/Deno and v53 for Bun,
+with unchanged Wasm. These are supplemental Linux path checks, not full-suite
+passes or proof of spawn-error/race parity; see
+[the before/after evidence](evidence/process-cwd-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

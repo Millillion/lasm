@@ -1,0 +1,546 @@
+{
+  "recordedAt": "2026-09-21T07:43:59.547281+00:00",
+  "scope": "Linux x64 native comparisons for ordinary Lean child cwd; supplemental fixtures, not full upstream or cross-platform conformance.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "cause": "The host normalized symlink/.. components lexically before POSIX chdir. Deno spawn normalizes the supplied cwd again.",
+  "correction": [
+    "Preserve absolute and relative child cwd components for OS resolution.",
+    "In Deno on POSIX, obtain the physical directory through realpath before its process launcher normalizes the path."
+  ],
+  "fixture": {
+    "source": "test/fixtures/process-cwd/Main.lean",
+    "cases": [
+      "Absolute base/link/.. resolves to target, not base.",
+      "Relative link/.. after IO.Process.setCurrentDir resolves to the same target.",
+      "The packaged fixture directory contains spaces and a Unicode character."
+    ]
+  },
+  "before": {
+    "comparison": {
+      "fixture": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-cwd/Main.lean",
+      "sourceSha256": "156788c9fb282923ef53ad7b5066746be8fa749048d53d229480ae6674c890ab",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "status": 0,
+          "signal": null,
+          "output": [
+            null,
+            "process cwd comparison completed\n",
+            ""
+          ],
+          "pid": 1784341,
+          "stdout": "process cwd comparison completed\n",
+          "stderr": "",
+          "seconds": 0.276502398,
+          "passed": true
+        },
+        {
+          "name": ".work/full-toolchains/node-v48-process-lifetime",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v48-process-lifetime/bin/lean",
+          "status": 1,
+          "signal": null,
+          "output": [
+            null,
+            "",
+            "uncaught exception: absolute symlink cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-cwd-before/base\\n\", \"\"\n"
+          ],
+          "pid": 1784371,
+          "stdout": "",
+          "stderr": "uncaught exception: absolute symlink cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-cwd-before/base\\n\", \"\"\n",
+          "seconds": 10.487518814,
+          "passed": false
+        }
+      ]
+    },
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-cwd-before-resources.json",
+      "peakMemoryBytes": 1878941696,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-21T07:34:15.705Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 12222464,
+        "peakMemoryBytes": 1878941696,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 65536,
+          "kernel": 958464,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 45056,
+          "slab": 144328
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "intermediate": [
+    {
+      "scope": "Removing host normalization fixed Node, but Deno still differed; first application run stopped at that assertion.",
+      "log": ".work/full-engine-probe/process-cwd-applications.log",
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-cwd-applications-resources.json",
+        "peakMemoryBytes": 417255424,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T07:35:55.998Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 29945856,
+          "peakMemoryBytes": 417255424,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 16789504,
+            "kernel": 1732608,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 15196160,
+            "slab": 902144
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        }
+      }
+    },
+    {
+      "scope": "Cached application comparison ran all engines: Node and Bun passed, Deno failed.",
+      "log": ".work/full-engine-probe/process-cwd-engines.log",
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-cwd-engines-resources.json",
+        "peakMemoryBytes": 99590144,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T07:36:48.232Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12423168,
+          "peakMemoryBytes": 99590144,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 94208,
+            "kernel": 946176,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 94208,
+            "slab": 143416
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        }
+      }
+    },
+    {
+      "scope": "The first tiny Deno realpath diagnostic accidentally normalized its own argument; this was a probe construction error.",
+      "log": ".work/full-engine-probe/check-deno-cwd.log"
+    },
+    {
+      "scope": "Corrected unnormalized input confirmed that Deno realpath uses physical symlink resolution.",
+      "log": ".work/full-engine-probe/check-deno-cwd-raw.log",
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/check-deno-cwd-raw-resources.json",
+        "peakMemoryBytes": 27234304,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T07:38:29.631Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12001280,
+          "peakMemoryBytes": 27234304,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 57344,
+            "kernel": 962560,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 57344,
+            "slab": 139000
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        }
+      }
+    }
+  ],
+  "packagedApplications": {
+    "log": ".work/full-engine-probe/process-cwd-fixed.log",
+    "nodeTestPasses": 4,
+    "explanation": "One parent test plus three engine subtests; native Lean is the control.",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-cwd-fixed-resources.json",
+      "peakMemoryBytes": 430432256,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T07:39:54.700Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 28672000,
+        "peakMemoryBytes": 430432256,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 15798272,
+          "kernel": 1462272,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 14204928,
+          "slab": 640192
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "fullCompilers": {
+    "comparison": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-cwd/Main.lean",
+      "sourceSha256": "156788c9fb282923ef53ad7b5066746be8fa749048d53d229480ae6674c890ab",
+      "scope": "Supplementary POSIX child cwd comparison with absolute/relative symlink/.. paths; not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-cwd-full-resources.json",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.26213505099999995,
+          "code": 0,
+          "signal": null,
+          "stdout": "process cwd comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v52-process-cwd/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v52-process-cwd",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 10.310969413999999,
+          "code": 0,
+          "signal": null,
+          "stdout": "process cwd comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v52-process-cwd/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v52-process-cwd",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v52-process-cwd/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 10.202808262000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "process cwd comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v53-process-cwd-lowered/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v53-process-cwd-lowered",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v53-process-cwd-lowered/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 2,
+            "engineEnvironment": {
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v53-process-cwd-lowered/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v53-process-cwd-lowered/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 4294967296,
+            "pthreadPoolSize": 8,
+            "backend": "full-lean-wasm64-lowered",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v53-process-cwd-lowered",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v53-process-cwd-lowered/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v53-process-cwd-lowered/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v53-process-cwd-lowered/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v53-process-cwd-lowered/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 69.82714287499999,
+          "code": 0,
+          "signal": null,
+          "stdout": "process cwd comparison completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "finishedAt": "2026-09-21T07:43:42.812Z"
+    },
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/process-cwd-full-resources.json",
+      "peakMemoryBytes": 2608357376,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T07:43:42.878Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 14508032,
+        "peakMemoryBytes": 2608357376,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10219520,
+          "file": 1900544,
+          "kernel": 1007616,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 1900544,
+          "slab": 154528
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      }
+    }
+  },
+  "sourceSha256": {
+    "src/node-process.mjs": "c9927e9246ff93dacc4350fb1aee70d725e9544aa8d604b35ca4a3f8fa6bb91a",
+    "test/fixtures/process-cwd/Main.lean": "156788c9fb282923ef53ad7b5066746be8fa749048d53d229480ae6674c890ab",
+    "test/node-process-cwd.test.mjs": "2219a01426730d1f347848ef8f3b391490aac5b202bfe921dcf7fc3da4e438f4",
+    "scripts/full-lean/probe-process-cwd.mjs": "81838d7e5c6bf5d1e174053dd850f53ce9147089f7cd7fc0b4e02dab4a1b5fd6"
+  },
+  "remaining": [
+    "This does not validate Windows/macOS behavior, concurrent directory renames, or all process-spawn errors.",
+    "Native POSIX child-side chdir/exec failure behavior still requires a separate correction.",
+    "The entire 3896-registration JavaScript campaigns remain unfinished.",
+    "Full Bun retains lowered Memory64, eight workers, and the explicit Linux stack helper."
+  ]
+}

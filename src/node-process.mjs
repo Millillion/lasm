@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
+import { realpath } from 'node:fs/promises';
 import { constants } from 'node:os';
-import { resolve } from 'node:path';
+import { resolve, isAbsolute, sep } from 'node:path';
 import { nativeFiles } from './native-files.mjs';
 import { numbers } from './node-host.mjs';
 
@@ -16,7 +17,15 @@ export function createNodeProcesses({ add, get, release, cwd }) {
     };
     const modes = [number(), number(), number()];
     const inherit = !!number(), setsid = !!number(), argc = number(), envc = number(), hasCwd = number();
-    const command = string(), args = Array.from({ length: argc }, string), directory = hasCwd ? resolve(cwd(), string()) : cwd();
+    const command = string(), args = Array.from({ length: argc }, string);
+    let directory = cwd();
+    if (hasCwd) {
+      const value = string();
+      // POSIX chdir resolves symlinks before subsequent '..' components. Keep
+      // that resolution in the OS, as for ordinary Lean filesystem paths.
+      directory = process.platform === 'win32' ? resolve(directory, value)
+        : isAbsolute(value) ? value : directory + sep + value;
+    }
     const env = inherit ? { ...process.env } : {};
     for (let i = 0; i < envc; i++) {
       const key = string(), present = number();
@@ -26,6 +35,9 @@ export function createNodeProcesses({ add, get, release, cwd }) {
   }
   async function start(bytes) {
     const options = decode(bytes), native = nativeFiles();
+    // Deno's Node-compatible spawn normalizes cwd lexically. Resolve it with
+    // the OS first so a symlink followed by '..' retains native Lean behavior.
+    if (process.versions.deno && process.platform !== 'win32') options.directory = await realpath(options.directory);
     const ours = [], theirs = [];
     try {
       const stdio = options.modes.map((mode, index) => {

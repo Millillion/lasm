@@ -54,6 +54,11 @@ close the full-suite or cross-platform gates. See the
   Node, Deno, and Bun on those controls. Windows termination semantics and
   native macOS validation remain open; see
   [the lifecycle evidence](docs/evidence/process-lifetime-2026-09-21.json).
+  Absolute and relative child working directories containing `symlink/..` now
+  also match native Linux in both execution paths and all three engines; see
+  [the cwd comparisons](docs/evidence/process-cwd-2026-09-21.json). Concurrent
+  directory renames and native POSIX child-side `chdir`/`exec` failure behavior
+  still need separate comparisons and corrections.
   `IO.getTID` is now implemented using the executing worker's actual OS thread ID;
   direct checks pass in Node, Deno, and Bun on Linux x64. Full Lean validation is
   still in progress.
