@@ -1,0 +1,866 @@
+{
+  "recordedAt": "2026-09-21T18:08:54.447852+00:00",
+  "scope": "Linux x64 Bun v109 candidate with five prestarted pthread workers, four Lean workers, and the unchanged original server test driver. Same Wasm and host implementation as v108; the worker pool may still grow dynamically.",
+  "findings": [
+    "Three independent runs of the unchanged HTTP regression passed. The earlier smaller-pool failure remains recorded on its older runtime.",
+    "The 16-control selection finished with 14 passes and two proactive resource aborts, not test failures.",
+    "All three original-driver cancellation controls passed. Original-driver docstringLinksExamples and hover crossed the existing 8 GiB proactive budget and were stopped.",
+    "All 7267 original test-source hashes were unchanged before and after every attempt, including the two interrupted tests.",
+    "All memory cap-hit, throttling, OOM, and swap counters remained zero. The guard limits were unchanged."
+  ],
+  "decision": "Keep five-worker Bun configuration experimental; do not claim these results close the original-driver server memory gate or the full-suite gate.",
+  "config": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "engine": "bun",
+    "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+    "engineArgs": [],
+    "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v109-pool5-lowered",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+    "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+    "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v109-pool5-lowered/runtime-support",
+    "leanThreads": 4,
+    "lakeThreads": 1,
+    "bunSmol": false,
+    "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+    "systemAllocator": "mimalloc",
+    "leanAllocator": "mimalloc",
+    "memoryMode": 2,
+    "engineEnvironment": {
+      "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v109-pool5-lowered/bun-stack-reservation.so",
+      "BUN_JSC_maxPerThreadStackUsage": "62914560"
+    },
+    "stackAdjustment": {
+      "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v109-pool5-lowered/bun-stack-reservation.so",
+      "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+      "osThreadStackBytes": 67108864,
+      "jscStackBudgetBytes": 62914560,
+      "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+    },
+    "maximumMemoryBytes": 4294967296,
+    "pthreadPoolSize": 5,
+    "backend": "full-lean-wasm64-lowered",
+    "nativeLeanFallback": false,
+    "environmentAdjustments": {
+      "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v109-pool5-lowered",
+      "LASM_FULL_APP_PATH": "Selected facade entry point",
+      "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+      "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+      "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+    },
+    "externalTools": {
+      "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v109-pool5-lowered/lib",
+      "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v109-pool5-lowered/include",
+      "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v109-pool5-lowered/share",
+      "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v109-pool5-lowered/bin/leanmake",
+      "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+      "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+    }
+  },
+  "snapshot": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v109-pool5-lowered/snapshot.json",
+    "sha256": "2beb1ac3eb8983cbcfce6aad797d648d8c5e2a7b01c2a99e319031f13e50958d"
+  },
+  "campaigns": [
+    {
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-http/campaign.json",
+        "sha256": "5a69e8d409562c4a029fbb4e96cd108ab49c730dbc827012f6b678203222bfcc"
+      },
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "tests": [
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-http/00001-2308d28a/results/execution.json",
+            "sha256": "9c0bc4708ed8c997e566ab5361bc7a3c5a573ffb6403d990bf11bfda36c7103c"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-http/00001-2308d28a/resources.json",
+            "sha256": "08ffe397654712fa124dc79c714fced5821637125be4784c0f72f3eacc6ddf42",
+            "peakMemoryBytes": 2509295616,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    },
+    {
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/campaign.json",
+        "sha256": "08609de60fbea7604c77b24b02c8353124cf030c221500a7f89f9dc78984aebc"
+      },
+      "counts": {
+        "passed": 14,
+        "failed": 0,
+        "resource-aborted": 2,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "tests": [
+        {
+          "name": "compile/StackOverflow.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00001-6f3d6ea8/results/execution.json",
+            "sha256": "8776c9cf438c71db56fb87f427b41634e675bc082769eae0030b9073caac58c3"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00001-6f3d6ea8/resources.json",
+            "sha256": "6aa351a134f09e2a496e26f96664ca5ad9fa363cf620c29cd78bcbcfd4c17eb4",
+            "peakMemoryBytes": 2081804288,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/StackOverflowTask.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00002-c35b4df2/results/execution.json",
+            "sha256": "d58d5be1efa154a490dbbce725319da0dbb8150fe15976647c392d07da9771b3"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00002-c35b4df2/resources.json",
+            "sha256": "b287b817bf6535e79bb0d4600bc6727c347807ca1218c3a3a07112a7670e1bd6",
+            "peakMemoryBytes": 2103476224,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00003-c976d844/results/execution.json",
+            "sha256": "d0c4752b3a6c3ac978d7ad86f3757a727c61ef88404344e7c33cdf90208d7ab3"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00003-c976d844/resources.json",
+            "sha256": "469f2fd76a370850d58466f544f1b85fbd9315bc681dbcef7cba8cfa49fdc5b6",
+            "peakMemoryBytes": 2110840832,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00004-9b075300/results/execution.json",
+            "sha256": "737423d3f916099aec51c41aad675d123f7db4bd1c05eca3d8e68791ea8329a0"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00004-9b075300/resources.json",
+            "sha256": "f4d6cb9b6ab35c70e58ef2b137be6132c8a1c2c1f1d50e6c3fa3017b553a24df",
+            "peakMemoryBytes": 2165354496,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00005-6802364f/results/execution.json",
+            "sha256": "08fd9414111edbd66d0bf6d11081b71ba01ec46f169f5dd5af63873d387e32a0"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00005-6802364f/resources.json",
+            "sha256": "366957a4abf7d984fc853e934383b7539630bcbe7279a286f320b08fe46d8aab",
+            "peakMemoryBytes": 4027019264,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00006-23c6bc7a/results/execution.json",
+            "sha256": "d21b0f1a452970746bec9b5b4049db92f65e8aaf53b8d507efe48522a2ac4c74"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00006-23c6bc7a/resources.json",
+            "sha256": "aa2f46ae953390beb9042c13c925540d28c2bc409395d759ec5d90a002e2f383",
+            "peakMemoryBytes": 2506268672,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/async_select_timer.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00007-a1f93239/results/execution.json",
+            "sha256": "b102c4bc26973dbcc4eafa3ea6e1f5416fc65ec85cc10b368259fde94cc6e490"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00007-a1f93239/resources.json",
+            "sha256": "afe39af1adae1c40fb26322ecee88878d564d77e0cf3618bd1dfe47642b73379",
+            "peakMemoryBytes": 2167062528,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/async_tcp_server_client.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00008-cd74c3ca/results/execution.json",
+            "sha256": "23cf9fabd76e7ecc9983ce40420436c3bdca1ca10d8d234b80b9d7b1428238c7"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00008-cd74c3ca/resources.json",
+            "sha256": "8e48967c255015887e0c57ef10bb510e749bc6f28cb906b622e1de3a2f955027",
+            "peakMemoryBytes": 2394628096,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/async_udp_sockets.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00009-b5651cbf/results/execution.json",
+            "sha256": "7ba0b214f133a3fba6871190d0a54e44108481f0cdbdbd34178c76ea18fd3b8b"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00009-b5651cbf/resources.json",
+            "sha256": "1504a574269787408c59759d8cfe0e118eaa56349818095cd0ae4d8a719823af",
+            "peakMemoryBytes": 2283372544,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/sync_shared_mutex.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00010-8bd7db08/results/execution.json",
+            "sha256": "74865565c0f3ecfd2aea3ca6d89e69db32846c6bac02e139924bccdbb13193a3"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00010-8bd7db08/resources.json",
+            "sha256": "f1bb4abc90a1a8c1f1c596af4c10468f95f0f6d3f94c5196e7a634525124f44d",
+            "peakMemoryBytes": 2452692992,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00011-ecc6fa7c/results/execution.json",
+            "sha256": "3a2dd3e865609370086506afe3379ced9a36eb4312363b8e6cb003f8d4693461"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00011-ecc6fa7c/resources.json",
+            "sha256": "138d0840f2b38add306075293ae93a6a20d5a4caae75fa45638de16a4935fc62",
+            "peakMemoryBytes": 2186711040,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "server_interactive/cancellation.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00012-d78a7cca/results/execution.json",
+            "sha256": "d82d8e24164c0b2d4db40eaee9700b7ccc63190bfe506fa703440421f3efc20c"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00012-d78a7cca/resources.json",
+            "sha256": "787dfed0f7549820650575886bcc521b3c5ac64ece855839ad3e6e985155f666",
+            "peakMemoryBytes": 8104640512,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "server_interactive/cancellation_empty_by.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00013-5dff0bf8/results/execution.json",
+            "sha256": "948931c1f8f54b43a8b76f7efc2a53bb8969013658e55e0d2ef83f7357627552"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00013-5dff0bf8/resources.json",
+            "sha256": "b840bc3c8277b747471aa0f3394185df4ecb6cefc95183ff68d65ea1b8fa3341",
+            "peakMemoryBytes": 8101109760,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "server_interactive/cancellation_par.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00014-89ddfd36/results/execution.json",
+            "sha256": "bb6551a3fb418de59f176cd7dc40232048d51424936d701ca1adaaf473fd13e5"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00014-89ddfd36/resources.json",
+            "sha256": "b4a8e6d64c77988d74446ce53cedce3a252932e3464644977a3e31c4398a8e0e",
+            "peakMemoryBytes": 8006160384,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "server_interactive/docstringLinksExamples.lean",
+          "status": "resource-aborted",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00015-7353de4a/results/execution.json",
+            "sha256": "b90ed86dfed9561c6c94701ee657e2f47a63d02dcd44351faa1131e8fd2c201e"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00015-7353de4a/resources.json",
+            "sha256": "b859aa65225d9895132ddc03c825edc7cd7d40caa40887037f52023410ddf898",
+            "peakMemoryBytes": 8612257792,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": true,
+            "stoppedBecause": "Workload reached its proactive memory budget",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "server_interactive/hover.lean",
+          "status": "resource-aborted",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00016-d570f7c0/results/execution.json",
+            "sha256": "515a2367086439856538e1248be0b215fd6d551df49810618f3b8030084a5e08"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-controls/00016-d570f7c0/resources.json",
+            "sha256": "f51e90c5adfb6ec476d8dc4a1e52cafd5ee22835ef02e2390c2831ba2f7bad77",
+            "peakMemoryBytes": 8603066368,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": true,
+            "stoppedBecause": "Workload reached its proactive memory budget",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    },
+    {
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-http-repeat3/campaign.json",
+        "sha256": "9cde6d1836e69c231bdedfa9f3c58b518d026326da75bde06d7bd47974c72843"
+      },
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "tests": [
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-http-repeat3/00001-0618f38b/results/execution.json",
+            "sha256": "dfcac67cbacfa55c389fd3b88df96a6af3ba60d3ba9e624927916cc451f223b1"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v109-pool5-http-repeat3/00001-0618f38b/resources.json",
+            "sha256": "1593ccddb1c8cbb3d2e1a11c4ecd4c730c1afc2c5d101e4f115452dceca3d9b6",
+            "peakMemoryBytes": 2493538304,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "resourceLimited": false,
+            "stoppedBecause": null,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    }
+  ]
+}

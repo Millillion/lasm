@@ -946,3 +946,15 @@ runtime ABI declarations, interpreter symbol retention, and host API coverage.
 
 Reproduction and experimental build details are in
 [the full-suite harness documentation](../scripts/full-lean/README.md).
+## Follow-up Bun worker-pool controls, September 21
+
+After the table-growth and realPath repairs, a separate five-worker Bun
+configuration passed three independent runs of the unchanged HTTP regression.
+Its broader selection finished with 14 passes and two resource aborts. All three
+original-driver cancellation controls passed; `docstringLinksExamples` and
+`hover` crossed the existing 8 GiB proactive budget and stopped. These are
+resource aborts, not test failures. All original file hashes were unchanged
+before and after every attempt, and all OOM, kernel-cap, throttle, and swap
+counters remained zero. The smaller pool remains experimental; this does not
+close the original-driver memory or full-suite gates. See
+[the frozen configuration and every result](evidence/bun-pool5-current-2026-09-21.json).
