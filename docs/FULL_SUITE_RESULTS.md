@@ -800,6 +800,16 @@ Independent virtual-cwd permission inheritance and the complete upstream suites
 remain open. The repaired frozen Node/Deno build is v86 and Bun is v88; neither
 result is imported into the older v78 broad campaign.
 
+The repaired hosts pass **24/24 selected unchanged upstream registrations**:
+both stack-overflow diagnostics, dedicated-worker shutdown, the ten-million-element
+list calculation, `IO_test`, `Process`, HTTP hang regressions, and `tempfile` in
+each of Node, Deno, and Bun. Both compiled and interpreted paths ran where the
+original driver requests them. All 7,267 original file hashes remained intact
+before and after each registration. Peak workload memory was **3.78 GiB**, with
+zero OOM, throttling, cap-hit, or swap events. Bun retains the disclosed Linux
+stack adjustment. This focused result does not close the complete-suite or
+packaged-runtime gates. See [the upstream regression evidence](evidence/native-launcher-upstream-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
