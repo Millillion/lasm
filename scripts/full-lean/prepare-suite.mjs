@@ -1,12 +1,13 @@
 // Prepare a parallel CTest suite. Upstream source tests and expected files remain
 // byte-for-byte unchanged; only generated environment drivers and deadlines vary.
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, symlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, symlinkSync, chmodSync } from 'node:fs';
 import { resolve, join, relative } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 
 import { ensureResourceGuard } from './resource-guard.mjs';
+import { verifyDriverArtifacts } from './driver-artifacts.mjs';
 
 await ensureResourceGuard();
 
@@ -15,6 +16,19 @@ const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 
 const output = resolve(option('--output', '.work/full-suite-native'));
 const prefix = resolve(option('--prefix', resolveLean(root).prefix));
 const backend = option('--backend', 'native');
+const driverManifest = option('--compiled-server-driver') && resolve(option('--compiled-server-driver'));
+const compiledServerDriver = driverManifest ? JSON.parse(readFileSync(driverManifest)) : undefined;
+if (compiledServerDriver) {
+  if (compiledServerDriver.version !== 1 || compiledServerDriver.leanCommit !== leanCommit
+    || compiledServerDriver.prefix !== prefix || compiledServerDriver.engine !== backend
+    || !compiledServerDriver.finishedAt || !compiledServerDriver.artifacts?.[compiledServerDriver.executable])
+    throw new Error('The compiled server driver must be a completed build for this exact pinned toolchain');
+  if (compiledServerDriver.config && createHash('sha256').update(readFileSync(join(prefix, 'toolchain.json'))).digest('hex')
+      !== compiledServerDriver.toolchainConfigSha256)
+    throw new Error('The compiled driver toolchain configuration changed');
+  const verified = await verifyDriverArtifacts(compiledServerDriver.artifacts);
+  if (verified.modified.length) throw new Error(`Compiled driver artifacts changed: ${verified.modified.join(', ')}`);
+}
 const networkLock = option('--network-lock') && resolve(option('--network-lock'));
 if (networkLock) {
   execFileSync('flock', ['--version'], { stdio: 'ignore' });
@@ -88,6 +102,30 @@ const environment = join(output,'with-test-environment.sh');
 const addEnvironment = text => rewriteEnvironment(text).replace('export ',
   `export LEAN_SRC_PATH=${shellQuote(sourcePath)} MAKEFLAGS=${shellQuote(makeFlags)} `);
 writeFileSync(environment, addEnvironment(readFileSync(originalEnvironment,'utf8')));
+let harnessArtifacts;
+if (compiledServerDriver) {
+  const driverSource = join(source, 'tests/server_interactive/run_test.lean');
+  if (digest(readFileSync(driverSource)) !== compiledServerDriver.sourceSha256)
+    throw new Error('Compiled driver does not match the unchanged upstream source');
+  const shimDirectory = join(output, 'compiled-driver-bin');
+  mkdirSync(shimDirectory, { recursive: true });
+  const shim = join(shimDirectory, 'lean');
+  writeFileSync(shim, `#!/usr/bin/env bash
+if [ "$PWD" = ${shellQuote(join(source, 'tests/server_interactive'))} ] && [ "$#" -eq 4 ] && [ "$1" = '-Dlinter.all=false' ] && [ "$2" = '--run' ] && [ "$3" = 'run_test.lean' ]; then
+  export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-4}"
+  export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-65536}"
+  exec ${shellQuote(compiledServerDriver.executable)} "$4"
+fi
+exec ${shellQuote(join(prefix, 'bin/lean'))} "$@"
+`);
+  chmodSync(shim, 0o755);
+  const current = readFileSync(environment, 'utf8'), needle = " PATH='";
+  if (current.split(needle).length !== 2) throw new Error('Upstream PATH environment layout changed');
+  writeFileSync(environment, current.replace(needle, ` PATH=${shellQuote(shimDirectory)}:'`));
+  harnessArtifacts = { ...compiledServerDriver.artifacts,
+    [driverManifest]: digest(readFileSync(driverManifest)), [shim]: digest(readFileSync(shim)),
+    [environment]: digest(readFileSync(environment)) };
+}
 const testExternDriver = join(output, 'test-extern-driver.sh');
 if (extraRegistrations.length) writeFileSync(testExternDriver,
   `# The original test intentionally pipes a failing Lake build into its error checker.\n` +
@@ -120,10 +158,12 @@ const lines = registered.flatMap(entry => {
 });
 writeFileSync(join(execution,'CTestTestfile.cmake'),lines.join('\n')+'\n');
 writeFileSync(join(output,'parallel-suite.json'),JSON.stringify({leanCommit,backend,prefix,source,archiveSha256:expected,
+  ...(compiledServerDriver ? { compiledServerDriver, harnessArtifacts } : {}),
   registered:registered.length,extraRegistrations,networkLock,timeoutSeconds:timeout,testSourceHashes:hashesFile,
   changes:['Generated environment points to the selected toolchain and isolated source copy.',
     'LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.',
     'Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.',
+    ...(compiledServerDriver ? ['The exact server_interactive run_test.lean invocation uses its unchanged source compiled ahead of time in the selected engine. Server/compiler children and expected outputs are unchanged. This is a distinct optional harness; its driver artifacts are verified before and after each run.'] : []),
     ...(networkLock ? [`A shared flock at ${networkLock} serializes the original fixed-port TCP/UDP tests across engine runs.`] : []),
     ...(extraRegistrations.length ? ['Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.',
       'A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.'] : []),

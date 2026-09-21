@@ -559,6 +559,31 @@ embedded-NUL behavior, and non-Linux validation remain open; see
 The independently checkpointed v52 Node campaign continues on its original
 snapshot; these focused new passes are not imported into that campaign.
 
+That original-driver campaign is now checkpointed at **27 passes, one resource
+abort, and 3,868 pending registrations**. `docstringLinksExamples` reached the
+8.01 GiB proactive budget. An optional parallel harness compiles the unchanged
+two-line `run_test.lean` driver ahead of time in the selected engine. Only its
+exact invocation is replaced; the full server/compiler children and all original
+tests and expected outputs remain unchanged. This preparation reduces the
+driver's interpretation overhead without changing the memory limits.
+
+The five original cancellation/documentation/hover controls pass **5/5 in native
+Lean and 5/5 in Node**, with Node peaks of 6.20–7.31 GiB. Deno passes the two
+selected parallel-cancellation/documentation controls at 6.87–7.26 GiB. Bun's
+first cancellation control instead reaches the unchanged 900-second deadline
+at 6.56 GiB; four controls remain pending. This is a timeout, not a resource
+abort or a pass. Its repeated file-worker startup remains slow.
+
+The maintained opt-in builder records source, toolchain, and executable hashes.
+The suite checks driver artifacts before and after every registration; three
+small private controls confirm that unchanged inputs pass and drift before or
+during execution stops as a harness failure. All 7,267 upstream source hashes
+remain intact in the completed Lean controls. A fresh 3,896-registration Node
+campaign now uses this separate harness and imports no earlier passes. Neither
+the subset results nor this harness change closes the original-driver resource
+gap or establishes complete conformance. See
+[the configurations and retained outcomes](evidence/compiled-server-driver-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

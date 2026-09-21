@@ -64,6 +64,38 @@ of the expanded sequence, all runtime/source-manifest inputs must match, and
 the prior selection is retained in checkpoint history. Completed results and
 their evidence are preserved without rerunning them.
 Completed failures are retained and require a separate rerun after a fix.
+
+For an explicitly separate language-server harness, the original two-line Lean
+test driver can be compiled ahead of time in the selected engine:
+
+```sh
+node scripts/full-lean/build-server-driver.mjs .work/full-toolchains/node-v52-process-cwd .work/server-driver-node
+node scripts/full-lean/prepare-suite.mjs --prefix .work/full-toolchains/node-v52-process-cwd --backend node --output .work/suite-node-compiled-driver --include-excluded --timeout 900 --compiled-server-driver .work/server-driver-node/driver.json
+node scripts/full-lean/run-campaign.mjs --suite .work/suite-node-compiled-driver --output .work/campaign-node-compiled-driver
+```
+
+The builder and suite preparation apply the resource guard automatically. Use
+fresh output directories. This opt-in mode replaces only the exact
+`lean -Dlinter.all=false --run run_test.lean TEST` call in `server_interactive`.
+The original driver source is compiled without edits; server/compiler children,
+test files, and expected outputs remain unchanged. The driver uses the same
+four Lean workers and 64 MiB stack default as the ordinary full-engine facade.
+The selected toolchain must match the recorded driver build, and driver files
+and generated wrappers are checked before and after each run. Keep its results
+separate from the interpreted-driver campaigns. A passing compiled-driver run
+does not erase an original-driver memory stop or establish full conformance.
+`probe-driver-integrity.mjs NEW_DIRECTORY` checks unchanged inputs and drift
+before/during execution using three tiny private CTest controls, each guarded
+individually; run that supervisor directly.
+
+For the driver build only, `build-server-driver.mjs PREFIX NEW_OUTPUT
+--external-link` lets Leanc print its public C/link flags and exit before the
+same external compiler runs. This avoids keeping a full Wasm Leanc process
+resident throughout linking. It requires a full-toolchain prefix without
+whitespace and records the flags without evaluating shell code. This is a
+disclosed preparation adjustment; it does not change how the suite invokes
+Leanc or other Lean tools under test.
+
 A proactive workload-budget stop is recorded as `resource-aborted`, never as a
 test failure or pass. Host pressure, actual OOM, monitoring failures, and source
 drift stop the campaign for investigation. Do not wrap this small supervisor in

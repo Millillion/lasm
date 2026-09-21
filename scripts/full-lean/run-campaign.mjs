@@ -149,11 +149,13 @@ for (const [index, test] of state.tests.entries()) {
   if (interrupted) status = 'interrupted';
   else if (resource?.resourceLimited) status = 'resource-aborted';
   else if (execution && execution.originalSources.before.modified.length === 0 && execution.originalSources.after.modified.length === 0
+    && (execution.harnessArtifacts?.before.modified.length ?? 0) === 0 && (execution.harnessArtifacts?.after.modified.length ?? 0) === 0
     && progress?.completed.length === 1 && progress.completed[0].name === test.name && !unsafe) {
     status = exit.code === 0 && execution.result.code === 0 && progress.completed[0].result === 'Passed' ? 'passed' : 'failed';
   } else status = 'harness-failed';
   Object.assign(attempt, { status, exit, finishedAt: new Date().toISOString(), resourceReport: resourcePath,
-    peakMemoryBytes: resource?.peakMemoryBytes, originalSources: execution?.originalSources });
+    peakMemoryBytes: resource?.peakMemoryBytes, originalSources: execution?.originalSources,
+    ...(execution?.harnessArtifacts ? { harnessArtifacts: execution.harnessArtifacts } : {}) });
   test.status = status === 'interrupted' ? 'pending' : status;
   executed++;
   save();

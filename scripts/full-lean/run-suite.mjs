@@ -6,6 +6,7 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { cleanupTestProcesses } from './cleanup-processes.mjs';
 import { ensureResourceGuard } from './resource-guard.mjs';
+import { verifyDriverArtifacts } from './driver-artifacts.mjs';
 
 await ensureResourceGuard();
 
@@ -28,6 +29,8 @@ function verify() {
 }
 const before = verify();
 if (before.modified.length) throw new Error(`Upstream test sources changed before execution: ${before.modified.join(', ')}`);
+const harnessBefore = await verifyDriverArtifacts(manifest.harnessArtifacts);
+if (harnessBefore.modified.length) throw new Error(`Harness artifacts changed before execution: ${harnessBefore.modified.join(', ')}`);
 // Supply ordinary host context without forwarding unrelated service credentials
 // or user compiler overrides into third-party test drivers.
 const env = Object.fromEntries(['PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR', 'SYSTEMROOT', 'COMSPEC', 'PATHEXT',
@@ -46,7 +49,8 @@ const filter = option('--filter');
 if (filter) command.push('-R', filter);
 const startedAt = new Date().toISOString();
 writeFileSync(join(results, 'execution-started.json'), JSON.stringify({ startedAt, command,
-  resourceReport: process.env.LASM_RESOURCE_REPORT, originalSources: { before } }, null, 2) + '\n');
+  resourceReport: process.env.LASM_RESOURCE_REPORT, originalSources: { before },
+  harnessArtifacts: { before: harnessBefore } }, null, 2) + '\n');
 const runId = `${directory}:${startedAt}:${process.pid}`;
 env.LASM_UPSTREAM_RUN_ID = runId;
 const log = createWriteStream(join(results, 'execution.log'));
@@ -96,11 +100,14 @@ if (cleanup.length) {
 }
 await new Promise(resolve => log.end(resolve));
 const after = verify();
+const harnessAfter = await verifyDriverArtifacts(manifest.harnessArtifacts);
 writeFileSync(join(results, 'execution.json'), JSON.stringify({ startedAt, finishedAt: new Date().toISOString(),
   backend: manifest.backend, registered: manifest.registered, command, result, originalSources: { before, after },
+  harnessArtifacts: { before: harnessBefore, after: harnessAfter },
   leftoverProcessCleanup: cleanup,
   resourceReport: process.env.LASM_RESOURCE_REPORT,
   environment: 'Explicit host context; Git signing disabled and test identity supplied; no compiler overrides.',
 }, null, 2) + '\n');
 if (after.modified.length) console.error(`Upstream test drivers changed original files: ${after.modified.join(', ')}`);
-process.exitCode = after.modified.length ? 2 : result.code ?? 1;
+if (harnessAfter.modified.length) console.error(`Harness artifacts changed: ${harnessAfter.modified.join(', ')}`);
+process.exitCode = after.modified.length || harnessAfter.modified.length ? 2 : result.code ?? 1;

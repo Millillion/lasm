@@ -222,3 +222,22 @@ Earlier timings still describe their actual file runs; the reported
 `useConcurrentJIT=false` belonged to their one-shot inspection call. No engine
 default or memory limit was changed; see
 [the option-mode comparison](evidence/bun-option-mode-2026-09-21.json).
+
+The original-driver v52 Node campaign reached 8.01 GiB in
+`docstringLinksExamples` after 27 passes. Compiling the unchanged small Lean
+server-test driver ahead of time in an explicitly separate harness allowed
+that original registration and four related Node controls to pass at
+6.20–7.31 GiB. Deno's two controls passed at 6.87–7.26 GiB. Bun's first control
+timed out at 900 seconds and 6.56 GiB. These different outcomes remain separate;
+no timeout or resource abort is counted as a conformance pass.
+
+Two Deno driver preparation attempts stopped on workload memory pressure during
+linking at 3.72 and 4.18 GiB. All workload memory-high/max/OOM counters and swap
+were zero; ancestor limits were unlimited and historical counters did not
+increase. The precise pressure mechanism remains unresolved. An optional
+preparation path lets the full Leanc process print its public flags and exit
+before invoking the same external C toolchain. That reduced overlap completed
+the driver build and suite preparation at 2.99 GiB without a pressure stop.
+Actual suite compiler/Leanc invocations remain unchanged. All stopped services
+were released, and every comparison retained the original guard settings.
+See [the build, suite, and integrity evidence](evidence/compiled-server-driver-2026-09-21.json).
