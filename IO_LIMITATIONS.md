@@ -41,7 +41,10 @@ close the full-suite or cross-platform gates. See the
   `IO.FS` externs have implementations; this is not complete behavioral coverage.
 - [ ] Validate devices, pipes, FIFOs, large files, permission combinations, symlink
   races, and every open/seek/metadata edge case across OSs. Current tests focus on
-  regular files and common directory operations.
+  regular files and common directory operations. `Handle.truncate` now preserves
+  the native call sequence even when querying the stream position fails; Linux
+  regular-file and pipe comparisons match native Lean in all three packaged and
+  full engines. See [the truncate evidence](docs/evidence/truncate-errors-2026-09-21.json).
 - [ ] Refine exact error mappings and platform-specific errno behavior beyond
   tested missing-file, exclusive-create, invalid-path, and UTF-8 cases.
   POSIX `IO.Process.setCurrentDir` now uses native errno/message values and

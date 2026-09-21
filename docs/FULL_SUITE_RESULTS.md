@@ -690,6 +690,17 @@ the allocation controls and build receipts are retained. Non-Linux directory
 identity, permission-change races, and broader suite conformance remain open.
 See [the cwd comparison and resource evidence](evidence/cwd-tracking-2026-09-21.json).
 
+The supplementary `Handle.truncate` comparison exposed a smaller filesystem
+error discrepancy in all three engines: Lasm returned the position query's
+ESPIPE error for pipes, whereas native Lean proceeds to `ftruncate` and returns
+EINVAL. Preserving the native call sequence fixes both pipe directions while
+retaining the read-only-file error and buffered read-cursor behavior. The same
+immutable fixture now matches native Lean in all three full compilers; 15
+packaged and native file-handle checks also pass. Both the failing baseline and
+passing comparison remain recorded. Peak memory stayed below 2.56 GiB, with no
+OOM, throttling, or swap. This is Linux evidence, not cross-platform or complete
+filesystem conformance. See [the truncate comparison](evidence/truncate-errors-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

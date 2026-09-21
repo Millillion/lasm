@@ -234,7 +234,9 @@ export function nativeFiles({ synchronous = false } = {}) {
     async rewind(file) { await checked(fseek, file.stream, 0, 0); },
     async truncate(file) {
       const position = ftell(file.stream);
-      if (position < 0) throw failure();
+      // Lean passes ftello's result to ftruncate even on a non-seekable stream.
+      // Preserve the truncation error (EINVAL on Linux pipes), not the earlier
+      // position-query error (ESPIPE).
       const { value, errno } = await call(ftruncate, file.fd, position);
       if (value !== 0) throw failure(windows ? value : errno);
     },
