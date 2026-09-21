@@ -3,14 +3,16 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The latest frozen v114 Node campaign has **100 passes, zero failures or resource
-aborts, and 3,796 pending registrations**. It includes the repaired ordinary-exit
+The continuing frozen v114 Node campaign has **200 passes, zero failures or resource
+aborts, and 3,696 pending registrations**. It includes the repaired ordinary-exit
 path, captured SDK, and unchanged server-test driver compiled ahead of time.
 All three tests that crashed in v113 pass again. Every original source and
 harness artifact matched before and after each test; peak memory was 3.82 GiB,
 with no OOM, hard-limit, throttling, or swap events. All 3,896 registrations remain
 selected, with no passes imported from older campaigns. See
-[the fresh checkpoint](evidence/node-broad-v114-2026-09-21.json).
+[the 200-test checkpoint](evidence/node-broad-v114-checkpoint200-2026-09-21.json).
+The [earlier 100-test checkpoint](evidence/node-broad-v114-2026-09-21.json)
+remains intact. The continued run ends at `elab/Miller1.lean`.
 The newly compiled original server driver also passes a separate unchanged
 `server_interactive/cancellation.lean` control, peaking at 6.52 GiB with all
 source/harness checks intact and no resource abort or memory event. That result
