@@ -701,6 +701,33 @@ passing comparison remain recorded. Peak memory stayed below 2.56 GiB, with no
 OOM, throttling, or swap. This is Linux evidence, not cross-platform or complete
 filesystem conformance. See [the truncate comparison](evidence/truncate-errors-2026-09-21.json).
 
+The HTTP timing investigation identified a concrete loader bottleneck. Diagnostic
+traces showed all workers ready before case 22; typical main-thread host-handler
+work took fractions of a millisecond, excluding transport and wakeup time. CPU
+profile samples instead repeatedly landed in `dlsym` export enumeration during
+module initialization and interpreter symbol lookup. Emscripten built and scanned
+the full name list even for missing symbols. The repair retains own/enumerable
+membership, stub handling, data values, and function behavior, and computes the
+enumeration index only when registering a new shared-table function. It does not
+cache misses or change any timers.
+
+With unchanged Wasm bytes and the corrected loader, the original HTTP regression
+passed **3/3 repetitions in each of Node, Deno, and Bun**. Node took 10.15–10.31
+seconds, Deno 10.39–10.65, and Bun 73.61–74.18; these are whole-file runtimes.
+The native control passed too. Nine focused loader controls pass, including
+export mutations and worker synchronization indexes. The maintained SDK patch
+also passes a native C control and five Node/Deno/Bun Wasm controls that exchange
+newly resolved function pointers between already-running threads. The first bare
+Emscripten attempt omitted Lasm's existing Bun worker bridge and timed out; its
+result remains separate from the passing normal-bootstrap configuration.
+
+The repeated HTTP run peaked at 2.37 GiB, and SDK/suite preparation at 2.20 GiB,
+with zero OOM, throttling, or swap. Diagnostic instrumentation and profiling
+results remain separate from ordinary original-source passes. The broad frozen
+v52 Node campaign independently reached 34 passes, zero failures/resource aborts,
+and 3,862 pending registrations. Full-suite and broader IO conformance remain
+open. See [the loader profile, repair, and controls](evidence/symbol-lookup-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

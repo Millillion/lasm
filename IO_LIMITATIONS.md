@@ -26,12 +26,18 @@ on Wasm pthreads. New DNS, UDP, system, signal, and thread-ID host implementatio
 do not by themselves establish conformance of either complete path. No remaining implementation gap is being reclassified
 as fundamental merely because it needs further work.
 
-The latest guarded full-runtime subsets pass 11/11 checks in Node and in Bun
-with an explicit Linux stack adjustment. Deno passes 11/12, with an intermittent
-early-streaming deadline still under investigation. These cover ordinary
+Earlier guarded full-runtime subsets passed 11/11 checks in Node and in Bun
+with an explicit Linux stack adjustment. Deno passed 11/12, with an intermittent
+early-streaming failure. These covered ordinary
 filesystem, TCP/UDP, timers, HTTP, and previous stack regressions; they do not
 close the full-suite or cross-platform gates. See the
 [recorded configurations and results](docs/evidence/guarded-runtime-regressions-2026-09-20.json).
+A subsequent profile identified repeated full export-dictionary scans in dynamic
+symbol lookup. Removing those scans preserves loader behavior and now passes
+three repetitions of the original HTTP regression in each engine, without
+changing its timings. The earlier failures remain recorded; broader scheduling,
+load, and suite conformance still need validation. See
+[the loader repair evidence](docs/evidence/symbol-lookup-2026-09-21.json).
 
 ## Standard API coverage
 

@@ -249,6 +249,26 @@ ABI/thread/dynamic-library checks. The ordinary unit controls exercise 32-bit an
 fallback, and mismatched metadata. These checks supplement the unchanged upstream
 suite; they do not replace it.
 
+`derive-symbol-lookup.mjs FROZEN_SOURCE NEW_OUTPUT` preserves the compiler Wasm
+while removing a separate dynamic-loader bottleneck. Emscripten rebuilt the
+export-name list for every `dlsym` call, including missing symbols. The derivative
+checks own/enumerable membership directly and computes an enumeration index only
+when adding a new table function. Worker synchronization still receives that
+exact index. The pinned SDK patch applies the same repair to future builds.
+
+The original HTTP streaming regression passed three repetitions in each engine
+after this change, with no timing edits. Nine loader unit controls and native/
+Wasm cross-thread pointer controls supplement those runs. Reproduce the latter
+with the normal Lasm worker bootstrap and a writable development SDK:
+
+```sh
+node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py env BINARYEN_CORES=1 node scripts/full-lean/probe-symbol-lookup.mjs .work/symbol-lookup-sdk .cache/emsdk-6.0.9-dev
+```
+
+Use a fresh output directory. The probe records the SDK patch and source hashes;
+it does not replace any upstream Lean test. The retained profile and comparisons
+are in [the symbol-lookup evidence](../../docs/evidence/symbol-lookup-2026-09-21.json).
+
 ## Unchanged tests and the native control
 
 ```sh

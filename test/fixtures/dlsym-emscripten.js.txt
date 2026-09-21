@@ -1,0 +1,35 @@
+// Emscripten 6.0.9 generated dlsym wrapper, retained for behavioral comparisons.
+var __dlsym_js = function(handle, symbol, symbolIndex) {
+  handle = bigintToI53Checked(handle);
+  symbol = bigintToI53Checked(symbol);
+  symbolIndex = bigintToI53Checked(symbolIndex);
+  var ret = (() => {
+    // void *dlsym(void *restrict handle, const char *restrict name);
+    // http://pubs.opengroup.org/onlinepubs/009695399/functions/dlsym.html
+    symbol = UTF8ToString(symbol);
+    var result;
+    var newSymIndex;
+    var lib = LDSO.loadedLibsByHandle[handle];
+    newSymIndex = Object.keys(lib.exports).indexOf(symbol);
+    if (newSymIndex == -1 || lib.exports[symbol].stub) {
+      dlSetError(`Tried to lookup unknown symbol "${symbol}" in dynamic lib: ${lib.name}`);
+      return 0;
+    }
+    result = lib.exports[symbol];
+    if (typeof result == "function") {
+      var addr = getFunctionAddress(result);
+      if (addr) {
+        result = addr;
+      } else {
+        // Insert the function into the wasm table.  If it's a direct wasm
+        // function the second argument will not be needed.  If it's a JS
+        // function we rely on the `sig` attribute being set based on the
+        // `<func>__sig` specified in library JS file.
+        result = addFunction(result, result.sig);
+        (growMemViews(), HEAPU64)[((symbolIndex) / 8)] = BigInt(newSymIndex);
+      }
+    }
+    return result;
+  })();
+  return BigInt(ret);
+};

@@ -48,3 +48,31 @@
        err(`received "${cmd}" command from terminated worker: ${worker.workerID}`);
  #endif
      };
+--- a/src/lib/libdylink.js
++++ b/src/lib/libdylink.js
+@@ -1366,8 +1366,14 @@
+ #if ASSERTIONS
+     assert(lib, `Tried to dlsym() from an unopened handle: ${handle}`);
+ #endif
++#if WASM_BIGINT
++    // Most interpreter lookups miss or find a function already in the table.
++    // Preserve own/enumerable semantics without scanning the export dictionary.
++    if (!Object.prototype.propertyIsEnumerable.call(lib.exports, symbol) || lib.exports[symbol].stub) {
++#else
+     newSymIndex = Object.keys(lib.exports).indexOf(symbol);
+     if (newSymIndex == -1 || lib.exports[symbol].stub) {
++#endif
+       dlSetError(`Tried to lookup unknown symbol "${symbol}" in dynamic lib: ${lib.name}`)
+       return 0;
+     }
+@@ -1403,6 +1409,10 @@
+         // function the second argument will not be needed.  If it's a JS
+         // function we rely on the `sig` attribute being set based on the
+         // `<func>__sig` specified in library JS file.
++#if WASM_BIGINT
++        // Worker catch-up still needs the exact current enumeration index.
++        newSymIndex = Object.keys(lib.exports).indexOf(symbol);
++#endif
+         result = addFunction(result, result.sig);
+ #if DYLINK_DEBUG
+         dbg('adding symbol to table:',  symbol);
