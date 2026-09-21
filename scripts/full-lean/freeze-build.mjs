@@ -3,6 +3,7 @@ import { resolve, join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { root, leanCommit } from '../../src/toolchain.mjs';
 import { indexFunctionTable } from './function-table-index.mjs';
+import { optimizeMainTableGrowth } from './table-growth.mjs';
 import { preserveWebWorker } from './preserve-web-worker.mjs';
 import { copyProcessLauncherBundle } from '../../src/native-bundle.mjs';
 
@@ -18,6 +19,7 @@ cpSync(build, output, { recursive: true, verbatimSymlinks: true, mode: constants
 mkdirSync(join(output, 'host'), { recursive: true });
 mkdirSync(join(output, 'runtime-support'), { recursive: true });
 const functionTableIndex = await indexFunctionTable(join(output, 'bin/lean.wasm'), join(output, 'bin/lean.js'));
+writeFileSync(join(output, 'bin/lean.js'), optimizeMainTableGrowth(readFileSync(join(output, 'bin/lean.js'), 'utf8')));
 preserveWebWorker(join(output, 'bin/lean.js'));
 copyFileSync(join(output, 'bin/lean.js'), join(output, 'bin/lean.cjs'));
 writeFileSync(join(output, 'function-table-index.json'), JSON.stringify(functionTableIndex, null, 2) + '\n');
@@ -31,6 +33,8 @@ cpSync(sdk, join(output, 'sdk'), { recursive: true, verbatimSymlinks: true, mode
 const sanity = join(output, 'sdk/upstream/emscripten/cache/sanity.txt');
 if (existsSync(sanity)) writeFileSync(sanity, readFileSync(sanity, 'utf8').replaceAll(sdk, join(output, 'sdk')));
 writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ ...provenance, sdk,
+  mainTableGrowth: { scope: 'One exact initial-main function-table reservation; original slot order and growth-failure fallback retained.',
+    implementationSha256: createHash('sha256').update(readFileSync(new URL('./table-growth.mjs', import.meta.url))).digest('hex') },
   functionTableIndex: { scope: 'Known function addresses from verified Wasm metadata; complete-scan fallback retained.',
     wasmSha256: functionTableIndex.wasmSha256, initialTableEntries: functionTableIndex.initialTableEntries,
     exportSeeds: functionTableIndex.exportSeeds.length, importSeeds: functionTableIndex.importSeeds.length },

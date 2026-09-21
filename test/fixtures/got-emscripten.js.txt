@@ -1,0 +1,32 @@
+// Emscripten 6.0.9 updateGOT reference; retained for differential loader tests.
+var lasmMainExports;
+var getEmptyTableSlot = () => {
+  if (freeTableIndexes.length) {
+    return freeTableIndexes.pop();
+  }
+  return wasmTable["grow"](1);
+};
+var updateGOT = (exports, replace) => {
+  for (var symName in exports) {
+    if (isInternalSym(symName)) {
+      continue;
+    }
+    var value = exports[symName];
+    var existingEntry = GOT[symName] && GOT[symName].value != -1n;
+    if (replace || !existingEntry) {
+      var newValue;
+      if (typeof value == "function") {
+        newValue = BigInt(addFunction(value));
+      } else if (typeof value.value == "bigint") {
+        newValue = value;
+      } else {
+        continue;
+      }
+      GOT[symName] ??= new WebAssembly.Global({
+        "value": "i64",
+        "mutable": true
+      });
+      GOT[symName].value = newValue;
+    }
+  }
+};

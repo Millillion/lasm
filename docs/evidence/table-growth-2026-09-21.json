@@ -1,0 +1,4053 @@
+{
+  "recordedAt": "2026-09-21T17:24:39.371501+00:00",
+  "scope": "Linux x64 initial full-compiler loader optimization. Original Wasm, worker counts, host modules, SDK and test sources remain unchanged. Not complete runtime conformance or a stock cross-platform Bun result.",
+  "findings": [
+    "Startup required 13985 individual WebAssembly.Table.grow calls per main/worker. Instrumented Bun workers spent 49-60 seconds inside those calls.",
+    "Reserve exactly the unique missing initial-main function slots in one growth. Existing freed slots retain priority, aliases share pointers, and later side-module behavior is unchanged.",
+    "A bulk-growth RangeError falls back to the original incremental allocation path; no extra capacity is reserved.",
+    "The uninstrumented ordinary console comparison went from 70.09 seconds on v98 Bun to 4.77 seconds on v104. The startup smoke finished in 4.42 seconds. Timings are individual executions, not statistical benchmarks.",
+    "All 16 targeted Node and Deno upstream registrations pass. Bun passes 15 and fails externBoxing because its filesystem realpath resolves the module root incorrectly. The identical source and invocation reproduce that failure on old v98 Bun and new v104 Bun; both Node versions and Deno match native Lean.",
+    "The initial native-table64 derivation stopped before executing any compiler because the transform accepted grow(1) but not grow(1n). That preparation failure is retained. Final controls cover both table widths."
+  ],
+  "remainingGaps": [
+    "The Bun realPath discrepancy needs a separate repair and rerun.",
+    "Original Bun server cancellation deadlines need retesting with the faster startup.",
+    "Bun retains its Linux stack helper and lowered-memory workaround.",
+    "Full upstream suites, package integration and non-Linux validation remain unfinished; no remaining difference is established fundamental."
+  ],
+  "unitControls": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-unit-r2.log",
+    "sha256": "b77a57535fcc8e4f96b827fe064921065c42f0780157c71d9fd35cde0627c192",
+    "tests": 28,
+    "pass": 28,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "traces": {
+    "node": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/startup-v100-trace/node.jsonl",
+      "sha256": "a16cd0e6236a92f324f7ac29db3922a62270b47bea7a3c8688de5ea60e5f5819",
+      "initialGotCosts": [
+        {
+          "stage": "got-costs",
+          "thread": 0,
+          "at": 1790008224303,
+          "monotonic": 1127.629415,
+          "details": {
+            "lookupMs": 31.935780000008208,
+            "growMs": 11.986940000012282,
+            "tableSetMs": 9.373973000001342,
+            "globalCreateMs": 36.754231999996364,
+            "globalSetMs": 6.199670999990303,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 118.80344900000011,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 4,
+          "at": 1790008224948,
+          "monotonic": 1773.379872,
+          "details": {
+            "lookupMs": 52.09666899999684,
+            "growMs": 18.689113000009684,
+            "tableSetMs": 17.154133999993974,
+            "globalCreateMs": 64.40715500001124,
+            "globalSetMs": 9.378384999954733,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 204.0385980000001,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 8,
+          "at": 1790008224991,
+          "monotonic": 1815.909513,
+          "details": {
+            "lookupMs": 56.18407200000479,
+            "growMs": 19.893623999993906,
+            "tableSetMs": 17.273456000009446,
+            "globalCreateMs": 68.01102699999387,
+            "globalSetMs": 10.377695000009453,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 211.01047799999992,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 5,
+          "at": 1790008224996,
+          "monotonic": 1820.861025,
+          "details": {
+            "lookupMs": 58.02831400000059,
+            "growMs": 20.876191999998355,
+            "tableSetMs": 18.07974999999192,
+            "globalCreateMs": 72.57417499998269,
+            "globalSetMs": 10.113426999988178,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 219.12521500000003,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 1,
+          "at": 1790008224998,
+          "monotonic": 1822.851829,
+          "details": {
+            "lookupMs": 64.56723900001589,
+            "growMs": 20.077774000006002,
+            "tableSetMs": 17.37411600001542,
+            "globalCreateMs": 63.315261000016335,
+            "globalSetMs": 10.0553700000346,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 214.87745500000005,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 3,
+          "at": 1790008225150,
+          "monotonic": 1975.284409,
+          "details": {
+            "lookupMs": 77.02071000003525,
+            "growMs": 23.973615000012842,
+            "tableSetMs": 18.09823599998822,
+            "globalCreateMs": 67.44521000001146,
+            "globalSetMs": 10.465993000016397,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 243.03541700000005,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 2,
+          "at": 1790008225177,
+          "monotonic": 2002.294427,
+          "details": {
+            "lookupMs": 77.21052699999973,
+            "growMs": 25.5085899999915,
+            "tableSetMs": 15.160319999981311,
+            "globalCreateMs": 55.7151889999991,
+            "globalSetMs": 8.357298000023775,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 223.2234229999999,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 7,
+          "at": 1790008225178,
+          "monotonic": 2003.333839,
+          "details": {
+            "lookupMs": 78.47489199998608,
+            "growMs": 24.697845000012194,
+            "tableSetMs": 14.633458000007067,
+            "globalCreateMs": 58.879742000001215,
+            "globalSetMs": 8.679259000012053,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 222.66616399999998,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 6,
+          "at": 1790008225186,
+          "monotonic": 2010.935705,
+          "details": {
+            "lookupMs": 78.61479299998541,
+            "growMs": 25.084330000003774,
+            "tableSetMs": 17.20592000001102,
+            "globalCreateMs": 66.86007600002563,
+            "globalSetMs": 10.441081000010172,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 238.57257299999992,
+            "symbols": 26778
+          }
+        }
+      ]
+    },
+    "bun": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/startup-v100-trace/bun.jsonl",
+      "sha256": "9b66353ca400ae69dd07c06c84ed598ee6e7ade2fb60c68771520e4232d7874e",
+      "initialGotCosts": [
+        {
+          "stage": "got-costs",
+          "thread": 0,
+          "at": 1790008234213,
+          "monotonic": 6010.468481,
+          "details": {
+            "lookupMs": 9.743309000051113,
+            "growMs": 4296.984055999957,
+            "tableSetMs": 8.89575299999774,
+            "globalCreateMs": 15.696924999944713,
+            "globalSetMs": 7.808592000038743,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 4358.085601,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 7,
+          "at": 1790008284374,
+          "monotonic": 55991.882117,
+          "details": {
+            "lookupMs": 44.618718999783596,
+            "growMs": 49389.33099700022,
+            "tableSetMs": 83.14848199998141,
+            "globalCreateMs": 102.20767800005433,
+            "globalSetMs": 52.577532000036626,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 49821.792951,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 6,
+          "at": 1790008288411,
+          "monotonic": 60028.641807,
+          "details": {
+            "lookupMs": 45.05709699965337,
+            "growMs": 53299.88483499972,
+            "tableSetMs": 85.99260799980584,
+            "globalCreateMs": 162.62947400037592,
+            "globalSetMs": 57.28857399973185,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 53856.367356999996,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 1,
+          "at": 1790008290163,
+          "monotonic": 61786.800794,
+          "details": {
+            "lookupMs": 52.0592459999707,
+            "growMs": 55059.88529599999,
+            "tableSetMs": 95.07645999996566,
+            "globalCreateMs": 150.9472569999989,
+            "globalSetMs": 55.0751290004946,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 55623.734165,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 8,
+          "at": 1790008291411,
+          "monotonic": 63027.98391,
+          "details": {
+            "lookupMs": 58.962616999820966,
+            "growMs": 56119.571645000084,
+            "tableSetMs": 93.36482200004684,
+            "globalCreateMs": 179.21136299996124,
+            "globalSetMs": 54.44029600058093,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 56688.072305,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 4,
+          "at": 1790008293566,
+          "monotonic": 65184.800045,
+          "details": {
+            "lookupMs": 60.177286000342065,
+            "growMs": 58237.444625999764,
+            "tableSetMs": 94.24530899986894,
+            "globalCreateMs": 186.69910299994535,
+            "globalSetMs": 61.81756600017707,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 58840.089153,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 3,
+          "at": 1790008295150,
+          "monotonic": 66768.363347,
+          "details": {
+            "lookupMs": 58.67560200011303,
+            "growMs": 59781.463328999664,
+            "tableSetMs": 97.33813399976043,
+            "globalCreateMs": 199.2431320004598,
+            "globalSetMs": 59.804783000147836,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 60424.76147899999,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 5,
+          "at": 1790008295180,
+          "monotonic": 66798.482027,
+          "details": {
+            "lookupMs": 42.01355100035835,
+            "growMs": 60103.01988400012,
+            "tableSetMs": 87.8732070000924,
+            "globalCreateMs": 157.2983520003836,
+            "globalSetMs": 60.38017500017759,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 60646.016067000004,
+            "symbols": 26778
+          }
+        },
+        {
+          "stage": "got-costs",
+          "thread": 2,
+          "at": 1790008295426,
+          "monotonic": 67045.03964,
+          "details": {
+            "lookupMs": 61.10786199954691,
+            "growMs": 60070.73852800001,
+            "tableSetMs": 106.3403019997113,
+            "globalCreateMs": 214.96179899975687,
+            "globalSetMs": 62.6574159993188,
+            "hits": 2467,
+            "misses": 13985,
+            "newGlobals": 26772,
+            "totalMs": 60710.26703,
+            "symbols": 26778
+          }
+        }
+      ]
+    }
+  },
+  "comparisons": {
+    "startup-v100-trace": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/startup-v100-trace/comparison.json",
+      "sha256": "a6ca65f656d4ea8f3835808572cb4919af94f428e9f2cac5919041c28c239eff",
+      "scope": "Diagnostic startup timestamps only; Wasm, Lean source, worker counts, host and link-time prelude unchanged.",
+      "source": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v98-stdio-lowered",
+      "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v100-startup-trace-lowered",
+      "sourceSha256": "5d6dea92bbf8d9c76d50c9a1f61e5675a31f61535648626916dfd35dfab190ed",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/startup-v100-trace.resources.json",
+      "results": [
+        {
+          "engine": "node",
+          "startedAt": 1790008223169,
+          "finishedAt": 1790008228040,
+          "seconds": 4.870875491,
+          "code": 0,
+          "signal": null,
+          "stdout": "startup trace passed\n",
+          "stderr": "",
+          "trace": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/startup-v100-trace/node.jsonl",
+          "passed": true
+        },
+        {
+          "engine": "bun",
+          "startedAt": 1790008228197,
+          "finishedAt": 1790008297702,
+          "seconds": 69.50537537899999,
+          "code": 0,
+          "signal": null,
+          "stdout": "startup trace passed\n",
+          "stderr": "",
+          "trace": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/startup-v100-trace/bun.jsonl",
+          "passed": true
+        }
+      ]
+    },
+    "console-buffering-final": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/console-buffering-final/comparison.json",
+      "sha256": "d7496abacc86ed9330e15817e2c3be6f14bfcab864e922bbaf35de99af8dc0ff",
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/console-buffering/Main.lean",
+      "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/console-buffering-final/fixture.lean",
+      "sourceSha256": "a57406c4f3e7529485538c002364986ea7a70954bf8273175570da11db61aef4",
+      "scope": "Supplementary standard-stream buffering and inherited-child comparison; not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/console-full-final.resources.json",
+      "executedSourceUnchanged": true,
+      "finishedAt": "2026-09-21T15:59:15.068Z",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.232538795,
+          "code": 0,
+          "signal": null,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n",
+          "passed": true
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v97-stdio-native/bin/lean",
+          "seconds": 5.238977656,
+          "code": 0,
+          "signal": null,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n",
+          "passed": true
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v97-stdio-native/bin/lean",
+          "seconds": 6.055595577000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n",
+          "passed": true
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v98-stdio-lowered/bin/lean",
+          "seconds": 70.08703799899999,
+          "code": 0,
+          "signal": null,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n",
+          "passed": true
+        }
+      ]
+    },
+    "table-growth-r2-bun-startup": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-r2-bun-startup/comparison.json",
+      "sha256": "905d2f1c6419db4c9d34036eb731f3e0e5cc1c9fd36e33eab2c5a6328132341c",
+      "scope": "Additional startup smoke comparison with fixed Wasm, Lean source, worker pool, and Linux stack adjustment. No setting is adopted without subsequent conformance checks.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-full-r2.resources.json",
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 2,
+        "engineEnvironment": {
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/bun-stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "stackAdjustment": {
+          "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/bun-stack-reservation.so",
+          "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+          "osThreadStackBytes": 67108864,
+          "jscStackBudgetBytes": 62914560,
+          "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+        },
+        "maximumMemoryBytes": 4294967296,
+        "pthreadPoolSize": 8,
+        "backend": "full-lean-wasm64-lowered",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "profile": "control",
+      "sourceSha256": "4bbc24ad93c0a3cbe4c2f8db0aa6d75a606240ebec07292d4568cc740df4f8b4",
+      "references": [
+        "https://github.com/WebKit/WebKit/blob/main/Source/JavaScriptCore/runtime/OptionsList.h",
+        "https://github.com/WebKit/WebKit/blob/main/Source/JavaScriptCore/runtime/Options.cpp",
+        "https://github.com/oven-sh/bun/issues/41438"
+      ],
+      "hypothesis": "Interpreter/tiering settings may reduce eager startup work; fewer compiler threads may reduce compiler working memory. Upstream reports and current WebKit source do not prove behavior in this pinned Bun binary.",
+      "finishedAt": "2026-09-21T16:42:57.210Z",
+      "results": [
+        {
+          "name": "native control",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-r2-bun-startup/Startup.lean"
+          ],
+          "environment": {},
+          "seconds": 0.21140943499999998,
+          "code": 0,
+          "signal": null,
+          "stdout": "startup smoke passed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "default",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/runtime-support/run-compiler.mjs",
+            "--prefix",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered",
+            "-j4",
+            "-s65536",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-r2-bun-startup/Startup.lean"
+          ],
+          "environment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560",
+            "LASM_FULL_LEAN_PREFIX": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered",
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered",
+            "LASM_FULL_APP_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/bin/lean",
+            "LASM_FULL_ENTRYPOINT": "lean",
+            "LASM_FULL_TOOLCHAIN_CONFIG": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/toolchain.json"
+          },
+          "seconds": 4.41980778,
+          "code": 0,
+          "signal": null,
+          "stdout": "startup smoke passed\n",
+          "stderr": "",
+          "passed": true,
+          "effectiveOptions": {
+            "useWasmIPInt": "true",
+            "useBBQJIT": "true",
+            "useOMGJIT": "true",
+            "useConcurrentJIT": "true",
+            "numberOfWasmCompilerThreads": "11",
+            "thresholdForBBQOptimizeAfterWarmUp": "150"
+          },
+          "optionsAccepted": true
+        }
+      ]
+    },
+    "table-growth-r2-console": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-r2-console/comparison.json",
+      "sha256": "78196b8c66559c4a4555455baf5d9111d8b475281e4230ce27be8dc5a4ca1ff2",
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/console-buffering/Main.lean",
+      "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-r2-console/fixture.lean",
+      "sourceSha256": "a57406c4f3e7529485538c002364986ea7a70954bf8273175570da11db61aef4",
+      "scope": "Supplementary standard-stream buffering and inherited-child comparison; not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-full-r2.resources.json",
+      "executedSourceUnchanged": true,
+      "finishedAt": "2026-09-21T16:43:15.300Z",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.22232975000000002,
+          "code": 0,
+          "signal": null,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n",
+          "passed": true
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v103-table-growth-native/bin/lean",
+          "seconds": 5.2397302020000005,
+          "code": 0,
+          "signal": null,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n",
+          "passed": true
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v103-table-growth-native/bin/lean",
+          "seconds": 5.966881439,
+          "code": 0,
+          "signal": null,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n",
+          "passed": true
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/bin/lean",
+          "seconds": 4.772077526000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n",
+          "passed": true
+        }
+      ]
+    },
+    "extern-module-name-baseline": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/extern-module-name-baseline/comparison.json",
+      "sha256": "0645e26e6f246c91e40e8f524d823f225331452b00ef77fe3dade46097d1331c",
+      "source": "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered/lean4-4.32.0/tests/elab/externBoxing.lean",
+      "sourceSha256": "5fd693ae5c0d3cf53d946faf2bf520a773e844480af9c7f88d370e1138fe4dd8",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/extern-module-name-baseline.resources.json",
+      "forcedError": {
+        "code": 1,
+        "stdout": "",
+        "stderr": "input file '/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered/lean4-4.32.0/tests/elab/externBoxing.lean' must be contained in root directory (/proc/1990345/fd/)\n"
+      },
+      "sourceUnchanged": true,
+      "results": [
+        {
+          "name": "native",
+          "command": [
+            "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "--root=..",
+            "-DprintMessageEndPos=true",
+            "-Dlinter.all=false",
+            "-DElab.inServer=true",
+            "-Dcompiler.postponeCompile=false",
+            "externBoxing.lean"
+          ],
+          "seconds": 0.1682241979870014,
+          "code": 0,
+          "stdout": "[Compiler.IR] [result]\n    extern _private.elab.externBoxing.0.Foo.bar (x_1 : obj) (x_2 : u64) : u64\n    def _private.elab.externBoxing.0.Foo.bar._boxed (x_1 : obj) (x_2 : obj) : obj :=\n      let x_3 : u64 := unbox x_2;\n      dec x_2;\n      let x_4 : u64 := _private.elab.externBoxing.0.Foo.bar x_1 x_3;\n      let x_5 : obj := box x_4;\n      ret x_5\n",
+          "stderr": ""
+        },
+        {
+          "name": "node-v97-stdio-native",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v97-stdio-native/bin/lean",
+            "--root=..",
+            "-DprintMessageEndPos=true",
+            "-Dlinter.all=false",
+            "-DElab.inServer=true",
+            "-Dcompiler.postponeCompile=false",
+            "externBoxing.lean"
+          ],
+          "seconds": 5.207605217001401,
+          "code": 0,
+          "stdout": "[Compiler.IR] [result]\n    extern _private.elab.externBoxing.0.Foo.bar (x_1 : obj) (x_2 : u64) : u64\n    def _private.elab.externBoxing.0.Foo.bar._boxed (x_1 : obj) (x_2 : obj) : obj :=\n      let x_3 : u64 := unbox x_2;\n      dec x_2;\n      let x_4 : u64 := _private.elab.externBoxing.0.Foo.bar x_1 x_3;\n      let x_5 : obj := box x_4;\n      ret x_5\n",
+          "stderr": ""
+        },
+        {
+          "name": "node-v103-table-growth-native",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v103-table-growth-native/bin/lean",
+            "--root=..",
+            "-DprintMessageEndPos=true",
+            "-Dlinter.all=false",
+            "-DElab.inServer=true",
+            "-Dcompiler.postponeCompile=false",
+            "externBoxing.lean"
+          ],
+          "seconds": 5.177055409993045,
+          "code": 0,
+          "stdout": "[Compiler.IR] [result]\n    extern _private.elab.externBoxing.0.Foo.bar (x_1 : obj) (x_2 : u64) : u64\n    def _private.elab.externBoxing.0.Foo.bar._boxed (x_1 : obj) (x_2 : obj) : obj :=\n      let x_3 : u64 := unbox x_2;\n      dec x_2;\n      let x_4 : u64 := _private.elab.externBoxing.0.Foo.bar x_1 x_3;\n      let x_5 : obj := box x_4;\n      ret x_5\n",
+          "stderr": ""
+        },
+        {
+          "name": "deno-v103-table-growth-native",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v103-table-growth-native/bin/lean",
+            "--root=..",
+            "-DprintMessageEndPos=true",
+            "-Dlinter.all=false",
+            "-DElab.inServer=true",
+            "-Dcompiler.postponeCompile=false",
+            "externBoxing.lean"
+          ],
+          "seconds": 5.2221855680109,
+          "code": 0,
+          "stdout": "[Compiler.IR] [result]\n    extern _private.elab.externBoxing.0.Foo.bar (x_1 : obj) (x_2 : u64) : u64\n    def _private.elab.externBoxing.0.Foo.bar._boxed (x_1 : obj) (x_2 : obj) : obj :=\n      let x_3 : u64 := unbox x_2;\n      dec x_2;\n      let x_4 : u64 := _private.elab.externBoxing.0.Foo.bar x_1 x_3;\n      let x_5 : obj := box x_4;\n      ret x_5\n",
+          "stderr": ""
+        },
+        {
+          "name": "bun-v98-stdio-lowered",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v98-stdio-lowered/bin/lean",
+            "--root=..",
+            "-DprintMessageEndPos=true",
+            "-Dlinter.all=false",
+            "-DElab.inServer=true",
+            "-Dcompiler.postponeCompile=false",
+            "externBoxing.lean"
+          ],
+          "seconds": 70.34024153300561,
+          "code": 0,
+          "stdout": "[Compiler.IR] [result]\n    extern _private._stdin.0.Foo.bar (x_1 : obj) (x_2 : u64) : u64\n    def _private._stdin.0.Foo.bar._boxed (x_1 : obj) (x_2 : obj) : obj :=\n      let x_3 : u64 := unbox x_2;\n      dec x_2;\n      let x_4 : u64 := _private._stdin.0.Foo.bar x_1 x_3;\n      let x_5 : obj := box x_4;\n      ret x_5\n",
+          "stderr": ""
+        },
+        {
+          "name": "bun-v104-table-growth-lowered",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/bin/lean",
+            "--root=..",
+            "-DprintMessageEndPos=true",
+            "-Dlinter.all=false",
+            "-DElab.inServer=true",
+            "-Dcompiler.postponeCompile=false",
+            "externBoxing.lean"
+          ],
+          "seconds": 4.505768709001131,
+          "code": 0,
+          "stdout": "[Compiler.IR] [result]\n    extern _private._stdin.0.Foo.bar (x_1 : obj) (x_2 : u64) : u64\n    def _private._stdin.0.Foo.bar._boxed (x_1 : obj) (x_2 : obj) : obj :=\n      let x_3 : u64 := unbox x_2;\n      dec x_2;\n      let x_4 : u64 := _private._stdin.0.Foo.bar x_1 x_3;\n      let x_5 : obj := box x_4;\n      ret x_5\n",
+          "stderr": ""
+        }
+      ]
+    }
+  },
+  "resources": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/startup-v99-trace.resources.json",
+      "sha256": "f6b73456dcb298f74cf2a84b5e67f79226d9cb3a2118bd25fba4edef8cf31841",
+      "command": [
+        "node",
+        ".work/full-engine-probe/trace-bun-startup.mjs"
+      ],
+      "startedAt": "2026-09-21T16:26:59.678Z",
+      "finishedAt": "2026-09-21T16:28:15.856Z",
+      "peakMemoryBytes": 2115670016,
+      "minimumHostAvailable": 26130350080,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/startup-v100-trace.resources.json",
+      "sha256": "754ab19f39bce3cec9f1f7cde61462250fa361d8e24b300d850d48745d521f71",
+      "command": [
+        "node",
+        ".work/full-engine-probe/trace-bun-startup-micro.mjs"
+      ],
+      "startedAt": "2026-09-21T16:30:21.898Z",
+      "finishedAt": "2026-09-21T16:31:37.792Z",
+      "peakMemoryBytes": 2158559232,
+      "minimumHostAvailable": 26335031296,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-unit.resources.json",
+      "sha256": "2a1897af08c42e98cd68c8227452258d10d283f8d15c62e63119adb812ec6654",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/full-table-growth.test.mjs",
+        "test/full-function-table.test.mjs",
+        "test/full-symbol-lookup.test.mjs"
+      ],
+      "startedAt": "2026-09-21T16:39:01.121Z",
+      "finishedAt": "2026-09-21T16:39:01.610Z",
+      "peakMemoryBytes": 62091264,
+      "minimumHostAvailable": 28331466752,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-full.resources.json",
+      "sha256": "8fd143d6fc446d9f402992363c9307722d07fe5a8343db889deae2ea42da7427",
+      "command": [
+        "node",
+        ".work/full-engine-probe/validate-table-growth.mjs"
+      ],
+      "startedAt": "2026-09-21T16:40:17.575Z",
+      "finishedAt": "2026-09-21T16:40:18.404Z",
+      "peakMemoryBytes": 53485568,
+      "minimumHostAvailable": 28330901504,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-unit-r2.resources.json",
+      "sha256": "d9e7dfca75c7d9f8b0f184e014ef77eb73ea1071cbd4294b3ba02d222990d67b",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/full-table-growth.test.mjs",
+        "test/full-function-table.test.mjs",
+        "test/full-symbol-lookup.test.mjs"
+      ],
+      "startedAt": "2026-09-21T16:42:12.163Z",
+      "finishedAt": "2026-09-21T16:42:12.621Z",
+      "peakMemoryBytes": 62619648,
+      "minimumHostAvailable": 28340457472,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-full-r2.resources.json",
+      "sha256": "6ae55cd8c2295facef9016fe963bb9535a7cd6fd687239bbf469c41652a8e5e3",
+      "command": [
+        "node",
+        ".work/full-engine-probe/validate-table-growth-r2.mjs"
+      ],
+      "startedAt": "2026-09-21T16:42:49.220Z",
+      "finishedAt": "2026-09-21T16:43:15.385Z",
+      "peakMemoryBytes": 2273583104,
+      "minimumHostAvailable": 25857392640,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/table-growth-suite-preparation.resources.json",
+      "sha256": "0872ae2f059690324ed67eecbe5d1db52a2ac95e31b99afa3090d709bd9e6daf",
+      "command": [
+        "node",
+        ".work/full-engine-probe/prepare-table-growth-suites.mjs"
+      ],
+      "startedAt": "2026-09-21T16:45:11.912Z",
+      "finishedAt": "2026-09-21T16:45:26.811Z",
+      "peakMemoryBytes": 2350903296,
+      "minimumHostAvailable": 27966586880,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/extern-module-name-baseline.resources.json",
+      "sha256": "f9aa228a89c74fff6109071e18ef774a5f1d0a6beaf944013ca31207047d4535",
+      "command": [
+        "python3",
+        ".work/full-engine-probe/probe-extern-module-name.py"
+      ],
+      "startedAt": "2026-09-21T16:57:30.194Z",
+      "finishedAt": "2026-09-21T16:59:03.497Z",
+      "peakMemoryBytes": 2193899520,
+      "minimumHostAvailable": 26085662720,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  ],
+  "upstream": {
+    "node": {
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/campaign.json",
+        "sha256": "baa0e9d798698d11206f6229ece37eccf23542be6c516a1a42eac54d19b368e1"
+      },
+      "counts": {
+        "passed": 16,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v103-table-growth-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "snapshot": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/snapshot.json",
+        "sha256": "14797796138222745d3e8c7dddcb9da062c988fe99fd43184af8f5ea9574f715"
+      },
+      "wasmSha256": "3f2e5f296c9faf7d1601f4ef246c598e05a3537bae1ae48c1537710f5d82da4e",
+      "tests": [
+        {
+          "name": "compile/StackOverflow.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00001-82dd9081/results/execution.json",
+            "sha256": "83c45dc11d9e1d659de0c2f061605a2bcc0c8ac7d4fc5657b8fad327b2b27e3d"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00001-82dd9081/resources.json",
+            "sha256": "dbbf2008277b3aad6ed29e87e0fd38f8d026a8deb4bf2a3ba60043ab4fd98abf",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00001-82dd9081/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/StackOverflow\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:59:04.233Z",
+            "finishedAt": "2026-09-21T16:59:24.485Z",
+            "peakMemoryBytes": 1775476736,
+            "minimumHostAvailable": 26209161216,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/StackOverflowTask.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00002-a187662b/results/execution.json",
+            "sha256": "874be59fa6f104f0c7f4379403369ad19da32c4a112d104a3d2300925da2f018"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00002-a187662b/resources.json",
+            "sha256": "524f7b7d8434de90981e535859dd40a537767e5f482acc068849e5f19187eba5",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00002-a187662b/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/StackOverflowTask\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:59:24.536Z",
+            "finishedAt": "2026-09-21T16:59:44.081Z",
+            "peakMemoryBytes": 1775439872,
+            "minimumHostAvailable": 25950294016,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00003-2c93f25d/results/execution.json",
+            "sha256": "13a5f35c00d711e1510f03d1e62a2e2ee1aacc96c8c3ff8e364b0ec8b0e6c989"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00003-2c93f25d/resources.json",
+            "sha256": "d290d1dc1731d23c3f3ae0d4612911b7f8305d4fbb2bc03954700d4c4ad3661f",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00003-2c93f25d/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/wait_dedicated\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:59:44.130Z",
+            "finishedAt": "2026-09-21T17:00:08.664Z",
+            "peakMemoryBytes": 1879568384,
+            "minimumHostAvailable": 26238537728,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00004-2e4e301b/results/execution.json",
+            "sha256": "2498ef8067d7f2439bf6ed4570ee0c812d93200ea032d697daaa591786b38202"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00004-2e4e301b/resources.json",
+            "sha256": "24f8aeff459e44ed14f9350b9e897dd5c2b1230a949f38ea2b82ad1e93c2617c",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00004-2e4e301b/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/IO_test\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:00:08.711Z",
+            "finishedAt": "2026-09-21T17:00:15.336Z",
+            "peakMemoryBytes": 1750036480,
+            "minimumHostAvailable": 26585538560,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00005-f09e9ed0/results/execution.json",
+            "sha256": "5ead316260913b580d17f5963a9b89d368a6fed66c965d19c3866e78c64a2044"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00005-f09e9ed0/resources.json",
+            "sha256": "afc9239c0f3f99bd799a6943658fb64ed99d56eb6f03b95e27701157754686ff",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00005-f09e9ed0/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/Process\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:00:15.380Z",
+            "finishedAt": "2026-09-21T17:00:28.628Z",
+            "peakMemoryBytes": 3626774528,
+            "minimumHostAvailable": 24555200512,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00006-913a9443/results/execution.json",
+            "sha256": "605ba438561b4aebb2bb4952d49322ddcbbcaaa55da4bace161434481c1b03ec"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00006-913a9443/resources.json",
+            "sha256": "f57c1ca097d5fc3ffd8fae4446fbe1c8fa04388c15299bdfe25512b2e966635d",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00006-913a9443/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/async_http_hang_regressions\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:00:28.673Z",
+            "finishedAt": "2026-09-21T17:00:39.956Z",
+            "peakMemoryBytes": 2229248000,
+            "minimumHostAvailable": 25853956096,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/extern.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00007-3157cd92/results/execution.json",
+            "sha256": "e3ef9dc6db91ee28f72eaf7839c9db22b6d8c83eb2c886b39e6d15da88fede94"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00007-3157cd92/resources.json",
+            "sha256": "c26982027fd12bcc28e534ac982b24ba0a252d1d4cb53fc3be4649c64789f235",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00007-3157cd92/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/extern\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:00:40.002Z",
+            "finishedAt": "2026-09-21T17:00:45.253Z",
+            "peakMemoryBytes": 1625387008,
+            "minimumHostAvailable": 26655670272,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00008-e0a95357/results/execution.json",
+            "sha256": "09b82255bb241c1594226aa52f3ac56364b9f275abd945a0a08cb35999b3cb22"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00008-e0a95357/resources.json",
+            "sha256": "fd2d7cefff0d067dbac182c1a12350a09151cf65d24bf14f9564a78c96517877",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00008-e0a95357/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/externBoxing\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:00:45.291Z",
+            "finishedAt": "2026-09-21T17:00:50.695Z",
+            "peakMemoryBytes": 1729630208,
+            "minimumHostAvailable": 26451075072,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00009-692384af/results/execution.json",
+            "sha256": "f953b33993fd614f6942a72324659e945e469a34b9ea3258a2f6ced20100f829"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00009-692384af/resources.json",
+            "sha256": "c3fab2d793cc5ec3cf70ab4f0707085eedd5ce3e9fda1efe43e5ed0819fb5ddc",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00009-692384af/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/tempfile\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:00:50.758Z",
+            "finishedAt": "2026-09-21T17:00:57.571Z",
+            "peakMemoryBytes": 1783717888,
+            "minimumHostAvailable": 26406567936,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00010-3471a01d/results/execution.json",
+            "sha256": "f202089b77acda6d0871ce6617d9375795108c0d4d335dc168a3435193924613"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00010-3471a01d/resources.json",
+            "sha256": "c1cebf3e2715245803ce710a74191ff4f91c37ace015e69c96721f61a69b37e7",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00010-3471a01d/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/ffi/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:00:57.624Z",
+            "finishedAt": "2026-09-21T17:02:54.579Z",
+            "peakMemoryBytes": 4676472832,
+            "minimumHostAvailable": 23672164352,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/precompile/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00011-4a81612d/results/execution.json",
+            "sha256": "dd0fc55feb109468e10d1c3eb2714df0b6cd9002de418b06eac6da7ae38d5333"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00011-4a81612d/resources.json",
+            "sha256": "49a87d646a8d81d78afb89c42c764d54fb65397c283bce3c5688d3742519b8a6",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00011-4a81612d/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/precompile/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:02:54.628Z",
+            "finishedAt": "2026-09-21T17:04:16.123Z",
+            "peakMemoryBytes": 4505989120,
+            "minimumHostAvailable": 23261519872,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/reverse-ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00012-799593fe/results/execution.json",
+            "sha256": "487061d44f9c2a6cac90a4380a5163c377bb2facdf735ed7381dd7339b8ceb95"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00012-799593fe/resources.json",
+            "sha256": "f08c25d754fc72e11e9089e0b9ab95988e2ef9c1811e9db760e6c94107b7240f",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00012-799593fe/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/reverse-ffi/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:04:16.166Z",
+            "finishedAt": "2026-09-21T17:04:52.079Z",
+            "peakMemoryBytes": 3898716160,
+            "minimumHostAvailable": 24236498944,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/tests/externLib/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00013-6f54a51f/results/execution.json",
+            "sha256": "967e622f9acd1ad44b72e748822be691ded809ce4b43adcade79771d13c8c7df"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00013-6f54a51f/resources.json",
+            "sha256": "1e2476ea926bef98d434adf79c878cdcfad95872c38a304311c2c84ac76bccea",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00013-6f54a51f/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/tests/externLib/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:04:52.120Z",
+            "finishedAt": "2026-09-21T17:05:59.804Z",
+            "peakMemoryBytes": 4559343616,
+            "minimumHostAvailable": 23549411328,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/tests/precompileLink/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00014-03782efe/results/execution.json",
+            "sha256": "f5160f184dd2fd41ff4b196b5e4bbd91f025c23740923881ee77fa1bd6ef4882"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00014-03782efe/resources.json",
+            "sha256": "65bbe3b58f4395ac4ad709ff0f093fbe599ee3a4486eea65921037b404d453b3",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00014-03782efe/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/tests/precompileLink/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:05:59.855Z",
+            "finishedAt": "2026-09-21T17:09:23.395Z",
+            "peakMemoryBytes": 5094768640,
+            "minimumHostAvailable": 23114059776,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "pkg/test_extern",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00015-4d73453c/results/execution.json",
+            "sha256": "d07f3b842478f669048347d26a6bfb19e62b5d1c388e3121a6ff7f1aef9538d2"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00015-4d73453c/resources.json",
+            "sha256": "fcdc7575fbb2a3376c9f9c143e9254647de6f4a14a9b49e9baccba85791b0f7c",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00015-4d73453c/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^pkg/test_extern$"
+            ],
+            "startedAt": "2026-09-21T17:09:23.443Z",
+            "finishedAt": "2026-09-21T17:09:45.102Z",
+            "peakMemoryBytes": 4843065344,
+            "minimumHostAvailable": 23177043968,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "pkg/user_ext",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00016-14f6291a/results/execution.json",
+            "sha256": "8e707c3109f6c0057bb372949a3bea642b5b2c54ed3b4bd711fbf2907c54947e"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00016-14f6291a/resources.json",
+            "sha256": "d5bb603088e815f9b47f3852e08f3c21dd58e959c83b5aa82ece6bdb9bd6fc4d",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v103-table-growth-native/00016-14f6291a/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^pkg/user_ext$"
+            ],
+            "startedAt": "2026-09-21T17:09:45.141Z",
+            "finishedAt": "2026-09-21T17:10:56.167Z",
+            "peakMemoryBytes": 5723828224,
+            "minimumHostAvailable": 22446231552,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    },
+    "deno": {
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/campaign.json",
+        "sha256": "8acf10f0b8db0c1cb80786bbaafcd4e5e3125580a1253fcd0d1a7615b8665305"
+      },
+      "counts": {
+        "passed": 16,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "engineArgs": [
+          "run",
+          "-A",
+          "--v8-flags=--stack-size=61440"
+        ],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v103-table-growth-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "snapshot": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v103-table-growth-native/snapshot.json",
+        "sha256": "14797796138222745d3e8c7dddcb9da062c988fe99fd43184af8f5ea9574f715"
+      },
+      "wasmSha256": "3f2e5f296c9faf7d1601f4ef246c598e05a3537bae1ae48c1537710f5d82da4e",
+      "tests": [
+        {
+          "name": "compile/StackOverflow.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00001-f906bf85/results/execution.json",
+            "sha256": "0c53e6707955cd14e12a6e39d05ec4eff704914da4394042e641ac320bdcd5ef"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00001-f906bf85/resources.json",
+            "sha256": "a4d77ca4881b0ff781e10e2461b7927e56bdddda1f1e55cdfdd150b748afbcf6",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00001-f906bf85/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/StackOverflow\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:10:56.911Z",
+            "finishedAt": "2026-09-21T17:11:16.634Z",
+            "peakMemoryBytes": 2038935552,
+            "minimumHostAvailable": 26112888832,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/StackOverflowTask.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00002-cd47add5/results/execution.json",
+            "sha256": "29674864b83c0f0ee83812cedb33892609921be96aa3c49280e2f859d0da0411"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00002-cd47add5/resources.json",
+            "sha256": "37f60084abbcc54333b6f36fa572f4b23f160dc92036fc737918014ad0a5ac6e",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00002-cd47add5/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/StackOverflowTask\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:11:16.684Z",
+            "finishedAt": "2026-09-21T17:11:36.844Z",
+            "peakMemoryBytes": 2024484864,
+            "minimumHostAvailable": 26212724736,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00003-c79b786b/results/execution.json",
+            "sha256": "21eca864391a60f1c2d4481b0a1ec791f715b0eb26f8b76dde2a0dd7dfae2796"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00003-c79b786b/resources.json",
+            "sha256": "3b9dd536664335a2fa5b6140652ae04db7bbac595e88696cd10dcdc00756f771",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00003-c79b786b/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/wait_dedicated\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:11:36.891Z",
+            "finishedAt": "2026-09-21T17:12:02.343Z",
+            "peakMemoryBytes": 2136281088,
+            "minimumHostAvailable": 26059886592,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00004-ceac7602/results/execution.json",
+            "sha256": "cf9dff3accf654648d600833be9326067ffc78ad3c66a4451246699538bff460"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00004-ceac7602/resources.json",
+            "sha256": "10c5250dfd96880d072555b3bca6bb763663337e7d1277e3ea094f9a796b9150",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00004-ceac7602/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/IO_test\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:12:02.390Z",
+            "finishedAt": "2026-09-21T17:12:08.873Z",
+            "peakMemoryBytes": 1890668544,
+            "minimumHostAvailable": 26294583296,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00005-e5168c67/results/execution.json",
+            "sha256": "81eac1e07ae83492b47aaaae08979bc5a73de8ea18e76caf32a3c1a3f8404773"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00005-e5168c67/resources.json",
+            "sha256": "ee73c9b72b9275d5c3eb988a509725571bbd401619c22ac1a6352811afff3d4e",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00005-e5168c67/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/Process\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:12:08.918Z",
+            "finishedAt": "2026-09-21T17:12:22.311Z",
+            "peakMemoryBytes": 3913867264,
+            "minimumHostAvailable": 24260849664,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00006-8c4f5253/results/execution.json",
+            "sha256": "1f259032104b1ceb87fd7bd35f2c5632bb6d499d69f218974802cc72e475d808"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00006-8c4f5253/resources.json",
+            "sha256": "802753ae190c4f48c3c3e35e9f2a6f568c7c2e29e14f7ac5eef4412d465930cc",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00006-8c4f5253/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/async_http_hang_regressions\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:12:22.360Z",
+            "finishedAt": "2026-09-21T17:12:33.742Z",
+            "peakMemoryBytes": 2476691456,
+            "minimumHostAvailable": 25640292352,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/extern.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00007-bfad81e9/results/execution.json",
+            "sha256": "6de6d0d4ea076f21d400ece958a8e8e827a84851ef65e58159059b49f755c0e9"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00007-bfad81e9/resources.json",
+            "sha256": "331ff4529adc2eb1b4f5349c6ba3bd96bc36432141d85cea2f0bdbb0e58e4a19",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00007-bfad81e9/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/extern\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:12:33.818Z",
+            "finishedAt": "2026-09-21T17:12:39.583Z",
+            "peakMemoryBytes": 1853116416,
+            "minimumHostAvailable": 26310516736,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00008-83ae9fe9/results/execution.json",
+            "sha256": "6de99faae0896cfce4917dc2d1d46f3e372b5e495a706b6b87b6e635668b86fd"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00008-83ae9fe9/resources.json",
+            "sha256": "759aae30d26771f45820bb35fe91d111cf62196adc9f7e1bdc5176b37169e834",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00008-83ae9fe9/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/externBoxing\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:12:39.635Z",
+            "finishedAt": "2026-09-21T17:12:45.560Z",
+            "peakMemoryBytes": 1977671680,
+            "minimumHostAvailable": 26137817088,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00009-ef914a66/results/execution.json",
+            "sha256": "8c728e2a8498e3f338b0493a7c691b9c0b5de25e18b080ab7cf198688ce41595"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00009-ef914a66/resources.json",
+            "sha256": "c37ee0b9244f1315e98e6133a09ddb839f669df8382dad8fc8bd20d13457b676",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00009-ef914a66/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/tempfile\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:12:45.608Z",
+            "finishedAt": "2026-09-21T17:12:52.803Z",
+            "peakMemoryBytes": 2163519488,
+            "minimumHostAvailable": 25849221120,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00010-10c23e3e/results/execution.json",
+            "sha256": "cb9e28735a8bc6484639260b5c9bc9580db1cedb38dd01add77e8af8ad61ca93"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00010-10c23e3e/resources.json",
+            "sha256": "191b0b99a8ac7f711100639924940d26d5dd39bd4a8be4157c42c8352bdbd766",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00010-10c23e3e/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/ffi/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:12:52.854Z",
+            "finishedAt": "2026-09-21T17:15:00.189Z",
+            "peakMemoryBytes": 4815478784,
+            "minimumHostAvailable": 23376211968,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/precompile/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00011-ee239261/results/execution.json",
+            "sha256": "2d559def47b06c784954531f77b518f8dcd9d548ecb81af69527048074b4124a"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00011-ee239261/resources.json",
+            "sha256": "abd9a765d086ff92d3ed82427d2862a30afe3093992942ec28699ea5911c0c83",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00011-ee239261/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/precompile/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:15:00.244Z",
+            "finishedAt": "2026-09-21T17:16:29.313Z",
+            "peakMemoryBytes": 4642287616,
+            "minimumHostAvailable": 23297458176,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/reverse-ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00012-c6db5d8a/results/execution.json",
+            "sha256": "1c55899a443d2dbc11004a3ccd251e9cd1b7592086e4c91bfbeeedf46f810db3"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00012-c6db5d8a/resources.json",
+            "sha256": "a964ea1a2c47a8ccde8228033bd77e1129dacc1156955a906c750d2aea8d490c",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00012-c6db5d8a/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/reverse-ffi/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:16:29.358Z",
+            "finishedAt": "2026-09-21T17:17:06.527Z",
+            "peakMemoryBytes": 4325924864,
+            "minimumHostAvailable": 23704928256,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/tests/externLib/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00013-7ed933ae/results/execution.json",
+            "sha256": "0e83b4d557b8ae6b757d753b16ec6eecb22c7241566e6f5f815e4e0de9fba738"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00013-7ed933ae/resources.json",
+            "sha256": "142bedf4b647749e125c7435be32ea833ad066c5e8dac19d10b695b24faac8ea",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00013-7ed933ae/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/tests/externLib/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:17:06.575Z",
+            "finishedAt": "2026-09-21T17:18:21.863Z",
+            "peakMemoryBytes": 4728074240,
+            "minimumHostAvailable": 23523516416,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/tests/precompileLink/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00014-d0b8ec8c/results/execution.json",
+            "sha256": "e63535b1148f169c02ae185500d9654a3861b6dcc83795dfcb078ec7c305ea77"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00014-d0b8ec8c/resources.json",
+            "sha256": "abb55ea25468ca3584822d5e61131fb7c8351af7a2615ea0c67351ff7da358f8",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00014-d0b8ec8c/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/tests/precompileLink/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T17:18:21.912Z",
+            "finishedAt": "2026-09-21T17:22:05.232Z",
+            "peakMemoryBytes": 4988469248,
+            "minimumHostAvailable": 22929637376,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "pkg/test_extern",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00015-fed30e8b/results/execution.json",
+            "sha256": "3bdc0041542efdedc5cbed16baee53fe527d501dc5422df0c230fdac17d1b382"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00015-fed30e8b/resources.json",
+            "sha256": "870d6a32c70ffe3aec3a0dc10f0d8b092afddb9d64b3ecddc2014eb7c95684a7",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00015-fed30e8b/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^pkg/test_extern$"
+            ],
+            "startedAt": "2026-09-21T17:22:05.274Z",
+            "finishedAt": "2026-09-21T17:22:29.200Z",
+            "peakMemoryBytes": 4996218880,
+            "minimumHostAvailable": 23152349184,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "pkg/user_ext",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00016-75b7fac1/results/execution.json",
+            "sha256": "1ee84be24c8e0fc258eda88f9ecf7c4d867c4d234c74cc2378b9de466836a7be"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00016-75b7fac1/resources.json",
+            "sha256": "b15dba72ef1babf8d34409243b967cd006c3262ed2708b6015216c6a7400b617",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v103-table-growth-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v103-table-growth-native/00016-75b7fac1/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^pkg/user_ext$"
+            ],
+            "startedAt": "2026-09-21T17:22:29.240Z",
+            "finishedAt": "2026-09-21T17:23:55.187Z",
+            "peakMemoryBytes": 6166130688,
+            "minimumHostAvailable": 21984796672,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    },
+    "bun": {
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/campaign.json",
+        "sha256": "20933e3b5f4da1f1a8d15a3b38046d907a3ebd11535134a443796d52c3966eea"
+      },
+      "counts": {
+        "passed": 15,
+        "failed": 1,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 2,
+        "engineEnvironment": {
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/bun-stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "stackAdjustment": {
+          "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/bun-stack-reservation.so",
+          "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+          "osThreadStackBytes": 67108864,
+          "jscStackBudgetBytes": 62914560,
+          "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+        },
+        "maximumMemoryBytes": 4294967296,
+        "pthreadPoolSize": 8,
+        "backend": "full-lean-wasm64-lowered",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "snapshot": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v104-table-growth-lowered/snapshot.json",
+        "sha256": "9169315f26870aca2554b3ec957a27329b40ab7356ff1b1dee56cdd83288e361"
+      },
+      "wasmSha256": "69f052757ebb82887838997cfde55e3f93a211e19aa4d4fd9d3586ee96994fae",
+      "tests": [
+        {
+          "name": "compile/StackOverflow.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00001-1d2c5d00/results/execution.json",
+            "sha256": "941ddc9b81a17d8e05e210ae7b8c5da01c49320f4e77e24f09ac5f24ff5a9808"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00001-1d2c5d00/resources.json",
+            "sha256": "4c394b0b55eb22a2f904bbef0e74933ba875607ef0431c20a9b5539ce1f197b4",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00001-1d2c5d00/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/StackOverflow\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:46:17.221Z",
+            "finishedAt": "2026-09-21T16:46:36.037Z",
+            "peakMemoryBytes": 2371944448,
+            "minimumHostAvailable": 25944510464,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/StackOverflowTask.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00002-c44c7b70/results/execution.json",
+            "sha256": "315968a221d651c5722bcc3a001dc5141c48e1f2fd179ba45cd81a53ed77445a"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00002-c44c7b70/resources.json",
+            "sha256": "d67c974ed33a4d6aab9c502bb1be274a59b242b935cdc5a3fe1763c37ead2df0",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00002-c44c7b70/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/StackOverflowTask\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:46:36.082Z",
+            "finishedAt": "2026-09-21T16:46:54.551Z",
+            "peakMemoryBytes": 2380451840,
+            "minimumHostAvailable": 25969856512,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00003-a97a66a6/results/execution.json",
+            "sha256": "aa9e6aaad4416b9cc2bd57004fddbf5f6ca9c5876d340b500f0da6502c50ce48"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00003-a97a66a6/resources.json",
+            "sha256": "33abddb923bf15534afbce05cf0c7b9b647011dbaa6d01544a8832047a81ac90",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00003-a97a66a6/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^compile/wait_dedicated\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:46:54.597Z",
+            "finishedAt": "2026-09-21T16:47:18.526Z",
+            "peakMemoryBytes": 2365489152,
+            "minimumHostAvailable": 25881821184,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00004-b656cc07/results/execution.json",
+            "sha256": "2931aa52fa0a7622f00b1209d9c9574ecf9798c59617b6a8b4da589a29c4e8b5"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00004-b656cc07/resources.json",
+            "sha256": "12a02fc4f2012fa5ad07dc9b571e83fd3ed9378a6551bfc1b5d777354eb296d5",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00004-b656cc07/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/IO_test\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:47:18.581Z",
+            "finishedAt": "2026-09-21T16:47:24.123Z",
+            "peakMemoryBytes": 2147655680,
+            "minimumHostAvailable": 26140372992,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00005-d6817119/results/execution.json",
+            "sha256": "abadfa580371768ae9aa33af6bd564c28b052f6517aca2aef559d7821961dd9d"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00005-d6817119/resources.json",
+            "sha256": "9b3b02e68dc650f53984c6b3564b319db6381bf6c8e550b75b4eb910ce68b450",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00005-d6817119/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/Process\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:47:24.179Z",
+            "finishedAt": "2026-09-21T16:47:35.571Z",
+            "peakMemoryBytes": 4326866944,
+            "minimumHostAvailable": 24022839296,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00006-50a5f83d/results/execution.json",
+            "sha256": "9a41156b3bf92e64123f6392075a293ca2c1dfffc2afec9fab580c0b96cfcac4"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00006-50a5f83d/resources.json",
+            "sha256": "499610283234f817609919581846b6f7da9c1334b25307a965c12ea3c1ad39ed",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00006-50a5f83d/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/async_http_hang_regressions\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:47:35.618Z",
+            "finishedAt": "2026-09-21T16:47:45.754Z",
+            "peakMemoryBytes": 2616905728,
+            "minimumHostAvailable": 25536647168,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/extern.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00007-ee2d1b1f/results/execution.json",
+            "sha256": "e396a02fd0de9cbe332e9e78e2441f22f2bdaeb2a0e9534bd053354321428c44"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00007-ee2d1b1f/resources.json",
+            "sha256": "c3cd07b8a2aadd09884d4c39e89c45d9b7cd69cb712b3db505df3061ef7c3f7d",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00007-ee2d1b1f/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/extern\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:47:45.800Z",
+            "finishedAt": "2026-09-21T16:47:51.090Z",
+            "peakMemoryBytes": 2245095424,
+            "minimumHostAvailable": 25939443712,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "status": "failed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00008-e909f398/results/execution.json",
+            "sha256": "4bf26556cefab6ac64ded54e909170f358b01ce10db6f22830d87ec3151b5ee7"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00008-e909f398/resources.json",
+            "sha256": "f0b372e9931ba284e3ae3f9f205b5b0ec4b939e268984f5ae81a94dbc8204f19",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00008-e909f398/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/externBoxing\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:47:51.135Z",
+            "finishedAt": "2026-09-21T16:47:56.189Z",
+            "peakMemoryBytes": 2215747584,
+            "minimumHostAvailable": 25866305536,
+            "result": {
+              "code": 8,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "failureOutput": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<testsuite name=\"(empty)\"\n\ttests=\"1\"\n\tfailures=\"1\"\n\tdisabled=\"0\"\n\tskipped=\"0\"\n\thostname=\"\"\n\ttime=\"4\"\n\ttimestamp=\"2026-09-21T12:47:51\"\n\t>\n\t<testcase name=\"elab/externBoxing.lean\" classname=\"elab/externBoxing.lean\" time=\"4.42854\" status=\"fail\">\n\t\t<failure message=\"Failed\"/>\n\t\t<properties/>\n\t\t<system-out>++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false externBoxing.lean\n[Compiler.IR] [result]\n    extern _private._stdin.0.Foo.bar (x_1 : obj) (x_2 : u64) : u64\n    def _private._stdin.0.Foo.bar._boxed (x_1 : obj) (x_2 : obj) : obj :=\n      let x_3 : u64 := unbox x_2;\n      dec x_2;\n      let x_4 : u64 := _private._stdin.0.Foo.bar x_1 x_3;\n      let x_5 : obj := box x_4;\n      ret x_5\n[NON-XML-CHAR-0x1B][1m--- externBoxing.lean.out.expected\t2026-06-21 07:16:11.000000000 -0400[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][1m+++ externBoxing.lean.out.produced\t2026-09-21 12:47:55.955595281 -0400[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][36m@@ -1,8 +1,8 @@[NON-XML-CHAR-0x1B][0m\n [Compiler.IR] [result]\n[NON-XML-CHAR-0x1B][31m-    extern _private.elab.externBoxing.0.Foo.bar (x_1 : obj) (x_2 : u64) : u64[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][31m-    def _private.elab.externBoxing.0.Foo.bar._boxed (x_1 : obj) (x_2 : obj) : obj :=[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][32m+    extern _private._stdin.0.Foo.bar (x_1 : obj) (x_2 : u64) : u64[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][32m+    def _private._stdin.0.Foo.bar._boxed (x_1 : obj) (x_2 : obj) : obj :=[NON-XML-CHAR-0x1B][0m\n       let x_3 : u64 := unbox x_2;\n       dec x_2;\n[NON-XML-CHAR-0x1B][31m-      let x_4 : u64 := _private.elab.externBoxing.0.Foo.bar x_1 x_3;[NON-XML-CHAR-0x1B][0m\n[NON-XML-CHAR-0x1B][32m+      let x_4 : u64 := _private._stdin.0.Foo.bar x_1 x_3;[NON-XML-CHAR-0x1B][0m\n       let x_5 : obj := box x_4;\n       ret x_5\nTEST FAILED: Unexpected output\n</system-out>\n\t</testcase>\n</testsuite>\n"
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00009-c9e01156/results/execution.json",
+            "sha256": "23961ffb131b08510c9d69a043d39657f30fad6b836cd9b990440dd0781ee159"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00009-c9e01156/resources.json",
+            "sha256": "9c36c82d0a35223bbff6dd85aaa1f92cfa61bb0cf0741ad112cf855c76abe862",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00009-c9e01156/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/tempfile\\.lean$"
+            ],
+            "startedAt": "2026-09-21T16:47:56.237Z",
+            "finishedAt": "2026-09-21T16:48:02.196Z",
+            "peakMemoryBytes": 2243842048,
+            "minimumHostAvailable": 25742389248,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00010-66769d15/results/execution.json",
+            "sha256": "cf3471661b6ebf7f85be4bbdcc819eb8e3c34741b86b1418cafb06fa1505325b"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00010-66769d15/resources.json",
+            "sha256": "e9728dd6accbf2eb1018e69ec1307e66525fe38fe01fc054f8f163513da027d3",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00010-66769d15/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/ffi/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T16:48:02.247Z",
+            "finishedAt": "2026-09-21T16:49:51.200Z",
+            "peakMemoryBytes": 5520441344,
+            "minimumHostAvailable": 22570758144,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/precompile/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00011-149ba6b2/results/execution.json",
+            "sha256": "c2d4bc8ba15bbaf9f86f27587d0c2de4f391b12b6676bdd1e9cce14ca5850569"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00011-149ba6b2/resources.json",
+            "sha256": "8179f86c5f454b7dc7000ba4d703eb4fc947cb11220777940039323f4a80d6ea",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00011-149ba6b2/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/precompile/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T16:49:51.249Z",
+            "finishedAt": "2026-09-21T16:51:03.345Z",
+            "peakMemoryBytes": 5358366720,
+            "minimumHostAvailable": 22767996928,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/examples/reverse-ffi/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00012-ceeb25ca/results/execution.json",
+            "sha256": "a48e0b39be4a136a3dc117ba77188898bd441d99e9d21e330539e86eeeda9d81"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00012-ceeb25ca/resources.json",
+            "sha256": "632bdc2cef700c55cb01db93becc3f62cba2b0717bacd5a4ae9a3c83324aeaa1",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00012-ceeb25ca/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/examples/reverse-ffi/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T16:51:03.392Z",
+            "finishedAt": "2026-09-21T16:51:38.468Z",
+            "peakMemoryBytes": 4906471424,
+            "minimumHostAvailable": 23284322304,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/tests/externLib/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00013-b7caad5f/results/execution.json",
+            "sha256": "59642645d7517fdfaa54ac071d641b490aa66ed2ac7414ce019ab8a3ed0a1824"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00013-b7caad5f/resources.json",
+            "sha256": "abbb5240cfdf1ece72d08352b5068b0580605b03a1c299d87cedd32467d532a6",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00013-b7caad5f/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/tests/externLib/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T16:51:38.517Z",
+            "finishedAt": "2026-09-21T16:52:39.826Z",
+            "peakMemoryBytes": 5487161344,
+            "minimumHostAvailable": 22693064704,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "tests/lake/tests/precompileLink/test.sh",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00014-fab2968c/results/execution.json",
+            "sha256": "f73f7087b03a3deb9f50f7a66b53e0b0e5bcb32f0955b72a5af11b52dde90997"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00014-fab2968c/resources.json",
+            "sha256": "b8b3bfd9437c689a5bb22128a9e4365d4adc7a9a07e986f946dbfadd404e97b6",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00014-fab2968c/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^tests/lake/tests/precompileLink/test\\.sh$"
+            ],
+            "startedAt": "2026-09-21T16:52:39.877Z",
+            "finishedAt": "2026-09-21T16:55:44.291Z",
+            "peakMemoryBytes": 5736390656,
+            "minimumHostAvailable": 22478647296,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "pkg/test_extern",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00015-786c2e14/results/execution.json",
+            "sha256": "a25b6432b24893f378ad2939abada67e0004610f37373440eb5de7fbf0e8be56"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00015-786c2e14/resources.json",
+            "sha256": "8ee1966bc6be7a563d7a727522e4011ee075442b751265d7d9db5402b2d4c81c",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00015-786c2e14/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^pkg/test_extern$"
+            ],
+            "startedAt": "2026-09-21T16:55:44.334Z",
+            "finishedAt": "2026-09-21T16:56:04.499Z",
+            "peakMemoryBytes": 5603180544,
+            "minimumHostAvailable": 22593933312,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "pkg/user_ext",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00016-108db497/results/execution.json",
+            "sha256": "ea501e013105ae98faeabbc98d3e35cdb2041e62415b385e5160915bc69f8c2c"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00016-108db497/resources.json",
+            "sha256": "993de81df9a9cab8f6d46d0319e9c120384e0a9f53b49dd3ec31c2a3de92b19c",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v104-table-growth-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v104-table-growth-lowered/00016-108db497/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^pkg/user_ext$"
+            ],
+            "startedAt": "2026-09-21T16:56:04.546Z",
+            "finishedAt": "2026-09-21T16:57:09.643Z",
+            "peakMemoryBytes": 6543601664,
+            "minimumHostAvailable": 21758046208,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    }
+  },
+  "implementationInputs": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/table-growth.mjs",
+      "sha256": "754f20894bae8a39c8fef98adc6aa705ac88e99c60eb89bb20ae1603f916c110"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/derive-table-growth.mjs",
+      "sha256": "8464c18a6dc03c982cd26d58a8fdddc2864ec659975aef44ac03a6c126624e97"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/freeze-build.mjs",
+      "sha256": "2f480f66053e23e70e67de7058bfa4abd732c05bec356d4e94a6142e4663cbaf"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/test/full-table-growth.test.mjs",
+      "sha256": "c5a6e4c327faaf28bc711dc8122924b3788156fe25d899fa7090edf1e8f85eb6"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/test/fixtures/got-emscripten.js.txt",
+      "sha256": "3f5e4692d95e193221e1b667a729165bf34af9b8cbb88c5747d9270a2988951b"
+    }
+  ]
+}

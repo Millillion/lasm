@@ -175,6 +175,19 @@ justify adopting five for general workloads. The first combined attempt stopped
 safely at its memory budget, and the isolated five-worker retry was a completed
 test failure; neither result is erased by the passing eight-worker control.
 
+The subsequent startup trace isolated 13,985 individual table-growth calls per
+main/worker. `derive-table-growth.mjs FROZEN_SOURCE NEW_OUTPUT` preserves the
+Wasm, worker count, and host while reserving exactly those missing initial-main
+function slots in one growth. Existing free slots, function-pointer order,
+aliases, later side modules, and incremental table-limit failures retain their
+original behavior. Future `freeze-build.mjs` snapshots apply this optimization.
+The eight-worker Bun startup smoke now takes 4.42 seconds; the same ordinary
+console fixture fell from 70.09 to 4.77 seconds. These are individual Linux x64
+executions with the disclosed Bun stack helper, not portable timing guarantees.
+The [retained evidence](../../docs/evidence/table-growth-2026-09-21.json) includes
+28 loader controls, 47 passing upstream registrations, and the pre-existing Bun
+module-root failure reproduced on both old and optimized runtimes.
+
 A later six-worker comparison also fails HTTP's early-streaming assertion and
 safely resource-aborts the original parallel-cancellation test at 8.06 GiB.
 `derive-bun-gc.mjs FROZEN_SOURCE NEW_OUTPUT` freezes an opt-in alternative with

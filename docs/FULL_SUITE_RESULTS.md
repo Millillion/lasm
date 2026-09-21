@@ -8,7 +8,7 @@ zero failures/resource aborts, and 3,743 pending registrations**. It uses the
 unchanged server-test driver compiled ahead of time, and prioritizes previously
 unattempted elaboration tests. Its [separate checkpoint](evidence/node-broad-v89-2026-09-21.json)
 verifies every original source and driver artifact before and after each test.
-Peak memory was 3.39 GiB with no OOM, throttling, or swap events. This frozen
+Peak memory was 3.63 GiB with no OOM, throttling, or swap events. This frozen
 runtime includes the file-read state repair; subsequent console and table-growth
 repairs are separate. The checkpoint ends at `elab/4064.lean`.
 
@@ -866,6 +866,29 @@ Eight reported packaged controls, fourteen final host/worker controls, and all
 22 Lean-server Vitest tests also pass. The record retains both console baselines,
 the initial failing full-pipe checks, and the corrected diagnostic-fixture
 cleanup; see [the complete console evidence](evidence/console-buffering-2026-09-21.json).
+
+A startup trace isolated Bun's remaining delay to **13,985 individual
+`WebAssembly.Table.grow` calls per main/worker**. Its workers spent 49–60 seconds
+in those calls. The loader now reserves exactly the missing initial-main slots
+in one growth while preserving free-slot priority, aliases, pointer values,
+later side-module behavior, and the original incremental failure path. Wasm,
+worker counts, host modules, and SDK inputs are unchanged. Twenty-eight loader
+controls pass, including real 32-bit and 64-bit tables and table-limit failures.
+
+The same ordinary console fixture fell from **70.09 to 4.77 seconds** on Bun;
+the startup smoke finished in **4.42 seconds**. These are individual Linux x64
+executions with the existing Bun stack adjustment, not general benchmarks.
+The frozen v103 Node/Deno and v104 Bun snapshots passed **47/48 targeted upstream
+registrations**: Node 16/16, Deno 16/16, and Bun 15/16. Coverage includes all five
+selected Lake linking cases and both additional extension tests. All 7,267
+original source hashes remain intact before and after every registration.
+Peak workload memory was **6.10 GiB**, with zero OOM, throttling, cap-hit, or swap
+events. Bun's `externBoxing` failure also reproduces on the preceding v98 runtime:
+its filesystem adapter resolves a saved-directory path followed by `..`
+incorrectly, causing Lean to assign the fallback `_stdin` module name. That
+separate filesystem repair and the original Bun server deadline remain pending.
+The record also retains the initial table64 transform preparation failure; see
+[the startup optimization evidence](evidence/table-growth-2026-09-21.json).
 
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
