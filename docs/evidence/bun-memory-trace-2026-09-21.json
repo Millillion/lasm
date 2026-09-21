@@ -1,0 +1,1357 @@
+{
+  "recordedAt": "2026-09-21T08:06:43.399666+00:00",
+  "scope": "Diagnostic execution of one unchanged original Bun cancellation test; private runtime metrics only. Not a conformance pass.",
+  "campaign": {
+    "path": ".work/full-campaign-bun-v54-metrics",
+    "identity": "7b4993757a87b2a9ab8ad6682ceafd37f533e0ae8b2aa18770724d4b8f473ee0",
+    "counts": {
+      "passed": 0,
+      "failed": 0,
+      "resource-aborted": 1,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "attempt": {
+      "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v54-metrics/00001-2d69c319",
+      "status": "resource-aborted",
+      "startedAt": "2026-09-21T07:57:28.711Z",
+      "exit": {
+        "code": 125,
+        "signal": null
+      },
+      "finishedAt": "2026-09-21T08:01:03.380Z",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v54-metrics/00001-2d69c319/resources.json",
+      "peakMemoryBytes": 8634662912,
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      }
+    }
+  },
+  "config": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "engine": "bun",
+    "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+    "engineArgs": [],
+    "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v54-bun-metrics",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+    "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+    "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v54-bun-metrics/runtime-support",
+    "leanThreads": 4,
+    "lakeThreads": 1,
+    "bunSmol": false,
+    "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+    "systemAllocator": "mimalloc",
+    "leanAllocator": "mimalloc",
+    "memoryMode": 2,
+    "engineEnvironment": {
+      "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v54-metrics/bun-stack-reservation.so",
+      "BUN_JSC_maxPerThreadStackUsage": "62914560"
+    },
+    "stackAdjustment": {
+      "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v54-metrics/bun-stack-reservation.so",
+      "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+      "osThreadStackBytes": 67108864,
+      "jscStackBudgetBytes": 62914560,
+      "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+    },
+    "maximumMemoryBytes": 4294967296,
+    "pthreadPoolSize": 8,
+    "backend": "full-lean-wasm64-lowered",
+    "nativeLeanFallback": false,
+    "environmentAdjustments": {
+      "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v54-metrics",
+      "LASM_FULL_APP_PATH": "Selected facade entry point",
+      "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+      "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+      "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+    },
+    "externalTools": {
+      "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v54-bun-metrics/lib",
+      "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v54-bun-metrics/include",
+      "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v54-bun-metrics/share",
+      "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v54-bun-metrics/bin/leanmake",
+      "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+      "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+    }
+  },
+  "derivation": {
+    "scope": "Private numeric heap/linear-memory metrics and function-table scan tracing. Diagnostic run only; no test, Wasm, host, GC, or worker-count changes.",
+    "metrics": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-v54-metrics",
+    "wasmSha256": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e",
+    "scriptSha256": "b8a1d9fbdf52beac416eaa148a6ef7887fd7a8417ba0b5558fafa330bfe93c06"
+  },
+  "resources": {
+    "startedAt": "2026-09-21T07:57:28.752Z",
+    "command": [
+      "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+      "--suite",
+      "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v54-metrics",
+      "--results",
+      "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v54-metrics/00001-2d69c319/results",
+      "--jobs",
+      "1",
+      "--filter",
+      "^server_interactive/cancellation_par\\.lean$"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "19e75490-b828-4cad-b3f0-f5754339547d",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 28969578496
+    },
+    "minimumHostAvailable": 20626010112,
+    "peakMemoryBytes": 8634662912,
+    "peakTasks": 150,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v54-metrics/00001-2d69c319/resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-21T08:01:03.070Z",
+      "memoryBytes": 2510462976,
+      "peakMemoryBytes": 8634662912,
+      "swapBytes": 0,
+      "tasks": 17,
+      "memoryBreakdown": {
+        "anon": 2444111872,
+        "file": 13877248,
+        "kernel": 17764352,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 6565888,
+        "slab": 791984
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-21T07:59:47.882Z",
+      "processes": [
+        {
+          "pid": 1791337,
+          "name": "bun",
+          "residentBytes": 3947737088,
+          "threads": 33
+        },
+        {
+          "pid": 1791468,
+          "name": "bun",
+          "residentBytes": 1640554496,
+          "threads": 42
+        },
+        {
+          "pid": 1791590,
+          "name": "bun",
+          "residentBytes": 982974464,
+          "threads": 28
+        },
+        {
+          "pid": 1791317,
+          "name": "MainThread",
+          "residentBytes": 74706944,
+          "threads": 11
+        },
+        {
+          "pid": 1791326,
+          "name": "ctest",
+          "residentBytes": 34004992,
+          "threads": 2
+        },
+        {
+          "pid": 1791332,
+          "name": "bash",
+          "residentBytes": 3911680,
+          "threads": 1
+        },
+        {
+          "pid": 1791336,
+          "name": "bash",
+          "residentBytes": 2613248,
+          "threads": 1
+        }
+      ]
+    },
+    "stoppedBecause": "Workload reached its proactive memory budget",
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "exit-code",
+      "exitCode": "exited",
+      "exitStatus": "1",
+      "capturedAt": "2026-09-21T08:01:03.196Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 279867392,
+      "peakMemoryBytes": 8634662912,
+      "swapBytes": 0,
+      "tasks": 10,
+      "memoryBreakdown": {
+        "anon": 233390080,
+        "file": 13881344,
+        "kernel": 11132928,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 6569984,
+        "slab": 561848
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-21T08:01:03.367Z",
+    "result": {
+      "code": 1,
+      "signal": null
+    },
+    "resourceLimited": true,
+    "memoryThrottled": false
+  },
+  "processes": [
+    {
+      "path": ".work/full-engine-probe/bun-v54-metrics/1791337.jsonl",
+      "stageCounts": {
+        "first-index": 9,
+        "main-sample": 21
+      },
+      "maximumSampledRssBytes": 3992133632,
+      "maximumSampledLinearBytes": 1968832512,
+      "rows": [
+        {
+          "at": "2026-09-21T07:57:30.838Z",
+          "stage": "first-index",
+          "pid": 1791337,
+          "thread": 0,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1206411264,
+            "heapTotal": 11109376,
+            "heapUsed": 270865284,
+            "external": 269312142,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:57:35.469Z",
+          "stage": "first-index",
+          "pid": 1791337,
+          "thread": 6,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1557028864,
+            "heapTotal": 11071488,
+            "heapUsed": 2319894,
+            "external": 269249201,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:57:35.476Z",
+          "stage": "first-index",
+          "pid": 1791337,
+          "thread": 3,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1561223168,
+            "heapTotal": 10267648,
+            "heapUsed": 417565636,
+            "external": 405175566,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:57:35.484Z",
+          "stage": "first-index",
+          "pid": 1791337,
+          "thread": 2,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1569480704,
+            "heapTotal": 10267648,
+            "heapUsed": 417565650,
+            "external": 405175580,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:57:35.562Z",
+          "stage": "first-index",
+          "pid": 1791337,
+          "thread": 8,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1642086400,
+            "heapTotal": 10267648,
+            "heapUsed": 417566168,
+            "external": 405175874,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:57:35.567Z",
+          "stage": "first-index",
+          "pid": 1791337,
+          "thread": 1,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1642872832,
+            "heapTotal": 10267648,
+            "heapUsed": 417566443,
+            "external": 405175909,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:57:35.634Z",
+          "stage": "first-index",
+          "pid": 1791337,
+          "thread": 5,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1591148544,
+            "heapTotal": 11071488,
+            "heapUsed": 2320503,
+            "external": 269249202,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:57:35.655Z",
+          "stage": "first-index",
+          "pid": 1791337,
+          "thread": 4,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1593245696,
+            "heapTotal": 10267648,
+            "heapUsed": 417566437,
+            "external": 405175903,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:57:35.722Z",
+          "stage": "first-index",
+          "pid": 1791337,
+          "thread": 7,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1603244032,
+            "heapTotal": 10267648,
+            "heapUsed": 417566289,
+            "external": 405175899,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:57:39.357Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 1600397312,
+            "heapTotal": 7456768,
+            "heapUsed": 298919963,
+            "external": 286037547,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:57:49.382Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 1538519040,
+            "heapTotal": 7456768,
+            "heapUsed": 298905496,
+            "external": 286024504,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:57:59.393Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 1545646080,
+            "heapTotal": 7456768,
+            "heapUsed": 298905843,
+            "external": 286024611,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:58:09.402Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 1560195072,
+            "heapTotal": 7456768,
+            "heapUsed": 298905843,
+            "external": 286024611,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:58:19.411Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 1567797248,
+            "heapTotal": 7456768,
+            "heapUsed": 298905843,
+            "external": 286024611,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:58:29.415Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 1566760960,
+            "heapTotal": 7456768,
+            "heapUsed": 298917241,
+            "external": 286032009,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:58:39.420Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3182366720,
+            "heapTotal": 8962048,
+            "heapUsed": 365470308,
+            "external": 351870292,
+            "arrayBuffers": 135837498
+          },
+          "linearBytes": 1700265984,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:58:49.430Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3992133632,
+            "heapTotal": 8432640,
+            "heapUsed": 3962796342,
+            "external": 3949271526,
+            "arrayBuffers": 1968833150
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:58:59.444Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3953655808,
+            "heapTotal": 8432640,
+            "heapUsed": 3962796361,
+            "external": 1968908082,
+            "arrayBuffers": 1968833150
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:09.453Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3946237952,
+            "heapTotal": 8431616,
+            "heapUsed": 3962763024,
+            "external": 3949261216,
+            "arrayBuffers": 1968833150
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:19.462Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3945844736,
+            "heapTotal": 8431616,
+            "heapUsed": 3962173381,
+            "external": 3948771285,
+            "arrayBuffers": 1968833150
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:29.471Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3945844736,
+            "heapTotal": 8431616,
+            "heapUsed": 3962173800,
+            "external": 3948771464,
+            "arrayBuffers": 1968833150
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:39.476Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3945844736,
+            "heapTotal": 8431616,
+            "heapUsed": 3962173800,
+            "external": 3948771464,
+            "arrayBuffers": 1968833150
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:49.478Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3946307584,
+            "heapTotal": 8483840,
+            "heapUsed": 3962254825,
+            "external": 3948831561,
+            "arrayBuffers": 1968845536
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:59.490Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3945361408,
+            "heapTotal": 8483840,
+            "heapUsed": 3962254825,
+            "external": 3948831561,
+            "arrayBuffers": 1968845536
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:09.499Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3944943616,
+            "heapTotal": 8483840,
+            "heapUsed": 3962254825,
+            "external": 3948831561,
+            "arrayBuffers": 1968845536
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:19.501Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3944943616,
+            "heapTotal": 8483840,
+            "heapUsed": 3962254825,
+            "external": 1968870445,
+            "arrayBuffers": 1968845536
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:29.511Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3944943616,
+            "heapTotal": 8483840,
+            "heapUsed": 3962254825,
+            "external": 1968870445,
+            "arrayBuffers": 1968845536
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:39.521Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3944943616,
+            "heapTotal": 8483840,
+            "heapUsed": 3962254825,
+            "external": 3948461287,
+            "arrayBuffers": 1968845536
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:49.529Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3940945920,
+            "heapTotal": 8464384,
+            "heapUsed": 3961918822,
+            "external": 3948533158,
+            "arrayBuffers": 1968833150
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:59.530Z",
+          "stage": "main-sample",
+          "pid": 1791337,
+          "thread": 0,
+          "usage": {
+            "rss": 3941208064,
+            "heapTotal": 8464384,
+            "heapUsed": 3961918822,
+            "external": 1968859031,
+            "arrayBuffers": 1968833150
+          },
+          "linearBytes": 1968832512,
+          "tableEntries": 275054
+        }
+      ]
+    },
+    {
+      "path": ".work/full-engine-probe/bun-v54-metrics/1791468.jsonl",
+      "stageCounts": {
+        "first-index": 9,
+        "main-sample": 14
+      },
+      "maximumSampledRssBytes": 2250907648,
+      "maximumSampledLinearBytes": 793182208,
+      "rows": [
+        {
+          "at": "2026-09-21T07:58:42.287Z",
+          "stage": "first-index",
+          "pid": 1791468,
+          "thread": 0,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1189806080,
+            "heapTotal": 11110400,
+            "heapUsed": 270865893,
+            "external": 269312719,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:58:46.762Z",
+          "stage": "first-index",
+          "pid": 1791468,
+          "thread": 7,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1552478208,
+            "heapTotal": 11071488,
+            "heapUsed": 2320598,
+            "external": 269249201,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:58:46.764Z",
+          "stage": "first-index",
+          "pid": 1791468,
+          "thread": 6,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1554706432,
+            "heapTotal": 11071488,
+            "heapUsed": 2320358,
+            "external": 269249201,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:58:46.778Z",
+          "stage": "first-index",
+          "pid": 1791468,
+          "thread": 3,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1563488256,
+            "heapTotal": 10267648,
+            "heapUsed": 417566435,
+            "external": 405175901,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:58:46.786Z",
+          "stage": "first-index",
+          "pid": 1791468,
+          "thread": 5,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1580789760,
+            "heapTotal": 10267648,
+            "heapUsed": 417566294,
+            "external": 405175904,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:58:46.943Z",
+          "stage": "first-index",
+          "pid": 1791468,
+          "thread": 4,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1557757952,
+            "heapTotal": 11071488,
+            "heapUsed": 2320454,
+            "external": 269249201,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:58:46.944Z",
+          "stage": "first-index",
+          "pid": 1791468,
+          "thread": 1,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1557757952,
+            "heapTotal": 11071488,
+            "heapUsed": 2320599,
+            "external": 269249202,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:58:46.945Z",
+          "stage": "first-index",
+          "pid": 1791468,
+          "thread": 8,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1557757952,
+            "heapTotal": 11071488,
+            "heapUsed": 2320262,
+            "external": 269249201,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:58:46.960Z",
+          "stage": "first-index",
+          "pid": 1791468,
+          "thread": 2,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1562214400,
+            "heapTotal": 10267648,
+            "heapUsed": 417566439,
+            "external": 405175905,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:58:50.848Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1588826112,
+            "heapTotal": 7474176,
+            "heapUsed": 298917301,
+            "external": 286037877,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:00.876Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1522106368,
+            "heapTotal": 7474176,
+            "heapUsed": 298900614,
+            "external": 286024918,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:10.885Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1531723776,
+            "heapTotal": 7474176,
+            "heapUsed": 298900961,
+            "external": 286025025,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:20.893Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1544044544,
+            "heapTotal": 7474176,
+            "heapUsed": 298900961,
+            "external": 286025025,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:30.908Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1550598144,
+            "heapTotal": 7474176,
+            "heapUsed": 298900961,
+            "external": 286025025,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:40.903Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1535774720,
+            "heapTotal": 7474176,
+            "heapUsed": 298912567,
+            "external": 286032423,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:50.903Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1704112128,
+            "heapTotal": 19813376,
+            "heapUsed": 372284097,
+            "external": 363670183,
+            "arrayBuffers": 147570633
+          },
+          "linearBytes": 561381376,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:00.903Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1913851904,
+            "heapTotal": 15057920,
+            "heapUsed": 415492737,
+            "external": 404414495,
+            "arrayBuffers": 188224966
+          },
+          "linearBytes": 561381376,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:10.903Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1991741440,
+            "heapTotal": 16303104,
+            "heapUsed": 439038862,
+            "external": 426984254,
+            "arrayBuffers": 210791568
+          },
+          "linearBytes": 673710080,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:20.903Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 2063548416,
+            "heapTotal": 17574912,
+            "heapUsed": 456758326,
+            "external": 444256830,
+            "arrayBuffers": 228063433
+          },
+          "linearBytes": 673710080,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:30.903Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 2163494912,
+            "heapTotal": 17891328,
+            "heapUsed": 475341011,
+            "external": 463168649,
+            "arrayBuffers": 246973446
+          },
+          "linearBytes": 793182208,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:40.903Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 2250907648,
+            "heapTotal": 19159040,
+            "heapUsed": 494090799,
+            "external": 481973492,
+            "arrayBuffers": 265776706
+          },
+          "linearBytes": 793182208,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:50.922Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1911791616,
+            "heapTotal": 8799232,
+            "heapUsed": 1611578281,
+            "external": 1598034905,
+            "arrayBuffers": 793183087
+          },
+          "linearBytes": 793182208,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:01:00.932Z",
+          "stage": "main-sample",
+          "pid": 1791468,
+          "thread": 0,
+          "usage": {
+            "rss": 1818021888,
+            "heapTotal": 8797184,
+            "heapUsed": 1611558091,
+            "external": 1598033435,
+            "arrayBuffers": 793183087
+          },
+          "linearBytes": 793182208,
+          "tableEntries": 275054
+        }
+      ]
+    },
+    {
+      "path": ".work/full-engine-probe/bun-v54-metrics/1791590.jsonl",
+      "stageCounts": {
+        "first-index": 10,
+        "main-sample": 7
+      },
+      "maximumSampledRssBytes": 1742643200,
+      "maximumSampledLinearBytes": 910360576,
+      "rows": [
+        {
+          "at": "2026-09-21T07:59:49.089Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 0,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1195909120,
+            "heapTotal": 11125760,
+            "heapUsed": 270865372,
+            "external": 269312182,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:59:57.478Z",
+          "stage": "main-sample",
+          "pid": 1791590,
+          "thread": 0,
+          "usage": {
+            "rss": 1096916992,
+            "heapTotal": 18729984,
+            "heapUsed": 270865372,
+            "external": 269312182,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T07:59:57.841Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 2,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1619378176,
+            "heapTotal": 11021312,
+            "heapUsed": 415154901,
+            "external": 404216319,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:59:57.841Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 1,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1619378176,
+            "heapTotal": 10481664,
+            "heapUsed": 417352767,
+            "external": 405191113,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:59:57.844Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 3,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1623965696,
+            "heapTotal": 10873856,
+            "heapUsed": 417184843,
+            "external": 405185973,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:59:57.925Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 4,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1559707648,
+            "heapTotal": 10972160,
+            "heapUsed": 417105373,
+            "external": 405199655,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:59:57.929Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 7,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1561280512,
+            "heapTotal": 10284032,
+            "heapUsed": 417565095,
+            "external": 405174929,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:59:57.934Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 6,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1563115520,
+            "heapTotal": 10644480,
+            "heapUsed": 417336202,
+            "external": 405175268,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:59:57.936Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 8,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1564295168,
+            "heapTotal": 10267648,
+            "heapUsed": 417564455,
+            "external": 405174241,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T07:59:57.948Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 5,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1568227328,
+            "heapTotal": 10120192,
+            "heapUsed": 417952768,
+            "external": 405169162,
+            "arrayBuffers": 134218090
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 261063
+        },
+        {
+          "at": "2026-09-21T08:00:07.492Z",
+          "stage": "main-sample",
+          "pid": 1791590,
+          "thread": 0,
+          "usage": {
+            "rss": 1611046912,
+            "heapTotal": 7440384,
+            "heapUsed": 298917956,
+            "external": 286035812,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:17.502Z",
+          "stage": "main-sample",
+          "pid": 1791590,
+          "thread": 0,
+          "usage": {
+            "rss": 1532268544,
+            "heapTotal": 7456768,
+            "heapUsed": 298904984,
+            "external": 286024616,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:27.517Z",
+          "stage": "main-sample",
+          "pid": 1791590,
+          "thread": 0,
+          "usage": {
+            "rss": 1546682368,
+            "heapTotal": 7456768,
+            "heapUsed": 298905003,
+            "external": 286024619,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:37.526Z",
+          "stage": "main-sample",
+          "pid": 1791590,
+          "thread": 0,
+          "usage": {
+            "rss": 1556598784,
+            "heapTotal": 7456768,
+            "heapUsed": 298905003,
+            "external": 286024619,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:47.557Z",
+          "stage": "main-sample",
+          "pid": 1791590,
+          "thread": 0,
+          "usage": {
+            "rss": 1561858048,
+            "heapTotal": 7456768,
+            "heapUsed": 298906099,
+            "external": 286025267,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:00:57.566Z",
+          "stage": "main-sample",
+          "pid": 1791590,
+          "thread": 0,
+          "usage": {
+            "rss": 1574395904,
+            "heapTotal": 7473152,
+            "heapUsed": 298916305,
+            "external": 286032017,
+            "arrayBuffers": 134217824
+          },
+          "linearBytes": 134217728,
+          "tableEntries": 275054
+        },
+        {
+          "at": "2026-09-21T08:01:02.038Z",
+          "stage": "first-index",
+          "pid": 1791590,
+          "thread": 12,
+          "functionName": "275009",
+          "usage": {
+            "rss": 1742643200,
+            "heapTotal": 11104256,
+            "heapUsed": 2320502,
+            "external": 2731928491,
+            "arrayBuffers": 910360938
+          },
+          "linearBytes": 910360576,
+          "tableEntries": 261063
+        }
+      ]
+    }
+  ],
+  "diagnosticScript": {
+    "path": ".work/full-engine-probe/derive-bun-metrics.mjs",
+    "sha256": "b8a1d9fbdf52beac416eaa148a6ef7887fd7a8417ba0b5558fafa330bfe93c06",
+    "source": "import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, symlinkSync, createReadStream } from 'node:fs';\nimport { resolve, join } from 'node:path';\nimport { createHash } from 'node:crypto';\nimport { ensureResourceGuard } from '../../scripts/full-lean/resource-guard.mjs';\nawait ensureResourceGuard();\nconst source = resolve('.work/full-artifacts/wasm64-v49-process-lifetime-lowered');\nconst output = resolve('.work/full-artifacts/wasm64-v54-bun-metrics');\nconst metrics = resolve('.work/full-engine-probe/bun-v54-metrics');\nif (existsSync(output) || existsSync(metrics)) throw new Error('Use fresh diagnostic outputs');\nasync function hash(path) {\n  const h = createHash('sha256');\n  for await (const bytes of createReadStream(path)) h.update(bytes);\n  return h.digest('hex');\n}\nconst metadata = JSON.parse(readFileSync(join(source, 'snapshot.json')));\nfor (const [name, expected] of Object.entries(metadata.files))\n  if (await hash(join(source, name)) !== expected) throw new Error('Frozen input changed: ' + name);\nlet glue = readFileSync(join(source, 'bin/lean.js'), 'utf8');\nconst marker = 'var getFunctionAddress = function indexedFunctionAddress(func) {';\nif (glue.split(marker).length !== 2) throw new Error('Function lookup drift');\nconst monitor = `\nvar lasmMetricDirectory = ${JSON.stringify(metrics)};\nfunction lasmEngineMemory(stage, func) {\n  var usage = process.memoryUsage();\n  var record = { at: new Date().toISOString(), stage, pid: process.pid, thread: require('node:worker_threads').threadId,\n    functionName: func?.name, usage,\n    linearBytes: typeof wasmMemory === 'undefined' ? null : wasmMemory?.buffer.byteLength,\n    tableEntries: typeof wasmTable === 'undefined' ? null : Number(wasmTable?.length) };\n  require('node:fs').appendFileSync(lasmMetricDirectory + '/' + process.pid + '.jsonl', JSON.stringify(record) + '\\\\n');\n}\nif (!ENVIRONMENT_IS_PTHREAD) {\n  var lasmMetricTimer = setInterval(() => lasmEngineMemory('main-sample'), 10000);\n  lasmMetricTimer.unref();\n}\n`;\nglue = glue.replace(marker, monitor + marker);\nconst first = '    functionsInTableMap = new WeakMap();';\nif (glue.split(first).length !== 2) throw new Error('Initial index drift');\nglue = glue.replace(first, first + '\\n    lasmEngineMemory(\"first-index\", func);');\nconst fallback = '    lasmTableMapComplete = true;\\n    updateTableMap(0, Number(wasmTable.length));';\nif (glue.split(fallback).length !== 2) throw new Error('Lookup fallback drift');\nglue = glue.replace(fallback, '    lasmEngineMemory(\"before-full-scan\", func);\\n' + fallback + '\\n    lasmEngineMemory(\"after-full-scan\", func);');\nmkdirSync(metrics);\nmkdirSync(join(output, 'bin'), { recursive: true });\nfor (const name of readdirSync(source)) {\n  if (['bin', 'snapshot.json', 'build-provenance.json'].includes(name)) continue;\n  symlinkSync(join(source, name), join(output, name));\n}\nfor (const name of readdirSync(join(source, 'bin'))) {\n  if (['lean.js', 'lean.cjs'].includes(name)) writeFileSync(join(output, 'bin', name), glue);\n  else symlinkSync(join(source, 'bin', name), join(output, 'bin', name));\n}\nconst derivation = { scope: 'Private numeric heap/linear-memory metrics and function-table scan tracing. Diagnostic run only; no test, Wasm, host, GC, or worker-count changes.',\n  metrics, wasmSha256: await hash(join(source, 'bin/lean.wasm')), scriptSha256: await hash(new URL(import.meta.url)) };\nconst provenance = JSON.parse(readFileSync(join(source, 'build-provenance.json')));\nwriteFileSync(join(output, 'build-provenance.json'), JSON.stringify({ ...provenance, memoryDiagnostic: derivation }, null, 2) + '\\n');\nObject.assign(metadata, { derivedFrom: source, createdAt: new Date().toISOString(), derivation });\nfor (const name of ['bin/lean.js', 'bin/lean.cjs', 'build-provenance.json']) metadata.files[name] = await hash(join(output, name));\nwriteFileSync(join(output, 'snapshot.json'), JSON.stringify(metadata, null, 2) + '\\n');\nconsole.log(JSON.stringify({ output, ...derivation }));\n"
+  },
+  "finding": "No complete function-table scan occurred in any of the three compiler processes before the 8.04 GiB budget stop. Each initialized its main instance and eight workers with the index; the file worker process also created a ninth worker before the stop.",
+  "interpretation": "The previous eager table-scan defect is absent from this reproduction. Linear-memory growth and other engine/native overhead remain. RSS and Bun memoryUsage fields are observations, not disjoint allocation categories or a complete memory attribution.",
+  "nextHypothesis": "Compare the ordinary three-Lean-worker CLI configuration with native Lean before adopting it. Keep Bun worker pools, any GC options, and guard limits explicit; do not treat a lower memory sample as a passing test."
+}

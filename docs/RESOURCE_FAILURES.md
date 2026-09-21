@@ -195,3 +195,13 @@ high/max/OOM counters and zero swap; every run preserved all 7,267 original
 hashes. Neither experiment resolves the server-memory gate. Six workers are not
 adopted; the GC setting remains an optional diagnostic rather than a default.
 See [the configurations and retained outcomes](evidence/bun-gc-2026-09-21.json).
+
+A subsequent numeric-memory trace of the original Bun cancellation workload
+recorded no full function-table scans in any of its three compiler processes;
+each used the metadata index in its main instance and eight workers. The guard
+stopped it at 8.04 GiB, again with zero OOM/throttling/swap and unchanged original
+sources. The file worker process also created a ninth worker before the stop.
+The driver's sampled linear memory reached 1.83 GiB and its RSS reached
+3.72 GiB. These counters do not fully attribute the remaining engine/native
+overhead, but they rule out a recurrence of the full-scan path in this attempt.
+See [the complete numeric trace](evidence/bun-memory-trace-2026-09-21.json).
