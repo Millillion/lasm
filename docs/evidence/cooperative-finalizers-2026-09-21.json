@@ -741,5 +741,40 @@
     "Synchronous disposal and fatal teardown do not yet await every native operation safely.",
     "Pending blocking C reads cannot be forcibly cancelled safely.",
     "These Linux FIFO checks do not establish complete IO or scheduler equivalence."
-  ]
+  ],
+  "applicationRegressions": {
+    "log": ".work/full-engine-probe/cooperative-finalizer-regressions.log",
+    "command": [
+      "node",
+      "--test",
+      "--test-concurrency=1",
+      "test/finalizers.test.mjs",
+      "test/standard-io.test.mjs",
+      "test/io.test.mjs"
+    ],
+    "tests": 14,
+    "passed": 13,
+    "failed": [
+      "the main runner respects Lake source directories and local dependencies"
+    ],
+    "failure": "The unchanged Lake warm-cache assertion failed. Initial setup creates lake-manifest.json after the original input signature was taken. This is a separate cache correctness defect; its targeted rerun is recorded separately.",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cooperative-finalizer-regressions-resources.json",
+      "status": "finished",
+      "peakMemoryBytes": 881098752,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "unitReleased": true
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0,
+    "followUp": "docs/evidence/lake-main-cache-2026-09-21.json"
+  }
 }

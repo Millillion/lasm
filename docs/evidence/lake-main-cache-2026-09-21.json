@@ -1,0 +1,45 @@
+{
+  "scope": "Unchanged application regression for a new Lake project, Unicode source path, warm cache, and invalidation after a local dependency edit.",
+  "failure": {
+    "log": ".work/full-engine-probe/cooperative-finalizer-regressions.log",
+    "tests": 14,
+    "passed": 13,
+    "failed": 1,
+    "assertion": "test/standard-io.test.mjs:113 expected cacheHit true but received false"
+  },
+  "cause": "The first fingerprint preceded Lake setup, so it omitted the manifest and resolved dependency directories produced by that setup.",
+  "fix": "Retain the fast initial cache lookup; after a cache miss and project setup, fingerprint again before compiling. Edits during compilation still invalidate the output on the next invocation.",
+  "verification": {
+    "log": ".work/full-engine-probe/lake-main-cache-regression.log",
+    "command": [
+      "node",
+      "--test",
+      "--test-concurrency=1",
+      "--test-name-pattern=main runner respects Lake",
+      "test/standard-io.test.mjs"
+    ],
+    "tests": 1,
+    "passed": 1,
+    "failed": 0
+  },
+  "files": {
+    "src/main.mjs": "c984e1e834e554d83b02bc058c281b28ca8aa48ccd9a43966d851062535317bb",
+    "test/standard-io.test.mjs": "078f907f4c2c079dba46b278ffcd6d7009ed4524b5fd479fc158fe6d1b0c234d"
+  },
+  "resources": {
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/lake-main-cache-regression-resources.json",
+    "peakMemoryBytes": 564359168,
+    "resourceLimited": false,
+    "memoryThrottled": false,
+    "unitReleased": true
+  },
+  "memoryEvents": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  },
+  "swapBytes": 0
+}

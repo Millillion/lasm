@@ -50,7 +50,7 @@ export async function buildMain(file, { output, rebuild = false, verbose = false
   mkdirSync(cache, { recursive: true });
   output = resolve(output ?? join(cache, 'dist'));
   const stampFile = join(output, '.main-cache.json');
-  const signature = fingerprint(directory, source, project);
+  let signature = fingerprint(directory, source, project);
   if (!rebuild && existsSync(stampFile)) {
     let previous;
     try { previous = JSON.parse(readFileSync(stampFile, 'utf8')); } catch { /* Rebuild a damaged cache. */ }
@@ -65,6 +65,10 @@ export async function buildMain(file, { output, rebuild = false, verbose = false
     const setup = JSON.parse(run(join(prefix, 'bin', executableName('lake')),
       ['--no-cache', '--keep-toolchain', '--quiet', 'setup-file', source], { cwd: directory, timeout: 600_000 }));
     module = setup.name;
+    // A first Lake setup can create its manifest and resolve local dependency
+    // directories. Include those inputs in the first stamp, while still taking
+    // it before compilation so concurrent source edits invalidate the output.
+    signature = fingerprint(directory, source, project);
   }
   writeFileSync(config, JSON.stringify({ module, main: true, sourceRoot: directory,
     ...(project ? { lake: project } : { lake: false, sourceFile: source }) }, null, 2) + '\n');
