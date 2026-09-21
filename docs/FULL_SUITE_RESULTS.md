@@ -4,7 +4,7 @@ Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
 Current checkpoints on 2026-09-21: the broader frozen v78 Node campaign has
-**56 passes, zero failures/resource aborts, and 3,840 pending registrations**.
+**213 passes, zero failures/resource aborts, and 3,683 pending registrations**.
 The separate v52 campaign with the compiled server driver reached **34 passes,
 zero failures/resource aborts, and 3,862 pending registrations**. No earlier
 passes were imported or combined across these campaigns. Deno's full
@@ -13,6 +13,14 @@ suite remains incomplete. A separate Bun server-control campaign now has
 the original 900-second timeout remains recorded. These checkpoints are not
 complete JavaScript-engine suite results. The sections below retain the earlier
 attempts and the scope of each targeted comparison.
+
+The [213-test Node checkpoint](evidence/node-broad-v78-2026-09-21.json) includes
+every original hash check before and after each attempt. Peak workload memory
+was 3.40 GiB, with no OOM, throttling, or swap events. In particular,
+`elab/12676.lean` now passes in the full compiler: its ten-million-element list
+calculation used 2.24 GiB. The packaged Wasm32 runtime still fails that test;
+this result does not establish packaged-runtime equivalence. The campaign is
+paused after `elab/1921.lean` while targeted runtime repairs are validated.
 
 The complete registered native control suite passed **3,891 / 3,891 tests** on
 Linux x64 on 2026-09-19 UTC. The clean run took 2,341.39 seconds with two CTest
