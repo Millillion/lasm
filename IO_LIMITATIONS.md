@@ -1,6 +1,6 @@
 # Current IO limitations in Lasm
 
-Snapshot: 2026-09-20, `0.1.0-experimental.3`, Lean `4.32.0`.
+Snapshot: 2026-09-21, `0.1.0-experimental.3`, Lean `4.32.0`.
 Every checkbox below is intentionally empty and describes remaining work, a
 known difference, or a validation gap. These are Lasm limitations, not Lean
 limitations. This list does not promise that every restriction will be removed.
@@ -141,9 +141,14 @@ close the full-suite or cross-platform gates. See the
   remains open. Idle workers are released promptly; active calls still consume
   OS thread resources. The full runtime also finalizes buffered files without blocking the
   host event loop: an ordinary Lean FIFO regression matches native Lean in Node,
-  Deno, and the Linux stack-adjusted Bun configuration. The packaged cooperative
-  path still has synchronous finalization and needs the same behavior integrated.
+  Deno, and the Linux stack-adjusted Bun configuration. Normal packaged
+  finalization now also suspends safely, including task-local stream cleanup:
+  two ordinary-Lean FIFO fixtures match native Lean in stock Node, Deno, and Bun
+  on Linux x64. Synchronous disposal/fatal teardown and interrupted in-flight
+  native operations still require separate lifetime and cancellation work.
   See [the FIFO evidence](docs/evidence/fifo-finalizer-2026-09-20.json).
+  The packaged implementation and its C-stack restoration correction are recorded
+  in [the cooperative finalizer evidence](docs/evidence/cooperative-finalizers-2026-09-21.json).
   The shared-pool deadlock and its separate fix are recorded in
   [the worker evidence](docs/evidence/fifo-workers-2026-09-20.json).
 - [ ] Traps, panics, native heartbeat/interrupt traps, and failed ABI conversion

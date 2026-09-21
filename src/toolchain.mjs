@@ -120,7 +120,7 @@ export function optimizeWasm(input, output) {
   // The portable Node optimizer can take several minutes on a full Std.Http
   // application, particularly on shared CI machines and ARM64 hosts.
   const options = { timeout: 600_000 };
-  const args = [input, '-O2', '--asyncify', '--pass-arg=asyncify-imports@lasm.request,lasm.task_wait,lasm.task_wait_any,lasm.node_call', '--enable-bulk-memory', '--enable-sign-ext', '--enable-nontrapping-float-to-int', '-o', output];
+  const args = [input, '-O2', '--asyncify', '--pass-arg=asyncify-imports@lasm.request,lasm.task_wait,lasm.task_wait_any,lasm.node_call,lasm.node_release', '--enable-bulk-memory', '--enable-sign-ext', '--enable-nontrapping-float-to-int', '-o', output];
   if (process.env.WASM_OPT) return run(process.env.WASM_OPT, args, options);
   const bundled = join(root, 'tools/wasm-opt.cjs');
   if (existsSync(bundled)) {

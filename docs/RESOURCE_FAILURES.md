@@ -137,3 +137,11 @@ control passes. The guard now records and preserves that normal CPU setting;
 all memory limits, pressure thresholds, swap restrictions, and concurrency
 limits are unchanged. This was a harness-induced failure, not a fundamental
 Lean or Wasm limit. See [the priority comparison](evidence/guard-priority-2026-09-20.json).
+
+The resumed packaged-finalizer investigation on September 21 found a Wasm
+memory-access trap, not host memory exhaustion. The probe peaked below 0.5 GiB
+with zero OOM/throttling counters. Its cause was incorrect restoration of a
+suspended fiber's C stack pointer. After correcting that state, fresh builds and
+native/Node/Deno/Bun FIFO comparisons passed at a combined 0.41 GiB peak, still
+with zero OOM, throttling, or swap use. The resource policy is unchanged; see
+[the finalizer evidence](evidence/cooperative-finalizers-2026-09-21.json).

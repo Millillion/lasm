@@ -21,11 +21,14 @@ const output = resolve(outputArg);
 if (existsSync(output)) throw new Error('Use a fresh output directory');
 mkdirSync(output, { recursive: true });
 const facades = facadesArg.split(',').map(resolvePath => resolve(resolvePath));
+const application = option('--application') && resolve(option('--application'));
+if (application && !existsSync(application)) throw new Error('Packaged application entry point is missing');
 const ffi = createRequire(import.meta.url)('koffi');
 const fcntl = ffi.load(null).func('int fcntl(int fd, int command)');
-const source = join(root, 'scripts/full-lean/probes/FifoFinalizer.lean');
+const source = resolve(option('--source', join(root, 'scripts/full-lean/probes/FifoFinalizer.lean')));
 const sourceSha256 = createHash('sha256').update(readFileSync(source)).digest('hex');
-const evidence = { leanCommit, sourceSha256, timeoutSeconds, resourceReport: process.env.LASM_RESOURCE_REPORT,
+writeFileSync(join(output, 'fixture.lean'), readFileSync(source));
+const evidence = { leanCommit, sourceSha256, timeoutSeconds, application, resourceReport: process.env.LASM_RESOURCE_REPORT,
   scope: 'Additional Linux differential fixture. A FIFO is held open by the harness while its measured capacity plus 2048 bytes is written through a buffered handle. A delayed reader must remain able to run when the writer is finalized. This is not an upstream-suite pass.',
   results: [] };
 const save = () => writeFileSync(join(output, 'comparison.json'), JSON.stringify(evidence, null, 2) + '\n');
@@ -46,7 +49,7 @@ function run(name, executable, command, env = {}, isHost = false) {
       timeout: isHost ? 5_000 : timeoutSeconds * 1000, killSignal: 'SIGKILL',
     });
     const expected = (isHost ? 'writer buffered\n' : '') + 'buffered FIFO finalizer and delayed reader completed\n';
-    const record = { name, executable, command, capacity, seconds: (performance.now() - started) / 1000,
+    const record = { name, executable, command, environment: env, capacity, seconds: (performance.now() - started) / 1000,
       code: result.status, signal: result.signal, error: result.error?.message,
       stdout: result.stdout, stderr: result.stderr,
       passed: result.status === 0 && result.stdout === expected && result.stderr === '' };
@@ -64,8 +67,13 @@ for (const facade of facades) {
   const host = resolve(option('--host-module') ?? join(config.build, 'host/node-host.mjs'));
   run(config.engine + '-host', config.executable,
     [...config.engineArgs, join(root, 'test/fixtures/fifo-finalizer-host.mjs'), host], config.engineEnvironment, true);
-  if (!args.includes('--host-only'))
-    run(config.engine + '-lean', join(facade, 'bin/lean'), ['--run', source]);
+  if (!args.includes('--host-only')) {
+    // Packaged applications must run with the ordinary engine flags. The
+    // full compiler's Linux stack adjustments are not portable launcher defaults.
+    if (application) run(config.engine + '-application', config.executable,
+      [...(config.engine === 'deno' ? ['run', '-A'] : []), application]);
+    else run(config.engine + '-lean', join(facade, 'bin/lean'), ['--run', source]);
+  }
 }
 evidence.finishedAt = new Date().toISOString();
 save();

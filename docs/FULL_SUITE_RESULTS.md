@@ -340,8 +340,8 @@ host RPC, allowing another Lean thread's delayed reader to run. The unchanged
 fixture then passed in Node, Deno, and Linux stack-adjusted Bun. Seventeen related
 host/application checks passed. The first Bun attempt's 60-second deadline was
 insufficient; its retained retry passed in 71 seconds with a 180-second external
-deadline. These are additional differential checks, not upstream-suite passes,
-and do not fix the packaged cooperative path's synchronous finalization. See
+deadline. These are additional differential checks, not upstream-suite passes;
+the packaged cooperative path was addressed separately afterward. See
 [the original and fixed comparisons](evidence/fifo-finalizer-2026-09-20.json).
 The unchanged upstream `file_read_overflow`, `IO_test`, and `tempfile` tests then
 passed in each fixed engine: **9/9** executions, all 7,267 source hashes intact
@@ -382,7 +382,7 @@ buffered-finalizer regression. Nineteen host/application checks and a separate
 open-handle lifetime check passed. The full differential run peaked at 3.38 GiB
 with no OOM, throttling, or swap use. Frozen v36 contains these host changes and
 the handle-ID fix while preserving the exact v35 Wasm and embedded dispatch.
-The ongoing v35 campaign remains a separate older-runtime result. See
+The paused v35 campaign remains a separate older-runtime result. See
 [the retained comparisons](evidence/fifo-workers-2026-09-20.json).
 The unchanged `file_read_overflow`, `IO_test`, and `tempfile` registrations also
 pass on v36 in each engine: **9/9**, with all 7,267 original hashes intact. Their
@@ -395,6 +395,22 @@ control and the unchanged test passes in v36 Node, Deno, and Linux stack-adjuste
 Bun (**3/3**). All 7,267 source hashes remained intact. The memory cap and stop
 thresholds are unchanged; the engine comparison peaked at 3.44 GiB with no OOM,
 throttling, or swap. See [the priority evidence](evidence/guard-priority-2026-09-20.json).
+
+The packaged application path now finalizes buffered files asynchronously as
+well. Its original FIFO regression timed out in stock Node, Deno, and Bun.
+Adding a suspending finalizer exposed a separate scheduler defect: rewind reset
+the C stack to its empty top instead of preserving the live frames' stack
+pointer. The subsequent allocator call overwrote Lean's reference-count cleanup
+list. Saving and restoring the suspended pointer fixes the trap. Task-local
+stream destruction now runs as its own resumable entry and detaches its stream
+references before yielding.
+
+Freshly built applications pass both the dropped-handle and task-local stdout
+fixtures in all three stock engines on Linux x64, matching both native controls
+(**6/6 application executions**). The combined build/comparison peaked at
+0.41 GiB with no OOM, throttling, or swap use. These are additional differential
+regressions, not new upstream-suite passes or proof of fatal-teardown parity.
+See [the retained failures and fixed comparisons](evidence/cooperative-finalizers-2026-09-21.json).
 
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.

@@ -235,8 +235,12 @@ extern "C" __attribute__((export_name("lasm_release_fiber_context")))
 void lasm_release_fiber_context(uint32_t id) {
     auto it = stream_contexts.find(id);
     if (it == stream_contexts.end()) return;
-    for (auto *stream : it->second) if (stream) lean_dec(stream);
+    // A handle finalizer can suspend while another fiber changes this map.
+    // Detach the owned references before yielding; do not retain an iterator
+    // across an Asyncify suspension and a possible unordered_map rehash.
+    auto streams = it->second;
     stream_contexts.erase(it);
+    for (auto *stream : streams) if (stream) lean_dec(stream);
 }
 static auto &current_streams() { return stream_contexts[lasm_fiber_current()]; }
 #endif

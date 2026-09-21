@@ -50,7 +50,6 @@ export function createScheduler(getExports, mode) {
     return { pointer, top: (pointer + stackBytes) & ~15, data: pointer + stackBytes + 16 };
   }
   function release(fiber) {
-    if (fiber.task) exports().lasm_release_fiber_context(fiber.id);
     fibers.delete(fiber);
     if (pool.length < 8) pool.push(fiber.stack);
     else exports().lasm_free(fiber.stack.pointer);
@@ -60,12 +59,16 @@ export function createScheduler(getExports, mode) {
     const e = exports();
     const originalStack = e.__stack_pointer.value;
     current = fiber;
-    e.__stack_pointer.value = fiber.stack.top;
+    // Asyncify restores locals and skips the original function prologues on
+    // rewind. Resume below the live C frames, not at the empty stack's top;
+    // otherwise a new call can overwrite those frames (including RC cleanup).
+    e.__stack_pointer.value = resume ? fiber.stackPointer : fiber.stack.top;
     e.lasm_stack_bounds(fiber.stack.pointer + 16, fiber.stack.top);
     try {
       if (resume) e.asyncify_start_rewind(fiber.stack.data);
       const value = fiber.fn(...fiber.args);
       if (mode === 'asyncify' && e.asyncify_get_state() === 1) {
+        fiber.stackPointer = e.__stack_pointer.value;
         e.asyncify_stop_unwind();
         fiber.pending.then(value => {
           fiber.response = value;
@@ -73,8 +76,19 @@ export function createScheduler(getExports, mode) {
         }, error => fail(error));
       } else {
         e.__stack_pointer.value = originalStack;
-        release(fiber);
-        fiber.resolve(value);
+        if (fiber.task && !fiber.cleaning) {
+          // Thread-local streams can own a buffered pipe. Clean them up as a
+          // separate resumable Wasm entry, while keeping this fiber's stack and
+          // result alive. Rewinding the original task entry would rerun its body.
+          fiber.value = value;
+          fiber.cleaning = true;
+          fiber.fn = e.lasm_release_fiber_context;
+          fiber.args = [fiber.id];
+          enqueue(() => invoke(fiber));
+        } else {
+          release(fiber);
+          fiber.resolve(fiber.cleaning ? fiber.value : value);
+        }
       }
     } catch (error) { fail(error); }
     finally { e.__stack_pointer.value = originalStack; e.lasm_stack_bounds(0, 0); current = undefined; }

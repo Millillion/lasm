@@ -112,7 +112,16 @@ comparison artifact for this fix. It verifies the original hashes, changes the
 embedded finalizer dispatch and matching link-time prelude, freezes the changed
 host modules, and retains the exact Wasm bytes. The full-runtime RPC awaits
 `fclose` completion while other Lean threads can dispatch host operations. The
-packaged cooperative runtime's synchronous finalizer is a separate remaining gap.
+packaged cooperative runtime is tested separately. Supply `--application
+PATH/main.mjs` to the probe to run a built application with stock engine flags,
+and `--source FILE.lean` to select a supplementary native control. Each run copies
+the exact fixture and records its hash. `FifoFinalizer.lean` covers a dropped file
+handle; `FifoThreadFinalizer.lean` covers the last reference in task-local stdout.
+Both now pass natively and in stock Node, Deno, and Bun on Linux x64. The packaged
+scheduler preserves its suspended C stack pointer and runs task-local cleanup as
+a resumable entry. `test/finalizers.test.mjs` keeps both as application regressions.
+See [the evidence](../../docs/evidence/cooperative-finalizers-2026-09-21.json);
+these are additional fixtures, not upstream-suite passes.
 
 `probe-fifo-workers.mjs --output NEW_DIRECTORY --toolchains FACADE[,FACADE]`
 checks four independent blocking reads followed by their dependent writes. The

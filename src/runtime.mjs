@@ -164,7 +164,11 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
       view(pointer, length).set(value.bytes);
       scheduler.current.nodeResponse = null;
     },
-    node_release(handle) { nodeRuntime?.release(handle); },
+    node_release(handle) {
+      if (mode === 'asyncify' && scheduler.current)
+        scheduler.suspend(() => nodeRuntime?.releaseAsync(handle));
+      else nodeRuntime?.release(handle);
+    },
     node_start(operation, handle, argument, pointer, length) {
       if (!nodeRuntime) throw new Error('Standard Lean async APIs require the Node runtime');
       return nodeRuntime.start(operation, handle, argument, view(pointer, length).slice(), { fiber: scheduler.current?.id });
