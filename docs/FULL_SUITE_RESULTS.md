@@ -3,6 +3,15 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+Current checkpoints on 2026-09-21: the separate v52 Node campaign with the
+compiled server driver has **31 passes, zero failures/resource aborts, and
+3,865 pending registrations**. No earlier passes were imported. Deno's full
+suite remains incomplete. A separate Bun server-control campaign now has
+**one pass and four pending controls** with a disclosed 3,600-second deadline;
+the original 900-second timeout remains recorded. These checkpoints are not
+complete JavaScript-engine suite results. The sections below retain the earlier
+attempts and the scope of each targeted comparison.
+
 The complete registered native control suite passed **3,891 / 3,891 tests** on
 Linux x64 on 2026-09-19 UTC. The clean run took 2,341.39 seconds with two CTest
 workers. All **7,267 original test and documentation-example files** matched their
@@ -639,6 +648,25 @@ fixture plus the existing cwd-error and spawn comparisons. The separate v52
 Node campaign is checkpointed at 31 passes, zero failures/resource aborts, and
 3,865 pending registrations. Native non-Linux validation and other string-boundary cases remain
 open. See [the NUL evidence](evidence/process-nul-2026-09-21.json).
+
+The separate longer-deadline Bun experiment passed the unchanged
+`server_interactive/cancellation.lean` control in **2,173.8 seconds**. The produced
+output matches the original expected output byte for byte. All 7,267 original
+source hashes and all nine compiled-driver artifact hashes remained intact
+before and after the run. Peak process-tree memory was **6.94 GiB**, with zero
+OOM, memory-throttling, cap-hit, or swap counters. The runtime, driver, worker
+counts, stack adjustment, and memory limits are the same as in the original
+900-second timeout; the maintained harness additionally checks driver integrity.
+
+Read-only process samples identified repeated serial file-worker and Lake
+`setup-file` compiler startup. An intermediate 1,800-second diagnostic was
+deliberately interrupted after observing that additional cost; it is neither a
+completed test nor a timeout or resource abort. Its partial output and resource
+record remain separate. The new 3,600-second campaign checkpoint contains one
+pass and four pending controls. This establishes the cancellation result under
+the disclosed parallel harness, while the startup-performance problem, original
+interpreted-driver resource gap, and full-suite gates remain open. See
+[the deadline comparison](evidence/bun-server-deadline-2026-09-21.json).
 
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
