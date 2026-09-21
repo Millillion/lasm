@@ -728,6 +728,14 @@ v52 Node campaign independently reached 34 passes, zero failures/resource aborts
 and 3,862 pending registrations. Full-suite and broader IO conformance remain
 open. See [the loader profile, repair, and controls](evidence/symbol-lookup-2026-09-21.json).
 
+The repaired loader also passes **12/12 selected unchanged upstream registrations**:
+reverse FFI, the HTTP hang regressions, timer selection, and module initialization
+in each of Node, Deno, and Bun. Every run verified all 7,267 original file hashes
+before and after execution; none changed. The largest process-tree peak was
+4.26 GiB, with zero OOM, throttling, cap-hit, or swap events. These are focused
+regressions, separate from the broad campaign and its pending registrations.
+See [the upstream loader regression evidence](evidence/symbol-lookup-upstream-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
