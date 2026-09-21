@@ -1057,3 +1057,12 @@ after 175.6 seconds, peaking at 1.92 GiB. These startup and engine controls do
 not establish full Lean compatibility, released Bun
 support, or cross-platform behavior. Package defaults are unchanged. See
 [the patch and all controls](evidence/bun-memory64-local-fix-2026-09-21.json).
+
+The same frozen configuration subsequently passed the unchanged upstream
+`elab/IO_test.lean`, including file modes, reads, Unicode, rename, directory
+removal, symlinks, and hard links. The test took 504.75 seconds on the ASAN debug
+engine and peaked at 2.53 GiB. All 7,267 original source hashes and the harness
+artifacts remained unchanged; no resource abort, OOM, hard-limit, throttling,
+or swap event occurred. This is one full-runtime IO test, not a complete Bun
+suite or a practical release configuration. See
+[the isolated IO result](evidence/bun-memory64-io-2026-09-21.json).

@@ -258,8 +258,10 @@ load, and suite conformance still need validation. See
   Node and Deno with an 8 GiB guest maximum. Released Bun still has shared-memory
   transfer defects. A local ASAN debug build with a small engine patch now passes
   18 cloning controls, 15 neighboring worker tests, and the original memory64
-  probe; full Lean validation on that build remains in progress. See
-  [the local engine repair](docs/evidence/bun-memory64-local-fix-2026-09-21.json).
+  probe. The full compiler also passes the unchanged upstream `IO_test` on that
+  build. See [the local engine repair](docs/evidence/bun-memory64-local-fix-2026-09-21.json)
+  and [isolated full-runtime IO result](docs/evidence/bun-memory64-io-2026-09-21.json).
+  Broader Lean validation on that build remains in progress.
   These full-runtime paths still need integration and comprehensive validation.
 - [ ] A pending C read cannot be safely interrupted by disposing the Wasm
   instance. Blocking file calls now use independent host workers, so reads do
