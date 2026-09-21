@@ -185,3 +185,13 @@ all 7,267 source hashes remained intact, and high/max/OOM counters and swap
 were zero. The same original registration passed in Node and Deno. This is
 a remaining resource result, not a Bun conformance failure or a fundamental
 limit. See [the process comparison](evidence/process-lifetime-2026-09-21.json).
+
+Two isolated follow-ups also retain the unchanged memory limits. Six prestarted
+Bun workers passed the dedicated-task test, failed HTTP's early-streaming check,
+and reached 8.06 GiB in parallel cancellation. Eight workers with Bun's opt-in
+`--smol`/worker `smol:true` GC mode passed HTTP but also reached 8.06 GiB in
+parallel cancellation. Both budget stops released their units with zero
+high/max/OOM counters and zero swap; every run preserved all 7,267 original
+hashes. Neither experiment resolves the server-memory gate. Six workers are not
+adopted; the GC setting remains an optional diagnostic rather than a default.
+See [the configurations and retained outcomes](evidence/bun-gc-2026-09-21.json).

@@ -8,6 +8,8 @@ import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 const argv = process.argv.slice(2);
 const option = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };
 const engine = option('--engine', 'node');
+const bunSmol = argv.includes('--bun-smol');
+if (bunSmol && engine !== 'bun') throw new Error('--bun-smol is only supported by the Bun facade');
 const leanThreads = Number(option('--lean-threads', '4'));
 if (!Number.isInteger(leanThreads) || leanThreads < 1 || leanThreads > 4)
   throw new Error('--lean-threads must be 1..4 on this maintainer host');
@@ -23,6 +25,7 @@ const defaults = {
 };
 if (!defaults[engine]) throw new Error('Use --engine node, deno, or bun');
 const [defaultExecutable, engineArgs] = defaults[engine];
+if (bunSmol) engineArgs.push('--smol');
 const executable = resolve(option('--executable', defaultExecutable));
 const output = resolve(option('--output', `.work/full-toolchains/${engine}`));
 if (existsSync(output)) throw new Error('Prepare a new toolchain directory to preserve previous run configurations');
@@ -37,12 +40,16 @@ for (const path of [executable, join(build, 'bin/lean.js'), join(build, 'bin/lea
 const buildConfig = readFileSync(join(build, 'CMakeCache.txt'), 'utf8');
 // A recorded worker-pool derivative changes generated JavaScript without
 // rebuilding the Wasm. Use its actual pool size for generated applications too.
-const poolMatches = [...readFileSync(join(build, 'bin/lean.js'), 'utf8').matchAll(/var pthreadPoolSize = (\d+);/g)];
+const javascript = readFileSync(join(build, 'bin/lean.js'), 'utf8');
+if (bunSmol && !javascript.includes('process.env.LASM_BUN_SMOL'))
+  throw new Error('The selected snapshot does not propagate Bun smol mode to workers; derive or rebuild it first');
+const poolMatches = [...javascript.matchAll(/var pthreadPoolSize = (\d+);/g)];
 if (poolMatches.length !== 1) throw new Error('Cannot determine the compiled worker-pool size');
 const pthreadPoolSize = Number(poolMatches[0][1]);
 const memoryMode = Number(buildConfig.match(/^LASM_MEMORY64:STRING=([12])$/m)?.[1]);
 if (![1, 2].includes(memoryMode)) throw new Error('The full suite requires a 64-bit Lean value layout');
 const engineEnvironment = engine === 'bun' && memoryMode === 1 ? { BUN_JSC_useWasmMemory64: 'true' } : {};
+if (bunSmol) engineEnvironment.LASM_BUN_SMOL = '1';
 // This is an explicit Linux harness resource adjustment, not an implicit change
 // to stock Bun or a portable launcher feature. Preserve a local copy and hash.
 const stackHelper = option('--bun-stack-helper');
@@ -117,7 +124,7 @@ for (const [name, tool] of Object.entries({ 'llvm-ar': 'emar', ar: 'emar', ranli
 for (const name of ['cadical', 'leantar']) if (existsSync(join(native.prefix, 'bin', name))) links['bin/' + name] = join(native.prefix, 'bin', name);
 for (const [name, target] of Object.entries(links)) if (!existsSync(join(output, name))) symlinkSync(target, join(output, name));
 writeFileSync(join(output, 'toolchain.json'), JSON.stringify({ leanCommit, engine, executable, engineArgs, build, source, sdk, runtimeSupport,
-  leanThreads, lakeThreads,
+  leanThreads, lakeThreads, bunSmol,
   sourceBuild: snapshot?.sourceBuild ?? build,
   systemAllocator: buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMALLOC=(\w+)/m)?.[1] ?? 'dlmalloc',
   leanAllocator: /^USE_MIMALLOC:BOOL=ON$/m.test(buildConfig) ? 'mimalloc' : 'generic',

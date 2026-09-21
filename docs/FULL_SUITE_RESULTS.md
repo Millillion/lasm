@@ -531,6 +531,15 @@ with unchanged Wasm. These are supplemental Linux path checks, not full-suite
 passes or proof of spawn-error/race parity; see
 [the before/after evidence](evidence/process-cwd-2026-09-21.json).
 
+The Bun memory follow-ups do not close its cancellation gate. Six prestarted
+workers pass the dedicated-task test but fail the early-streaming HTTP assertion
+and safely resource-abort cancellation at 8.06 GiB. Eight workers with opt-in
+lower-memory GC pass HTTP but also resource-abort cancellation at 8.06 GiB.
+Wasm, host, four actual Lean workers, and test bytes are unchanged in these
+comparisons. Neither configuration raises a cap or produces an OOM, and no
+resource abort is counted as a Lean test failure or a fundamental limitation.
+See [the Bun resource evidence](evidence/bun-gc-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

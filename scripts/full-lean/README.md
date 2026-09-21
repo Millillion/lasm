@@ -127,6 +127,18 @@ justify adopting five for general workloads. The first combined attempt stopped
 safely at its memory budget, and the isolated five-worker retry was a completed
 test failure; neither result is erased by the passing eight-worker control.
 
+A later six-worker comparison also fails HTTP's early-streaming assertion and
+safely resource-aborts the original parallel-cancellation test at 8.06 GiB.
+`derive-bun-gc.mjs FROZEN_SOURCE NEW_OUTPUT` freezes an opt-in alternative with
+unchanged Wasm and worker counts. Prepare that snapshot with `--engine bun
+--bun-smol` to apply Bun's `--smol` to the main process and `smol:true` to every
+Emscripten worker, including generated applications. The flag is rejected for
+other engines or snapshots without the matching worker prelude. Ordinary
+facades retain their existing GC behavior. The eight-worker GC experiment
+passes HTTP but still reaches 8.06 GiB in cancellation, so it remains a
+diagnostic, not a solution to that memory gate. See
+[the retained results](../../docs/evidence/bun-gc-2026-09-21.json).
+
 `probe-fifo-finalizer.mjs --output NEW_DIRECTORY --toolchains FACADE[,FACADE]`
 compares a supplementary ordinary Lean fixture against native Lean and the
 selected engines. On Linux it measures a FIFO's capacity, fills it plus a partial

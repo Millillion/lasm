@@ -20,6 +20,7 @@ if (ENVIRONMENT_IS_NODE) {
   };
   globalThis.Worker = class extends LasmHostWorker {
     constructor(filename, options = {}) {
+      if (process.versions.bun && process.env.LASM_BUN_SMOL === "1") options = { ...options, smol: true };
       super(filename, process.versions.bun ? options : {
         ...options, resourceLimits: { ...options.resourceLimits, stackSizeMb: lasmVmStackMb },
       });

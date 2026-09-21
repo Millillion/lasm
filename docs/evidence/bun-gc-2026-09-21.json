@@ -1,0 +1,1756 @@
+{
+  "recordedAt": "2026-09-21T07:49:50.521677+00:00",
+  "scope": "Linux x64 Bun resource experiments on unchanged Lean tests; not full-suite or stock-Bun portability claims.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "engine": "Bun 1.4.2",
+  "configs": [
+    {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "engine": "bun",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "engineArgs": [],
+      "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered",
+      "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+      "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+      "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/runtime-support",
+      "leanThreads": 4,
+      "lakeThreads": 1,
+      "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+      "systemAllocator": "mimalloc",
+      "leanAllocator": "mimalloc",
+      "memoryMode": 2,
+      "engineEnvironment": {
+        "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v49-process-lifetime/bun-stack-reservation.so",
+        "BUN_JSC_maxPerThreadStackUsage": "62914560"
+      },
+      "stackAdjustment": {
+        "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v49-process-lifetime/bun-stack-reservation.so",
+        "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+        "osThreadStackBytes": 67108864,
+        "jscStackBudgetBytes": 62914560,
+        "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+      },
+      "maximumMemoryBytes": 4294967296,
+      "pthreadPoolSize": 8,
+      "backend": "full-lean-wasm64-lowered",
+      "nativeLeanFallback": false,
+      "environmentAdjustments": {
+        "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v49-process-lifetime",
+        "LASM_FULL_APP_PATH": "Selected facade entry point",
+        "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+        "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+        "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+      },
+      "externalTools": {
+        "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/lib",
+        "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/include",
+        "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/share",
+        "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v49-process-lifetime-lowered/bin/leanmake",
+        "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+        "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+      }
+    },
+    {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "engine": "bun",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "engineArgs": [],
+      "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6",
+      "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+      "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+      "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6/runtime-support",
+      "leanThreads": 4,
+      "lakeThreads": 1,
+      "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+      "systemAllocator": "mimalloc",
+      "leanAllocator": "mimalloc",
+      "memoryMode": 2,
+      "engineEnvironment": {
+        "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v50-pool6/bun-stack-reservation.so",
+        "BUN_JSC_maxPerThreadStackUsage": "62914560"
+      },
+      "stackAdjustment": {
+        "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v50-pool6/bun-stack-reservation.so",
+        "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+        "osThreadStackBytes": 67108864,
+        "jscStackBudgetBytes": 62914560,
+        "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+      },
+      "maximumMemoryBytes": 4294967296,
+      "pthreadPoolSize": 6,
+      "backend": "full-lean-wasm64-lowered",
+      "nativeLeanFallback": false,
+      "environmentAdjustments": {
+        "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v50-pool6",
+        "LASM_FULL_APP_PATH": "Selected facade entry point",
+        "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+        "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+        "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+      },
+      "externalTools": {
+        "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6/lib",
+        "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6/include",
+        "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6/share",
+        "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6/bin/leanmake",
+        "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+        "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+      }
+    },
+    {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "engine": "bun",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "engineArgs": [
+        "--smol"
+      ],
+      "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v51-bun-smol",
+      "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+      "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+      "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v51-bun-smol/runtime-support",
+      "leanThreads": 4,
+      "lakeThreads": 1,
+      "bunSmol": true,
+      "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+      "systemAllocator": "mimalloc",
+      "leanAllocator": "mimalloc",
+      "memoryMode": 2,
+      "engineEnvironment": {
+        "LASM_BUN_SMOL": "1",
+        "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v51-smol/bun-stack-reservation.so",
+        "BUN_JSC_maxPerThreadStackUsage": "62914560"
+      },
+      "stackAdjustment": {
+        "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v51-smol/bun-stack-reservation.so",
+        "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+        "osThreadStackBytes": 67108864,
+        "jscStackBudgetBytes": 62914560,
+        "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+      },
+      "maximumMemoryBytes": 4294967296,
+      "pthreadPoolSize": 8,
+      "backend": "full-lean-wasm64-lowered",
+      "nativeLeanFallback": false,
+      "environmentAdjustments": {
+        "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v51-smol",
+        "LASM_FULL_APP_PATH": "Selected facade entry point",
+        "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+        "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+        "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+      },
+      "externalTools": {
+        "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v51-bun-smol/lib",
+        "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v51-bun-smol/include",
+        "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v51-bun-smol/share",
+        "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v51-bun-smol/bin/leanmake",
+        "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+        "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+      }
+    }
+  ],
+  "unchangedWasmSha256": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e",
+  "unchangedProcessHostSha256": "f4d5db8008a3232f363f5b7de53c091cd62abe120aa08019878786fb4f44afe1",
+  "defaultEightWorkers": {
+    "directory": ".work/full-campaign-bun-v49-process-lifetime-regressions",
+    "identity": "947e0002c0e231d831e51bcb1f635bb795aec185aa8f95e2d11c052445ec880c",
+    "counts": {
+      "passed": 2,
+      "failed": 0,
+      "resource-aborted": 1,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "records": [
+      {
+        "name": "elab/Process.lean",
+        "status": "passed",
+        "attempt": ".work/full-campaign-bun-v49-process-lifetime-regressions/00001-67a8ed67",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 5048283136,
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-21T07:13:55.568Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 13041664,
+            "peakMemoryBytes": 5048283136,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 9900032,
+              "file": 409600,
+              "kernel": 954368,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 401408,
+              "slab": 169936
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "resourceLimited": false
+        },
+        "stoppedBecause": null,
+        "execution": {
+          "startedAt": "2026-09-21T07:11:34.535Z",
+          "finishedAt": "2026-09-21T07:13:55.513Z",
+          "backend": "bun",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v49-process-lifetime/run",
+            "-j",
+            "1",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v49-process-lifetime-regressions/00001-67a8ed67/results/results.xml",
+            "-R",
+            "^elab/Process\\.lean$"
+          ],
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v49-process-lifetime-regressions/00001-67a8ed67/resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        }
+      },
+      {
+        "name": "elab/emptyEnvVar.lean",
+        "status": "passed",
+        "attempt": ".work/full-campaign-bun-v49-process-lifetime-regressions/00002-606a20cd",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 2493403136,
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-21T07:15:06.219Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 13107200,
+            "peakMemoryBytes": 2493403136,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10215424,
+              "file": 45056,
+              "kernel": 983040,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 45056,
+              "slab": 155136
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "resourceLimited": false
+        },
+        "stoppedBecause": null,
+        "execution": {
+          "startedAt": "2026-09-21T07:13:55.928Z",
+          "finishedAt": "2026-09-21T07:15:06.161Z",
+          "backend": "bun",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v49-process-lifetime/run",
+            "-j",
+            "1",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v49-process-lifetime-regressions/00002-606a20cd/results/results.xml",
+            "-R",
+            "^elab/emptyEnvVar\\.lean$"
+          ],
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v49-process-lifetime-regressions/00002-606a20cd/resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_par.lean",
+        "status": "resource-aborted",
+        "attempt": ".work/full-campaign-bun-v49-process-lifetime-regressions/00003-3c613060",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 8728322048,
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-21T07:18:39.651Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 727744512,
+            "peakMemoryBytes": 8728322048,
+            "swapBytes": 0,
+            "tasks": 10,
+            "memoryBreakdown": {
+              "anon": 709345280,
+              "file": 24576,
+              "kernel": 10944512,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 24576,
+              "slab": 337720
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "resourceLimited": true
+        },
+        "stoppedBecause": "Workload reached its proactive memory budget",
+        "execution": {
+          "startedAt": "2026-09-21T07:15:06.549Z",
+          "finishedAt": "2026-09-21T07:18:39.581Z",
+          "backend": "bun",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v49-process-lifetime/run",
+            "-j",
+            "1",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v49-process-lifetime-regressions/00003-3c613060/results/results.xml",
+            "-R",
+            "^server_interactive/cancellation_par\\.lean$"
+          ],
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v49-process-lifetime-regressions/00003-3c613060/resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        }
+      }
+    ]
+  },
+  "sixWorkers": {
+    "directory": ".work/full-campaign-bun-v50-pool6",
+    "identity": "0193ba59a4f6ced64d00b54485320a3dd8a155b29b7abaa5d8e5efbc679ad289",
+    "counts": {
+      "passed": 1,
+      "failed": 1,
+      "resource-aborted": 1,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "records": [
+      {
+        "name": "compile/wait_dedicated.lean",
+        "status": "passed",
+        "attempt": ".work/full-campaign-bun-v50-pool6/00001-9dae1118",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 2633023488,
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-21T07:29:46.698Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 22212608,
+            "peakMemoryBytes": 2633023488,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10219520,
+              "file": 9494528,
+              "kernel": 1273856,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 9494528,
+              "slab": 452088
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "resourceLimited": false
+        },
+        "stoppedBecause": null,
+        "execution": {
+          "startedAt": "2026-09-21T07:26:49.309Z",
+          "finishedAt": "2026-09-21T07:29:46.644Z",
+          "backend": "bun",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v50-pool6/run",
+            "-j",
+            "1",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v50-pool6/00001-9dae1118/results/results.xml",
+            "-R",
+            "^compile/wait_dedicated\\.lean$"
+          ],
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v50-pool6/00001-9dae1118/resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        }
+      },
+      {
+        "name": "elab/async_http_hang_regressions.lean",
+        "status": "failed",
+        "attempt": ".work/full-campaign-bun-v50-pool6/00002-34e5e4d6",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 3508334592,
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "8",
+            "capturedAt": "2026-09-21T07:30:48.255Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 11907072,
+            "peakMemoryBytes": 3508334592,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10223616,
+              "file": 40960,
+              "kernel": 978944,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 40960,
+              "slab": 141304
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "resourceLimited": false
+        },
+        "stoppedBecause": null,
+        "execution": {
+          "startedAt": "2026-09-21T07:29:47.015Z",
+          "finishedAt": "2026-09-21T07:30:48.174Z",
+          "backend": "bun",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v50-pool6/run",
+            "-j",
+            "1",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v50-pool6/00002-34e5e4d6/results/results.xml",
+            "-R",
+            "^elab/async_http_hang_regressions\\.lean$"
+          ],
+          "result": {
+            "code": 8,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v50-pool6/00002-34e5e4d6/resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_par.lean",
+        "status": "resource-aborted",
+        "attempt": ".work/full-campaign-bun-v50-pool6/00003-ab635079",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 8650661888,
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-21T07:33:37.005Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 910462976,
+            "peakMemoryBytes": 8650661888,
+            "swapBytes": 0,
+            "tasks": 10,
+            "memoryBreakdown": {
+              "anon": 864894976,
+              "file": 4976640,
+              "kernel": 10420224,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4976640,
+              "slab": 326440
+            },
+            "pressureSomeAvg10": 0.18,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "resourceLimited": true
+        },
+        "stoppedBecause": "Workload reached its proactive memory budget",
+        "execution": {
+          "startedAt": "2026-09-21T07:30:48.588Z",
+          "finishedAt": "2026-09-21T07:33:36.950Z",
+          "backend": "bun",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v50-pool6/run",
+            "-j",
+            "1",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v50-pool6/00003-ab635079/results/results.xml",
+            "-R",
+            "^server_interactive/cancellation_par\\.lean$"
+          ],
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v50-pool6/00003-ab635079/resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        }
+      }
+    ]
+  },
+  "smolEightWorkers": {
+    "directory": ".work/full-campaign-bun-v51-smol",
+    "identity": "1523403a4cab6c62db85d86c391699f3a06b0f272277c70311b6fde58cc6c83d",
+    "counts": {
+      "passed": 1,
+      "failed": 0,
+      "resource-aborted": 1,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "records": [
+      {
+        "name": "elab/async_http_hang_regressions.lean",
+        "status": "passed",
+        "attempt": ".work/full-campaign-bun-v51-smol/00001-cae676a7",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 3631751168,
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-21T07:45:15.940Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 20115456,
+            "peakMemoryBytes": 3631751168,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10219520,
+              "file": 7327744,
+              "kernel": 1212416,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 7327744,
+              "slab": 374488
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "resourceLimited": false
+        },
+        "stoppedBecause": null,
+        "execution": {
+          "startedAt": "2026-09-21T07:43:59.312Z",
+          "finishedAt": "2026-09-21T07:45:15.893Z",
+          "backend": "bun",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v51-smol/run",
+            "-j",
+            "1",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v51-smol/00001-cae676a7/results/results.xml",
+            "-R",
+            "^elab/async_http_hang_regressions\\.lean$"
+          ],
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v51-smol/00001-cae676a7/resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_par.lean",
+        "status": "resource-aborted",
+        "attempt": ".work/full-campaign-bun-v51-smol/00002-be251c7b",
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "resources": {
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "peakMemoryBytes": 8649445376,
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-21T07:48:51.197Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 283082752,
+            "peakMemoryBytes": 8649445376,
+            "swapBytes": 0,
+            "tasks": 10,
+            "memoryBreakdown": {
+              "anon": 228524032,
+              "file": 3063808,
+              "kernel": 10899456,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 3063808,
+              "slab": 313576
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "resourceLimited": true
+        },
+        "stoppedBecause": "Workload reached its proactive memory budget",
+        "execution": {
+          "startedAt": "2026-09-21T07:45:16.277Z",
+          "finishedAt": "2026-09-21T07:48:51.116Z",
+          "backend": "bun",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v51-smol/run",
+            "-j",
+            "1",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v51-smol/00002-be251c7b/results/results.xml",
+            "-R",
+            "^server_interactive/cancellation_par\\.lean$"
+          ],
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v51-smol/00002-be251c7b/resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        }
+      }
+    ]
+  },
+  "sixWorkerHttpFailure": "The early-streaming check received only HTTP/1.1 200 at the sampling point; six workers were not adopted.",
+  "readOnlyMappingDiagnostic": {
+    "scope": "Read-only /proc mapping sizes from the currently guarded upstream workload; no Wasm bytes or source changed.",
+    "at": "2026-09-21T07:33:08.362720+00:00",
+    "test": "server_interactive/cancellation_par.lean",
+    "attempt": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v50-pool6/00003-ab635079",
+    "sameTestStillRunning": true,
+    "resourceId": "a5c49e81-f0ae-48ce-be4b-7b1278d987af",
+    "processes": [
+      {
+        "pid": 1783399,
+        "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun /home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6/runtime-support/run-compiler.mjs --prefix /home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6 -j4 -s65536 -Dlinter.all=false --run run_test.lean cancellation_par.lean",
+        "totals": {
+          "Size": 15852998656,
+          "Rss": 3757256704,
+          "Pss": 3727604736,
+          "Anonymous": 3712311296,
+          "Private_Dirty": 3712311296,
+          "Shared_Dirty": 0,
+          "Swap": 0
+        },
+        "largestResidentMappings": [
+          {
+            "address": "4a0f3400000-4a1689a1000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 1968836608,
+            "Rss": 1082093568,
+            "Pss": 1082093568,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 1082093568,
+            "Anonymous": 1082093568,
+            "Swap": 0
+          },
+          {
+            "address": "4a234800000-4a274800000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 1073741824,
+            "Rss": 1014489088,
+            "Pss": 1014489088,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 1014489088,
+            "Anonymous": 1014489088,
+            "Swap": 0
+          },
+          {
+            "address": "4a1f4400000-4a234400000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 1073741824,
+            "Rss": 860536832,
+            "Pss": 860536832,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 860536832,
+            "Anonymous": 860536832,
+            "Swap": 0
+          },
+          {
+            "address": "4a0be160000-4a0f3000000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 887750656,
+            "Rss": 586100736,
+            "Pss": 586100736,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 586100736,
+            "Anonymous": 586100736,
+            "Swap": 0
+          },
+          {
+            "address": "4a0b3000000-4a0be150000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 185925632,
+            "Rss": 108343296,
+            "Pss": 108343296,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 108343296,
+            "Anonymous": 108343296,
+            "Swap": 0
+          },
+          {
+            "address": "4a274c00000-4a2b4c00000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 1073741824,
+            "Rss": 44302336,
+            "Pss": 44302336,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 44302336,
+            "Anonymous": 44302336,
+            "Swap": 0
+          },
+          {
+            "address": "0177a000-04db2000",
+            "permissions": "r-xp",
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "Size": 56852480,
+            "Rss": 33320960,
+            "Pss": 12462080,
+            "Shared_Clean": 32440320,
+            "Shared_Dirty": 0,
+            "Private_Clean": 880640,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7cb36d2d6000-7cb3ad2d6000",
+            "permissions": "rwxp",
+            "path": "[anon:JSJITCode]",
+            "Size": 1073741824,
+            "Rss": 8593408,
+            "Pss": 8593408,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 8593408,
+            "Anonymous": 8593408,
+            "Swap": 0
+          },
+          {
+            "address": "00200000-01773000",
+            "permissions": "r--p",
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "Size": 22491136,
+            "Rss": 6836224,
+            "Pss": 2372608,
+            "Shared_Clean": 6836224,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7cb200000000-7cb300000000",
+            "permissions": "rw-p",
+            "path": "[anon:JSStructureHeap]",
+            "Size": 4294967296,
+            "Rss": 3751936,
+            "Pss": 3751936,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 3751936,
+            "Anonymous": 3751936,
+            "Swap": 0
+          },
+          {
+            "address": "7cb3ad628000-7cb3ad7b1000",
+            "permissions": "r-xp",
+            "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+            "Size": 1609728,
+            "Rss": 1380352,
+            "Pss": 11264,
+            "Shared_Clean": 1380352,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7cb36329d000-7cb3633e5000",
+            "permissions": "r-xp",
+            "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+            "Size": 1343488,
+            "Rss": 684032,
+            "Pss": 14336,
+            "Shared_Clean": 684032,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7cb363200000-7cb36329d000",
+            "permissions": "r--p",
+            "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+            "Size": 643072,
+            "Rss": 643072,
+            "Pss": 13312,
+            "Shared_Clean": 643072,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7cb328000000-7cb32c000000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 67108864,
+            "Rss": 376832,
+            "Pss": 376832,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 376832,
+            "Anonymous": 376832,
+            "Swap": 0
+          },
+          {
+            "address": "7cb3ad527000-7cb3ad5a6000",
+            "permissions": "r-xp",
+            "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+            "Size": 520192,
+            "Rss": 352256,
+            "Pss": 6144,
+            "Shared_Clean": 352256,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7cb36361c000-7cb363686000",
+            "permissions": "r-xp",
+            "path": "/home/lastmjs/development/lasm/compiler/node_modules/@koromix/koffi-linux-x64/linux_x64/koffi.node",
+            "Size": 434176,
+            "Rss": 339968,
+            "Pss": 184320,
+            "Shared_Clean": 311296,
+            "Shared_Dirty": 0,
+            "Private_Clean": 28672,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7cb3635b6000-7cb36361c000",
+            "permissions": "r--p",
+            "path": "/home/lastmjs/development/lasm/compiler/node_modules/@koromix/koffi-linux-x64/linux_x64/koffi.node",
+            "Size": 417792,
+            "Rss": 323584,
+            "Pss": 174080,
+            "Shared_Clean": 299008,
+            "Shared_Dirty": 0,
+            "Private_Clean": 24576,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7cb36d204000-7cb36d254000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 327680,
+            "Rss": 274432,
+            "Pss": 274432,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 274432,
+            "Anonymous": 274432,
+            "Swap": 0
+          }
+        ]
+      },
+      {
+        "pid": 1783693,
+        "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun /home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6/runtime-support/run-compiler.mjs --prefix /home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6 -j4 -s65536 --server -DstderrAsMessages=false -Dexperimental.module=true",
+        "totals": {
+          "Size": 14909235200,
+          "Rss": 1947561984,
+          "Pss": 1917950976,
+          "Anonymous": 1903497216,
+          "Private_Dirty": 1903497216,
+          "Shared_Dirty": 0,
+          "Swap": 0
+        },
+        "largestResidentMappings": [
+          {
+            "address": "5c52ac00000-5c56ac00000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 1073741824,
+            "Rss": 709472256,
+            "Pss": 709472256,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 709472256,
+            "Anonymous": 709472256,
+            "Swap": 0
+          },
+          {
+            "address": "5c3f3b90000-5c429800000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 902234112,
+            "Rss": 635162624,
+            "Pss": 635162624,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 635162624,
+            "Anonymous": 635162624,
+            "Swap": 0
+          },
+          {
+            "address": "5c56b000000-5c5ab000000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 1073741824,
+            "Rss": 225853440,
+            "Pss": 225853440,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 225853440,
+            "Anonymous": 225853440,
+            "Swap": 0
+          },
+          {
+            "address": "5c429c00000-5c451e81000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 673714176,
+            "Rss": 222834688,
+            "Pss": 222834688,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 222834688,
+            "Anonymous": 222834688,
+            "Swap": 0
+          },
+          {
+            "address": "5c3e9800000-5c3f3b80000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 171442176,
+            "Rss": 95797248,
+            "Pss": 95797248,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 95797248,
+            "Anonymous": 95797248,
+            "Swap": 0
+          },
+          {
+            "address": "0177a000-04db2000",
+            "permissions": "r-xp",
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "Size": 56852480,
+            "Rss": 32501760,
+            "Pss": 11642880,
+            "Shared_Clean": 32440320,
+            "Shared_Dirty": 0,
+            "Private_Clean": 61440,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "00200000-01773000",
+            "permissions": "r--p",
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "Size": 22491136,
+            "Rss": 6836224,
+            "Pss": 2372608,
+            "Shared_Clean": 6836224,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7a25637bf000-7a25a37bf000",
+            "permissions": "rwxp",
+            "path": "[anon:JSJITCode]",
+            "Size": 1073741824,
+            "Rss": 5988352,
+            "Pss": 5988352,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 5988352,
+            "Anonymous": 5988352,
+            "Swap": 0
+          },
+          {
+            "address": "7a2400000000-7a2500000000",
+            "permissions": "rw-p",
+            "path": "[anon:JSStructureHeap]",
+            "Size": 4294967296,
+            "Rss": 4165632,
+            "Pss": 4165632,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 4165632,
+            "Anonymous": 4165632,
+            "Swap": 0
+          },
+          {
+            "address": "7a25a3a28000-7a25a3bb1000",
+            "permissions": "r-xp",
+            "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+            "Size": 1609728,
+            "Rss": 1380352,
+            "Pss": 12288,
+            "Shared_Clean": 1380352,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7a256189d000-7a25619e5000",
+            "permissions": "r-xp",
+            "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+            "Size": 1343488,
+            "Rss": 684032,
+            "Pss": 14336,
+            "Shared_Clean": 684032,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7a2561800000-7a256189d000",
+            "permissions": "r--p",
+            "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+            "Size": 643072,
+            "Rss": 643072,
+            "Pss": 13312,
+            "Shared_Clean": 643072,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7a251c000000-7a2520000000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 67108864,
+            "Rss": 376832,
+            "Pss": 376832,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 376832,
+            "Anonymous": 376832,
+            "Swap": 0
+          },
+          {
+            "address": "7a2561b7e000-7a2561be4000",
+            "permissions": "r--p",
+            "path": "/home/lastmjs/development/lasm/compiler/node_modules/@koromix/koffi-linux-x64/linux_x64/koffi.node",
+            "Size": 417792,
+            "Rss": 331776,
+            "Pss": 182272,
+            "Shared_Clean": 299008,
+            "Shared_Dirty": 0,
+            "Private_Clean": 32768,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7a25a3c2d000-7a25a3cac000",
+            "permissions": "r-xp",
+            "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+            "Size": 520192,
+            "Rss": 315392,
+            "Pss": 4096,
+            "Shared_Clean": 315392,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7a2561be4000-7a2561c4e000",
+            "permissions": "r-xp",
+            "path": "/home/lastmjs/development/lasm/compiler/node_modules/@koromix/koffi-linux-x64/linux_x64/koffi.node",
+            "Size": 434176,
+            "Rss": 311296,
+            "Pss": 155648,
+            "Shared_Clean": 311296,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7a2563200000-7a2563600000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 4194304,
+            "Rss": 233472,
+            "Pss": 233472,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 233472,
+            "Anonymous": 233472,
+            "Swap": 0
+          },
+          {
+            "address": "7a25a3bb1000-7a25a3c00000",
+            "permissions": "r--p",
+            "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+            "Size": 323584,
+            "Rss": 188416,
+            "Pss": 1024,
+            "Shared_Clean": 188416,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          }
+        ]
+      },
+      {
+        "pid": 1783822,
+        "command": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun /home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6/runtime-support/run-compiler.mjs --prefix /home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v50-bun-pool6 -j4 -s65536 --worker -j4 -s65536 -DstderrAsMessages=false -Dexperimental.module=true file:///cancellation_par.lean",
+        "totals": {
+          "Size": 13885177856,
+          "Rss": 1368936448,
+          "Pss": 1343676416,
+          "Anonymous": 1332277248,
+          "Private_Dirty": 1332277248,
+          "Shared_Dirty": 0,
+          "Swap": 0
+        },
+        "largestResidentMappings": [
+          {
+            "address": "4d175800000-4d1b5800000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 1073741824,
+            "Rss": 616927232,
+            "Pss": 616927232,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 616927232,
+            "Anonymous": 616927232,
+            "Swap": 0
+          },
+          {
+            "address": "4d03e430000-4d074400000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 905773056,
+            "Rss": 560783360,
+            "Pss": 560783360,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 560783360,
+            "Anonymous": 560783360,
+            "Swap": 0
+          },
+          {
+            "address": "4d034400000-4d03e420000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 167903232,
+            "Rss": 95563776,
+            "Pss": 95563776,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 95563776,
+            "Anonymous": 95563776,
+            "Swap": 0
+          },
+          {
+            "address": "4d074800000-4d07c801000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 134221824,
+            "Rss": 35549184,
+            "Pss": 35549184,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 35549184,
+            "Anonymous": 35549184,
+            "Swap": 0
+          },
+          {
+            "address": "0177a000-04db2000",
+            "permissions": "r-xp",
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "Size": 56852480,
+            "Rss": 27820032,
+            "Pss": 9271296,
+            "Shared_Clean": 27820032,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "4d1b5c00000-4d1f5c00000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 1073741824,
+            "Rss": 16793600,
+            "Pss": 16793600,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 16793600,
+            "Anonymous": 16793600,
+            "Swap": 0
+          },
+          {
+            "address": "00200000-01773000",
+            "permissions": "r--p",
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "Size": 22491136,
+            "Rss": 6266880,
+            "Pss": 2087936,
+            "Shared_Clean": 6266880,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7d0100000000-7d0200000000",
+            "permissions": "rw-p",
+            "path": "[anon:JSStructureHeap]",
+            "Size": 4294967296,
+            "Rss": 3133440,
+            "Pss": 3133440,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 3133440,
+            "Anonymous": 3133440,
+            "Swap": 0
+          },
+          {
+            "address": "7d02d9c28000-7d02d9db1000",
+            "permissions": "r-xp",
+            "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+            "Size": 1609728,
+            "Rss": 1380352,
+            "Pss": 11264,
+            "Shared_Clean": 1380352,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7d02998d6000-7d02d98d6000",
+            "permissions": "rwxp",
+            "path": "[anon:JSJITCode]",
+            "Size": 1073741824,
+            "Rss": 905216,
+            "Pss": 905216,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 905216,
+            "Anonymous": 905216,
+            "Swap": 0
+          },
+          {
+            "address": "7d02d9b27000-7d02d9ba6000",
+            "permissions": "r-xp",
+            "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+            "Size": 520192,
+            "Rss": 352256,
+            "Pss": 6144,
+            "Shared_Clean": 352256,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7d0299814000-7d0299854000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 262144,
+            "Rss": 200704,
+            "Pss": 200704,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 200704,
+            "Anonymous": 200704,
+            "Swap": 0
+          },
+          {
+            "address": "7d0299400000-7d0299800000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 4194304,
+            "Rss": 192512,
+            "Pss": 192512,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 192512,
+            "Anonymous": 192512,
+            "Swap": 0
+          },
+          {
+            "address": "7d02d9db1000-7d02d9e00000",
+            "permissions": "r--p",
+            "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+            "Size": 323584,
+            "Rss": 188416,
+            "Pss": 1024,
+            "Shared_Clean": 188416,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7d02d9ef5000-7d02d9f20000",
+            "permissions": "r-xp",
+            "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+            "Size": 176128,
+            "Rss": 176128,
+            "Pss": 1024,
+            "Shared_Clean": 176128,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7d02d9c00000-7d02d9c28000",
+            "permissions": "r--p",
+            "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+            "Size": 163840,
+            "Rss": 163840,
+            "Pss": 1024,
+            "Shared_Clean": 163840,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "7d02d9ba6000-7d02d9bfe000",
+            "permissions": "r--p",
+            "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+            "Size": 360448,
+            "Rss": 122880,
+            "Pss": 3072,
+            "Shared_Clean": 122880,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 0,
+            "Anonymous": 0,
+            "Swap": 0
+          },
+          {
+            "address": "04dce000-04f88000",
+            "permissions": "rw-p",
+            "path": "",
+            "Size": 1810432,
+            "Rss": 118784,
+            "Pss": 118784,
+            "Shared_Clean": 0,
+            "Shared_Dirty": 0,
+            "Private_Clean": 0,
+            "Private_Dirty": 118784,
+            "Anonymous": 118784,
+            "Swap": 0
+          }
+        ]
+      }
+    ]
+  },
+  "gcConfiguration": "The main engine uses --smol, and every Emscripten worker gets smol:true. Both remain opt-in; all worker counts, Lean/Wasm inputs, and memory guard thresholds stay unchanged.",
+  "references": [
+    "https://bun.com/docs/runtime",
+    "https://bun.com/docs/runtime/workers",
+    "https://github.com/oven-sh/bun/blob/744846f844374847c902b5e7fd59b4342a51ef99/src/jsc/bindings/webcore/JSWorker.cpp"
+  ],
+  "sourceSha256": {
+    "scripts/full-lean/emscripten-pre.js": "37d09c6ee5dc194c7256210023bd935cdbc64e32cef54d6e22d6d832fd30141d",
+    "scripts/full-lean/prepare-toolchain.mjs": "96affad51327c7a76c3a1d2be3d7b202b22c75bf7013aa28c6fb6efbd67bc82f",
+    "scripts/full-lean/derive-bun-gc.mjs": "fe3f5459ef07972c5f312887f61cca18f70a0d8e12196db07ce1ef300cc01c1f"
+  },
+  "remaining": [
+    "Do not infer full Bun conformance or portable stack support from these selected results.",
+    "Bun shared Memory64 cloning still needs an engine correction; these experiments retain the lowered 4 GiB memory target.",
+    "Wall-clock-sensitive HTTP behavior, broader server workloads, and full engine suites still need validation.",
+    "A contained resource abort is separate from a test failure and does not prove a fundamental limitation."
+  ]
+}
