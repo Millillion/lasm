@@ -40,8 +40,11 @@ try {
     if (count === 0) break;
     chunks.push(bytes.subarray(0, count));
   }
-  close(3);
   const options = JSON.parse(Buffer.concat(chunks).toString());
+  if (options.awaitExec) {
+    if (fcntl(3, 2 /* F_SETFD */, 1 /* FD_CLOEXEC */) < 0)
+      throw new Error(`exec acknowledgement setup failed: errno ${ffi.errno()}`);
+  } else close(3);
   // Runtime startup may mark these descriptors close-on-exec. Preserve the
   // original Lean stdin/stdout/stderr through the replacement executable.
   for (let fd = 0; fd < 3; fd++) {
@@ -60,7 +63,8 @@ try {
   if (inheritedDirectory) {
     // This descriptor was duplicated into the child by spawn. It remains valid
     // after a directory rename/removal or after the parent exits.
-    if (!absolute && fchdir(4) < 0) throw new Error(`inherited cwd setup failed: errno ${ffi.errno()}`);
+    if (!absolute && !options.inheritProcessCwd && fchdir(4) < 0)
+      throw new Error(`inherited cwd setup failed: errno ${ffi.errno()}`);
     close(4);
   }
   const directories = absolute || inheritedDirectory

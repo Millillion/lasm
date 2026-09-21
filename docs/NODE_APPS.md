@@ -84,7 +84,7 @@ parallel CPU execution or preempt a long computation.
 | Tasks | Promises, spawn/map/bind/waits, cooperative explicit cancellation, mutexes, condition variables |
 | Async | Sleep/timers and the selectors/channels/cancellation used by `Std.Http.Server` |
 | HTTP server | HTTP/1.1, concurrent requests, binary/chunked bodies, response streams, limits, disconnects, graceful shutdown |
-| Process context | Arguments, environment lookup, instance working directory, exit status, clocks and entropy |
+| Process context | Arguments, environment lookup, working directory, exit status, clocks and entropy |
 | Child processes | Spawn, output, wait/poll, PID, kill, environment overrides, redirected and inherited pipes |
 
 See [the example](../examples/lean-server/README.md) and the current unchecked
@@ -94,8 +94,11 @@ The [upstream audit](UPSTREAM_RESULTS.md) separates observed matches from missin
 APIs, adaptation failures, resource limits, and behavior differences.
 
 Node applications have ordinary process-level filesystem/network access. Relative
-paths resolve against the supplied working directory; `IO.Process.setCurrentDir`
-changes this instance's directory. It does not change other Node code's cwd.
+paths resolve against the supplied working directory. `IO.Process.setCurrentDir`
+changes the process working directory in a standalone Lean main, including the
+source launchers and generated `main.mjs`. This preserves native child-process
+inheritance when directory permissions change. A module created with
+`createModule` keeps an isolated instance directory by default.
 `System.Platform` reports Node's operating system with Wasm's 32-bit pointer
 width, so ordinary Lean path operations follow the host's path conventions.
 The older capability-limited `Lasm.IO` adapter is separate and remains available

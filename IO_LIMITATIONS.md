@@ -69,6 +69,15 @@ load, and suite conformance still need validation. See
   Non-Linux cwd identity, permission-change races, long relative paths, and
   operation without a mounted `/proc` remain open, alongside other string-boundary
   and platform cases.
+- [ ] Complete working-directory permission inheritance in every execution
+  context. The full compilers now match native Linux for a named cwd whose
+  search permission is revoked, including the different behavior of inherited,
+  explicit relative, and absolute child directories. Node and Bun also pass a
+  deleted-and-revoked host control. That combined case still fails in Deno and
+  remains an executing TODO regression. Embedded instance directories that differ
+  from the host process cwd also need a complete inheritance design. These are
+  implementation gaps, not established fundamental limitations. See
+  [the permission and lifecycle comparisons](docs/evidence/cwd-permissions-2026-09-21.json).
 - [ ] Account for the pinned native Lean defect where
   `IO.Process.getCurrentDir` crashes after cwd deletion: its ENOENT decoder
   dereferences a null filename. Lasm returns a structured error safely; the
@@ -101,10 +110,10 @@ load, and suite conformance still need validation. See
   `IO.getTID` is now implemented using the executing worker's actual OS thread ID;
   direct checks pass in Node, Deno, and Bun on Linux x64. Full Lean validation is
   still in progress.
-- [ ] The packaged application host uses an instance cwd and reports its containing
-  executable as `IO.appPath`. The full compiler host propagates cwd changes and
-  supplies the selected Lean/tool entry point. Complete native context comparisons
-  and integrate the full behavior into the ordinary launchers.
+- [ ] Embedded application modules use an instance cwd, while standalone mains
+  and the full compiler propagate cwd changes. Packaged applications still report
+  their containing executable as `IO.appPath`; the full compiler supplies the
+  selected Lean/tool entry point. Complete native process-context comparisons.
 - [ ] Windows named time zones other than UTC return an explicit unsupported
   error. Date/time behavior beyond tested UTC HTTP dates needs broader OS coverage.
 - [ ] Native FFI dependencies still need Wasm implementations or internal host

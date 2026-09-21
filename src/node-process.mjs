@@ -3,6 +3,7 @@ import { constants } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { nativeFiles } from './native-files.mjs';
+import { spawnInheritedProcess } from './native-process.mjs';
 import { numbers } from './node-host.mjs';
 
 export function createNodeProcesses({ add, get, release, cwd }) {
@@ -25,7 +26,7 @@ export function createNodeProcesses({ add, get, release, cwd }) {
     const modes = [number(), number(), number()];
     const inherit = !!number(), setsid = !!number(), argc = number(), envc = number(), hasCwd = number();
     const command = string(), args = Array.from({ length: argc }, string);
-    let { directory, directoryFd } = cwd(state), requestedCwd;
+    let { directory, directoryFd, inheritProcessCwd } = cwd(state), requestedCwd;
     if (hasCwd) {
       const value = string();
       // Retain even an empty path: native chdir("") fails in the child. The
@@ -38,7 +39,7 @@ export function createNodeProcesses({ add, get, release, cwd }) {
       const key = string(), present = number();
       if (present) env[key] = string(); else delete env[key];
     }
-    return { modes, command, args, directory, directoryFd, requestedCwd, env, setsid };
+    return { modes, command, args, directory, directoryFd, inheritProcessCwd, requestedCwd, env, setsid };
   }
   async function start(bytes, state) {
     const options = decode(bytes, state), native = nativeFiles();
@@ -56,16 +57,23 @@ export function createNodeProcesses({ add, get, release, cwd }) {
       const stdioFlags = posix ? stdio.map((fd, index) => fd === 'ignore' ? 0
         : native.descriptorFlags(typeof fd === 'number' ? fd : index)) : undefined;
       const helper = fileURLToPath(new URL('./process-exec.mjs', import.meta.url));
-      const child = posix
+      const inheritedNative = posix && options.inheritProcessCwd && !!process.versions.deno;
+      const child = inheritedNative
+        ? spawnInheritedProcess(process.execPath, ['run', '--no-config', '-A', helper],
+          [...stdio, options.directoryFd], { ...options, stdioFlags })
+        : posix
         ? spawn(process.execPath, [...(process.versions.deno ? ['run', '--no-config', '-A'] : []), helper],
-          { cwd: '/', env: {}, stdio: [...stdio, 'pipe', ...(options.directoryFd === undefined ? [] : [options.directoryFd])] })
+          { cwd: options.inheritProcessCwd ? undefined : '/', env: {},
+            stdio: [...stdio, 'pipe', ...(options.directoryFd === undefined ? [] : [options.directoryFd])] })
         : spawn(options.command, options.args, { cwd: options.directory, env: options.env, stdio, windowsHide: false });
       const resource = { type: 'process', child, setsid: options.setsid, reaped: false };
-      resource.exit = new Promise(resolve => {
+      resource.exit = inheritedNative ? child.exit.then(code => resource.code = code) : new Promise(resolve => {
         child.once('exit', (code, signal) => { resource.code = code ?? 128 + (constants.signals[signal] ?? 0); resolve(resource.code); });
       });
-      await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
-      if (posix) {
+      resource.exit.catch(error => { resource.waitError = error; });
+      if (!inheritedNative)
+        await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
+      if (posix && !inheritedNative) {
         // A killed/exited child may close the transport before consuming it.
         // The ordinary exit status remains observable through Child.wait.
         child.stdio[3].on('error', () => {});
@@ -93,7 +101,9 @@ export function createNodeProcesses({ add, get, release, cwd }) {
     switch (op) {
     case 81: return numbers(p.child.pid);
     case 82: return p.exit.then(code => numbers(reap(p, code)));
-    case 83: return p.code === undefined ? numbers(0) : numbers(1, reap(p, p.code));
+    case 83:
+      if (p.waitError) throw p.waitError;
+      return p.code === undefined ? numbers(0) : numbers(1, reap(p, p.code));
     case 84:
       if (p.setsid && process.platform !== 'win32') {
         // A group can outlive its leader, even after wait reaps that leader.

@@ -473,6 +473,26 @@ Lean uses different behavior in these APIs: the process C interfaces truncate,
 `getEnv` returns `none`, and filesystem primitives return structured errors.
 `test/node-process-nul.test.mjs` exercises the packaged application path.
 
+`probe-cwd-permissions.mjs NEW_OUTPUT TOOLCHAIN...` compares the same supplementary
+Lean fixture with native Linux and each frozen full compiler. It revokes search
+permission after entering a directory, then checks cwd queries, relative files,
+inherited children, explicit relative/absolute child cwd, and search-only access.
+`test/node-cwd-permissions.test.mjs` covers generated mains and source launchers.
+Standalone mains propagate cwd changes; embedded module instances retain their
+separate directory by default.
+
+When the saved directory identity matches the process cwd, Linux child launchers
+inherit it instead of calling `fchdir` again. Deno uses libc `posix_spawn` for this
+path because its [Node-compatible spawn implementation](https://github.com/denoland/deno/blob/v2.9.7/ext/process/lib.rs)
+re-enters a named cwd even when no cwd argument was supplied. Only libc runs
+between its internal fork/vfork and exec. A private socket transfers configuration;
+close-on-exec acknowledgement keeps a dropped child's bootstrap alive until the
+requested executable starts or the launcher fails. It does not wait for that
+executable to finish. Native spawn controls cover low-numbered descriptors, large
+configuration payloads, concurrent engine/native child reapers, and signal exit
+status. Deno's deleted-and-revoked cwd case remains an executing TODO; independent
+instance cwd permission inheritance and non-Linux behavior remain open.
+
 Lean's C++ shell does not read the generated application main's thread/stack
 environment defaults. The facade supplies its ordinary `-j` and `-s` options
 before user arguments. Explicit later options win. Two workers are insufficient

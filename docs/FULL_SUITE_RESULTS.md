@@ -3,9 +3,11 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-Current checkpoints on 2026-09-21: the separate v52 Node campaign with the
-compiled server driver has **31 passes, zero failures/resource aborts, and
-3,865 pending registrations**. No earlier passes were imported. Deno's full
+Current checkpoints on 2026-09-21: the broader frozen v78 Node campaign has
+**56 passes, zero failures/resource aborts, and 3,840 pending registrations**.
+The separate v52 campaign with the compiled server driver reached **34 passes,
+zero failures/resource aborts, and 3,862 pending registrations**. No earlier
+passes were imported or combined across these campaigns. Deno's full
 suite remains incomplete. A separate Bun server-control campaign now has
 **one pass and four pending controls** with a disclosed 3,600-second deadline;
 the original 900-second timeout remains recorded. These checkpoints are not
@@ -735,6 +737,26 @@ before and after execution; none changed. The largest process-tree peak was
 4.26 GiB, with zero OOM, throttling, cap-hit, or swap events. These are focused
 regressions, separate from the broad campaign and its pending registrations.
 See [the upstream loader regression evidence](evidence/symbol-lookup-upstream-2026-09-21.json).
+
+A supplementary permission comparison exposed a child-launcher discrepancy:
+native Lean inherits its cwd after search permission is revoked, while the old
+launcher tried to enter it again and failed. Directory identity checks now avoid
+that extra entry. Deno uses libc's spawn operation for this case and acknowledges
+the private launcher's exec handoff before a dropped child lets the parent exit.
+The ordinary Lean fixture now matches native in all three full compilers.
+Standalone packaged mains and source launchers propagate cwd changes too, while
+embedded module instances retain separate directories by default.
+
+All 31 packaged regressions pass, including six built/source-launcher checks and
+the unchanged existing process error/lifetime tests. Seventeen direct host checks
+pass; one additional deleted-and-revoked Deno case remains an executing failing
+TODO. The initial fixture preparation error and intermediate dropped-child
+failures are retained separately. These runs peaked at 2.21 GiB without OOM,
+throttling, cap hits, or swap. The broader v78 Node campaign independently reached
+56 passes and 3,840 pending registrations, with all 7,267 original hashes intact
+on every completed run and a 3.37 GiB maximum peak. Embedded virtual cwd
+permission inheritance, non-Linux behavior, and complete suites remain open. See
+[the permission and lifecycle evidence](evidence/cwd-permissions-2026-09-21.json).
 
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.

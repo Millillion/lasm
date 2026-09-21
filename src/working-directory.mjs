@@ -1,4 +1,5 @@
 import * as fs from 'node:fs/promises';
+import { statSync } from 'node:fs';
 import { resolve, isAbsolute, sep } from 'node:path';
 import { nativeFiles } from './native-files.mjs';
 
@@ -27,7 +28,18 @@ export function createWorkingDirectory(cwd, propagate) {
     },
     release,
     path,
-    spawn(directory) { return { directory: directory.path, directoryFd: directory.fd }; },
+    spawn(directory) {
+      let inheritProcessCwd = false;
+      if (directory.fd !== undefined) {
+        const saved = statSync(location(directory), { bigint: true });
+        const actual = statSync('/proc/self/cwd', { bigint: true });
+        // The Deno CLI cannot bootstrap from an unlinked cwd. Its existing
+        // descriptor-entry path still handles removed, searchable directories.
+        inheritProcessCwd = saved.dev === actual.dev && saved.ino === actual.ino
+          && (!process.versions.deno || saved.nlink !== 0n);
+      }
+      return { directory: directory.path, directoryFd: directory.fd, inheritProcessCwd };
+    },
     async name(directory) {
       if (!descriptors) return directory.path;
       try {

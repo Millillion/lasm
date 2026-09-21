@@ -77,7 +77,7 @@ export async function buildMain(file, { output, rebuild = false, verbose = false
 import createModule from './index.mjs';
 let api;
 try {
-  api = await createModule({args: process.argv.slice(2), cwd: process.cwd()});
+  api = await createModule({args: process.argv.slice(2), cwd: process.cwd(), propagateCwd: true});
   process.exitCode = await api.runMain();
 } catch (error) {
   if (error.name === 'LeanExit') process.exitCode = error.code;
@@ -86,7 +86,7 @@ try {
 `);
   // Stamp the inputs observed before compilation. If a source or runtime file
   // changes during the build, the next invocation must invalidate this output.
-  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'process-exec.mjs', 'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-worker-cwd.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native/manifest.json', 'wasi.mjs', 'manifest.json'];
+  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'native-process.mjs', 'process-exec.mjs', 'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-worker-cwd.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native/manifest.json', 'wasi.mjs', 'manifest.json'];
   writeFileSync(stampFile, JSON.stringify({ signature, files }) + '\n');
   return { ...result, cacheHit: false, signature };
 }
@@ -96,7 +96,7 @@ export async function runMain(file, args = [], options = {}) {
   const create = (await import(pathToFileURL(join(output, 'index.mjs')).href + '?' + signature)).default;
   let api;
   try {
-    api = await create({ args, cwd: process.cwd() });
+    api = await create({ args, cwd: process.cwd(), propagateCwd: options.propagateCwd ?? false });
     return await api.runMain();
   } catch (error) {
     if (error.name === 'LeanExit') return error.code;
@@ -117,5 +117,5 @@ export async function mainCommand(arguments_, command = 'run') {
     return 0;
   }
   if (args[0] === '--') args.shift();
-  return runMain(file, args, options);
+  return runMain(file, args, { ...options, propagateCwd: true });
 }
