@@ -1,0 +1,1563 @@
+{
+  "recordedAt": "2026-09-21T22:08:47.243816+00:00",
+  "scope": "External compiler adapter repair on Linux x64. Three native controls, fifteen engine controls, and twelve unchanged upstream FFI registrations; no full-suite or native cross-OS claim.",
+  "baseline": {
+    "scope": "Private compiler-driver differential regression, no upstream tests edited.",
+    "passed": true,
+    "hashes": {
+      "main.c": "4d6ff5b95b4bf555c1829fb822aa6b95d223a6baedff13a44cc55fb331bab979",
+      "answer.cpp": "2928a3013dd17e5ca0f736927aad6c0fb4a386bb27229e2618cdf5ab418685ff",
+      "before.mjs": "f45e85b4952d77d8831cf778bda42ff08b7154fe49e96942555d3a005b9fa794",
+      "after.mjs": "86291c3bba308838b2d08948f11ba3d225d6b38a06f7f42e6652627b0126139e"
+    },
+    "results": [
+      {
+        "label": "native C++ object",
+        "command": [
+          "c++",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/answer.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/native-answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "native mixed source/object",
+        "command": [
+          "cc",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/native-answer.o",
+          "-lstdc++",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/native"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "native output",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/native"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": ""
+      },
+      {
+        "label": "Wasm C++ object",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v114-engine-exit/bin/clang++",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/answer.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "Wasm static archive",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v114-engine-exit/bin/ar",
+          "rcs",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/libanswer.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "before mixed object",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/before.mjs",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/answer.o",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/before-object"
+        ],
+        "code": 1,
+        "signal": null,
+        "stdout": "",
+        "stderr": "clang: warning: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/answer.o: 'linker' input unused [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-fPIC' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-fvisibility=default' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-mllvm -combiner-global-alias-analysis=false' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-mllvm -wasm-enable-sjlj' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-mllvm -wasm-use-legacy-eh' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-mllvm -disable-lsr' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-D __EMSCRIPTEN_SHARED_MEMORY__=1' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-Xclang -iwithsysroot/include/fakesdl' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-Xclang -iwithsysroot/include/compat' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-pthread' [-Wunused-command-line-argument]\nTraceback (most recent call last):\n  File \"/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk/upstream/emscripten/emcc.py\", line 630, in <module>\n    sys.exit(main(sys.argv))\n             ^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/contextlib.py\", line 81, in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk/upstream/emscripten/emcc.py\", line 372, in main\n    linker_args = phase_compile_inputs(state, newargs)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/contextlib.py\", line 81, in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk/upstream/emscripten/emcc.py\", line 618, in phase_compile_inputs\n    arg.value = compile_source_file(input_file)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v112-exit-lowered/sdk/upstream/emscripten/emcc.py\", line 600, in compile_source_file\n    assert os.path.exists(output_file)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "label": "before mixed archive",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/before.mjs",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/libanswer.a",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/before-archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n"
+      },
+      {
+        "label": "before archive execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/before-archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": ""
+      },
+      {
+        "label": "after mixed object",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/after.mjs",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/answer.o",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/after-object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n"
+      },
+      {
+        "label": "after object execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/after-object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": ""
+      },
+      {
+        "label": "after mixed archive",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/after.mjs",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/libanswer.a",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/after-archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n"
+      },
+      {
+        "label": "after archive execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/after-archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "baselineFile": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential/results.json",
+    "sha256": "9b76a3cfe743c7a4a501d5e0def23438dc0817e5976d8f600cf034b4d9cfde64"
+  },
+  "baselineResources": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/c-driver-differential.resources.json",
+    "sha256": "ccb535acb5e95c6d1b2f63da61ddd442ea7d621636bb7c56a6a8eb55fc08ea58",
+    "peakMemoryBytes": 443203584,
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "startedAt": "2026-09-21T21:44:12.366Z",
+    "finishedAt": "2026-09-21T21:44:18.957Z",
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0
+  },
+  "repaired": {
+    "scope": "C/C++ source classification and mixed source/object/archive linking on the selected frozen toolchains; supplementary checks, not an upstream suite result.",
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "startedAt": "2026-09-21T21:58:30.027Z",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls.resources.json",
+    "fixtures": {
+      "cc-inputs-main.c": "bbec2298e24bc632efe9b680a844d9ff6f8a4bd9dbe9beea0dc8ae27264c8406",
+      "cc-inputs-answer.cpp": "d090faee803c4891c52a8976e645ef33bd4e1365cbb9f4a68eb3369a9e187587",
+      "cc-inputs-cxx-main.c": "f5fef8173a11e4c0a7eb20e267951bf1fddbb9f4aa3b3835be355e1f685f7c84"
+    },
+    "configs": [
+      {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v116-host-platform-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "engineArgs": [
+          "run",
+          "-A",
+          "--v8-flags=--stack-size=61440"
+        ],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v116-host-platform-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v119-cc-inputs-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v118-cc-inputs-lowered",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v116-host-platform-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v118-cc-inputs-lowered/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 2,
+        "engineEnvironment": {
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered/bun-stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "stackAdjustment": {
+          "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered/bun-stack-reservation.so",
+          "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+          "osThreadStackBytes": 67108864,
+          "jscStackBudgetBytes": 62914560,
+          "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+        },
+        "maximumMemoryBytes": 4294967296,
+        "pthreadPoolSize": 8,
+        "backend": "full-lean-wasm64-lowered",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v118-cc-inputs-lowered/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v118-cc-inputs-lowered/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v118-cc-inputs-lowered/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v118-cc-inputs-lowered/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      }
+    ],
+    "commands": [
+      {
+        "label": "native C++ object",
+        "command": [
+          "c++",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/cc-inputs-answer.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.132177298
+      },
+      {
+        "label": "native C source plus C++ object",
+        "command": [
+          "cc",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/answer.o",
+          "-lstdc++",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/C source plus C++ object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.08126855399999999
+      },
+      {
+        "label": "native C source plus C++ object execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/C source plus C++ object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.002680804000000023
+      },
+      {
+        "label": "native C++ driver with .c suffix",
+        "command": [
+          "c++",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/cc-inputs-cxx-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/answer.o",
+          "-lstdc++",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/C++ driver with .c suffix"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.18226217599999997
+      },
+      {
+        "label": "native C++ driver with .c suffix execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/C++ driver with .c suffix"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.002337031999999965
+      },
+      {
+        "label": "native C and C++ sources",
+        "command": [
+          "cc",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/cc-inputs-answer.cpp",
+          "-lstdc++",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/C and C++ sources"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.189264723
+      },
+      {
+        "label": "native C and C++ sources execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/native inputs/C and C++ sources"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.002276471000000015
+      },
+      {
+        "label": "node C++ object",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/clang++",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/cc-inputs-answer.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.8614469999999999
+      },
+      {
+        "label": "node archive",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/ar",
+          "rcs",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/libanswer.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.06650509199999988
+      },
+      {
+        "label": "node C source plus C++ object",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/clang",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/answer.o",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/C source plus C++ object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 1.647151792
+      },
+      {
+        "label": "node C source plus C++ object execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/C source plus C++ object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.15653450099999963
+      },
+      {
+        "label": "node C source plus C++ archive",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/clang",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/libanswer.a",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/C source plus C++ archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 1.6189752349999995
+      },
+      {
+        "label": "node C source plus C++ archive execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/C source plus C++ archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.27191754899999976
+      },
+      {
+        "label": "node C++ driver with .c suffix",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/clang++",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/cc-inputs-cxx-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/answer.o",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/C++ driver with .c suffix"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "clang++: warning: treating 'c' input as 'c++' when in C++ mode, this behavior is deprecated [-Wdeprecated]\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 2.3577192939999994
+      },
+      {
+        "label": "node C++ driver with .c suffix execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/C++ driver with .c suffix"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.1716452879999997
+      },
+      {
+        "label": "node C and C++ sources",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/clang",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/cc-inputs-answer.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/C and C++ sources"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 1.934656946000001
+      },
+      {
+        "label": "node C and C++ sources execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/C and C++ sources"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.15250526300000092
+      },
+      {
+        "label": "node response file with spaces",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/clang",
+          "@/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/inputs.rsp"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 1.419430359
+      },
+      {
+        "label": "node response file with spaces execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/node inputs/response file with spaces"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.1403777599999994
+      },
+      {
+        "label": "deno C++ object",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v119-cc-inputs-native/bin/clang++",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/cc-inputs-answer.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.7203842629999999
+      },
+      {
+        "label": "deno archive",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v119-cc-inputs-native/bin/ar",
+          "rcs",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/libanswer.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.05027056499999889
+      },
+      {
+        "label": "deno C source plus C++ object",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v119-cc-inputs-native/bin/clang",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/answer.o",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/C source plus C++ object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 1.2912728779999998
+      },
+      {
+        "label": "deno C source plus C++ object execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/C source plus C++ object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.3606014720000003
+      },
+      {
+        "label": "deno C source plus C++ archive",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v119-cc-inputs-native/bin/clang",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/libanswer.a",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/C source plus C++ archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 1.2940071700000009
+      },
+      {
+        "label": "deno C source plus C++ archive execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/C source plus C++ archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.36439462399999867
+      },
+      {
+        "label": "deno C++ driver with .c suffix",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v119-cc-inputs-native/bin/clang++",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/cc-inputs-cxx-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/answer.o",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/C++ driver with .c suffix"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "clang++: warning: treating 'c' input as 'c++' when in C++ mode, this behavior is deprecated [-Wdeprecated]\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 2.1974770900000005
+      },
+      {
+        "label": "deno C++ driver with .c suffix execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/C++ driver with .c suffix"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.3530314130000006
+      },
+      {
+        "label": "deno C and C++ sources",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v119-cc-inputs-native/bin/clang",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/cc-inputs-answer.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/C and C++ sources"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 1.8775718289999968
+      },
+      {
+        "label": "deno C and C++ sources execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/C and C++ sources"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.35750519500000155
+      },
+      {
+        "label": "deno response file with spaces",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v119-cc-inputs-native/bin/clang",
+          "@/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/inputs.rsp"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "emcc: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\n",
+        "seconds": 1.3016568679999982
+      },
+      {
+        "label": "deno response file with spaces execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/deno inputs/response file with spaces"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.3501907949999986
+      },
+      {
+        "label": "bun C++ object",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered/bin/clang++",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/cc-inputs-answer.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.7048381209999971
+      },
+      {
+        "label": "bun archive",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered/bin/ar",
+          "rcs",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/libanswer.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/answer.o"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.06278483000000051
+      },
+      {
+        "label": "bun C source plus C++ object",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered/bin/clang",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/answer.o",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/C source plus C++ object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 2.153534349999998
+      },
+      {
+        "label": "bun C source plus C++ object execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/C source plus C++ object"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.1389263060000012
+      },
+      {
+        "label": "bun C source plus C++ archive",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered/bin/clang",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/libanswer.a",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/C source plus C++ archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 1.8470610869999982
+      },
+      {
+        "label": "bun C source plus C++ archive execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/C source plus C++ archive"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.1352667110000002
+      },
+      {
+        "label": "bun C++ driver with .c suffix",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered/bin/clang++",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/cc-inputs-cxx-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/answer.o",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/C++ driver with .c suffix"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "clang++: warning: treating 'c' input as 'c++' when in C++ mode, this behavior is deprecated [-Wdeprecated]\n",
+        "seconds": 2.4179891769999995
+      },
+      {
+        "label": "bun C++ driver with .c suffix execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/C++ driver with .c suffix"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.12978888999999982
+      },
+      {
+        "label": "bun C and C++ sources",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered/bin/clang",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/cc-inputs-main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/cc-inputs-answer.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/C and C++ sources"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 2.4195497689999974
+      },
+      {
+        "label": "bun C and C++ sources execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/C and C++ sources"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.14328088600000047
+      },
+      {
+        "label": "bun response file with spaces",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v118-cc-inputs-lowered/bin/clang",
+          "@/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/inputs.rsp"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 1.8152919799999945
+      },
+      {
+        "label": "bun response file with spaces execution",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/bun inputs/response file with spaces"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.12978569399999834
+      }
+    ],
+    "passed": true,
+    "fixturesUnchanged": true,
+    "finishedAt": "2026-09-21T21:59:05.821Z"
+  },
+  "repairedFile": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls/comparison.json",
+    "sha256": "ab53d0119d8f8113e1efe28ea50e7a691695151c54db658fa07956b91dbb5b2f"
+  },
+  "preparationResources": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cc-inputs-controls.resources.json",
+    "sha256": "1156aaeb9bc3fee5d62a43b1bf916f2761fea07c639f06ef8adbe58d184855a8",
+    "peakMemoryBytes": 2710474752,
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "startedAt": "2026-09-21T21:58:12.201Z",
+    "finishedAt": "2026-09-21T21:59:05.899Z",
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0
+  },
+  "upstream": [
+    {
+      "engine": "node",
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-cc-inputs-native-controls/campaign.json",
+        "sha256": "cd52a9037fa9653d1624aff57f19bbc17a7e818128405e817ed0d5b78388f75c"
+      },
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "tests": [
+        {
+          "name": "tests/lake/examples/ffi/test.sh",
+          "seconds": 115.711,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-cc-inputs-native-controls/00001-d7c608a1/resources.json",
+            "sha256": "2a37851c91ef0a4d4326537be6a6c1878ef4a7ca7f2538824a23c222a88d4db6",
+            "peakMemoryBytes": 4686843904,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T21:59:29.862Z",
+            "finishedAt": "2026-09-21T22:01:26.261Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-cc-inputs-native-controls/00001-d7c608a1/results/execution.json",
+            "sha256": "a4336d42019fdf2caf8eea952212c5abc113492b2e5d332869b1952485536529"
+          }
+        },
+        {
+          "name": "tests/lake/examples/reverse-ffi/test.sh",
+          "seconds": 34.0438,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-cc-inputs-native-controls/00002-5504c1bb/resources.json",
+            "sha256": "9cdda79d09c1600b605cb57277c96a0caeb79b0cfbbab120fd19ec7ccc9fc771",
+            "peakMemoryBytes": 3967139840,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:01:26.307Z",
+            "finishedAt": "2026-09-21T22:02:01.013Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-cc-inputs-native-controls/00002-5504c1bb/results/execution.json",
+            "sha256": "fb194ef5a48fd86bac732b080c6d9d33223cbb7e1a6a46e0d8c8ff95db89500e"
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "seconds": 25.3275,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-cc-inputs-native-controls/00003-b5ba9a3d/resources.json",
+            "sha256": "88b69712df7b99911ef7eb8a921a8a056ed64a34cd953a0003c394b1bd196823",
+            "peakMemoryBytes": 1891143680,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:02:01.057Z",
+            "finishedAt": "2026-09-21T22:02:27.013Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-cc-inputs-native-controls/00003-b5ba9a3d/results/execution.json",
+            "sha256": "625842d90adc98dd540f21df1f78dbe0061aaf0e74f4a262ce13435687b4f8dc"
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "seconds": 5.05255,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-cc-inputs-native-controls/00004-b4e301fe/resources.json",
+            "sha256": "f181032c8f9e5446c6fa4f8c43ac3e4a283192085254be1df93fb422b70af535",
+            "peakMemoryBytes": 1739517952,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:02:27.060Z",
+            "finishedAt": "2026-09-21T22:02:32.811Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-cc-inputs-native-controls/00004-b4e301fe/results/execution.json",
+            "sha256": "c883ff4eff7a14bdf37ad974c0a5e30acb7679f60d012cd782b711c05600c58e"
+          }
+        }
+      ]
+    },
+    {
+      "engine": "deno",
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v119-cc-inputs-native-controls/campaign.json",
+        "sha256": "65f1d39fc4dfbaad7453c43bdf79406fcc9c87785d14b5debb68027be8738ae9"
+      },
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "tests": [
+        {
+          "name": "tests/lake/examples/ffi/test.sh",
+          "seconds": 125.97,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v119-cc-inputs-native-controls/00001-d2b296eb/resources.json",
+            "sha256": "8fb3b666354f12952b278fecad176148880e8769a135fcc6c0cdb994ae046f0e",
+            "peakMemoryBytes": 4813918208,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:02:33.535Z",
+            "finishedAt": "2026-09-21T22:04:40.481Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v119-cc-inputs-native-controls/00001-d2b296eb/results/execution.json",
+            "sha256": "9745b6ac8072c87fc2acf05d10460ac22b49e50923fedb9d409bd84e0ae5d677"
+          }
+        },
+        {
+          "name": "tests/lake/examples/reverse-ffi/test.sh",
+          "seconds": 36.5501,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v119-cc-inputs-native-controls/00002-742a4ad2/resources.json",
+            "sha256": "67499cbdbc014e190367f8d6b4a16e4214a2b87ee45fa75407eb37b331e1ebd8",
+            "peakMemoryBytes": 4329861120,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:04:40.532Z",
+            "finishedAt": "2026-09-21T22:05:17.772Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v119-cc-inputs-native-controls/00002-742a4ad2/results/execution.json",
+            "sha256": "76d704237d432577b776eb55a872cb512bef73208afb2bddfc1395a996309749"
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "seconds": 26.1106,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v119-cc-inputs-native-controls/00003-0ed9c18b/resources.json",
+            "sha256": "e3386fd55b9ec60d434be8ee3f7491324784755f702b529064f7a47cee9a5903",
+            "peakMemoryBytes": 2142867456,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:05:17.820Z",
+            "finishedAt": "2026-09-21T22:05:44.596Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v119-cc-inputs-native-controls/00003-0ed9c18b/results/execution.json",
+            "sha256": "cc1268e0849fc02c0c6db89b3fc091453d8bc25da8792f3904cb2affe3f719c2"
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "seconds": 5.22463,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v119-cc-inputs-native-controls/00004-6dbe2ce6/resources.json",
+            "sha256": "eb43c076d3e9c1533ae2852d800e5c276306173ba2e299eda3bb7db7413067a4",
+            "peakMemoryBytes": 1974448128,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:05:44.642Z",
+            "finishedAt": "2026-09-21T22:05:50.518Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v119-cc-inputs-native-controls/00004-6dbe2ce6/results/execution.json",
+            "sha256": "11cc9807db8b21302ae5e82540e0537a0eebbce9a72d9cf9861c7a3b5c61da05"
+          }
+        }
+      ]
+    },
+    {
+      "engine": "bun",
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v118-cc-inputs-lowered-controls/campaign.json",
+        "sha256": "0ccd38dfa17b756cdb5a373afad91d9f9ccfb88b4e1fad39d6eae1276e6a0e57"
+      },
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "tests": [
+        {
+          "name": "tests/lake/examples/ffi/test.sh",
+          "seconds": 103.716,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v118-cc-inputs-lowered-controls/00001-a228a953/resources.json",
+            "sha256": "315ec006b02b396e486b98fc85ea2fc71e39a1ebf95d22d33d50688078d97fd6",
+            "peakMemoryBytes": 5421010944,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:05:51.253Z",
+            "finishedAt": "2026-09-21T22:07:35.967Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v118-cc-inputs-lowered-controls/00001-a228a953/results/execution.json",
+            "sha256": "ddc7b09f6741119a09369a342185d1b3eefdce476936652ec895a6998f448d6c"
+          }
+        },
+        {
+          "name": "tests/lake/examples/reverse-ffi/test.sh",
+          "seconds": 33.6303,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v118-cc-inputs-lowered-controls/00002-48b6eb0e/resources.json",
+            "sha256": "c145fa4ec3b4ce5c21a15898f0a4e4da2d099e915210ef17d05d60e6a986d762",
+            "peakMemoryBytes": 4837801984,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:07:36.020Z",
+            "finishedAt": "2026-09-21T22:08:10.314Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v118-cc-inputs-lowered-controls/00002-48b6eb0e/results/execution.json",
+            "sha256": "71e58e1fc9ee4e3c01626a773ba2660e75d31259aef7387692e207beddf7d613"
+          }
+        },
+        {
+          "name": "compile/wait_dedicated.lean",
+          "seconds": 22.8214,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v118-cc-inputs-lowered-controls/00003-4c34a24f/resources.json",
+            "sha256": "6d99cbc7497686b7fb1a1075e2d3730d803e01159efb926eaf69787b5816329e",
+            "peakMemoryBytes": 2359525376,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:08:10.360Z",
+            "finishedAt": "2026-09-21T22:08:33.830Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v118-cc-inputs-lowered-controls/00003-4c34a24f/results/execution.json",
+            "sha256": "88371f488ff27c70a5f11cdafb150be09b4eee6da8bab7dcd1d71f7ce42fe98d"
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "seconds": 4.2295,
+          "sourceIntegrity": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v118-cc-inputs-lowered-controls/00004-395f00e7/resources.json",
+            "sha256": "02762474bc586e8c1f5efe2b2a02cef5ad703035d83c62b8e1761f371884ebb2",
+            "peakMemoryBytes": 2219470848,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "startedAt": "2026-09-21T22:08:33.876Z",
+            "finishedAt": "2026-09-21T22:08:38.776Z",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v118-cc-inputs-lowered-controls/00004-395f00e7/results/execution.json",
+            "sha256": "e8f4c1ec62f8eac5d74c18b279b45ea2187bf195de63d4410de25d635490e098"
+          }
+        }
+      ]
+    }
+  ],
+  "implementation": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/cc-driver.mjs",
+      "sha256": "2fccafc22093fba3281936eb5654bfd67601a447ac6a08e2dd24257416f30c70"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probe-cc-inputs.mjs",
+      "sha256": "c98e00bbac23156dc30d791d5f8fd2e2377c808ae02d187d8bb7290d47416fc5"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/derive-cc-driver.mjs",
+      "sha256": "f882592657f88e454ed1aea82f9a83ba2317c41e78d4ba517b0040bbf5870e35"
+    }
+  ],
+  "remaining": [
+    "Complete JavaScript-engine suites remain unfinished.",
+    "Native Windows/macOS and ARM64 validation is still required."
+  ]
+}

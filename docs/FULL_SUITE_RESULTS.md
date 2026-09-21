@@ -1147,3 +1147,24 @@ also exposed a mixed C-source/object linker-driver defect; that failure is
 retained separately and its repair is separate work. Native Windows/macOS,
 ARM64, and the complete JavaScript suites remain open. See
 [the platform comparisons, unchanged tests, and resource records](evidence/host-platform-2026-09-21.json).
+
+## Mixed C source and object linking, September 21
+
+The external compiler adapter no longer inserts language-switch flags around
+C inputs. With the pinned SDK, those switches caused a command such as
+`clang main.c helper.o -o app` to treat the existing object as another source
+file and fail inside Emscripten. The retained baseline reproduces that failure;
+removing the injected switches fixes it while preserving C input semantics and
+linking the required C++ runtime.
+
+Three native controls and **15 engine controls** pass: mixed C/C++ sources,
+objects, archives, C++ compilation of a `.c` input, and response files containing
+paths with spaces. The full compiler snapshots differ from their platform-fixed
+parents only in the external compiler adapter. The unchanged upstream Lake FFI
+and reverse-FFI examples, dedicated-thread compilation, and external boxing
+then pass in each engine, **12/12 registrations**. Every attempt preserves all
+7,267 original source hashes. Peak memory is 5.05 GiB, with zero resource aborts,
+OOM, hard-limit, throttling, or swap events. Bun uses the released binary with
+lowered memory64 and the existing explicit Linux stack adjustment. These local
+results do not establish complete suites or cross-OS conformance. See
+[the baseline failure, repaired controls, and upstream results](evidence/cc-inputs-2026-09-21.json).

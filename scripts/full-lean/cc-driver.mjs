@@ -2,7 +2,7 @@
 // This replaces their external C toolchain and wraps resulting Wasm executables
 // for the chosen engine. Test sources and expected output are never rewritten.
 import { readFileSync, writeFileSync, chmodSync, existsSync } from 'node:fs';
-import { resolve, join, extname } from 'node:path';
+import { resolve, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { expandResponseArgs } from './response-args.mjs';
@@ -54,12 +54,12 @@ for (let i = 0; i < original.length; i++) {
     embeddedLake ||= arg === '-lLake_shared';
     continue;
   }
-  if (!compileOnly && !arg.startsWith('-') && extname(arg) === '.c' && existsSync(arg)) args.push('-x', 'c', arg, '-x', 'none');
-  else args.push(arg);
+  args.push(arg);
 }
 args.push(`-sMEMORY64=${config.memoryMode ?? 2}`, '-pthread', '-fwasm-exceptions');
-// Preserve C input semantics while linking the Lean C++ runtime. Emscripten's
-// C++ driver otherwise reclassifies .c inputs, even with per-input -x flags.
+// Include the Lean C++ runtime without changing the selected compiler driver.
+// emcc classifies C/C++ sources by suffix. Injecting per-file -x switches makes
+// the pinned SDK attempt to compile existing .o inputs as sources.
 if (!compileOnly) args.push('-sDEFAULT_TO_CXX=1', '-Wno-experimental', '-Wno-pthreads-mem-growth');
 if (compileOnly) {
   if (explicitOutput) args.push('-o', output);

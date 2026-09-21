@@ -797,3 +797,28 @@ Nine repaired comparisons pass, while the original fails all six non-Linux
 cases. Actual rebuilt compiler checks and six unchanged upstream registrations
 per engine also pass on Linux x64. These are separate from native cross-OS
 validation; see [the retained evidence](../../docs/evidence/host-platform-2026-09-21.json).
+
+## External C compiler inputs
+
+The compiler adapter leaves source-language selection to the chosen Emscripten
+driver. It links the C++ runtime without injecting `-x c`/`-x none` around C
+inputs. Those injected flags made the pinned SDK try to compile an existing
+object file when linking a command such as `clang main.c helper.o -o app`.
+
+`probe-cc-inputs.mjs NEW_OUTPUT PREFIX...` checks mixed C/C++ sources, objects,
+archives, the C++ driver's treatment of a `.c` input, and quoted response files
+containing paths with spaces. Run it through `run-bounded.mjs` with
+`base-pages.py`, supplying one frozen toolchain prefix per engine. Three native
+controls and all fifteen engine cases pass on Linux x64. The small fixture
+rejects accidental C++ compilation of its C source and verifies the linked
+program's result.
+
+`derive-cc-driver.mjs FROZEN_SOURCE NEW_OUTPUT` freezes only the revised external
+compiler adapter. It verifies the parent hashes and its helper dependencies,
+retains the Wasm compiler, SDK, and host runtime, and requires a fresh output.
+This allows an isolated adapter regression without rebuilding or mutating the
+parent compiler snapshot.
+
+The unchanged Lake FFI and reverse-FFI examples, dedicated-thread compilation,
+and external boxing also pass in each engine, twelve registrations total. See
+[the original failure and full validation](../../docs/evidence/cc-inputs-2026-09-21.json).
