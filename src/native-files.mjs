@@ -38,6 +38,8 @@ export function nativeFiles({ synchronous = false } = {}) {
   const isatty = bind(windows ? '_isatty' : 'isatty', 'int', ['int']);
   const strerror = bind('strerror', 'str', ['int']);
   const free = bind('free', 'void', ['void *']);
+  const realpath = windows ? null : bind('realpath', 'void *', ['str', 'void *']);
+  const strlen = windows ? null : bind('strlen', 'size_t', ['void *']);
   const scanDirectory = windows ? null : libc.func('int scandir(str path, _Out_ void **entries, void *filter, void *compare)');
   const accessAt = windows ? null : libc.func('int faccessat(int directory, str path, int mode, int flags)');
   const getdelim = windows ? null : libc.func('intptr_t getdelim(_Inout_ void **line, _Inout_ size_t *capacity, int delimiter, void *stream)');
@@ -144,6 +146,17 @@ export function nativeFiles({ synchronous = false } = {}) {
         free(output[0]);
       }
       return names;
+    },
+    async realPath(path) {
+      if (!realpath) throw new Error('Native realpath is POSIX-only');
+      // Let libc traverse symlinks before dot segments. Some engine filesystem
+      // adapters normalize them first, including /proc/self/fd/N/.. on Bun.
+      const { value, errno } = await call(realpath, path, null);
+      if (!value) throw failure(errno);
+      // Buffer.from(ArrayBuffer) aliases storage; copy through a typed array
+      // before freeing the allocation and posting it back from this worker.
+      try { return Buffer.from(new Uint8Array(ffi.view(value, Number(strlen(value))))); }
+      finally { free(value); }
     },
     async groupInfo(gid) {
       if (windows) throw Object.assign(failure(ffi.os.errno.ENOSYS), { errno: -ffi.os.errno.ENOSYS });
@@ -308,6 +321,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     },
     async getLine(file) { return buffer(await callNativeFile('getLine', [reference(file)])); },
     async readDirectory(path) { return (await callNativeFile('readDirectory', [path])).map(buffer); },
+    async realPath(path) { return buffer(await callNativeFile('realPath', [path])); },
     groupInfo(gid) { return callNativeFile('groupInfo', [gid]); },
     checkDirectorySearch(path) { return callNativeFile('checkDirectorySearch', [path]); },
   };

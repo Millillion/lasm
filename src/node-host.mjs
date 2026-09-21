@@ -155,7 +155,9 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       return numbers(...time(stat.atimeNs), ...time(stat.mtimeNs), stat.size, stat.nlink,
         stat.isDirectory() ? 0 : stat.isFile() ? 1 : stat.isSymbolicLink() ? 2 : 3);
     })();
-    case 12: return fsp.realpath(path(bytes)).then(value => Buffer.from(process.platform === 'win32' ? value.replace(/^[A-Z]:/, x => x.toLowerCase()) : value), () => {
+    case 12: return (process.platform === 'win32'
+      ? fsp.realpath(path(bytes)).then(value => Buffer.from(value.replace(/^[A-Z]:/, x => x.toLowerCase())))
+      : nativeFiles().realPath(path(bytes))).catch(() => {
       // Lean deliberately reports this constructor for every realpath failure.
       throw Object.assign(error('ENOENT', ''), { errno: 2, nativeMessage: true });
     });

@@ -282,6 +282,13 @@ Use a fresh output directory. The probe records the SDK patch and source hashes;
 it does not replace any upstream Lean test. The retained profile and comparisons
 are in [the symbol-lookup evidence](../../docs/evidence/symbol-lookup-2026-09-21.json).
 
+`probe-realpath.mjs NEW_OUTPUT FULL_TOOLCHAIN...` compares 17 ordinary Lean
+path cases against native Lean, including symlink/parent traversal, missing and
+non-directory components, empty paths, permissions, and malformed filename
+bytes. The fixture checks both printed paths and the resulting UTF-8 bytes.
+It preserves a source copy and its hash, verifies frozen inputs, and records
+every engine result. This POSIX comparison does not establish Windows behavior.
+
 `probe-getline-state.mjs NEW_OUTPUT FULL_TOOLCHAIN...` compares an unchanged
 supplementary ordinary-Lean program with the pinned native runtime and each
 selected full compiler. It covers reading appended data after a final partial

@@ -1,0 +1,2301 @@
+{
+  "recordedAt": "2026-09-21T17:37:45.067738+00:00",
+  "scope": "Linux x64 IO.FS.realPath repair. Seventeen ordinary Lean path cases, supplementary packaged cwd controls, and 24 unchanged upstream registrations. Not a complete filesystem, platform, or upstream-suite result.",
+  "findings": [
+    "Bun normalized parent segments before resolving symlinks, accepted an empty path, and accepted paths whose removed lexical components did not exist or were regular files. Module-root inference consequently assigned _stdin to ordinary source files.",
+    "Node and Bun decoded one malformed byte sequence into two replacement characters, while native Lean used one. Deno rejected that filename. Passing raw libc path bytes into Lean preserves its own lossy UTF-8 conversion.",
+    "POSIX realPath now invokes libc through an independent file worker. It copies the allocated bytes before free and retains the original Lean error-constructor mapping and embedded-NUL rejection.",
+    "The failing baseline and successful repair execute the identical immutable Lean fixture. The new implementation matches native Lean in full and packaged Node, Deno, and Bun.",
+    "The original externBoxing failure now passes alongside filesystem, private-name and module-header controls in every engine. All 7267 original file hashes remain intact before and after every registration."
+  ],
+  "retainedDevelopmentAttempts": [
+    "The first supplementary fixture did not derive Repr for IO.Error and failed the native compilation control before any engine comparison. The corrected fixture is used unchanged in the actual baseline and repaired comparison.",
+    "The first adapter used Buffer.from(ArrayBuffer), which aliased freed native storage and caused corrupted compiler search paths. Validation rejected it. Copying through Uint8Array fixes ownership; those failed snapshots and outputs remain retained.",
+    "A subsequent preparation stopped because an earlier log filename already existed. Fresh log names preserve the previous evidence; no test was executed by that failed preparation."
+  ],
+  "remainingGaps": [
+    "Native macOS and Windows comparisons remain unexecuted; the Windows adapter is unchanged.",
+    "Long paths, filesystem races, devices and complete platform coverage remain open.",
+    "Bun full-compiler results retain the disclosed Linux stack helper and memory-lowering workaround.",
+    "Full upstream suites and packaged full-runtime integration remain unfinished; no remaining difference is established fundamental."
+  ],
+  "ordinaryLeanComparisons": {
+    "realpath-before": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before/comparison.json",
+      "sha256": "2c95b9b8a8cd9a526b4818af004fdd9cae5bec7f2edbe9bdca67bc74152126f9",
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/realpath/Main.lean",
+      "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before/fixture.lean",
+      "sourceSha256": "46c552508dd415137ecdc3bf49f3ed41d20e1fa6178297cf1e075526387195ad",
+      "scope": "Supplementary realPath symlink traversal, invalid bytes, and structured error comparison; not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-validation.resources.json",
+      "executedSourceUnchanged": true,
+      "finishedAt": "2026-09-21T17:24:39.137Z",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.22007812999999998,
+          "code": 1,
+          "signal": null,
+          "stdout": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before/fixture.lean:11:47: error(lean.synthInstanceFailed): failed to synthesize instance of type class\n  Repr IO.Error\n\nHint: Adding the command `deriving instance Repr for IO.Error` may allow Lean to derive the missing instance.\n",
+          "stderr": "",
+          "passed": false
+        }
+      ]
+    },
+    "realpath-before-r2": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/comparison.json",
+      "sha256": "d414cbe5464a3b2a92d355abdfef30206be518e57483e796a870bd968ebe420b",
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/realpath/Main.lean",
+      "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/fixture.lean",
+      "sourceSha256": "4e6abac6004494864d9282ea4acfdd692d282cfded1f38e07d9e5bea1d89145e",
+      "scope": "Supplementary realPath symlink traversal, invalid bytes, and structured error comparison; not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-validation-r2.resources.json",
+      "executedSourceUnchanged": true,
+      "finishedAt": "2026-09-21T17:25:48.833Z",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.31557704799999997,
+          "code": 0,
+          "signal": null,
+          "stdout": "\"\": IO.Error.noFileOrDirectory \"\" 2 \"\"\n\".\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\"..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2\"\n\"target/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\"link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/child\"\n\"link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"link//../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"./link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"target/./file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"missing/../target/file\": IO.Error.noFileOrDirectory \"missing/../target/file\" 2 \"\"\n\"file/..\": IO.Error.noFileOrDirectory \"file/..\" 2 \"\"\n\"file/\": IO.Error.noFileOrDirectory \"file/\" 2 \"\"\n\"link/../file/\": IO.Error.noFileOrDirectory \"link/../file/\" 2 \"\"\n\"loop\": IO.Error.noFileOrDirectory \"loop\" 2 \"\"\n\"raw-link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/bad\ufffd\"\nraw path bytes: [47, 104, 111, 109, 101, 47, 108, 97, 115, 116, 109, 106, 115, 47, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110,\n 116, 47, 108, 97, 115, 109, 47, 99, 111, 109, 112, 105, 108, 101, 114, 47, 46, 119, 111, 114, 107, 47, 102, 117, 108,\n 108, 45, 101, 110, 103, 105, 110, 101, 45, 112, 114, 111, 98, 101, 47, 114, 101, 97, 108, 112, 97, 116, 104, 45, 98,\n 101, 102, 111, 114, 101, 45, 114, 50, 47, 112, 97, 116, 104, 115, 47, 116, 97, 114, 103, 101, 116, 47, 98, 97, 100,\n 239, 191, 189]\n\"denied/secret\": IO.Error.noFileOrDirectory \"denied/secret\" 2 \"\"\n\"bad\\x00path\": IO.Error.invalidArgument (some \"bad\\x00path\") 22 \"string contains NUL bytes\"\nrealPath comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v103-table-growth-native/bin/lean",
+          "seconds": 5.5709289349999995,
+          "code": 0,
+          "signal": null,
+          "stdout": "\"\": IO.Error.noFileOrDirectory \"\" 2 \"\"\n\".\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\"..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2\"\n\"target/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\"link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/child\"\n\"link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"link//../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"./link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"target/./file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"missing/../target/file\": IO.Error.noFileOrDirectory \"missing/../target/file\" 2 \"\"\n\"file/..\": IO.Error.noFileOrDirectory \"file/..\" 2 \"\"\n\"file/\": IO.Error.noFileOrDirectory \"file/\" 2 \"\"\n\"link/../file/\": IO.Error.noFileOrDirectory \"link/../file/\" 2 \"\"\n\"loop\": IO.Error.noFileOrDirectory \"loop\" 2 \"\"\n\"raw-link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/bad\ufffd\ufffd\"\nraw path bytes: [47, 104, 111, 109, 101, 47, 108, 97, 115, 116, 109, 106, 115, 47, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110,\n 116, 47, 108, 97, 115, 109, 47, 99, 111, 109, 112, 105, 108, 101, 114, 47, 46, 119, 111, 114, 107, 47, 102, 117, 108,\n 108, 45, 101, 110, 103, 105, 110, 101, 45, 112, 114, 111, 98, 101, 47, 114, 101, 97, 108, 112, 97, 116, 104, 45, 98,\n 101, 102, 111, 114, 101, 45, 114, 50, 47, 112, 97, 116, 104, 115, 47, 116, 97, 114, 103, 101, 116, 47, 98, 97, 100,\n 239, 191, 189, 239, 191, 189]\n\"denied/secret\": IO.Error.noFileOrDirectory \"denied/secret\" 2 \"\"\n\"bad\\x00path\": IO.Error.invalidArgument (some \"bad\\x00path\") 22 \"string contains NUL bytes\"\nrealPath comparison completed\n",
+          "stderr": "",
+          "passed": false
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v103-table-growth-native/bin/lean",
+          "seconds": 6.066321939,
+          "code": 0,
+          "signal": null,
+          "stdout": "\"\": IO.Error.noFileOrDirectory \"\" 2 \"\"\n\".\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\"..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2\"\n\"target/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\"link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/child\"\n\"link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"link//../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"./link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"target/./file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"missing/../target/file\": IO.Error.noFileOrDirectory \"missing/../target/file\" 2 \"\"\n\"file/..\": IO.Error.noFileOrDirectory \"file/..\" 2 \"\"\n\"file/\": IO.Error.noFileOrDirectory \"file/\" 2 \"\"\n\"link/../file/\": IO.Error.noFileOrDirectory \"link/../file/\" 2 \"\"\n\"loop\": IO.Error.noFileOrDirectory \"loop\" 2 \"\"\n\"raw-link\": IO.Error.noFileOrDirectory \"raw-link\" 2 \"\"\n\"denied/secret\": IO.Error.noFileOrDirectory \"denied/secret\" 2 \"\"\n\"bad\\x00path\": IO.Error.invalidArgument (some \"bad\\x00path\") 22 \"string contains NUL bytes\"\nrealPath comparison completed\n",
+          "stderr": "",
+          "passed": false
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v104-table-growth-lowered/bin/lean",
+          "seconds": 5.168668948999999,
+          "code": 0,
+          "signal": null,
+          "stdout": "\"\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\".\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\"..\": ok \"/proc/2005188/fd\"\n\"target/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\"link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/child\"\n\"link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/file\"\n\"link//../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/file\"\n\"./link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/file\"\n\"target/./file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"missing/../target/file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/file\"\n\"file/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths\"\n\"file/\": IO.Error.noFileOrDirectory \"file/\" 2 \"\"\n\"link/../file/\": IO.Error.noFileOrDirectory \"link/../file/\" 2 \"\"\n\"loop\": IO.Error.noFileOrDirectory \"loop\" 2 \"\"\n\"raw-link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-before-r2/paths/target/bad\ufffd\ufffd\"\nraw path bytes: [47, 104, 111, 109, 101, 47, 108, 97, 115, 116, 109, 106, 115, 47, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110,\n 116, 47, 108, 97, 115, 109, 47, 99, 111, 109, 112, 105, 108, 101, 114, 47, 46, 119, 111, 114, 107, 47, 102, 117, 108,\n 108, 45, 101, 110, 103, 105, 110, 101, 45, 112, 114, 111, 98, 101, 47, 114, 101, 97, 108, 112, 97, 116, 104, 45, 98,\n 101, 102, 111, 114, 101, 45, 114, 50, 47, 112, 97, 116, 104, 115, 47, 116, 97, 114, 103, 101, 116, 47, 98, 97, 100,\n 239, 191, 189, 239, 191, 189]\n\"denied/secret\": IO.Error.noFileOrDirectory \"denied/secret\" 2 \"\"\n\"bad\\x00path\": IO.Error.invalidArgument (some \"bad\\x00path\") 22 \"string contains NUL bytes\"\nrealPath comparison completed\n",
+          "stderr": "",
+          "passed": false
+        }
+      ]
+    },
+    "realpath-after": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/comparison.json",
+      "sha256": "a1565d1d8921fa979f3ee00dcc79a905590e1fd9b64fa6fc50ccb1a525e1afc0",
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/realpath/Main.lean",
+      "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/fixture.lean",
+      "sourceSha256": "4e6abac6004494864d9282ea4acfdd692d282cfded1f38e07d9e5bea1d89145e",
+      "scope": "Supplementary realPath symlink traversal, invalid bytes, and structured error comparison; not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-validation-r2.resources.json",
+      "executedSourceUnchanged": true,
+      "finishedAt": "2026-09-21T17:26:01.852Z",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.297391546,
+          "code": 0,
+          "signal": null,
+          "stdout": "\"\": IO.Error.noFileOrDirectory \"\" 2 \"\"\n\".\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/paths\"\n\"..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after\"\n\"target/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/paths\"\n\"link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/paths/target/child\"\n\"link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/paths/target/file\"\n\"link//../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/paths/target/file\"\n\"./link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/paths/target/file\"\n\"target/./file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/paths/target/file\"\n\"missing/../target/file\": IO.Error.noFileOrDirectory \"missing/../target/file\" 2 \"\"\n\"file/..\": IO.Error.noFileOrDirectory \"file/..\" 2 \"\"\n\"file/\": IO.Error.noFileOrDirectory \"file/\" 2 \"\"\n\"link/../file/\": IO.Error.noFileOrDirectory \"link/../file/\" 2 \"\"\n\"loop\": IO.Error.noFileOrDirectory \"loop\" 2 \"\"\n\"raw-link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/paths/target/bad\ufffd\"\nraw path bytes: [47, 104, 111, 109, 101, 47, 108, 97, 115, 116, 109, 106, 115, 47, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110,\n 116, 47, 108, 97, 115, 109, 47, 99, 111, 109, 112, 105, 108, 101, 114, 47, 46, 119, 111, 114, 107, 47, 102, 117, 108,\n 108, 45, 101, 110, 103, 105, 110, 101, 45, 112, 114, 111, 98, 101, 47, 114, 101, 97, 108, 112, 97, 116, 104, 45, 97,\n 102, 116, 101, 114, 47, 112, 97, 116, 104, 115, 47, 116, 97, 114, 103, 101, 116, 47, 98, 97, 100, 239, 191, 189]\n\"denied/secret\": IO.Error.noFileOrDirectory \"denied/secret\" 2 \"\"\n\"bad\\x00path\": IO.Error.invalidArgument (some \"bad\\x00path\") 22 \"string contains NUL bytes\"\nrealPath comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v105-realpath-native/bin/lean",
+          "seconds": 2.3159626170000003,
+          "code": 1,
+          "signal": null,
+          "stdout": "",
+          "stderr": "error: no such file or directory (error code: 2)\n  file: /home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v105-realpath-native/bin\n",
+          "passed": false
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v105-realpath-native/bin/lean",
+          "seconds": 3.0382656330000004,
+          "code": 1,
+          "signal": null,
+          "stdout": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after/fixture.lean:1:0: error: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n\ufffd.\ufffd\u001cv\u0000\u0000\u001d+\u0745\ufffdZAkvelopment/lasm/compiler/.work/full-toolchains/deno-v105-realpath-native/lib/lean\n",
+          "stderr": "",
+          "passed": false
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v106-realpath-lowered/bin/lean",
+          "seconds": 2.488536938000001,
+          "code": 1,
+          "signal": null,
+          "stdout": "",
+          "stderr": "error: no such file or directory (error code: 2)\n  file: /home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v106-realpath-lowered/bin\n",
+          "passed": false
+        }
+      ]
+    },
+    "realpath-after-r2": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/comparison.json",
+      "sha256": "712cd5cea43ff448fb447e109dd3f7491c5abaa8bf49480c1fe8285174c19853",
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/realpath/Main.lean",
+      "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/fixture.lean",
+      "sourceSha256": "4e6abac6004494864d9282ea4acfdd692d282cfded1f38e07d9e5bea1d89145e",
+      "scope": "Supplementary realPath symlink traversal, invalid bytes, and structured error comparison; not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-validation-r4.resources.json",
+      "executedSourceUnchanged": true,
+      "finishedAt": "2026-09-21T17:28:21.362Z",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.31154782,
+          "code": 0,
+          "signal": null,
+          "stdout": "\"\": IO.Error.noFileOrDirectory \"\" 2 \"\"\n\".\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths\"\n\"..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2\"\n\"target/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths\"\n\"link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/child\"\n\"link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"link//../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"./link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"target/./file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"missing/../target/file\": IO.Error.noFileOrDirectory \"missing/../target/file\" 2 \"\"\n\"file/..\": IO.Error.noFileOrDirectory \"file/..\" 2 \"\"\n\"file/\": IO.Error.noFileOrDirectory \"file/\" 2 \"\"\n\"link/../file/\": IO.Error.noFileOrDirectory \"link/../file/\" 2 \"\"\n\"loop\": IO.Error.noFileOrDirectory \"loop\" 2 \"\"\n\"raw-link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/bad\ufffd\"\nraw path bytes: [47, 104, 111, 109, 101, 47, 108, 97, 115, 116, 109, 106, 115, 47, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110,\n 116, 47, 108, 97, 115, 109, 47, 99, 111, 109, 112, 105, 108, 101, 114, 47, 46, 119, 111, 114, 107, 47, 102, 117, 108,\n 108, 45, 101, 110, 103, 105, 110, 101, 45, 112, 114, 111, 98, 101, 47, 114, 101, 97, 108, 112, 97, 116, 104, 45, 97,\n 102, 116, 101, 114, 45, 114, 50, 47, 112, 97, 116, 104, 115, 47, 116, 97, 114, 103, 101, 116, 47, 98, 97, 100, 239,\n 191, 189]\n\"denied/secret\": IO.Error.noFileOrDirectory \"denied/secret\" 2 \"\"\n\"bad\\x00path\": IO.Error.invalidArgument (some \"bad\\x00path\") 22 \"string contains NUL bytes\"\nrealPath comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v107-realpath-native/bin/lean",
+          "seconds": 5.7170032609999994,
+          "code": 0,
+          "signal": null,
+          "stdout": "\"\": IO.Error.noFileOrDirectory \"\" 2 \"\"\n\".\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths\"\n\"..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2\"\n\"target/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths\"\n\"link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/child\"\n\"link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"link//../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"./link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"target/./file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"missing/../target/file\": IO.Error.noFileOrDirectory \"missing/../target/file\" 2 \"\"\n\"file/..\": IO.Error.noFileOrDirectory \"file/..\" 2 \"\"\n\"file/\": IO.Error.noFileOrDirectory \"file/\" 2 \"\"\n\"link/../file/\": IO.Error.noFileOrDirectory \"link/../file/\" 2 \"\"\n\"loop\": IO.Error.noFileOrDirectory \"loop\" 2 \"\"\n\"raw-link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/bad\ufffd\"\nraw path bytes: [47, 104, 111, 109, 101, 47, 108, 97, 115, 116, 109, 106, 115, 47, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110,\n 116, 47, 108, 97, 115, 109, 47, 99, 111, 109, 112, 105, 108, 101, 114, 47, 46, 119, 111, 114, 107, 47, 102, 117, 108,\n 108, 45, 101, 110, 103, 105, 110, 101, 45, 112, 114, 111, 98, 101, 47, 114, 101, 97, 108, 112, 97, 116, 104, 45, 97,\n 102, 116, 101, 114, 45, 114, 50, 47, 112, 97, 116, 104, 115, 47, 116, 97, 114, 103, 101, 116, 47, 98, 97, 100, 239,\n 191, 189]\n\"denied/secret\": IO.Error.noFileOrDirectory \"denied/secret\" 2 \"\"\n\"bad\\x00path\": IO.Error.invalidArgument (some \"bad\\x00path\") 22 \"string contains NUL bytes\"\nrealPath comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v107-realpath-native/bin/lean",
+          "seconds": 6.396022095999999,
+          "code": 0,
+          "signal": null,
+          "stdout": "\"\": IO.Error.noFileOrDirectory \"\" 2 \"\"\n\".\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths\"\n\"..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2\"\n\"target/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths\"\n\"link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/child\"\n\"link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"link//../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"./link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"target/./file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"missing/../target/file\": IO.Error.noFileOrDirectory \"missing/../target/file\" 2 \"\"\n\"file/..\": IO.Error.noFileOrDirectory \"file/..\" 2 \"\"\n\"file/\": IO.Error.noFileOrDirectory \"file/\" 2 \"\"\n\"link/../file/\": IO.Error.noFileOrDirectory \"link/../file/\" 2 \"\"\n\"loop\": IO.Error.noFileOrDirectory \"loop\" 2 \"\"\n\"raw-link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/bad\ufffd\"\nraw path bytes: [47, 104, 111, 109, 101, 47, 108, 97, 115, 116, 109, 106, 115, 47, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110,\n 116, 47, 108, 97, 115, 109, 47, 99, 111, 109, 112, 105, 108, 101, 114, 47, 46, 119, 111, 114, 107, 47, 102, 117, 108,\n 108, 45, 101, 110, 103, 105, 110, 101, 45, 112, 114, 111, 98, 101, 47, 114, 101, 97, 108, 112, 97, 116, 104, 45, 97,\n 102, 116, 101, 114, 45, 114, 50, 47, 112, 97, 116, 104, 115, 47, 116, 97, 114, 103, 101, 116, 47, 98, 97, 100, 239,\n 191, 189]\n\"denied/secret\": IO.Error.noFileOrDirectory \"denied/secret\" 2 \"\"\n\"bad\\x00path\": IO.Error.invalidArgument (some \"bad\\x00path\") 22 \"string contains NUL bytes\"\nrealPath comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bin/lean",
+          "seconds": 5.224682162000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "\"\": IO.Error.noFileOrDirectory \"\" 2 \"\"\n\".\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths\"\n\"..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2\"\n\"target/..\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths\"\n\"link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/child\"\n\"link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"link//../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"./link/../file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"target/./file\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/file\"\n\"missing/../target/file\": IO.Error.noFileOrDirectory \"missing/../target/file\" 2 \"\"\n\"file/..\": IO.Error.noFileOrDirectory \"file/..\" 2 \"\"\n\"file/\": IO.Error.noFileOrDirectory \"file/\" 2 \"\"\n\"link/../file/\": IO.Error.noFileOrDirectory \"link/../file/\" 2 \"\"\n\"loop\": IO.Error.noFileOrDirectory \"loop\" 2 \"\"\n\"raw-link\": ok \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-after-r2/paths/target/bad\ufffd\"\nraw path bytes: [47, 104, 111, 109, 101, 47, 108, 97, 115, 116, 109, 106, 115, 47, 100, 101, 118, 101, 108, 111, 112, 109, 101, 110,\n 116, 47, 108, 97, 115, 109, 47, 99, 111, 109, 112, 105, 108, 101, 114, 47, 46, 119, 111, 114, 107, 47, 102, 117, 108,\n 108, 45, 101, 110, 103, 105, 110, 101, 45, 112, 114, 111, 98, 101, 47, 114, 101, 97, 108, 112, 97, 116, 104, 45, 97,\n 102, 116, 101, 114, 45, 114, 50, 47, 112, 97, 116, 104, 115, 47, 116, 97, 114, 103, 101, 116, 47, 98, 97, 100, 239,\n 191, 189]\n\"denied/secret\": IO.Error.noFileOrDirectory \"denied/secret\" 2 \"\"\n\"bad\\x00path\": IO.Error.invalidArgument (some \"bad\\x00path\") 22 \"string contains NUL bytes\"\nrealPath comparison completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ]
+    }
+  },
+  "packagedChecks": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-packaged.log",
+    "sha256": "a8a02c9e4493e0b91d15e785e451a4f56a8508065414090fe5d36ec08543e8b6",
+    "tests": 12,
+    "pass": 12,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "resources": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-validation.resources.json",
+      "sha256": "47ecb08d2b86bb67cb83fe97f74dea24e47327b7bb4cf2874789b8cb95ae8593",
+      "command": [
+        "node",
+        ".work/full-engine-probe/validate-realpath.mjs"
+      ],
+      "startedAt": "2026-09-21T17:24:38.723Z",
+      "finishedAt": "2026-09-21T17:24:39.238Z",
+      "peakMemoryBytes": 95137792,
+      "minimumHostAvailable": 28229455872,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-validation-r2.resources.json",
+      "sha256": "2582a59fa89d1748147343a649762673170737649260a912d447c23e5c565578",
+      "command": [
+        "node",
+        ".work/full-engine-probe/validate-realpath-r2.mjs"
+      ],
+      "startedAt": "2026-09-21T17:25:29.720Z",
+      "finishedAt": "2026-09-21T17:26:01.933Z",
+      "peakMemoryBytes": 2313093120,
+      "minimumHostAvailable": 25745690624,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-validation-r3.resources.json",
+      "sha256": "a38ca9bcf887acbb1a37ddff4fd1a460d68c3dab9841f5853df5129f670c0d6e",
+      "command": [
+        "node",
+        ".work/full-engine-probe/validate-realpath-r3.mjs"
+      ],
+      "startedAt": "2026-09-21T17:27:16.943Z",
+      "finishedAt": "2026-09-21T17:27:19.501Z",
+      "peakMemoryBytes": 73670656,
+      "minimumHostAvailable": 28293500928,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-validation-r4.resources.json",
+      "sha256": "ae92102633ee3b911ceb6d9a9e0eae4dcf1a4a8e1b066d2ce7337d63233f6ddd",
+      "command": [
+        "node",
+        ".work/full-engine-probe/validate-realpath-r4.mjs"
+      ],
+      "startedAt": "2026-09-21T17:28:01.009Z",
+      "finishedAt": "2026-09-21T17:32:59.071Z",
+      "peakMemoryBytes": 2272010240,
+      "minimumHostAvailable": 25419337728,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-bun-driver.resources.json",
+      "sha256": "998cc847641213b4978f8bdd05fa90d15a6bd6203742f450416475846d3983f4",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "env",
+        "BINARYEN_CORES=1",
+        "CMAKE_BUILD_PARALLEL_LEVEL=1",
+        "node",
+        "scripts/full-lean/build-server-driver.mjs",
+        ".work/full-toolchains/bun-v108-realpath-lowered",
+        ".work/full-engine-probe/server-driver-bun-v108",
+        "--external-link"
+      ],
+      "startedAt": "2026-09-21T17:32:59.111Z",
+      "finishedAt": "2026-09-21T17:33:56.369Z",
+      "peakMemoryBytes": 3255975936,
+      "minimumHostAvailable": 24699011072,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-suite-preparation.resources.json",
+      "sha256": "3de738d93ca65d745e95ad32761b38561890a6dce746963b04411653bb9aeede",
+      "command": [
+        "node",
+        ".work/full-engine-probe/prepare-realpath-upstream-r3.mjs"
+      ],
+      "startedAt": "2026-09-21T17:33:56.411Z",
+      "finishedAt": "2026-09-21T17:34:12.264Z",
+      "peakMemoryBytes": 2352418816,
+      "minimumHostAvailable": 27763130368,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  ],
+  "upstream": {
+    "node": {
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/campaign.json",
+        "sha256": "c8b3883e7ad4347a6db8aa32cb1363d62b4372863e10e7019a0d543957e6c4df"
+      },
+      "counts": {
+        "passed": 8,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v107-realpath-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "snapshot": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/snapshot.json",
+        "sha256": "22b6d08b93b6b74387dd2341c795b2ac576c0370ce59453eb053215bb7ddd838"
+      },
+      "wasmSha256": "3f2e5f296c9faf7d1601f4ef246c598e05a3537bae1ae48c1537710f5d82da4e",
+      "tests": [
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00001-79945467/results/execution.json",
+            "sha256": "247315251a080e86c52ccb909da665a136ff81e56fc4334d07d6c957b5adb930"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00001-79945467/resources.json",
+            "sha256": "c1028d53f7472b98b9c159707696846c76abf7c365e677b79a568e8ec166905d",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00001-79945467/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/IO_test\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:35:16.366Z",
+            "finishedAt": "2026-09-21T17:35:22.689Z",
+            "peakMemoryBytes": 1804488704,
+            "minimumHostAvailable": 25785942016,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00002-520f2cca/results/execution.json",
+            "sha256": "7c75663e08a17a4e32d48e3ee5400dff1b35ef8125e164dc8b004ad4aa9d578e"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00002-520f2cca/resources.json",
+            "sha256": "0a2a4077e1e17afcae6743976e70c3c8b659d7acbfca86752d8566f793d30784",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00002-520f2cca/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/externBoxing\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:35:22.736Z",
+            "finishedAt": "2026-09-21T17:35:28.228Z",
+            "peakMemoryBytes": 1702191104,
+            "minimumHostAvailable": 26136506368,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/moduleDoc.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00003-219e7475/results/execution.json",
+            "sha256": "2537fff9989d71274d74d0bbf0e037c86354491d4fd01e6faf665a1643f7df1b"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00003-219e7475/resources.json",
+            "sha256": "501c8b0f1912010ef23d5302048ebf0b6b44674c405a462dc6d31c93b8cee6d4",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00003-219e7475/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/moduleDoc\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:35:28.270Z",
+            "finishedAt": "2026-09-21T17:35:40.742Z",
+            "peakMemoryBytes": 3548008448,
+            "minimumHostAvailable": 24601489408,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/moduleHeaderLeadingWhitespace.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00004-79685182/results/execution.json",
+            "sha256": "2a6374fcdb469c771812836f051d11be80acd16fb3d953839b0e129c9b4f2268"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00004-79685182/resources.json",
+            "sha256": "4ac33915174cebe4ef00c320fb738c25b19f87acbeacd62b0eca37aa405b075a",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00004-79685182/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/moduleHeaderLeadingWhitespace\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:35:40.789Z",
+            "finishedAt": "2026-09-21T17:35:53.695Z",
+            "peakMemoryBytes": 3513413632,
+            "minimumHostAvailable": 24560467968,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/privateCtor.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00005-5c24c992/results/execution.json",
+            "sha256": "f2c4ca0f49ec2440273e7ed0ab0c2da1f511d9eaa9604835d36393f94c5cd056"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00005-5c24c992/resources.json",
+            "sha256": "ef6105e1b35e277b82f090c9facc884c126ce7fdbb984a7fa463e947cf60ff6f",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00005-5c24c992/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/privateCtor\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:35:53.742Z",
+            "finishedAt": "2026-09-21T17:35:59.491Z",
+            "peakMemoryBytes": 1708228608,
+            "minimumHostAvailable": 26362064896,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/privateFieldCopyIssue.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00006-fa86b2b6/results/execution.json",
+            "sha256": "faf015f5a0aedac41f6ef07a0aea9ad2402dc9fd6368c84b33fe9c6ac0683cc1"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00006-fa86b2b6/resources.json",
+            "sha256": "0b19da8130122e5bf9c1fd7f079aabecae6ee511c3ef3bd249f690c57fff4740",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00006-fa86b2b6/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/privateFieldCopyIssue\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:35:59.556Z",
+            "finishedAt": "2026-09-21T17:36:05.197Z",
+            "peakMemoryBytes": 1845321728,
+            "minimumHostAvailable": 26129096704,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/privateInPublic.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00007-5b0fe569/results/execution.json",
+            "sha256": "1dce7e4fc05224c078922264d09006c3982e17c0ad23ecc81289b75dd3c14a5e"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00007-5b0fe569/resources.json",
+            "sha256": "20d88a27dd7b655060c16d3d82b4aced22d427e4e86c140a9488f23456cf41ee",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00007-5b0fe569/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/privateInPublic\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:36:05.241Z",
+            "finishedAt": "2026-09-21T17:36:10.938Z",
+            "peakMemoryBytes": 1855332352,
+            "minimumHostAvailable": 25952661504,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00008-5f1354ee/results/execution.json",
+            "sha256": "7880d0992169339f69125024296f7d1d83d3897f4276e16b9e331beb95075eb1"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00008-5f1354ee/resources.json",
+            "sha256": "13d0af1cda1bcdece5c5a2705d7d3519821bbe90be8adfcc0763303346cb830b",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v107-realpath-native/00008-5f1354ee/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/tempfile\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:36:10.979Z",
+            "finishedAt": "2026-09-21T17:36:17.348Z",
+            "peakMemoryBytes": 1786912768,
+            "minimumHostAvailable": 25983983616,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    },
+    "deno": {
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/campaign.json",
+        "sha256": "0de1ed66503c39f42492e5044bc7c237633a733377eea4847159c312e178b0a8"
+      },
+      "counts": {
+        "passed": 8,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "engineArgs": [
+          "run",
+          "-A",
+          "--v8-flags=--stack-size=61440"
+        ],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v107-realpath-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "snapshot": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v107-realpath-native/snapshot.json",
+        "sha256": "22b6d08b93b6b74387dd2341c795b2ac576c0370ce59453eb053215bb7ddd838"
+      },
+      "wasmSha256": "3f2e5f296c9faf7d1601f4ef246c598e05a3537bae1ae48c1537710f5d82da4e",
+      "tests": [
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00001-0cd44803/results/execution.json",
+            "sha256": "44f63b3ec208675c05cd2fcda1108e9eb9899cfe5446265b098f56c0501ec22d"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00001-0cd44803/resources.json",
+            "sha256": "9367fcfc1739c7d4b22136157983346661769ee6f10473b9369ae97e3829b22f",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00001-0cd44803/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/IO_test\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:36:18.092Z",
+            "finishedAt": "2026-09-21T17:36:24.656Z",
+            "peakMemoryBytes": 1862049792,
+            "minimumHostAvailable": 25890553856,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00002-780a7154/results/execution.json",
+            "sha256": "4011e60abee5bf3a5edef94c2d64ea9bcc14e507ec21e93f6c991926fb4e261b"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00002-780a7154/resources.json",
+            "sha256": "5f7f4df27d1797cf015b4da98332505c242713afe31710fc50ea0c3b5b28f860",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00002-780a7154/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/externBoxing\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:36:24.713Z",
+            "finishedAt": "2026-09-21T17:36:30.856Z",
+            "peakMemoryBytes": 1976717312,
+            "minimumHostAvailable": 25951657984,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/moduleDoc.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00003-7e106f42/results/execution.json",
+            "sha256": "1c341ad0832107cf6fadf032c58fb39bc62b76b98b310dc3e3d56237df83fd49"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00003-7e106f42/resources.json",
+            "sha256": "d6c2589bad480c64adf63d33355365e913d9fa60cd066dff906f3a581213bea6",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00003-7e106f42/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/moduleDoc\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:36:30.904Z",
+            "finishedAt": "2026-09-21T17:36:44.999Z",
+            "peakMemoryBytes": 3813752832,
+            "minimumHostAvailable": 24304877568,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/moduleHeaderLeadingWhitespace.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00004-d9228278/results/execution.json",
+            "sha256": "d22c757f20bce94f07c14e48718fe5c3482972c179bee98228b6ec1114957525"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00004-d9228278/resources.json",
+            "sha256": "c824af323cf766c76102a7b682d7d3948a0db277aab72905a3d0b57913adea8e",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00004-d9228278/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/moduleHeaderLeadingWhitespace\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:36:45.050Z",
+            "finishedAt": "2026-09-21T17:36:58.335Z",
+            "peakMemoryBytes": 3734999040,
+            "minimumHostAvailable": 24277159936,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/privateCtor.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00005-a627eded/results/execution.json",
+            "sha256": "ee6f05f69f033f817792e47d59089c142e3643da2166bea1828c61bbd554c1cc"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00005-a627eded/resources.json",
+            "sha256": "4a42d2b459ad4ade6037e2bf26115b281a74fd22ca0db9de6ea49e5b7e4ccf97",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00005-a627eded/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/privateCtor\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:36:58.382Z",
+            "finishedAt": "2026-09-21T17:37:04.405Z",
+            "peakMemoryBytes": 1960005632,
+            "minimumHostAvailable": 26085109760,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/privateFieldCopyIssue.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00006-28bf2de8/results/execution.json",
+            "sha256": "4e47d30660cfceab14bec77af8c9352da12236d2ec08fea3b663badbf05c0a80"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00006-28bf2de8/resources.json",
+            "sha256": "c1eb804ca82eac98b895a6636a7b110af59737a452768878975d2e55584ec67e",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00006-28bf2de8/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/privateFieldCopyIssue\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:37:04.450Z",
+            "finishedAt": "2026-09-21T17:37:10.521Z",
+            "peakMemoryBytes": 2056089600,
+            "minimumHostAvailable": 26005311488,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/privateInPublic.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00007-859f215b/results/execution.json",
+            "sha256": "4cf4478846d84cf970ef9bc76cf477e5592aa1c39bfd1575ccb4dd9a267a28c7"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00007-859f215b/resources.json",
+            "sha256": "eb0678de26ab7882edfe0323eb4fc2fd567c9af08bd5e238cfda5c67e10cdf23",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00007-859f215b/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/privateInPublic\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:37:10.566Z",
+            "finishedAt": "2026-09-21T17:37:16.945Z",
+            "peakMemoryBytes": 2173050880,
+            "minimumHostAvailable": 25945403392,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00008-ad615ba5/results/execution.json",
+            "sha256": "23fca60cd64bbdf85bba353ada66a6db6c80340232c9233ab74394eb9061fd76"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00008-ad615ba5/resources.json",
+            "sha256": "39e3d205ecc445f4de322c53ff7ece4436421ed0f513be68bbf4e4119a10a8d5",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v107-realpath-native",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v107-realpath-native/00008-ad615ba5/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/tempfile\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:37:16.997Z",
+            "finishedAt": "2026-09-21T17:37:24.207Z",
+            "peakMemoryBytes": 2027573248,
+            "minimumHostAvailable": 26004344832,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    },
+    "bun": {
+      "campaign": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/campaign.json",
+        "sha256": "c470638e33e3c74c3a6851fe18c6a7fff6262160a88c8af078d082fa8c04f36f"
+      },
+      "counts": {
+        "passed": 8,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 2,
+        "engineEnvironment": {
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bun-stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "stackAdjustment": {
+          "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bun-stack-reservation.so",
+          "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+          "osThreadStackBytes": 67108864,
+          "jscStackBudgetBytes": 62914560,
+          "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+        },
+        "maximumMemoryBytes": 4294967296,
+        "pthreadPoolSize": 8,
+        "backend": "full-lean-wasm64-lowered",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "snapshot": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/snapshot.json",
+        "sha256": "f6bb34a72905cad6083ef4c654f1a29ba4ac606ec48c2d9f8da8b1b5b6767e91"
+      },
+      "wasmSha256": "69f052757ebb82887838997cfde55e3f93a211e19aa4d4fd9d3586ee96994fae",
+      "tests": [
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00001-ab470d8b/results/execution.json",
+            "sha256": "67a63e5d8817270911ab4be576642eb7dfec7ad7fd51b2cb70e2d16aa497c8c0"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00001-ab470d8b/resources.json",
+            "sha256": "33ed6d675efa508f68e4336a9169ea9adee64d327cd713e258e51498dba70672",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00001-ab470d8b/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/IO_test\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:34:13.056Z",
+            "finishedAt": "2026-09-21T17:34:19.953Z",
+            "peakMemoryBytes": 2176258048,
+            "minimumHostAvailable": 25441062912,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/externBoxing.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00002-3b71b113/results/execution.json",
+            "sha256": "3c2e412050b81c45d0ec6841e78c5d9621b4423efed0610dc9f38d4b1fc0d453"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00002-3b71b113/resources.json",
+            "sha256": "29376ee09f59911e5e9293db5e039a7cceb6aacd4fbb43e490ca94abfe93269a",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00002-3b71b113/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/externBoxing\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:34:19.994Z",
+            "finishedAt": "2026-09-21T17:34:25.874Z",
+            "peakMemoryBytes": 2288455680,
+            "minimumHostAvailable": 25627258880,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/moduleDoc.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00003-967c09ab/results/execution.json",
+            "sha256": "f99640ea495203c843e3834ef7cf763c147bcfd072b27835055560a365b4ecc2"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00003-967c09ab/resources.json",
+            "sha256": "bfcfdea8e3c0def4e6ca033378132491a2709138dc2aca493a95b1a042371139",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00003-967c09ab/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/moduleDoc\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:34:25.916Z",
+            "finishedAt": "2026-09-21T17:34:37.864Z",
+            "peakMemoryBytes": 3883773952,
+            "minimumHostAvailable": 24378298368,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/moduleHeaderLeadingWhitespace.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00004-dcb32340/results/execution.json",
+            "sha256": "af0fdfee086a89cc21b0b2166d0c6215ed1437d87d6b717a6f9a48c07c5ff780"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00004-dcb32340/resources.json",
+            "sha256": "7ca9e2294d1f0bd4066f6122a7881cabe12744dd6dc00add429b970eacaf8cec",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00004-dcb32340/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/moduleHeaderLeadingWhitespace\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:34:37.911Z",
+            "finishedAt": "2026-09-21T17:34:50.177Z",
+            "peakMemoryBytes": 3964497920,
+            "minimumHostAvailable": 24259981312,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/privateCtor.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00005-69bc84ef/results/execution.json",
+            "sha256": "d18e6888d2849580e9665669351e03b146e2907f1ca9dc4e87ce5ef388ea0884"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00005-69bc84ef/resources.json",
+            "sha256": "4c166b4e92cfecad448a2c87a131dff8f099a04b68e70bb9d9f755d409002b58",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00005-69bc84ef/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/privateCtor\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:34:50.224Z",
+            "finishedAt": "2026-09-21T17:34:56.604Z",
+            "peakMemoryBytes": 2220204032,
+            "minimumHostAvailable": 25887727616,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/privateFieldCopyIssue.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00006-1f53b5ad/results/execution.json",
+            "sha256": "a1cc640a08febf09f4f2d2622ec35bdaa666b6dddf3ca530453236a792fce2aa"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00006-1f53b5ad/resources.json",
+            "sha256": "bde4e40642d6151a653c7e3546bd5b335e9d093e116a5107f408616f6cce1317",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00006-1f53b5ad/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/privateFieldCopyIssue\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:34:56.659Z",
+            "finishedAt": "2026-09-21T17:35:02.835Z",
+            "peakMemoryBytes": 2242170880,
+            "minimumHostAvailable": 25844772864,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/privateInPublic.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00007-95c5dde7/results/execution.json",
+            "sha256": "6944e35a3c0b8511e632b428904710e686816afe0485aad124218286ce9ce852"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00007-95c5dde7/resources.json",
+            "sha256": "7448f96d85f34f5442835ff63b4c4eb80b547a783a3b5043e4b242bac3e294a2",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00007-95c5dde7/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/privateInPublic\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:35:02.880Z",
+            "finishedAt": "2026-09-21T17:35:08.629Z",
+            "peakMemoryBytes": 2252992512,
+            "minimumHostAvailable": 25773559808,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00008-31785196/results/execution.json",
+            "sha256": "8485b88bf044410a528814cdb32639aea1e85989b22ad8e80e74eeefa00116e1"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00008-31785196/resources.json",
+            "sha256": "a159a5f2fd633cac52574e5e9276d2712a4af82da3e1037e5136515a5e18c628",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-realpath-lowered/00008-31785196/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^elab/tempfile\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:35:08.674Z",
+            "finishedAt": "2026-09-21T17:35:15.601Z",
+            "peakMemoryBytes": 2287890432,
+            "minimumHostAvailable": 25528807424,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    }
+  },
+  "implementationInputs": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/src/native-files.mjs",
+      "sha256": "9c8289212f46adcadb35d6730e789637f3b9063ca5d2089e2cba2efdbaa5aedf"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/src/native-file-worker.mjs",
+      "sha256": "ebea284543fa12a3711cb622bff5c0b17495f4af96fcd016b1f512c369aecee1"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/src/node-host.mjs",
+      "sha256": "3c055cf5c3a58042b22de3b85580ebe031e8042b537f564a91f130625f7b866f"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/test/fixtures/realpath/Main.lean",
+      "sha256": "4e6abac6004494864d9282ea4acfdd692d282cfded1f38e07d9e5bea1d89145e"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/test/fixtures/realpath/setup.mjs",
+      "sha256": "6dfc5d688275f30e694e47a3d71b863cd9b0df5a96321e2d92f7cbc649ab3a50"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/test/node-realpath.test.mjs",
+      "sha256": "623a3c275ce8962c5f4552c35b0bf6cd4173592cb2abe36089683e4e51c549be"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probe-realpath.mjs",
+      "sha256": "c05b71eaee82b9d779d6504d779b29dd8934812704c527db8a30b9591112562c"
+    }
+  ]
+}

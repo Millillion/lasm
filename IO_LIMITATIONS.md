@@ -60,6 +60,13 @@ load, and suite conformance still need validation. See
   [the stream-state comparisons](docs/evidence/getline-state-2026-09-21.json).
 - [ ] Refine exact error mappings and platform-specific errno behavior beyond
   tested missing-file, exclusive-create, invalid-path, and UTF-8 cases.
+  POSIX `IO.FS.realPath` now calls libc asynchronously and lets Lean decode the
+  returned filename bytes. This fixes Bun's symlink/parent traversal and empty
+  path behavior, plus malformed-UTF-8 differences in all three engines. Seventeen
+  ordinary Lean cases match native Linux in full and packaged runtimes; 24
+  unchanged upstream filesystem/module tests and 12 packaged checks pass. Native
+  macOS/Windows validation and broader path coverage remain open; see
+  [the realPath evidence](docs/evidence/realpath-2026-09-21.json).
   POSIX `IO.Process.setCurrentDir` now uses native errno/message values and
   validates search permission for the packaged instance cwd. Seven ordinary
   Lean cases match native Linux in Node, Deno, and Bun, in both packaged and

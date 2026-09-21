@@ -890,6 +890,28 @@ separate filesystem repair and the original Bun server deadline remain pending.
 The record also retains the initial table64 transform preparation failure; see
 [the startup optimization evidence](evidence/table-growth-2026-09-21.json).
 
+The subsequent filesystem repair replaces POSIX engine `realpath` calls with
+asynchronous libc calls and copies the returned bytes before freeing their
+storage. Bun had resolved parent segments before symlinks, accepted empty paths,
+and ignored missing or non-directory components removed by normalization.
+Malformed filename bytes also differed in every engine: Node and Bun produced
+two replacement characters where native Lean produced one, while Deno rejected
+the filename. The bridge now lets Lean perform its own byte conversion.
+
+The identical 17-case ordinary Lean fixture now matches native Linux in the
+full and packaged Node, Deno, and Bun runtimes. **Twelve packaged checks** pass,
+including existing directory-error and renamed/deleted-directory controls.
+The final v107 Node/Deno and v108 Bun snapshots also pass **24/24 unchanged
+upstream registrations**, including `externBoxing`, filesystem, module-header,
+and private-name controls. All 7,267 original files remain unchanged before and
+after every test; applicable compiled-driver artifacts also pass their integrity
+checks. Peak memory was **3.70 GiB**, with zero OOM, throttling, cap-hit, or swap
+events. The record retains a supplementary-fixture compilation error, the first
+adapter's rejected buffer-ownership bug, and a log-name preparation collision.
+See [the full realPath comparisons](evidence/realpath-2026-09-21.json).
+Native macOS/Windows validation, long paths, races, and complete suite coverage
+remain open.
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
