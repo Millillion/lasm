@@ -166,12 +166,16 @@ load, and suite conformance still need validation. See
   and the full compiler propagate cwd changes. Packaged applications still report
   their containing executable as `IO.appPath`; the full compiler supplies the
   selected Lean/tool entry point. Complete native process-context comparisons.
-- [ ] Route the full compiler's Windows/macOS platform queries to the host before
-  claiming portable `System.FilePath` behavior. Source inspection shows that its
-  `lean_system_platform_windows` and `lean_system_platform_osx` implementations
-  still use compile-time C macros. The packaged application builder already
-  redirects these two queries to the host. Linux full-suite passes do not
-  validate this missing full-compiler adaptation or native Windows/macOS behavior.
+- [ ] Validate ordinary platform queries and `System.FilePath` on native Windows,
+  macOS, and ARM64 hosts. The full compiler now routes its Windows/macOS queries
+  to the JavaScript host, matching the packaged application builder. Nine
+  controlled host-value comparisons pass across Node, Deno, and patched Bun;
+  the original implementation failed the six simulated Windows/macOS cases.
+  Rebuilt full compilers also report the correct Linux host and `wasm64` target
+  in Node, Deno, and released Bun with the existing Linux stack adjustment.
+  Six unchanged upstream regressions pass in each engine. These local checks do not establish
+  native Windows/macOS filesystem conformance; see
+  [the platform evidence](docs/evidence/host-platform-2026-09-21.json).
 - [ ] Windows named time zones other than UTC return an explicit unsupported
   error. Date/time behavior beyond tested UTC HTTP dates needs broader OS coverage.
 - [ ] Native FFI dependencies still need Wasm implementations or internal host

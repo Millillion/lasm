@@ -1,6 +1,10 @@
 // Emscripten JavaScript library. A Lean pthread waits while the JavaScript main
 // thread continues serving asynchronous filesystem, process, and network calls.
 addToLibrary({
+  lasm_host_platform__sig: 'i',
+  lasm_host_platform: function () {
+    return process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0;
+  },
   lasm_collect_loaded_libraries__deps: ['$LDSO', '$dynCall', '$stringToNewUTF8', 'free'],
   lasm_collect_loaded_libraries__sig: 'vpp',
   lasm_collect_loaded_libraries: function (context, callback) {

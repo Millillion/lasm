@@ -1,0 +1,35 @@
+--- a/src/runtime/platform.cpp
++++ b/src/runtime/platform.cpp
+@@ -9,6 +9,10 @@
+ #include "githash.h"
+ 
+ namespace lean {
++#ifdef __EMSCRIPTEN__
++extern "C" unsigned lasm_host_platform();
++#endif
++
+ extern "C" LEAN_EXPORT obj_res lean_system_platform_nbits(obj_arg) {
+     if (sizeof(void*) == 8) {
+         return box(64);
+@@ -18,7 +22,9 @@
+ }
+ 
+ extern "C" LEAN_EXPORT uint8 lean_system_platform_windows(obj_arg) {
+-#if defined(LEAN_WINDOWS)
++#if defined(__EMSCRIPTEN__)
++    return lasm_host_platform() == 1;
++#elif defined(LEAN_WINDOWS)
+     return 1;
+ #else
+     return 0;
+@@ -26,7 +32,9 @@
+ }
+ 
+ extern "C" LEAN_EXPORT uint8 lean_system_platform_osx(obj_arg) {
+-#if defined(__APPLE__)
++#if defined(__EMSCRIPTEN__)
++    return lasm_host_platform() == 2;
++#elif defined(__APPLE__)
+     return 1;
+ #else
+     return 0;

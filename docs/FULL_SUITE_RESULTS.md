@@ -1114,3 +1114,34 @@ still requires implementation work and validation. Neither limit is being called
 fundamental. The patched engine remains opt-in; stock Bun, package defaults,
 cross-platform conformance, and full-suite completion remain separate gates. See
 [the release build, all five outcomes, and capacity evidence](evidence/bun-memory64-release-2026-09-21.json).
+
+## Host platform and compilation target, September 21
+
+The full runtime now answers `System.Platform.isWindows` and `isOSX` using
+the JavaScript host. Its previous compile-time branches always answered false
+under Emscripten, giving incorrect Windows path behavior. A separate ordinary
+Lean fixture exercises those queries, path joining, absolute paths, and parents.
+With controlled Linux, Windows, and macOS host values, the original runtime
+matches only three of nine cases; the repaired runtime matches all nine across
+Node, Deno, and the locally patched Bun release. These controlled values do not
+establish native Windows/macOS filesystem conformance.
+
+The build also now explicitly supplies the correct `wasm64-unknown-emscripten`
+compilation target for both memory64 modes. CMake's earlier target query omitted
+the memory setting and incorrectly recorded `wasm32`. The rebuilt full compilers
+report the correct Linux host, 64-bit width, and Wasm64 target in all three
+engines. Six unchanged upstream registrations pass per engine, **18/18 total**:
+`IO_test`, `currentDir`, `externBoxing`, `filePath`, `readDir`, and `realPath`.
+All 7,267 original hashes remain intact before and after every test. The largest
+test peak is 2.12 GiB, with no resource abort or memory event. These Bun checks
+use its released binary with lowered memory64 and the existing explicit Linux
+stack adjustment; they do not use the locally patched engine.
+
+The compiler rebuild completed, but accumulated file cache caused the following
+native-memory64 link to stop proactively at 8.04 GiB. A separate retry of that
+link succeeded at 3.04 GiB under the same limits. Both attempts recorded zero
+OOM, hard-limit, throttling, and swap events. An earlier probe-harness failure
+also exposed a mixed C-source/object linker-driver defect; that failure is
+retained separately and its repair is separate work. Native Windows/macOS,
+ARM64, and the complete JavaScript suites remain open. See
+[the platform comparisons, unchanged tests, and resource records](evidence/host-platform-2026-09-21.json).

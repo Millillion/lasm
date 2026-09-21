@@ -779,3 +779,21 @@ Patched Bun reports 4 GiB for an 8 GiB declaration; Deno reports 8 GiB. The pinn
 Node lacks this query, which is recorded explicitly. This is an engine diagnosis,
 not an upstream test or a fundamental-limit claim. The release build and all five
 Lean outcomes are preserved in [the release evidence](../../docs/evidence/bun-memory64-release-2026-09-21.json).
+
+## Host platform comparisons
+
+`build.mjs` applies `patches/lean-4.32.0-host-platform.patch` so the ordinary
+Windows/macOS platform queries use the private JavaScript host import. It also
+sets the compilation-target string explicitly: native and lowered memory64 both
+use the Wasm64 ABI. This changes no public Lean API.
+
+`probe-host-platform.mjs NEW_OUTPUT PREFIX...` compares the original and patched
+platform object using the same frozen runtime archives. Supply native-memory64
+prefixes sharing one frozen compiler and run under `run-bounded.mjs` with
+`base-pages.py`. The supplementary ordinary Lean fixture runs against native
+Lean and controlled Linux/Windows/macOS host values in each selected engine.
+The production mapping body is retained; only its host input is controlled.
+Nine repaired comparisons pass, while the original fails all six non-Linux
+cases. Actual rebuilt compiler checks and six unchanged upstream registrations
+per engine also pass on Linux x64. These are separate from native cross-OS
+validation; see [the retained evidence](../../docs/evidence/host-platform-2026-09-21.json).

@@ -58,8 +58,10 @@ const threadRuntimePatch = readFileSync(join(root, 'scripts/full-lean/patches/le
 const sdkMimallocPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-sdk-mimalloc.patch'));
 const cInputsPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-c-inputs.patch'));
 const regionAllocationPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-region-allocation.patch'));
+const hostPlatformPatch = readFileSync(join(root, 'scripts/full-lean/patches/lean-4.32.0-host-platform.patch'));
 for (const [name, input] of [['compact alignment', alignmentPatch], ['thread runtime', threadRuntimePatch],
-  ['SDK mimalloc', sdkMimallocPatch], ['generated C dependencies', cInputsPatch], ['region allocation', regionAllocationPatch]]) {
+  ['SDK mimalloc', sdkMimallocPatch], ['generated C dependencies', cInputsPatch], ['region allocation', regionAllocationPatch],
+  ['host platform', hostPlatformPatch]]) {
   const checkExtra = reverse => spawnSync('patch', ['--force', '--dry-run', reverse ? '--reverse' : '--forward', '-p1'],
     { cwd: source, input });
   if (checkExtra(true).status !== 0) {
@@ -75,6 +77,7 @@ writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ leanCommit
   systemAllocator, leanAllocator, sdkMimallocPatchSha256: digest(sdkMimallocPatch),
   cInputsPatchSha256: digest(cInputsPatch),
   regionAllocationPatchSha256: digest(regionAllocationPatch),
+  hostPlatformPatchSha256: digest(hostPlatformPatch),
   memoryMode, maximumMemoryBytes: maximumMemoryGb * 1024 ** 3, pthreadPoolSize,
   bootstrapOptions: '-j2 -s8192', bootstrapEnvironment: { LEAN_STACK_SIZE_KB: '8192' }, generatedAt: new Date().toISOString(),
 }, null, 2) + '\n');
@@ -114,6 +117,9 @@ if (stage === 'wasm' || stage === 'wasm64') {
   // CMake otherwise retains the old compiler paths even after its toolchain
   // file changes. Clear only generated CMake configuration on an SDK switch.
   run(join(sdk, 'upstream/emscripten/emcmake'), ['cmake', ...(changedSdk ? ['--fresh'] : []), '-S', join(source, 'src'), '-B', wasm, ...common,
+    // CMake's bare --print-target-triple probe omits the memory64 setting.
+    // Both native and lowered memory64 compile Lean with the wasm64 ABI.
+    `-DLEAN_PLATFORM_TARGET=${is64 ? 'wasm64' : 'wasm32'}-unknown-emscripten`,
     '-DSTAGE=1', `-DPREV_STAGE=${previous}`, '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
     `-DUSE_MIMALLOC=${leanAllocator === 'mimalloc' ? 'ON' : 'OFF'}`,
     `-DLASM_SDK_MIMALLOC=${leanAllocator === 'mimalloc' ? 'ON' : 'OFF'}`,
