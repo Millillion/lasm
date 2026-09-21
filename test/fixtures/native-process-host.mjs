@@ -10,6 +10,7 @@ import { spawnInheritedProcess } from '../../src/native-process.mjs';
 const native = nativeFiles(), root = mkdtempSync(join(tmpdir(), 'lasm-native-process-'));
 const helper = fileURLToPath(new URL('../../src/process-exec.mjs', import.meta.url));
 const prefix = process.versions.deno ? ['run', '--no-config', '-A'] : [];
+const nativeLauncher = process.argv[2] === 'native';
 async function capture(configuration, directoryFd) {
   const stdout = native.pipe(), stderr = native.pipe();
   let child;
@@ -18,7 +19,7 @@ async function capture(configuration, directoryFd) {
       ['ignore', stdout[1], stderr[1], directoryFd], {
         stdioFlags: [0, native.descriptorFlags(stdout[1]), native.descriptorFlags(stderr[1])],
         directoryFd, inheritProcessCwd: false, args: [], env: {}, ...configuration,
-      });
+      }, nativeLauncher);
   } catch (error) {
     native.closeDescriptor(stdout[0]); native.closeDescriptor(stderr[0]); throw error;
   } finally { native.closeDescriptor(stdout[1]); native.closeDescriptor(stderr[1]); }

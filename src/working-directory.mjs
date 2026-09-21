@@ -33,10 +33,7 @@ export function createWorkingDirectory(cwd, propagate) {
       if (directory.fd !== undefined) {
         const saved = statSync(location(directory), { bigint: true });
         const actual = statSync('/proc/self/cwd', { bigint: true });
-        // The Deno CLI cannot bootstrap from an unlinked cwd. Its existing
-        // descriptor-entry path still handles removed, searchable directories.
-        inheritProcessCwd = saved.dev === actual.dev && saved.ino === actual.ino
-          && (!process.versions.deno || saved.nlink !== 0n);
+        inheritProcessCwd = saved.dev === actual.dev && saved.ino === actual.ino;
       }
       return { directory: directory.path, directoryFd: directory.fd, inheritProcessCwd };
     },

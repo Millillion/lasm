@@ -4,6 +4,7 @@ import { resolve, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { ensureResourceGuard } from './resource-guard.mjs';
 import { root } from '../../src/toolchain.mjs';
+import { copyProcessLauncherBundle } from '../../src/native-bundle.mjs';
 
 await ensureResourceGuard();
 const [sourceArg, outputArg] = process.argv.slice(2);
@@ -22,8 +23,8 @@ for (const [name, expected] of Object.entries(metadata.files))
 for (const name of ['host-pre.js', 'host-library.js'])
   if (await hash(join(source, 'runtime-support', name)) !== await hash(join(root, 'scripts/full-lean', name)))
     throw new Error(`Host integration changed: ${name}; rebuild or derive it explicitly`);
-const hostFiles = ['node-host.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'native-process.mjs', 'process-exec.mjs',
-  'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs',
+const hostFiles = ['node-host.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs',
+  'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-files.mjs',
   'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-worker-cwd.cjs', 'native-dns.mjs', 'native-interfaces.mjs'];
 mkdirSync(output); mkdirSync(join(output, 'host'));
 for (const name of readdirSync(source)) {
@@ -31,10 +32,15 @@ for (const name of readdirSync(source)) {
   symlinkSync(join(source, name), join(output, name));
 }
 for (const name of readdirSync(join(source, 'host')))
-  if (!hostFiles.includes(name)) symlinkSync(join(source, 'host', name), join(output, 'host', name));
+  if (name !== 'native' && !hostFiles.includes(name)) symlinkSync(join(source, 'host', name), join(output, 'host', name));
 const changed = [];
 for (const name of hostFiles) {
   copyFileSync(join(root, 'src', name), join(output, 'host', name));
+  const relative = 'host/' + name, digest = await hash(join(output, relative));
+  if (metadata.files[relative] !== digest) changed.push(relative);
+  metadata.files[relative] = digest;
+}
+for (const name of copyProcessLauncherBundle(root, join(output, 'host'))) {
   const relative = 'host/' + name, digest = await hash(join(output, relative));
   if (metadata.files[relative] !== digest) changed.push(relative);
   metadata.files[relative] = digest;

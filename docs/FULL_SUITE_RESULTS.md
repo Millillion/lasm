@@ -772,6 +772,34 @@ All 7,267 original hashes remained intact before and after every registration.
 The largest process-tree peak was 3.76 GiB, without OOM, throttling, cap hits,
 or swap. See [the upstream cwd regression evidence](evidence/cwd-permissions-upstream-2026-09-21.json).
 
+The remaining deleted-and-revoked Deno cwd failure is now repaired. A small
+bundled native Linux launcher avoids Deno CLI bootstrap and preserves the real
+child PID, environment, pipes, exec errors, and inherited directory. A new
+ordinary-Lean fixture also exposed fresh pthread bootstrap failures after cwd
+deletion in Node and Deno. Node preloads its private worker cwd fallback. Deno
+uses a private factory with its own Linux filesystem context when a new worker
+cannot start from the removed application directory; the application's directory
+is never changed for this operation.
+
+Both named- and deleted-directory fixtures now match native Lean in all three
+full compilers. A clean serial run passes **48/48 packaged and host tests**, and
+five worker transport/lifecycle checks also pass. The tests preserve shared
+memory, transferred ports, nested exceptions, and each engine's native worker
+diagnostics. Initial fixture errors, proxy error-field loss, and three
+source-launcher timeouts caused by concurrent maintainer edits are retained;
+the clean rerun kept sources fixed and used the same deadlines. No upstream test
+or expected output changed. Validation peaked at 2.19 GiB including suite
+preparation, with zero OOM, cap, throttling, or swap events. See
+[the native-launcher and worker evidence](evidence/native-launcher-cwd-2026-09-21.json).
+
+Linux x64 launcher behavior is executed locally, including startup/protocol checks
+of the static musl executable. ARM64 variants are cross-compiled only; complete
+musl-host and non-Linux conformance remain unverified. The Deno worker fallback
+also needs `unshare(CLONE_FS)` and remains unavailable where a sandbox denies it.
+Independent virtual-cwd permission inheritance and the complete upstream suites
+remain open. The repaired frozen Node/Deno build is v86 and Bun is v88; neither
+result is imported into the older v78 broad campaign.
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

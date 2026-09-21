@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { root, leanCommit } from '../../src/toolchain.mjs';
 import { indexFunctionTable } from './function-table-index.mjs';
 import { preserveWebWorker } from './preserve-web-worker.mjs';
+import { copyProcessLauncherBundle } from '../../src/native-bundle.mjs';
 
 import { ensureResourceGuard } from './resource-guard.mjs';
 
@@ -36,9 +37,10 @@ writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ ...provena
 }, null, 2) + '\n');
 files.push('build-provenance.json', 'sdk/.emscripten', 'sdk/upstream/emscripten/tools/link.py',
   'sdk/upstream/emscripten/src/lib/libdylink.js', 'sdk/upstream/emscripten/src/lib/libpthread.js');
-for (const name of ['node-host.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'native-process.mjs', 'process-exec.mjs', 'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-worker-cwd.cjs', 'native-dns.mjs', 'native-interfaces.mjs']) {
+for (const name of ['node-host.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs', 'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-files.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-worker-cwd.cjs', 'native-dns.mjs', 'native-interfaces.mjs']) {
   copyFileSync(join(root, 'src', name), join(output, 'host', name)); files.push('host/' + name);
 }
+for (const name of copyProcessLauncherBundle(root, join(output, 'host'))) files.push('host/' + name);
 for (const name of ['run-compiler.mjs', 'cc-driver.mjs', 'response-args.mjs', 'preserve-web-worker.mjs', 'emscripten-pre.js', 'host-pre.js', 'host-library.js']) {
   copyFileSync(join(root, 'scripts/full-lean', name), join(output, 'runtime-support', name)); files.push('runtime-support/' + name);
 }

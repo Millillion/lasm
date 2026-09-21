@@ -32,7 +32,8 @@ function fingerprint(directory, source, project) {
       ? resolve(project, pkg.dir) : resolve(project, manifest.packagesDir ?? '.lake/packages', pkg.name));
   }
   for (const name of ['src', 'runtime', 'bin']) walk(join(root, name), true);
-  for (const name of ['package.json', 'scripts/build-runtime.mjs', `targets/${targetName}/target.json`]) {
+  for (const name of ['package.json', 'scripts/build-runtime.mjs', 'scripts/build-process-launcher.mjs',
+    'native/process-launcher.c', '.cache/native-host/process/manifest.json', `targets/${targetName}/target.json`]) {
     if (existsSync(join(root, name))) file(join(root, name));
   }
   hash.update(process.env.LEAN ?? '').update(process.env.LASM_TARGET_DIR ?? '').update(process.env.WASM_OPT ?? '');
@@ -86,7 +87,9 @@ try {
 `);
   // Stamp the inputs observed before compilation. If a source or runtime file
   // changes during the build, the next invocation must invalidate this output.
-  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'native-process.mjs', 'process-exec.mjs', 'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-worker-cwd.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native/manifest.json', 'wasi.mjs', 'manifest.json'];
+  const files = ['main.mjs', 'module.wasm', 'index.mjs', 'runtime.mjs', 'scheduler.mjs', 'node-host.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs', 'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs', 'native-worker-cwd.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native/manifest.json', 'native/process/manifest.json', 'wasi.mjs', 'manifest.json'];
+  const launchers = JSON.parse(readFileSync(join(output, 'native/process/manifest.json')));
+  for (const name of Object.keys(launchers.files)) files.push('native/process/' + name);
   writeFileSync(stampFile, JSON.stringify({ signature, files }) + '\n');
   return { ...result, cacheHit: false, signature };
 }

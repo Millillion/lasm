@@ -8,12 +8,15 @@ import { ensureResourceGuard } from './resource-guard.mjs';
 
 await ensureResourceGuard();
 if (process.platform !== 'linux') throw new Error('This comparison requires a Linux host');
-const [outputArg, ...facades] = process.argv.slice(2);
+const argv = process.argv.slice(2);
+const removed = argv[0] === '--removed';
+if (removed) argv.shift();
+const [outputArg, ...facades] = argv;
 if (!outputArg || !facades.length) throw new Error('Supply NEW_OUTPUT and one or more full-toolchain directories');
 const output = resolve(outputArg);
 if (existsSync(output)) throw new Error('Use a fresh output');
 mkdirSync(output, { recursive: true });
-const source = join(root, 'test/fixtures/cwd-permissions/Main.lean');
+const source = join(root, `test/fixtures/${removed ? 'cwd-removed-permissions' : 'cwd-permissions'}/Main.lean`);
 const bytes = readFileSync(source), executedSource = join(output, 'fixture.lean');
 writeFileSync(executedSource, bytes);
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -32,7 +35,7 @@ function run(name, executable, config) {
     stdout: result.stdout, stderr: result.stderr,
     passed: result.status === 0 && result.stderr === '' && (evidence.results.length
       ? result.stdout === evidence.results[0].stdout
-      : result.stdout.endsWith('cwd permission comparison completed\n')) };
+      : result.stdout.endsWith(`${removed ? 'removed ' : ''}cwd permission comparison completed\n`)) };
   evidence.results.push(record); save();
   console.log(`${name}: ${record.passed ? 'passed' : 'failed'} (${record.seconds.toFixed(2)} s)`);
   return record;

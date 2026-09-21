@@ -57,10 +57,10 @@ export function createNodeProcesses({ add, get, release, cwd }) {
       const stdioFlags = posix ? stdio.map((fd, index) => fd === 'ignore' ? 0
         : native.descriptorFlags(typeof fd === 'number' ? fd : index)) : undefined;
       const helper = fileURLToPath(new URL('./process-exec.mjs', import.meta.url));
-      const inheritedNative = posix && options.inheritProcessCwd && !!process.versions.deno;
+      const inheritedNative = process.platform === 'linux' && !!process.versions.deno;
       const child = inheritedNative
-        ? spawnInheritedProcess(process.execPath, ['run', '--no-config', '-A', helper],
-          [...stdio, options.directoryFd], { ...options, stdioFlags })
+        ? spawnInheritedProcess(undefined, [],
+          [...stdio, ...(options.directoryFd === undefined ? [] : [options.directoryFd])], { ...options, stdioFlags }, true)
         : posix
         ? spawn(process.execPath, [...(process.versions.deno ? ['run', '--no-config', '-A'] : []), helper],
           { cwd: options.inheritProcessCwd ? undefined : '/', env: {},

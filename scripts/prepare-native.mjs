@@ -35,3 +35,4 @@ for (const name of names) {
   console.log(`Prepared ${name} ${entry.version}`);
 }
 writeFileSync(join(output, 'manifest.json'), JSON.stringify({ nodeApi: 8, packages: records }, null, 2) + '\n');
+await import('./build-process-launcher.mjs');

@@ -13,10 +13,7 @@ test('Linux process cwd inheritance survives loss of directory search permission
       ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
     ]) {
       if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
-      for (const mode of ['named', 'removed']) await t.test(`${name}: ${mode}`, {
-        todo: name === 'deno' && mode === 'removed'
-          ? 'Deno CLI bootstrap needs a named cwd; removed plus revoked cwd inheritance remains unresolved' : false,
-      }, () => {
+      for (const mode of ['named', 'removed']) await t.test(`${name}: ${mode}`, () => {
         const result = spawnSync(executable, [...prefix, join(root, 'test/fixtures/cwd-permissions-host.mjs'), mode], {
           encoding: 'utf8', timeout: 15_000, killSignal: 'SIGKILL',
         });

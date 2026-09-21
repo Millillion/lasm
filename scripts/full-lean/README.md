@@ -490,8 +490,32 @@ close-on-exec acknowledgement keeps a dropped child's bootstrap alive until the
 requested executable starts or the launcher fails. It does not wait for that
 executable to finish. Native spawn controls cover low-numbered descriptors, large
 configuration payloads, concurrent engine/native child reapers, and signal exit
-status. Deno's deleted-and-revoked cwd case remains an executing TODO; independent
-instance cwd permission inheritance and non-Linux behavior remain open.
+status. Deno's Linux child now starts through `native/process-launcher.c`, a small
+bundled executable that does not query cwd during bootstrap. The maintainer-only
+`scripts/build-process-launcher.mjs` builds glibc and static-musl variants for x64
+and ARM64 with pinned Zig under the resource guard and a two-CPU affinity. End
+users do not compile this helper. Source, binary hashes, and third-party notices
+are included in the native bundle. Cross-compilation does not establish ARM64 or
+complete musl-host conformance.
+
+`probe-cwd-permissions.mjs --removed NEW_OUTPUT TOOLCHAIN...` adds a separate
+ordinary-Lean comparison for deleting a cwd after revoking search permission.
+It covers inherited/explicit child cwd, failed execution, PATH search, and a
+100,000-byte environment. `test/node-cwd-removed-permissions.test.mjs` checks the
+same source through generated mains and source launchers. It is a supplementary
+fixture, not an edited upstream test.
+
+That comparison also exposed fresh pthread bootstrap failures after cwd deletion.
+Node now preloads the existing worker-local JS cwd fallback. Deno starts one
+unreferenced private factory while the directory is valid; Linux `unshare(CLONE_FS)`
+gives only that factory its own directory context, rooted at `/`. When the real
+application cwd is removed, the factory starts new workers with the same stack
+limits and relays their messages, transferred ports, and shared memory. Ordinary
+workers retain their direct path. The application cwd is never temporarily
+changed. Error and shutdown comparisons include each engine's unwrapped worker
+control. Sandboxes denying `unshare(CLONE_FS)`, independent instance cwd permission
+inheritance, and non-Linux behavior remain open. `derive-worker-cwd.mjs` freezes
+this private prelude change without rebuilding or modifying Wasm or Lean inputs.
 
 Lean's C++ shell does not read the generated application main's thread/stack
 environment defaults. The facade supplies its ordinary `-j` and `-s` options

@@ -2,6 +2,7 @@ import { createRequire } from 'node:module';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { nativeFiles } from './native-files.mjs';
+import { encodeProcessConfiguration, nativeProcessLauncher } from './process-launcher.mjs';
 
 const require = createRequire(import.meta.url);
 let implementation;
@@ -10,7 +11,7 @@ let implementation;
 // Linux posix_spawn can inherit it without a new search-permission check.
 // Only libc executes between its internal fork/vfork and exec: no JavaScript
 // or FFI callback runs in the child of a multithreaded engine.
-export function spawnInheritedProcess(command, args, descriptors, configuration) {
+export function spawnInheritedProcess(command, args, descriptors, configuration, nativeLauncher = false) {
   if (process.platform !== 'linux') throw new Error('Native cwd inheritance is Linux-only');
   if (!implementation) {
     const bundled = new URL('./native/node_modules/koffi/index.cjs', import.meta.url);
@@ -18,7 +19,7 @@ export function spawnInheritedProcess(command, args, descriptors, configuration)
     const libc = ffi.load(null);
     // Linux glibc and musl use this ABI on the supported x64/arm64 hosts.
     const actions = ffi.struct({ allocated: 'int', used: 'int', entries: 'void *', reserved: 'int[16]' });
-    implementation = { ffi, size: ffi.sizeof(actions),
+    implementation = { ffi, libc, size: ffi.sizeof(actions),
       initialize: libc.func('int posix_spawn_file_actions_init(void *actions)'),
       destroy: libc.func('int posix_spawn_file_actions_destroy(void *actions)'),
       duplicate: libc.func('int posix_spawn_file_actions_adddup2(void *actions, int fd, int target)'),
@@ -33,6 +34,9 @@ export function spawnInheritedProcess(command, args, descriptors, configuration)
     };
   }
   const api = implementation, native = nativeFiles(), actions = Buffer.alloc(api.size);
+  if (nativeLauncher) { command = nativeProcessLauncher(api.libc); args = []; }
+  const bytes = nativeLauncher ? encodeProcessConfiguration(configuration)
+    : Buffer.from(JSON.stringify({ ...configuration, awaitExec: true }));
   const checked = code => { if (code) throw native.error(code); };
   checked(api.initialize(actions));
   const owned = [];
@@ -68,7 +72,6 @@ export function spawnInheritedProcess(command, args, descriptors, configuration)
     for (const fd of owned) native.closeDescriptor(fd);
     if (input !== undefined) native.closeDescriptor(input);
   }
-  const bytes = Buffer.from(JSON.stringify({ ...configuration, awaitExec: true }));
   // A large environment must not block the event loop while the private
   // helper starts. Its reader needs no operation on this FFI worker pool.
   void (async () => {

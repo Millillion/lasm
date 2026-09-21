@@ -73,11 +73,19 @@ load, and suite conformance still need validation. See
   context. The full compilers now match native Linux for a named cwd whose
   search permission is revoked, including the different behavior of inherited,
   explicit relative, and absolute child directories. Node and Bun also pass a
-  deleted-and-revoked host control. That combined case still fails in Deno and
-  remains an executing TODO regression. Embedded instance directories that differ
-  from the host process cwd also need a complete inheritance design. These are
-  implementation gaps, not established fundamental limitations. See
-  [the permission and lifecycle comparisons](docs/evidence/cwd-permissions-2026-09-21.json).
+  deleted-and-revoked host control. A bundled native Linux launcher now also
+  fixes that combined Deno case. Supplementary ordinary Lean programs match
+  native Linux in all three full compilers for both named and deleted directories
+  with revoked search permission. Fresh full-compiler workers also start after
+  directory removal: Node preloads its private cwd fallback; Deno uses a private
+  factory with a separate filesystem context. The Deno factory requires Linux
+  `unshare(CLONE_FS)`; if a sandbox denies it, ordinary workers still work but
+  this removed-cwd fallback remains unavailable. Embedded instance directories
+  that differ from the host process cwd also need a complete inheritance design.
+  These are implementation gaps, not established fundamental limitations. The
+  [earlier permission comparisons](docs/evidence/cwd-permissions-2026-09-21.json)
+  retain the original Deno failure; later results are recorded in the
+  [native launcher and worker evidence](docs/evidence/native-launcher-cwd-2026-09-21.json).
 - [ ] Account for the pinned native Lean defect where
   `IO.Process.getCurrentDir` crashes after cwd deletion: its ENOENT decoder
   dereferences a null filename. Lasm returns a structured error safely; the
@@ -196,7 +204,9 @@ load, and suite conformance still need validation. See
   Asyncify stacks. Stack queries track the active fiber, but unchecked C recursion
   is not comprehensively protected or tested for every exhaustion path.
   Upstream `elab/12676.lean` exhausts memory and `compile_bench/const_fold.lean`
-  exceeds the runtime stack. Raising the heap limit did not fix the former.
+  exceeds the packaged runtime stack. Raising its heap limit did not fix the
+  former. The separate full Node compiler now passes `elab/12676.lean` at a
+  measured 2.24 GiB workload peak; that repair still needs packaged integration.
 - [ ] `USize` and `ISize` are 32-bit in Wasm32, unlike native 64-bit Lean builds.
   Width-sensitive application results therefore differ. The full lowered-memory64
   target preserves 64-bit widths but currently has a 4 GiB address-space ceiling;

@@ -12,33 +12,68 @@ if (globalThis.process?.versions?.bun && ENVIRONMENT_IS_PTHREAD) {
 // Deno also supports this worker option. Bun does not; do not pretend otherwise.
 if (ENVIRONMENT_IS_NODE) {
   var LasmHostWorker = globalThis.Worker;
+  var lasmWorkerHost = process.env.LASM_FULL_HOST_MODULE;
+  var LasmCwdWorker, lasmCwdWorkerError;
+  if (process.versions.deno && process.platform === 'linux' && !ENVIRONMENT_IS_PTHREAD && lasmWorkerHost) {
+    try {
+      LasmCwdWorker = require(require('node:url').fileURLToPath(new URL('./native-pthread-factory.cjs', lasmWorkerHost)))
+        .createCwdWorkerFactory();
+    } catch (error) {
+      // Some Linux sandboxes deny unshare(CLONE_FS). Ordinary worker creation
+      // remains available; report the missing capability only if needed.
+      lasmCwdWorkerError = error;
+    }
+  }
   var lasmVmStackMb = Number(process.env.LASM_VM_STACK_MB ?? 64);
   if (!Number.isFinite(lasmVmStackMb) || lasmVmStackMb <= 0) throw new Error('Invalid LASM_VM_STACK_MB');
   var lasmStackOverflow = function() {
     require('node:fs').writeSync(2, '\nStack overflow detected. Aborting.\n');
     process.exit(134);
   };
+  var lasmCheckWorkerFailure = function(event, args) {
+    // Emscripten reports caught pthread exceptions as CMD_ONERROR (8).
+    var failure = event === 'message' && args[0]?.cmd === 8 ? args[0].error
+      : event === 'error' ? args[0] : undefined;
+    if (failure?.name === 'RangeError'
+        && /call stack|stack overflow/i.test(failure.message)
+        && (/wasm-function|wasm:\/\//.test(failure.stack ?? '')
+          || (process.versions.bun && event === 'message' && args[0]?.cmd === 8))) lasmStackOverflow();
+  };
   globalThis.Worker = class extends LasmHostWorker {
     constructor(filename, options = {}) {
       if (process.versions.bun && process.env.LASM_BUN_SMOL === "1") options = { ...options, smol: true };
-      super(filename, process.versions.bun ? options : {
-        ...options, resourceLimits: { ...options.resourceLimits, stackSizeMb: lasmVmStackMb },
-      });
+      if (!process.versions.bun) options = {
+        ...options, resourceLimits: { ...options.resourceLimits, stackSizeMb: lasmVmStackMb } };
+      if (!process.versions.bun && !process.versions.deno && lasmWorkerHost) {
+        options = { ...options, execArgv: [...(options.execArgv ?? process.execArgv), '--require',
+          require('node:url').fileURLToPath(new URL('./native-worker-cwd.cjs', lasmWorkerHost))] };
+      }
+      if (LasmCwdWorker || lasmCwdWorkerError) {
+        var removed = false;
+        try { Deno.cwd(); } catch (error) {
+          if (error.name !== 'NotFound' && error.code !== 'ENOENT') throw error;
+          removed = true;
+        }
+        if (removed) {
+          if (lasmCwdWorkerError) throw lasmCwdWorkerError;
+          var worker = new LasmCwdWorker(filename, options), originalEmit = worker.emit;
+          worker.emit = function(event, ...args) {
+            lasmCheckWorkerFailure(event, args); return originalEmit.call(this, event, ...args);
+          };
+          return worker;
+        }
+      }
+      super(filename, options);
     }
     emit(event, ...args) {
       // Emscripten reports a caught worker exception as CMD_ONERROR (8),
       // whereas the engine reports an uncaught worker exception as 'error'.
-      var failure = event === 'message' && args[0]?.cmd === 8 ? args[0].error
-        : event === 'error' ? args[0] : undefined;
       // Native Lean's guard aborts with this diagnostic on an exhausted stack.
       // Preserve that behavior for uncaught engine stack exhaustion in Wasm,
       // while leaving unrelated JavaScript errors and Lean exceptions intact.
       // Bun 1.4.2 renders Wasm frames as `unknown`; structured cloning then
       // loses that stack. CMD_UNCAUGHT_EXN still identifies its pthread failure.
-      if (failure?.name === 'RangeError'
-          && /call stack|stack overflow/i.test(failure.message)
-          && (/wasm-function|wasm:\/\//.test(failure.stack ?? '')
-            || (process.versions.bun && event === 'message' && args[0]?.cmd === 8))) lasmStackOverflow();
+      lasmCheckWorkerFailure(event, args);
       return super.emit(event, ...args);
     }
   };

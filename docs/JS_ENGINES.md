@@ -21,6 +21,12 @@ the complete runner; `--allow-all` supplies them. The runtime uses bundled Koffi
 Node-API adapters for host C file semantics. These commands grant ordinary local
 application access and are not an untrusted-code sandbox.
 
+Linux Deno child processes also use a small bundled native launcher. It preserves
+the inherited working directory even after deletion or search-permission changes,
+then replaces itself with the requested executable. Its binaries are prepared by
+maintainers; application execution does not require a C compiler. The x64 launcher
+has local validation; ARM64 binaries have been cross-compiled but not run here.
+
 After building, the same generated directory runs in all three engines:
 
 ```sh

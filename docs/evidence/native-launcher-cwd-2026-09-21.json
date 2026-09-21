@@ -1,0 +1,2222 @@
+{
+  "recordedAt": "2026-09-21T14:43:19.446036+00:00",
+  "scope": "Supplementary ordinary-Lean and host comparisons for child and worker startup after Linux cwd deletion and permission revocation. No upstream test or expected-output edits. Not full-suite or cross-platform conformance.",
+  "changes": [
+    "Deno Linux uses a bundled C exec launcher via libc posix_spawn, avoiding Deno CLI cwd lookup and cwd reentry. No JavaScript runs between libc internal fork/vfork and exec.",
+    "Node full pthread workers preload the existing worker-local cwd lookup fallback.",
+    "Deno full runtimes prepare an unreferenced factory with its own Linux CLONE_FS context and use it only when the application cwd is removed. Application OS cwd is never changed for worker bootstrap.",
+    "The private relay preserves shared memory, transferred MessagePorts, worker errors, nested Emscripten exceptions and unreferenced shutdown.",
+    "Generated application cache inventories include the launcher module, manifest and binaries; maintainer cache signatures also include native launcher inputs."
+  ],
+  "before": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/cwd-removed-permissions/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-removed-before-r2/fixture.lean",
+    "sourceSha256": "e5197735bc8ac3798911f7fd0a85c7f4192e0fdce34e2450e4bdb20702aac394",
+    "scope": "Supplementary Linux inherited-cwd permission comparison; not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-before-r2.resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.30620730100000004,
+        "code": 0,
+        "signal": null,
+        "stdout": "inherited cwd: 0, \"\", \"\"\nexplicit dot cwd: 255, \"\", \"could not change directory to .\\n\"\nabsolute cwd: 0, \"\", \"\"\nmissing executable: 255, \"\", \"could not execute external process '/lasm-test-no-such-executable'\\n\"\nPATH search: 0, \"\", \"\"\nlarge environment preserved\nremoved cwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v82-cwd-exec-ack-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v82-cwd-exec-ack-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 5.2008764,
+        "code": 1,
+        "signal": null,
+        "stdout": "",
+        "stderr": "worker sent an error! undefined:undefined: ENOENT: process.cwd failed with error no such file or directory, the current working directory was likely removed without changing the working directory, uv_cwd\n\nnode:internal/event_target:1118\n  process.nextTick(() => { throw err; });\n                           ^\nError: ENOENT: process.cwd failed with error no such file or directory, the current working directory was likely removed without changing the working directory, uv_cwd\n    at process.cwd (node:internal/main/worker_thread:130:19)\n    at MessagePort.<anonymous> (node:internal/main/worker_thread:147:50)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:843:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'uv_cwd'\n}\n\nNode.js v24.13.1\n",
+        "passed": false
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v82-cwd-exec-ack-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v82-cwd-exec-ack-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v82-cwd-exec-ack-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 5.632837258999999,
+        "code": 1,
+        "signal": null,
+        "stdout": "",
+        "stderr": "\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Uncaught (in worker \"em-pthread\") NotFound: No such file or directory (os error 2)\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mObject.cwd\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mext:deno_fs/30_fs.js\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m2555\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mmainModuleArgv\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mnode:process\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m19798\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mObject.t.__bootstrapNodeProcess\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mnode:process\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m20100\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245minitialize\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mnode:module\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m6\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m2008\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\n    \u001b[0m\u001b[2m\u001b[38;5;245mat \u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mbootstrapWorkerRuntime\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m (\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245mext:runtime_main/js/99_main.js\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m1\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m:\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m18417\u001b[0m\u001b[0m\u001b[2m\u001b[38;5;245m)\u001b[0m\nworker sent an error! undefined:undefined: No such file or directory (os error 2)\n\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Uncaught (in promise) Error: No such file or directory (os error 2)\n",
+        "passed": false
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v83-cwd-exec-ack-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v83-cwd-exec-ack-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v83-cwd-exec-ack-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v83-cwd-exec-ack-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v83-cwd-exec-ack-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v83-cwd-exec-ack-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v83-cwd-exec-ack-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v83-cwd-exec-ack-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v83-cwd-exec-ack-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v83-cwd-exec-ack-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 70.585288986,
+        "code": 0,
+        "signal": null,
+        "stdout": "inherited cwd: 0, \"\", \"\"\nexplicit dot cwd: 255, \"\", \"could not change directory to .\\n\"\nabsolute cwd: 0, \"\", \"\"\nmissing executable: 255, \"\", \"could not execute external process '/lasm-test-no-such-executable'\\n\"\nPATH search: 0, \"\", \"\"\nlarge environment preserved\nremoved cwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      }
+    ],
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T14:07:55.339Z"
+  },
+  "after": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/cwd-removed-permissions/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-removed-after/fixture.lean",
+    "sourceSha256": "e5197735bc8ac3798911f7fd0a85c7f4192e0fdce34e2450e4bdb20702aac394",
+    "scope": "Supplementary Linux inherited-cwd permission comparison; not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-full-r2.resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.27382752200000005,
+        "code": 0,
+        "signal": null,
+        "stdout": "inherited cwd: 0, \"\", \"\"\nexplicit dot cwd: 255, \"\", \"could not change directory to .\\n\"\nabsolute cwd: 0, \"\", \"\"\nmissing executable: 255, \"\", \"could not execute external process '/lasm-test-no-such-executable'\\n\"\nPATH search: 0, \"\", \"\"\nlarge environment preserved\nremoved cwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v86-worker-cwd-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v86-worker-cwd-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 5.849508213999999,
+        "code": 0,
+        "signal": null,
+        "stdout": "inherited cwd: 0, \"\", \"\"\nexplicit dot cwd: 255, \"\", \"could not change directory to .\\n\"\nabsolute cwd: 0, \"\", \"\"\nmissing executable: 255, \"\", \"could not execute external process '/lasm-test-no-such-executable'\\n\"\nPATH search: 0, \"\", \"\"\nlarge environment preserved\nremoved cwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v86-worker-cwd-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v86-worker-cwd-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 12.402536242999998,
+        "code": 0,
+        "signal": null,
+        "stdout": "inherited cwd: 0, \"\", \"\"\nexplicit dot cwd: 255, \"\", \"could not change directory to .\\n\"\nabsolute cwd: 0, \"\", \"\"\nmissing executable: 255, \"\", \"could not execute external process '/lasm-test-no-such-executable'\\n\"\nPATH search: 0, \"\", \"\"\nlarge environment preserved\nremoved cwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 70.264394618,
+        "code": 0,
+        "signal": null,
+        "stdout": "inherited cwd: 0, \"\", \"\"\nexplicit dot cwd: 255, \"\", \"could not change directory to .\\n\"\nabsolute cwd: 0, \"\", \"\"\nmissing executable: 255, \"\", \"could not execute external process '/lasm-test-no-such-executable'\\n\"\nPATH search: 0, \"\", \"\"\nlarge environment preserved\nremoved cwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      }
+    ],
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T14:28:09.630Z"
+  },
+  "namedRegression": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/cwd-permissions/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-named-after/fixture.lean",
+    "sourceSha256": "5ec89c7a45280cda755641df711d920739426e494563c3baafa1c97fb5034e55",
+    "scope": "Supplementary Linux inherited-cwd permission comparison; not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-full-r2.resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.332277698,
+        "code": 0,
+        "signal": null,
+        "stdout": "revoked cwd query: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-named-after/revoked\"\nrevoked legacy cwd query: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-named-after/revoked\"\nrevoked relative file: IO.Error.permissionDenied (some \"payload\") 4294967283 \"permission denied\"\nrevoked relative reentry: IO.Error.permissionDenied (some \".\") 13 \"Permission denied\"\nrevoked inherited child: \"0: \\\"\\\", \\\"\\\"\"\nrevoked explicit dot child: \"255: \\\"\\\", \\\"could not change directory to .\\\\n\\\"\"\nrevoked absolute child: \"0: \\\"\\\", \\\"\\\"\"\nsearch-only relative file: \"preserved\"\nsearch-only inherited child: \"0: \\\"\\\", \\\"\\\"\"\nsearch-only explicit dot child: \"0: \\\"\\\", \\\"\\\"\"\ncwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v86-worker-cwd-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v86-worker-cwd-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 6.419465453000001,
+        "code": 0,
+        "signal": null,
+        "stdout": "revoked cwd query: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-named-after/revoked\"\nrevoked legacy cwd query: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-named-after/revoked\"\nrevoked relative file: IO.Error.permissionDenied (some \"payload\") 4294967283 \"permission denied\"\nrevoked relative reentry: IO.Error.permissionDenied (some \".\") 13 \"Permission denied\"\nrevoked inherited child: \"0: \\\"\\\", \\\"\\\"\"\nrevoked explicit dot child: \"255: \\\"\\\", \\\"could not change directory to .\\\\n\\\"\"\nrevoked absolute child: \"0: \\\"\\\", \\\"\\\"\"\nsearch-only relative file: \"preserved\"\nsearch-only inherited child: \"0: \\\"\\\", \\\"\\\"\"\nsearch-only explicit dot child: \"0: \\\"\\\", \\\"\\\"\"\ncwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v86-worker-cwd-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v86-worker-cwd-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v86-worker-cwd-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 6.629098484999999,
+        "code": 0,
+        "signal": null,
+        "stdout": "revoked cwd query: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-named-after/revoked\"\nrevoked legacy cwd query: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-named-after/revoked\"\nrevoked relative file: IO.Error.permissionDenied (some \"payload\") 4294967283 \"permission denied\"\nrevoked relative reentry: IO.Error.permissionDenied (some \".\") 13 \"Permission denied\"\nrevoked inherited child: \"0: \\\"\\\", \\\"\\\"\"\nrevoked explicit dot child: \"255: \\\"\\\", \\\"could not change directory to .\\\\n\\\"\"\nrevoked absolute child: \"0: \\\"\\\", \\\"\\\"\"\nsearch-only relative file: \"preserved\"\nsearch-only inherited child: \"0: \\\"\\\", \\\"\\\"\"\nsearch-only explicit dot child: \"0: \\\"\\\", \\\"\\\"\"\ncwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v88-worker-cwd-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v88-worker-cwd-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 71.789985423,
+        "code": 0,
+        "signal": null,
+        "stdout": "revoked cwd query: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-named-after/revoked\"\nrevoked legacy cwd query: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-named-after/revoked\"\nrevoked relative file: IO.Error.permissionDenied (some \"payload\") 4294967283 \"permission denied\"\nrevoked relative reentry: IO.Error.permissionDenied (some \".\") 13 \"Permission denied\"\nrevoked inherited child: \"0: \\\"\\\", \\\"\\\"\"\nrevoked explicit dot child: \"255: \\\"\\\", \\\"could not change directory to .\\\\n\\\"\"\nrevoked absolute child: \"0: \\\"\\\", \\\"\\\"\"\nsearch-only relative file: \"preserved\"\nsearch-only inherited child: \"0: \\\"\\\", \\\"\\\"\"\nsearch-only explicit dot child: \"0: \\\"\\\", \\\"\\\"\"\ncwd permission comparison completed\n",
+        "stderr": "",
+        "passed": true
+      }
+    ],
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T14:29:36.721Z"
+  },
+  "packagedAndHostResults": [
+    {
+      "label": "native-launcher-build-final",
+      "args": [
+        "scripts/build-process-launcher.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-build-final.log",
+      "code": 0,
+      "seconds": 0.208718927,
+      "counts": {}
+    },
+    {
+      "label": "native-launcher-r2-process-launcher",
+      "args": [
+        "--test",
+        "--test-isolation=none",
+        "test/process-launcher.test.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-r2-process-launcher.log",
+      "code": 0,
+      "seconds": 0.09361192800000004,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "label": "native-launcher-r2-native-process",
+      "args": [
+        "--test",
+        "--test-isolation=none",
+        "test/native-process.test.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-r2-native-process.log",
+      "code": 0,
+      "seconds": 2.799945955,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "label": "native-launcher-r2-cwd-permissions",
+      "args": [
+        "--test",
+        "--test-isolation=none",
+        "test/cwd-permissions.test.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-r2-cwd-permissions.log",
+      "code": 0,
+      "seconds": 1.2780847720000001,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "label": "native-launcher-r2-working-directory",
+      "args": [
+        "--test",
+        "--test-isolation=none",
+        "test/working-directory.test.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-r2-working-directory.log",
+      "code": 0,
+      "seconds": 1.6590888190000006,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "label": "native-launcher-r2-node-cwd-removed-permissions",
+      "args": [
+        "--test",
+        "--test-isolation=none",
+        "test/node-cwd-removed-permissions.test.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-r2-node-cwd-removed-permissions.log",
+      "code": 0,
+      "seconds": 73.979978852,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "label": "native-launcher-r2-node-cwd-permissions",
+      "args": [
+        "--test",
+        "--test-isolation=none",
+        "test/node-cwd-permissions.test.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-r2-node-cwd-permissions.log",
+      "code": 0,
+      "seconds": 70.933640752,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "label": "native-launcher-r2-node-spawn",
+      "args": [
+        "--test",
+        "--test-isolation=none",
+        "test/node-spawn.test.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-r2-node-spawn.log",
+      "code": 0,
+      "seconds": 69.990279464,
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "label": "native-launcher-r2-node-process",
+      "args": [
+        "--test",
+        "--test-isolation=none",
+        "test/node-process.test.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-r2-node-process.log",
+      "code": 0,
+      "seconds": 134.189060028,
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "label": "native-launcher-r2-node-process-nul",
+      "args": [
+        "--test",
+        "--test-isolation=none",
+        "test/node-process-nul.test.mjs"
+      ],
+      "path": ".work/full-engine-probe/native-launcher-r2-node-process-nul.log",
+      "code": 0,
+      "seconds": 68.68244662499998,
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    }
+  ],
+  "hostLogs": {
+    "native-launcher-host-r1": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-host-r1.log",
+      "sha256": "dd0bf16e1cdc519559d2f19a4c725a56f25ad900f01efc950607bba621216ff5",
+      "counts": {
+        "tests": 21,
+        "pass": 20,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 1
+      }
+    },
+    "native-launcher-packaged": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-packaged.log",
+      "sha256": "da2f8a8731a8b659fb3464e1170ef666569a58399091aaf8839fe0aaf6905253",
+      "counts": {
+        "tests": 30,
+        "pass": 26,
+        "fail": 4,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    "pthread-cwd-direct": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct.log",
+      "sha256": "e927efdf33a8de70d7ba62aeacafba6aeceb55191eeb67adfdfa385de7f147e9",
+      "counts": {
+        "tests": 5,
+        "pass": 2,
+        "fail": 3,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    "pthread-cwd-direct-r2": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct-r2.log",
+      "sha256": "83abe18ab7c3b8f510c34e2ae7e64106797f658a0def10bebf0c11e315ee649b",
+      "counts": {
+        "tests": 5,
+        "pass": 3,
+        "fail": 2,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    "pthread-cwd-direct-r3": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct-r3.log",
+      "sha256": "cad592a3cab6378f23fa6dbabbc63fdaeea0aa79a4364455bd204d371a8a3836",
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    "pthread-cwd-nested": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-nested.log",
+      "sha256": "865bb92d4f3dd81a460a9a8ec58e333cd763086d439195a629ce524944b89e56",
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    }
+  },
+  "launcherManifest": {
+    "protocol": 1,
+    "source": "native/process-launcher.c",
+    "sourceSha256": "dc0287c2d2669a81392a2d370883640bcbe5333adce7faeb694146271076fc98",
+    "compiler": "Zig 0.16.0",
+    "files": {
+      "linux-x64-gnu": {
+        "target": "x86_64-linux-gnu.2.17",
+        "sha256": "a1d879a39dd61b47db14130dd54e534d9cd204f9d0680d2f32afd5294588e9ce",
+        "bytes": 18920
+      },
+      "linux-x64-musl": {
+        "target": "x86_64-linux-musl",
+        "sha256": "e2b1ba5e8f862220b348b33dfeaf4f858bf7f20555e3474842b2ad69e41f34d3",
+        "bytes": 1252824
+      },
+      "linux-arm64-gnu": {
+        "target": "aarch64-linux-gnu.2.17",
+        "sha256": "d43417a98ab64fc39e8ae58d2f3befd03e975621ba422f7a04f83170a4d9ad5e",
+        "bytes": 19536
+      },
+      "linux-arm64-musl": {
+        "target": "aarch64-linux-musl",
+        "sha256": "5bf1a1f91a7a63a394df814420471ac92feb5b64a59421c9682b4b8ebf1a97ec",
+        "bytes": 1319432
+      }
+    },
+    "validation": "Cross-compilation is not execution validation. See repository evidence for tested architectures and libc implementations."
+  },
+  "platformValidation": {
+    "linux-x64-gnu": "Executed through direct host, ordinary Lean packaged applications and full compiler comparisons.",
+    "linux-x64-musl": "Static executable startup and private protocol checks executed on the glibc host; full musl-host Lean/engine conformance not tested.",
+    "linux-arm64-gnu": "Cross-compiled only; not executed.",
+    "linux-arm64-musl": "Cross-compiled only; not executed."
+  },
+  "retainedIntermediateAttempts": [
+    {
+      "artifact": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-removed-before/comparison.json",
+      "classification": "Supplementary fixture preparation error: multiline Lean record indentation. Corrected before the immutable before/after comparison."
+    },
+    {
+      "artifact": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-host-r1.log",
+      "classification": "Deno removed-cwd control passed while still marked TODO; subsequent clean run removed the obsolete TODO and passed all controls."
+    },
+    {
+      "artifact": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-packaged.log",
+      "classification": "26 passes and 4 reported failures (3 timed-out source-launcher subtests plus their parent). Concurrent maintainer source edits invalidated warm build signatures. Clean serial rerun held runtime sources fixed and passed with the same deadlines; failures retained, no timeout relaxed. The initial command also named nonexistent node-process-spawn.test.mjs, so node-spawn.test.mjs was validated explicitly in the clean run."
+    },
+    {
+      "artifact": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct.log",
+      "classification": "Found an error relay field loss, repaired by explicit serialization. Also found a supplementary fixture used parentPort.close, which Deno does not implement; natural worker exit is now checked."
+    },
+    {
+      "artifact": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct-r2.log",
+      "classification": "The supplementary test wrongly required empty stderr for an intentional uncaught worker error. An unwrapped engine control confirms Deno emits that diagnostic. Final fixture requires byte-identical control stderr and intact error fields."
+    },
+    {
+      "artifact": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-full.log",
+      "classification": "Freeze preparation rejected the lowered compiler original lasm-emscripten-pre.js filename. The matcher now accepts both verified original prelude filenames; partial v87 retained and fresh v88 used. No Lean comparison ran during this preparation failure."
+    }
+  ],
+  "remainingLimitations": [
+    "Independent virtual cwd permission inheritance when it differs from actual OS cwd.",
+    "Non-Linux cwd identity and native validation on macOS, Windows and ARM64.",
+    "The Deno removed-cwd worker fallback requires unshare(CLONE_FS). Sandboxes denying it retain ordinary worker startup but cannot use this fallback.",
+    "Complete musl-host conformance has not been executed.",
+    "The packaged cooperative scheduler remains separate from the experimental full pthread runtime.",
+    "The full upstream suite remains incomplete; these supplementary comparisons do not establish all remaining differences are fundamental."
+  ],
+  "resources": {
+    "cwd-native-launcher-before": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-before.resources.json",
+      "sha256": "6e421e1cdf676a24b3b76fe14ad044d2829755ff0c34a2e7c2169c39296b84b9",
+      "report": {
+        "startedAt": "2026-09-21T14:05:50.504Z",
+        "command": [
+          "node",
+          "scripts/full-lean/probe-cwd-permissions.mjs",
+          "--removed",
+          ".work/full-engine-probe/cwd-removed-before",
+          ".work/full-toolchains/node-v82-cwd-exec-ack-native",
+          ".work/full-toolchains/deno-v82-cwd-exec-ack-native",
+          ".work/full-toolchains/bun-v83-cwd-exec-ack-lowered"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "2d10c7c4-dfc8-4f0a-93d8-e79d2fbbd8a7",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28764139520
+        },
+        "minimumHostAvailable": 28734230528,
+        "peakMemoryBytes": 84078592,
+        "peakTasks": 11,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-before.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:05:50.910Z",
+          "memoryBytes": 544768,
+          "peakMemoryBytes": 84078592,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 16384,
+            "kernel": 286720,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 16384,
+            "slab": 125416
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T14:05:50.960Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12267520,
+          "peakMemoryBytes": 84078592,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10211328,
+            "file": 16384,
+            "kernel": 983040,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 16384,
+            "slab": 154384
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:05:50.986Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "cwd-native-launcher-before-r2": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-before-r2.resources.json",
+      "sha256": "3eb96256f65a319de1a0fddf9a02e7f5fb5bb3488886fe943ab44b4df6b4c0f2",
+      "report": {
+        "startedAt": "2026-09-21T14:06:31.686Z",
+        "command": [
+          "node",
+          "scripts/full-lean/probe-cwd-permissions.mjs",
+          "--removed",
+          ".work/full-engine-probe/cwd-removed-before-r2",
+          ".work/full-toolchains/node-v82-cwd-exec-ack-native",
+          ".work/full-toolchains/deno-v82-cwd-exec-ack-native",
+          ".work/full-toolchains/bun-v83-cwd-exec-ack-lowered"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "1a117532-ac97-4dce-b2d7-39949554d319",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28722868224
+        },
+        "minimumHostAvailable": 26480058368,
+        "peakMemoryBytes": 2156638208,
+        "peakTasks": 57,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-native-launcher-before-r2.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:07:55.274Z",
+          "memoryBytes": 1271738368,
+          "peakMemoryBytes": 2156638208,
+          "swapBytes": 0,
+          "tasks": 13,
+          "memoryBreakdown": {
+            "anon": 1223430144,
+            "file": 126976,
+            "kernel": 7528448,
+            "shmem": 0,
+            "file_mapped": 114688,
+            "inactive_file": 126976,
+            "slab": 363128
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T14:07:55.385Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12791808,
+          "peakMemoryBytes": 2156638208,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 131072,
+            "kernel": 987136,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 131072,
+            "slab": 146480
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:07:55.411Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "native-launcher-build": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-build.resources.json",
+      "sha256": "373ff243d7ef05ed3a5a555ec0ee7acdaae248a79991bf7b4cad3a49e2ddd760",
+      "report": {
+        "startedAt": "2026-09-21T14:08:13.057Z",
+        "command": [
+          "python3",
+          "-c",
+          "import os; os.sched_setaffinity(0, sorted(os.sched_getaffinity(0))[:2]); os.execvp(\"node\", [\"node\", \"scripts/build-process-launcher.mjs\"])"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "cb68ed21-a162-429c-89e3-b314ce51d821",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28635676672
+        },
+        "minimumHostAvailable": 28449452032,
+        "peakMemoryBytes": 307314688,
+        "peakTasks": 12,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-build.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:09:34.566Z",
+          "memoryBytes": 301039616,
+          "peakMemoryBytes": 307314688,
+          "swapBytes": 0,
+          "tasks": 12,
+          "memoryBreakdown": {
+            "anon": 136761344,
+            "file": 143904768,
+            "kernel": 20271104,
+            "shmem": 0,
+            "file_mapped": 18239488,
+            "inactive_file": 122834944,
+            "slab": 18193448
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T14:09:34.629Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 175198208,
+          "peakMemoryBytes": 307314688,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10211328,
+            "file": 145235968,
+            "kernel": 18649088,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 122843136,
+            "slab": 17824344
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:09:34.653Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "native-launcher-host-r1": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-host-r1.resources.json",
+      "sha256": "a8a93d7b373226e4a1fabea0ee5aee37940ad1d8b3b55d4a562816c8666aff1c",
+      "report": {
+        "startedAt": "2026-09-21T14:10:08.257Z",
+        "command": [
+          "node",
+          "--test",
+          "--test-isolation=none",
+          "--test-concurrency=1",
+          "test/native-process.test.mjs",
+          "test/cwd-permissions.test.mjs",
+          "test/working-directory.test.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "fd2ce26f-8c56-4dea-a451-a724a66ab098",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28678602752
+        },
+        "minimumHostAvailable": 28343578624,
+        "peakMemoryBytes": 280084480,
+        "peakTasks": 80,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-host-r1.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:10:13.869Z",
+          "memoryBytes": 1445888,
+          "peakMemoryBytes": 280084480,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 159744,
+            "kernel": 245760,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 159744,
+            "slab": 125960
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T14:10:13.912Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12709888,
+          "peakMemoryBytes": 280084480,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 159744,
+            "kernel": 995328,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 159744,
+            "slab": 153896
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:10:13.936Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "cwd-factory": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-factory.resources.json",
+      "sha256": "c9a9fb7ee9a6fb2b4aa0436ab4ad2109d5f6cd027be14f41e83245d3d34daa00",
+      "report": {
+        "startedAt": "2026-09-21T14:11:21.845Z",
+        "command": [
+          ".cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "-A",
+          ".work/full-engine-probe/cwd-factory.cjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "e634e9bc-e262-4b55-aba1-d5d07dc0f75a",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28716044288
+        },
+        "minimumHostAvailable": 28667244544,
+        "peakMemoryBytes": 39112704,
+        "peakTasks": 11,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-factory.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:11:22.452Z",
+          "memoryBytes": 38047744,
+          "peakMemoryBytes": 38723584,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 35741696,
+            "file": 94208,
+            "kernel": 1912832,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 94208,
+            "slab": 220360
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T14:11:22.609Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12419072,
+          "peakMemoryBytes": 39112704,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 94208,
+            "kernel": 978944,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 94208,
+            "slab": 146528
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:11:22.634Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "native-launcher-packaged": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-packaged.resources.json",
+      "sha256": "3243b99a137616bcf3ee54e8e85b5446e3d1db432eed8b5fe6913710e3f3ff85",
+      "report": {
+        "startedAt": "2026-09-21T14:13:19.136Z",
+        "command": [
+          "node",
+          "--test",
+          "--test-isolation=none",
+          "--test-concurrency=1",
+          "test/process-launcher.test.mjs",
+          "test/cwd-permissions.test.mjs",
+          "test/node-cwd-removed-permissions.test.mjs",
+          "test/node-cwd-permissions.test.mjs",
+          "test/node-process-spawn.test.mjs",
+          "test/node-process.test.mjs",
+          "test/node-process-nul.test.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "6edabf58-8500-41c5-b0c3-b40afb775145",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28689657856
+        },
+        "minimumHostAvailable": 27677655040,
+        "peakMemoryBytes": 1093517312,
+        "peakTasks": 61,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-packaged.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:20:58.326Z",
+          "memoryBytes": 135147520,
+          "peakMemoryBytes": 1093517312,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 131604480,
+            "kernel": 3420160,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 123351040,
+            "slab": 3333376
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T14:20:58.371Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 146661376,
+          "peakMemoryBytes": 1093517312,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 131604480,
+            "kernel": 4268032,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 123351040,
+            "slab": 3448072
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:20:58.401Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "pthread-cwd-direct": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct.resources.json",
+      "sha256": "ff2a6ea928c0e3f2157aea707ca02d5b5f0a33ccce1503b357f95a4de648124c",
+      "report": {
+        "startedAt": "2026-09-21T14:21:14.368Z",
+        "command": [
+          "node",
+          "--test",
+          "--test-isolation=none",
+          "test/pthread-cwd.test.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "4dd0e298-fb47-4ba5-98a2-9f566ed83dff",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28645810176
+        },
+        "minimumHostAvailable": 28608131072,
+        "peakMemoryBytes": 53604352,
+        "peakTasks": 20,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:21:16.980Z",
+          "memoryBytes": 52097024,
+          "peakMemoryBytes": 53604352,
+          "swapBytes": 0,
+          "tasks": 18,
+          "memoryBreakdown": {
+            "anon": 48590848,
+            "file": 110592,
+            "kernel": 3141632,
+            "shmem": 0,
+            "file_mapped": 200704,
+            "inactive_file": 110592,
+            "slab": 414872
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T14:21:17.145Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12296192,
+          "peakMemoryBytes": 53604352,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10211328,
+            "file": 114688,
+            "kernel": 954368,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 114688,
+            "slab": 138592
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:21:17.172Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "pthread-cwd-direct-r2": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct-r2.resources.json",
+      "sha256": "da68ed9eaed7fbc74580a35721519738756b4217aa0596ad0e47e701dbcef54f",
+      "report": {
+        "startedAt": "2026-09-21T14:22:32.729Z",
+        "command": [
+          "node",
+          "--test",
+          "--test-isolation=none",
+          "test/pthread-cwd.test.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "635946f9-9a17-4b05-a853-3ea4da943f5a",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28703711232
+        },
+        "minimumHostAvailable": 28668604416,
+        "peakMemoryBytes": 53960704,
+        "peakTasks": 20,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct-r2.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:22:36.341Z",
+          "memoryBytes": 52363264,
+          "peakMemoryBytes": 53960704,
+          "swapBytes": 0,
+          "tasks": 18,
+          "memoryBreakdown": {
+            "anon": 48570368,
+            "file": 118784,
+            "kernel": 3100672,
+            "shmem": 0,
+            "file_mapped": 200704,
+            "inactive_file": 118784,
+            "slab": 401568
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T14:22:36.506Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12783616,
+          "peakMemoryBytes": 53960704,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 122880,
+            "kernel": 978944,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 122880,
+            "slab": 140800
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:22:36.533Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "pthread-cwd-direct-r3": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct-r3.resources.json",
+      "sha256": "011cefe473cc082ec8e5d63d340f9bf704e8baf0d1be9165e4868e66a6d91a60",
+      "report": {
+        "startedAt": "2026-09-21T14:23:30.164Z",
+        "command": [
+          "node",
+          "--test",
+          "--test-isolation=none",
+          "test/pthread-cwd.test.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "59cfd7a6-1daf-4354-9da6-1eca45cb9ba6",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28732829696
+        },
+        "minimumHostAvailable": 28653740032,
+        "peakMemoryBytes": 53260288,
+        "peakTasks": 18,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-direct-r3.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:23:33.978Z",
+          "memoryBytes": 51859456,
+          "peakMemoryBytes": 53260288,
+          "swapBytes": 0,
+          "tasks": 18,
+          "memoryBreakdown": {
+            "anon": 48594944,
+            "file": 94208,
+            "kernel": 3170304,
+            "shmem": 0,
+            "file_mapped": 200704,
+            "inactive_file": 94208,
+            "slab": 415488
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T14:23:34.097Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12701696,
+          "peakMemoryBytes": 53260288,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 94208,
+            "kernel": 978944,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 94208,
+            "slab": 137928
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:23:34.123Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "native-launcher-full": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-full.resources.json",
+      "sha256": "bfeac20195f38501e6ac99599ce5b612ef21d7165070bd6346449fc35c3bb042",
+      "report": {
+        "startedAt": "2026-09-21T14:25:06.829Z",
+        "command": [
+          "node",
+          ".work/full-engine-probe/validate-native-launcher-full.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "4c500369-0782-4911-9da5-dde6eb3d9e12",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28708040704
+        },
+        "minimumHostAvailable": 28543377408,
+        "peakMemoryBytes": 145854464,
+        "peakTasks": 18,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-full.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:25:11.246Z",
+          "memoryBytes": 60870656,
+          "peakMemoryBytes": 145854464,
+          "swapBytes": 0,
+          "tasks": 18,
+          "memoryBreakdown": {
+            "anon": 38039552,
+            "file": 18857984,
+            "kernel": 2985984,
+            "shmem": 0,
+            "file_mapped": 200704,
+            "inactive_file": 18857984,
+            "slab": 1196368
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-21T14:25:11.376Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 32813056,
+          "peakMemoryBytes": 145854464,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 19062784,
+            "kernel": 1900544,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 19062784,
+            "slab": 1066680
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:25:11.401Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "native-launcher-full-r2": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-full-r2.resources.json",
+      "sha256": "643428a733317a076034e35bfca7a39d496780daadad65c9c6bb78c712ffafa0",
+      "report": {
+        "startedAt": "2026-09-21T14:26:36.965Z",
+        "command": [
+          "node",
+          ".work/full-engine-probe/validate-native-launcher-full-r2.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "f759e1b2-dccc-4cea-8f4d-2e6cfaf971ae",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28712144896
+        },
+        "minimumHostAvailable": 26330669056,
+        "peakMemoryBytes": 2206023680,
+        "peakTasks": 63,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-full-r2.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:29:36.731Z",
+          "memoryBytes": 54468608,
+          "peakMemoryBytes": 2206023680,
+          "swapBytes": 0,
+          "tasks": 16,
+          "memoryBreakdown": {
+            "anon": 27983872,
+            "file": 23212032,
+            "kernel": 2580480,
+            "shmem": 0,
+            "file_mapped": 172032,
+            "inactive_file": 23212032,
+            "slab": 1228560
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T14:29:36.782Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 36483072,
+          "peakMemoryBytes": 2206023680,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10219520,
+            "file": 23212032,
+            "kernel": 1859584,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 23212032,
+            "slab": 1028472
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:29:36.808Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "pthread-cwd-nested": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-nested.resources.json",
+      "sha256": "67b2bb2572b647a142cd6af0d20dcd057889184942ad8e136c35189864658f0c",
+      "report": {
+        "startedAt": "2026-09-21T14:30:21.207Z",
+        "command": [
+          "node",
+          "--test",
+          "--test-isolation=none",
+          "test/pthread-cwd.test.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "47db53b7-ec38-4617-8eea-8ba988b4e7dd",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28702437376
+        },
+        "minimumHostAvailable": 28646567936,
+        "peakMemoryBytes": 53657600,
+        "peakTasks": 18,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/pthread-cwd-nested.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:30:25.226Z",
+          "memoryBytes": 10948608,
+          "peakMemoryBytes": 53657600,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 8937472,
+            "file": 184320,
+            "kernel": 888832,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 184320,
+            "slab": 141920
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T14:30:25.238Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12259328,
+          "peakMemoryBytes": 53657600,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 184320,
+            "kernel": 942080,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 184320,
+            "slab": 141920
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:30:25.267Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "native-launcher-packaged-r2": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-packaged-r2.resources.json",
+      "sha256": "12069d825e095685a050d722545cb62dab327506e53d7ca784c3246a2ea2b510",
+      "report": {
+        "startedAt": "2026-09-21T14:32:14.344Z",
+        "command": [
+          "node",
+          ".work/full-engine-probe/validate-native-launcher-packaged-r2.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "cf958055-3db3-4093-8126-c85c4af4ca20",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28704804864
+        },
+        "minimumHostAvailable": 28213215232,
+        "peakMemoryBytes": 547680256,
+        "peakTasks": 72,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-packaged-r2.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:39:18.103Z",
+          "memoryBytes": 364523520,
+          "peakMemoryBytes": 547680256,
+          "swapBytes": 0,
+          "tasks": 49,
+          "memoryBreakdown": {
+            "anon": 235819008,
+            "file": 115527680,
+            "kernel": 11948032,
+            "shmem": 0,
+            "file_mapped": 1011712,
+            "inactive_file": 103260160,
+            "slab": 4825696
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T14:39:18.294Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 131735552,
+          "peakMemoryBytes": 547680256,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10215424,
+            "file": 115523584,
+            "kernel": 4734976,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 103256064,
+            "slab": 3888928
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:39:18.322Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    "native-launcher-prepare-suites": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-prepare-suites.resources.json",
+      "sha256": "b18c49c86c44ad3a7485475e649b92f5daf30e87e599ce2c30d4893064a5ecfd",
+      "report": {
+        "startedAt": "2026-09-21T14:40:41.930Z",
+        "command": [
+          "node",
+          ".work/full-engine-probe/prepare-native-launcher-suites.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "b90c1abd-3a3a-48bb-b47c-ec99c11511cc",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28904906752
+        },
+        "minimumHostAvailable": 28376805376,
+        "peakMemoryBytes": 2350911488,
+        "peakTasks": 17,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/native-launcher-prepare-suites.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-21T14:40:56.755Z",
+          "memoryBytes": 2237050880,
+          "peakMemoryBytes": 2350911488,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 2102009856,
+            "kernel": 134352896,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 2102009856,
+            "slab": 134260368
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-21T14:40:56.792Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 2248749056,
+          "peakMemoryBytes": 2350911488,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10223616,
+            "file": 2102009856,
+            "kernel": 135188480,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 2102009856,
+            "slab": 134341072
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-21T14:40:56.817Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  },
+  "maximumValidationPeakBytes": 2350911488
+}
