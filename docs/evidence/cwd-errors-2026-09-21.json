@@ -1,0 +1,534 @@
+{
+  "recordedAt": "2026-09-21T08:22:08.320410+00:00",
+  "scope": "Linux x64 native comparisons of ordinary IO.Process.setCurrentDir errors and permissions. Supplemental fixtures, not a full-suite or cross-platform claim.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "cause": [
+    "POSIX chdir uses positive errno and libc messages; the host retained signed libuv codes and a custom ENOTDIR message.",
+    "The instance-local cwd path validated directory type but not directory search permission."
+  ],
+  "correction": [
+    "Map POSIX errors through the existing native errno adapter.",
+    "Validate virtual cwd search permission with faccessat and AT_EACCESS in a private filesystem worker; retain read-independent search behavior."
+  ],
+  "fixtureCases": [
+    "missing target",
+    "regular file",
+    "file path component",
+    "empty path",
+    "symlink loop",
+    "search denied",
+    "search permitted without read permission"
+  ],
+  "before": {
+    "comparison": {
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/cwd-errors/Main.lean",
+      "sourceSha256": "cf7e6ec5fc2e9a69fc7c35e18063177964797c7be48e00f0420e4a4bfcccaace",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "status": 0,
+          "signal": null,
+          "output": [
+            null,
+            "missing: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/missing\"\n  2\n  \"No such file or directory\"\nregular file: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/file\")\n  20\n  \"Not a directory\"\nfile component: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/file/child\")\n  20\n  \"Not a directory\"\nempty: IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\nsymlink loop: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/loop\")\n  40\n  \"Too many levels of symbolic links\"\nsearch denied: IO.Error.permissionDenied\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/denied\")\n  13\n  \"Permission denied\"\nsearch without read: ok\ncwd error comparison completed\n",
+            ""
+          ],
+          "pid": 1795945,
+          "stdout": "missing: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/missing\"\n  2\n  \"No such file or directory\"\nregular file: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/file\")\n  20\n  \"Not a directory\"\nfile component: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/file/child\")\n  20\n  \"Not a directory\"\nempty: IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\nsymlink loop: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/loop\")\n  40\n  \"Too many levels of symbolic links\"\nsearch denied: IO.Error.permissionDenied\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/denied\")\n  13\n  \"Permission denied\"\nsearch without read: ok\ncwd error comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": ".work/full-toolchains/node-v52-process-cwd",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v52-process-cwd/bin/lean",
+          "status": 0,
+          "signal": null,
+          "output": [
+            null,
+            "missing: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/missing\"\n  4294967294\n  \"no such file or directory\"\nregular file: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/file\")\n  0\n  \"Working directory must be a directory\"\nfile component: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/file/child\")\n  4294967276\n  \"not a directory\"\nempty: IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nsymlink loop: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/loop\")\n  4294967256\n  \"too many symbolic links encountered\"\nsearch denied: IO.Error.permissionDenied\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/denied\")\n  4294967283\n  \"permission denied\"\nsearch without read: ok\ncwd error comparison completed\n",
+            ""
+          ],
+          "pid": 1795973,
+          "stdout": "missing: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/missing\"\n  4294967294\n  \"no such file or directory\"\nregular file: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/file\")\n  0\n  \"Working directory must be a directory\"\nfile component: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/file/child\")\n  4294967276\n  \"not a directory\"\nempty: IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\nsymlink loop: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/loop\")\n  4294967256\n  \"too many symbolic links encountered\"\nsearch denied: IO.Error.permissionDenied\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before/denied\")\n  4294967283\n  \"permission denied\"\nsearch without read: ok\ncwd error comparison completed\n",
+          "stderr": "",
+          "passed": false
+        }
+      ]
+    },
+    "resources": {
+      "startedAt": "2026-09-21T08:16:51.674Z",
+      "command": [
+        "node",
+        ".work/full-engine-probe/probe-cwd-errors.mjs",
+        ".work/full-engine-probe/cwd-errors-before",
+        ".work/full-toolchains/node-v52-process-cwd"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "833ad850-df3c-4ff4-8b94-f1b549e6a1d7",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 29288464384
+      },
+      "minimumHostAvailable": 27375767552,
+      "peakMemoryBytes": 1764790272,
+      "peakTasks": 24,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-before-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T08:17:02.292Z",
+        "memoryBytes": 220897280,
+        "peakMemoryBytes": 1764790272,
+        "swapBytes": 0,
+        "tasks": 18,
+        "memoryBreakdown": {
+          "anon": 217616384,
+          "file": 24576,
+          "kernel": 2621440,
+          "shmem": 0,
+          "file_mapped": 200704,
+          "inactive_file": 24576,
+          "slab": 488136
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-21T08:17:02.376Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 12570624,
+        "peakMemoryBytes": 1764790272,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 28672,
+          "kernel": 962560,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 28672,
+          "slab": 145104
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T08:17:02.405Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "packagedApplications": {
+    "log": ".work/full-engine-probe/cwd-errors-applications.log",
+    "nodeTestPasses": 4,
+    "explanation": "One parent and three stock-engine subtests, compared byte-for-byte with native Lean.",
+    "resources": {
+      "startedAt": "2026-09-21T08:17:56.660Z",
+      "command": [
+        "node",
+        "--test",
+        "test/node-cwd.test.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "d9c56b68-d4f7-45bd-a06c-fd67d9f8ccc8",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 29245665280
+      },
+      "minimumHostAvailable": 28710203392,
+      "peakMemoryBytes": 439025664,
+      "peakTasks": 36,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-applications-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T08:19:05.356Z",
+        "memoryBytes": 245768192,
+        "peakMemoryBytes": 439025664,
+        "swapBytes": 0,
+        "tasks": 36,
+        "memoryBreakdown": {
+          "anon": 219447296,
+          "file": 17133568,
+          "kernel": 8052736,
+          "shmem": 0,
+          "file_mapped": 200704,
+          "inactive_file": 15536128,
+          "slab": 1583064
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T08:19:05.504Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 30793728,
+        "peakMemoryBytes": 439025664,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 17129472,
+          "kernel": 1761280,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 15532032,
+          "slab": 912880
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T08:19:05.529Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "fullCompilers": {
+    "comparison": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/cwd-errors/Main.lean",
+      "sourceSha256": "cf7e6ec5fc2e9a69fc7c35e18063177964797c7be48e00f0420e4a4bfcccaace",
+      "scope": "Supplementary POSIX chdir error and permission comparison, not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full-resources.json",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "seconds": 0.297410365,
+          "code": 0,
+          "signal": null,
+          "stdout": "missing: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/missing\"\n  2\n  \"No such file or directory\"\nregular file: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/file\")\n  20\n  \"Not a directory\"\nfile component: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/file/child\")\n  20\n  \"Not a directory\"\nempty: IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\nsymlink loop: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/loop\")\n  40\n  \"Too many levels of symbolic links\"\nsearch denied: IO.Error.permissionDenied\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/denied\")\n  13\n  \"Permission denied\"\nsearch without read: ok\ncwd error comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v55-cwd-errors/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v55-cwd-errors",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 9.944064992000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "missing: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/missing\"\n  2\n  \"No such file or directory\"\nregular file: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/file\")\n  20\n  \"Not a directory\"\nfile component: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/file/child\")\n  20\n  \"Not a directory\"\nempty: IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\nsymlink loop: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/loop\")\n  40\n  \"Too many levels of symbolic links\"\nsearch denied: IO.Error.permissionDenied\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/denied\")\n  13\n  \"Permission denied\"\nsearch without read: ok\ncwd error comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v55-cwd-errors/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v55-cwd-errors",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v55-cwd-errors/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 10.102328635000001,
+          "code": 0,
+          "signal": null,
+          "stdout": "missing: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/missing\"\n  2\n  \"No such file or directory\"\nregular file: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/file\")\n  20\n  \"Not a directory\"\nfile component: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/file/child\")\n  20\n  \"Not a directory\"\nempty: IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\nsymlink loop: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/loop\")\n  40\n  \"Too many levels of symbolic links\"\nsearch denied: IO.Error.permissionDenied\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/denied\")\n  13\n  \"Permission denied\"\nsearch without read: ok\ncwd error comparison completed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v56-cwd-errors-lowered/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v56-cwd-errors-lowered",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v56-cwd-errors-lowered/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 2,
+            "engineEnvironment": {
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v56-cwd-errors-lowered/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v56-cwd-errors-lowered/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 4294967296,
+            "pthreadPoolSize": 8,
+            "backend": "full-lean-wasm64-lowered",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v56-cwd-errors-lowered",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v56-cwd-errors-lowered/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v56-cwd-errors-lowered/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v56-cwd-errors-lowered/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v56-cwd-errors-lowered/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "seconds": 71.584804991,
+          "code": 0,
+          "signal": null,
+          "stdout": "missing: IO.Error.noFileOrDirectory\n  \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/missing\"\n  2\n  \"No such file or directory\"\nregular file: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/file\")\n  20\n  \"Not a directory\"\nfile component: IO.Error.inappropriateType\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/file/child\")\n  20\n  \"Not a directory\"\nempty: IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\nsymlink loop: IO.Error.invalidArgument\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/loop\")\n  40\n  \"Too many levels of symbolic links\"\nsearch denied: IO.Error.permissionDenied\n  (some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full/denied\")\n  13\n  \"Permission denied\"\nsearch without read: ok\ncwd error comparison completed\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "finishedAt": "2026-09-21T08:21:04.534Z"
+    },
+    "resources": {
+      "startedAt": "2026-09-21T08:19:27.602Z",
+      "command": [
+        "python3",
+        ".work/full-engine-probe/prepare-cwd-errors.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "bfbec50b-e698-42bf-ac56-fa1845dd7a2d",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 29320286208
+      },
+      "minimumHostAvailable": 26498510848,
+      "peakMemoryBytes": 2641690624,
+      "peakTasks": 53,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-errors-full-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T08:21:04.410Z",
+        "memoryBytes": 1873281024,
+        "peakMemoryBytes": 2641690624,
+        "swapBytes": 0,
+        "tasks": 45,
+        "memoryBreakdown": {
+          "anon": 1859215360,
+          "file": 2822144,
+          "kernel": 9723904,
+          "shmem": 0,
+          "file_mapped": 126976,
+          "inactive_file": 2715648,
+          "slab": 1005896
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T08:21:04.594Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 15224832,
+        "peakMemoryBytes": 2641690624,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10219520,
+          "file": 2826240,
+          "kernel": 1269760,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2719744,
+          "slab": 451408
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T08:21:04.618Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "references": [
+    "https://github.com/leanprover/lean4/blob/8c9756b28d64dab099da31a4c09229a9e6a2ef35/src/runtime/process.cpp",
+    "https://raw.githubusercontent.com/apple-oss-distributions/xnu/main/bsd/sys/fcntl.h",
+    "/usr/include/linux/fcntl.h"
+  ],
+  "sourceSha256": {
+    "src/node-host.mjs": "f65bf2d90872140f52d0ffc472cd55e5e975d06b7051bbe55de91af02e2a6e77",
+    "src/native-files.mjs": "e04679e06cf3952b358594732db01f31e50f27d8b32f9a7d71b5f98d25556cca",
+    "src/native-file-worker.mjs": "d9616168fd20fbd4ab2284cd92a6dafbc35f6fd0ff178082afab2b60e248ec72",
+    "test/fixtures/cwd-errors/Main.lean": "cf7e6ec5fc2e9a69fc7c35e18063177964797c7be48e00f0420e4a4bfcccaace",
+    "test/node-cwd.test.mjs": "18badc01b9ec25dfc96e2dbc2973b1622615cf5ea0d34a505ea1b2acc8d8a8c1",
+    "scripts/full-lean/probe-cwd-errors.mjs": "21bb8364800d0f0324c7c8eb886fc9211658ce996140fd24b4707ecb0917a39c"
+  },
+  "remaining": [
+    "macOS and Windows need native execution; the Windows path is unchanged.",
+    "Concurrent cwd rename/removal, embedded NUL path behavior, and child-side spawn failures remain separate gaps.",
+    "Full Bun uses lowered Memory64, eight workers, and the disclosed Linux stack helper.",
+    "The resumed v52 Node campaign predates this cwd-only correction; no passes are transferred to the v55/v56 snapshots."
+  ]
+}

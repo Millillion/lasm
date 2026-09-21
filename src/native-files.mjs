@@ -37,6 +37,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const strerror = bind('strerror', 'str', ['int']);
   const free = bind('free', 'void', ['void *']);
   const scanDirectory = windows ? null : libc.func('int scandir(str path, _Out_ void **entries, void *filter, void *compare)');
+  const accessAt = windows ? null : libc.func('int faccessat(int directory, str path, int mode, int flags)');
   const getdelim = windows ? null : libc.func('intptr_t getdelim(_Inout_ void **line, _Inout_ size_t *capacity, int delimiter, void *stream)');
   const groupRecord = windows ? null : ffi.struct({ name: 'str', password: 'str', gid: 'uint32_t', members: 'void *' });
   const getGroup = windows ? null : libc.func('getgrgid_r', 'int', ['uint32_t', ffi.out(ffi.pointer(groupRecord)), 'void *', 'size_t', ffi.out(ffi.pointer('void *'))]);
@@ -98,6 +99,14 @@ export function nativeFiles({ synchronous = false } = {}) {
     fromNodeError,
     outOfMemory() { return failure(ffi.os.errno.ENOMEM); },
     strerror,
+    async checkDirectorySearch(path) {
+      // chdir checks search permission with effective credentials, without
+      // requiring read permission. The packaged host has an instance-local
+      // cwd, so validate it without changing the JavaScript process's cwd.
+      if (!accessAt) throw new Error('Directory search validation is POSIX-only');
+      const darwin = process.platform === 'darwin';
+      await checked(accessAt, darwin ? -2 : -100, path, constants.X_OK, darwin ? 0x10 : 0x200);
+    },
     async readDirectory(path) {
       if (!scanDirectory) throw new Error('Native directory scanning is POSIX-only');
       // A null comparator preserves readdir order. Copy raw filename bytes
@@ -273,6 +282,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     async getLine(file) { return buffer(await callNativeFile('getLine', [reference(file)])); },
     async readDirectory(path) { return (await callNativeFile('readDirectory', [path])).map(buffer); },
     groupInfo(gid) { return callNativeFile('groupInfo', [gid]); },
+    checkDirectorySearch(path) { return callNativeFile('checkDirectorySearch', [path]); },
   };
   for (const name of ['flush', 'rewind', 'truncate'])
     implementation[name] = file => callNativeFile(name, [reference(file)]);

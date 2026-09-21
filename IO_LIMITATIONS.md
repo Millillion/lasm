@@ -44,6 +44,12 @@ close the full-suite or cross-platform gates. See the
   regular files and common directory operations.
 - [ ] Refine exact error mappings and platform-specific errno behavior beyond
   tested missing-file, exclusive-create, invalid-path, and UTF-8 cases.
+  POSIX `IO.Process.setCurrentDir` now uses native errno/message values and
+  validates search permission for the packaged instance cwd. Seven ordinary
+  Lean cases match native Linux in Node, Deno, and Bun, in both packaged and
+  full-compiler paths; see [the directory-error comparison](docs/evidence/cwd-errors-2026-09-21.json).
+  Renamed/deleted cwd tracking, embedded-NUL behavior, and macOS/Windows
+  execution remain open.
 - [ ] Expand stdin, terminal, redirected-console, and interactive backpressure tests.
 - [ ] Broaden native child-process, process-group, pipe, signal and thread-ID
   parity tests, especially Windows quoting and process termination. Ordinary

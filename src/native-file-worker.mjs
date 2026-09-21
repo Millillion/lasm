@@ -6,7 +6,7 @@ import { nativeFiles } from './native-files.mjs';
 // until its call completes. Only the native call blocks this worker's thread.
 const files = nativeFiles({ synchronous: true });
 const operations = new Set(['open', 'read', 'write', 'flush', 'rewind', 'truncate', 'getLine',
-  'closeAsync', 'readDirectory', 'groupInfo']);
+  'closeAsync', 'readDirectory', 'groupInfo', 'checkDirectorySearch']);
 parentPort.on('message', async ({ operation, args }) => {
   try {
     if (!operations.has(operation)) throw new Error(`Invalid native file operation: ${operation}`);

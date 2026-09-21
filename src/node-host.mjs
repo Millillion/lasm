@@ -186,12 +186,20 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     case 26: return numbers(process.hrtime.bigint());
     case 27: { const ms = BigInt(Date.now()); return numbers(ms / 1000n, ms % 1000n * 1_000_000n); }
     case 28: return randomBytes(n);
-    case 29: return fsp.stat(path(bytes)).then(async stat => {
-      if (!stat.isDirectory()) throw error('ENOTDIR', 'Working directory must be a directory');
-      const nextDirectory = await fsp.realpath(path(bytes));
-      if (propagateCwd) process.chdir(nextDirectory);
-      directory = nextDirectory; return empty;
-    });
+    case 29: return (async () => {
+      try {
+        const target = path(bytes);
+        const stat = await fsp.stat(target);
+        if (!stat.isDirectory()) throw error('ENOTDIR', 'Working directory must be a directory');
+        if (!propagateCwd && process.platform !== 'win32') await nativeFiles().checkDirectorySearch(target);
+        const nextDirectory = await fsp.realpath(target);
+        if (propagateCwd) process.chdir(nextDirectory);
+        directory = nextDirectory; return empty;
+      } catch (err) {
+        if (process.platform === 'win32' || err.nativeMessage) throw err;
+        throw nativeFiles().fromNodeError(err);
+      }
+    })();
     case 30: throw new LeanExit(n);
     case 31: return Buffer.from(args.map(value => value + '\0').join(''));
     case 32: case 33: case 34: {

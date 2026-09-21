@@ -540,6 +540,25 @@ comparisons. Neither configuration raises a cap or produces an OOM, and no
 resource abort is counted as a Lean test failure or a fundamental limitation.
 See [the Bun resource evidence](evidence/bun-gc-2026-09-21.json).
 
+An additional three-Lean-worker/six-Bun-worker comparison passed HTTP but
+resource-aborted parallel cancellation at 8.09 GiB. Native controls passed both
+with three workers. The numeric trace also found no full function-table scans
+in the earlier eight-worker attempt. These are retained diagnostics, not a
+solution or a fundamental-limit claim; see
+[the three-worker comparison](evidence/bun-three-workers-2026-09-21.json) and
+[the numeric trace](evidence/bun-memory-trace-2026-09-21.json).
+
+Another ordinary Lean fixture exposed incorrect `IO.Process.setCurrentDir`
+error numbers/messages and missing search-permission validation for virtual
+working directories. Native Linux and all three packaged and full compiler
+engines now match exactly on seven path/error cases. The application run peaked
+at 0.41 GiB and the full comparison at 2.46 GiB, with no OOM, throttling, or swap.
+Full snapshots v55/v56 preserve the previous Wasm bytes. Cwd rename/removal,
+embedded-NUL behavior, and non-Linux validation remain open; see
+[the before/after comparison](evidence/cwd-errors-2026-09-21.json).
+The independently checkpointed v52 Node campaign continues on its original
+snapshot; these focused new passes are not imported into that campaign.
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
