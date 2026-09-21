@@ -8,7 +8,7 @@ import { spawn } from 'node:child_process';
 
 if (process.env.LASM_RESOURCE_UNIT) throw new Error('Run this supervisor directly; each test applies its own resource guard');
 const args = process.argv.slice(2);
-const allowed = new Set(['--suite', '--output', '--filter', '--max-tests']);
+const allowed = new Set(['--suite', '--output', '--filter', '--max-tests', '--prioritize']);
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--extend-selection') continue;
   if (!allowed.has(args[i]) || args[i + 1] === undefined) throw new Error(`Invalid option: ${args[i]}`);
@@ -19,12 +19,17 @@ const suite = resolve(option('--suite', '.work/full-suite-node'));
 const output = resolve(option('--output', join(suite, 'campaign')));
 const filter = option('--filter', '.*');
 const selection = new RegExp(filter);
+const prioritize = option('--prioritize');
+const priority = prioritize === undefined ? null : new RegExp(prioritize);
 const maximum = Number(option('--max-tests', 'Infinity'));
 if (!(maximum === Infinity || Number.isInteger(maximum) && maximum > 0)) throw new Error('--max-tests must be a positive integer');
 const manifestPath = join(suite, 'parallel-suite.json');
 const manifestBytes = readFileSync(manifestPath);
 const manifest = JSON.parse(manifestBytes);
 const selected = manifest.tests.filter(test => selection.test(test.name)).map(test => test.name);
+// Change execution order only. Every selected original registration still
+// runs, and both groups retain their original relative order.
+if (priority) selected.sort((a, b) => Number(priority.test(b)) - Number(priority.test(a)));
 if (!selected.length || new Set(selected).size !== selected.length) throw new Error('Selection must contain unique registered test names');
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const configPath = join(manifest.prefix, 'toolchain.json');
@@ -41,7 +46,8 @@ if (config) {
     if (hash.digest('hex') !== expected) throw new Error(`Frozen input changed: ${name}`);
   }
 }
-const identityFor = filter => digest(JSON.stringify({ manifest: digest(manifestBytes), filter, config, snapshot }));
+const identityFor = filter => digest(JSON.stringify({ manifest: digest(manifestBytes), filter, config, snapshot,
+  ...(prioritize === undefined ? {} : { prioritize }) }));
 const identity = identityFor(filter);
 mkdirSync(output, { recursive: true });
 // The workload guard prevents concurrent compilers; this separate lock prevents
@@ -67,7 +73,7 @@ process.on('exit', () => {
 });
 const statePath = join(output, 'campaign.json');
 const state = existsSync(statePath) ? JSON.parse(readFileSync(statePath)) : {
-  identity, suite, filter, backend: manifest.backend, createdAt: new Date().toISOString(),
+  identity, suite, filter, ...(prioritize === undefined ? {} : { prioritize }), backend: manifest.backend, createdAt: new Date().toISOString(),
   registered: manifest.registered, selected: selected.length,
   tests: selected.map(name => ({ name, attempts: [] })),
 };

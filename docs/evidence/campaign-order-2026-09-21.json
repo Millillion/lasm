@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "scope": "Synthetic CTest controls: stable priority ordering, all original registrations retained, immutable resume, and rejection of changed ordering.",
+  "order": [
+    "priority-first",
+    "priority-last",
+    "ordinary-first",
+    "ordinary-last"
+  ],
+  "counts": {
+    "passed": 4,
+    "failed": 0,
+    "resource-aborted": 0,
+    "harness-failed": 0,
+    "pending": 0
+  },
+  "peakMemoryBytes": 26161152,
+  "evidence": ".work/full-engine-probe/campaign-order-v1",
+  "sourceHashProtection": "Original source hashes verified before/after each synthetic registration by the unchanged suite runner."
+}

@@ -51,6 +51,13 @@ resource cgroup and result directory, and saves progress after every test. Run
 the identical command to resume pending tests. `--max-tests N` bounds a batch;
 `--filter REGEX` selects a documented subset and must remain identical when
 resuming that campaign. Frozen input hashes are verified before starting.
+`--prioritize REGEX` runs matching registrations first while retaining every
+selected test and the original relative order within both groups. Keep this
+option identical when resuming: it is part of the campaign identity. This lets
+new campaigns reach previously unattempted tests sooner without importing passes
+from an older runtime. `probe-campaign-order.mjs NEW_DIRECTORY` verifies stable
+ordering, complete membership, immutable resume, and rejection of a changed
+priority using four tiny guarded CTest controls.
 To expand a successful initial prefix to all registrations, use `--filter '.*'
 with `--extend-selection`. The existing names must remain the exact beginning
 of the expanded sequence, all runtime/source-manifest inputs must match, and
