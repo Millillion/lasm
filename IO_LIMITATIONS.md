@@ -113,9 +113,16 @@ load, and suite conformance still need validation. See
   before a child inherits stdin match native Linux in Node, Deno, and Bun full
   compilers. Small full-pipe controls also verify that flush and disposal leave
   the JavaScript event loop available. Terminal behavior, already nonblocking
-  descriptors, regular-file process-exit flushing, and forced exit remain open.
-  In particular, the private runtime still aliases `IO.Process.forceExit` to ordinary
-  exit, unlike native Lean's `_Exit` implementation.
+  descriptors, and cross-platform process-exit behavior remain open. Standalone
+  runners now distinguish `IO.Process.exit` from `IO.Process.forceExit` and use
+  native C termination before JavaScript teardown can flush streams. Ordinary
+  Lean exit/status/console/open-file comparisons match native Linux in the
+  packaged and full Node, Deno, and Bun runtimes; see
+  [the exit comparison](docs/evidence/process-exit-2026-09-21.json).
+- [ ] Preserve forced-exit buffer discard for an embedded module without
+  terminating its host process. Embedded exits still throw `LeanExit` and dispose
+  the guest; closing its file streams currently flushes buffered output even on
+  forced exit. This is an implementation gap, not a fundamental restriction.
 - [ ] Validate the private Node worker diagnostic adapter on supported Node
   versions and operating systems. Node's default forwarding can change shared
   stdout/stderr pipes to nonblocking mode. Descriptor-backed forwarding now

@@ -28,6 +28,8 @@ export function nativeFiles({ synchronous = false } = {}) {
   const fread = bind('fread', 'size_t', ['void *', 'size_t', 'size_t', 'void *']);
   const fwrite = bind('fwrite', 'size_t', ['void *', 'size_t', 'size_t', 'void *']);
   const fflush = bind('fflush', 'int', ['void *']);
+  const exit = bind('exit', 'void', ['int']);
+  const forceExit = bind('_Exit', 'void', ['int']);
   const setvbuf = bind('setvbuf', 'int', ['void *', 'void *', 'int', 'size_t']);
   const fseek = bind(windows ? '_fseeki64' : 'fseeko', 'int', ['void *', 'int64_t', 'int']);
   const ftell = bind(windows ? '_ftelli64' : 'ftello', 'int64_t', ['void *']);
@@ -101,6 +103,10 @@ export function nativeFiles({ synchronous = false } = {}) {
   const adapter = {
     error: failure,
     fromNodeError,
+    // Standalone Lean runners own their process. Use the same CRT as their
+    // FILE streams: exit flushes every open stream, while _Exit discards them.
+    // This must happen before JS instance disposal can close/flush the streams.
+    exitProcess(code, force) { (force ? forceExit : exit)(code); },
     openDirectory(path) {
       if (process.platform !== 'linux') throw failure(ffi.os.errno.ENOSYS);
       const fd = openFile(path, 0x200000 /* O_PATH */ | 0x10000 /* O_DIRECTORY */ | 0x80000 /* O_CLOEXEC */, 0);

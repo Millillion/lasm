@@ -708,3 +708,14 @@ Lake build to reach its unchanged expected-output comparison. The unadjusted
 native failure and an initial generated-wrapper cwd error are retained separately.
 Run these extra tests separately and do not add them to the standard registration
 count without identifying the harness adjustment.
+
+### Exit and buffered-file comparison
+
+`node scripts/full-lean/probe-process-exit.mjs NEW_OUTPUT TOOLCHAIN_PREFIX...`
+runs a supplementary ordinary Lean program against the pinned native compiler
+and each selected frozen full compiler. It compares normal return,
+`IO.Process.exit`, and `IO.Process.forceExit`, including exit status, stdout,
+stderr, and an open buffered file. The source and every frozen input are
+verified; upstream tests and expectations are unchanged. The resource guard
+applies automatically. Packaged runners and embedded host lifetime are covered
+separately by `test/node-process-exit.test.mjs`.

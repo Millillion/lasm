@@ -15,7 +15,7 @@ import { HandleTable } from './handle-table.mjs';
 import { createWorkingDirectory } from './working-directory.mjs';
 
 const empty = Buffer.alloc(0);
-export class LeanExit extends Error { constructor(code) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; } }
+export class LeanExit extends Error { constructor(code, force = false) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; this.force = force; } }
 export function numbers(...values) {
   const result = Buffer.alloc(values.length * 8);
   values.forEach((value, i) => result.writeBigUInt64LE(BigInt.asUintN(64, BigInt(value)), i * 8));
@@ -44,7 +44,7 @@ export function encodeError(err) {
 }
 
 /** Private Node implementation of Lean's runtime primitives, not a Lean API. */
-export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = {}, appPath = process.execPath, propagateCwd = false } = {}) {
+export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = {}, appPath = process.execPath, propagateCwd = false, processExit = false } = {}) {
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))
     throw new TypeError('Lean main arguments must be Unicode strings without NUL characters');
   const directory = createWorkingDirectory(cwd, propagateCwd);
@@ -206,7 +206,9 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       if (value.includes('\0')) throw Object.assign(error('EINVAL', 'string contains NUL bytes'), { errno: 22, nativeMessage: true });
       return directory.change(value, state).then(() => empty);
     }
-    case 30: throw new LeanExit(n);
+    case 30:
+      if (processExit) nativeFiles().exitProcess(n, id !== 0);
+      throw new LeanExit(n, id !== 0);
     case 31: return Buffer.from(args.map(value => value + '\0').join(''));
     case 32: case 33: case 34: {
       const f = get(id, 'file');

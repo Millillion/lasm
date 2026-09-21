@@ -78,7 +78,7 @@ export async function buildMain(file, { output, rebuild = false, verbose = false
 import createModule from './index.mjs';
 let api;
 try {
-  api = await createModule({args: process.argv.slice(2), cwd: process.cwd(), propagateCwd: true});
+  api = await createModule({args: process.argv.slice(2), cwd: process.cwd(), propagateCwd: true, processExit: true});
   process.exitCode = await api.runMain();
 } catch (error) {
   if (error.name === 'LeanExit') process.exitCode = error.code;
@@ -99,7 +99,8 @@ export async function runMain(file, args = [], options = {}) {
   const create = (await import(pathToFileURL(join(output, 'index.mjs')).href + '?' + signature)).default;
   let api;
   try {
-    api = await create({ args, cwd: process.cwd(), propagateCwd: options.propagateCwd ?? false });
+    api = await create({ args, cwd: process.cwd(), propagateCwd: options.propagateCwd ?? false,
+      processExit: options.processExit ?? false });
     return await api.runMain();
   } catch (error) {
     if (error.name === 'LeanExit') return error.code;
@@ -120,5 +121,5 @@ export async function mainCommand(arguments_, command = 'run') {
     return 0;
   }
   if (args[0] === '--') args.shift();
-  return runMain(file, args, { ...options, propagateCwd: true });
+  return runMain(file, args, { ...options, propagateCwd: true, processExit: true });
 }

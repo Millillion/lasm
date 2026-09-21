@@ -197,7 +197,7 @@ O *lean_get_current_time() {
 }
 O *lean_io_get_random_bytes(size_t n) { auto r = Reply(28, 0, n); return r.failed ? r.result() : ok(r.array()); }
 O *lean_io_exit(uint8_t code) { Reply(30, 0, code); __builtin_trap(); }
-O *lean_io_force_exit(uint8_t code) { return lean_io_exit(code); }
+O *lean_io_force_exit(uint8_t code) { Reply(30, 1, code); __builtin_trap(); }
 O *lean_io_sleep(uint32_t ms) { Reply(35, 0, ms); return lean_box(0); }
 O *lasm_main_args() {
     auto r = Reply(31);

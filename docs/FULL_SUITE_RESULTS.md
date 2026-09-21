@@ -946,6 +946,7 @@ runtime ABI declarations, interpreter symbol retention, and host API coverage.
 
 Reproduction and experimental build details are in
 [the full-suite harness documentation](../scripts/full-lean/README.md).
+
 ## Follow-up Bun worker-pool controls, September 21
 
 After the table-growth and realPath repairs, a separate five-worker Bun
@@ -958,3 +959,21 @@ before and after every attempt, and all OOM, kernel-cap, throttle, and swap
 counters remained zero. The smaller pool remains experimental; this does not
 close the original-driver memory or full-suite gates. See
 [the frozen configuration and every result](evidence/bun-pool5-current-2026-09-21.json).
+
+## Standalone exit parity, September 21
+
+Full and packaged Node, Deno, and Bun runners now distinguish ordinary exit
+from forced exit. The same ordinary Lean fixture matches native status,
+stdout, stderr, and open-file contents for normal return, `IO.Process.exit`,
+and `IO.Process.forceExit`. The previous Bun full-runtime ordinary exit lost
+buffered file data, and all three engines incorrectly flushed stdout on forced
+exit. Standalone launchers now call native C `exit`/`_Exit` before JS cleanup.
+
+The expanded packaged checks passed 51/51, including generated and source
+launchers, embedded-host survival, console buffering, worker diagnostics, and
+loader controls. Each full engine passed the same 12 unchanged upstream
+regressions; all 7,267 original file hashes were verified before and after each
+test. The build and checks had zero OOM, cap-hit, throttle, or swap events.
+These are Linux x64 results. Embedded forced-exit buffer disposal and native
+macOS/Windows validation remain open. See
+[the baseline, repair, and resource evidence](evidence/process-exit-2026-09-21.json).
