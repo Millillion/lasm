@@ -72,8 +72,14 @@ close the full-suite or cross-platform gates. See the
 - [ ] Implement remaining UV loop configuration/aliveness primitives. Network
   interface enumeration now matches native Lean's records and ordering in Node,
   Deno, and Bun on Linux x64; other OSs still require validation.
-- [ ] Node TCP bind is performed when `listen` runs; bind-time errors and bound
-  socket address queries therefore differ before listening.
+- [ ] Complete TCP bind parity on Windows and validate the POSIX implementation
+  on macOS. Linux x64 now reserves the socket during ordinary Lean `bind`, retains
+  the same port through listen/connect, and matches native bind/name/keepalive
+  errors in Node, Deno, and Bun. IPv4/IPv6, delayed address-in-use errors, small
+  reads, readiness checks, and response-after-half-close pass additional
+  differential fixtures. This does not establish every networking edge case or
+  cross-platform parity; Windows still uses deferred binding. See
+  [the binding comparisons](docs/evidence/tcp-binding-2026-09-21.json).
 - [ ] Validate IPv6, keepalive details, transport half-close/error behavior,
   connection floods, slow consumers, and timer-boundary races more extensively.
   IPv6 wildcard dual-stack acceptance and response-after-client-half-close now

@@ -22,7 +22,7 @@ for (const [name, expected] of Object.entries(metadata.files))
 for (const name of ['host-pre.js', 'host-library.js'])
   if (await hash(join(source, 'runtime-support', name)) !== await hash(join(root, 'scripts/full-lean', name)))
     throw new Error(`Host integration changed: ${name}; rebuild or derive it explicitly`);
-const hostFiles = ['node-host.mjs', 'handle-table.mjs', 'node-network.mjs', 'node-process.mjs',
+const hostFiles = ['node-host.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs',
   'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs',
   'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-dns.mjs', 'native-interfaces.mjs'];
 mkdirSync(output); mkdirSync(join(output, 'host'));

@@ -145,3 +145,14 @@ suspended fiber's C stack pointer. After correcting that state, fresh builds and
 native/Node/Deno/Bun FIFO comparisons passed at a combined 0.41 GiB peak, still
 with zero OOM, throttling, or swap use. The resource policy is unchanged; see
 [the finalizer evidence](evidence/cooperative-finalizers-2026-09-21.json).
+
+A later combined TCP/HTTP regression sequence was stopped proactively at
+8.03 GiB while running Bun with five prestarted workers. The entire service was
+released; memory-high/max/OOM counters and swap use all remained zero. About
+1.9 GiB of the final sample was retained file cache, so the same HTTP registration
+was retried alone under the unchanged guard. It finished as a real test failure
+at 7.07 GiB: all 22 original cases timed out. Restoring eight prestarted workers
+with identical Wasm and host code passed the unchanged registration at a
+4.78 GiB combined preparation/test peak. Keep this resource abort, the isolated
+failure, and the passing control distinct. The guard limits were never raised;
+see [the worker-pool HTTP comparison](evidence/bun-pool-http-2026-09-21.json).

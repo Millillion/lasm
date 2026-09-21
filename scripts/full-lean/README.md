@@ -86,6 +86,17 @@ native/engine executions of the uniformly scaled parallel derivative. It keeps
 every failure and verifies the original source hash afterward. A derivative
 pass never counts as a pass of the original timing-sensitive registration.
 
+`probe-tcp-binding.mjs --output NEW_DIRECTORY --toolchains FACADE[,FACADE]`
+compares a supplementary ordinary-Lean fixture against a native control. It
+checks unbound/bound address queries, deferred bind errors, keepalive, repeated
+listen, bound-client ports, readiness, small reads, and half-close in IPv4/IPv6.
+`--application PATH/main.mjs` selects an already built packaged fixture and
+uses stock engine flags; otherwise it verifies frozen inputs and runs each full
+compiler facade. Each child has an external deadline (default 180 seconds).
+The original failures and fixed comparisons are retained separately. This is
+additional behavioral coverage, not an upstream-suite pass. The Windows bind
+path still needs implementation; the POSIX branch needs native macOS validation.
+
 `probe-bun-startup.mjs --toolchain FROZEN_BUN_FACADE --output NEW_DIRECTORY`
 compares four sequential startup smoke runs under one resource guard. It checks
 the pinned engine's option dump before executing each variant and retains a
@@ -101,6 +112,13 @@ frozen five-worker facade, with identical Wasm bytes, completed the same smoke
 in 46 seconds and passed the unchanged dedicated-task, timer, and TCP tests.
 These are single-run timings and three regressions, not full Bun conformance.
 See [the retained comparison](../../docs/evidence/bun-pool5-2026-09-21.json).
+Broader validation subsequently timed out in every case of the unchanged HTTP
+hang-regression file with five prestarted workers. Restoring eight workers with
+identical Wasm and host code passed that original test in 77 seconds. Keep eight
+prestarted workers for full Bun testing; the smaller startup smoke does not
+justify adopting five for general workloads. The first combined attempt stopped
+safely at its memory budget, and the isolated five-worker retry was a completed
+test failure; neither result is erased by the passing eight-worker control.
 
 `probe-fifo-finalizer.mjs --output NEW_DIRECTORY --toolchains FACADE[,FACADE]`
 compares a supplementary ordinary Lean fixture against native Lean and the

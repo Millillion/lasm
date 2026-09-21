@@ -2,7 +2,29 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import net from 'node:net';
 import { once } from 'node:events';
+import { existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { join } from 'node:path';
 import { createNodeRuntimeHost, numbers } from '../src/node-host.mjs';
+import { root } from '../src/toolchain.mjs';
+
+test('bound and failed-bind descriptors are released in each installed engine',
+  { skip: process.platform !== 'linux', timeout: 30_000 }, t => {
+    const fixture = join(root, 'test/fixtures/tcp-lifetime-host.mjs');
+    const engines = [
+      ['node', process.execPath, [fixture]],
+      ['deno', join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', fixture]],
+      ['bun', join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), [fixture]],
+    ];
+    for (const [name, executable, command] of engines) {
+      if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
+      const result = spawnSync(executable, command, { cwd: root, encoding: 'utf8', timeout: 5000 });
+      assert.equal(result.status, 0, `${name}: ${result.error?.message ?? result.stderr}`);
+      assert.equal(result.stdout, '100 bound sockets and 10 connected client/server pairs released\n');
+      assert.equal(result.stderr, '');
+      t.diagnostic(`${name}: passed without descriptor growth`);
+    }
+  });
 
 test('IPv6 wildcard listeners accept IPv6 and IPv4-mapped peers and preserve half-close', { timeout: 10_000 }, async t => {
   const host = createNodeRuntimeHost();

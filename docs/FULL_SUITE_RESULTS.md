@@ -431,6 +431,44 @@ throttling, or swap. This still uses the explicit Linux Bun stack adjustment;
 native Memory64 worker cloning and stock-engine stack limits remain open.
 See [the startup and regression evidence](evidence/bun-pool5-2026-09-21.json).
 
+The broader follow-up rejected five workers as the general Bun configuration.
+The unchanged `async_http_hang_regressions` registration timed out in all 22
+cases on an isolated five-worker run (7.07 GiB peak). A preceding combined run
+had stopped at the proactive memory budget, so that attempt remains a separate
+resource abort. Restoring eight prestarted workers, with the exact same Wasm
+and host files, passed the original registration in 76.82 seconds at a 4.78 GiB
+combined preparation/test peak. The test uses Lean's in-memory mock transport;
+it does not exercise the new TCP descriptor path. This comparison establishes
+the worker-pool configuration difference; it is not evidence of full scheduler
+conformance or a diagnosis of every internal timing mechanism. No OOM,
+throttling, or swap use occurred in any of these runs.
+See [the retained HTTP controls](evidence/bun-pool-http-2026-09-21.json).
+
+The TCP host now binds a real POSIX socket immediately and preserves its
+descriptor through listening or connecting. A new ordinary-Lean fixture matches
+native output in the packaged Node/Deno/Bun applications and the full compiler
+facades on Linux x64. It covers queries before listening, ephemeral ports,
+deferred address-in-use errors, keepalive, repeated listen calls, bound clients,
+readiness checks, small reads, and replies after half-close. The same application
+Wasm fails with the previous host module in all three engines. Deno's imported
+streams require an explicit read restart; Bun's descriptor-import path requires
+waiting for its connect event. Both adaptations stay inside the private host.
+
+The unchanged `async_tcp_fname_errors`, `async_tcp_half`,
+`async_tcp_server_client`, and `async_http_hang_regressions` registrations pass
+in all three engines (**12/12 executions**), with all 7,267 original source hashes
+intact. Node/Deno use frozen v38; Bun uses v39 with the restored eight-worker
+configuration and explicit Linux stack adjustment. Repeated host checks also
+release 100 bound/failed-bind sockets and ten client/server pairs per engine
+without OS descriptor growth. Fresh application and full-runtime comparisons
+peaked at 3.00–3.11 GiB; the separate Bun HTTP control peaked at 4.78 GiB.
+The earlier resource abort and five-worker failure remain recorded above.
+
+Windows still uses deferred binding, and the POSIX implementation requires
+native macOS validation. The latest Deno HTTP pass does not establish that the
+older intermittent early-streaming deadline issue is eliminated. See
+[the binding evidence and retained failures](evidence/tcp-binding-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

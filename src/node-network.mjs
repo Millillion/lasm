@@ -1,9 +1,16 @@
 import net from 'node:net';
+import { getSystemErrorMap } from 'node:util';
 import { numbers } from './node-host.mjs';
+import { nativeTcp } from './native-tcp.mjs';
 
 const empty = Buffer.alloc(0);
 const failure = (code, message) => Object.assign(new Error(message), { code });
 const cancelled = () => failure('ECANCELED', 'Operation cancelled');
+const uvErrors = new Map([...getSystemErrorMap()].map(([errno, [code, message]]) => [code, { errno, message }]));
+const tcpFailure = code => {
+  const value = uvErrors.get(code);
+  return Object.assign(new Error(value?.message ?? code), { code, errno: value?.errno });
+};
 function address(bytes) {
   // Lean calls uv_tcp_bind with flags=0, permitting IPv4-mapped connections on
   // an IPv6 wildcard listener where the host supports dual-stack sockets.
@@ -15,6 +22,13 @@ function encodeAddress(value) {
 }
 
 export function createNodeNetwork({ add, get, release }) {
+  function getTcp(id) {
+    const resource = get(id, 'tcp');
+    // destroy() can close the fd before its deferred 'close' event. Never run a
+    // native query/option on that number after the OS may have reused it.
+    if (resource.socket?.destroyed) resource.bound?.forget();
+    return resource;
+  }
   function tcp(socket) {
     const resource = { type: 'tcp', socket, accepted: [], readWait: null, acceptWait: null, noDelay: false };
     if (socket) {
@@ -27,6 +41,7 @@ export function createNodeNetwork({ add, get, release }) {
       for (const id of resource.accepted.splice(0)) release(id);
       resource.socket?.destroy();
       resource.server?.close();
+      resource.bound?.close();
     };
     return resource;
   }
@@ -35,7 +50,9 @@ export function createNodeNetwork({ add, get, release }) {
     const socket = resource.socket;
     if (!socket) throw failure('ENOTCONN', 'Socket is not connected');
     return new Promise((resolve, reject) => {
+      const resumeImported = Boolean(process.versions.deno && resource.bound);
       const cleanup = () => {
+        if (resumeImported) socket.pause();
         socket.off('readable', ready); socket.off('end', ready); socket.off('close', ready); socket.off('error', failed);
         resource.readWait = null;
       };
@@ -52,6 +69,10 @@ export function createNodeNetwork({ add, get, release }) {
       }
       resource.readWait = { reject: failed };
       socket.on('readable', ready); socket.on('end', ready); socket.on('close', ready); socket.on('error', failed);
+      // Deno's imported TCP stream can remain stopped when only a readable
+      // listener is added. Resume for this read, then pause before detaching
+      // that listener so data cannot flow away between Lean receive calls.
+      if (resumeImported) socket.resume();
       ready();
     });
   }
@@ -127,59 +148,118 @@ export function createNodeNetwork({ add, get, release }) {
     case 46: get(id, 'condvar').waiters.shift()?.(); return empty;
     case 47: for (const wake of get(id, 'condvar').waiters.splice(0)) wake(); return empty;
     case 50: return numbers(add(tcp()));
-    case 51: { const t = get(id, 'tcp'); t.address = address(bytes); return empty; }
+    case 51: {
+      const t = getTcp(id), target = address(bytes), native = nativeTcp();
+      if (native) {
+        if (!t.bound && (t.socket || t.server)) throw tcpFailure('EINVAL');
+        t.bound ??= native.create(target, t);
+        t.bound.bind(target);
+      } else t.address = target;
+      return empty;
+    }
     case 52: {
-      const t = get(id, 'tcp');
-      if (t.server || t.socket) throw failure('EINVAL', 'Socket is already in use');
+      const t = getTcp(id);
+      if (t.socket) throw tcpFailure('EINVAL');
+      const native = nativeTcp();
+      if (native) {
+        t.bound ??= native.create({ host: '0.0.0.0', port: 0 }, t);
+        t.bound.listen(n);
+        if (t.server) return empty; // libuv permits updating the listen backlog.
+      } else if (t.server) throw tcpFailure('EINVAL');
       t.server = net.createServer({ pauseOnConnect: true, allowHalfOpen: true }, socket => {
         socket.setNoDelay(t.noDelay);
-        if (t.keepAlive) socket.setKeepAlive(...t.keepAlive);
+        if (!t.bound && t.keepAlive) socket.setKeepAlive(...t.keepAlive);
         let client;
         try { client = add(tcp(socket)); } catch { socket.destroy(); return; }
         if (t.acceptWait) { const waiter = t.acceptWait; t.acceptWait = null; waiter.resolve(numbers(client)); }
         else t.accepted.push(client);
       });
+      t.server.once('close', () => t.bound?.forget());
       t.server.on('error', err => { t.error = err; t.acceptWait?.reject(err); t.acceptWait = null; });
       return new Promise((resolve, reject) => {
         const fail = err => { t.server.off('listening', ready); reject(err); };
         const ready = () => { t.server.off('error', fail); resolve(empty); };
         t.server.once('error', fail); t.server.once('listening', ready);
-        t.server.listen({ ...(t.address ?? { host: '0.0.0.0', port: 0 }), backlog: n });
+        t.server.listen(t.bound ? { fd: t.bound.transfer(), backlog: n }
+          : { ...(t.address ?? { host: '0.0.0.0', port: 0 }), backlog: n });
       });
     }
     case 53: {
-      const t = get(id, 'tcp');
+      const t = getTcp(id);
       if (t.error) throw t.error;
       if (!t.server?.listening) throw failure('EINVAL', 'Socket is not listening');
       if (t.acceptWait) throw failure('EBUSY', 'Parallel accepts are not allowed');
       if (t.accepted.length) return numbers(t.accepted.shift());
       return new Promise((resolve, reject) => { t.acceptWait = { resolve, reject }; });
     }
-    case 54: { const t = get(id, 'tcp'); if (t.error) throw t.error; return numbers(t.accepted.shift() ?? 0); }
-    case 55: { const t = get(id, 'tcp'); t.acceptWait?.reject(cancelled()); t.acceptWait = null; return empty; }
-    case 56: if (!n) return empty; return receive(get(id, 'tcp'), n, false);
-    case 57: return receive(get(id, 'tcp'), 0, true);
-    case 58: get(id, 'tcp').readWait?.reject(cancelled()); return empty;
+    case 54: { const t = getTcp(id); if (t.error) throw t.error; return numbers(t.accepted.shift() ?? 0); }
+    case 55: { const t = getTcp(id); t.acceptWait?.reject(cancelled()); t.acceptWait = null; return empty; }
+    case 56: if (!n) return empty; return receive(getTcp(id), n, false);
+    case 57: return receive(getTcp(id), 0, true);
+    case 58: getTcp(id).readWait?.reject(cancelled()); return empty;
     case 59: {
-      const t = get(id, 'tcp');
+      const t = getTcp(id);
       if (!t.socket) throw failure('ENOTCONN', 'Socket is not connected');
       return new Promise((resolve, reject) => t.socket.write(bytes, err => err ? reject(err) : resolve(empty)));
     }
     case 60: {
-      const t = get(id, 'tcp');
+      const t = getTcp(id);
       if (!t.socket) throw failure('ENOTCONN', 'Socket is not connected');
       return new Promise((resolve, reject) => t.socket.end(err => err ? reject(err) : resolve(empty)));
     }
-    case 61: { const s = get(id, 'tcp').socket; return encodeAddress(s?.remoteAddress && { address: s.remoteAddress, port: s.remotePort, family: s.remoteFamily }); }
-    case 62: { const t = get(id, 'tcp'); return encodeAddress(t.server?.address() ?? t.socket?.address()); }
-    case 63: { const t = get(id, 'tcp'); t.noDelay = true; t.socket?.setNoDelay(true); return empty; }
-    case 64: { const t = get(id, 'tcp'); t.keepAlive = [(n & 1) !== 0, Math.floor(n / 2) * 1000]; t.socket?.setKeepAlive(...t.keepAlive); return empty; }
+    case 61: {
+      const t = getTcp(id), s = t.socket;
+      if (t.bound) return encodeAddress(t.bound.name(true));
+      if (!s && !t.server || s?.destroyed) throw tcpFailure('EBADF');
+      if (!s?.remoteAddress) throw tcpFailure('ENOTCONN');
+      return encodeAddress({ address: s.remoteAddress, port: s.remotePort, family: s.remoteFamily });
+    }
+    case 62: {
+      const t = getTcp(id);
+      if (t.bound) return encodeAddress(t.bound.name());
+      if (!t.socket && !t.server || t.socket?.destroyed) throw tcpFailure('EBADF');
+      return encodeAddress(t.server?.address() ?? t.socket?.address());
+    }
+    case 63: {
+      const t = getTcp(id);
+      if (t.bound) t.bound.noDelay(); else t.socket?.setNoDelay(true);
+      t.noDelay = true;
+      return empty;
+    }
+    case 64: {
+      const t = getTcp(id), enabled = (n & 1) !== 0, delay = Math.floor(n / 2);
+      if (t.bound) t.bound.keepAlive(enabled, delay);
+      else if (t.socket) {
+        if (enabled && !delay && nativeTcp()) throw nativeTcp().error(1);
+        t.socket.setKeepAlive(enabled, delay * 1000);
+      }
+      t.keepAlive = [enabled, delay * 1000];
+      return empty;
+    }
     case 65: {
-      const t = get(id, 'tcp');
-      if (t.socket || t.server) throw failure('EINVAL', 'Socket is already in use');
+      const t = getTcp(id);
+      if (t.socket || t.server) throw tcpFailure('EINVAL');
+      if (t.bound) return t.bound.connect(address(bytes)).then(async () => {
+        // Complete the connection before importing it. Bun's constructor only
+        // validates TCP fds; its pinned node:net implementation imports them in
+        // connect({fd}), also used internally for cluster-accepted sockets.
+        t.socket = process.versions.bun ? new net.Socket({ allowHalfOpen: true })
+          : new net.Socket({ fd: t.bound.transfer(), allowHalfOpen: true, readable: true, writable: true });
+        t.socket.pause();
+        t.socket.on('error', err => { t.error = err; });
+        t.socket.once('close', () => t.bound.forget());
+        if (process.versions.bun) await new Promise((resolve, reject) => {
+          const failed = error => { t.socket.off('connect', ready); reject(error); };
+          const ready = () => { t.socket.off('error', failed); resolve(); };
+          t.socket.once('error', failed);
+          t.socket.once('connect', ready);
+          t.socket.connect({ fd: t.bound.transfer(), fdIsRawSocket: true, pauseOnConnect: true });
+        });
+        return empty;
+      });
       t.socket = new net.Socket({ allowHalfOpen: true }); t.socket.pause();
       t.socket.setNoDelay(t.noDelay);
-      if (t.keepAlive) t.socket.setKeepAlive(...t.keepAlive);
+      if (t.keepAlive) t.socket.setKeepAlive(t.keepAlive[0], nativeTcp() ? 60_000 : t.keepAlive[1]);
       t.socket.on('error', err => { t.error = err; });
       return new Promise((resolve, reject) => {
         const failed = err => reject(err);

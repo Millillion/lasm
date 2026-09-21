@@ -1,0 +1,574 @@
+{
+  "scope": "Supplementary ordinary Lean TCP binding parity on Linux x64, followed by unchanged upstream TCP/HTTP regressions. Not full API/suite or cross-platform conformance.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "source": "test/fixtures/tcp-binding/Main.lean",
+  "sourceSha256": "02b2e6e20d6b2fd7b80f3a02cb6ba67145f10c4358886938e2c2098d767ee56e",
+  "implementation": [
+    "Private POSIX socket setup preserves a live bound fd across listen/connect.",
+    "Pinned libuv bind/name/keepalive error behavior, including deferred EADDRINUSE.",
+    "Engine event-loop stream IO after fd handoff; Deno read restart and Bun connect-event adoption handled privately.",
+    "No Lasm Lean declarations or annotations added."
+  ],
+  "baselineSameWasmSha256": "9e1f5cafc7ace16520d92e45336ca1231236b94921777bbeeac2986aa1547b9f",
+  "originalHost": {
+    "evidence": ".work/full-engine-probe/tcp-binding-original-app-results/comparison.json",
+    "sourceSha256": "02b2e6e20d6b2fd7b80f3a02cb6ba67145f10c4358886938e2c2098d767ee56e",
+    "results": [
+      {
+        "name": "native",
+        "code": 0,
+        "signal": null,
+        "seconds": 0.352627593,
+        "passed": true,
+        "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node-application",
+        "code": 1,
+        "signal": null,
+        "seconds": 0.17456360399999993,
+        "passed": false,
+        "stdout": "IPv4\nunbound name: invalid argument (error code: 0, socket has no address)\nunbound peer: invalid argument (error code: 0, socket has no address)\nunbound zero keepalive delay: ok\n",
+        "stderr": "uncaught exception: invalid argument (error code: 0, socket has no address)\n"
+      },
+      {
+        "name": "deno-application",
+        "code": 1,
+        "signal": null,
+        "seconds": 0.26247845100000006,
+        "passed": false,
+        "stdout": "IPv4\nunbound name: invalid argument (error code: 0, socket has no address)\nunbound peer: invalid argument (error code: 0, socket has no address)\nunbound zero keepalive delay: ok\n",
+        "stderr": "uncaught exception: invalid argument (error code: 0, socket has no address)\n"
+      },
+      {
+        "name": "bun-application",
+        "code": 1,
+        "signal": null,
+        "seconds": 0.09279843300000004,
+        "passed": false,
+        "stdout": "IPv4\nunbound name: invalid argument (error code: 0, socket has no address)\nunbound peer: invalid argument (error code: 0, socket has no address)\nunbound zero keepalive delay: ok\n",
+        "stderr": "uncaught exception: invalid argument (error code: 0, socket has no address)\n"
+      }
+    ]
+  },
+  "retainedIntermediateFailures": [
+    {
+      "log": ".work/full-engine-probe/tcp-binding-first.log",
+      "finding": "Deno imported socket left a Lean read unresolved after half-close; Node matched native."
+    },
+    {
+      "log": ".work/full-engine-probe/tcp-binding-fixed.log",
+      "finding": "Explicit readable/writable flags alone did not fix the Deno read restart."
+    },
+    {
+      "log": ".work/full-engine-probe/tcp-binding-verified.log",
+      "finding": "Node/Deno matched native; Bun fd-connect path ignored the supplied connect callback and timed out."
+    },
+    {
+      "log": ".work/full-engine-probe/tcp-binding-deno-public-resume.log",
+      "finding": "Public resume established the minimal Deno read restart, without native shutdown or keepalive timers."
+    }
+  ],
+  "fixedComparisons": [
+    {
+      "evidence": ".work/full-engine-probe/tcp-binding-fresh-app/comparison.json",
+      "sourceSha256": "02b2e6e20d6b2fd7b80f3a02cb6ba67145f10c4358886938e2c2098d767ee56e",
+      "results": [
+        {
+          "name": "native",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.33764471300000004,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": ""
+        },
+        {
+          "name": "node-application",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.22025660499999997,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": ""
+        },
+        {
+          "name": "deno-application",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.26489951200000006,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": ""
+        },
+        {
+          "name": "bun-application",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.1572698999999999,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "evidence": ".work/full-engine-probe/tcp-binding-full/comparison.json",
+      "sourceSha256": "02b2e6e20d6b2fd7b80f3a02cb6ba67145f10c4358886938e2c2098d767ee56e",
+      "results": [
+        {
+          "name": "native",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.334424218,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": ""
+        },
+        {
+          "name": "node-full",
+          "code": 0,
+          "signal": null,
+          "seconds": 11.12737338,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": "",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/runtime-support",
+            "lakeThreads": 1,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v38-tcp",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          }
+        },
+        {
+          "name": "deno-full",
+          "code": 0,
+          "signal": null,
+          "seconds": 10.355664361999999,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": "",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/runtime-support",
+            "lakeThreads": 1,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v38-tcp",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          }
+        },
+        {
+          "name": "bun-full",
+          "code": 0,
+          "signal": null,
+          "seconds": 51.500600486,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": "",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp-lowered",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp-lowered/runtime-support",
+            "lakeThreads": 1,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 2,
+            "engineEnvironment": {
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v38-tcp/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v38-tcp/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 4294967296,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-lowered",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v38-tcp",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp-lowered/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp-lowered/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp-lowered/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp-lowered/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "evidence": ".work/full-engine-probe/tcp-binding-full-bun-pool8/comparison.json",
+      "sourceSha256": "02b2e6e20d6b2fd7b80f3a02cb6ba67145f10c4358886938e2c2098d767ee56e",
+      "results": [
+        {
+          "name": "native",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.34102198799999994,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": ""
+        },
+        {
+          "name": "bun-full",
+          "code": 0,
+          "signal": null,
+          "seconds": 71.101520985,
+          "passed": true,
+          "stdout": "IPv4\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nIPv6\nunbound name: invalid argument (error code: 4294967287, bad file descriptor)\nunbound peer: invalid argument (error code: 4294967287, bad file descriptor)\nunbound zero keepalive delay: ok\nephemeral port reserved before listen\nbound peer: invalid argument (error code: 4294967189, socket is not connected)\nrebind: invalid argument (error code: 4294967274, invalid argument)\nbound zero keepalive delay: operation not permitted (error code: 4294967295)\ndisabled zero keepalive delay: ok\nupdate listen backlog: ok\nconflicting bind: ok\nconflicting name: resource busy (error code: 4294967198, address already in use)\nconflicting peer: resource busy (error code: 4294967198, address already in use)\nconflicting listen: resource busy (error code: 4294967198, address already in use)\nbound client preserved its port and exchanged data across half-close\nunavailable bind: unsupported operation (error code: 4294967197, address not available)\nretry after unavailable bind: ok\nTCP binding comparison completed\n",
+          "stderr": "",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v39-tcp-pool8-lowered",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v39-tcp-pool8-lowered/runtime-support",
+            "lakeThreads": 1,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 2,
+            "engineEnvironment": {
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v39-tcp-pool8/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v39-tcp-pool8/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 4294967296,
+            "pthreadPoolSize": 8,
+            "backend": "full-lean-wasm64-lowered",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v39-tcp-pool8",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v39-tcp-pool8-lowered/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v39-tcp-pool8-lowered/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v39-tcp-pool8-lowered/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v39-tcp-pool8-lowered/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "hostAndApplicationTests": {
+    "log": ".work/full-engine-probe/tcp-final-validation.log",
+    "passed": 3,
+    "failed": 0,
+    "expandedLifetimeLog": ".work/full-engine-probe/tcp-evidence-finish.log",
+    "lifetimeScope": "Each engine: 100 bound/failed-bind resources and 10 connected pairs, including bound and unbound clients, without OS socket-descriptor growth."
+  },
+  "upstream": [
+    {
+      "engine": "node",
+      "evidence": ".work/full-engine-probe/tcp-upstream-node-v38",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "completed": [
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "result": "Passed",
+          "line": "1/4 Test #1061: elab/async_http_hang_regressions.lean ...   Passed   19.43 sec"
+        },
+        {
+          "name": "elab/async_tcp_fname_errors.lean",
+          "result": "Passed",
+          "line": "2/4 Test #1076: elab/async_tcp_fname_errors.lean ........   Passed   12.88 sec"
+        },
+        {
+          "name": "elab/async_tcp_half.lean",
+          "result": "Passed",
+          "line": "3/4 Test #1077: elab/async_tcp_half.lean ................   Passed   12.46 sec"
+        },
+        {
+          "name": "elab/async_tcp_server_client.lean",
+          "result": "Passed",
+          "line": "4/4 Test #1078: elab/async_tcp_server_client.lean .......   Passed   13.49 sec"
+        }
+      ]
+    },
+    {
+      "engine": "deno",
+      "evidence": ".work/full-engine-probe/tcp-upstream-deno-v38",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "completed": [
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "result": "Passed",
+          "line": "1/4 Test #1061: elab/async_http_hang_regressions.lean ...   Passed   18.90 sec"
+        },
+        {
+          "name": "elab/async_tcp_fname_errors.lean",
+          "result": "Passed",
+          "line": "2/4 Test #1076: elab/async_tcp_fname_errors.lean ........   Passed   12.59 sec"
+        },
+        {
+          "name": "elab/async_tcp_half.lean",
+          "result": "Passed",
+          "line": "3/4 Test #1077: elab/async_tcp_half.lean ................   Passed   12.17 sec"
+        },
+        {
+          "name": "elab/async_tcp_server_client.lean",
+          "result": "Passed",
+          "line": "4/4 Test #1078: elab/async_tcp_server_client.lean .......   Passed   12.74 sec"
+        }
+      ]
+    },
+    {
+      "engine": "bun",
+      "configuration": "v39 TCP host, eight prestarted workers, explicit Linux stack adjustment",
+      "http": {
+        "evidence": ".work/full-engine-probe/tcp-bun-pool8-control",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        }
+      },
+      "tcpCampaign": ".work/full-campaign-bun-v39-tcp/campaign.json",
+      "tcp": [
+        {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v39-tcp/00001-3c9e3541",
+          "status": "passed",
+          "peakMemoryBytes": 4106280960,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "name": "elab/async_tcp_fname_errors.lean"
+        },
+        {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v39-tcp/00002-24936537",
+          "status": "passed",
+          "peakMemoryBytes": 3992846336,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "name": "elab/async_tcp_half.lean"
+        },
+        {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v39-tcp/00003-0d48b2fb",
+          "status": "passed",
+          "peakMemoryBytes": 3788140544,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "name": "elab/async_tcp_server_client.lean"
+        }
+      ]
+    }
+  ],
+  "upstreamPassedExecutions": 12,
+  "resourceReports": [
+    {
+      "report": ".work/full-engine-probe/tcp-final-validation-resources.json",
+      "peakMemoryBytes": 3222560768,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "report": ".work/full-engine-probe/tcp-evidence-finish-resources.json",
+      "peakMemoryBytes": 3343290368,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    {
+      "report": ".work/full-engine-probe/tcp-bun-pool8-control-resources.json",
+      "peakMemoryBytes": 5135904768,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  ],
+  "separateWorkerPoolRegression": "docs/evidence/bun-pool-http-2026-09-21.json",
+  "sourceReferences": [
+    "https://github.com/leanprover/lean4/blob/8c9756b28d64dab099da31a4c09229a9e6a2ef35/src/runtime/uv/tcp.cpp",
+    "https://github.com/libuv/libuv/blob/v1.48.0/src/unix/tcp.c",
+    "https://github.com/oven-sh/bun/blob/744846f844374847c902b5e7fd59b4342a51ef99/src/js/node/net.ts",
+    "https://github.com/denoland/deno/blob/v2.9.7/ext/node/polyfills/net.ts"
+  ],
+  "limits": [
+    "Windows still uses deferred binding; its native socket handoff remains open.",
+    "The POSIX implementation contains macOS ABI handling but has only been executed on Linux x64.",
+    "The Bun raw-fd path is engine-specific and requires continued version/OS validation.",
+    "Other error, cancellation, timing, and networking edge cases remain unverified.",
+    "The Deno HTTP pass does not erase the older intermittent early-streaming failure.",
+    "The full upstream suite is still incomplete."
+  ]
+}
