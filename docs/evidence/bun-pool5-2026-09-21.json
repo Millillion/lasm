@@ -1,0 +1,163 @@
+{
+  "scope": "Single sequential startup comparison and three unchanged upstream regressions on Linux x64 using Bun 1.4.2 with the explicitly recorded Linux stack adjustment. This is not stock Bun or a complete suite run.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "derivedArtifact": ".work/full-artifacts/wasm64-v37-pool5-lowered",
+  "facade": ".work/full-toolchains/bun-v37-pool5",
+  "sameWasmSha256": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e",
+  "comparisons": [
+    {
+      "evidence": ".work/full-engine-probe/bun-startup-no-jit-v36/comparison.json",
+      "pool": 8,
+      "profile": "interpreter",
+      "sourceSha256": "4bbc24ad93c0a3cbe4c2f8db0aa6d75a606240ebec07292d4568cc740df4f8b4",
+      "results": [
+        {
+          "name": "native control",
+          "seconds": 0.22047594799999998,
+          "code": 0,
+          "signal": null,
+          "passed": true
+        },
+        {
+          "name": "default",
+          "seconds": 71.629662647,
+          "code": 0,
+          "signal": null,
+          "passed": true,
+          "effectiveOptions": {
+            "useWasmIPInt": "true",
+            "useBBQJIT": "true",
+            "useOMGJIT": "true",
+            "useConcurrentJIT": "false",
+            "numberOfWasmCompilerThreads": "11",
+            "thresholdForBBQOptimizeAfterWarmUp": "150"
+          }
+        },
+        {
+          "name": "interpreter-without-jit",
+          "seconds": 80.129759889,
+          "code": 0,
+          "signal": null,
+          "passed": true,
+          "effectiveOptions": {
+            "useWasmIPInt": "true",
+            "useBBQJIT": "false",
+            "useOMGJIT": "false",
+            "useConcurrentJIT": "false",
+            "numberOfWasmCompilerThreads": "11",
+            "thresholdForBBQOptimizeAfterWarmUp": "150"
+          }
+        }
+      ]
+    },
+    {
+      "evidence": ".work/full-engine-probe/bun-startup-pool5-v37/comparison.json",
+      "pool": 5,
+      "profile": "control",
+      "sourceSha256": "4bbc24ad93c0a3cbe4c2f8db0aa6d75a606240ebec07292d4568cc740df4f8b4",
+      "results": [
+        {
+          "name": "native control",
+          "seconds": 0.172713699,
+          "code": 0,
+          "signal": null,
+          "passed": true
+        },
+        {
+          "name": "default",
+          "seconds": 45.947470675999995,
+          "code": 0,
+          "signal": null,
+          "passed": true,
+          "effectiveOptions": {
+            "useWasmIPInt": "true",
+            "useBBQJIT": "true",
+            "useOMGJIT": "true",
+            "useConcurrentJIT": "false",
+            "numberOfWasmCompilerThreads": "11",
+            "thresholdForBBQOptimizeAfterWarmUp": "150"
+          }
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "evidence": ".work/full-engine-probe/bun-startup-followup-resources.json",
+      "startedAt": "2026-09-21T04:33:22.282Z",
+      "finishedAt": "2026-09-21T04:36:42.250Z",
+      "peakMemoryBytes": 3279671296,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "swapBytes": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    {
+      "evidence": ".work/full-engine-probe/bun-pool5-regressions-resources.json",
+      "startedAt": "2026-09-21T04:39:11.712Z",
+      "finishedAt": "2026-09-21T04:43:25.915Z",
+      "peakMemoryBytes": 4406824960,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "swapBytes": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  ],
+  "upstream": {
+    "evidence": ".work/full-engine-probe/bun-pool5-upstream/execution.json",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "originalSources": {
+      "before": {
+        "checked": 7267,
+        "modified": []
+      },
+      "after": {
+        "checked": 7267,
+        "modified": []
+      }
+    },
+    "completed": [
+      {
+        "name": "compile/wait_dedicated.lean",
+        "result": "Passed",
+        "line": "1/3 Test  #133: compile/wait_dedicated.lean .........   Passed  153.64 sec"
+      },
+      {
+        "name": "elab/async_select_timer.lean",
+        "result": "Passed",
+        "line": "2/3 Test #1072: elab/async_select_timer.lean ........   Passed   48.07 sec"
+      },
+      {
+        "name": "elab/async_tcp_server_client.lean",
+        "result": "Passed",
+        "line": "3/3 Test #1078: elab/async_tcp_server_client.lean ...   Passed   47.15 sec"
+      }
+    ]
+  },
+  "decision": "Retain normal engine tiering; use the separately frozen five-prestarted-worker Bun facade for subsequent full-runtime testing. The worker pool can still allocate additional workers on demand.",
+  "limits": [
+    "Startup timings are single runs, not benchmark distributions.",
+    "Memory peaks cover each entire guarded sequence and do not establish per-variant memory reductions.",
+    "Three unchanged registrations passed; all remaining registrations are still unverified on this facade.",
+    "Bun shared native Memory64 clone and stock-engine stack limits remain unresolved."
+  ]
+}

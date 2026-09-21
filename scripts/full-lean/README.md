@@ -94,6 +94,13 @@ effective options determine whether a variant actually changes anything.
 The first comparison found no startup improvement from that setting or from
 reducing Wasm compiler threads to two. Its resource peak covers the entire
 comparison, so it cannot establish a per-variant memory improvement.
+`--profile interpreter` compares normal tiering with IPInt enabled and both Wasm
+JIT tiers disabled; `--profile control` runs just the normal-engine control.
+The follow-up found disabling the JIT slower (80 versus 72 seconds). A separately
+frozen five-worker facade, with identical Wasm bytes, completed the same smoke
+in 46 seconds and passed the unchanged dedicated-task, timer, and TCP tests.
+These are single-run timings and three regressions, not full Bun conformance.
+See [the retained comparison](../../docs/evidence/bun-pool5-2026-09-21.json).
 
 `probe-fifo-finalizer.mjs --output NEW_DIRECTORY --toolchains FACADE[,FACADE]`
 compares a supplementary ordinary Lean fixture against native Lean and the

@@ -1,5 +1,5 @@
 // Derive a resource-adjusted facade without rebuilding or changing Lean/Wasm.
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, symlinkSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, symlinkSync, createReadStream } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { ensureResourceGuard } from './resource-guard.mjs';
@@ -12,9 +12,13 @@ if (!sourceArg || !outputArg || !Number.isInteger(workers) || workers < 1 || wor
 const source = resolve(sourceArg), output = resolve(outputArg);
 if (existsSync(output)) throw new Error('Use a new output directory');
 const metadata = JSON.parse(readFileSync(join(source, 'snapshot.json')));
-const hash = path => createHash('sha256').update(readFileSync(path)).digest('hex');
+async function hash(path) {
+  const digest = createHash('sha256');
+  for await (const bytes of createReadStream(path)) digest.update(bytes);
+  return digest.digest('hex');
+}
 for (const [name, expected] of Object.entries(metadata.files))
-  if (hash(join(source, name)) !== expected) throw new Error(`Frozen input drift: ${name}`);
+  if (await hash(join(source, name)) !== expected) throw new Error(`Frozen input drift: ${name}`);
 const original = readFileSync(join(source, 'bin/lean.js'), 'utf8');
 const pattern = /var pthreadPoolSize = (\d+);/g;
 const matches = [...original.matchAll(pattern)];
@@ -35,7 +39,7 @@ metadata.derivedFrom = source;
 metadata.createdAt = new Date().toISOString();
 metadata.derivation = { scope: 'Resource-adjusted preinitialized worker count; unchanged Wasm and Lean sources.',
   from: Number(matches[0][1]), to: workers, sharedFrozenInputs: 'Unchanged inputs are symlinked to the immutable source snapshot.',
-  wasmSha256: hash(join(source, 'bin/lean.wasm')) };
-for (const name of ['bin/lean.js', 'bin/lean.cjs', 'build-provenance.json']) metadata.files[name] = hash(join(output, name));
+  wasmSha256: await hash(join(source, 'bin/lean.wasm')) };
+for (const name of ['bin/lean.js', 'bin/lean.cjs', 'build-provenance.json']) metadata.files[name] = await hash(join(output, name));
 writeFileSync(join(output, 'snapshot.json'), JSON.stringify(metadata, null, 2) + '\n');
 console.log(JSON.stringify({ output, ...metadata.derivation }));

@@ -419,6 +419,18 @@ fixtures in all three stock engines on Linux x64, matching both native controls
 regressions, not new upstream-suite passes or proof of fatal-teardown parity.
 See [the retained failures and fixed comparisons](evidence/cooperative-finalizers-2026-09-21.json).
 
+A follow-up Bun startup comparison found no improvement from disabling both
+Wasm JIT tiers (80 seconds versus the 72-second control). Reducing prestarted
+workers from eight to five, without changing Wasm bytes, completed the same
+smoke in 46 seconds. This is a single comparison, not a benchmark distribution.
+The separately frozen five-worker facade then passed the unchanged
+`compile/wait_dedicated`, `elab/async_select_timer`, and
+`elab/async_tcp_server_client` registrations (**3/3**). All 7,267 original hashes
+remained intact. The regression sequence peaked at 4.10 GiB, with zero OOM,
+throttling, or swap. This still uses the explicit Linux Bun stack adjustment;
+native Memory64 worker cloning and stock-engine stack limits remain open.
+See [the startup and regression evidence](evidence/bun-pool5-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

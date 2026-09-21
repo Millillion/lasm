@@ -12,6 +12,8 @@ const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const toolchain = resolve(option('--toolchain', '.work/full-toolchains/bun-v35-finalizer'));
 const output = resolve(option('--output', '.work/full-engine-probe/bun-startup'));
+const profile = option('--profile', 'baseline');
+if (!['baseline', 'interpreter', 'control'].includes(profile)) throw new Error('--profile must be baseline, interpreter, or control');
 if (existsSync(output)) throw new Error('Use a fresh output directory');
 const config = JSON.parse(readFileSync(join(toolchain, 'toolchain.json')));
 if (config.engine !== 'bun') throw new Error('This comparison requires a frozen Bun facade');
@@ -20,7 +22,7 @@ const source = join(output, 'Startup.lean');
 writeFileSync(source, 'import Init\n#eval IO.println "startup smoke passed"\n');
 const expected = 'startup smoke passed\n';
 const evidence = { scope: 'Additional startup smoke comparison with fixed Wasm, Lean source, worker pool, and Linux stack adjustment. No setting is adopted without subsequent conformance checks.',
-  resourceReport: process.env.LASM_RESOURCE_REPORT, config,
+  resourceReport: process.env.LASM_RESOURCE_REPORT, config, profile,
   sourceSha256: createHash('sha256').update(readFileSync(source)).digest('hex'),
   references: [
     'https://github.com/WebKit/WebKit/blob/main/Source/JavaScriptCore/runtime/OptionsList.h',
@@ -41,7 +43,10 @@ const native = run('native control', resolveLean(root).lean, ['-j4', source]);
 native.passed = native.code === 0 && native.stdout === expected && native.stderr === '';
 evidence.results.push(native); save();
 if (!native.passed) throw new Error('Native startup control failed');
-const variants = [
+const variants = profile === 'control' ? [['default', {}]] : profile === 'interpreter' ? [
+  ['default', {}],
+  ['interpreter-without-jit', { BUN_JSC_useWasmIPInt: 'true', BUN_JSC_useBBQJIT: 'false', BUN_JSC_useOMGJIT: 'false' }],
+] : [
   ['default', {}],
   ['explicit-ipint', { BUN_JSC_useWasmIPInt: 'true' }],
   ['two-compiler-threads', { BUN_JSC_numberOfWasmCompilerThreads: '2' }],
