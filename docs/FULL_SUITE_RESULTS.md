@@ -17,9 +17,12 @@ The older frozen v78 Node campaign has
 The separate v52 campaign with the compiled server driver reached **34 passes,
 zero failures/resource aborts, and 3,862 pending registrations**. No earlier
 passes were imported or combined across these campaigns. Deno's full
-suite remains incomplete. A separate Bun server-control campaign now has
-**one pass and four pending controls** with a disclosed 3,600-second deadline;
-the original 900-second timeout remains recorded. These checkpoints are not
+suite remains incomplete. Bun now passes **five selected server controls** with
+the unchanged driver compiled ahead of time and the existing 900-second harness
+deadline. A separate cancellation run also passes with the original interpreted
+driver. The earlier timeout and 3,600-second experiment remain recorded; see
+[the current server evidence](evidence/bun-server-current-2026-09-21.json).
+These checkpoints are not
 complete JavaScript-engine suite results. The sections below retain the earlier
 attempts and the scope of each targeted comparison.
 
@@ -911,6 +914,24 @@ adapter's rejected buffer-ownership bug, and a log-name preparation collision.
 See [the full realPath comparisons](evidence/realpath-2026-09-21.json).
 Native macOS/Windows validation, long paths, races, and complete suite coverage
 remain open.
+
+On v108, Bun now passes all five selected server controls with the unchanged
+driver compiled ahead of time: cancellation, empty-proof cancellation, parallel
+cancellation, documentation links, and hover. The 900-second harness deadline
+is unchanged. Cancellation takes **133.2 seconds**, compared with 2,173.8 seconds
+in the earlier 3,600-second experiment; several runtime repairs separate these
+snapshots. The original interpreted cancellation driver also passes separately
+in **135.8 seconds**, so that result no longer requires the compiled-driver
+adjustment. Its other server controls are not established by this comparison.
+
+Peak memory is **7.92 GiB** for the five compiled-driver controls and **7.89 GiB**
+for the original-driver cancellation run, close to the unchanged 8 GiB proactive
+stop. All memory-event and swap counters are zero. Every run verifies all 7,267
+original sources before and after; compiled-driver runs also verify all nine
+driver/harness artifacts. These are Linux runs with the disclosed Bun stack
+helper, not full-suite or cross-platform conformance. The complete outputs,
+timings, driver build and resource records are in
+[the current Bun server evidence](evidence/bun-server-current-2026-09-21.json).
 
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.

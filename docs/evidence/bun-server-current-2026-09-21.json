@@ -1,0 +1,819 @@
+{
+  "recordedAt": "2026-09-21T17:50:58.121951+00:00",
+  "scope": "Linux x64 Bun server controls on frozen v108 with the existing 900-second parallel-suite deadline. All test and expected-output files are unchanged. Five controls use the unchanged test driver compiled ahead of time; a separate cancellation run uses its original interpreted invocation.",
+  "findings": [
+    "All five selected compiled-driver controls pass, including parallel cancellation, documentation links and hover.",
+    "The cancellation control passes with its original interpreted driver as well; it does not require the compiled-driver adjustment for this result.",
+    "The compiled cancellation run takes 133.161 seconds, compared with 2173.8 seconds in the earlier separate 3600-second campaign. Multiple runtime repairs separate these snapshots; this is not an isolated timing benchmark.",
+    "Every attempt verifies all 7267 original source files before and after. Compiled-driver attempts additionally verify all nine driver/harness artifacts.",
+    "Memory limits remain a 10 GiB kernel cap, an 8 GiB proactive stop, no throttling, and no swap. Every completed run has zero cap-hit/OOM/throttling/swap events."
+  ],
+  "remainingGaps": [
+    "The compiled documentation-link and hover controls peak near the proactive budget; the original-driver equivalents are not established by this result.",
+    "Original-driver cancellation is one registration, not a full-suite pass.",
+    "Bun still uses the disclosed Linux stack adjustment and lowered memory; non-Linux and native-memory64 behavior remain open.",
+    "No remaining difference has been established fundamental."
+  ],
+  "campaigns": {
+    "compiled-driver": {
+      "checkpoint": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-v108-server-compiled-driver-checkpoint.json",
+        "sha256": "6fc8b84e1bf8b1fbac9b3441949ea1d14bb79c057d0f511ac9720231f837539a"
+      },
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "suite": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered/parallel-suite.json",
+        "sha256": "c45903743028bf2c24928f8adfac68672400dd1529f1d001de8ca3d419ba0890"
+      },
+      "timeoutSeconds": 900,
+      "harnessChanges": [
+        "Generated environment points to the selected toolchain and isolated source copy.",
+        "LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.",
+        "Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.",
+        "The exact server_interactive run_test.lean invocation uses its unchanged source compiled ahead of time in the selected engine. Server/compiler children and expected outputs are unchanged. This is a distinct optional harness; its driver artifacts are verified before and after each run.",
+        "A shared flock at /home/lastmjs/development/lasm/compiler/.work/full-network-tests.lock serializes the original fixed-port TCP/UDP tests across engine runs.",
+        "Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.",
+        "A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.",
+        "MAKEFLAGS supplies LEAN_AR=/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bin/llvm-ar instead of the release builder path embedded in lean.mk.",
+        "CTest timeout is explicit; no test or expected-output source is edited."
+      ],
+      "tests": [
+        {
+          "name": "server_interactive/cancellation.lean",
+          "status": "passed",
+          "seconds": 133.161,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00001-c672cddf/results/execution.json",
+            "sha256": "215d131d6e47e7e5679ba953768ee6740b3df1e09dfb5c3d9f9be2d87eee1ec4"
+          },
+          "output": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00001-c672cddf/results/results.xml",
+            "sha256": "6b9298494bb19e7810adc1aedcf1bfadee03d6ee7efd5fe4224648bbee00271a"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00001-c672cddf/resources.json",
+            "sha256": "0944a1c570c889d5929b40e0e306fe5727b868563a65bfd00414b360f32f7c10",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00001-c672cddf/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/cancellation\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:37:24.972Z",
+            "finishedAt": "2026-09-21T17:39:39.729Z",
+            "peakMemoryBytes": 7342657536,
+            "minimumHostAvailable": 20567044096,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "server_interactive/cancellation_empty_by.lean",
+          "status": "passed",
+          "seconds": 19.6065,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00002-1e0a675c/results/execution.json",
+            "sha256": "edaa012919a4511c118973468f5fbbb8e57d7cd9008c96f0df0d803e9f63c0a3"
+          },
+          "output": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00002-1e0a675c/results/results.xml",
+            "sha256": "ad972a3bdb9d84563473144d971150c6c513393977f6e5a90ea6476c61eca128"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00002-1e0a675c/resources.json",
+            "sha256": "44aa2194d31166d95feca1bcae8c799172480aeb401e6b39e91c2e20e3764c10",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00002-1e0a675c/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/cancellation_empty_by\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:41:09.214Z",
+            "finishedAt": "2026-09-21T17:41:30.439Z",
+            "peakMemoryBytes": 7314976768,
+            "minimumHostAvailable": 20775587840,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "server_interactive/cancellation_par.lean",
+          "status": "passed",
+          "seconds": 39.7646,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00003-f697146b/results/execution.json",
+            "sha256": "f81850de41e508997fe486c269c3fbe1f81aee7bfd9defe2aa3a5a88092e2964"
+          },
+          "output": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00003-f697146b/results/results.xml",
+            "sha256": "b9ceaa6712b6098aec4a962c2a852bcd3b35048921d3e6091aac26d3208946c5"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00003-f697146b/resources.json",
+            "sha256": "6580715e7513e40bd457da28bae3998793b8a39850b053632688b779587db3bb",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00003-f697146b/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/cancellation_par\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:41:30.487Z",
+            "finishedAt": "2026-09-21T17:42:11.852Z",
+            "peakMemoryBytes": 7508074496,
+            "minimumHostAvailable": 20589146112,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "server_interactive/docstringLinksExamples.lean",
+          "status": "passed",
+          "seconds": 23.1763,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00004-7ce6d3c2/results/execution.json",
+            "sha256": "47e20a596ee0403bf6e6e6054db861e9515cfc37f6efa67cca2ac2eb72fb5dbb"
+          },
+          "output": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00004-7ce6d3c2/results/results.xml",
+            "sha256": "27f94811e66f95c0597f14380d32f466e60561f07bb34672272cf33493411328"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00004-7ce6d3c2/resources.json",
+            "sha256": "539bdbfbcafd35d75792872a0a01e9f755722bfb4729cd6d2169dc9af13a1cdd",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00004-7ce6d3c2/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/docstringLinksExamples\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:42:11.901Z",
+            "finishedAt": "2026-09-21T17:42:36.629Z",
+            "peakMemoryBytes": 8497561600,
+            "minimumHostAvailable": 19678367744,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        },
+        {
+          "name": "server_interactive/hover.lean",
+          "status": "passed",
+          "seconds": 34.2042,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00005-f2b7ed7f/results/execution.json",
+            "sha256": "093996ae4cefda04eb649851bbe48ef0be8e88bc22d8d24a12c0759ef3a7c720"
+          },
+          "output": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00005-f2b7ed7f/results/results.xml",
+            "sha256": "2ac36286e6052e8b0d4c0e21eb259a0581b4cc04c6be34d8b4a47c8395043559"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00005-f2b7ed7f/resources.json",
+            "sha256": "a475e371ad780f7dd5728ebd76e471e2a4c3b16de02581e74ddc168d54f089ac",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-realpath-lowered",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-server-cancellation/00005-f2b7ed7f/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/hover\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:42:36.678Z",
+            "finishedAt": "2026-09-21T17:43:12.528Z",
+            "peakMemoryBytes": 8311332864,
+            "minimumHostAvailable": 19922878464,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    },
+    "original-driver": {
+      "checkpoint": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-v108-server-original-driver-checkpoint.json",
+        "sha256": "c0db6dc97619140fc1c937efd91a372def8859498d198b4668b61254eb55371e"
+      },
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "suite": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-original-driver/parallel-suite.json",
+        "sha256": "dda330247e1636b5e271c007cfa85c3d838cb1653d219b85f5060421a2259639"
+      },
+      "timeoutSeconds": 900,
+      "harnessChanges": [
+        "Generated environment points to the selected toolchain and isolated source copy.",
+        "LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.",
+        "Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.",
+        "A shared flock at /home/lastmjs/development/lasm/compiler/.work/full-network-tests.lock serializes the original fixed-port TCP/UDP tests across engine runs.",
+        "Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.",
+        "A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.",
+        "MAKEFLAGS supplies LEAN_AR=/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bin/llvm-ar instead of the release builder path embedded in lean.mk.",
+        "CTest timeout is explicit; no test or expected-output source is edited."
+      ],
+      "tests": [
+        {
+          "name": "server_interactive/cancellation.lean",
+          "status": "passed",
+          "seconds": 135.782,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 0,
+              "modified": []
+            },
+            "after": {
+              "checked": 0,
+              "modified": []
+            }
+          },
+          "execution": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-original-driver/00001-0916a6c5/results/execution.json",
+            "sha256": "6c0e0db4ac512d0a13021cde3fa4a37714e82aee238456308f4436f5d0f1989c"
+          },
+          "output": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-original-driver/00001-0916a6c5/results/results.xml",
+            "sha256": "129fdeaebdcc711338426b331873f8ad654fb49dc31fb90ef10b5545ce83454e"
+          },
+          "resources": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-original-driver/00001-0916a6c5/resources.json",
+            "sha256": "7dabb1e5e80c582d9d382563148291611c19ad66dbfa9d64a8d96996f606e6d0",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v108-original-driver",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v108-original-driver/00001-0916a6c5/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/cancellation\\.lean$"
+            ],
+            "startedAt": "2026-09-21T17:44:55.563Z",
+            "finishedAt": "2026-09-21T17:47:12.033Z",
+            "peakMemoryBytes": 8471031808,
+            "minimumHostAvailable": 19648364544,
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0
+          }
+        }
+      ]
+    }
+  },
+  "config": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "engine": "bun",
+    "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+    "engineArgs": [],
+    "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+    "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+    "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/runtime-support",
+    "leanThreads": 4,
+    "lakeThreads": 1,
+    "bunSmol": false,
+    "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+    "systemAllocator": "mimalloc",
+    "leanAllocator": "mimalloc",
+    "memoryMode": 2,
+    "engineEnvironment": {
+      "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bun-stack-reservation.so",
+      "BUN_JSC_maxPerThreadStackUsage": "62914560"
+    },
+    "stackAdjustment": {
+      "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bun-stack-reservation.so",
+      "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+      "osThreadStackBytes": 67108864,
+      "jscStackBudgetBytes": 62914560,
+      "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+    },
+    "maximumMemoryBytes": 4294967296,
+    "pthreadPoolSize": 8,
+    "backend": "full-lean-wasm64-lowered",
+    "nativeLeanFallback": false,
+    "environmentAdjustments": {
+      "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered",
+      "LASM_FULL_APP_PATH": "Selected facade entry point",
+      "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+      "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+      "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+    },
+    "externalTools": {
+      "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/lib",
+      "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/include",
+      "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/share",
+      "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/bin/leanmake",
+      "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+      "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+    }
+  },
+  "snapshot": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/snapshot.json",
+    "sha256": "f6bb34a72905cad6083ef4c654f1a29ba4ac606ec48c2d9f8da8b1b5b6767e91"
+  },
+  "wasmSha256": "69f052757ebb82887838997cfde55e3f93a211e19aa4d4fd9d3586ee96994fae",
+  "driverBuild": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver.json",
+    "sha256": "c6e6edc76d059ab38121e81cdf63ebaf822f4bc26f5b170c455a2c28cda74fa5",
+    "manifest": {
+      "version": 1,
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "prefix": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered",
+      "engine": "bun",
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 2,
+        "engineEnvironment": {
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bun-stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "stackAdjustment": {
+          "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bun-stack-reservation.so",
+          "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+          "osThreadStackBytes": 67108864,
+          "jscStackBudgetBytes": 62914560,
+          "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+        },
+        "maximumMemoryBytes": 4294967296,
+        "pthreadPoolSize": 8,
+        "backend": "full-lean-wasm64-lowered",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v108-realpath-lowered/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "linkStrategy": "Run Leanc only to print its public link flags, then exit it before invoking the same external C toolchain.",
+      "toolchainConfigSha256": "466761e141a9b277e49960790bf3f639a4017425efb8c1c8a779b660dfc378f6",
+      "source": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean",
+      "sourceSha256": "56410b1b00e9f04bb326741df718a7e3c6bf51de85481ce1cb2aff2304cd8fff",
+      "executable": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver",
+      "scope": "Unchanged upstream server-test driver compiled ahead of time. Server and test sources still use the selected full compiler; this is an optional parallel harness.",
+      "startedAt": "2026-09-21T17:32:59.819Z",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-bun-driver.resources.json",
+      "commands": [
+        {
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bin/lean",
+            "-Dlinter.all=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver.c",
+            "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean"
+          ],
+          "startedAt": "2026-09-21T17:32:59.820Z",
+          "finishedAt": "2026-09-21T17:33:05.994Z",
+          "code": 0,
+          "signal": null
+        },
+        {
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bin/leanc",
+            "--print-ldflags"
+          ],
+          "startedAt": "2026-09-21T17:33:05.994Z",
+          "finishedAt": "2026-09-21T17:33:08.545Z",
+          "code": 0,
+          "signal": null,
+          "stdout": "-I /home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/include -pthread -D LEAN_EMSCRIPTEN -s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=2 -fwasm-exceptions -pthread -fstack-clash-protection -ffp-contract=off -fPIC -L /home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/lib/lean -lleancpp -lInit -lStd -lLean -lnodefs.js -lleanrt -lc++ -lc++abi -lLake -sMALLOC=mimalloc -sMAXIMUM_MEMORY=4294967296 -sPTHREAD_POOL_SIZE=8 -sGROWABLE_ARRAYBUFFERS=1 -sSTACK_OVERFLOW_CHECK=2 -sSTACK_SIZE=67108864 -Wl,--export=__cpp_exception -s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=2 -fwasm-exceptions -pthread /home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/lib/libgmp.a /home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64/libuv/src/libuv/libuv.a -lm -pthread\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/bin/clang",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver.c",
+            "-I",
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/include",
+            "-pthread",
+            "-D",
+            "LEAN_EMSCRIPTEN",
+            "-s",
+            "ALLOW_MEMORY_GROWTH=1",
+            "-sMEMORY64=2",
+            "-fwasm-exceptions",
+            "-pthread",
+            "-fstack-clash-protection",
+            "-ffp-contract=off",
+            "-fPIC",
+            "-L",
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v108-realpath-lowered/lib/lean",
+            "-lleancpp",
+            "-lInit",
+            "-lStd",
+            "-lLean",
+            "-lnodefs.js",
+            "-lleanrt",
+            "-lc++",
+            "-lc++abi",
+            "-lLake",
+            "-sMALLOC=mimalloc",
+            "-sMAXIMUM_MEMORY=4294967296",
+            "-sPTHREAD_POOL_SIZE=8",
+            "-sGROWABLE_ARRAYBUFFERS=1",
+            "-sSTACK_OVERFLOW_CHECK=2",
+            "-sSTACK_SIZE=67108864",
+            "-Wl,--export=__cpp_exception",
+            "-s",
+            "ALLOW_MEMORY_GROWTH=1",
+            "-sMEMORY64=2",
+            "-fwasm-exceptions",
+            "-pthread",
+            "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/lib/libgmp.a",
+            "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64/libuv/src/libuv/libuv.a",
+            "-lm",
+            "-pthread",
+            "-Wno-unused-command-line-argument"
+          ],
+          "startedAt": "2026-09-21T17:33:08.546Z",
+          "finishedAt": "2026-09-21T17:33:55.860Z",
+          "code": 0,
+          "signal": null
+        }
+      ],
+      "artifacts": {
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver": "9fabe27af6984777c96dce4328dd0a65c9d68ca5d20feebbcc9c0d81bfca7f67",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver.c": "fdb21d4c18d1e1edcc6f1283029f60bb96e3960a337ddde8e05d1726e4cc160e",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver.cjs": "9610f47a7da761e6013403888c098b8c7037cace790c5f1cd30ae4d5a6f8583a",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver.exports.json": "2d7201b079a96c62619890434567a1ae048b2e47e035a2ac46d75fc43fe59754",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver.rpaths.js": "4e3a19f5b8ad344bf45e723addf12849f371580df11fe448bb0fda722f93395a",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-bun-v108/driver.wasm": "2de7a5b79632da0d905985078bb1666d4ca343f69e0598699e4887fee9fd480e"
+      },
+      "finishedAt": "2026-09-21T17:33:56.296Z"
+    },
+    "resources": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/realpath-bun-driver.resources.json",
+      "sha256": "998cc847641213b4978f8bdd05fa90d15a6bd6203742f450416475846d3983f4",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "env",
+        "BINARYEN_CORES=1",
+        "CMAKE_BUILD_PARALLEL_LEVEL=1",
+        "node",
+        "scripts/full-lean/build-server-driver.mjs",
+        ".work/full-toolchains/bun-v108-realpath-lowered",
+        ".work/full-engine-probe/server-driver-bun-v108",
+        "--external-link"
+      ],
+      "startedAt": "2026-09-21T17:32:59.111Z",
+      "finishedAt": "2026-09-21T17:33:56.369Z",
+      "peakMemoryBytes": 3255975936,
+      "minimumHostAvailable": 24699011072,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  },
+  "originalDriverPreparation": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-v108-original-driver-prepare.resources.json",
+    "sha256": "dcbbd42820121c4d7c3ac7c9c4380e5d179f04c6aa343b96896970e9cf7533b9",
+    "command": [
+      "node",
+      "scripts/full-lean/prepare-suite.mjs",
+      "--prefix",
+      ".work/full-toolchains/bun-v108-realpath-lowered",
+      "--backend",
+      "bun",
+      "--output",
+      ".work/full-suite-bun-v108-original-driver",
+      "--include-excluded",
+      "--timeout",
+      "900",
+      "--network-lock",
+      ".work/full-network-tests.lock"
+    ],
+    "startedAt": "2026-09-21T17:44:49.814Z",
+    "finishedAt": "2026-09-21T17:44:54.815Z",
+    "peakMemoryBytes": 852410368,
+    "minimumHostAvailable": 27617976320,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0
+  },
+  "earlierDeadlineEvidence": {
+    "path": "/home/lastmjs/development/lasm/compiler/docs/evidence/bun-server-deadline-2026-09-21.json",
+    "sha256": "14bd53a08bff8412270c2d0ff764e2ea3d04791d0dd418c4566ecdcae6d918cb"
+  }
+}
