@@ -3,13 +3,19 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The newest frozen v119 Node campaign has **10 passes, zero failures or resource
-aborts, and 3,886 pending registrations**. It includes the host-platform and mixed
+The newest frozen v119 Node campaign has **13 passes, one harness timeout,
+zero resource aborts, and 3,882 pending registrations**. It includes the host-platform and mixed
 C-input repairs. All 3,896 registrations remain selected; previously pending
 v114 names run first, and no previous passes are imported. Every source and
 harness hash matched before and after each test; the largest workload peak was
-4.39 GiB with no memory-limit events. See
-[the first v119 checkpoint](evidence/node-broad-v119-checkpoint10-2026-09-21.json).
+5.45 GiB with no memory-limit events. The unchanged
+`tests/lake/tests/builtin-lint/test.sh` reached its final lint-driver cases but
+exceeded the 900-second parallel-harness deadline. Its timeout is retained as a
+failure and needs a separately documented longer timing profile; it is not
+classified as fundamental. See
+[the 14-attempt checkpoint](evidence/node-broad-v119-checkpoint14-2026-09-21.json).
+The [earlier ten-pass checkpoint](evidence/node-broad-v119-checkpoint10-2026-09-21.json)
+remains intact.
 Its separately compiled original server driver also passes the unchanged
 `server_interactive/cancellation.lean` test at 6.38 GiB, with all integrity checks
 intact and no resource abort. That control is not part of the broad count; see
