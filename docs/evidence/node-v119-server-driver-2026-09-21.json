@@ -1,0 +1,486 @@
+{
+  "recordedAt": "2026-09-21T22:53:30.022468+00:00",
+  "scope": "Separate unchanged cancellation control for the fresh v119 Node compiler and ahead-of-time upstream server driver. Not imported into the broad campaign.",
+  "campaign": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-server-driver-control/campaign.json",
+    "sha256": "24e0f0a11fb39716bb208a259d264a27774f44ef7a242bc425744661c034e85e",
+    "counts": {
+      "passed": 1,
+      "failed": 0,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "test": {
+      "name": "server_interactive/cancellation.lean",
+      "attempts": [
+        {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-server-driver-control/00001-75a94fa7",
+          "status": "passed",
+          "startedAt": "2026-09-21T22:11:29.100Z",
+          "exit": {
+            "code": 0,
+            "signal": null
+          },
+          "finishedAt": "2026-09-21T22:13:58.516Z",
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-server-driver-control/00001-75a94fa7/resources.json",
+          "peakMemoryBytes": 6850482176,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 9,
+              "modified": []
+            },
+            "after": {
+              "checked": 9,
+              "modified": []
+            }
+          }
+        }
+      ],
+      "status": "passed"
+    }
+  },
+  "junit": [
+    {
+      "name": "server_interactive/cancellation.lean",
+      "classname": "server_interactive/cancellation.lean",
+      "time": "147.493",
+      "status": "run"
+    }
+  ],
+  "resources": {
+    "startedAt": "2026-09-21T22:11:29.142Z",
+    "command": [
+      "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+      "--suite",
+      "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v119-cc-inputs-compiled-driver",
+      "--results",
+      "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-server-driver-control/00001-75a94fa7/results",
+      "--jobs",
+      "1",
+      "--filter",
+      "^server_interactive/cancellation\\.lean$"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "dca0252f-4ea0-43ec-9fcc-eee709242629",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 27160498176
+    },
+    "minimumHostAvailable": 20297101312,
+    "peakMemoryBytes": 6850482176,
+    "peakTasks": 94,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-server-driver-control/00001-75a94fa7/resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-21T22:13:58.343Z",
+      "memoryBytes": 318799872,
+      "peakMemoryBytes": 6850482176,
+      "swapBytes": 0,
+      "tasks": 11,
+      "memoryBreakdown": {
+        "anon": 60940288,
+        "file": 254312448,
+        "kernel": 2891776,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 254222336,
+        "slab": 1540672
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-21T22:12:10.413Z",
+      "processes": [
+        {
+          "pid": 2179996,
+          "name": "MainThread",
+          "residentBytes": 2901278720,
+          "threads": 26
+        },
+        {
+          "pid": 2179827,
+          "name": "MainThread",
+          "residentBytes": 2140106752,
+          "threads": 20
+        },
+        {
+          "pid": 2179811,
+          "name": "MainThread",
+          "residentBytes": 1348124672,
+          "threads": 17
+        },
+        {
+          "pid": 2179743,
+          "name": "MainThread",
+          "residentBytes": 114388992,
+          "threads": 11
+        },
+        {
+          "pid": 2179804,
+          "name": "ctest",
+          "residentBytes": 34512896,
+          "threads": 2
+        },
+        {
+          "pid": 2179806,
+          "name": "bash",
+          "residentBytes": 3919872,
+          "threads": 1
+        },
+        {
+          "pid": 2179810,
+          "name": "bash",
+          "residentBytes": 2646016,
+          "threads": 1
+        }
+      ]
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-21T22:13:58.484Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 304181248,
+      "peakMemoryBytes": 6850482176,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10219520,
+        "file": 290451456,
+        "kernel": 2314240,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 290451456,
+        "slab": 1477000
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-21T22:13:58.509Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "execution": {
+    "startedAt": "2026-09-21T22:11:29.889Z",
+    "finishedAt": "2026-09-21T22:13:58.437Z",
+    "backend": "node",
+    "registered": 3896,
+    "command": [
+      "--test-dir",
+      "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v119-cc-inputs-compiled-driver/run",
+      "-j",
+      "1",
+      "--output-on-failure",
+      "--output-junit",
+      "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-server-driver-control/00001-75a94fa7/results/results.xml",
+      "-R",
+      "^server_interactive/cancellation\\.lean$"
+    ],
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "originalSources": {
+      "before": {
+        "checked": 7267,
+        "modified": []
+      },
+      "after": {
+        "checked": 7267,
+        "modified": []
+      }
+    },
+    "harnessArtifacts": {
+      "before": {
+        "checked": 9,
+        "modified": []
+      },
+      "after": {
+        "checked": 9,
+        "modified": []
+      }
+    },
+    "leftoverProcessCleanup": [],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v119-server-driver-control/00001-75a94fa7/resources.json",
+    "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+  },
+  "driver": {
+    "version": 1,
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "prefix": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native",
+    "engine": "node",
+    "config": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "engine": "node",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "engineArgs": [],
+      "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native",
+      "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+      "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v116-host-platform-lowered/sdk",
+      "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/runtime-support",
+      "leanThreads": 4,
+      "lakeThreads": 1,
+      "bunSmol": false,
+      "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+      "systemAllocator": "mimalloc",
+      "leanAllocator": "mimalloc",
+      "memoryMode": 1,
+      "engineEnvironment": {},
+      "maximumMemoryBytes": 8589934592,
+      "pthreadPoolSize": 5,
+      "backend": "full-lean-wasm64-native",
+      "nativeLeanFallback": false,
+      "environmentAdjustments": {
+        "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native",
+        "LASM_FULL_APP_PATH": "Selected facade entry point",
+        "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+        "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+        "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+      },
+      "externalTools": {
+        "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/lib",
+        "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/include",
+        "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/share",
+        "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v119-cc-inputs-native/bin/leanmake",
+        "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+        "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+      }
+    },
+    "linkStrategy": "Run Leanc only to print its public link flags, then exit it before invoking the same external C toolchain.",
+    "toolchainConfigSha256": "c5052666fb6fcc9a868097a6380adc020baa43e88f3be1a648a418c546678ecf",
+    "source": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean",
+    "sourceSha256": "56410b1b00e9f04bb326741df718a7e3c6bf51de85481ce1cb2aff2304cd8fff",
+    "executable": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver",
+    "scope": "Unchanged upstream server-test driver compiled ahead of time. Server and test sources still use the selected full compiler; this is an optional parallel harness.",
+    "startedAt": "2026-09-21T22:09:36.503Z",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-v119-broad-preparation.resources.json",
+    "commands": [
+      {
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/lean",
+          "-Dlinter.all=false",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver.c",
+          "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean"
+        ],
+        "startedAt": "2026-09-21T22:09:36.504Z",
+        "finishedAt": "2026-09-21T22:09:43.580Z",
+        "code": 0,
+        "signal": null
+      },
+      {
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/leanc",
+          "--print-ldflags"
+        ],
+        "startedAt": "2026-09-21T22:09:43.580Z",
+        "finishedAt": "2026-09-21T22:09:45.873Z",
+        "code": 0,
+        "signal": null,
+        "stdout": "-I /home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/include -pthread -D LEAN_EMSCRIPTEN -s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=2 -fwasm-exceptions -pthread -fstack-clash-protection -ffp-contract=off -fPIC -L /home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/lib/lean -lleancpp -lInit -lStd -lLean -lnodefs.js -lleanrt -lc++ -lc++abi -lLake -sMALLOC=mimalloc -sMAXIMUM_MEMORY=4294967296 -sPTHREAD_POOL_SIZE=8 -sGROWABLE_ARRAYBUFFERS=1 -sSTACK_OVERFLOW_CHECK=2 -sSTACK_SIZE=67108864 -Wl,--export=__cpp_exception -s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=2 -fwasm-exceptions -pthread /home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/lib/libgmp.a /home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64/libuv/src/libuv/libuv.a -lm -pthread\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/bin/clang",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver.c",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/include",
+          "-pthread",
+          "-D",
+          "LEAN_EMSCRIPTEN",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=2",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-fstack-clash-protection",
+          "-ffp-contract=off",
+          "-fPIC",
+          "-L",
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v119-cc-inputs-native/lib/lean",
+          "-lleancpp",
+          "-lInit",
+          "-lStd",
+          "-lLean",
+          "-lnodefs.js",
+          "-lleanrt",
+          "-lc++",
+          "-lc++abi",
+          "-lLake",
+          "-sMALLOC=mimalloc",
+          "-sMAXIMUM_MEMORY=4294967296",
+          "-sPTHREAD_POOL_SIZE=8",
+          "-sGROWABLE_ARRAYBUFFERS=1",
+          "-sSTACK_OVERFLOW_CHECK=2",
+          "-sSTACK_SIZE=67108864",
+          "-Wl,--export=__cpp_exception",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=2",
+          "-fwasm-exceptions",
+          "-pthread",
+          "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/lib/libgmp.a",
+          "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64/libuv/src/libuv/libuv.a",
+          "-lm",
+          "-pthread",
+          "-Wno-unused-command-line-argument"
+        ],
+        "startedAt": "2026-09-21T22:09:45.873Z",
+        "finishedAt": "2026-09-21T22:10:09.175Z",
+        "code": 0,
+        "signal": null
+      }
+    ],
+    "artifacts": {
+      "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver": "6b6f3c1aa5ca9ce791a7cdb60d16c0e774386beaf36477225c0de8e3da89fcd1",
+      "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver.c": "fdb21d4c18d1e1edcc6f1283029f60bb96e3960a337ddde8e05d1726e4cc160e",
+      "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver.cjs": "d571b2343143a9207634a21dd5445787d455474c2df02c73258e9181e4c8f645",
+      "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver.exports.json": "2d7201b079a96c62619890434567a1ae048b2e47e035a2ac46d75fc43fe59754",
+      "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver.rpaths.js": "4e3a19f5b8ad344bf45e723addf12849f371580df11fe448bb0fda722f93395a",
+      "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver.wasm": "94bf0e0dadc3d685f17f2e4153713519cac9c68eb41186cdbc508a7dabdca471"
+    },
+    "finishedAt": "2026-09-21T22:10:09.619Z"
+  },
+  "preparationResources": {
+    "startedAt": "2026-09-21T22:09:35.755Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "env",
+      "BINARYEN_CORES=1",
+      "EMCC_CORES=1",
+      "CMAKE_BUILD_PARALLEL_LEVEL=1",
+      "python3",
+      ".work/full-engine-probe/prepare-node-v119-broad.py"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "bb127b24-d7c9-4e51-a3ae-22ea5aed40c3",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 27334520832
+    },
+    "minimumHostAvailable": 23846174720,
+    "peakMemoryBytes": 3171196928,
+    "peakTasks": 33,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-v119-broad-preparation.resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-21T22:10:15.409Z",
+      "memoryBytes": 994344960,
+      "peakMemoryBytes": 3171196928,
+      "swapBytes": 0,
+      "tasks": 12,
+      "memoryBreakdown": {
+        "anon": 93007872,
+        "file": 848977920,
+        "kernel": 52076544,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 848977920,
+        "slab": 49352032
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-21T22:10:15.577Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 919764992,
+      "peakMemoryBytes": 3171196928,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10219520,
+        "file": 858288128,
+        "kernel": 50302976,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 858288128,
+        "slab": 49476960
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-21T22:10:15.603Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  }
+}
