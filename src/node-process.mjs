@@ -6,7 +6,7 @@ import { nativeFiles } from './native-files.mjs';
 import { spawnInheritedProcess } from './native-process.mjs';
 import { numbers } from './node-host.mjs';
 
-export function createNodeProcesses({ add, get, release, cwd }) {
+export function createNodeProcesses({ add, get, release, cwd, flushStdout = async () => {} }) {
   function decode(bytes, state) {
     let offset = 0;
     const number = () => { const n = Number(bytes.readBigUInt64LE(offset)); offset += 8; return n; };
@@ -43,6 +43,9 @@ export function createNodeProcesses({ add, get, release, cwd }) {
   }
   async function start(bytes, state) {
     const options = decode(bytes, state), native = nativeFiles();
+    // Native Lean flushes std::cout only when the child inherits stdin. A
+    // failed implicit flush does not stop it from attempting the spawn.
+    if (options.modes[0] === 1) await flushStdout().catch(() => {});
     const ours = [], theirs = [];
     try {
       const stdio = options.modes.map((mode, index) => {

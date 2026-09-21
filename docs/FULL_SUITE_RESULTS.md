@@ -836,6 +836,37 @@ upstream tests and expected outputs are unchanged. Validation peaked at **1.98 G
 without OOM, throttling, cap hits, or swap. Native non-Linux behavior and complete
 suites remain open. See [the stream-state evidence](evidence/getline-state-2026-09-21.json).
 
+A supplementary console comparison exposed another native-behavior difference:
+the host wrote directly through JavaScript streams instead of preserving FILE
+buffering. Default stdout now retains native buffering, stderr is unbuffered,
+and normal shutdown flushes console output. The adapter also preserves native
+Lean's implicit stdout flush when a child inherits stdin. The first inherited-
+stdin control already passed before the repair; adding a null-stdin control
+exposed the mismatch in all three engines. Both versions of that baseline are
+retained, and the final ordinary-Lean comparison matches native in Node, Deno,
+and Bun full compilers and packaged runners.
+
+A small full-pipe control then exposed Node changing shared standard descriptors
+to nonblocking mode during Worker setup. Descriptor-backed diagnostic forwarding
+avoids both implicit `process.stdout` accesses, including the one inside ordinary
+stream piping. A checked private Node stream flag preserves the default behavior
+of unreferenced workers. Diagnostics, descriptor ownership, worker shutdown, and
+event-loop progress during flush/disposal have passing controls. This adapter is
+validated on Node 24.13.1 Linux x64; other Node layouts and operating systems need
+validation. Forced-exit semantics and broader terminal behavior remain open.
+
+The frozen v97 Node/Deno and v98 Bun console snapshots also pass **21/21 unchanged
+upstream registrations**: both stack-overflow diagnostics, dedicated-worker
+shutdown, `IO_test`, `Process`, HTTP hang regressions, and `tempfile` in each
+engine. All 7,267 original source hashes remain intact before and after every
+registration. Peak workload memory was **3.79 GiB**, with zero OOM, throttling,
+cap-hit, or swap events. These focused results are separate from the older
+v89 broad campaign, and Bun retains its disclosed Linux stack adjustment.
+Eight reported packaged controls, fourteen final host/worker controls, and all
+22 Lean-server Vitest tests also pass. The record retains both console baselines,
+the initial failing full-pipe checks, and the corrected diagnostic-fixture
+cleanup; see [the complete console evidence](evidence/console-buffering-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

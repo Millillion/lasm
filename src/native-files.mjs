@@ -28,6 +28,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const fread = bind('fread', 'size_t', ['void *', 'size_t', 'size_t', 'void *']);
   const fwrite = bind('fwrite', 'size_t', ['void *', 'size_t', 'size_t', 'void *']);
   const fflush = bind('fflush', 'int', ['void *']);
+  const setvbuf = bind('setvbuf', 'int', ['void *', 'void *', 'int', 'size_t']);
   const fseek = bind(windows ? '_fseeki64' : 'fseeko', 'int', ['void *', 'int64_t', 'int']);
   const ftell = bind(windows ? '_ftelli64' : 'ftello', 'int64_t', ['void *']);
   const ftruncate = bind(windows ? '_chsize_s' : 'ftruncate', 'int', ['int', 'int64_t']);
@@ -232,6 +233,10 @@ export function nativeFiles({ synchronous = false } = {}) {
       if (value !== bytes.length) throw failure(errno);
     },
     async flush(file) { await checked(fflush, file.stream); },
+    unbuffer(file) {
+      // _IONBF is 4 in the Windows CRT and 2 in the supported POSIX libcs.
+      if (setvbuf(file.stream, null, windows ? 4 : 2, 0) !== 0) throw failure();
+    },
     async rewind(file) { await checked(fseek, file.stream, 0, 0); },
     async truncate(file) {
       const position = ftell(file.stream);

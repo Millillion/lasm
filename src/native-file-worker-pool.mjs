@@ -1,5 +1,6 @@
 import { Worker } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
+import forwardWorkerStdio from './worker-stdio.cjs';
 const DenoWebWorker = globalThis[Symbol.for('lasm.denoWebWorker')] ?? globalThis.Worker;
 
 // Blocking stdio calls cannot use the shared N-API/libuv pool: enough reads
@@ -38,9 +39,11 @@ function create() {
     : new Worker(new URL('./native-file-worker.mjs', import.meta.url), {
       name: 'lasm-file-io',
       ...(!process.versions.deno && !process.versions.bun ? {
+        stdout: true, stderr: true,
         execArgv: ['--require', fileURLToPath(new URL('./native-worker-cwd.cjs', import.meta.url))],
       } : {}),
     });
+  if (!process.versions.deno && !process.versions.bun) forwardWorkerStdio(worker);
   const state = { worker };
   const received = message => {
     const job = state.job;

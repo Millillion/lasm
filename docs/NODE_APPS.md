@@ -40,6 +40,13 @@ native executable. `Unit` exits successfully; `UInt32` sets Node's exit status
 message and exit 1. `IO.Process.exit`/`forceExit` end the guest and set the runner's
 status; an embedded guest cannot terminate its containing Node process.
 
+Default console streams follow native buffering: redirected stdout can retain
+output until it is flushed, while stderr is unbuffered. When another process
+must see a message immediately, call `(← IO.getStdout).flush` after printing it.
+The Lean server example does this for its listening address. Normal main
+completion flushes console output. Forced-exit buffering still needs the
+correction tracked in [IO limitations](../IO_LIMITATIONS.md).
+
 The runner discovers Lake automatically, including custom source directories and
 path/Git dependencies. Lake still owns dependencies, options, and compile-time
 plugins. Standalone files need no Lake configuration or `lasm.json`. The compiler

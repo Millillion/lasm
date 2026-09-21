@@ -253,6 +253,7 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
         if (error instanceof LeanIOError) throw error;
         throw fatal(error);
       } finally {
+        if (manifest.main && !disposed) await nodeRuntime?.flushStdIO().catch(() => {});
         currentSignal?.removeEventListener('abort', onAbort);
         busy = false;
         currentSignal = undefined;

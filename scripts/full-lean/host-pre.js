@@ -3,6 +3,13 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   var lasmFullHost;
   var lasmFullCompletions = [];
   var lasmFullCompletionWaiter;
+  var lasmPreviousOnExit = Module["onExit"];
+  Module["onExit"] = function (code) {
+    lasmPreviousOnExit?.(code);
+    // Emscripten records the exit status and lets the host event loop drain.
+    // Native file workers keep these final flushes alive without blocking it.
+    lasmFullHost?.then(host => host.flushStdIO()).catch(() => {});
+  };
   Module.lasmFullHostRequest = async function (request) {
     const { port, signalPointer } = request;
     const signal = new Int32Array(wasmMemory.buffer, signalPointer, 1);
@@ -39,7 +46,10 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       else result = await host.request(...args);
       port.postMessage(result);
     } catch (error) {
-      if (error.name === 'LeanExit') process.exit(error.code);
+      if (error.name === 'LeanExit') {
+        await lasmFullHost?.then(host => host.flushStdIO()).catch(() => {});
+        process.exit(error.code);
+      }
       port.postMessage({ failure: error.stack ?? String(error) });
     } finally {
       Atomics.store(signal, 0, 1);

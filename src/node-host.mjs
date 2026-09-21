@@ -91,6 +91,8 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   function nativeFile(file) {
     if (!file.stream) {
       const owned = nativeFiles().duplicateDescriptor(file.fd, file.fd === 0 ? 'r' : 'w');
+      try { if (file.standardId === 2) nativeFiles().unbuffer(owned); }
+      catch (error) { nativeFiles().close(owned); throw error; }
       file.fd = owned.fd; file.stream = owned.stream;
     }
     return file;
@@ -98,12 +100,12 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   async function fileWrite(file, bytes) {
     const sink = file.standardId === 1 ? stdio.stdout : file.standardId === 2 ? stdio.stderr : undefined;
     if (sink) { await sink(bytes); return empty; }
-    if (file.standardId === 1 || file.standardId === 2) {
-      await new Promise((resolve, reject) => (file.standardId === 1 ? process.stdout : process.stderr).write(bytes, err => err ? reject(err) : resolve()));
-      return empty;
-    }
-    await nativeFiles().write(file, bytes);
+    await nativeFiles().write(nativeFile(file), bytes);
     return empty;
+  }
+  function flushStandard(id) {
+    const file = resources.get(id);
+    return serial(file, async () => { if (file.stream) await nativeFiles().flush(file); });
   }
   function release(id, asynchronous = false) {
     if (id < 3) return;
@@ -116,7 +118,8 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   }
   const network = createNodeNetwork({ add, get, release });
   const udp = createNodeUdp({ add, get });
-  const processes = createNodeProcesses({ add, get, release, cwd: state => directory.spawn(state) });
+  const processes = createNodeProcesses({ add, get, release, cwd: state => directory.spawn(state),
+    flushStdout: () => flushStandard(1) });
   const system = createNodeSystem();
   const signals = createNodeSignals({ add, get });
   const pending = new HandleTable();
@@ -139,7 +142,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     })();
     case 2: { const f = get(id, 'file'); return serial(f, () => fileRead(f, n)); }
     case 3: { const f = get(id, 'file'); return serial(f, () => fileWrite(f, bytes)); }
-    case 4: { const f = get(id, 'file'); return serial(f, async () => { if (id > 2) await nativeFiles().flush(f); return empty; }); }
+    case 4: { const f = get(id, 'file'); return serial(f, async () => { if (f.stream) await nativeFiles().flush(f); return empty; }); }
     case 5: { const f = get(id, 'file'); return serial(f, async () => { await nativeFiles().rewind(nativeFile(f)); return empty; }); }
     case 6: { const f = get(id, 'file'); return serial(f, async () => { await nativeFiles().truncate(nativeFile(f)); return empty; }); }
     case 7: { const f = get(id, 'file'); return serial(f, async () => {
@@ -254,6 +257,9 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     }
   }
   return { request, release, platform: process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0,
+    // Normal main shutdown must finish these flushes without blocking the host
+    // event loop that may itself be draining a redirected output pipe.
+    flushStdIO() { return Promise.all([flushStandard(1), flushStandard(2)]); },
     // Internal full-runtime RPC: the Lean caller waits for this promise while
     // other threads can continue issuing host operations, including pipe reads.
     releaseAsync(id) { return release(id, true); },
@@ -266,7 +272,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       if (!pending.has(id)) throw new Error('Unknown asynchronous host request');
       return Promise.resolve(pending.get(id));
     },
-    close() { closed = true; directory.close(); for (const value of resources.values()) value.cancelled = true; for (const id of resources.keys()) release(id); for (const id of [0,1,2]) { const f = resources.get(id); if (f.stream) closeResource(f); } pending.clear(); },
+    close() { closed = true; directory.close(); for (const value of resources.values()) value.cancelled = true; for (const id of resources.keys()) release(id); for (const id of [0,1,2]) { const f = resources.get(id); if (f.stream) closeResource(f, true); } pending.clear(); },
     stats() { return { resources: resources.size - 3 }; },
   };
 }

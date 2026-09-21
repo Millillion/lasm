@@ -280,6 +280,22 @@ consumed bytes, and EOF/error ordering. Run it through the resource guard; it
 executes serially in each installed engine. `test/node-getline-state.test.mjs`
 checks the packaged ordinary-Lean path.
 
+`probe-console-buffering.mjs NEW_OUTPUT FULL_TOOLCHAIN...` compares ordinary
+Lean stdout/stderr buffering, explicit flushes, inherited-child ordering, and
+normal shutdown against the pinned native compiler. It preserves the executed
+source and records hashes and complete output; it does not modify upstream
+tests. `test/node-console-buffering.test.mjs` checks the packaged path, while
+`test/stdio-backpressure.test.mjs` fills a small Linux pipe and verifies that
+flush/disposal let a delayed JavaScript reader run. `test/worker-stdio.test.mjs`
+checks diagnostic forwarding and natural exit after `Worker.unref()` on Node.
+Run these through `run-bounded.mjs`, sequentially with other compiler work.
+
+`derive-host-prelude.mjs FROZEN_SOURCE NEW_OUTPUT` updates only the embedded
+private host prelude and its link-time copy, retaining the Wasm and Lean inputs.
+Like `derive-worker-cwd.mjs` for the worker prelude and `derive-host-files.mjs`
+for host modules, it verifies the parent snapshot and requires a fresh output.
+Never modify a frozen snapshot or carry passes into a different campaign identity.
+
 ## Unchanged tests and the native control
 
 ```sh

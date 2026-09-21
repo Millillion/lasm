@@ -232,6 +232,7 @@ private unsafe def «runProgram» : IO UInt32 := do
   copyFileSync(join(root, 'src/native-file-worker-pool.mjs'), join(output, 'native-file-worker-pool.mjs'));
   copyFileSync(join(root, 'src/native-file-worker-deno.mjs'), join(output, 'native-file-worker-deno.mjs'));
   copyFileSync(join(root, 'src/native-worker-cwd.cjs'), join(output, 'native-worker-cwd.cjs'));
+  copyFileSync(join(root, 'src/worker-stdio.cjs'), join(output, 'worker-stdio.cjs'));
   copyNativeBundle(root, output);
   copyFileSync(join(root, 'src/node-network.mjs'), join(output, 'node-network.mjs'));
   copyFileSync(join(root, 'src/native-tcp.mjs'), join(output, 'native-tcp.mjs'));

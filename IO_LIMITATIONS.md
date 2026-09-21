@@ -101,6 +101,24 @@ load, and suite conformance still need validation. See
   not a fundamental JavaScript limitation. `IO.currentDir` has a different native
   error and Lasm now preserves that distinction.
 - [ ] Expand stdin, terminal, redirected-console, and interactive backpressure tests.
+  Ordinary redirected stdout now uses native FILE buffering; stderr remains
+  unbuffered. Explicit flushes, normal shutdown, and the implicit stdout flush
+  before a child inherits stdin match native Linux in Node, Deno, and Bun full
+  compilers. Small full-pipe controls also verify that flush and disposal leave
+  the JavaScript event loop available. Terminal behavior, already nonblocking
+  descriptors, regular-file process-exit flushing, and forced exit remain open.
+  In particular, the private runtime still aliases `IO.Process.forceExit` to ordinary
+  exit, unlike native Lean's `_Exit` implementation.
+- [ ] Validate the private Node worker diagnostic adapter on supported Node
+  versions and operating systems. Node's default forwarding can change shared
+  stdout/stderr pipes to nonblocking mode. Descriptor-backed forwarding now
+  preserves flags, diagnostics, and unreferenced-worker shutdown on Node 24.13.1
+  Linux x64. Matching Node's ordinary lifetime requires checked private stream
+  flags; an unfamiliar layout reports an unsupported-adapter error. This
+  implementation dependency needs broader validation and is not a fundamental
+  JavaScript limitation. The console comparison, 21 unchanged upstream passes,
+  worker controls, and 22 passing Lean-server Vitest checks are recorded in
+  [the console evidence](docs/evidence/console-buffering-2026-09-21.json).
 - [ ] Broaden native child-process, process-group, pipe, signal and thread-ID
   parity tests, especially Windows quoting and process termination. Ordinary
   spawn/output/wait/poll/PID/kill operations and file-backed pipes are implemented.

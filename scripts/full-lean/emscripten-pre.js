@@ -45,7 +45,8 @@ if (ENVIRONMENT_IS_NODE) {
       if (!process.versions.bun) options = {
         ...options, resourceLimits: { ...options.resourceLimits, stackSizeMb: lasmVmStackMb } };
       if (!process.versions.bun && !process.versions.deno && lasmWorkerHost) {
-        options = { ...options, execArgv: [...(options.execArgv ?? process.execArgv), '--require',
+        options = { ...options, stdout: true, stderr: true,
+          execArgv: [...(options.execArgv ?? process.execArgv), '--require',
           require('node:url').fileURLToPath(new URL('./native-worker-cwd.cjs', lasmWorkerHost))] };
       }
       if (LasmCwdWorker || lasmCwdWorkerError) {
@@ -64,6 +65,9 @@ if (ENVIRONMENT_IS_NODE) {
         }
       }
       super(filename, options);
+      if (!process.versions.bun && !process.versions.deno && lasmWorkerHost) {
+        require(require('node:url').fileURLToPath(new URL('./worker-stdio.cjs', lasmWorkerHost)))(this);
+      }
     }
     emit(event, ...args) {
       // Emscripten reports a caught worker exception as CMD_ONERROR (8),
