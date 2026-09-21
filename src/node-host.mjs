@@ -1,6 +1,6 @@
 import * as fsp from 'node:fs/promises';
 import { getSystemErrorMessage } from 'node:util';
-import { resolve, join, isAbsolute, sep } from 'node:path';
+import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
 import { createNodeNetwork } from './node-network.mjs';
@@ -12,6 +12,7 @@ import { createNodeSystem } from './node-system.mjs';
 import { createNodeSignals } from './node-signal.mjs';
 import nativeThreadId from './thread-id.cjs';
 import { HandleTable } from './handle-table.mjs';
+import { createWorkingDirectory } from './working-directory.mjs';
 
 const empty = Buffer.alloc(0);
 export class LeanExit extends Error { constructor(code) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; } }
@@ -46,7 +47,7 @@ export function encodeError(err) {
 export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = {}, appPath = process.execPath, propagateCwd = false } = {}) {
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))
     throw new TypeError('Lean main arguments must be Unicode strings without NUL characters');
-  let directory = resolve(cwd);
+  const directory = createWorkingDirectory(cwd, propagateCwd);
   const resources = new HandleTable({ first: 10,
     entries: [0, 1, 2].map(fd => [fd, { type: 'file', fd, standardId: fd, tail: Promise.resolve() }]) });
   let closed = false;
@@ -71,12 +72,12 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     if (!resource || type && resource.type !== type) throw error('EBADF', 'Invalid or closed resource');
     return resource;
   }
-  function path(bytes) {
+  function pathAt(bytes, state) {
     const value = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
     if (value.includes('\0')) throw Object.assign(error('EINVAL', 'string contains NUL bytes'), { errno: 22, nativeMessage: true });
     // Leave dot segments and trailing separators for the OS to resolve. In
     // particular, link/../file is not equivalent to lexical path normalization.
-    return !value || isAbsolute(value) ? value : directory + sep + value;
+    return directory.path(value, state);
   }
   function serial(file, action) {
     file.pending = (file.pending ?? 0) + 1;
@@ -115,11 +116,12 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   }
   const network = createNodeNetwork({ add, get, release });
   const udp = createNodeUdp({ add, get });
-  const processes = createNodeProcesses({ add, get, release, cwd: () => directory });
+  const processes = createNodeProcesses({ add, get, release, cwd: state => directory.spawn(state) });
   const system = createNodeSystem();
   const signals = createNodeSignals({ add, get });
   const pending = new HandleTable();
-  function dispatch(op, id, arg, bytes, context) {
+  function dispatch(op, id, arg, bytes, context, state) {
+    const path = bytes => pathAt(bytes, state);
     if (op >= 160 && op <= 164) return signals.dispatch(op, id, arg);
     if (op >= 120 && op <= 144) return system.dispatch(op, id, arg, bytes);
     if (op === 115) {
@@ -128,7 +130,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     }
     if (op === 116) return nativeDns().getNameInfo(Number(bytes.readBigUInt64LE()), bytes.subarray(16).toString(), Number(bytes.readBigUInt64LE(8)));
     if (op >= 100 && op < 115) return udp.dispatch(op, id, arg, bytes, context);
-    if (op >= 80 && op < 90) return processes.dispatch(op, id, arg, bytes, context);
+    if (op >= 80 && op < 90) return processes.dispatch(op, id, arg, bytes, state);
     if (op >= 40) return network.dispatch(op, id, arg, bytes, context);
     const n = Number(arg);
     switch (op) {
@@ -186,28 +188,19 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       const value = process.env[bytes.toString()];
       return value === undefined ? empty : Buffer.from('\x01' + value);
     }
-    case 23: return Buffer.from(directory);
+    case 23: return directory.name(state).then(value => Buffer.from(value));
     case 24: return Buffer.from(appPath);
     case 25: return numbers(process.hrtime.bigint() / 1_000_000n);
     case 26: return numbers(process.hrtime.bigint());
     case 27: { const ms = BigInt(Date.now()); return numbers(ms / 1000n, ms % 1000n * 1_000_000n); }
     case 28: return randomBytes(n);
-    case 29: return (async () => {
-      try {
-        // Unlike IO.FS, native POSIX setCurrentDir uses a C string directly.
-        const nul = process.platform !== 'win32' ? bytes.indexOf(0) : -1;
-        const target = path(nul < 0 ? bytes : bytes.subarray(0, nul));
-        const stat = await fsp.stat(target);
-        if (!stat.isDirectory()) throw error('ENOTDIR', 'Working directory must be a directory');
-        if (!propagateCwd && process.platform !== 'win32') await nativeFiles().checkDirectorySearch(target);
-        const nextDirectory = await fsp.realpath(target);
-        if (propagateCwd) process.chdir(nextDirectory);
-        directory = nextDirectory; return empty;
-      } catch (err) {
-        if (process.platform === 'win32' || err.nativeMessage) throw err;
-        throw nativeFiles().fromNodeError(err);
-      }
-    })();
+    case 29: {
+      // Unlike IO.FS, native POSIX setCurrentDir uses a C string directly.
+      const nul = process.platform !== 'win32' ? bytes.indexOf(0) : -1;
+      const value = new TextDecoder('utf-8', { fatal: true }).decode(nul < 0 ? bytes : bytes.subarray(0, nul));
+      if (value.includes('\0')) throw Object.assign(error('EINVAL', 'string contains NUL bytes'), { errno: 22, nativeMessage: true });
+      return directory.change(value, state).then(() => empty);
+    }
     case 30: throw new LeanExit(n);
     case 31: return Buffer.from(args.map(value => value + '\0').join(''));
     case 32: case 33: case 34: {
@@ -239,11 +232,26 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       if (!result) throw new Error('Unknown asynchronous host request');
       pending.delete(id); return result;
     }
+    let state;
     try {
-      const result = dispatch(op, id, arg, Buffer.from(bytes), context);
-      if (result?.then) return result.then(bytes => ({ error: false, bytes }), err => { if (err instanceof LeanExit) throw err; return encodeError(err); });
+      if (closed) throw error('ECANCELED', 'Lean runtime disposed');
+      // Only path-based operations need this lease. A long-lived socket read
+      // or timer must not retain every directory that was current at startup.
+      if (op === 1 || op >= 10 && op <= 19 || op === 23 || op === 29 || op === 80)
+        state = directory.retain();
+      const result = dispatch(op, id, arg, Buffer.from(bytes), context, state);
+      if (result?.then) {
+        const response = result.then(bytes => ({ error: false, bytes }), err => { if (err instanceof LeanExit) throw err; return encodeError(err); });
+        return state ? response.finally(() => directory.release(state)) : response;
+      }
+      if (state) directory.release(state);
+      state = undefined;
       return { error: false, bytes: result };
-    } catch (err) { if (err instanceof LeanExit) throw err; return encodeError(err); }
+    } catch (err) {
+      if (state) directory.release(state);
+      if (err instanceof LeanExit) throw err;
+      return encodeError(err);
+    }
   }
   return { request, release, platform: process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0,
     // Internal full-runtime RPC: the Lean caller waits for this promise while
@@ -258,7 +266,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       if (!pending.has(id)) throw new Error('Unknown asynchronous host request');
       return Promise.resolve(pending.get(id));
     },
-    close() { closed = true; for (const value of resources.values()) value.cancelled = true; for (const id of resources.keys()) release(id); for (const id of [0,1,2]) { const f = resources.get(id); if (f.stream) closeResource(f); } pending.clear(); },
+    close() { closed = true; directory.close(); for (const value of resources.values()) value.cancelled = true; for (const id of resources.keys()) release(id); for (const id of [0,1,2]) { const f = resources.get(id); if (f.stream) closeResource(f); } pending.clear(); },
     stats() { return { resources: resources.size - 3 }; },
   };
 }

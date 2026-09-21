@@ -33,6 +33,22 @@ corrected guard leaves `MemoryHigh=infinity` and samples usage/pressure every
 allocation below the kernel cap, mutual exclusion, cleanup, and reuse. Its
 verified run recorded zero OOM and throttling events.
 
+Full compiler links on this host also use process-local base pages. Two links
+stopped on allocation pressure at 1.80 and 2.26 GiB despite ample host headroom.
+Disabling transparent huge pages for the build and its descendants allowed both
+compiler variants and their frozen snapshots to finish at 6.95 GiB, with no
+measured compaction/allocation stalls or resource events. Keep one build and
+Binaryen worker for these links:
+
+```sh
+node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py env BINARYEN_CORES=1 cmake --build .work/lean-full/wasm64 --target lean -j 1
+```
+
+The wrapper requires an active guard, verifies the Linux process flag, and
+executes the supplied command directly. The flag is inherited across exec;
+system-wide huge-page settings and all memory/pressure limits remain unchanged.
+This is a maintainer build adjustment, not an application runtime requirement.
+
 Resource reports and systemd exit evidence live in `.work/resource-runs/` (or an
 explicit `--report` path). Exit 125 denotes a resource stop or interruption,
 not a Lean conformance failure. `execution-started.json` links suite runs to

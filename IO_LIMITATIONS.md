@@ -52,8 +52,21 @@ close the full-suite or cross-platform gates. See the
   at embedded NULs; `getEnv` returns `none` for NUL-containing names, while
   filesystem primitives retain their explicit rejection. Targeted ordinary
   Lean comparisons match native Linux; see [the NUL comparisons](docs/evidence/process-nul-2026-09-21.json).
-  Renamed/deleted cwd tracking, other string-boundary cases, and macOS/Windows
-  execution remain open.
+  Linux cwd identity now survives directory and ancestor renames/deletion in
+  both execution paths. Twelve ordinary Lean controls match native behavior in
+  all three engines. Per-instance isolation, pending FIFO opens, cancellation,
+  and descriptor cleanup also have passing host checks; see
+  [the directory-identity evidence](docs/evidence/cwd-tracking-2026-09-21.json).
+  Non-Linux cwd identity, permission-change races, long relative paths, and
+  operation without a mounted `/proc` remain open, alongside other string-boundary
+  and platform cases.
+- [ ] Account for the pinned native Lean defect where
+  `IO.Process.getCurrentDir` crashes after cwd deletion: its ENOENT decoder
+  dereferences a null filename. Lasm returns a structured error safely; the
+  separate native crash and three-engine safety checks are recorded in the
+  directory-identity evidence. This intentional difference is an upstream bug,
+  not a fundamental JavaScript limitation. `IO.currentDir` has a different native
+  error and Lasm now preserves that distinction.
 - [ ] Expand stdin, terminal, redirected-console, and interactive backpressure tests.
 - [ ] Broaden native child-process, process-group, pipe, signal and thread-ID
   parity tests, especially Windows quoting and process termination. Ordinary
@@ -73,7 +86,7 @@ close the full-suite or cross-platform gates. See the
   removal of the parent directory, in both execution paths and all three engines.
   Private file-worker startup now handles that removed-cwd case without changing
   OS cwd; four blocked FIFO readers still permit their dependent writes.
-  Concurrent rename/removal races, virtual cwd tracking, and native duplication
+  Concurrent rename/removal/permission races, non-Linux cwd identity, and native duplication
   of unflushed parent output on failed forks remain open. The private launcher
   also adds engine startup overhead. See [the retained process comparisons](docs/evidence/process-spawn-2026-09-21.json).
   `IO.getTID` is now implemented using the executing worker's actual OS thread ID;

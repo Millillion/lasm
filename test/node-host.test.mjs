@@ -70,12 +70,13 @@ test('Std.Async timers preserve UInt64 delays and reset without overflowing Node
   assert.equal(host.stats().resources, 0);
 });
 
-test('a synchronous exit during request startup leaves no pending result', () => {
+test('a synchronous exit during request startup leaves no pending result', async () => {
   const host = createNodeRuntimeHost();
   try {
     assert.throws(() => host.start(30, 0, 7n, new Uint8Array()), { name: 'LeanExit', code: 7 });
     assert.throws(() => host.whenReady(1), /Unknown asynchronous host request/);
     const next = host.start(23, 0, 0n, new Uint8Array());
-    assert.equal(host.request(90, next).error, false);
+    assert.equal((await host.whenReady(next)).error, false);
+    assert.equal((await host.request(90, next)).error, false);
   } finally { host.close(); }
 });

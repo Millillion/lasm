@@ -1,0 +1,4835 @@
+{
+  "recordedAt": "2026-09-21T12:06:31.372552+00:00",
+  "scope": "Linux cwd identity and ordinary Lean API comparison in packaged and full compiler execution paths. Supplemental controls and selected unchanged upstream registrations; not complete IO or suite conformance.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "before": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/fixture.lean",
+    "sourceSha256": "9fe09e10c50d1bdb369898d2334f5a5da3a97ab6895bc4c6868f2512ecf1c583",
+    "scope": "Supplementary POSIX cwd rename/delete comparison; not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before-resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.39966801399999996,
+        "code": 0,
+        "signal": null,
+        "stdout": "renamed process cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\"\nrenamed legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\"\nrenamed relative read: \"preserved\"\nrenamed child cwd: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\\\\n\\\", \\\"\\\"\"\nrenamed relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before\"\ndeleted legacy cwd: IO.Error.userError \"failed to retrieve current working directory\"\ndeleted relative metadata: \"IO.FS.FileType.dir\"\ndeleted relative readDir: \"#[]\"\ndeleted inherited child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted dot child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted absolute child recovery: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before\\\\n\\\", \\\"\\\"\"\ndeleted relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before\"\ncwd tracking comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v71-process-nul/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v71-process-nul",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 11.240699651000002,
+        "code": 0,
+        "signal": null,
+        "stdout": "renamed process cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/before\"\nrenamed legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/before\"\nrenamed relative read: IO.Error.noFileOrDirectory \"payload\" 4294967294 \"no such file or directory\"\nrenamed child cwd: \"255: \\\"\\\", \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/before\\\\n\\\"\"\nrenamed relative chdir: IO.Error.noFileOrDirectory \"..\" 2 \"No such file or directory\"\ndeleted legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\"\ndeleted relative metadata: IO.Error.noFileOrDirectory \".\" 4294967294 \"no such file or directory\"\ndeleted relative readDir: IO.Error.noFileOrDirectory \".\" 2 \"No such file or directory\"\ndeleted inherited child cwd: \"255: \\\"\\\", \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\\\\n\\\"\"\ndeleted dot child cwd: \"255: \\\"\\\", \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\\\\n\\\"\"\ndeleted absolute child recovery: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before\\\\n\\\", \\\"\\\"\"\ndeleted relative chdir: IO.Error.noFileOrDirectory \"..\" 2 \"No such file or directory\"\ncwd tracking comparison completed\n",
+        "stderr": "",
+        "passed": false
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v71-process-nul/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v71-process-nul",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v71-process-nul/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 11.023605522,
+        "code": 0,
+        "signal": null,
+        "stdout": "renamed process cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/before\"\nrenamed legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/before\"\nrenamed relative read: IO.Error.noFileOrDirectory \"payload\" 4294967294 \"no such file or directory\"\nrenamed child cwd: \"255: \\\"\\\", \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/before\\\\n\\\"\"\nrenamed relative chdir: IO.Error.noFileOrDirectory \"..\" 2 \"No such file or directory\"\ndeleted legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\"\ndeleted relative metadata: IO.Error.noFileOrDirectory \".\" 4294967294 \"no such file or directory\"\ndeleted relative readDir: IO.Error.noFileOrDirectory \".\" 2 \"No such file or directory\"\ndeleted inherited child cwd: \"255: \\\"\\\", \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\\\\n\\\"\"\ndeleted dot child cwd: \"255: \\\"\\\", \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\\\\n\\\"\"\ndeleted absolute child recovery: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before\\\\n\\\", \\\"\\\"\"\ndeleted relative chdir: IO.Error.noFileOrDirectory \"..\" 2 \"No such file or directory\"\ncwd tracking comparison completed\n",
+        "stderr": "",
+        "passed": false
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v72-process-nul-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v72-process-nul-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v72-process-nul-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v72-process-nul-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v72-process-nul-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 71.699057803,
+        "code": 0,
+        "signal": null,
+        "stdout": "renamed process cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/before\"\nrenamed legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/before\"\nrenamed relative read: IO.Error.noFileOrDirectory \"payload\" 4294967294 \"no such file or directory\"\nrenamed child cwd: \"255: \\\"\\\", \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/before\\\\n\\\"\"\nrenamed relative chdir: IO.Error.noFileOrDirectory \"..\" 2 \"No such file or directory\"\ndeleted legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\"\ndeleted relative metadata: IO.Error.noFileOrDirectory \".\" 4294967294 \"no such file or directory\"\ndeleted relative readDir: IO.Error.noFileOrDirectory \".\" 2 \"No such file or directory\"\ndeleted inherited child cwd: \"255: \\\"\\\", \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\\\\n\\\"\"\ndeleted dot child cwd: \"255: \\\"\\\", \\\"could not change directory to /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before/after\\\\n\\\"\"\ndeleted absolute child recovery: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-before\\\\n\\\", \\\"\\\"\"\ndeleted relative chdir: IO.Error.noFileOrDirectory \"..\" 2 \"No such file or directory\"\ncwd tracking comparison completed\n",
+        "stderr": "",
+        "passed": false
+      }
+    ],
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T10:50:08.617Z"
+  },
+  "after": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/cwd-tracking/Main.lean",
+    "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/fixture.lean",
+    "sourceSha256": "9fe09e10c50d1bdb369898d2334f5a5da3a97ab6895bc4c6868f2512ecf1c583",
+    "scope": "Supplementary Linux cwd rename/delete comparison; not an upstream-suite result.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-full-resources.json",
+    "results": [
+      {
+        "name": "native",
+        "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "seconds": 0.360273903,
+        "code": 0,
+        "signal": null,
+        "stdout": "renamed process cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\"\nrenamed legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\"\nrenamed relative read: \"preserved\"\nrenamed child cwd: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\\\\n\\\", \\\"\\\"\"\nrenamed relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\"\ndeleted legacy cwd: IO.Error.userError \"failed to retrieve current working directory\"\ndeleted relative metadata: \"IO.FS.FileType.dir\"\ndeleted relative readDir: \"#[]\"\ndeleted inherited child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted dot child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted absolute child recovery: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\\\\n\\\", \\\"\\\"\"\ndeleted relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\"\ncwd tracking comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "node",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v74-cwd-tracking-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v74-cwd-tracking-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 11.057129266,
+        "code": 0,
+        "signal": null,
+        "stdout": "renamed process cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\"\nrenamed legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\"\nrenamed relative read: \"preserved\"\nrenamed child cwd: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\\\\n\\\", \\\"\\\"\"\nrenamed relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\"\ndeleted legacy cwd: IO.Error.userError \"failed to retrieve current working directory\"\ndeleted relative metadata: \"IO.FS.FileType.dir\"\ndeleted relative readDir: \"#[]\"\ndeleted inherited child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted dot child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted absolute child recovery: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\\\\n\\\", \\\"\\\"\"\ndeleted relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\"\ncwd tracking comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v74-cwd-tracking-native/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v74-cwd-tracking-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v74-cwd-tracking-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 10.988353293000003,
+        "code": 0,
+        "signal": null,
+        "stdout": "renamed process cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\"\nrenamed legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\"\nrenamed relative read: \"preserved\"\nrenamed child cwd: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\\\\n\\\", \\\"\\\"\"\nrenamed relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\"\ndeleted legacy cwd: IO.Error.userError \"failed to retrieve current working directory\"\ndeleted relative metadata: \"IO.FS.FileType.dir\"\ndeleted relative readDir: \"#[]\"\ndeleted inherited child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted dot child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted absolute child recovery: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\\\\n\\\", \\\"\\\"\"\ndeleted relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\"\ncwd tracking comparison completed\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v73-cwd-tracking-lowered/bin/lean",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/runtime-support",
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 2,
+          "engineEnvironment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v73-cwd-tracking-lowered/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v73-cwd-tracking-lowered/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 4294967296,
+          "pthreadPoolSize": 8,
+          "backend": "full-lean-wasm64-lowered",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v73-cwd-tracking-lowered",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v73-cwd-tracking-lowered/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "seconds": 70.852015487,
+        "code": 0,
+        "signal": null,
+        "stdout": "renamed process cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\"\nrenamed legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\"\nrenamed relative read: \"preserved\"\nrenamed child cwd: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/after\\\\n\\\", \\\"\\\"\"\nrenamed relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\"\ndeleted legacy cwd: IO.Error.userError \"failed to retrieve current working directory\"\ndeleted relative metadata: \"IO.FS.FileType.dir\"\ndeleted relative readDir: \"#[]\"\ndeleted inherited child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted dot child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted absolute child recovery: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\\\\n\\\", \\\"\\\"\"\ndeleted relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after\"\ncwd tracking comparison completed\n",
+        "stderr": "",
+        "passed": true
+      }
+    ],
+    "deletedProcess": {
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/cwd-tracking/DeletedProcess.lean",
+      "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-after/deleted-process.lean",
+      "sourceSha256": "fe8eb3c8f9992bdc13c812942f8308e0178839d726dbc7db1e43e01d6e243083",
+      "scope": "Lasm safety regression only: pinned native Lean crashes in this ENOENT branch; no native parity claim.",
+      "results": [
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v74-cwd-tracking-native/bin/lean",
+          "seconds": 9.813918309,
+          "code": 0,
+          "signal": null,
+          "stdout": "before deleted process cwd\nerror: IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v74-cwd-tracking-native/bin/lean",
+          "seconds": 9.650962876000005,
+          "code": 0,
+          "signal": null,
+          "stdout": "before deleted process cwd\nerror: IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v73-cwd-tracking-lowered/bin/lean",
+          "seconds": 70.704648589,
+          "code": 0,
+          "signal": null,
+          "stdout": "before deleted process cwd\nerror: IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "executedSourceUnchanged": true
+    },
+    "executedSourceUnchanged": true,
+    "finishedAt": "2026-09-21T11:54:08.001Z"
+  },
+  "nativeUpstreamDefect": {
+    "result": {
+      "name": "native-deleted-process-cwd",
+      "command": [
+        "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+        "--run",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/DeletedProcess.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/deleted-process"
+      ],
+      "returncode": -11,
+      "stdout": "before deleted process cwd\n",
+      "stderr": "",
+      "startedAt": "2026-09-21T10:47:34.546081+00:00",
+      "seconds": 0.428828
+    },
+    "sourceSha256": "fe8eb3c8f9992bdc13c812942f8308e0178839d726dbc7db1e43e01d6e243083",
+    "cause": "The pinned Process.getCurrentDir passes a null filename to the ENOENT error decoder, which increments that null object reference.",
+    "lasmBehavior": "Return IO.Error.noFileOrDirectory with empty filename and errno 2. This safe result deliberately differs from the native crash; it is not a fundamental JavaScript limit."
+  },
+  "descriptorMechanisms": {
+    "sourceSha256": {
+      "Main.lean": "9fe09e10c50d1bdb369898d2334f5a5da3a97ab6895bc4c6868f2512ecf1c583",
+      "DeletedProcess.lean": "fe8eb3c8f9992bdc13c812942f8308e0178839d726dbc7db1e43e01d6e243083",
+      "descriptor-control.mjs": "3e49eb981e282b20f3069d462d3ea7a07135f1590cb2eba421539ebe797e43ea"
+    },
+    "results": [
+      {
+        "name": "native-tracking",
+        "command": [
+          "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/Main.lean",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/native"
+        ],
+        "returncode": 0,
+        "stdout": "renamed process cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/native/after\"\nrenamed legacy cwd: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/native/after\"\nrenamed relative read: \"preserved\"\nrenamed child cwd: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/native/after\\\\n\\\", \\\"\\\"\"\nrenamed relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/native\"\ndeleted legacy cwd: IO.Error.userError \"failed to retrieve current working directory\"\ndeleted relative metadata: \"IO.FS.FileType.dir\"\ndeleted relative readDir: \"#[]\"\ndeleted inherited child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted dot child cwd: \"0: \\\"\\\", \\\"\\\"\"\ndeleted absolute child recovery: \"0: \\\"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/native\\\\n\\\", \\\"\\\"\"\ndeleted relative chdir: \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/native\"\ncwd tracking comparison completed\n",
+        "stderr": "",
+        "startedAt": "2026-09-21T10:47:34.171409+00:00",
+        "seconds": 0.374388
+      },
+      {
+        "name": "native-deleted-process-cwd",
+        "command": [
+          "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/DeletedProcess.lean",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/deleted-process"
+        ],
+        "returncode": -11,
+        "stdout": "before deleted process cwd\n",
+        "stderr": "",
+        "startedAt": "2026-09-21T10:47:34.546081+00:00",
+        "seconds": 0.428828
+      },
+      {
+        "name": "node-descriptor",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/descriptor-control.mjs"
+        ],
+        "returncode": 0,
+        "stdout": "Directory descriptor survives rename/deletion and same-engine child startup\n",
+        "stderr": "",
+        "startedAt": "2026-09-21T10:47:34.975197+00:00",
+        "seconds": 0.08484
+      },
+      {
+        "name": "deno-descriptor",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "--no-config",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/descriptor-control.mjs"
+        ],
+        "returncode": 0,
+        "stdout": "Directory descriptor survives rename/deletion and same-engine child startup\n",
+        "stderr": "",
+        "startedAt": "2026-09-21T10:47:35.060284+00:00",
+        "seconds": 0.111957
+      },
+      {
+        "name": "bun-descriptor",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-mechanisms-v1/descriptor-control.mjs"
+        ],
+        "returncode": 0,
+        "stdout": "Directory descriptor survives rename/deletion and same-engine child startup\n",
+        "stderr": "",
+        "startedAt": "2026-09-21T10:47:35.172468+00:00",
+        "seconds": 0.038084
+      }
+    ]
+  },
+  "directHost": {
+    "tests": 7,
+    "passed": 7,
+    "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-host-v3.log",
+    "cases": [
+      "rename and deletion",
+      "ancestor rename",
+      "literal deleted suffix",
+      "initial symlink/dot path",
+      "independent instances",
+      "pending FIFO open across chdir",
+      "child cwd inheritance and absolute recovery",
+      "repeated chdir with a pending timer",
+      "disposal with pending file open and directory change",
+      "descriptor cleanup"
+    ]
+  },
+  "packaged": {
+    "tests": 36,
+    "pass": 36,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-packaged.log"
+  },
+  "resources": {
+    "cwd-host-v3": {
+      "startedAt": "2026-09-21T11:35:03.146Z",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/working-directory.test.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "527fc607-3685-4d43-a427-c5f186e9ab18",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 28956880896
+      },
+      "minimumHostAvailable": 28853587968,
+      "peakMemoryBytes": 88965120,
+      "peakTasks": 35,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-host-v3-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T11:35:05.354Z",
+        "memoryBytes": 11374592,
+        "peakMemoryBytes": 88965120,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 8720384,
+          "file": 212992,
+          "kernel": 929792,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 212992,
+          "slab": 153264
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T11:35:05.362Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 12980224,
+        "peakMemoryBytes": 88965120,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 212992,
+          "kernel": 950272,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 212992,
+          "slab": 145616
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T11:35:05.386Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "cwd-tracking-packaged": {
+      "startedAt": "2026-09-21T11:35:05.426Z",
+      "command": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/node-cwd-tracking.test.mjs",
+        "test/node-cwd.test.mjs",
+        "test/node-process-nul.test.mjs",
+        "test/node-spawn.test.mjs",
+        "test/node-process-cwd.test.mjs",
+        "test/native-files.test.mjs",
+        "test/node-host.test.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "b35427a5-8a2e-43b2-92d7-6d2e9ebf3d2c",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 28922322944
+      },
+      "minimumHostAvailable": 28462620672,
+      "peakMemoryBytes": 556830720,
+      "peakTasks": 50,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-packaged-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T11:42:12.210Z",
+        "memoryBytes": 358379520,
+        "peakMemoryBytes": 556830720,
+        "swapBytes": 0,
+        "tasks": 47,
+        "memoryBreakdown": {
+          "anon": 231669760,
+          "file": 113430528,
+          "kernel": 12124160,
+          "shmem": 0,
+          "file_mapped": 921600,
+          "inactive_file": 103751680,
+          "slab": 5120760
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T11:42:12.335Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 130269184,
+        "peakMemoryBytes": 556830720,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 113422336,
+          "kernel": 4997120,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 103743488,
+          "slab": 4163944
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T11:42:12.361Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "cwd-tracking-build-no-thp": {
+      "startedAt": "2026-09-21T11:48:45.003Z",
+      "command": [
+        "python3",
+        ".work/full-engine-probe/no-thp-build.py",
+        "python3",
+        ".work/full-engine-probe/finish-cwd-tracking-build-no-thp.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "4881bf4a-ac3b-4bf7-8511-3137338d974a",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 28942233600
+      },
+      "minimumHostAvailable": 25620307968,
+      "peakMemoryBytes": 7458893824,
+      "peakTasks": 24,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-build-no-thp-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T11:50:30.536Z",
+        "memoryBytes": 4390674432,
+        "peakMemoryBytes": 7458893824,
+        "swapBytes": 0,
+        "tasks": 2,
+        "memoryBreakdown": {
+          "anon": 6791168,
+          "file": 4219244544,
+          "kernel": 163934208,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 4219035648,
+          "slab": 163811448
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "highWaterProcesses": {
+        "at": "2026-09-21T11:50:06.505Z",
+        "processes": [
+          {
+            "pid": 1863322,
+            "name": "wasm-emscripten",
+            "residentBytes": 2015956992,
+            "threads": 1
+          },
+          {
+            "pid": 1863280,
+            "name": "python3",
+            "residentBytes": 95629312,
+            "threads": 1
+          },
+          {
+            "pid": 1863279,
+            "name": "python3",
+            "residentBytes": 17473536,
+            "threads": 1
+          },
+          {
+            "pid": 1862839,
+            "name": "python3",
+            "residentBytes": 16986112,
+            "threads": 1
+          },
+          {
+            "pid": 1862837,
+            "name": "python3",
+            "residentBytes": 13979648,
+            "threads": 1
+          }
+        ]
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T11:50:30.692Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 4395683840,
+        "peakMemoryBytes": 7458893824,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10219520,
+          "file": 4219248640,
+          "kernel": 164696064,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 4219039744,
+          "slab": 163873656
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T11:50:30.717Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "cwd-tracking-full": {
+      "startedAt": "2026-09-21T11:51:02.648Z",
+      "command": [
+        "node",
+        "scripts/full-lean/probe-cwd-tracking.mjs",
+        ".work/full-engine-probe/cwd-tracking-after",
+        ".work/full-toolchains/node-v74-cwd-tracking-native",
+        ".work/full-toolchains/deno-v74-cwd-tracking-native",
+        ".work/full-toolchains/bun-v73-cwd-tracking-lowered"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "95fee73b-30dd-475b-b7c4-6372e47eed63",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 28955123712
+      },
+      "minimumHostAvailable": 26305429504,
+      "peakMemoryBytes": 2723311616,
+      "peakTasks": 54,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-full-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T11:54:08.012Z",
+        "memoryBytes": 39866368,
+        "peakMemoryBytes": 2723311616,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 27168768,
+          "file": 10125312,
+          "kernel": 1110016,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 10055680,
+          "slab": 505968
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T11:54:08.062Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 23400448,
+        "peakMemoryBytes": 2723311616,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10219520,
+          "file": 10125312,
+          "kernel": 1277952,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 10055680,
+          "slab": 445624
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T11:54:08.087Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "cwd-tracking-suite-preparation": {
+      "startedAt": "2026-09-21T11:54:57.952Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/check-base-pages-and-prepare.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "35dd4f67-a98f-469b-ab56-2c38fdf2ebeb",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 28908863488
+      },
+      "minimumHostAvailable": 28025561088,
+      "peakMemoryBytes": 2352488448,
+      "peakTasks": 12,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-suite-preparation-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T11:55:12.577Z",
+        "memoryBytes": 2347364352,
+        "peakMemoryBytes": 2347364352,
+        "swapBytes": 0,
+        "tasks": 9,
+        "memoryBreakdown": {
+          "anon": 109207552,
+          "file": 2100031488,
+          "kernel": 137400320,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2100031488,
+          "slab": 134501544
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-21T11:55:12.661Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 2248732672,
+        "peakMemoryBytes": 2352488448,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 2102472704,
+          "kernel": 135233536,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2102472704,
+          "slab": 134425696
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T11:55:12.693Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "build": {
+    "startedAt": "2026-09-21T11:48:45.113518+00:00",
+    "reason": "Resume final linking with process-local transparent huge pages disabled, one build/Binaryen worker, and unchanged memory/pressure caps.",
+    "previousAttempt": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-build-aborted.json",
+    "binaryenCores": 1,
+    "buildJobs": 1,
+    "steps": [
+      {
+        "command": [
+          "cmake",
+          "--build",
+          ".work/lean-full/wasm64",
+          "--target",
+          "lean",
+          "-j",
+          "1"
+        ],
+        "startedAt": "2026-09-21T11:48:45.113660+00:00",
+        "exitCode": 0,
+        "finishedAt": "2026-09-21T11:49:48.493491+00:00"
+      },
+      {
+        "command": [
+          "node",
+          "scripts/full-lean/freeze-build.mjs",
+          ".work/lean-full/wasm64",
+          ".work/full-artifacts/wasm64-v73-cwd-tracking-lowered"
+        ],
+        "startedAt": "2026-09-21T11:49:48.493663+00:00",
+        "exitCode": 0,
+        "finishedAt": "2026-09-21T11:49:55.176827+00:00"
+      },
+      {
+        "command": [
+          "python3",
+          ".work/full-engine-probe/relink-cwd-native.py"
+        ],
+        "startedAt": "2026-09-21T11:49:55.177106+00:00",
+        "exitCode": 0,
+        "finishedAt": "2026-09-21T11:50:29.720356+00:00"
+      },
+      {
+        "command": [
+          "node",
+          "scripts/full-lean/prepare-toolchain.mjs",
+          "--engine",
+          "node",
+          "--build",
+          ".work/full-artifacts/wasm64-v74-cwd-tracking-native",
+          "--output",
+          ".work/full-toolchains/node-v74-cwd-tracking-native",
+          "--lake-threads",
+          "1"
+        ],
+        "startedAt": "2026-09-21T11:50:29.720526+00:00",
+        "exitCode": 0,
+        "finishedAt": "2026-09-21T11:50:29.877772+00:00"
+      },
+      {
+        "command": [
+          "node",
+          "scripts/full-lean/prepare-toolchain.mjs",
+          "--engine",
+          "deno",
+          "--build",
+          ".work/full-artifacts/wasm64-v74-cwd-tracking-native",
+          "--output",
+          ".work/full-toolchains/deno-v74-cwd-tracking-native",
+          "--lake-threads",
+          "1"
+        ],
+        "startedAt": "2026-09-21T11:50:29.878097+00:00",
+        "exitCode": 0,
+        "finishedAt": "2026-09-21T11:50:30.044155+00:00"
+      },
+      {
+        "command": [
+          "node",
+          "scripts/full-lean/prepare-toolchain.mjs",
+          "--engine",
+          "bun",
+          "--build",
+          ".work/full-artifacts/wasm64-v73-cwd-tracking-lowered",
+          "--output",
+          ".work/full-toolchains/bun-v73-cwd-tracking-lowered",
+          "--lake-threads",
+          "1",
+          "--bun-stack-helper",
+          ".work/full-toolchains/bun-v72-process-nul-lowered/bun-stack-reservation.so"
+        ],
+        "startedAt": "2026-09-21T11:50:30.044351+00:00",
+        "exitCode": 0,
+        "finishedAt": "2026-09-21T11:50:30.215778+00:00"
+      }
+    ],
+    "nodeIoSha256": "996a6c6a4cf6c827938ca7a9fbd2cab42bf32e135dba20209a1d221ad6c77aa2",
+    "finishedAt": "2026-09-21T11:50:30.216189+00:00"
+  },
+  "upstream": {
+    "node": {
+      "suite": "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v74-cwd-tracking-native",
+      "status": "complete",
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "updatedAt": "2026-09-21T11:56:35.204Z",
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native",
+      "tests": [
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00001-c1cb95ff",
+              "status": "passed",
+              "startedAt": "2026-09-21T11:55:31.826Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T11:55:42.198Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00001-c1cb95ff/resources.json",
+              "peakMemoryBytes": 1772199936,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T11:55:31.862Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v74-cwd-tracking-native",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00001-c1cb95ff/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/IO_test\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "ce993de0-8276-4ec3-9a4f-b832cc6d0ec0",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28600397824
+                },
+                "minimumHostAvailable": 26877370368,
+                "peakMemoryBytes": 1772199936,
+                "peakTasks": 41,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00001-c1cb95ff/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T11:55:42.081Z",
+                  "memoryBytes": 50724864,
+                  "peakMemoryBytes": 1772199936,
+                  "swapBytes": 0,
+                  "tasks": 11,
+                  "memoryBreakdown": {
+                    "anon": 47513600,
+                    "file": 73728,
+                    "kernel": 2105344,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 73728,
+                    "slab": 272176
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T11:55:42.168Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12931072,
+                  "peakMemoryBytes": 1772199936,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10215424,
+                    "file": 77824,
+                    "kernel": 995328,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 77824,
+                    "slab": 173944
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T11:55:42.192Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T11:55:32.115Z",
+                "finishedAt": "2026-09-21T11:55:42.122Z",
+                "backend": "node",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v74-cwd-tracking-native/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00001-c1cb95ff/results/results.xml",
+                  "-R",
+                  "^elab/IO_test\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00001-c1cb95ff/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/IO_test.lean",
+                    "classname": "elab/IO_test.lean",
+                    "time": "9.68913",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00002-4806b619",
+              "status": "passed",
+              "startedAt": "2026-09-21T11:55:42.199Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T11:56:04.032Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00002-4806b619/resources.json",
+              "peakMemoryBytes": 3580313600,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T11:55:42.234Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v74-cwd-tracking-native",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00002-4806b619/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/Process\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "1b3499e5-5b0e-489d-b4db-d27720f88227",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28055691264
+                },
+                "minimumHostAvailable": 25359101952,
+                "peakMemoryBytes": 3580313600,
+                "peakTasks": 51,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00002-4806b619/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T11:56:03.869Z",
+                  "memoryBytes": 43790336,
+                  "peakMemoryBytes": 3580313600,
+                  "swapBytes": 0,
+                  "tasks": 11,
+                  "memoryBreakdown": {
+                    "anon": 41533440,
+                    "file": 36864,
+                    "kernel": 2060288,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 36864,
+                    "slab": 240296
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T11:56:04.003Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12288000,
+                  "peakMemoryBytes": 3580313600,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10219520,
+                    "file": 40960,
+                    "kernel": 987136,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 40960,
+                    "slab": 153344
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T11:56:04.027Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T11:55:42.495Z",
+                "finishedAt": "2026-09-21T11:56:03.955Z",
+                "backend": "node",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v74-cwd-tracking-native/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00002-4806b619/results/results.xml",
+                  "-R",
+                  "^elab/Process\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00002-4806b619/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/Process.lean",
+                    "classname": "elab/Process.lean",
+                    "time": "21.1288",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00003-2f5ef403",
+              "status": "passed",
+              "startedAt": "2026-09-21T11:56:04.032Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T11:56:23.776Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00003-2f5ef403/resources.json",
+              "peakMemoryBytes": 2206699520,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T11:56:04.074Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v74-cwd-tracking-native",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00003-2f5ef403/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/async_http_hang_regressions\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "a3a87988-6b12-48d8-aadb-e58efb36f7c5",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28268756992
+                },
+                "minimumHostAvailable": 26702913536,
+                "peakMemoryBytes": 2206699520,
+                "peakTasks": 33,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00003-2f5ef403/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T11:56:23.710Z",
+                  "memoryBytes": 929792,
+                  "peakMemoryBytes": 2206699520,
+                  "swapBytes": 0,
+                  "tasks": 1,
+                  "memoryBreakdown": {
+                    "anon": 0,
+                    "file": 438272,
+                    "kernel": 274432,
+                    "shmem": 0,
+                    "file_mapped": 0,
+                    "inactive_file": 438272,
+                    "slab": 167320
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T11:56:23.745Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12820480,
+                  "peakMemoryBytes": 2206699520,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10219520,
+                    "file": 438272,
+                    "kernel": 983040,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 438272,
+                    "slab": 154240
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T11:56:23.771Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T11:56:04.445Z",
+                "finishedAt": "2026-09-21T11:56:23.698Z",
+                "backend": "node",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v74-cwd-tracking-native/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00003-2f5ef403/results/results.xml",
+                  "-R",
+                  "^elab/async_http_hang_regressions\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00003-2f5ef403/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/async_http_hang_regressions.lean",
+                    "classname": "elab/async_http_hang_regressions.lean",
+                    "time": "18.9242",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00004-6acb2005",
+              "status": "passed",
+              "startedAt": "2026-09-21T11:56:23.777Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T11:56:35.204Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00004-6acb2005/resources.json",
+              "peakMemoryBytes": 1802633216,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T11:56:23.817Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v74-cwd-tracking-native",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00004-6acb2005/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/tempfile\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "a4272edb-7220-4ed2-898c-caae55482de6",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28837625856
+                },
+                "minimumHostAvailable": 27162050560,
+                "peakMemoryBytes": 1802633216,
+                "peakTasks": 33,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00004-6acb2005/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T11:56:35.035Z",
+                  "memoryBytes": 48156672,
+                  "peakMemoryBytes": 1802633216,
+                  "swapBytes": 0,
+                  "tasks": 11,
+                  "memoryBreakdown": {
+                    "anon": 45338624,
+                    "file": 32768,
+                    "kernel": 2093056,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 32768,
+                    "slab": 252024
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T11:56:35.171Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12070912,
+                  "peakMemoryBytes": 1802633216,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10219520,
+                    "file": 36864,
+                    "kernel": 999424,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 36864,
+                    "slab": 152776
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T11:56:35.198Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T11:56:24.069Z",
+                "finishedAt": "2026-09-21T11:56:35.108Z",
+                "backend": "node",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v74-cwd-tracking-native/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00004-6acb2005/results/results.xml",
+                  "-R",
+                  "^elab/tempfile\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v74-cwd-tracking-native/00004-6acb2005/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/tempfile.lean",
+                    "classname": "elab/tempfile.lean",
+                    "time": "10.7159",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "deno": {
+      "suite": "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v74-cwd-tracking-native",
+      "status": "complete",
+      "counts": {
+        "passed": 3,
+        "failed": 1,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "updatedAt": "2026-09-21T11:57:36.364Z",
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native",
+      "tests": [
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00001-b4981f43",
+              "status": "passed",
+              "startedAt": "2026-09-21T11:56:35.914Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T11:56:46.327Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00001-b4981f43/resources.json",
+              "peakMemoryBytes": 2025517056,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T11:56:35.952Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v74-cwd-tracking-native",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00001-b4981f43/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/IO_test\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "d3ef614f-0003-4177-9370-60dc93018835",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28746633216
+                },
+                "minimumHostAvailable": 26865168384,
+                "peakMemoryBytes": 2025517056,
+                "peakTasks": 32,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00001-b4981f43/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T11:56:46.171Z",
+                  "memoryBytes": 44544000,
+                  "peakMemoryBytes": 2025517056,
+                  "swapBytes": 0,
+                  "tasks": 11,
+                  "memoryBreakdown": {
+                    "anon": 41525248,
+                    "file": 159744,
+                    "kernel": 2060288,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 159744,
+                    "slab": 273832
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T11:56:46.297Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12283904,
+                  "peakMemoryBytes": 2025517056,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10215424,
+                    "file": 163840,
+                    "kernel": 991232,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 163840,
+                    "slab": 172168
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T11:56:46.321Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T11:56:36.223Z",
+                "finishedAt": "2026-09-21T11:56:46.248Z",
+                "backend": "deno",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v74-cwd-tracking-native/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00001-b4981f43/results/results.xml",
+                  "-R",
+                  "^elab/IO_test\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00001-b4981f43/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/IO_test.lean",
+                    "classname": "elab/IO_test.lean",
+                    "time": "9.71021",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00002-3a3d01fc",
+              "status": "passed",
+              "startedAt": "2026-09-21T11:56:46.328Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T11:57:07.236Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00002-3a3d01fc/resources.json",
+              "peakMemoryBytes": 3816062976,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T11:56:46.365Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v74-cwd-tracking-native",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00002-3a3d01fc/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/Process\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "63d1674f-45b5-458e-bcdc-b425431d1c42",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28637294592
+                },
+                "minimumHostAvailable": 25066430464,
+                "peakMemoryBytes": 3816062976,
+                "peakTasks": 47,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00002-3a3d01fc/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T11:57:07.195Z",
+                  "memoryBytes": 10039296,
+                  "peakMemoryBytes": 3816062976,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 7892992,
+                    "file": 131072,
+                    "kernel": 946176,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 131072,
+                    "slab": 166912
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T11:57:07.208Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12439552,
+                  "peakMemoryBytes": 3816062976,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10219520,
+                    "file": 131072,
+                    "kernel": 987136,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 131072,
+                    "slab": 163504
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T11:57:07.231Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T11:56:46.632Z",
+                "finishedAt": "2026-09-21T11:57:07.161Z",
+                "backend": "deno",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v74-cwd-tracking-native/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00002-3a3d01fc/results/results.xml",
+                  "-R",
+                  "^elab/Process\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00002-3a3d01fc/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/Process.lean",
+                    "classname": "elab/Process.lean",
+                    "time": "20.2293",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "status": "failed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00003-98b1a217",
+              "status": "failed",
+              "startedAt": "2026-09-21T11:57:07.237Z",
+              "exit": {
+                "code": 8,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T11:57:25.856Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00003-98b1a217/resources.json",
+              "peakMemoryBytes": 2516271104,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T11:57:07.272Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v74-cwd-tracking-native",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00003-98b1a217/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/async_http_hang_regressions\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "50ccef1f-dd20-4f41-a75f-f74de0078c88",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28668035072
+                },
+                "minimumHostAvailable": 26325245952,
+                "peakMemoryBytes": 2516271104,
+                "peakTasks": 31,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00003-98b1a217/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T11:57:25.712Z",
+                  "memoryBytes": 46428160,
+                  "peakMemoryBytes": 2516271104,
+                  "swapBytes": 0,
+                  "tasks": 11,
+                  "memoryBreakdown": {
+                    "anon": 42692608,
+                    "file": 532480,
+                    "kernel": 2052096,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 532480,
+                    "slab": 244712
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "exit-code",
+                  "exitCode": "exited",
+                  "exitStatus": "8",
+                  "capturedAt": "2026-09-21T11:57:25.825Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12918784,
+                  "peakMemoryBytes": 2516271104,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10215424,
+                    "file": 536576,
+                    "kernel": 991232,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 536576,
+                    "slab": 156304
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T11:57:25.851Z",
+                "result": {
+                  "code": 8,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T11:57:07.541Z",
+                "finishedAt": "2026-09-21T11:57:25.767Z",
+                "backend": "deno",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v74-cwd-tracking-native/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00003-98b1a217/results/results.xml",
+                  "-R",
+                  "^elab/async_http_hang_regressions\\.lean$"
+                ],
+                "result": {
+                  "code": 8,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00003-98b1a217/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/async_http_hang_regressions.lean",
+                    "classname": "elab/async_http_hang_regressions.lean",
+                    "time": "17.9133",
+                    "status": "fail"
+                  },
+                  "failures": [
+                    {
+                      "attributes": {
+                        "message": "Failed"
+                      },
+                      "text": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00004-f825b8c9",
+              "status": "passed",
+              "startedAt": "2026-09-21T11:57:25.856Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T11:57:36.364Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00004-f825b8c9/resources.json",
+              "peakMemoryBytes": 2046971904,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T11:57:25.903Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v74-cwd-tracking-native",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00004-f825b8c9/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/tempfile\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "2d4939c1-0cb2-48aa-8fad-698a20d01fb2",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28734070784
+                },
+                "minimumHostAvailable": 26722750464,
+                "peakMemoryBytes": 2046971904,
+                "peakTasks": 31,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00004-f825b8c9/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T11:57:36.326Z",
+                  "memoryBytes": 10526720,
+                  "peakMemoryBytes": 2046971904,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 8204288,
+                    "file": 126976,
+                    "kernel": 933888,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 126976,
+                    "slab": 158840
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T11:57:36.336Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12361728,
+                  "peakMemoryBytes": 2046971904,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10215424,
+                    "file": 126976,
+                    "kernel": 983040,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 126976,
+                    "slab": 154696
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T11:57:36.359Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T11:57:26.168Z",
+                "finishedAt": "2026-09-21T11:57:36.286Z",
+                "backend": "deno",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v74-cwd-tracking-native/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00004-f825b8c9/results/results.xml",
+                  "-R",
+                  "^elab/tempfile\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v74-cwd-tracking-native/00004-f825b8c9/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/tempfile.lean",
+                    "classname": "elab/tempfile.lean",
+                    "time": "9.80979",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "bun": {
+      "suite": "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v73-cwd-tracking-lowered",
+      "status": "complete",
+      "counts": {
+        "passed": 4,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "updatedAt": "2026-09-21T12:05:53.958Z",
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered",
+      "tests": [
+        {
+          "name": "elab/IO_test.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00001-0bed432a",
+              "status": "passed",
+              "startedAt": "2026-09-21T11:59:50.532Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T12:01:02.537Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00001-0bed432a/resources.json",
+              "peakMemoryBytes": 2356400128,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T11:59:50.568Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v73-cwd-tracking-lowered",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00001-0bed432a/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/IO_test\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "c8c63251-fa12-4645-9226-b8dfab5a5916",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28893655040
+                },
+                "minimumHostAvailable": 26486267904,
+                "peakMemoryBytes": 2356400128,
+                "peakTasks": 56,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00001-0bed432a/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T12:01:02.338Z",
+                  "memoryBytes": 42065920,
+                  "peakMemoryBytes": 2356400128,
+                  "swapBytes": 0,
+                  "tasks": 11,
+                  "memoryBreakdown": {
+                    "anon": 38752256,
+                    "file": 81920,
+                    "kernel": 2060288,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 81920,
+                    "slab": 280800
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T12:01:02.506Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12181504,
+                  "peakMemoryBytes": 2356400128,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10219520,
+                    "file": 86016,
+                    "kernel": 1011712,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 86016,
+                    "slab": 184512
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T12:01:02.530Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T11:59:50.842Z",
+                "finishedAt": "2026-09-21T12:01:02.446Z",
+                "backend": "bun",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v73-cwd-tracking-lowered/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00001-0bed432a/results/results.xml",
+                  "-R",
+                  "^elab/IO_test\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00001-0bed432a/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/IO_test.lean",
+                    "classname": "elab/IO_test.lean",
+                    "time": "71.2938",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elab/Process.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00002-8a9e3a17",
+              "status": "passed",
+              "startedAt": "2026-09-21T12:01:02.537Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T12:03:22.337Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00002-8a9e3a17/resources.json",
+              "peakMemoryBytes": 5096448000,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T12:01:02.575Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v73-cwd-tracking-lowered",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00002-8a9e3a17/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/Process\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "9aa1f141-850c-4dfa-8f6c-6a0371b8d51a",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28863156224
+                },
+                "minimumHostAvailable": 23908433920,
+                "peakMemoryBytes": 5096448000,
+                "peakTasks": 96,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00002-8a9e3a17/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T12:03:22.243Z",
+                  "memoryBytes": 32899072,
+                  "peakMemoryBytes": 5096448000,
+                  "swapBytes": 0,
+                  "tasks": 11,
+                  "memoryBreakdown": {
+                    "anon": 30322688,
+                    "file": 32768,
+                    "kernel": 1540096,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 32768,
+                    "slab": 237512
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T12:03:22.304Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12279808,
+                  "peakMemoryBytes": 5096448000,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10219520,
+                    "file": 36864,
+                    "kernel": 983040,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 36864,
+                    "slab": 153032
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T12:03:22.331Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T12:01:02.834Z",
+                "finishedAt": "2026-09-21T12:03:22.256Z",
+                "backend": "bun",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v73-cwd-tracking-lowered/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00002-8a9e3a17/results/results.xml",
+                  "-R",
+                  "^elab/Process\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00002-8a9e3a17/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/Process.lean",
+                    "classname": "elab/Process.lean",
+                    "time": "139.114",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00003-10f03b0c",
+              "status": "passed",
+              "startedAt": "2026-09-21T12:03:22.337Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T12:04:40.178Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00003-10f03b0c/resources.json",
+              "peakMemoryBytes": 3899822080,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T12:03:22.377Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v73-cwd-tracking-lowered",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00003-10f03b0c/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/async_http_hang_regressions\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "7e48c4f8-602a-4d89-9da5-dc2f00848147",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28494913536
+                },
+                "minimumHostAvailable": 24969682944,
+                "peakMemoryBytes": 3899822080,
+                "peakTasks": 55,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00003-10f03b0c/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T12:04:39.952Z",
+                  "memoryBytes": 44003328,
+                  "peakMemoryBytes": 3899822080,
+                  "swapBytes": 0,
+                  "tasks": 11,
+                  "memoryBreakdown": {
+                    "anon": 41152512,
+                    "file": 442368,
+                    "kernel": 2019328,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 442368,
+                    "slab": 262664
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T12:04:40.143Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12443648,
+                  "peakMemoryBytes": 3899822080,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10219520,
+                    "file": 446464,
+                    "kernel": 983040,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 446464,
+                    "slab": 157984
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T12:04:40.171Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T12:03:22.806Z",
+                "finishedAt": "2026-09-21T12:04:40.081Z",
+                "backend": "bun",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v73-cwd-tracking-lowered/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00003-10f03b0c/results/results.xml",
+                  "-R",
+                  "^elab/async_http_hang_regressions\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00003-10f03b0c/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/async_http_hang_regressions.lean",
+                    "classname": "elab/async_http_hang_regressions.lean",
+                    "time": "76.9452",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "status": "passed",
+          "attempts": [
+            {
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00004-8c49ccac",
+              "status": "passed",
+              "startedAt": "2026-09-21T12:04:40.178Z",
+              "exit": {
+                "code": 0,
+                "signal": null
+              },
+              "finishedAt": "2026-09-21T12:05:53.957Z",
+              "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00004-8c49ccac/resources.json",
+              "peakMemoryBytes": 3045355520,
+              "originalSources": {
+                "before": {
+                  "checked": 7267,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 7267,
+                  "modified": []
+                }
+              },
+              "harnessArtifacts": {
+                "before": {
+                  "checked": 0,
+                  "modified": []
+                },
+                "after": {
+                  "checked": 0,
+                  "modified": []
+                }
+              },
+              "resources": {
+                "startedAt": "2026-09-21T12:04:40.220Z",
+                "command": [
+                  "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+                  "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+                  "--suite",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v73-cwd-tracking-lowered",
+                  "--results",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00004-8c49ccac/results",
+                  "--jobs",
+                  "1",
+                  "--filter",
+                  "^elab/tempfile\\.lean$"
+                ],
+                "cwd": "/home/lastmjs/development/lasm/compiler",
+                "unit": "lasm-heavy-a79a4e3ab9f2.service",
+                "id": "c455d00c-c45c-40b5-ac0f-be9d4eb900b8",
+                "limits": {
+                  "memoryMax": 10737418240,
+                  "memoryHigh": "infinity",
+                  "stopMemoryBytes": 8589934592,
+                  "memorySwapMax": 0,
+                  "tasksMax": 1024,
+                  "nice": 0
+                },
+                "hostAtStart": {
+                  "total": 33456926720,
+                  "available": 28759834624
+                },
+                "minimumHostAvailable": 25873301504,
+                "peakMemoryBytes": 3045355520,
+                "peakTasks": 56,
+                "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00004-8c49ccac/resources.json",
+                "status": "finished",
+                "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                "lastSample": {
+                  "at": "2026-09-21T12:05:53.802Z",
+                  "memoryBytes": 46571520,
+                  "peakMemoryBytes": 3045355520,
+                  "swapBytes": 0,
+                  "tasks": 11,
+                  "memoryBreakdown": {
+                    "anon": 42930176,
+                    "file": 32768,
+                    "kernel": 1994752,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 32768,
+                    "slab": 251536
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "unitReleased": true,
+                "service": {
+                  "serviceResult": "success",
+                  "exitCode": "exited",
+                  "exitStatus": "0",
+                  "capturedAt": "2026-09-21T12:05:53.927Z",
+                  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+                  "memoryBytes": 12693504,
+                  "peakMemoryBytes": 3045355520,
+                  "swapBytes": 0,
+                  "tasks": 7,
+                  "memoryBreakdown": {
+                    "anon": 10219520,
+                    "file": 36864,
+                    "kernel": 999424,
+                    "shmem": 0,
+                    "file_mapped": 86016,
+                    "inactive_file": 36864,
+                    "slab": 168904
+                  },
+                  "pressureSomeAvg10": 0,
+                  "memoryEvents": {
+                    "low": 0,
+                    "high": 0,
+                    "max": 0,
+                    "oom": 0,
+                    "oom_kill": 0,
+                    "oom_group_kill": 0
+                  }
+                },
+                "finishedAt": "2026-09-21T12:05:53.952Z",
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "resourceLimited": false,
+                "memoryThrottled": false
+              },
+              "execution": {
+                "startedAt": "2026-09-21T12:04:40.518Z",
+                "finishedAt": "2026-09-21T12:05:53.869Z",
+                "backend": "bun",
+                "registered": 3896,
+                "command": [
+                  "--test-dir",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v73-cwd-tracking-lowered/run",
+                  "-j",
+                  "1",
+                  "--output-on-failure",
+                  "--output-junit",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00004-8c49ccac/results/results.xml",
+                  "-R",
+                  "^elab/tempfile\\.lean$"
+                ],
+                "result": {
+                  "code": 0,
+                  "signal": null
+                },
+                "originalSources": {
+                  "before": {
+                    "checked": 7267,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 7267,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                },
+                "leftoverProcessCleanup": [],
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v73-cwd-tracking-lowered/00004-8c49ccac/resources.json",
+                "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+              },
+              "junit": [
+                {
+                  "attributes": {
+                    "name": "elab/tempfile.lean",
+                    "classname": "elab/tempfile.lean",
+                    "time": "72.8778",
+                    "status": "run"
+                  },
+                  "failures": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "buildResourceAborts": [
+    {
+      "startedAt": "2026-09-21T11:42:12.406Z",
+      "command": [
+        "python3",
+        ".work/full-engine-probe/rebuild-cwd-tracking.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "739bb055-a30f-49f4-b0ff-70c882616e48",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 28825649152
+      },
+      "minimumHostAvailable": 27419860992,
+      "peakMemoryBytes": 1934839808,
+      "peakTasks": 30,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-build-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T11:42:42.446Z",
+        "memoryBytes": 1931964416,
+        "peakMemoryBytes": 1931964416,
+        "swapBytes": 0,
+        "tasks": 18,
+        "memoryBreakdown": {
+          "anon": 1627889664,
+          "file": 279531520,
+          "kernel": 13402112,
+          "shmem": 0,
+          "file_mapped": 114688,
+          "inactive_file": 277291008,
+          "slab": 8289888
+        },
+        "pressureSomeAvg10": 6.44,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "stoppedBecause": "Workload memory pressure reached 5 percent",
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "killed",
+        "exitStatus": "TERM",
+        "capturedAt": "2026-09-21T11:42:42.525Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 299413504,
+        "peakMemoryBytes": 1934839808,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 279535616,
+          "kernel": 8675328,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 277295104,
+          "slab": 7826480
+        },
+        "pressureSomeAvg10": 6.44,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T11:42:42.553Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": true,
+      "memoryThrottled": false
+    },
+    {
+      "startedAt": "2026-09-21T11:45:20.488Z",
+      "command": [
+        "python3",
+        ".work/full-engine-probe/finish-cwd-tracking-build.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "17f11390-1835-4f82-a084-b990bfba3d29",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 28944183296
+      },
+      "minimumHostAvailable": 26787282944,
+      "peakMemoryBytes": 2423066624,
+      "peakTasks": 23,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-build-retry-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-21T11:45:32.509Z",
+        "memoryBytes": 2420862976,
+        "peakMemoryBytes": 2420957184,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 2214805504,
+          "file": 182210560,
+          "kernel": 11382784,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 181587968,
+          "slab": 6032632
+        },
+        "pressureSomeAvg10": 6.05,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "stoppedBecause": "Workload memory pressure reached 5 percent",
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "killed",
+        "exitStatus": "TERM",
+        "capturedAt": "2026-09-21T11:45:32.580Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 504397824,
+        "peakMemoryBytes": 2423066624,
+        "swapBytes": 0,
+        "tasks": 8,
+        "memoryBreakdown": {
+          "anon": 299986944,
+          "file": 182210560,
+          "kernel": 8445952,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 181587968,
+          "slab": 5748312
+        },
+        "pressureSomeAvg10": 6.05,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-21T11:45:32.604Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": true,
+      "memoryThrottled": false
+    }
+  ],
+  "buildAllocationMitigation": {
+    "startedAt": "2026-09-21T11:48:45.082203+00:00",
+    "scope": "Process-local build allocator diagnostic. No host settings, test bytes, or resource caps changed.",
+    "prctlBefore": 0,
+    "prctlAfter": 1,
+    "executedChildPrctl": 1,
+    "vmstatBefore": {
+      "allocstall_dma": 0,
+      "allocstall_dma32": 0,
+      "allocstall_normal": 39386,
+      "allocstall_movable": 7352931,
+      "allocstall_device": 0,
+      "pgscan_direct": 469302812,
+      "pgscan_direct_throttle": 0,
+      "thp_migration_success": 0,
+      "thp_migration_fail": 0,
+      "thp_migration_split": 0,
+      "compact_migrate_scanned": 1092317522,
+      "compact_free_scanned": 4403214107,
+      "compact_isolated": 409111645,
+      "compact_stall": 93533,
+      "compact_fail": 68874,
+      "compact_success": 24659,
+      "compact_daemon_wake": 38489,
+      "compact_daemon_migrate_scanned": 902711331,
+      "compact_daemon_free_scanned": 3625286483,
+      "thp_fault_alloc": 1409811,
+      "thp_fault_fallback": 20208,
+      "thp_fault_fallback_charge": 0,
+      "thp_collapse_alloc": 4226,
+      "thp_collapse_alloc_failed": 32,
+      "thp_file_alloc": 0,
+      "thp_file_fallback": 0,
+      "thp_file_fallback_charge": 0,
+      "thp_file_mapped": 0,
+      "thp_split_page": 605,
+      "thp_split_page_failed": 0,
+      "thp_deferred_split_page": 198394,
+      "thp_split_pmd": 199964,
+      "thp_scan_exceed_none_pte": 4,
+      "thp_scan_exceed_swap_pte": 0,
+      "thp_scan_exceed_share_pte": 0,
+      "thp_split_pud": 0,
+      "thp_zero_page_alloc": 0,
+      "thp_zero_page_alloc_failed": 0,
+      "thp_swpout": 0,
+      "thp_swpout_fallback": 85
+    },
+    "command": [
+      "python3",
+      ".work/full-engine-probe/finish-cwd-tracking-build-no-thp.py"
+    ],
+    "samples": [
+      {
+        "at": "2026-09-21T11:48:45.082909+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:48:46.083524+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:48:47.084523+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:48:48.086257+00:00",
+        "processes": [
+          {
+            "Name": "wasm-ld",
+            "Pid": "1863153",
+            "VmRSS": "758412 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:49.096955+00:00",
+        "processes": [
+          {
+            "Name": "wasm-ld",
+            "Pid": "1863153",
+            "VmRSS": "1174544 kB",
+            "Threads": "13",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:50.112697+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:48:51.114006+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "234404 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:52.118266+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "549332 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:53.126242+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "869260 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:54.137161+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "1189988 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:55.151455+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "1507816 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:56.176766+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "1828476 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:57.196559+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2147828 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:58.218928+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2466788 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:48:59.243885+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2782200 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:00.271684+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2682536 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:01.298173+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2711856 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:02.324674+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2682912 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:03.351551+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2726532 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:04.379205+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2783172 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:05.407330+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2844364 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:06.435564+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2913276 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:07.465582+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2913276 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:08.495079+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863170",
+            "VmRSS": "2913276 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:09.524721+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:10.526470+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:11.527943+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:12.529440+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:13.530838+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:14.532313+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "342820 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:15.537795+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "681908 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:16.547352+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "966588 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:17.560572+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "1272560 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:18.575664+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "1592788 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:19.593497+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "1893144 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:20.614550+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2208528 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:21.637825+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2527016 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:22.668402+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2620188 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:23.696375+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2620160 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:24.722648+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2620296 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:25.748881+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2620224 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:26.776228+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2741972 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:27.806485+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2793648 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:28.834450+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2793772 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:29.861625+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2793616 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:30.890442+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2858132 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:31.920781+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2882160 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:32.949698+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2850736 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:33.978237+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2859740 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:35.006407+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2939248 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:36.036560+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "2999448 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:37.067925+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "3087120 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:38.100296+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "3109304 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:39.132801+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "3109304 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:40.165157+00:00",
+        "processes": [
+          {
+            "Name": "wasm-opt",
+            "Pid": "1863199",
+            "VmRSS": "3094136 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:41.193855+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:42.195549+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:43.197572+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:44.200945+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:45.202873+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:46.205346+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:47.207311+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:48.209386+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:49.211261+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:50.212541+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:51.213759+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:52.215174+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:53.216352+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:54.217751+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:55.223151+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:56.224388+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:49:57.225652+00:00",
+        "processes": [
+          {
+            "Name": "wasm-ld",
+            "Pid": "1863290",
+            "VmRSS": "291192 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:58.230387+00:00",
+        "processes": [
+          {
+            "Name": "wasm-ld",
+            "Pid": "1863290",
+            "VmRSS": "1119588 kB",
+            "Threads": "13",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:49:59.243158+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:00.247247+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:01.248630+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "331372 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:02.253560+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "660916 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:03.261162+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "975712 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:04.271181+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "1291556 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:05.284099+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "1590668 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:06.299083+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "1905256 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:07.317393+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2206520 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:08.338495+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2518824 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:09.361495+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2617632 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:10.385138+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2689008 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:11.408533+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2712668 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:12.431660+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2690860 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:13.455758+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2731824 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:14.480534+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2791244 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:15.505712+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2854760 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:16.532003+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2913440 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:17.558226+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2913440 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:18.583740+00:00",
+        "processes": [
+          {
+            "Name": "wasm-emscripten",
+            "Pid": "1863322",
+            "VmRSS": "2913440 kB",
+            "Threads": "1",
+            "THP_enabled": "0",
+            "AnonHugePages": "0 kB"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-21T11:50:19.608422+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:20.610237+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:21.611765+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:22.613266+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:23.614789+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:24.616344+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:25.618514+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:26.620295+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:27.623143+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:28.626131+00:00",
+        "processes": []
+      },
+      {
+        "at": "2026-09-21T11:50:29.628791+00:00",
+        "processes": []
+      }
+    ],
+    "exitCode": 0,
+    "vmstatAfter": {
+      "allocstall_dma": 0,
+      "allocstall_dma32": 0,
+      "allocstall_normal": 39386,
+      "allocstall_movable": 7352931,
+      "allocstall_device": 0,
+      "pgscan_direct": 469302812,
+      "pgscan_direct_throttle": 0,
+      "thp_migration_success": 0,
+      "thp_migration_fail": 0,
+      "thp_migration_split": 0,
+      "compact_migrate_scanned": 1092317522,
+      "compact_free_scanned": 4403214107,
+      "compact_isolated": 409111645,
+      "compact_stall": 93533,
+      "compact_fail": 68874,
+      "compact_success": 24659,
+      "compact_daemon_wake": 38489,
+      "compact_daemon_migrate_scanned": 902711331,
+      "compact_daemon_free_scanned": 3625286483,
+      "thp_fault_alloc": 1409811,
+      "thp_fault_fallback": 20208,
+      "thp_fault_fallback_charge": 0,
+      "thp_collapse_alloc": 4226,
+      "thp_collapse_alloc_failed": 32,
+      "thp_file_alloc": 0,
+      "thp_file_fallback": 0,
+      "thp_file_fallback_charge": 0,
+      "thp_file_mapped": 0,
+      "thp_split_page": 605,
+      "thp_split_page_failed": 0,
+      "thp_deferred_split_page": 198394,
+      "thp_split_pmd": 199964,
+      "thp_scan_exceed_none_pte": 4,
+      "thp_scan_exceed_swap_pte": 0,
+      "thp_scan_exceed_share_pte": 0,
+      "thp_split_pud": 0,
+      "thp_zero_page_alloc": 0,
+      "thp_zero_page_alloc_failed": 0,
+      "thp_swpout": 0,
+      "thp_swpout_fallback": 85
+    },
+    "vmstatDelta": {
+      "allocstall_dma": 0,
+      "allocstall_dma32": 0,
+      "allocstall_normal": 0,
+      "allocstall_movable": 0,
+      "allocstall_device": 0,
+      "pgscan_direct": 0,
+      "pgscan_direct_throttle": 0,
+      "thp_migration_success": 0,
+      "thp_migration_fail": 0,
+      "thp_migration_split": 0,
+      "compact_migrate_scanned": 0,
+      "compact_free_scanned": 0,
+      "compact_isolated": 0,
+      "compact_stall": 0,
+      "compact_fail": 0,
+      "compact_success": 0,
+      "compact_daemon_wake": 0,
+      "compact_daemon_migrate_scanned": 0,
+      "compact_daemon_free_scanned": 0,
+      "thp_fault_alloc": 0,
+      "thp_fault_fallback": 0,
+      "thp_fault_fallback_charge": 0,
+      "thp_collapse_alloc": 0,
+      "thp_collapse_alloc_failed": 0,
+      "thp_file_alloc": 0,
+      "thp_file_fallback": 0,
+      "thp_file_fallback_charge": 0,
+      "thp_file_mapped": 0,
+      "thp_split_page": 0,
+      "thp_split_page_failed": 0,
+      "thp_deferred_split_page": 0,
+      "thp_split_pmd": 0,
+      "thp_scan_exceed_none_pte": 0,
+      "thp_scan_exceed_swap_pte": 0,
+      "thp_scan_exceed_share_pte": 0,
+      "thp_split_pud": 0,
+      "thp_zero_page_alloc": 0,
+      "thp_zero_page_alloc_failed": 0,
+      "thp_swpout": 0,
+      "thp_swpout_fallback": 0
+    },
+    "finishedAt": "2026-09-21T11:50:30.631307+00:00"
+  },
+  "buildBasePagesControl": {
+    "wrapper": "scripts/full-lean/base-pages.py",
+    "prctlCurrent": 1,
+    "prctlExecutedChild": 1,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cwd-tracking-suite-preparation-resources.json",
+    "scope": "No allocation stress; verify process-local flag and exec inheritance under the unchanged guard."
+  },
+  "sourceSha256": {
+    "src/working-directory.mjs": "bf6363418bec73f1f913615b06642647965f722f24b4cea18cea30c34eadd674",
+    "src/node-host.mjs": "cdcf90f95ecee469ecf33e10a18fff6c7ea64bce2911a8d0b7b0d3eff6607a7b",
+    "src/node-process.mjs": "347136587ee5fafe1a9c354662a07b54199378ce17f236442a2fe8ebaace7901",
+    "src/process-exec.mjs": "c1ef1260ac2aedcccc8cba4b4da625e393894d8df1dfedf7ef536857e219fa47",
+    "src/native-files.mjs": "1a3079062d62ea1d43029379e06476d50f47c497da2f60a40a751361f195c5a2",
+    "src/main.mjs": "07f4efa925a6e0e146e5a3cce843fc13d1c6a96f5e735d6b7650aee7079f5e2e",
+    "src/build.mjs": "1d6dcb747955dac6770511e0e5fa5ca80899a0014ab3b7df7fcc3553ff7f8be4",
+    "runtime/node-io.cpp": "996a6c6a4cf6c827938ca7a9fbd2cab42bf32e135dba20209a1d221ad6c77aa2",
+    "scripts/full-lean/freeze-build.mjs": "9ce0ac05247f795b6878a3df17ab252a015dacf488f2143e8a1453df293d3552",
+    "scripts/full-lean/derive-host-files.mjs": "0186b36c1f00554f53a3cdcff25e9295897fda318e7bdbf8b8cb6d30af3ce3a2",
+    "scripts/full-lean/probe-cwd-tracking.mjs": "bb0d16abe9ed42714d074e4796d4a5b6a759b53ef48ca4f55943aac0474757cd",
+    "scripts/full-lean/base-pages.py": "f983bcfb3473b1f14fb733a40d26bc934bfbcee9adf4bcd929bec266194c8c7a",
+    "test/working-directory.test.mjs": "dedb18f27b2155bbc29aa3c37d099a044fcf1ca75ba9ccfdc89a2ae8712b3c0a",
+    "test/fixtures/cwd-tracking-host.mjs": "7f40d642ab9ad58a9ca78871d1b7438ee526fac9dc2baed26011654091fc359b",
+    "test/node-cwd-tracking.test.mjs": "d2f32ee04b73b508465a8f3aa199bf8083cad5214218dc220e3e02157ba6ae57",
+    "test/node-host.test.mjs": "1a1b757d28a572849ea0edfc2ad054971e0d31136b00c5b021e9b6674c22a910",
+    "test/fixtures/cwd-tracking/Main.lean": "9fe09e10c50d1bdb369898d2334f5a5da3a97ab6895bc4c6868f2512ecf1c583",
+    "test/fixtures/cwd-tracking/DeletedProcess.lean": "fe8eb3c8f9992bdc13c812942f8308e0178839d726dbc7db1e43e01d6e243083"
+  },
+  "remaining": [
+    "Implement and validate directory identity on macOS and Windows.",
+    "Broaden races and permission-change controls, including child cwd inheritance after search permission is revoked.",
+    "Validate long relative paths and operation without a mounted /proc; current Linux instance paths use directory-descriptor links.",
+    "Resolve the separate full-suite and broader IO/HTTP gaps. No residual implementation gap is classified as fundamental."
+  ]
+}

@@ -241,3 +241,27 @@ the driver build and suite preparation at 2.99 GiB without a pressure stop.
 Actual suite compiler/Leanc invocations remain unchanged. All stopped services
 were released, and every comparison retained the original guard settings.
 See [the build, suite, and integrity evidence](evidence/compiled-server-driver-2026-09-21.json).
+
+During the directory-identity runtime rebuild, two full Wasm links stopped on
+workload pressure at 1.80 and 2.26 GiB. The second attempt used only one build
+and Binaryen worker, so reducing that concurrency alone did not resolve the
+problem. Neither attempt reached the byte cap or recorded OOM, memory-high/max,
+or swap events. More than 25 GiB of host memory remained available.
+
+A subsequent process-local huge-page adjustment completed the lowered and
+native-memory64 links, snapshots, and facades in 105.7 seconds at a 6.95 GiB
+peak. The native SDK optimizer contains mimalloc; huge-page allocation and
+compaction were the working diagnosis. With transparent huge pages disabled
+for build processes, sampled optimizer processes reported `THP_enabled: 0`
+and zero huge-page residency. Kernel allocation-stall, direct-scan, compaction,
+and huge-page counters did not increase during the completed run, and measured
+workload pressure stayed zero. This supports the mitigation; the earlier
+attempts did not record enough allocator-level data to prove every cause of
+their pressure spikes.
+
+`scripts/full-lean/base-pages.py` preserves this build adjustment. It requires
+the existing resource guard, sets only the calling process flag, verifies it,
+and executes the requested command. A small control verifies inheritance across
+exec without allocation stress. Kernel caps, pressure thresholds, and host-wide
+settings are unchanged. Both aborted builds and the passing preparation remain
+in [the cwd milestone evidence](evidence/cwd-tracking-2026-09-21.json).

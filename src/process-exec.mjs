@@ -13,6 +13,7 @@ const write = libc.func('intptr_t write(int fd, void *buffer, size_t size)');
 const close = libc.func('int close(int fd)');
 const fcntl = libc.func('int fcntl(int fd, int command, int value)');
 const chdir = libc.func('int chdir(str path)');
+const fchdir = libc.func('int fchdir(int fd)');
 const setsid = libc.func('int setsid()');
 const unsetenv = libc.func('int unsetenv(str key)');
 const setenv = libc.func('int setenv(str key, str value, int overwrite)');
@@ -54,7 +55,15 @@ try {
   for (const [key, value] of Object.entries(options.env)) setenv(key, value, 1);
   // An absolute cwd can recover from a removed/renamed parent directory.
   // Do not first try to enter the stale parent path in that case.
-  const directories = options.requestedCwd?.startsWith('/')
+  const absolute = options.requestedCwd?.startsWith('/');
+  const inheritedDirectory = options.directoryFd !== undefined;
+  if (inheritedDirectory) {
+    // This descriptor was duplicated into the child by spawn. It remains valid
+    // after a directory rename/removal or after the parent exits.
+    if (!absolute && fchdir(4) < 0) throw new Error(`inherited cwd setup failed: errno ${ffi.errno()}`);
+    close(4);
+  }
+  const directories = absolute || inheritedDirectory
     ? [options.requestedCwd] : [options.directory, options.requestedCwd];
   for (const directory of directories) {
     if (directory === undefined) continue;

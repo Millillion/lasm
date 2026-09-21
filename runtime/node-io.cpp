@@ -140,8 +140,11 @@ O *lean_io_create_tempdir() { auto r = Reply(21); return r.failed ? r.result() :
 O *lean_io_getenv(O *name) {
     auto r = path_call(22, name); return r.bytes.empty() ? lean_box(0) : some(r.string(1));
 }
-O *lean_io_current_dir() { auto r = Reply(23); return r.failed ? r.result() : ok(r.string()); }
-O *lean_io_process_get_current_dir() { return lean_io_current_dir(); }
+O *lean_io_current_dir() {
+    auto r = Reply(23);
+    return r.failed ? lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string("failed to retrieve current working directory"))) : ok(r.string());
+}
+O *lean_io_process_get_current_dir() { auto r = Reply(23); return r.failed ? r.result() : ok(r.string()); }
 O *lean_io_process_set_current_dir(O *path) { return path_call(29, path).result(lean_box(0), path); }
 uint32_t lean_io_process_get_pid() { return Reply(85).number(); }
 static uint32_t child_id(O *child) { return handle_id(lean_ctor_get(child, 3)); }

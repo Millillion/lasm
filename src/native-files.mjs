@@ -97,6 +97,12 @@ export function nativeFiles({ synchronous = false } = {}) {
   const adapter = {
     error: failure,
     fromNodeError,
+    openDirectory(path) {
+      if (process.platform !== 'linux') throw failure(ffi.os.errno.ENOSYS);
+      const fd = openFile(path, 0x200000 /* O_PATH */ | 0x10000 /* O_DIRECTORY */ | 0x80000 /* O_CLOEXEC */, 0);
+      if (fd < 0) throw failure();
+      return fd;
+    },
     descriptorFlags(fd) {
       if (!fcntl) throw failure(ffi.os.errno.ENOSYS);
       const flags = fcntl(fd, 3 /* F_GETFL */, 0);

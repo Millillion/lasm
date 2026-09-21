@@ -6,7 +6,7 @@ import { nativeFiles } from './native-files.mjs';
 import { numbers } from './node-host.mjs';
 
 export function createNodeProcesses({ add, get, release, cwd }) {
-  function decode(bytes) {
+  function decode(bytes, state) {
     let offset = 0;
     const number = () => { const n = Number(bytes.readBigUInt64LE(offset)); offset += 8; return n; };
     const string = () => {
@@ -25,7 +25,7 @@ export function createNodeProcesses({ add, get, release, cwd }) {
     const modes = [number(), number(), number()];
     const inherit = !!number(), setsid = !!number(), argc = number(), envc = number(), hasCwd = number();
     const command = string(), args = Array.from({ length: argc }, string);
-    let directory = cwd(), requestedCwd;
+    let { directory, directoryFd } = cwd(state), requestedCwd;
     if (hasCwd) {
       const value = string();
       // Retain even an empty path: native chdir("") fails in the child. The
@@ -38,10 +38,10 @@ export function createNodeProcesses({ add, get, release, cwd }) {
       const key = string(), present = number();
       if (present) env[key] = string(); else delete env[key];
     }
-    return { modes, command, args, directory, requestedCwd, env, setsid };
+    return { modes, command, args, directory, directoryFd, requestedCwd, env, setsid };
   }
-  async function start(bytes) {
-    const options = decode(bytes), native = nativeFiles();
+  async function start(bytes, state) {
+    const options = decode(bytes, state), native = nativeFiles();
     const ours = [], theirs = [];
     try {
       const stdio = options.modes.map((mode, index) => {
@@ -58,7 +58,7 @@ export function createNodeProcesses({ add, get, release, cwd }) {
       const helper = fileURLToPath(new URL('./process-exec.mjs', import.meta.url));
       const child = posix
         ? spawn(process.execPath, [...(process.versions.deno ? ['run', '--no-config', '-A'] : []), helper],
-          { cwd: '/', env: {}, stdio: [...stdio, 'pipe'] })
+          { cwd: '/', env: {}, stdio: [...stdio, 'pipe', ...(options.directoryFd === undefined ? [] : [options.directoryFd])] })
         : spawn(options.command, options.args, { cwd: options.directory, env: options.env, stdio, windowsHide: false });
       const resource = { type: 'process', child, setsid: options.setsid, reaped: false };
       resource.exit = new Promise(resolve => {
@@ -86,8 +86,8 @@ export function createNodeProcesses({ add, get, release, cwd }) {
     if (process.platform !== 'win32' && resource.reaped) throw nativeFiles().error(constants.errno.ECHILD);
     resource.reaped = true; return code;
   }
-  return { dispatch(op, id, arg, bytes) {
-    if (op === 80) return start(bytes);
+  return { dispatch(op, id, arg, bytes, state) {
+    if (op === 80) return start(bytes, state);
     if (op === 85) return numbers(process.pid);
     const p = get(id, 'process');
     switch (op) {

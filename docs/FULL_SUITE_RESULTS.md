@@ -668,6 +668,28 @@ the disclosed parallel harness, while the startup-performance problem, original
 interpreted-driver resource gap, and full-suite gates remain open. See
 [the deadline comparison](evidence/bun-server-deadline-2026-09-21.json).
 
+Linux working directories now retain their directory identity across rename and
+removal. Relative filesystem operations and child processes use that identity,
+and in-flight operations keep their own directory lease across later changes.
+The same twelve-control ordinary Lean fixture failed in all three engines before
+this correction and now matches native Lean in all three full compilers. Seven
+direct host checks and 36 packaged regressions pass, including disposal, pending
+FIFO operations, instance isolation, and descriptor cleanup. The pinned native
+`IO.Process.getCurrentDir` crashes after directory removal; Lasm deliberately
+returns structured ENOENT instead. `IO.currentDir` retains the native user error.
+
+The selected unchanged upstream registrations (`IO_test`, `Process`, `tempfile`,
+and `async_http_hang_regressions`) pass 4/4 in Node, 4/4 in Bun, and 3/4 in Deno.
+Deno reproduced the existing case-22 early-streaming timing failure; that result
+is retained and remains unresolved. All 7,267 original file hashes stayed intact.
+The successful focused full comparison peaked at 2.54 GiB; the selected upstream
+runs peaked at 4.75 GiB, without OOM, throttling, or swap. Two linker attempts were
+proactively aborted for memory pressure, separately from test failures. A
+process-local base-page linker run completed under the same guard at 6.95 GiB;
+the allocation controls and build receipts are retained. Non-Linux directory
+identity, permission-change races, and broader suite conformance remain open.
+See [the cwd comparison and resource evidence](evidence/cwd-tracking-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
