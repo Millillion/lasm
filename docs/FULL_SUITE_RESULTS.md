@@ -272,6 +272,13 @@ Two bounded engine investigations narrow the remaining memory/stack work:
   in Node and Deno; in Bun, fresh worker memory works and cloned memory fails.
   This does not establish a fundamental limit. See [the memory64 evidence](evidence/native-memory64-2026-09-19.json).
 
+Inspection of the pinned Bun 1.4.2 source confirms that its worker-message
+deserializer recreates shared Wasm memory with a fixed 32-bit address type.
+That matches the small reproduction's failure and identifies an engine
+implementation gap in the experimental Memory64/pthreads path. See the
+[pinned source](https://github.com/oven-sh/bun/blob/744846f844374847c902b5e7fd59b4342a51ef99/src/jsc/bindings/webcore/SerializedScriptValue.cpp#L3807-L3820)
+and [source identity](evidence/bun-memory64-source-2026-09-21.json).
+
 The native-allocator capacity comparison now isolates an unchecked allocation:
 the same native-memory64 Wasm passes `instances` with an 8 GiB guest limit and
 fails with a 4 GiB limit. The module reader used a null `malloc` result as a file

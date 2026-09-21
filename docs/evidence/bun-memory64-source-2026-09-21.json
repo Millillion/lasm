@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-09-21",
+  "scope": "Source-level explanation of the previously recorded 64 KiB worker-clone reproduction. No new engine build or runtime pass is claimed.",
+  "bunRelease": "1.4.2",
+  "commit": "744846f844374847c902b5e7fd59b4342a51ef99",
+  "source": "https://github.com/oven-sh/bun/blob/744846f844374847c902b5e7fd59b4342a51ef99/src/jsc/bindings/webcore/SerializedScriptValue.cpp",
+  "localSource": ".cache/bun-SerializedScriptValue-v1.4.2.cpp",
+  "sha256": "d87e27801c49af29b98877a2d3f59392aec9632213a6d17037b11359ec18f708",
+  "serializerLines": [
+    1391,
+    1395
+  ],
+  "deserializerLines": [
+    3807,
+    3820
+  ],
+  "finding": "The worker-message serializer retains shared memory backing without its address type. The deserializer explicitly recreates it with Wasm::AddressType::I32. This explains why a module requiring i64 memory rejects the cloned memory while a fresh i64 memory works in the same worker.",
+  "earlierRuntimeEvidence": "docs/evidence/native-memory64-2026-09-19.json",
+  "classification": "Confirmed engine implementation gap for the tested experimental Memory64/pthreads path. It is not an inherent Lean or WebAssembly restriction, and it does not affect the passing Wasm32 application finalizer checks.",
+  "nextStep": "The native Memory64 path requires an engine change or another backend. Continue unchanged-suite coverage with the recorded lowered-memory64 configuration, retaining its 4 GiB capacity limitation."
+}
