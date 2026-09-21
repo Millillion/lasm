@@ -1,15 +1,15 @@
 {
-  "recordedAt": "2026-09-21T15:32:03.629369+00:00",
-  "scope": "Checkpoint of one frozen v89 Node campaign with the original server-test driver compiled ahead of time. 101 unchanged upstream registrations passed; 3795 remain pending. No earlier passes imported; no full-suite claim. Console investigations and subsequent fixes are separate from this immutable runtime.",
+  "recordedAt": "2026-09-21T16:48:41.980192+00:00",
+  "scope": "Checkpoint of one frozen v89 Node campaign with the original server-test driver compiled ahead of time. 153 unchanged upstream registrations passed; 3743 remain pending. No earlier passes imported; no full-suite claim. Later console and table-growth fixes are separate from this immutable runtime.",
   "campaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad",
-  "checkpointSha256": "4134048ad9625a0e20984c920874c14b204d27dbf72a5f608c57d6d07fdaaa42",
+  "checkpointSha256": "86b56d51b86f4012f26dae5ce7872127b0f0d2a45bf8b1b8ecfdf927c3a6264c",
   "identity": "4dac54cd42cdf66ddb25912d15739716351e73603d55819ecf72637579810a86",
   "counts": {
-    "passed": 101,
+    "passed": 153,
     "failed": 0,
     "resource-aborted": 0,
     "harness-failed": 0,
-    "pending": 3795
+    "pending": 3743
   },
   "toolchain": {
     "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
@@ -162,7 +162,7 @@
       "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot."
     }
   },
-  "maximumPeakBytes": 3644604416,
+  "maximumPeakBytes": 3890618368,
   "tests": [
     {
       "name": "elab/1926.lean",
@@ -5513,6 +5513,2762 @@
           "name": "elab/3150.lean",
           "classname": "elab/3150.lean",
           "time": "5.19853",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/319.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00102-980b6b7e",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:24:22.704Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:24:29.716Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00102-980b6b7e/resources.json",
+        "peakMemoryBytes": 1837367296,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "4094e0ffc2b51143a07409b77d20cf0ce21fa71dc1d9c1c95e6deee42f524a66",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/319.lean",
+          "classname": "elab/319.lean",
+          "time": "5.00725",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3214.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00103-9c0c8f09",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:24:29.722Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:24:35.974Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00103-9c0c8f09/resources.json",
+        "peakMemoryBytes": 1702203392,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "c651a3ee9a49b4b5d56347c527d1c0b8b56724c187c43e707adadc8a25e3d989",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3214.lean",
+          "classname": "elab/3214.lean",
+          "time": "4.61212",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3219.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00104-d73d6f25",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:24:35.980Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:24:43.478Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00104-d73d6f25/resources.json",
+        "peakMemoryBytes": 1855688704,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "da042d23a24c1f12b4a27e81832182734b2e51d6d0f30cab01c2e26ef0217fac",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3219.lean",
+          "classname": "elab/3219.lean",
+          "time": "5.90026",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3229.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00105-8295ade7",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:24:43.485Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:24:49.812Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00105-8295ade7/resources.json",
+        "peakMemoryBytes": 1651548160,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "ed2c284f189e76580a3aa3a4c92e4003dd9bc04f554b5a8e827a325af9dc6c59",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3229.lean",
+          "classname": "elab/3229.lean",
+          "time": "4.72473",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3242.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00106-197c53a9",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:24:49.818Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:24:56.345Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00106-197c53a9/resources.json",
+        "peakMemoryBytes": 1683427328,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "7e0ed0de35fa56dd7a08680bd67a05fa6879a5aa117b13c4802091be1332c384",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3242.lean",
+          "classname": "elab/3242.lean",
+          "time": "4.89679",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3257.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00107-097e9d7b",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:24:56.351Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:25:03.446Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00107-097e9d7b/resources.json",
+        "peakMemoryBytes": 1871228928,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "1f9fd1ec09eea669fd63f44b6c14ee6725ef44e937f76529b28e2d78a792c9f0",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3257.lean",
+          "classname": "elab/3257.lean",
+          "time": "5.4891",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/326.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00108-6ed9992a",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:25:03.452Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:25:10.019Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00108-6ed9992a/resources.json",
+        "peakMemoryBytes": 1673793536,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "ba9d1aefe4616ee423f3b8d8620b73a96fdb0fa747075ed816e0c51deff0a90c",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/326.lean",
+          "classname": "elab/326.lean",
+          "time": "4.83864",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/327.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00109-d45b4fc0",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:25:10.024Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:25:16.448Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00109-d45b4fc0/resources.json",
+        "peakMemoryBytes": 1765781504,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "d723393b1bf142876ca2a2bff594f4ef956abf356435e89b584111b4cb410954",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/327.lean",
+          "classname": "elab/327.lean",
+          "time": "4.81597",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/329.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00110-55d902ea",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:25:16.453Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:25:23.299Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00110-55d902ea/resources.json",
+        "peakMemoryBytes": 1900351488,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "60f2d6fc5d81e623141a027fe8e5d7d006dad13782fec7675827d7f4f3701240",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/329.lean",
+          "classname": "elab/329.lean",
+          "time": "5.25191",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3313.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00111-1411aa6f",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:25:23.304Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:25:30.068Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00111-1411aa6f/resources.json",
+        "peakMemoryBytes": 1897938944,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "cc5aa4959e2aee5ad740855bbc643dfee13c1147e2a7ccb488e04720be5709ef",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3313.lean",
+          "classname": "elab/3313.lean",
+          "time": "5.10436",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/335.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00112-80924192",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:25:30.073Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:25:36.959Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00112-80924192/resources.json",
+        "peakMemoryBytes": 1762856960,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "2973a59c800033870dd7460001ddc9179569d6a9e88c3f790f5294cedcd3677b",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/335.lean",
+          "classname": "elab/335.lean",
+          "time": "5.26902",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/337.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00113-fb475e50",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:25:36.965Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:25:43.690Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00113-fb475e50/resources.json",
+        "peakMemoryBytes": 1854771200,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "b5d2014ee932e890b5c0a242f65f318ae939f6c6f98fecae66b2a54ab4bef50a",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/337.lean",
+          "classname": "elab/337.lean",
+          "time": "5.12245",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/338.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00114-191b954d",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:25:43.695Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:25:50.065Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00114-191b954d/resources.json",
+        "peakMemoryBytes": 1642524672,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "86d2ec791ebfe132830bf2b073852abe13074c286834b35b7b5c2ff14a1be486",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/338.lean",
+          "classname": "elab/338.lean",
+          "time": "4.76386",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3386.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00115-7013f2ef",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:25:50.071Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:25:56.573Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00115-7013f2ef/resources.json",
+        "peakMemoryBytes": 1668333568,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "95b9a5f06a6f16c2d36d0658ba19f3b5769c8720e89597adc0d324d27c03eefc",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3386.lean",
+          "classname": "elab/3386.lean",
+          "time": "4.67448",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3395.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00116-4b0ccff3",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:25:56.584Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:26:02.878Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00116-4b0ccff3/resources.json",
+        "peakMemoryBytes": 1668947968,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "1fe3a96d02c43656c3d01a22b27419f92444bb99689d4c6c21527aad3583e040",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3395.lean",
+          "classname": "elab/3395.lean",
+          "time": "4.68013",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/34.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00117-f621aece",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:26:02.883Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:26:09.261Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00117-f621aece/resources.json",
+        "peakMemoryBytes": 1699471360,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "e8df315648f6837522a01df5fdd99941842815de034855a60bc22a14e419b7c3",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/34.lean",
+          "classname": "elab/34.lean",
+          "time": "4.76019",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/341.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00118-170ff32f",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:26:09.268Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:26:16.851Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00118-170ff32f/resources.json",
+        "peakMemoryBytes": 1822355456,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "bb2ece48d627e401335c55f327acd7047b1cb6c8c2a1c83a251f34ad6a2018e2",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/341.lean",
+          "classname": "elab/341.lean",
+          "time": "5.78017",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/343.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00119-563bfaea",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:26:16.859Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:26:23.734Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00119-563bfaea/resources.json",
+        "peakMemoryBytes": 1799729152,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "7cee11a43391439893287416aeb7001058bb89dd12473d0a9bb76e5be4cc4401",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/343.lean",
+          "classname": "elab/343.lean",
+          "time": "5.23943",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/345.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00120-47740a00",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:26:23.740Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:26:30.648Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00120-47740a00/resources.json",
+        "peakMemoryBytes": 1855787008,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "7bd7b19c55da8275692cbe73015effb641be8338d4423c9e59b65487886264cd",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/345.lean",
+          "classname": "elab/345.lean",
+          "time": "5.22923",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3458_1.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00121-45e877a7",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:32:29.063Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:32:36.291Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00121-45e877a7/resources.json",
+        "peakMemoryBytes": 1835995136,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "2f5143a0c2290377f0a83492f87e387123972f39a647b631fbc52f4693c7f45c",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3458_1.lean",
+          "classname": "elab/3458_1.lean",
+          "time": "5.51396",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3458_2.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00122-1262e89b",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:32:36.296Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:32:43.162Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00122-1262e89b/resources.json",
+        "peakMemoryBytes": 1779982336,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "0a094bea39111c9ac772ea81784ca97817635bab66ea9a1f67d3f47ea51ccb1a",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3458_2.lean",
+          "classname": "elab/3458_2.lean",
+          "time": "5.26471",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3467.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00123-dbb61488",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:32:43.168Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:32:56.042Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00123-dbb61488/resources.json",
+        "peakMemoryBytes": 3638624256,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "942ec8abb08ee13e3983ffcd32e8647ffd7951a50faeee37ce9f7863eae8cf49",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3467.lean",
+          "classname": "elab/3467.lean",
+          "time": "11.2807",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3497.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00124-0b771e46",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:32:56.048Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:33:08.767Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00124-0b771e46/resources.json",
+        "peakMemoryBytes": 3524493312,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "aa15da02244fba2321102f762ea25579a6384cad2983bbc5e703a283235c2e13",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3497.lean",
+          "classname": "elab/3497.lean",
+          "time": "10.9306",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3501.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00125-b3ffb082",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:33:08.772Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:33:14.953Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00125-b3ffb082/resources.json",
+        "peakMemoryBytes": 1673846784,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "6133a94d23743f3a7aa77d8ab229b33308aaf2da5cf426c50315063d36494cbd",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3501.lean",
+          "classname": "elab/3501.lean",
+          "time": "4.58251",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3519.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00126-0ea39cf0",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:33:14.959Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:33:21.079Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00126-0ea39cf0/resources.json",
+        "peakMemoryBytes": 1675235328,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "42b705920ec7aa018b02ab4745bbc235e2ce0da142149b37564d82e1baf68434",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3519.lean",
+          "classname": "elab/3519.lean",
+          "time": "4.50895",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3524.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00127-109fd8cd",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:33:21.085Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:33:27.713Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00127-109fd8cd/resources.json",
+        "peakMemoryBytes": 1693306880,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "f546476757281b964dd0078bf4f20dfb8e1c4c347042f69b492437821bf7461b",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3524.lean",
+          "classname": "elab/3524.lean",
+          "time": "4.93842",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3546.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00128-8c0b099e",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:33:27.719Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:33:34.240Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00128-8c0b099e/resources.json",
+        "peakMemoryBytes": 1811116032,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "1a6c24393008aa3148f33092f889b1ca3636d8eee2da09ad84822f85e0f288ca",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3546.lean",
+          "classname": "elab/3546.lean",
+          "time": "4.92374",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3547.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00129-c7254438",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:33:34.245Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:33:40.812Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00129-c7254438/resources.json",
+        "peakMemoryBytes": 1694326784,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "a5a12cf679ae1bc872d6eec3161c495e8dfef5be50a2c6bb8d14a46338856c5b",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3547.lean",
+          "classname": "elab/3547.lean",
+          "time": "4.97562",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3554.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00130-d6397818",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:33:40.817Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:33:47.677Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00130-d6397818/resources.json",
+        "peakMemoryBytes": 1951223808,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "8f15d44880293d396114ff3be6e143489e5769610f3da0aa742fa649870dd68c",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3554.lean",
+          "classname": "elab/3554.lean",
+          "time": "5.22837",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3643.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00131-80df57b2",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:33:47.684Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:34:00.613Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00131-80df57b2/resources.json",
+        "peakMemoryBytes": 3505954816,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "76942191892a962601461a711054d88cf5932c6246be029a9bde03b3fa1394b6",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3643.lean",
+          "classname": "elab/3643.lean",
+          "time": "11.2731",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/366.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00132-80ae5465",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:34:00.620Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:34:06.824Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00132-80ae5465/resources.json",
+        "peakMemoryBytes": 1685852160,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "926fee4f51854bdee60bc3d9646a3573ade36b3213abde56808452494c1ffeb5",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/366.lean",
+          "classname": "elab/366.lean",
+          "time": "4.58618",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3686.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00133-5b1a1058",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:34:06.829Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:34:13.528Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00133-5b1a1058/resources.json",
+        "peakMemoryBytes": 1711697920,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "e931a3b79ea7ca3b91007c1c94255b0213f7bb3d6aec64e8a4739900c012cfe6",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3686.lean",
+          "classname": "elab/3686.lean",
+          "time": "5.03632",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3705.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00134-eef160ce",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:34:13.533Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:34:20.912Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00134-eef160ce/resources.json",
+        "peakMemoryBytes": 1801949184,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "40bd1543347f0df42da6262d38e117c5b27adb62e23402b1714d5de0737ad5b3",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3705.lean",
+          "classname": "elab/3705.lean",
+          "time": "5.75566",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3706.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00135-d2dae050",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:34:20.917Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:34:27.728Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00135-d2dae050/resources.json",
+        "peakMemoryBytes": 1933938688,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "66992a10db529a648164ed416559f29e1a47f868941dfc55ae2d5b50c3648976",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3706.lean",
+          "classname": "elab/3706.lean",
+          "time": "5.19515",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3710.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00136-9a3bf3f4",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:34:27.736Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:34:34.106Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00136-9a3bf3f4/resources.json",
+        "peakMemoryBytes": 1741127680,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "c16c7a262ad18dfa0e071bc985aa9f6d056ce68a4bc8f98fd1c8563e63053144",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3710.lean",
+          "classname": "elab/3710.lean",
+          "time": "4.76962",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3713.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00137-b3039f07",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:34:34.112Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:34:46.734Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00137-b3039f07/resources.json",
+        "peakMemoryBytes": 3572047872,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "4f0ac4b3d5d4a3de8bb1b550f22bc886f991d3ae1e9ddc5935a4e9f92993319b",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3713.lean",
+          "classname": "elab/3713.lean",
+          "time": "10.9951",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3731.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00138-1f175513",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:34:46.740Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:34:54.525Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00138-1f175513/resources.json",
+        "peakMemoryBytes": 2076213248,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "09b5a38768db6e56424f07957bb55139f9e7e7bb8ce89a505fef689af7625b28",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3731.lean",
+          "classname": "elab/3731.lean",
+          "time": "6.19536",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3740.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00139-80ccb122",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:34:54.531Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:35:01.553Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00139-80ccb122/resources.json",
+        "peakMemoryBytes": 1877811200,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "202d4c36d9d2b15cd0dee83e19f7f853684571328464541daf6d3c1fe6aca143",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3740.lean",
+          "classname": "elab/3740.lean",
+          "time": "5.44323",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3745.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00140-07cc36f7",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:35:01.558Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:35:07.928Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00140-07cc36f7/resources.json",
+        "peakMemoryBytes": 1759596544,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "bc3e894fe74bc855d10f615c0c9465bbfecb9391a215637a1911166cad462157",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3745.lean",
+          "classname": "elab/3745.lean",
+          "time": "4.76093",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3791.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00141-2643d324",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:35:07.933Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:35:21.126Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00141-2643d324/resources.json",
+        "peakMemoryBytes": 3890618368,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "e1416c4cb31a22cf2549953237ee09343f327e7b193dfd94a47ef793c8591b10",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3791.lean",
+          "classname": "elab/3791.lean",
+          "time": "11.6",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3807.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00142-63ad612a",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:35:21.133Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:35:45.938Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00142-63ad612a/resources.json",
+        "peakMemoryBytes": 2410754048,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "5d57a124fdf3fd78d0eb5e38e07643c71b33ec81d38f28b7d74cc860384fed49",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3807.lean",
+          "classname": "elab/3807.lean",
+          "time": "23.1789",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/382.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00143-24c3bf1e",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:35:45.943Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:35:52.286Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00143-24c3bf1e/resources.json",
+        "peakMemoryBytes": 1706840064,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "78af9dab1796ec0f666eee2e27835dbe593a3f1d4b4fd76c630365593388a4a5",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/382.lean",
+          "classname": "elab/382.lean",
+          "time": "4.75859",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/387.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00144-815025b9",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:35:52.292Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:35:58.592Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00144-815025b9/resources.json",
+        "peakMemoryBytes": 1752633344,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "a393d8cbd6179ab57f55e2def7cc756dd6e1806747298a2549137d78e3b04159",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/387.lean",
+          "classname": "elab/387.lean",
+          "time": "4.69537",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3922.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00145-40996c21",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:35:58.598Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:36:05.990Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00145-40996c21/resources.json",
+        "peakMemoryBytes": 2129145856,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "d938f241a7709f2792293986856845acee0d865f6174f6606d43f4e987928f43",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3922.lean",
+          "classname": "elab/3922.lean",
+          "time": "5.77537",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/394.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00146-c011cb97",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:36:05.995Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:36:12.445Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00146-c011cb97/resources.json",
+        "peakMemoryBytes": 1728192512,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "43cdabb483bd51def1496b500376c603706fa19fac8bf82c7389bfc186b40d4f",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/394.lean",
+          "classname": "elab/394.lean",
+          "time": "4.81495",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3943.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00147-59ab64a7",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:36:12.457Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:36:19.474Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00147-59ab64a7/resources.json",
+        "peakMemoryBytes": 1844789248,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "b4ce0d3c76661e8efd0ac48185fdddb4f14bb19eb3f345995d93c1981b5bce58",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3943.lean",
+          "classname": "elab/3943.lean",
+          "time": "5.39133",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3965.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00148-05cd2d89",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:36:19.480Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:36:26.795Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00148-05cd2d89/resources.json",
+        "peakMemoryBytes": 1941012480,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "9dfefc2b20c2dd4827f3b3201ea3d0af13cb3dcdfe2eaf6ac5b1a598c31fd660",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3965.lean",
+          "classname": "elab/3965.lean",
+          "time": "5.70258",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3965_2.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00149-403b2227",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:36:26.800Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:36:33.702Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00149-403b2227/resources.json",
+        "peakMemoryBytes": 1778475008,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "5147589821e3b3321eaadb32f92f367c8cf26b0197fb2d0689fd3f704084cf7b",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3965_2.lean",
+          "classname": "elab/3965_2.lean",
+          "time": "5.17154",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3965_3.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00150-45be7454",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:36:33.708Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:36:42.554Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00150-45be7454/resources.json",
+        "peakMemoryBytes": 1967112192,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "18cf67159bd93ee0777c48096a6b3b95f2e525616c2ed07e6943a1725951f999",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3965_3.lean",
+          "classname": "elab/3965_3.lean",
+          "time": "6.99746",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/3996.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00151-d0aad6b4",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:36:42.559Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:36:48.985Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00151-d0aad6b4/resources.json",
+        "peakMemoryBytes": 1835266048,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "9658e854849ab82f061c30c5077135351c90ffb7b1c24960e98c75d36c9c678c",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/3996.lean",
+          "classname": "elab/3996.lean",
+          "time": "4.81357",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/4051.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00152-a2c6e0ea",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:36:48.991Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:36:56.457Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00152-a2c6e0ea/resources.json",
+        "peakMemoryBytes": 1810497536,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "ba9bb74df4231230d2602464ca195364cd7f9cbdf77686ac877ae3c3ff62f1a2",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/4051.lean",
+          "classname": "elab/4051.lean",
+          "time": "5.8556",
+          "status": "run"
+        }
+      ]
+    },
+    {
+      "name": "elab/4064.lean",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00153-da01dbd9",
+        "status": "passed",
+        "startedAt": "2026-09-21T16:36:56.464Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-21T16:37:09.407Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v89-broad/00153-da01dbd9/resources.json",
+        "peakMemoryBytes": 3486609408,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "resourceSha256": "1e248a0a62f00b4491fcba1dd563892b8ccbdf4804a69e10674747f66aeb2810",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "junit": [
+        {
+          "name": "elab/4064.lean",
+          "classname": "elab/4064.lean",
+          "time": "11.2805",
           "status": "run"
         }
       ]

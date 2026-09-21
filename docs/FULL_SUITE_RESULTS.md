@@ -3,14 +3,14 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-Recorded checkpoints on 2026-09-21: the fresh v89 Node campaign has **101 passes,
-zero failures/resource aborts, and 3,795 pending registrations**. It uses the
+Recorded checkpoints on 2026-09-21: the fresh v89 Node campaign has **153 passes,
+zero failures/resource aborts, and 3,743 pending registrations**. It uses the
 unchanged server-test driver compiled ahead of time, and prioritizes previously
 unattempted elaboration tests. Its [separate checkpoint](evidence/node-broad-v89-2026-09-21.json)
 verifies every original source and driver artifact before and after each test.
 Peak memory was 3.39 GiB with no OOM, throttling, or swap events. This frozen
-runtime includes the file-read state repair; subsequent console investigations
-are separate. The campaign is paused after `elab/3150.lean` for those comparisons.
+runtime includes the file-read state repair; subsequent console and table-growth
+repairs are separate. The checkpoint ends at `elab/4064.lean`.
 
 The older frozen v78 Node campaign has
 **213 passes, zero failures/resource aborts, and 3,683 pending registrations**.
