@@ -758,6 +758,12 @@ on every completed run and a 3.37 GiB maximum peak. Embedded virtual cwd
 permission inheritance, non-Linux behavior, and complete suites remain open. See
 [the permission and lifecycle evidence](evidence/cwd-permissions-2026-09-21.json).
 
+The new frozen hosts also pass **12/12 unchanged upstream regressions**:
+`IO_test`, `Process`, `async_http_hang_regressions`, and `tempfile` in each engine.
+All 7,267 original hashes remained intact before and after every registration.
+The largest process-tree peak was 3.76 GiB, without OOM, throttling, cap hits,
+or swap. See [the upstream cwd regression evidence](evidence/cwd-permissions-upstream-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.
