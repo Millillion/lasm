@@ -214,3 +214,11 @@ snapshot matched the earlier six-worker experiment; source hashes remained
 intact, and the guard released every unit with zero OOM/throttling/swap events.
 The compiler-shell setting was validated here, not AOT-generated launchers.
 See [the retained comparison](evidence/bun-three-workers-2026-09-21.json).
+
+A later source check and tiny Bun control corrected one diagnostic detail:
+`bun -e` deliberately uses different JIT startup defaults from a script file.
+The startup probe now inspects a file invocation, matching the compiler launcher.
+Earlier timings still describe their actual file runs; the reported
+`useConcurrentJIT=false` belonged to their one-shot inspection call. No engine
+default or memory limit was changed; see
+[the option-mode comparison](evidence/bun-option-mode-2026-09-21.json).

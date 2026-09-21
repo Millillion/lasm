@@ -20,6 +20,10 @@ if (config.engine !== 'bun') throw new Error('This comparison requires a frozen 
 mkdirSync(output, { recursive: true });
 const source = join(output, 'Startup.lean');
 writeFileSync(source, 'import Init\n#eval IO.println "startup smoke passed"\n');
+// Bun's -e/--print startup intentionally disables concurrent JIT and changes
+// GC defaults. Inspect a file invocation, matching the compiler's launch mode.
+const optionsSource = join(output, 'EngineOptions.mjs');
+writeFileSync(optionsSource, 'console.log(process.versions.bun);\n');
 const expected = 'startup smoke passed\n';
 const evidence = { scope: 'Additional startup smoke comparison with fixed Wasm, Lean source, worker pool, and Linux stack adjustment. No setting is adopted without subsequent conformance checks.',
   resourceReport: process.env.LASM_RESOURCE_REPORT, config, profile,
@@ -56,7 +60,7 @@ const flags = ['useWasmIPInt', 'useBBQJIT', 'useOMGJIT', 'useConcurrentJIT', 'nu
 for (const [name, settings] of variants) {
   const environment = { ...config.engineEnvironment, ...settings };
   const inspected = run(name + ' options', config.executable,
-    [...config.engineArgs, '-e', 'console.log(process.versions.bun)'], { ...environment, BUN_JSC_dumpOptions: '2' }, 10_000);
+    [...config.engineArgs, optionsSource], { ...environment, BUN_JSC_dumpOptions: '2' }, 10_000);
   writeFileSync(join(output, name + '-options.log'), inspected.stdout + inspected.stderr);
   const effectiveOptions = Object.fromEntries(flags.map(flag => [flag,
     inspected.stderr.match(new RegExp('\\b' + flag + '\\s*=\\s*([^\\s;]+)'))?.[1] ?? null]));

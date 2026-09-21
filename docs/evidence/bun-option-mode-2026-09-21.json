@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-09-21T09:05:10.013609+00:00",
+  "comparison": {
+    "records": [
+      {
+        "mode": "one-shot",
+        "code": 0,
+        "useConcurrentJIT": "false"
+      },
+      {
+        "mode": "file",
+        "code": 0,
+        "useConcurrentJIT": "true"
+      }
+    ],
+    "scope": "Tiny engine option inspection: one-shot mode is not the Lean compiler launch mode.",
+    "reference": "https://github.com/oven-sh/bun/blob/744846f844374847c902b5e7fd59b4342a51ef99/src/jsc/bindings/ZigGlobalObject.cpp"
+  },
+  "scope": "Bun 1.4.2 option-reporting modes on Linux x64. A tiny file invocation now matches the full compiler launcher mode; no JIT default is changed.",
+  "correction": "Earlier startup experiments inspected settings through bun -e, which enables its one-shot startup policy. Their timings remain observations of full file execution, but useConcurrentJIT=false describes only that inspection call.",
+  "logs": {
+    "one-shot": ".work/full-engine-probe/bun-file-options-external-link/one-shot.log",
+    "file": ".work/full-engine-probe/bun-file-options-external-link/file.log"
+  },
+  "sourceSha256": {
+    "scripts/full-lean/probe-bun-startup.mjs": "27e65e27b13c8b3defc889f29c9db10d6040796dd6c3d60e27a7f06199f894a7"
+  },
+  "combinedPreparationResources": {
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/maintained-driver-external-link-resources.json",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "peakMemoryBytes": 3205533696,
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-21T09:01:31.487Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 1661124608,
+      "peakMemoryBytes": 3205533696,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10219520,
+        "file": 1554219008,
+        "kernel": 94998528,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1554219008,
+        "slab": 94168536
+      },
+      "pressureSomeAvg10": 0.59,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  }
+}
