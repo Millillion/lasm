@@ -6,12 +6,14 @@ import assert from 'node:assert/strict';
 import { root } from '../../src/toolchain.mjs';
 import { patchSdk } from './patch-sdk.mjs';
 import { runtimeAbiExports } from './runtime-abi.mjs';
+import { indexFunctionTable } from './function-table-index.mjs';
 
 import { ensureResourceGuard } from './resource-guard.mjs';
 
 await ensureResourceGuard();
 
 const output = resolve(process.argv[2] ?? join(root, '.work/full-engine-probe'));
+const functionTableIndex = process.argv.includes('--function-table-index');
 mkdirSync(output, { recursive: true });
 const sdk = process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9');
 patchSdk(sdk);
@@ -60,6 +62,10 @@ for (const variant of variants) {
   ], { encoding: 'utf8', timeout: 120_000 });
   writeFileSync(join(output, variant.name + '-build.log'), build.stdout + build.stderr);
   assert.equal(build.status, 0, build.error?.message ?? build.stderr);
+  if (functionTableIndex) {
+    const index = await indexFunctionTable(compiled.replace(/\.cjs$/, '.wasm'), compiled);
+    writeFileSync(join(output, variant.name + '-function-table-index.json'), JSON.stringify(index, null, 2) + '\n');
+  }
 for (const [name, executable, prefix] of engines) {
   const version = spawnSync(executable, ['--version'], { encoding: 'utf8' }).stdout.trim();
 for (let repetition = 1; repetition <= (variant.repeats ?? 1); repetition++) {
@@ -73,7 +79,7 @@ for (let repetition = 1; repetition <= (variant.repeats ?? 1); repetition++) {
 }
 }
 }
-writeFileSync(join(output, 'results.json'), JSON.stringify({ testedAt: new Date().toISOString(), results }, null, 2) + '\n');
+writeFileSync(join(output, 'results.json'), JSON.stringify({ testedAt: new Date().toISOString(), functionTableIndex, results }, null, 2) + '\n');
 for (const result of results) {
   assert.equal(result.status, 0, `${result.name}: ${result.error ?? result.stderr}`);
   assert.equal(result.stdout, result.expected, result.name);

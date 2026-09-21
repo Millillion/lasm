@@ -469,6 +469,35 @@ native macOS validation. The latest Deno HTTP pass does not establish that the
 older intermittent early-streaming deadline issue is eliminated. See
 [the binding evidence and retained failures](evidence/tcp-binding-2026-09-21.json).
 
+The prioritized v38 Node campaign passed its first nine registrations, including
+the three HTTP fuzz files, cancellation, DNS, socket selection, and timers. It
+then reached the proactive memory budget in three language-server cancellation
+tests. These are resource aborts, not Lean failures. The campaign is checkpointed
+with 3,884 registrations still pending; those old results are not transferred
+to a changed runtime.
+
+A loader investigation found an eager scan of all 261,062 initial Wasm function
+slots in every JavaScript worker. Initializing known exported addresses from
+verified binary metadata avoids that scan while preserving a fallback for
+unknown functions and handling JavaScript imports, aliases, and loaded libraries.
+The compiler probe's peak fell from 3.77 to 3.09 GiB with the exact same Wasm.
+The first derivative retained a console-import fallback and saved little memory;
+that attempt remains recorded. A V8 size-tuning comparison saved less memory and
+was not adopted.
+
+The corrected diagnostic derivative passes all three unchanged server tests
+(`cancellation`, `cancellation_empty_by`, and `cancellation_par`) with the original
+four Lean workers at 7.18–7.37 GiB per guarded process tree. All 7,267 original
+hashes remain intact. Five focused lookup controls and all 54 existing ABI,
+threading, dynamic-loading, and exception checks also pass across Node, Deno,
+and Bun. The maintained implementation is now frozen as v46 for Node/Deno and
+v47 for Bun. Both Deno and Bun pass all four original dedicated-task, filesystem,
+HTTP, and TCP regressions on these final snapshots. Bun's full-compiler startup
+also passes its native comparison, but remains slow. Broader upstream validation
+is continuing. No memory cap was raised, and these comparisons recorded no OOM,
+throttling, or swap use. See
+[the full comparisons](evidence/function-table-index-2026-09-21.json).
+
 - [x] Complete clean native control run with original-source integrity checks.
 - [x] Full compiler startup in Node, Deno, and Bun.
 - [ ] Complete unchanged suite inside Node.

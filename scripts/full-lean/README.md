@@ -170,6 +170,25 @@ inputs. It first verifies all parent hashes and rejects changes to the host
 prelude or import ABI. This permits testing a host-only fix without recompiling
 the toolchain or silently changing an ongoing campaign's inputs.
 
+`derive-function-table.mjs FROZEN_SOURCE NEW_OUTPUT` creates a loader-only
+derivative with the same Wasm bytes. The original compiler has 261,062 initial
+function-table entries; Emscripten eagerly exposed all of them to JavaScript in
+every worker just to look up exported function addresses. The derivative reads
+the Wasm export/import/element sections and initializes known addresses from that
+metadata. Runtime identity checks verify each exported address. Aliases retain
+their canonical index, dynamically loaded tables are incorporated, and unknown
+functions still use the original complete scan. Unsupported binary layouts or
+changed generated-loader semantics fail explicitly.
+
+New `freeze-build.mjs` snapshots apply this optimization and record
+`function-table-index.json`; the input build remains unchanged. Both paths stream
+large-file hashes and skip Wasm code/data when reading metadata. Run
+`probe-engines.mjs NEW_DIRECTORY --function-table-index` to apply it to all 54
+ABI/thread/dynamic-library checks. The ordinary unit controls exercise 32-bit and
+64-bit tables, aliases, JavaScript and Wasm imports, table growth, unknown-function
+fallback, and mismatched metadata. These checks supplement the unchanged upstream
+suite; they do not replace it.
+
 ## Unchanged tests and the native control
 
 ```sh
@@ -319,6 +338,14 @@ direct tool invocations keep the four-worker default, and an explicit existing
 environment value still wins. This is a disclosed parallel-suite resource
 adjustment, not a public runtime default or a source-test edit. Native control
 examples must accompany comparisons that use it.
+
+`--lean-threads N` independently records the direct-tool default (1–4, default
+four). Lowering every server process to one worker stalled a native cancellation
+control; two workers timed out in native parallel cancellation. Three passed the
+native controls but still exceeded the Node process-tree memory budget. The
+function-table optimization allows the original four-worker Node configuration
+to pass those tests without raising the memory cap. Keep these failed resource
+and concurrency experiments separate from passing conformance results.
 
 Lean's C++ shell does not read the generated application main's thread/stack
 environment defaults. The facade supplies its ordinary `-j` and `-s` options

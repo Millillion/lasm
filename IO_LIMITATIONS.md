@@ -95,6 +95,12 @@ close the full-suite or cross-platform gates. See the
 - [ ] Integrate and validate the full compiler's real Lean scheduler/pthreads in
   the packaged application path, which still runs tasks cooperatively on one
   JavaScript thread.
+- [ ] Complete full-compiler subprocess and language-server memory validation.
+  A private loader index removes the eager JavaScript scan of all 261,062
+  function-table entries in each worker. Three unchanged Node cancellation
+  tests now pass within the existing memory guard, using the same Wasm and four
+  Lean workers. Broader server/project workloads and full-suite completion
+  remain open; see [the comparisons](docs/evidence/function-table-index-2026-09-21.json).
 - [ ] Validate all task-drop/cancellation propagation behavior against the native
   scheduler, beyond explicit cooperative cancellation and tested task/promise
   lifetimes. Do not infer complete scheduling equivalence from server tests.

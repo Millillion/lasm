@@ -1,0 +1,3001 @@
+{
+  "recordedAt": "2026-09-21T06:37:29.746128+00:00",
+  "scope": "Compiler loader memory correction, with unchanged Wasm/Lean/upstream tests. Targeted validation and earlier unsuccessful experiments remain separate. Not a complete upstream-suite pass.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "references": [
+    "https://github.com/emscripten-core/emscripten/blob/6.0.9/src/lib/libaddfunction.js",
+    "https://webassembly.github.io/spec/core/binary/modules.html#element-section"
+  ],
+  "cause": "The original first function-address lookup eagerly read the entire 261062-entry main table through getWasmTableEntry in each worker, materializing/caching JavaScript function references. Most entries are Lean declarations called directly inside Wasm.",
+  "correction": "Read only Wasm import/export/element metadata, seed known canonical function addresses, verify exported-function identity at runtime, account for JS imports and prior DSO growth, and retain the original complete scan for unknown functions. Unsupported layouts and changed generated-loader semantics fail closed.",
+  "initialTableEntriesIncludingNull": 261063,
+  "exportSeeds": 2052,
+  "functionExports": 16455,
+  "functionImports": 131,
+  "unchangedWasmSha256": {
+    "nodeAndDeno": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1",
+    "bunLowered": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e"
+  },
+  "olderFullCampaign": {
+    "directory": ".work/full-campaign-node-v38-priority",
+    "identity": "d82280d454eeee13722333bad4c6fd0937ee1fbb2a168328ee1a270975220856",
+    "status": "paused",
+    "selected": 3896,
+    "counts": {
+      "passed": 9,
+      "failed": 0,
+      "resource-aborted": 3,
+      "harness-failed": 0,
+      "pending": 3884
+    },
+    "tests": [
+      {
+        "name": "lint.py",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00001-26beb2e9",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00001-26beb2e9/resources.json",
+          "peakMemoryBytes": 61128704,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00001-26beb2e9/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "lint.py",
+              "result": "Passed",
+              "line": "1/1 Test #57: lint.py ..........................   Passed    1.20 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_cancellation.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00002-03119ae1",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00002-03119ae1/resources.json",
+          "peakMemoryBytes": 3141832704,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00002-03119ae1/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_cancellation.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1047: elab/async_cancellation.lean .....   Passed   17.14 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_dns.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00003-a363af3d",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00003-a363af3d/resources.json",
+          "peakMemoryBytes": 2836664320,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00003-a363af3d/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_dns.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1049: elab/async_dns.lean ..............   Passed   14.87 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_http_fuzz.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00004-bfa0b521",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00004-bfa0b521/resources.json",
+          "peakMemoryBytes": 3214962688,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00004-bfa0b521/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_http_fuzz.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1055: elab/async_http_fuzz.lean ........   Passed   20.51 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_http_fuzz_limits.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00005-89b7c6d2",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00005-89b7c6d2/resources.json",
+          "peakMemoryBytes": 3215618048,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00005-89b7c6d2/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_http_fuzz_limits.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1056: elab/async_http_fuzz_limits.lean ...   Passed   17.95 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_http_fuzz_random.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00006-12b000ea",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00006-12b000ea/resources.json",
+          "peakMemoryBytes": 3263655936,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00006-12b000ea/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_http_fuzz_random.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1057: elab/async_http_fuzz_random.lean ...   Passed   18.00 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_http_hang_regressions.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00007-cc2ac10e",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00007-cc2ac10e/resources.json",
+          "peakMemoryBytes": 3241140224,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00007-cc2ac10e/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_http_hang_regressions.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1061: elab/async_http_hang_regressions.lean ...   Passed   20.21 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_select_socket.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00008-a4b95e02",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00008-a4b95e02/resources.json",
+          "peakMemoryBytes": 2931970048,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00008-a4b95e02/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_select_socket.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1071: elab/async_select_socket.lean ....   Passed   15.13 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_select_timer.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00009-95ec9f81",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00009-95ec9f81/resources.json",
+          "peakMemoryBytes": 2824757248,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00009-95ec9f81/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_select_timer.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1072: elab/async_select_timer.lean .....   Passed   12.88 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "server_interactive/cancellation.lean",
+        "status": "resource-aborted",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00010-f1ad2fad",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00010-f1ad2fad/resources.json",
+          "peakMemoryBytes": 8640774144,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": "Workload reached its proactive memory budget",
+          "resourceLimited": true,
+          "serviceResult": "exit-code",
+          "exitStatus": "1",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00010-f1ad2fad/results",
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": []
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_empty_by.lean",
+        "status": "resource-aborted",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00011-5721bbd1",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00011-5721bbd1/resources.json",
+          "peakMemoryBytes": 8708227072,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": "Workload reached its proactive memory budget",
+          "resourceLimited": true,
+          "serviceResult": "exit-code",
+          "exitStatus": "1",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00011-5721bbd1/results",
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": []
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_par.lean",
+        "status": "resource-aborted",
+        "attemptDirectory": ".work/full-campaign-node-v38-priority/00012-e05c863f",
+        "resources": {
+          "report": ".work/full-campaign-node-v38-priority/00012-e05c863f/resources.json",
+          "peakMemoryBytes": 8665755648,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": "Workload reached its proactive memory budget",
+          "resourceLimited": true,
+          "serviceResult": "exit-code",
+          "exitStatus": "1",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v38-priority/00012-e05c863f/results",
+          "result": {
+            "code": null,
+            "signal": "SIGTERM"
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": []
+        }
+      }
+    ]
+  },
+  "workerCountControls": {
+    "oneNative": {
+      "classification": "Controlled diagnostic interruption, not a completed test result",
+      "stop": {
+        "at": "2026-09-21T05:44:36.759611+00:00",
+        "reason": "One-thread native control remained blocked after the first cancellation/reset segment; reject this setting before testing Node. This is a controlled diagnostic interruption, not a completed test result.",
+        "startedAt": "2026-09-21T05:43:12.159Z"
+      },
+      "resources": {
+        "report": ".work/full-engine-probe/server1-native-resources.json",
+        "peakMemoryBytes": 636022784,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "stoppedBecause": "SIGTERM",
+        "resourceLimited": true,
+        "serviceResult": "exit-code",
+        "exitStatus": "1",
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true
+      },
+      "execution": {
+        "directory": ".work/full-engine-probe/server1-native-results",
+        "result": {
+          "code": null,
+          "signal": "SIGTERM"
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "tests": []
+      }
+    },
+    "twoNative": {
+      "classification": "Two passes, parallel cancellation hit the explicit 180-second parallel-harness deadline",
+      "resources": {
+        "report": ".work/full-engine-probe/server2-native-resources.json",
+        "peakMemoryBytes": 2084265984,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "stoppedBecause": null,
+        "resourceLimited": false,
+        "serviceResult": "exit-code",
+        "exitStatus": "8",
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true
+      },
+      "execution": {
+        "directory": ".work/full-engine-probe/server2-native-results",
+        "result": {
+          "code": 8,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "tests": [
+          {
+            "name": "server_interactive/cancellation.lean",
+            "result": "Passed",
+            "line": "1/3 Test #3736: server_interactive/cancellation.lean ............   Passed    7.47 sec"
+          },
+          {
+            "name": "server_interactive/cancellation_empty_by.lean",
+            "result": "Passed",
+            "line": "2/3 Test #3737: server_interactive/cancellation_empty_by.lean ...   Passed    1.21 sec"
+          },
+          {
+            "name": "server_interactive/cancellation_par.lean",
+            "result": "unknown",
+            "line": "3/3 Test #3738: server_interactive/cancellation_par.lean ........***Timeout 180.05 sec"
+          }
+        ]
+      }
+    },
+    "threeNative": {
+      "resources": {
+        "report": ".work/full-engine-probe/server3-native-resources.json",
+        "peakMemoryBytes": 2091757568,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "stoppedBecause": null,
+        "resourceLimited": false,
+        "serviceResult": "success",
+        "exitStatus": "0",
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true
+      },
+      "execution": {
+        "directory": ".work/full-engine-probe/server3-native-results",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "tests": [
+          {
+            "name": "server_interactive/cancellation.lean",
+            "result": "Passed",
+            "line": "1/3 Test #3736: server_interactive/cancellation.lean ............   Passed    7.40 sec"
+          },
+          {
+            "name": "server_interactive/cancellation_empty_by.lean",
+            "result": "Passed",
+            "line": "2/3 Test #3737: server_interactive/cancellation_empty_by.lean ...   Passed    1.22 sec"
+          },
+          {
+            "name": "server_interactive/cancellation_par.lean",
+            "result": "Passed",
+            "line": "3/3 Test #3738: server_interactive/cancellation_par.lean ........   Passed    2.16 sec"
+          }
+        ]
+      }
+    },
+    "threeNode": {
+      "directory": ".work/full-campaign-node-v42-server3",
+      "identity": "2d167ff606a867ef76ac1e765d9f5b02909dbef18d2990e6fe899de2d5e5a424",
+      "status": "paused",
+      "selected": 3,
+      "counts": {
+        "passed": 0,
+        "failed": 0,
+        "resource-aborted": 1,
+        "harness-failed": 0,
+        "pending": 2
+      },
+      "tests": [
+        {
+          "name": "server_interactive/cancellation.lean",
+          "status": "resource-aborted",
+          "attemptDirectory": ".work/full-campaign-node-v42-server3/00001-9483e12d",
+          "resources": {
+            "report": ".work/full-campaign-node-v42-server3/00001-9483e12d/resources.json",
+            "peakMemoryBytes": 8697749504,
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "stoppedBecause": "Workload reached its proactive memory budget",
+            "resourceLimited": true,
+            "serviceResult": "exit-code",
+            "exitStatus": "1",
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            },
+            "swapBytes": 0,
+            "unitReleased": true
+          },
+          "execution": {
+            "directory": ".work/full-campaign-node-v42-server3/00001-9483e12d/results",
+            "result": {
+              "code": null,
+              "signal": "SIGTERM"
+            },
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "tests": []
+          }
+        }
+      ]
+    },
+    "conclusion": "No reduced thread setting was adopted. The passing indexed server runs use four Lean workers, as before."
+  },
+  "instrumentedOriginalServer": {
+    "classification": "Proactive memory stop while collecting real-workload memory samples",
+    "resources": {
+      "report": ".work/full-engine-probe/server-profile-node-resources.json",
+      "peakMemoryBytes": 8722694144,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "stoppedBecause": "Workload reached its proactive memory budget",
+      "resourceLimited": true,
+      "serviceResult": "exit-code",
+      "exitStatus": "1",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    },
+    "samplesDirectory": ".work/full-engine-probe/node-server-memory"
+  },
+  "memoryComparisons": [
+    {
+      "name": "baseline",
+      "comparison": ".work/full-engine-probe/node-memory-baseline/comparison.json",
+      "sourceSha256": "5ad892d1377f6e8dd9cc26616ce6cf7de31890ce9cdf38057be3a4935d9b23df",
+      "seconds": 22.875956762999998,
+      "stdout": "memory smoke passed\n",
+      "code": 0,
+      "configuration": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/runtime-support",
+        "lakeThreads": 1,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v38-tcp",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "command": [
+        "--require",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-memory-v2.cjs",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/runtime-support/run-compiler.mjs",
+        "--prefix",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp",
+        "-j4",
+        "-s65536",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-memory-baseline/Memory.lean"
+      ],
+      "resources": {
+        "report": ".work/full-engine-probe/node-memory-baseline-resources.json",
+        "peakMemoryBytes": 4044660736,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "stoppedBecause": null,
+        "resourceLimited": false,
+        "serviceResult": "success",
+        "exitStatus": "0",
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true
+      },
+      "isolateSamples": [
+        {
+          "threadId": 0,
+          "lastHeapUsedBytes": 190410288,
+          "lastWasmMemoryBytes": [
+            3177512960
+          ]
+        },
+        {
+          "threadId": 1,
+          "lastHeapUsedBytes": 184402096,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 2,
+          "lastHeapUsedBytes": 192449104,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 3,
+          "lastHeapUsedBytes": 191923264,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 4,
+          "lastHeapUsedBytes": 183938800,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 5,
+          "lastHeapUsedBytes": 184157936,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 6,
+          "lastHeapUsedBytes": 7383264,
+          "lastWasmMemoryBytes": []
+        }
+      ]
+    },
+    {
+      "name": "small-gc",
+      "comparison": ".work/full-engine-probe/node-memory-small-gc/comparison.json",
+      "sourceSha256": "5ad892d1377f6e8dd9cc26616ce6cf7de31890ce9cdf38057be3a4935d9b23df",
+      "seconds": 24.67612218,
+      "stdout": "memory smoke passed\n",
+      "code": 0,
+      "configuration": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/runtime-support",
+        "lakeThreads": 1,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v38-tcp",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "command": [
+        "--optimize-for-size",
+        "--require",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-memory-v2.cjs",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp/runtime-support/run-compiler.mjs",
+        "--prefix",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v38-tcp",
+        "-j4",
+        "-s65536",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-memory-small-gc/Memory.lean"
+      ],
+      "resources": {
+        "report": ".work/full-engine-probe/node-memory-small-gc-resources.json",
+        "peakMemoryBytes": 3648991232,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "stoppedBecause": null,
+        "resourceLimited": false,
+        "serviceResult": "success",
+        "exitStatus": "0",
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true
+      },
+      "isolateSamples": [
+        {
+          "threadId": 0,
+          "lastHeapUsedBytes": 160023144,
+          "lastWasmMemoryBytes": [
+            3177512960
+          ]
+        },
+        {
+          "threadId": 1,
+          "lastHeapUsedBytes": 156071872,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 2,
+          "lastHeapUsedBytes": 156061504,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 3,
+          "lastHeapUsedBytes": 160728832,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 4,
+          "lastHeapUsedBytes": 180313720,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 5,
+          "lastHeapUsedBytes": 160038272,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 6,
+          "lastHeapUsedBytes": 6759288,
+          "lastWasmMemoryBytes": []
+        }
+      ]
+    },
+    {
+      "name": "table-index",
+      "comparison": ".work/full-engine-probe/node-memory-table-index/comparison.json",
+      "sourceSha256": "5ad892d1377f6e8dd9cc26616ce6cf7de31890ce9cdf38057be3a4935d9b23df",
+      "seconds": 23.011057801,
+      "stdout": "memory smoke passed\n",
+      "code": 0,
+      "configuration": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v44-table-index",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v44-table-index/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v44-table-index",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v44-table-index/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v44-table-index/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v44-table-index/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v44-table-index/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "command": [
+        "--require",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-memory-v2.cjs",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v44-table-index/runtime-support/run-compiler.mjs",
+        "--prefix",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v44-table-index",
+        "-j4",
+        "-s65536",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-memory-table-index/Memory.lean"
+      ],
+      "resources": {
+        "report": ".work/full-engine-probe/node-memory-table-index-resources.json",
+        "peakMemoryBytes": 3958091776,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "stoppedBecause": null,
+        "resourceLimited": false,
+        "serviceResult": "success",
+        "exitStatus": "0",
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true
+      },
+      "isolateSamples": [
+        {
+          "threadId": 0,
+          "lastHeapUsedBytes": 191490544,
+          "lastWasmMemoryBytes": [
+            3177512960
+          ]
+        },
+        {
+          "threadId": 1,
+          "lastHeapUsedBytes": 182452536,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 2,
+          "lastHeapUsedBytes": 182402080,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 3,
+          "lastHeapUsedBytes": 184270024,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 4,
+          "lastHeapUsedBytes": 184565096,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 5,
+          "lastHeapUsedBytes": 184341432,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 6,
+          "lastHeapUsedBytes": 7381544,
+          "lastWasmMemoryBytes": []
+        }
+      ]
+    },
+    {
+      "name": "table-index-v2",
+      "comparison": ".work/full-engine-probe/node-memory-table-index-v2/comparison.json",
+      "sourceSha256": "5ad892d1377f6e8dd9cc26616ce6cf7de31890ce9cdf38057be3a4935d9b23df",
+      "seconds": 22.055174339,
+      "stdout": "memory smoke passed\n",
+      "code": 0,
+      "configuration": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v45-table-index",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v45-table-index/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v45-table-index",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v45-table-index/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v45-table-index/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v45-table-index/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v45-table-index/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "command": [
+        "--require",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-memory-v2.cjs",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v45-table-index/runtime-support/run-compiler.mjs",
+        "--prefix",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v45-table-index",
+        "-j4",
+        "-s65536",
+        "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-memory-table-index-v2/Memory.lean"
+      ],
+      "resources": {
+        "report": ".work/full-engine-probe/node-memory-table-index-v2-resources.json",
+        "peakMemoryBytes": 3313025024,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "stoppedBecause": null,
+        "resourceLimited": false,
+        "serviceResult": "success",
+        "exitStatus": "0",
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0,
+        "unitReleased": true
+      },
+      "isolateSamples": [
+        {
+          "threadId": 0,
+          "lastHeapUsedBytes": 88303536,
+          "lastWasmMemoryBytes": [
+            3177512960
+          ]
+        },
+        {
+          "threadId": 1,
+          "lastHeapUsedBytes": 94345408,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 2,
+          "lastHeapUsedBytes": 94506296,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 3,
+          "lastHeapUsedBytes": 94577392,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 4,
+          "lastHeapUsedBytes": 87472136,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 5,
+          "lastHeapUsedBytes": 94260512,
+          "lastWasmMemoryBytes": []
+        },
+        {
+          "threadId": 6,
+          "lastHeapUsedBytes": 7411384,
+          "lastWasmMemoryBytes": []
+        }
+      ]
+    }
+  ],
+  "firstIndexAttempt": {
+    "classification": "Passed its smoke, but console imports triggered the original full-scan fallback, so little memory was saved",
+    "fallbacks": [
+      {
+        "pid": 1761655,
+        "thread": 0,
+        "name": "_emscripten_console_log"
+      },
+      {
+        "pid": 1761655,
+        "thread": 1,
+        "name": "_emscripten_console_log"
+      },
+      {
+        "pid": 1761655,
+        "thread": 5,
+        "name": "_emscripten_console_log"
+      },
+      {
+        "pid": 1761655,
+        "thread": 3,
+        "name": "_emscripten_console_log"
+      },
+      {
+        "pid": 1761655,
+        "thread": 4,
+        "name": "_emscripten_console_log"
+      },
+      {
+        "pid": 1761655,
+        "thread": 2,
+        "name": "_emscripten_console_log"
+      }
+    ]
+  },
+  "indexedDiagnosticServerCampaign": {
+    "directory": ".work/full-campaign-node-v45-server",
+    "identity": "86a8f8942f449fe7301abb6f3ea416028b01c2d707d79f40bfb9a4edee3b61a9",
+    "status": "complete",
+    "selected": 3,
+    "counts": {
+      "passed": 3,
+      "failed": 0,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "tests": [
+      {
+        "name": "server_interactive/cancellation.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v45-server/00001-dc3628d5",
+        "resources": {
+          "report": ".work/full-campaign-node-v45-server/00001-dc3628d5/resources.json",
+          "peakMemoryBytes": 7910305792,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v45-server/00001-dc3628d5/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "server_interactive/cancellation.lean",
+              "result": "Passed",
+              "line": "1/1 Test #3736: server_interactive/cancellation.lean ...   Passed  227.83 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_empty_by.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v45-server/00002-cdc1d631",
+        "resources": {
+          "report": ".work/full-campaign-node-v45-server/00002-cdc1d631/resources.json",
+          "peakMemoryBytes": 7732387840,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v45-server/00002-cdc1d631/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "server_interactive/cancellation_empty_by.lean",
+              "result": "Passed",
+              "line": "1/1 Test #3737: server_interactive/cancellation_empty_by.lean ...   Passed   42.37 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "server_interactive/cancellation_par.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-node-v45-server/00003-56fd9cfc",
+        "resources": {
+          "report": ".work/full-campaign-node-v45-server/00003-56fd9cfc/resources.json",
+          "peakMemoryBytes": 7714664448,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-node-v45-server/00003-56fd9cfc/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "server_interactive/cancellation_par.lean",
+              "result": "Passed",
+              "line": "1/1 Test #3738: server_interactive/cancellation_par.lean ...   Passed   71.66 sec"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "focusedControls": {
+    "passed": 5,
+    "log": ".work/full-engine-probe/bun-v47-index-regressions.log",
+    "resources": {
+      "report": ".work/full-engine-probe/function-table-final-unit-resources.json",
+      "peakMemoryBytes": 214343680,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "stoppedBecause": null,
+      "resourceLimited": false,
+      "serviceResult": "success",
+      "exitStatus": "0",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    },
+    "coverage": [
+      "32-bit and 64-bit tables",
+      "canonical aliases including dollar/Unicode export names",
+      "JS import wrappers",
+      "Wasm functions imported from another instance",
+      "table extension before first lookup",
+      "unknown-function full-scan fallback",
+      "metadata mismatch",
+      "generated-loader drift",
+      "truncated metadata"
+    ]
+  },
+  "crossEngineAbi": {
+    "passed": 54,
+    "results": ".work/full-engine-probe/function-table-abi/results.json",
+    "resources": {
+      "report": ".work/full-engine-probe/function-table-abi-resources.json",
+      "peakMemoryBytes": 481218560,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "stoppedBecause": null,
+      "resourceLimited": false,
+      "serviceResult": "success",
+      "exitStatus": "0",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    },
+    "executions": [
+      {
+        "name": "node",
+        "variant": "threads32",
+        "repetition": 1,
+        "expected": "caught exception\npthread joined\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "caught exception\npthread joined\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "threads32",
+        "repetition": 1,
+        "expected": "caught exception\npthread joined\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "caught exception\npthread joined\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "threads32",
+        "repetition": 1,
+        "expected": "caught exception\npthread joined\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "caught exception\npthread joined\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "threads64",
+        "repetition": 1,
+        "expected": "caught exception\npthread joined\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "caught exception\npthread joined\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "threads64",
+        "repetition": 1,
+        "expected": "caught exception\npthread joined\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "caught exception\npthread joined\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "threads64",
+        "repetition": 1,
+        "expected": "caught exception\npthread joined\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "caught exception\npthread joined\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "host64",
+        "repetition": 1,
+        "expected": "asynchronous host bridge joined four threads\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "asynchronous host bridge joined four threads\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "host64",
+        "repetition": 1,
+        "expected": "asynchronous host bridge joined four threads\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "asynchronous host bridge joined four threads\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "host64",
+        "repetition": 1,
+        "expected": "asynchronous host bridge joined four threads\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "asynchronous host bridge joined four threads\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "highmemory64",
+        "repetition": 1,
+        "expected": "pthread and host access above 2 GiB passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "pthread and host access above 2 GiB passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "highmemory64",
+        "repetition": 1,
+        "expected": "pthread and host access above 2 GiB passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "pthread and host access above 2 GiB passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "highmemory64",
+        "repetition": 1,
+        "expected": "pthread and host access above 2 GiB passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "pthread and host access above 2 GiB passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 1,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 2,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 3,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 4,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 5,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 6,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 7,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 8,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 9,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "shutdown64",
+        "repetition": 10,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 1,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 2,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 3,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 4,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 5,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 6,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 7,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 8,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 9,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "shutdown64",
+        "repetition": 10,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 1,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 2,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 3,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 4,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 5,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 6,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 7,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 8,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 9,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "shutdown64",
+        "repetition": 10,
+        "expected": "thread shutdown passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "thread shutdown passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "dylink64",
+        "repetition": 1,
+        "expected": "shared module data and function pointers passed\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "shared module data and function pointers passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "dylink64",
+        "repetition": 1,
+        "expected": "shared module data and function pointers passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "shared module data and function pointers passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "dylink64",
+        "repetition": 1,
+        "expected": "shared module data and function pointers passed\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "shared module data and function pointers passed\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "dylinkhost64",
+        "repetition": 1,
+        "expected": "dynamic loading progresses while a worker waits on host IO\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "dynamic loading progresses while a worker waits on host IO\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "dylinkhost64",
+        "repetition": 1,
+        "expected": "dynamic loading progresses while a worker waits on host IO\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "dynamic loading progresses while a worker waits on host IO\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "dylinkhost64",
+        "repetition": 1,
+        "expected": "dynamic loading progresses while a worker waits on host IO\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "dynamic loading progresses while a worker waits on host IO\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "dylinkexception64",
+        "repetition": 1,
+        "expected": "C++ exceptions cross dynamically loaded module boundaries\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "C++ exceptions cross dynamically loaded module boundaries\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "dylinkexception64",
+        "repetition": 1,
+        "expected": "C++ exceptions cross dynamically loaded module boundaries\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "C++ exceptions cross dynamically loaded module boundaries\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "dylinkexception64",
+        "repetition": 1,
+        "expected": "C++ exceptions cross dynamically loaded module boundaries\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "C++ exceptions cross dynamically loaded module boundaries\n",
+        "stderr": ""
+      },
+      {
+        "name": "node",
+        "variant": "sharedgrowth64",
+        "repetition": 1,
+        "expected": "blocked worker observes shared memory growth\n",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "version": "v24.13.1",
+        "status": 0,
+        "signal": null,
+        "stdout": "blocked worker observes shared memory growth\n",
+        "stderr": ""
+      },
+      {
+        "name": "deno",
+        "variant": "sharedgrowth64",
+        "repetition": 1,
+        "expected": "blocked worker observes shared memory growth\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "status": 0,
+        "signal": null,
+        "stdout": "blocked worker observes shared memory growth\n",
+        "stderr": ""
+      },
+      {
+        "name": "bun",
+        "variant": "sharedgrowth64",
+        "repetition": 1,
+        "expected": "blocked worker observes shared memory growth\n",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "status": 0,
+        "signal": null,
+        "stdout": "blocked worker observes shared memory growth\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "finalImplementation": {
+    "passed": true,
+    "scope": "The final symbol-escaping fix emits byte-identical runtime glue for both tested full compilers; no frozen input was modified.",
+    "implementationSha256": "700d38b046b81237511ac0767f311bc06877f33a14f7cc531c470bb2c30762fe",
+    "results": [
+      {
+        "before": "wasm64-v38-tcp",
+        "after": "wasm64-v46-table-index",
+        "wasmSha256": "dd380c5a38a256b998c07a76d86dc11e03acc0c1b66198c0419c0ff49f71e0b1",
+        "glueSha256": "b5c4774985177d04dccd294581f6e186c4157dbafaae8aedb2a804a95f5f9b4f",
+        "identical": true
+      },
+      {
+        "before": "wasm64-v39-tcp-pool8-lowered",
+        "after": "wasm64-v47-table-index-lowered",
+        "wasmSha256": "18db1c2e98388513d3a7213c4b35e3a378de5863fa445d3e26dad16c2459a78e",
+        "glueSha256": "d16e7067530751978f2663d891764b30417fb822d348ad27b46cecc8dc966113",
+        "identical": true
+      }
+    ]
+  },
+  "fullBunStartup": {
+    "comparison": {
+      "scope": "Additional startup smoke comparison with fixed Wasm, Lean source, worker pool, and Linux stack adjustment. No setting is adopted without subsequent conformance checks.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-table-index-startup-resources.json",
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v47-table-index-lowered",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v32-region/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v47-table-index-lowered/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 2,
+        "engineEnvironment": {
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v47-table-index/bun-stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "stackAdjustment": {
+          "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v47-table-index/bun-stack-reservation.so",
+          "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+          "osThreadStackBytes": 67108864,
+          "jscStackBudgetBytes": 62914560,
+          "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+        },
+        "maximumMemoryBytes": 4294967296,
+        "pthreadPoolSize": 8,
+        "backend": "full-lean-wasm64-lowered",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v47-table-index",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v47-table-index-lowered/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v47-table-index-lowered/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v47-table-index-lowered/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v47-table-index-lowered/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      },
+      "profile": "control",
+      "sourceSha256": "4bbc24ad93c0a3cbe4c2f8db0aa6d75a606240ebec07292d4568cc740df4f8b4",
+      "references": [
+        "https://github.com/WebKit/WebKit/blob/main/Source/JavaScriptCore/runtime/OptionsList.h",
+        "https://github.com/WebKit/WebKit/blob/main/Source/JavaScriptCore/runtime/Options.cpp",
+        "https://github.com/oven-sh/bun/issues/41438"
+      ],
+      "hypothesis": "Interpreter/tiering settings may reduce eager startup work; fewer compiler threads may reduce compiler working memory. Upstream reports and current WebKit source do not prove behavior in this pinned Bun binary.",
+      "results": [
+        {
+          "name": "native control",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "command": [
+            "-j4",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-table-index-startup/Startup.lean"
+          ],
+          "environment": {},
+          "seconds": 0.18535744700000004,
+          "code": 0,
+          "signal": null,
+          "stdout": "startup smoke passed\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "name": "default",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v47-table-index-lowered/runtime-support/run-compiler.mjs",
+            "--prefix",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v47-table-index-lowered",
+            "-j4",
+            "-s65536",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/bun-table-index-startup/Startup.lean"
+          ],
+          "environment": {
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v47-table-index/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560",
+            "LASM_FULL_LEAN_PREFIX": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v47-table-index-lowered",
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v47-table-index",
+            "LASM_FULL_APP_PATH": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v47-table-index/bin/lean",
+            "LASM_FULL_ENTRYPOINT": "lean",
+            "LASM_FULL_TOOLCHAIN_CONFIG": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v47-table-index/toolchain.json"
+          },
+          "seconds": 68.10401376600001,
+          "code": 0,
+          "signal": null,
+          "stdout": "startup smoke passed\n",
+          "stderr": "",
+          "passed": true,
+          "effectiveOptions": {
+            "useWasmIPInt": "true",
+            "useBBQJIT": "true",
+            "useOMGJIT": "true",
+            "useConcurrentJIT": "false",
+            "numberOfWasmCompilerThreads": "11",
+            "thresholdForBBQOptimizeAfterWarmUp": "150"
+          },
+          "optionsAccepted": true
+        }
+      ],
+      "finishedAt": "2026-09-21T06:23:03.659Z"
+    },
+    "resources": {
+      "report": ".work/full-engine-probe/bun-table-index-startup-resources.json",
+      "peakMemoryBytes": 2514161664,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "stoppedBecause": null,
+      "resourceLimited": false,
+      "serviceResult": "success",
+      "exitStatus": "0",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    }
+  },
+  "finalDenoRegressions": {
+    "directory": ".work/full-campaign-deno-v46-index-regressions",
+    "identity": "565feeadef043f7f293b2d214b4a64ccc5ed1cb6a664cad01068414895dee4d8",
+    "status": "complete",
+    "selected": 4,
+    "counts": {
+      "passed": 4,
+      "failed": 0,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "tests": [
+      {
+        "name": "compile/wait_dedicated.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-deno-v46-index-regressions/00001-6df0f942",
+        "resources": {
+          "report": ".work/full-campaign-deno-v46-index-regressions/00001-6df0f942/resources.json",
+          "peakMemoryBytes": 2139275264,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-deno-v46-index-regressions/00001-6df0f942/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "compile/wait_dedicated.lean",
+              "result": "Passed",
+              "line": "1/1 Test #133: compile/wait_dedicated.lean ......   Passed   32.08 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/IO_test.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-deno-v46-index-regressions/00002-8ad9a6cf",
+        "resources": {
+          "report": ".work/full-campaign-deno-v46-index-regressions/00002-8ad9a6cf/resources.json",
+          "peakMemoryBytes": 2019237888,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-deno-v46-index-regressions/00002-8ad9a6cf/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/IO_test.lean",
+              "result": "Passed",
+              "line": "1/1 Test #976: elab/IO_test.lean ................   Passed    9.14 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_http_hang_regressions.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-deno-v46-index-regressions/00003-fb2bb7ed",
+        "resources": {
+          "report": ".work/full-campaign-deno-v46-index-regressions/00003-fb2bb7ed/resources.json",
+          "peakMemoryBytes": 2506780672,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-deno-v46-index-regressions/00003-fb2bb7ed/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_http_hang_regressions.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1061: elab/async_http_hang_regressions.lean ...   Passed   18.34 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_tcp_server_client.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-deno-v46-index-regressions/00004-ef94c579",
+        "resources": {
+          "report": ".work/full-campaign-deno-v46-index-regressions/00004-ef94c579/resources.json",
+          "peakMemoryBytes": 2309775360,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-deno-v46-index-regressions/00004-ef94c579/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_tcp_server_client.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1078: elab/async_tcp_server_client.lean ...   Passed   11.94 sec"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "finalBunRegressions": {
+    "directory": ".work/full-campaign-bun-v47-index-regressions",
+    "identity": "f9750d409afa7834d93c3f7c8741101256452af7674994b03618b4f48c071ea5",
+    "status": "complete",
+    "selected": 4,
+    "counts": {
+      "passed": 4,
+      "failed": 0,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "tests": [
+      {
+        "name": "compile/wait_dedicated.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-bun-v47-index-regressions/00001-0862cc44",
+        "resources": {
+          "report": ".work/full-campaign-bun-v47-index-regressions/00001-0862cc44/resources.json",
+          "peakMemoryBytes": 2541420544,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-bun-v47-index-regressions/00001-0862cc44/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "compile/wait_dedicated.lean",
+              "result": "Passed",
+              "line": "1/1 Test #133: compile/wait_dedicated.lean ......   Passed  214.57 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/IO_test.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-bun-v47-index-regressions/00002-0783206a",
+        "resources": {
+          "report": ".work/full-campaign-bun-v47-index-regressions/00002-0783206a/resources.json",
+          "peakMemoryBytes": 2392035328,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-bun-v47-index-regressions/00002-0783206a/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/IO_test.lean",
+              "result": "Passed",
+              "line": "1/1 Test #976: elab/IO_test.lean ................   Passed   68.97 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_http_hang_regressions.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-bun-v47-index-regressions/00003-2e2b27d8",
+        "resources": {
+          "report": ".work/full-campaign-bun-v47-index-regressions/00003-2e2b27d8/resources.json",
+          "peakMemoryBytes": 3939807232,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-bun-v47-index-regressions/00003-2e2b27d8/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_http_hang_regressions.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1061: elab/async_http_hang_regressions.lean ...   Passed   74.89 sec"
+            }
+          ]
+        }
+      },
+      {
+        "name": "elab/async_tcp_server_client.lean",
+        "status": "passed",
+        "attemptDirectory": ".work/full-campaign-bun-v47-index-regressions/00004-7a82cdd2",
+        "resources": {
+          "report": ".work/full-campaign-bun-v47-index-regressions/00004-7a82cdd2/resources.json",
+          "peakMemoryBytes": 3132846080,
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "stoppedBecause": null,
+          "resourceLimited": false,
+          "serviceResult": "success",
+          "exitStatus": "0",
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "unitReleased": true
+        },
+        "execution": {
+          "directory": ".work/full-campaign-bun-v47-index-regressions/00004-7a82cdd2/results",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "tests": [
+            {
+              "name": "elab/async_tcp_server_client.lean",
+              "result": "Passed",
+              "line": "1/1 Test #1078: elab/async_tcp_server_client.lean ...   Passed   70.52 sec"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "remaining": [
+    "The complete 3896-registration campaigns are still unfinished.",
+    "The latest Deno HTTP pass does not prove elimination of the previously intermittent streaming deadline.",
+    "Full Bun retains eight prestarted workers, the Linux stack helper, and lowered Memory64 with a 4 GiB guest ceiling.",
+    "Native macOS, Windows, and ARM64 validation is still pending.",
+    "Other IO/runtime implementation gaps remain; they have not been established as fundamental."
+  ]
+}

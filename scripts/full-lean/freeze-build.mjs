@@ -1,7 +1,8 @@
-import { cpSync, copyFileSync, mkdirSync, writeFileSync, readFileSync, existsSync, constants } from 'node:fs';
+import { cpSync, copyFileSync, mkdirSync, writeFileSync, readFileSync, existsSync, createReadStream, constants } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { root, leanCommit } from '../../src/toolchain.mjs';
+import { indexFunctionTable } from './function-table-index.mjs';
 
 import { ensureResourceGuard } from './resource-guard.mjs';
 
@@ -14,7 +15,10 @@ for (const name of ['bin/lean.js', 'bin/lean.wasm']) if (!existsSync(join(build,
 cpSync(build, output, { recursive: true, verbatimSymlinks: true, mode: constants.COPYFILE_FICLONE });
 mkdirSync(join(output, 'host'), { recursive: true });
 mkdirSync(join(output, 'runtime-support'), { recursive: true });
-const files = ['bin/lean.js', 'bin/lean.wasm', 'lasm-wasm-exports.json'];
+const functionTableIndex = await indexFunctionTable(join(output, 'bin/lean.wasm'), join(output, 'bin/lean.js'));
+copyFileSync(join(output, 'bin/lean.js'), join(output, 'bin/lean.cjs'));
+writeFileSync(join(output, 'function-table-index.json'), JSON.stringify(functionTableIndex, null, 2) + '\n');
+const files = ['bin/lean.js', 'bin/lean.cjs', 'bin/lean.wasm', 'lasm-wasm-exports.json', 'function-table-index.json'];
 const provenanceFile = join(dirname(build), 'build-provenance.json');
 const provenance = existsSync(provenanceFile) ? JSON.parse(readFileSync(provenanceFile)) : {};
 const sdk = resolve(process.env.LASM_EMSDK ?? provenance.sdk ?? join(root, '.cache/emsdk-6.0.9'));
@@ -23,7 +27,11 @@ const sdk = resolve(process.env.LASM_EMSDK ?? provenance.sdk ?? join(root, '.cac
 cpSync(sdk, join(output, 'sdk'), { recursive: true, verbatimSymlinks: true, mode: constants.COPYFILE_FICLONE });
 const sanity = join(output, 'sdk/upstream/emscripten/cache/sanity.txt');
 if (existsSync(sanity)) writeFileSync(sanity, readFileSync(sanity, 'utf8').replaceAll(sdk, join(output, 'sdk')));
-writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ ...provenance, sdk }, null, 2) + '\n');
+writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ ...provenance, sdk,
+  functionTableIndex: { scope: 'Known function addresses from verified Wasm metadata; complete-scan fallback retained.',
+    wasmSha256: functionTableIndex.wasmSha256, initialTableEntries: functionTableIndex.initialTableEntries,
+    exportSeeds: functionTableIndex.exportSeeds.length, importSeeds: functionTableIndex.importSeeds.length },
+}, null, 2) + '\n');
 files.push('build-provenance.json', 'sdk/.emscripten', 'sdk/upstream/emscripten/tools/link.py',
   'sdk/upstream/emscripten/src/lib/libdylink.js', 'sdk/upstream/emscripten/src/lib/libpthread.js');
 for (const name of ['node-host.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs', 'node-process.mjs', 'node-udp.mjs', 'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-files.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-dns.mjs', 'native-interfaces.mjs']) {
@@ -32,8 +40,13 @@ for (const name of ['node-host.mjs', 'handle-table.mjs', 'node-network.mjs', 'na
 for (const name of ['run-compiler.mjs', 'cc-driver.mjs', 'response-args.mjs', 'emscripten-pre.js', 'host-pre.js', 'host-library.js']) {
   copyFileSync(join(root, 'scripts/full-lean', name), join(output, 'runtime-support', name)); files.push('runtime-support/' + name);
 }
+const hashes = {};
+for (const name of files) {
+  const hash = createHash('sha256');
+  for await (const bytes of createReadStream(join(output, name))) hash.update(bytes);
+  hashes[name] = hash.digest('hex');
+}
 writeFileSync(join(output, 'snapshot.json'), JSON.stringify({ leanCommit, sourceBuild: build, sdk: join(output, 'sdk'),
-  createdAt: new Date().toISOString(), files: Object.fromEntries(files.map(name => [name,
-    createHash('sha256').update(readFileSync(join(output, name))).digest('hex')])),
+  createdAt: new Date().toISOString(), files: hashes,
 }, null, 2) + '\n');
 console.log(JSON.stringify({ output, frozenFiles: files.length }));

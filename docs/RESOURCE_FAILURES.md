@@ -2,6 +2,7 @@
 
 The shutdowns had two experimentally observed causes. Both involved the local
 Lasm workload; the first resource-protection attempt also caused a shutdown.
+Subsequent investigations and guarded workload results are recorded below.
 
 ## Original whole-machine exhaustion
 
@@ -156,3 +157,23 @@ with identical Wasm and host code passed the unchanged registration at a
 4.78 GiB combined preparation/test peak. Keep this resource abort, the isolated
 failure, and the passing control distinct. The guard limits were never raised;
 see [the worker-pool HTTP comparison](evidence/bun-pool-http-2026-09-21.json).
+
+The prioritized Node campaign then reached the proactive budget in three
+language-server cancellation registrations (8.05–8.11 GiB). Lowering all Lean
+processes to three workers still stopped at 8.10 GiB, while one- and two-worker
+settings could not complete all native cancellation controls. A separate
+instrumented four-worker retry stopped at 8.12 GiB. These are retained real
+workload diagnostics, not deliberate memory-exhaustion tests of the guard.
+All stops released the entire service, with zero high/max/OOM counters and swap.
+
+Emscripten was eagerly exposing all 261,062 initial function-table entries to
+JavaScript in each worker. A metadata-based index preserves known addresses and
+the original unknown-function fallback. With unchanged Wasm bytes and the
+original four Lean workers, all three unchanged Node server tests then passed
+at 7.18–7.37 GiB, with all original source hashes intact. The compiler memory
+probe fell from 3.77 to 3.09 GiB. The first index attempt fell back on console
+imports and saved little; it remains recorded along with the concurrency trials.
+Five focused lookup tests and 54 cross-engine ABI/thread/library checks pass.
+Broader server and engine campaigns remain necessary. The memory cap, proactive
+stop, pressure monitor, swap restriction, and single-workload policy are unchanged.
+See [the complete comparisons](evidence/function-table-index-2026-09-21.json).
