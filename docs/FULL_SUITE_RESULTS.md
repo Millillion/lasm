@@ -3,6 +3,18 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The full-runtime message transport now avoids a large Deno allocation cost.
+The same ordinary-Lean 64 MiB read drops from **5.23 GiB to 1.99 GiB** peak memory
+and from 26.5 to 5.9 seconds. The before/after Wasm binaries are identical;
+messages now carry ArrayBuffers with numeric view bounds. Native Lean and all
+three engines pass the 1/16/64 MiB comparisons and subsequent 256 MiB reads.
+The larger engine runs peak at 2.62–2.92 GiB, with no resource event. These
+single-run controls do not establish multi-GiB payload or complete-suite parity.
+All 43 selected unchanged upstream controls pass again: eleven each in Node,
+Deno, and the local Bun native-memory64 profile, and ten in released Bun's
+lowered profile. All original source hashes remain intact, with no resource abort.
+See [the transport comparison](evidence/deno-message-envelope-2026-09-22.json).
+
 The full-runtime host transfer ABI now preserves lengths across the 2 GiB and
 4 GiB boundaries. All **72 synthetic checks** pass after reproducing 36 failures
 in the original ABI. On the rebuilt v121 native-memory64 compiler, Node, Deno,

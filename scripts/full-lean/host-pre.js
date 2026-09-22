@@ -23,7 +23,8 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       }
       const host = await lasmFullHost;
       let result;
-      const args = [request.operation, request.handle, request.argument, request.bytes,
+      const bytes = new Uint8Array(request.byteBuffer, request.byteOffset, request.byteLength);
+      const args = [request.operation, request.handle, request.argument, bytes,
         { fiber: request.thread, nativeThreadId: request.nativeThreadId }];
       if (request.kind === 'start') result = { id: host.start(...args) };
       else if (request.kind === 'release') { await host.releaseAsync(request.handle); result = {}; }
@@ -31,7 +32,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
         // Completion registration carries opaque Lean pointers. JavaScript only
         // queues their bytes; the dedicated Lean thread owns and resolves them.
         host.whenReady(request.handle).then(() => {
-          const completion = { error: false, bytes: request.bytes };
+          const completion = { error: false, bytes };
           if (lasmFullCompletionWaiter) {
             const resolve = lasmFullCompletionWaiter;
             lasmFullCompletionWaiter = undefined;
@@ -44,7 +45,12 @@ if (!ENVIRONMENT_IS_PTHREAD) {
           : await new Promise(resolve => { lasmFullCompletionWaiter = resolve; });
       }
       else result = await host.request(...args);
-      port.postMessage(result);
+      // Keep typed-array indices out of Deno's recursive MessagePort patcher.
+      // Responses may alias retained host buffers, so preserve cloning here.
+      port.postMessage(result.bytes === undefined ? result : {
+        error: result.error, byteBuffer: result.bytes.buffer,
+        byteOffset: result.bytes.byteOffset, byteLength: result.bytes.byteLength,
+      });
     } catch (error) {
       if (error.name === 'LeanExit') {
         await lasmFullHost?.then(host => host.flushStdIO()).catch(() => {});

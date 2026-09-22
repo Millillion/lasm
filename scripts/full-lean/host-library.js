@@ -52,10 +52,14 @@ addToLibrary({
         // Send the numeric offset, not the typed view. Some engine structured
         // cloners truncate a typed array's byteOffset above 4 GiB. The parent
         // already owns this shared Wasm memory and can construct its own view.
-        kind, operation, handle, argument, bytes, signalPointer: Number(signalPointer), port: channel.port2,
+        // Deno's synchronous port receiver recursively enumerates typed-array
+        // indices. Send the backing store and numeric view bounds instead.
+        kind, operation, handle, argument, byteBuffer: bytes.buffer,
+        byteOffset: bytes.byteOffset, byteLength: bytes.byteLength,
+        signalPointer: Number(signalPointer), port: channel.port2,
         thread: Number(_pthread_self()),
         nativeThreadId,
-      }] }, [channel.port2]);
+      }] }, [channel.port2, bytes.buffer]);
       var packet;
       try {
         while (Atomics.load(signal, 0) === 0) _emscripten_futex_wait(signalPointer, 0, Infinity);
@@ -65,6 +69,10 @@ addToLibrary({
         _free(signalPointer);
       }
       if (packet.message.failure) throw new Error(packet.message.failure);
+      if (packet.message.byteBuffer !== undefined) {
+        packet.message.bytes = new Uint8Array(packet.message.byteBuffer,
+          packet.message.byteOffset, packet.message.byteLength);
+      }
       return packet.message;
     },
   },

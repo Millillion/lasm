@@ -327,9 +327,18 @@ load, and suite conformance still need validation. See
   regression uses synthetic lengths without large buffers; the high-address
   bridge controls move small payloads. Real responses still clone across a
   worker port and copy through a temporary C++ vector before constructing Lean
-  data. Measure modest ordinary-Lean reads before attempting multi-GiB IO under
-  the unchanged memory guard. This remains an implementation and validation gap,
-  not an established fundamental restriction.
+  data. Initial ordinary-Lean reads through 256 MiB now pass; larger payloads,
+  short-read backing-buffer costs, and copy reduction still require measurements
+  under the unchanged memory guard. This remains an implementation and validation
+  gap, not an established fundamental restriction.
+- [x] Avoid Deno's per-byte traversal of full-runtime message payloads. Private
+  messages now carry ArrayBuffers plus numeric view bounds. The same ordinary
+  Lean 64 MiB read falls from a 5.23 GiB workload peak to 1.99 GiB in Deno, with
+  byte-identical Wasm. Native Lean and all three engines pass the 1/16/64 MiB
+  comparisons and subsequent 256 MiB reads; the latter engine peaks stay below
+  2.92 GiB. These are local measurements, not a multi-GiB IO guarantee. Response
+  cloning and C++/Lean copies remain. See
+  [the transport evidence](docs/evidence/deno-message-envelope-2026-09-22.json).
 - [ ] A pending C read cannot be safely interrupted by disposing the Wasm
   instance. Blocking file calls now use independent host workers, so reads do
   not fill the shared N-API pool and prevent their dependent writes from running.

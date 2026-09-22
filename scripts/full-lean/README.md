@@ -663,6 +663,26 @@ counts and the separate high-address bridge checks do not establish safe
 multi-GiB payload allocation. The packaged Wasm32 ABI remains unchanged; see
 [the repair evidence](../../docs/evidence/host-transfer-width-2026-09-22.json).
 
+The private transport carries ArrayBuffers and explicit view bounds, reconstructing
+typed arrays after receipt. [Deno 2.9.7's synchronous port adapter](https://github.com/denoland/deno/blob/v2.9.7/ext/node/polyfills/worker_threads.ts#L2120)
+recursively enumerates typed-array indices; the ArrayBuffer envelope avoids that traversal.
+Fresh request copies transfer their backing stores. Responses preserve cloning
+because the host may retain aliases. `probes/message-buffer.cjs` compares the
+small-buffer forms without a compiler build:
+
+```sh
+node scripts/full-lean/run-bounded.mjs --report .work/message-buffer.resources.json -- \
+  python3 scripts/full-lean/base-pages.py node scripts/full-lean/probes/message-buffer.cjs \
+  arraybuffer transfer 8388608
+```
+
+Use `buffer`, `uint8`, or `arraybuffer`, and `clone` or `transfer`. Repeat with
+`deno run -A` and Bun in separate guarded workloads. The probe caps payloads at
+8 MiB, verifies received length and sampled bytes, and reports elapsed time and
+RSS without a timing-based pass threshold. Larger ordinary-Lean reads and their
+remaining copy costs are recorded in
+[the transport evidence](../../docs/evidence/deno-message-envelope-2026-09-22.json).
+
 The maintained build patch also fixes C++/Lean ABI declaration mismatches exposed
 by strict Wasm validation, retains initialized constants needed by the interpreter,
 and links Emscripten's C++ runtime while preserving C source semantics. The engine probes use the same dynamic-module/thread settings, include exceptions,
