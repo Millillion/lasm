@@ -451,6 +451,10 @@ and records any files the upstream drivers themselves change.
 `parallel-suite.json` preserves every command and the selected backend;
 `results.xml`, `execution.log`, and `execution.json` preserve results and source
 integrity checks. No test is filtered unless `--filter` is supplied explicitly.
+An empty selection fails explicitly via CTest's `--no-tests=error`; a misspelled
+filter must never be recorded as a successful run. The guarded
+`probe-suite-selection.mjs SUITE NEW_OUTPUT TEST_NAME` exercises that rejection
+and one existing registration, preserving both executions and integrity checks.
 `--rerun-failed` is for investigation after a complete first run, not a replacement
 for the final clean conformance run. Native control results do not count as Lean
 execution inside a JavaScript engine.

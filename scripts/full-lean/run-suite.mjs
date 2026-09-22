@@ -43,7 +43,7 @@ Object.assign(env, {
   GIT_CONFIG_KEY_2: 'user.email', GIT_CONFIG_VALUE_2: 'upstream-tests@localhost',
   CTEST_OUTPUT_ON_FAILURE: '1',
 });
-const command = ['--test-dir', manifest.execution, '-j', String(jobs), '--output-on-failure', '--output-junit', join(results, 'results.xml')];
+const command = ['--test-dir', manifest.execution, '-j', String(jobs), '--no-tests=error', '--output-on-failure', '--output-junit', join(results, 'results.xml')];
 if (args.includes('--rerun-failed')) command.push('--rerun-failed');
 const filter = option('--filter');
 if (filter) command.push('-R', filter);

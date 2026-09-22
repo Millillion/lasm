@@ -20,6 +20,15 @@ These checks do not complete the full suites, native cross-platform validation,
 or UV loop configuration/aliveness. See
 [the metadata repair evidence](evidence/runtime-library-metadata-2026-09-22.json).
 
+The v145 original compiled server driver also passes
+`server_interactive/cancellation_empty_by.lean`, with all original and harness
+hashes intact. Preparation and execution peak at 6.26 GiB without resource
+events. An initial misspelled filter selected zero tests and returned success;
+that attempt is retained and is not counted as a pass. The suite runner now
+rejects empty selections explicitly, verified with an actual CTest negative
+control and the passing original registration. See
+[the server and selection evidence](evidence/runtime-library-metadata-server-2026-09-22.json).
+
 The v144 Node campaign is paused at **1,629 passes, one conformance failure,
 zero resource aborts, and 2,266 pending registrations**. The unchanged
 `elab/libuv.lean` exposed Lasm's hardcoded native-library version: it reported

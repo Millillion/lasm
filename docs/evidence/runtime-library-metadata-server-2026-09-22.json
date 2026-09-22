@@ -1,0 +1,464 @@
+{
+  "recordedAt": "2026-09-22T15:12:39.567061+00:00",
+  "scope": "Original standalone compiled Node server driver on v145; one unchanged server cancellation control plus actual empty-selection rejection. Not complete-suite conformance.",
+  "findings": [
+    "The original cancellation_empty_by test passes with all 7267 original source and ten compiled-driver/harness hashes intact.",
+    "Initial preparation supplied the nonexistent server_interactive/empty_by.lean name. CTest ran zero tests and returned zero. This is retained as an empty harness attempt and is not counted as a passing test.",
+    "run-suite.mjs now supplies --no-tests=error. An actual empty-selection control returns eight with zero completed tests; the positive upstream control returns zero with exactly one completed test.",
+    "Preparation and validation use base pages, one build worker, and the existing memory/pressure guard. No resource aborts, OOM, hard-limit, throttling or swap events occur."
+  ],
+  "driver": {
+    "version": 1,
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "prefix": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native",
+    "engine": "node",
+    "config": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "engine": "node",
+      "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "engineArgs": [],
+      "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native",
+      "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+      "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+      "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/runtime-support",
+      "standaloneLinkOptimization": {
+        "level": 1,
+        "providedArchives": [
+          {
+            "path": "lib/lean/libgmp.a",
+            "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+            "bytes": 846928
+          },
+          {
+            "path": "libuv/src/libuv/libuv.a",
+            "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+            "bytes": 183206
+          }
+        ],
+        "compilerLibraryDirectories": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean",
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/lib/lean"
+        ],
+        "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+      },
+      "leanThreads": 4,
+      "lakeThreads": 1,
+      "bunSmol": false,
+      "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+      "systemAllocator": "mimalloc",
+      "leanAllocator": "mimalloc",
+      "memoryMode": 1,
+      "engineEnvironment": {},
+      "maximumMemoryBytes": 8589934592,
+      "pthreadPoolSize": 5,
+      "backend": "full-lean-wasm64-native",
+      "nativeLeanFallback": false,
+      "environmentAdjustments": {
+        "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native",
+        "LASM_FULL_APP_PATH": "Selected facade entry point",
+        "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+        "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+        "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+      },
+      "externalTools": {
+        "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib",
+        "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/include",
+        "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/share",
+        "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/bin/leanmake",
+        "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+        "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+      }
+    },
+    "applicationLinkMode": "standalone",
+    "linkAdjustment": "Compile the unchanged test driver as a standalone Wasm application to reduce the memory retained while compiler/server children run.",
+    "linkStrategy": "Run Leanc only to print its public link flags, then exit it before invoking the same external C toolchain.",
+    "toolchainConfigSha256": "e35559ff6246011053f14763cffe76322d89aa9d41a8a049f0952ad049706611",
+    "source": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean",
+    "sourceSha256": "56410b1b00e9f04bb326741df718a7e3c6bf51de85481ce1cb2aff2304cd8fff",
+    "executable": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver",
+    "scope": "Unchanged upstream server-test driver compiled ahead of time. Server and test sources still use the selected full compiler; this is an optional parallel harness.",
+    "startedAt": "2026-09-22T15:06:34.559Z",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-preparation.resources.json",
+    "commands": [
+      {
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/bin/lean",
+          "-Dlinter.all=false",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.c",
+          "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean"
+        ],
+        "startedAt": "2026-09-22T15:06:34.560Z",
+        "finishedAt": "2026-09-22T15:06:41.550Z",
+        "code": 0,
+        "signal": null
+      },
+      {
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/bin/leanc",
+          "--print-ldflags"
+        ],
+        "startedAt": "2026-09-22T15:06:41.550Z",
+        "finishedAt": "2026-09-22T15:06:43.813Z",
+        "code": 0,
+        "signal": null,
+        "stdout": "-I /home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/include -pthread -D LEAN_EMSCRIPTEN -s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=2 -fwasm-exceptions -pthread -fstack-clash-protection -ffp-contract=off -fPIC -L /home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/lib/lean -lleancpp -lInit -lStd -lLean -lnodefs.js -lleanrt -lc++ -lc++abi -lLake -sMALLOC=mimalloc -sMAXIMUM_MEMORY=4294967296 -sPTHREAD_POOL_SIZE=8 -sGROWABLE_ARRAYBUFFERS=1 -sSTACK_OVERFLOW_CHECK=2 -sSTACK_SIZE=67108864 -Wl,--export=__cpp_exception -s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=2 -fwasm-exceptions -pthread /home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/lib/libgmp.a /home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64/libuv/src/libuv/libuv.a -lm -pthread\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/bin/clang",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.c",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/include",
+          "-pthread",
+          "-D",
+          "LEAN_EMSCRIPTEN",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=2",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-fstack-clash-protection",
+          "-ffp-contract=off",
+          "-fPIC",
+          "-L",
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/lib/lean",
+          "-lleancpp",
+          "-lInit",
+          "-lStd",
+          "-lLean",
+          "-lnodefs.js",
+          "-lleanrt",
+          "-lc++",
+          "-lc++abi",
+          "-lLake",
+          "-sMALLOC=mimalloc",
+          "-sMAXIMUM_MEMORY=4294967296",
+          "-sPTHREAD_POOL_SIZE=8",
+          "-sGROWABLE_ARRAYBUFFERS=1",
+          "-sSTACK_OVERFLOW_CHECK=2",
+          "-sSTACK_SIZE=67108864",
+          "-Wl,--export=__cpp_exception",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=2",
+          "-fwasm-exceptions",
+          "-pthread",
+          "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/lib/libgmp.a",
+          "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64/libuv/src/libuv/libuv.a",
+          "-lm",
+          "-pthread",
+          "-Wno-unused-command-line-argument"
+        ],
+        "startedAt": "2026-09-22T15:06:43.813Z",
+        "finishedAt": "2026-09-22T15:07:05.799Z",
+        "code": 0,
+        "signal": null
+      }
+    ],
+    "artifacts": {
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver": "87cc5efe52c8e66ebd1ecd6dbe6d77824ba302f81d617abb2f3ca67033e7cfb6",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.c": "fdb21d4c18d1e1edcc6f1283029f60bb96e3960a337ddde8e05d1726e4cc160e",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.cjs": "b467b76f63906d571576c61b30118fb9e02991f8a23dff04b715e6a255e62a8a",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.exports.json": "2d7201b079a96c62619890434567a1ae048b2e47e035a2ac46d75fc43fe59754",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.lasm-optimization.json": "6b9f76d1e447099736209ec0625e95bb26499538dd20d5df9736f28f4ca5245b",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.rpaths.js": "4e3a19f5b8ad344bf45e723addf12849f371580df11fe448bb0fda722f93395a",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.wasm": "671755ef3a0aa029b2485c99b9caad22be9fba8727433cbecffda58291fd7beb"
+    },
+    "finishedAt": "2026-09-22T15:07:06.230Z"
+  },
+  "initialEmptySelection": {
+    "startedAt": "2026-09-22T15:07:12.196Z",
+    "finishedAt": "2026-09-22T15:07:12.949Z",
+    "backend": "node",
+    "registered": 3896,
+    "command": [
+      "--test-dir",
+      "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v145-runtime-metadata-driver/run",
+      "-j",
+      "1",
+      "--output-on-failure",
+      "--output-junit",
+      "/home/lastmjs/development/lasm/compiler/.work/full-results-node-v145-runtime-metadata-server/results.xml",
+      "-R",
+      "^server_interactive/empty_by\\.lean$"
+    ],
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "originalSources": {
+      "before": {
+        "checked": 7267,
+        "modified": []
+      },
+      "after": {
+        "checked": 7267,
+        "modified": []
+      }
+    },
+    "harnessArtifacts": {
+      "before": {
+        "checked": 10,
+        "modified": []
+      },
+      "after": {
+        "checked": 10,
+        "modified": []
+      }
+    },
+    "leftoverProcessCleanup": [],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-preparation.resources.json",
+    "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+  },
+  "initialEmptyProgress": {
+    "startedAt": "2026-09-22T15:07:12.196Z",
+    "command": [
+      "--test-dir",
+      "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v145-runtime-metadata-driver/run",
+      "-j",
+      "1",
+      "--output-on-failure",
+      "--output-junit",
+      "/home/lastmjs/development/lasm/compiler/.work/full-results-node-v145-runtime-metadata-server/results.xml",
+      "-R",
+      "^server_interactive/empty_by\\.lean$"
+    ],
+    "completed": []
+  },
+  "verification": {
+    "scope": "Actual empty-selection failure and one unchanged positive upstream control; not a complete Lean suite.",
+    "suite": "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v145-runtime-metadata-driver",
+    "name": "server_interactive/cancellation_empty_by.lean",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control.resources.json",
+    "runnerSha256": "a5b9785ecb189b2dae2c6d83dc35d457568f9291fa53a5a7e0af359ff05aa230",
+    "cases": [
+      {
+        "label": "empty",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+          "--suite",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v145-runtime-metadata-driver",
+          "--results",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control/empty",
+          "--jobs",
+          "1",
+          "--filter",
+          "^__lasm_empty_selection_control__$"
+        ],
+        "code": 8,
+        "results": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control/empty",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control/empty.log",
+        "execution": {
+          "startedAt": "2026-09-22T15:10:40.953Z",
+          "finishedAt": "2026-09-22T15:10:41.747Z",
+          "backend": "node",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v145-runtime-metadata-driver/run",
+            "-j",
+            "1",
+            "--no-tests=error",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control/empty/results.xml",
+            "-R",
+            "^__lasm_empty_selection_control__$"
+          ],
+          "result": {
+            "code": 8,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 10,
+              "modified": []
+            },
+            "after": {
+              "checked": 10,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control.resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        },
+        "completed": []
+      },
+      {
+        "label": "positive",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+          "--suite",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v145-runtime-metadata-driver",
+          "--results",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control/positive",
+          "--jobs",
+          "1",
+          "--filter",
+          "^server_interactive/cancellation_empty_by\\.lean$"
+        ],
+        "code": 0,
+        "results": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control/positive",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control/positive.log",
+        "execution": {
+          "startedAt": "2026-09-22T15:10:42.446Z",
+          "finishedAt": "2026-09-22T15:11:04.173Z",
+          "backend": "node",
+          "registered": 3896,
+          "command": [
+            "--test-dir",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v145-runtime-metadata-driver/run",
+            "-j",
+            "1",
+            "--no-tests=error",
+            "--output-on-failure",
+            "--output-junit",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control/positive/results.xml",
+            "-R",
+            "^server_interactive/cancellation_empty_by\\.lean$"
+          ],
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 10,
+              "modified": []
+            },
+            "after": {
+              "checked": 10,
+              "modified": []
+            }
+          },
+          "leftoverProcessCleanup": [],
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control.resources.json",
+          "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+        },
+        "completed": [
+          {
+            "name": "server_interactive/cancellation_empty_by.lean",
+            "result": "Passed",
+            "line": "1/1 Test #3737: server_interactive/cancellation_empty_by.lean ...   Passed   20.93 sec"
+          }
+        ]
+      }
+    ],
+    "passed": true
+  },
+  "resources": {
+    "runtime-metadata-server-preparation": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-preparation.resources.json",
+      "sha256": "312fd52dd7d3bf6d4406a5f8c936750e65590b6011a17bc5138c10bb3d5d1a13",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/prepare-node-v145-broad.py"
+      ],
+      "startedAt": "2026-09-22T15:06:33.786Z",
+      "finishedAt": "2026-09-22T15:07:13.033Z",
+      "peakMemoryBytes": 3184992256,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    "runtime-metadata-server-control": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-server-control.resources.json",
+      "sha256": "3ad7e2a443d20f21f5b2b36f7a5e3fb615be721b04d2647c8323cad92cbb1d4f",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "node",
+        "scripts/full-lean/probe-suite-selection.mjs",
+        ".work/full-suite-node-v145-runtime-metadata-driver",
+        ".work/full-engine-probe/runtime-metadata-server-control",
+        "server_interactive/cancellation_empty_by.lean"
+      ],
+      "startedAt": "2026-09-22T15:10:40.154Z",
+      "finishedAt": "2026-09-22T15:11:04.259Z",
+      "peakMemoryBytes": 6723579904,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    }
+  },
+  "implementationInputs": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+      "sha256": "a5b9785ecb189b2dae2c6d83dc35d457568f9291fa53a5a7e0af359ff05aa230"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probe-suite-selection.mjs",
+      "sha256": "d5feeeb5a77846f0ee13f03c5d39f321df6b84e1f0e8de52aee82d56afb039f9"
+    }
+  ],
+  "suiteManifest": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v145-runtime-metadata-driver/parallel-suite.json",
+    "sha256": "8e179fcb90f615d8060173d5a84605ceee8873f478a876411aa7ae8b9d1a49db"
+  },
+  "remainingGaps": [
+    "Complete Node/Deno/Bun upstream suites, released-Bun full-compiler behavior, native cross-platform validation and packaged full-runtime integration remain open."
+  ]
+}
