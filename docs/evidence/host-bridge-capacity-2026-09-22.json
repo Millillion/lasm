@@ -1,0 +1,421 @@
+{
+  "recordedAt": "2026-09-22T00:44:43.619874+00:00",
+  "scope": "Nine actual full-runtime host bridge controls pass across Node, Deno, and the local Bun 8 GiB build. Every program checks synchronous and asynchronous transfers and wakeup signals with four additional pthread callers. No upstream Lean registrations are counted here.",
+  "helper": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-capacity-host-bridge.py",
+  "helperSha256": "f6bbe9ddd5cc72032bff4866e9b978eac4a932c149d3ca980a79b0a7805e408d",
+  "helperSource": "from pathlib import Path\nimport datetime, hashlib, json, os, subprocess\n\nassert os.environ.get('LASM_RESOURCE_UNIT')\nroot = Path.cwd()\noutput = root / '.work/full-engine-probe/capacity-host-bridge'\nassert not output.exists()\noutput.mkdir()\nenv = {**os.environ, 'BINARYEN_CORES': '1', 'EMCC_CORES': '1', 'CMAKE_BUILD_PARALLEL_LEVEL': '1'}\n\ndef sha(path):\n    digest = hashlib.sha256()\n    with path.open('rb') as stream:\n        while chunk := stream.read(1024 * 1024):\n            digest.update(chunk)\n    return digest.hexdigest()\n\ninputs = [root / 'scripts/full-lean/probes/host-highmemory.cpp',\n          root / 'scripts/full-lean/emscripten-pre.js',\n          root / 'scripts/full-lean/host-pre.js',\n          root / 'scripts/full-lean/host-library.js', *sorted((root / 'src').glob('*.mjs')),\n          *sorted((root / 'src').glob('*.cjs'))]\nbefore = {str(path): sha(path) for path in inputs}\nengines = [\n    ('node', [str(Path('/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node'))]),\n    ('deno', [str(root / '.cache/js-runtimes/deno-2.9.7/deno'), 'run', '-A']),\n    ('bun', [str(root / '.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun')]),\n]\nengine_hashes = {name: sha(Path(command[0])) for name, command in engines}\nassert engine_hashes['bun'] == '8199c4efa1c3217d2229bcb35f0699e3fa6946d12edde13df9f871502d26ae1a'\naudit = output / 'audit-pre.js'\naudit.write_text('''\nif (!ENVIRONMENT_IS_PTHREAD) {\n  const original = Module.lasmFullHostRequest;\n  Module.lasmFullHostRequest = function (request) {\n    if (request.signalPointer < Number(process.env.LASM_PROBE_HIGH_BASE)) {\n      console.error('Probe did not allocate its wait signal above the requested boundary');\n      process.exit(10);\n    }\n    return original(request);\n  };\n}\n''')\nrecord = {'startedAt': datetime.datetime.now(datetime.timezone.utc).isoformat(),\n          'scope': 'Actual full-runtime host RPC above 2/4 GiB, including four concurrent pthread callers; separate from upstream suite counts.',\n          'inputHashesBefore': before, 'engineHashesBefore': engine_hashes,\n          'auditSource': audit.read_text(), 'results': []}\nsummary = output / 'results.json'\ndef save():\n    summary.write_text(json.dumps(record, indent=2) + '\\n')\n\nfor label, boundary in [('small', 65536), ('above2gb', 2**31), ('above4gb', 2**32)]:\n    program = output / (label + '.cjs')\n    command = [str(root / '.cache/emsdk-6.0.9-dev/upstream/emscripten/em++'), str(inputs[0]),\n               '-O1', '-pthread', '-fwasm-exceptions', '-sMEMORY64=1',\n               '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=1', '-sMAXIMUM_MEMORY=8589934592',\n               '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=5', '-sEXIT_RUNTIME=1',\n               f'-DLASM_HIGH_MEMORY_BASE={boundary}ULL',\n               '--pre-js', str(inputs[1]), '--pre-js', str(inputs[2]), '--pre-js', str(audit),\n               '--js-library', str(inputs[3]), '-o', str(program)]\n    log = output / (label + '-build.log')\n    with log.open('x') as stream:\n        built = subprocess.run(command, env=env, stdout=stream, stderr=subprocess.STDOUT, timeout=180)\n    item = {'label': label, 'buildCommand': command, 'buildCode': built.returncode,\n            'buildLog': str(log), 'runs': []}\n    record['results'].append(item)\n    save()\n    assert built.returncode == 0, str(log)\n    item['artifacts'] = {str(path): sha(path) for path in [program, program.with_suffix('.wasm')]}\n    for name, engine in engines:\n        run_env = {**env, 'LASM_PROBE_HIGH_BASE': str(boundary), 'LASM_PROBE_HIGH_VALUE': 'host above heap',\n                   'LASM_FULL_HOST_MODULE': (root / 'src/node-host.mjs').as_uri()}\n        if name == 'bun':\n            run_env['BUN_JSC_useWasmMemory64'] = 'true'\n        result = subprocess.run(engine + [str(program)], env=run_env, capture_output=True, text=True, timeout=90)\n        passed = result.returncode == 0 and result.stdout == 'high-memory synchronous and asynchronous host calls passed\\n' and result.stderr == ''\n        item['runs'].append({'engine': name, 'command': engine + [str(program)], 'code': result.returncode,\n                             'stdout': result.stdout, 'stderr': result.stderr, 'passed': passed})\n        save()\n        print(json.dumps({'label': label, 'engine': name, 'passed': passed}), flush=True)\n        if label == 'small':\n            assert passed, 'Small control failed; do not request larger memory'\nrecord['inputHashesAfter'] = {str(path): sha(path) for path in inputs}\nrecord['engineHashesAfter'] = {name: sha(Path(command[0])) for name, command in engines}\nrecord['inputsUnchanged'] = record['inputHashesBefore'] == record['inputHashesAfter'] and record['engineHashesBefore'] == record['engineHashesAfter']\nrecord['passed'] = record['inputsUnchanged'] and all(run['passed'] for item in record['results'] for run in item['runs'])\nrecord['finishedAt'] = datetime.datetime.now(datetime.timezone.utc).isoformat()\nsave()\nraise SystemExit(0 if record['passed'] else 1)\n",
+  "validation": {
+    "startedAt": "2026-09-22T00:39:00.782673+00:00",
+    "scope": "Actual full-runtime host RPC above 2/4 GiB, including four concurrent pthread callers; separate from upstream suite counts.",
+    "inputHashesBefore": {
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/host-highmemory.cpp": "87326335c3120a5fc944f6f8c6023212d234c6be1bd713c31983427bf5ee6d94",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/emscripten-pre.js": "491e7960427820704e3d435caf5ec3c8a30c3b1e7d20d2fca81b143553bd8bae",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-pre.js": "8ad70d48eb587289c4f5ca0012ab619e4639dadabf7a1ae70793791947b651bb",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-library.js": "ed93c0071d37ea01382fae93b2f734deee12af5b635aafc89c19bde39bee6913",
+      "/home/lastmjs/development/lasm/compiler/src/build.mjs": "50020c9d1d24b5de40cea6d791cda993d23979cc31955576dfb1e69ed0bd1b00",
+      "/home/lastmjs/development/lasm/compiler/src/handle-table.mjs": "c58518fb2b4e8184edfc113fc68415858918d6fae66753b04e65fe6b7e0bb825",
+      "/home/lastmjs/development/lasm/compiler/src/host.mjs": "aafe9e68d468c6e9f2ae2a81c17adbd5d0853e76f80992b7f2e30ad79e0c5f7a",
+      "/home/lastmjs/development/lasm/compiler/src/js-engine.mjs": "7238a45c06fa1f639647aab69c9f0e91e3e7aaa71ea4813c7e0a9d4b4043639a",
+      "/home/lastmjs/development/lasm/compiler/src/lake.mjs": "e0c001d995f6477a5852aa07b746baa0565ed1753a7f0fcf0fd6408e9c539770",
+      "/home/lastmjs/development/lasm/compiler/src/launcher.mjs": "24fef0a5112d1218e40c82e3148bf475ab09eae0dd80b0ccceaf027fa6fca004",
+      "/home/lastmjs/development/lasm/compiler/src/main.mjs": "c6d8349bfb2a0d4de54706fa80891f6398a746fa316c86215158747b66eb4a1a",
+      "/home/lastmjs/development/lasm/compiler/src/native-bundle.mjs": "da6307f6e49a76681b6806f5074c3d8f9ced18381fe43dd6ada4f18078322ddd",
+      "/home/lastmjs/development/lasm/compiler/src/native-dns.mjs": "2380cc0bd99e7f3aef582e39db08954b148a59e93740efb742aa9a64f45b7e16",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-worker-deno.mjs": "c80058f1ced5dbaffabf21515e68015e7d97400334d724aff320ae05a133e544",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-worker-pool.mjs": "b2047e050ab6266ad3613dcd0b37107abfcf5fa80857187f2ae1b13cd7c55ca2",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-worker.mjs": "ebea284543fa12a3711cb622bff5c0b17495f4af96fcd016b1f512c369aecee1",
+      "/home/lastmjs/development/lasm/compiler/src/native-files.mjs": "04c0adf59f30862556611b83496bdf22db7744e5398ee39460caa0fb77bf525b",
+      "/home/lastmjs/development/lasm/compiler/src/native-interfaces.mjs": "6a5c99ef69a83f9ef199dfc1136b30ac4dc10b4fd69f2d4a0cf173f2ae23ad2c",
+      "/home/lastmjs/development/lasm/compiler/src/native-process.mjs": "e0281181fa526700cc1a45dc2c0b91e0abfd93630f5a0f989523d93490b7e552",
+      "/home/lastmjs/development/lasm/compiler/src/native-tcp.mjs": "5e6df0775ff191a9521622979ee27130cb0a4bdee3917a9e5f679107825926fe",
+      "/home/lastmjs/development/lasm/compiler/src/node-host.mjs": "750422b70e01a4965df35fb752f9d8aec3c02a3bd58b703b4c8d168949b4c4e9",
+      "/home/lastmjs/development/lasm/compiler/src/node-network.mjs": "f67a5043a2fe81efc676777e97b7f5129676d34d8f3151d29d1a6eec9a3e24c1",
+      "/home/lastmjs/development/lasm/compiler/src/node-process.mjs": "702fe9e848cb2612a551e1d53f35f50d07214cada1f7539f4295c4e77dcd8745",
+      "/home/lastmjs/development/lasm/compiler/src/node-signal.mjs": "44e16fc035abd651c57abdc07ca4e36245c76868e041a23c39e5a0804639da63",
+      "/home/lastmjs/development/lasm/compiler/src/node-system.mjs": "dd4e1c5c1b41ba8ecd41e16ca4ec98bc8026ccc87e9bec6eedfb6df03eb22c24",
+      "/home/lastmjs/development/lasm/compiler/src/node-udp.mjs": "b4c1cf428bfecceb7386e46da32eb441ebee64920d77c87008c85e5ce9871599",
+      "/home/lastmjs/development/lasm/compiler/src/notices.mjs": "2562bb265de82c4ecaff5ff8535eac11cf1b2f4b7d6e1c6e0a90723667b2a7d6",
+      "/home/lastmjs/development/lasm/compiler/src/platform.mjs": "8fdadd40922fdab62ad57ddcfeed413c92815ccce28a24c867e3bbba27f8de78",
+      "/home/lastmjs/development/lasm/compiler/src/process-exec.mjs": "c860a0d7271db9f2917317fd04722ee2aca52d4ddad8d79df6a5c2581bd2e3cf",
+      "/home/lastmjs/development/lasm/compiler/src/process-launcher.mjs": "39126483f5f87f5a93f3be2e3e42f834e4176c9f50eb203cc56949be2519021e",
+      "/home/lastmjs/development/lasm/compiler/src/runtime.mjs": "2ddeddadbbc85704a46ef4443a8b8aeceb312ea49942d62c4667e4b335a0e5b0",
+      "/home/lastmjs/development/lasm/compiler/src/scheduler.mjs": "5cb08469e3ab581dee8f2e95f587e638fc45fe64713f2eed4a4ba90711993c9d",
+      "/home/lastmjs/development/lasm/compiler/src/toolchain.mjs": "51bbbaff49505ccbc46649162ffab484df2c982fcc87afd1be566b12e917ea8e",
+      "/home/lastmjs/development/lasm/compiler/src/wasi.mjs": "10c7509df815d178446c5e044930b52502a050082e436d88f4a14bbe87019280",
+      "/home/lastmjs/development/lasm/compiler/src/web-host.mjs": "05f070c7f338a694f6fd0bee24274ac2307c5f1964a8d72e5f209988b45c1e62",
+      "/home/lastmjs/development/lasm/compiler/src/working-directory.mjs": "de76cfc16206d9e4ea0fd8227225b870812ad37838ddaf38974f422cadcebaaa",
+      "/home/lastmjs/development/lasm/compiler/src/native-pthread-factory.cjs": "ad423ab08d5aff4b8358b0863b238ea18ddb6c6bc5891682da6afc69ff66abf3",
+      "/home/lastmjs/development/lasm/compiler/src/native-worker-cwd.cjs": "69080ceea6aeac63baf9da1839c4e95913c7e9e893b93e036c4bdca82b09512b",
+      "/home/lastmjs/development/lasm/compiler/src/thread-id.cjs": "dcec6da112d1cdefebd943e83828b0506d7819167e1b81ae3724ee1effa940d9",
+      "/home/lastmjs/development/lasm/compiler/src/worker-stdio.cjs": "eb5afd5cd4cdaddff135559182f129963ea511fbea37a9a5aedd35b305630dc8"
+    },
+    "engineHashesBefore": {
+      "node": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f",
+      "deno": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+      "bun": "8199c4efa1c3217d2229bcb35f0699e3fa6946d12edde13df9f871502d26ae1a"
+    },
+    "auditSource": "\nif (!ENVIRONMENT_IS_PTHREAD) {\n  const original = Module.lasmFullHostRequest;\n  Module.lasmFullHostRequest = function (request) {\n    if (request.signalPointer < Number(process.env.LASM_PROBE_HIGH_BASE)) {\n      console.error('Probe did not allocate its wait signal above the requested boundary');\n      process.exit(10);\n    }\n    return original(request);\n  };\n}\n",
+    "results": [
+      {
+        "label": "small",
+        "buildCommand": [
+          "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/em++",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/host-highmemory.cpp",
+          "-O1",
+          "-pthread",
+          "-fwasm-exceptions",
+          "-sMEMORY64=1",
+          "-sALLOW_MEMORY_GROWTH=1",
+          "-sGROWABLE_ARRAYBUFFERS=1",
+          "-sMAXIMUM_MEMORY=8589934592",
+          "-sPROXY_TO_PTHREAD=1",
+          "-sPTHREAD_POOL_SIZE=5",
+          "-sEXIT_RUNTIME=1",
+          "-DLASM_HIGH_MEMORY_BASE=65536ULL",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/emscripten-pre.js",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-pre.js",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/audit-pre.js",
+          "--js-library",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-library.js",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/small.cjs"
+        ],
+        "buildCode": 0,
+        "buildLog": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/small-build.log",
+        "runs": [
+          {
+            "engine": "node",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/small.cjs"
+            ],
+            "code": 0,
+            "stdout": "high-memory synchronous and asynchronous host calls passed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "engine": "deno",
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/small.cjs"
+            ],
+            "code": 0,
+            "stdout": "high-memory synchronous and asynchronous host calls passed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "engine": "bun",
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+              "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/small.cjs"
+            ],
+            "code": 0,
+            "stdout": "high-memory synchronous and asynchronous host calls passed\n",
+            "stderr": "",
+            "passed": true
+          }
+        ],
+        "artifacts": {
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/small.cjs": "200bdd8b5fdeba6e428e28c1fd20262f3b83c44d4b8f389bbe0a873bad4634cf",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/small.wasm": "ea5f2d3ec762291ee4e9844dca87050ed185627dd9729f0e626f11b33a185b60"
+        }
+      },
+      {
+        "label": "above2gb",
+        "buildCommand": [
+          "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/em++",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/host-highmemory.cpp",
+          "-O1",
+          "-pthread",
+          "-fwasm-exceptions",
+          "-sMEMORY64=1",
+          "-sALLOW_MEMORY_GROWTH=1",
+          "-sGROWABLE_ARRAYBUFFERS=1",
+          "-sMAXIMUM_MEMORY=8589934592",
+          "-sPROXY_TO_PTHREAD=1",
+          "-sPTHREAD_POOL_SIZE=5",
+          "-sEXIT_RUNTIME=1",
+          "-DLASM_HIGH_MEMORY_BASE=2147483648ULL",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/emscripten-pre.js",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-pre.js",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/audit-pre.js",
+          "--js-library",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-library.js",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above2gb.cjs"
+        ],
+        "buildCode": 0,
+        "buildLog": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above2gb-build.log",
+        "runs": [
+          {
+            "engine": "node",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above2gb.cjs"
+            ],
+            "code": 0,
+            "stdout": "high-memory synchronous and asynchronous host calls passed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "engine": "deno",
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above2gb.cjs"
+            ],
+            "code": 0,
+            "stdout": "high-memory synchronous and asynchronous host calls passed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "engine": "bun",
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+              "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above2gb.cjs"
+            ],
+            "code": 0,
+            "stdout": "high-memory synchronous and asynchronous host calls passed\n",
+            "stderr": "",
+            "passed": true
+          }
+        ],
+        "artifacts": {
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above2gb.cjs": "0ad4a0de4f41e2f30c02d3fc1367101ad78f8d15740ae713a8f064d6fad75067",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above2gb.wasm": "201c160f7515be0454d3eaa3e7bf411a3d0320c256ac11c245a7c9c711368e3b"
+        }
+      },
+      {
+        "label": "above4gb",
+        "buildCommand": [
+          "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/em++",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/host-highmemory.cpp",
+          "-O1",
+          "-pthread",
+          "-fwasm-exceptions",
+          "-sMEMORY64=1",
+          "-sALLOW_MEMORY_GROWTH=1",
+          "-sGROWABLE_ARRAYBUFFERS=1",
+          "-sMAXIMUM_MEMORY=8589934592",
+          "-sPROXY_TO_PTHREAD=1",
+          "-sPTHREAD_POOL_SIZE=5",
+          "-sEXIT_RUNTIME=1",
+          "-DLASM_HIGH_MEMORY_BASE=4294967296ULL",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/emscripten-pre.js",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-pre.js",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/audit-pre.js",
+          "--js-library",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-library.js",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above4gb.cjs"
+        ],
+        "buildCode": 0,
+        "buildLog": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above4gb-build.log",
+        "runs": [
+          {
+            "engine": "node",
+            "command": [
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above4gb.cjs"
+            ],
+            "code": 0,
+            "stdout": "high-memory synchronous and asynchronous host calls passed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "engine": "deno",
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above4gb.cjs"
+            ],
+            "code": 0,
+            "stdout": "high-memory synchronous and asynchronous host calls passed\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "engine": "bun",
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+              "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above4gb.cjs"
+            ],
+            "code": 0,
+            "stdout": "high-memory synchronous and asynchronous host calls passed\n",
+            "stderr": "",
+            "passed": true
+          }
+        ],
+        "artifacts": {
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above4gb.cjs": "6eff47073d3f6d5f2c1f9e35ee59e8b63532b1f3ba0afda42c6eeda06d383017",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge/above4gb.wasm": "b372e45a23cb39b9ca5b36d5fdbbbb7e05a3999d3d464d039f029e01f1c96401"
+        }
+      }
+    ],
+    "inputHashesAfter": {
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/host-highmemory.cpp": "87326335c3120a5fc944f6f8c6023212d234c6be1bd713c31983427bf5ee6d94",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/emscripten-pre.js": "491e7960427820704e3d435caf5ec3c8a30c3b1e7d20d2fca81b143553bd8bae",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-pre.js": "8ad70d48eb587289c4f5ca0012ab619e4639dadabf7a1ae70793791947b651bb",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/host-library.js": "ed93c0071d37ea01382fae93b2f734deee12af5b635aafc89c19bde39bee6913",
+      "/home/lastmjs/development/lasm/compiler/src/build.mjs": "50020c9d1d24b5de40cea6d791cda993d23979cc31955576dfb1e69ed0bd1b00",
+      "/home/lastmjs/development/lasm/compiler/src/handle-table.mjs": "c58518fb2b4e8184edfc113fc68415858918d6fae66753b04e65fe6b7e0bb825",
+      "/home/lastmjs/development/lasm/compiler/src/host.mjs": "aafe9e68d468c6e9f2ae2a81c17adbd5d0853e76f80992b7f2e30ad79e0c5f7a",
+      "/home/lastmjs/development/lasm/compiler/src/js-engine.mjs": "7238a45c06fa1f639647aab69c9f0e91e3e7aaa71ea4813c7e0a9d4b4043639a",
+      "/home/lastmjs/development/lasm/compiler/src/lake.mjs": "e0c001d995f6477a5852aa07b746baa0565ed1753a7f0fcf0fd6408e9c539770",
+      "/home/lastmjs/development/lasm/compiler/src/launcher.mjs": "24fef0a5112d1218e40c82e3148bf475ab09eae0dd80b0ccceaf027fa6fca004",
+      "/home/lastmjs/development/lasm/compiler/src/main.mjs": "c6d8349bfb2a0d4de54706fa80891f6398a746fa316c86215158747b66eb4a1a",
+      "/home/lastmjs/development/lasm/compiler/src/native-bundle.mjs": "da6307f6e49a76681b6806f5074c3d8f9ced18381fe43dd6ada4f18078322ddd",
+      "/home/lastmjs/development/lasm/compiler/src/native-dns.mjs": "2380cc0bd99e7f3aef582e39db08954b148a59e93740efb742aa9a64f45b7e16",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-worker-deno.mjs": "c80058f1ced5dbaffabf21515e68015e7d97400334d724aff320ae05a133e544",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-worker-pool.mjs": "b2047e050ab6266ad3613dcd0b37107abfcf5fa80857187f2ae1b13cd7c55ca2",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-worker.mjs": "ebea284543fa12a3711cb622bff5c0b17495f4af96fcd016b1f512c369aecee1",
+      "/home/lastmjs/development/lasm/compiler/src/native-files.mjs": "04c0adf59f30862556611b83496bdf22db7744e5398ee39460caa0fb77bf525b",
+      "/home/lastmjs/development/lasm/compiler/src/native-interfaces.mjs": "6a5c99ef69a83f9ef199dfc1136b30ac4dc10b4fd69f2d4a0cf173f2ae23ad2c",
+      "/home/lastmjs/development/lasm/compiler/src/native-process.mjs": "e0281181fa526700cc1a45dc2c0b91e0abfd93630f5a0f989523d93490b7e552",
+      "/home/lastmjs/development/lasm/compiler/src/native-tcp.mjs": "5e6df0775ff191a9521622979ee27130cb0a4bdee3917a9e5f679107825926fe",
+      "/home/lastmjs/development/lasm/compiler/src/node-host.mjs": "750422b70e01a4965df35fb752f9d8aec3c02a3bd58b703b4c8d168949b4c4e9",
+      "/home/lastmjs/development/lasm/compiler/src/node-network.mjs": "f67a5043a2fe81efc676777e97b7f5129676d34d8f3151d29d1a6eec9a3e24c1",
+      "/home/lastmjs/development/lasm/compiler/src/node-process.mjs": "702fe9e848cb2612a551e1d53f35f50d07214cada1f7539f4295c4e77dcd8745",
+      "/home/lastmjs/development/lasm/compiler/src/node-signal.mjs": "44e16fc035abd651c57abdc07ca4e36245c76868e041a23c39e5a0804639da63",
+      "/home/lastmjs/development/lasm/compiler/src/node-system.mjs": "dd4e1c5c1b41ba8ecd41e16ca4ec98bc8026ccc87e9bec6eedfb6df03eb22c24",
+      "/home/lastmjs/development/lasm/compiler/src/node-udp.mjs": "b4c1cf428bfecceb7386e46da32eb441ebee64920d77c87008c85e5ce9871599",
+      "/home/lastmjs/development/lasm/compiler/src/notices.mjs": "2562bb265de82c4ecaff5ff8535eac11cf1b2f4b7d6e1c6e0a90723667b2a7d6",
+      "/home/lastmjs/development/lasm/compiler/src/platform.mjs": "8fdadd40922fdab62ad57ddcfeed413c92815ccce28a24c867e3bbba27f8de78",
+      "/home/lastmjs/development/lasm/compiler/src/process-exec.mjs": "c860a0d7271db9f2917317fd04722ee2aca52d4ddad8d79df6a5c2581bd2e3cf",
+      "/home/lastmjs/development/lasm/compiler/src/process-launcher.mjs": "39126483f5f87f5a93f3be2e3e42f834e4176c9f50eb203cc56949be2519021e",
+      "/home/lastmjs/development/lasm/compiler/src/runtime.mjs": "2ddeddadbbc85704a46ef4443a8b8aeceb312ea49942d62c4667e4b335a0e5b0",
+      "/home/lastmjs/development/lasm/compiler/src/scheduler.mjs": "5cb08469e3ab581dee8f2e95f587e638fc45fe64713f2eed4a4ba90711993c9d",
+      "/home/lastmjs/development/lasm/compiler/src/toolchain.mjs": "51bbbaff49505ccbc46649162ffab484df2c982fcc87afd1be566b12e917ea8e",
+      "/home/lastmjs/development/lasm/compiler/src/wasi.mjs": "10c7509df815d178446c5e044930b52502a050082e436d88f4a14bbe87019280",
+      "/home/lastmjs/development/lasm/compiler/src/web-host.mjs": "05f070c7f338a694f6fd0bee24274ac2307c5f1964a8d72e5f209988b45c1e62",
+      "/home/lastmjs/development/lasm/compiler/src/working-directory.mjs": "de76cfc16206d9e4ea0fd8227225b870812ad37838ddaf38974f422cadcebaaa",
+      "/home/lastmjs/development/lasm/compiler/src/native-pthread-factory.cjs": "ad423ab08d5aff4b8358b0863b238ea18ddb6c6bc5891682da6afc69ff66abf3",
+      "/home/lastmjs/development/lasm/compiler/src/native-worker-cwd.cjs": "69080ceea6aeac63baf9da1839c4e95913c7e9e893b93e036c4bdca82b09512b",
+      "/home/lastmjs/development/lasm/compiler/src/thread-id.cjs": "dcec6da112d1cdefebd943e83828b0506d7819167e1b81ae3724ee1effa940d9",
+      "/home/lastmjs/development/lasm/compiler/src/worker-stdio.cjs": "eb5afd5cd4cdaddff135559182f129963ea511fbea37a9a5aedd35b305630dc8"
+    },
+    "engineHashesAfter": {
+      "node": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f",
+      "deno": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+      "bun": "8199c4efa1c3217d2229bcb35f0699e3fa6946d12edde13df9f871502d26ae1a"
+    },
+    "inputsUnchanged": true,
+    "passed": true,
+    "finishedAt": "2026-09-22T00:39:06.672339+00:00"
+  },
+  "resource": {
+    "startedAt": "2026-09-22T00:38:59.548Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "python3",
+      ".work/full-engine-probe/probe-capacity-host-bridge.py"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "7249c827-5198-454a-9602-d105ee782dfa",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 26585915392
+    },
+    "minimumHostAvailable": 26416406528,
+    "peakMemoryBytes": 227102720,
+    "peakTasks": 38,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/capacity-host-bridge.resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-22T00:39:06.562Z",
+      "memoryBytes": 139247616,
+      "peakMemoryBytes": 227102720,
+      "swapBytes": 0,
+      "tasks": 1,
+      "memoryBreakdown": {
+        "anon": 9207808,
+        "file": 129462272,
+        "kernel": 352256,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 114237440,
+        "slab": 217056
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-22T00:39:06.731Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 141627392,
+      "peakMemoryBytes": 227102720,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10219520,
+        "file": 129470464,
+        "kernel": 1134592,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 114245632,
+        "slab": 323352
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-22T00:39:06.758Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "limitations": [
+    "The Bun executable is a local Linux x64 WebKit capacity experiment, not released Bun or a package default.",
+    "These are targeted host RPC checks, not a complete Buffer audit, OS matrix, or full Lean suite.",
+    "Source hashes describe this run before the later embedded force-exit cleanup edits."
+  ]
+}

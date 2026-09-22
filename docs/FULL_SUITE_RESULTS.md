@@ -1211,6 +1211,14 @@ Bun build 23/23. All 69 small-operation controls pass. The typed-array slice/set
 and numeric-offset reconstruction paths used by Lasm pass in all three engines;
 these engine findings do not establish a Lasm bridge failure.
 
+Nine subsequent actual host-bridge controls pass in Node, Deno, and patched Bun:
+a small control and calls above 2 GiB and 4 GiB in each engine. The unchanged
+C++ fixture checks synchronous and asynchronous transfers, response bytes, and
+wake-up signals from the main caller and four additional pthreads. Source and
+engine hashes match before/after; the guarded workload peaks at 216.58 MiB with
+no resource event. These are separate bridge controls, not additional upstream
+Lean passes; see [their complete evidence](evidence/host-bridge-capacity-2026-09-22.json).
+
 Stock Bun, packaged full-runtime integration, full-suite completion, broader IO
 coverage, and native Windows/macOS/ARM64 validation remain open. See
 [all attempts, hashes, dependencies, and resource reports](evidence/bun-memory64-capacity-2026-09-22.json).

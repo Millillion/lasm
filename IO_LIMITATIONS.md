@@ -305,8 +305,12 @@ load, and suite conformance still need validation. See
   cloning. Deno 2.9.7 rejects that copy and truncates offsets in `Buffer.toString`
   and `Buffer.fill`. Lasm's existing typed-array slice/set and numeric-offset
   reconstruction paths pass the minimized checks in all three engines; these
-  engine failures are not observed failures of that bridge. Broader coverage
-  remains necessary; see the same capacity evidence for all retained outcomes.
+  engine failures are not observed failures of that bridge. Nine subsequent
+  full host-bridge controls pass in Node, Deno, and patched Bun, with request
+  bytes, response bytes, and wake-up signals above 2 GiB and 4 GiB, including
+  concurrent pthread callers. Broader coverage remains necessary; see
+  [the actual bridge checks](docs/evidence/host-bridge-capacity-2026-09-22.json)
+  and the capacity evidence for the retained engine failures.
 - [ ] A pending C read cannot be safely interrupted by disposing the Wasm
   instance. Blocking file calls now use independent host workers, so reads do
   not fill the shared N-API pool and prevent their dependent writes from running.
