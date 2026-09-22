@@ -18,6 +18,13 @@ inputs carry upstream `.no_test` markers and are outside that count. Their
 sources and original test drivers are inventoried, with separate execution
 still pending; see [the benchmark-only inventory](evidence/upstream-benchmark-only-inventory-2026-09-22.json).
 
+Source integrity checks now also verify the six symlink targets from the
+verified original release archive. Two focused controls cover equal-byte
+retargeting, link replacement, missing links, and archive/revision mismatches.
+The ongoing campaign's new execution records include these checks before and
+after each test, alongside all 7,267 regular-file hashes. Older attempts without
+the `symlinks` field retain their original, narrower verification scope.
+
 The optional compiled-server harness now covers the exact
 `misc_dir/server_project` invocation as well as `server_interactive`. Both
 upstream driver files are byte-identical; the harness verifies their hashes

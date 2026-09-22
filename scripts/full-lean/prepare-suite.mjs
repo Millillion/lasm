@@ -9,6 +9,7 @@ import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 import { ensureResourceGuard } from './resource-guard.mjs';
 import { verifyDriverArtifacts } from './driver-artifacts.mjs';
 import { serverDriverShim } from './server-driver-shim.mjs';
+import { originalSourceLinks, verifySourceLinks } from './source-links.mjs';
 
 await ensureResourceGuard();
 
@@ -57,6 +58,9 @@ if (!existsSync(hashesFile)) {
 }
 for (const [path, hash] of Object.entries(JSON.parse(readFileSync(hashesFile))))
   if (!existsSync(join(source,path)) || digest(readFileSync(join(source,path))) !== hash) throw new Error(`Modified upstream test source: ${path}`);
+const sourceLinks = originalSourceLinks({ leanCommit, archiveSha256: expected });
+const linksVerified = verifySourceLinks(source, sourceLinks);
+if (linksVerified.modified.length) throw new Error(`Modified upstream source links: ${linksVerified.modified.join(', ')}`);
 
 const cmakeQuote = text => `[==[${text}]==]`;
 writeFileSync(join(harness,'CMakeLists.txt'), `cmake_minimum_required(VERSION 3.25)
@@ -153,6 +157,7 @@ const lines = registered.flatMap(entry => {
 });
 writeFileSync(join(execution,'CTestTestfile.cmake'),lines.join('\n')+'\n');
 writeFileSync(join(output,'parallel-suite.json'),JSON.stringify({leanCommit,backend,prefix,source,archiveSha256:expected,
+  sourceLinks,
   ...(compiledServerDriver ? { compiledServerDriver, harnessArtifacts } : {}),
   registered:registered.length,extraRegistrations,networkLock,timeoutSeconds:timeout,testSourceHashes:hashesFile,
   changes:['Generated environment points to the selected toolchain and isolated source copy.',

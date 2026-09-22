@@ -9,6 +9,13 @@ five flaky tests with `--include-excluded` produces 3,896 registrations and does
 not add those benchmark-only inputs. See
 [the source/driver inventory](../../docs/evidence/upstream-benchmark-only-inventory-2026-09-22.json).
 
+Source verification covers 7,267 original regular-file hashes and the six
+original symlink targets, including shared benchmark drivers. The link inventory
+is pinned to the release commit and verified source archive. Changing a link's
+target or replacing it with a regular file fails verification even if its bytes
+match. Each run records these checks before and after execution; older result
+files without `symlinks` record only the regular-file checks.
+
 ## Resource protection on the maintainer desktop
 
 Heavy work must run one workload at a time through `run-bounded.mjs`. Full

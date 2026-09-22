@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { cleanupTestProcesses } from './cleanup-processes.mjs';
 import { ensureResourceGuard } from './resource-guard.mjs';
 import { verifyDriverArtifacts } from './driver-artifacts.mjs';
+import { originalSourceLinks, verifySourceLinks } from './source-links.mjs';
 
 await ensureResourceGuard();
 
@@ -20,12 +21,14 @@ const jobs = Number(option('--jobs', '1'));
 if (jobs !== 1) throw new Error('This host permits one CTest job');
 const manifest = JSON.parse(readFileSync(join(directory, 'parallel-suite.json')));
 const hashes = JSON.parse(readFileSync(manifest.testSourceHashes));
+const sourceLinks = originalSourceLinks(manifest);
 function verify() {
   const modified = Object.entries(hashes).filter(([path, hash]) => {
     const file = join(manifest.source, path);
     return !existsSync(file) || createHash('sha256').update(readFileSync(file)).digest('hex') !== hash;
   }).map(([path]) => path);
-  return { checked: Object.keys(hashes).length, modified };
+  const symlinks = verifySourceLinks(manifest.source, sourceLinks);
+  return { checked: Object.keys(hashes).length, modified: [...new Set([...modified, ...symlinks.modified])], symlinks };
 }
 const before = verify();
 if (before.modified.length) throw new Error(`Upstream test sources changed before execution: ${before.modified.join(', ')}`);

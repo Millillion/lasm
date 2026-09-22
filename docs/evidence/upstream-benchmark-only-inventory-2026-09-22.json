@@ -91,5 +91,20 @@
       },
       "validation": "Not registered as an upstream CTest test; no execution claimed by this inventory."
     }
-  ]
+  ],
+  "originalSourceVerification": {
+    "checkedUniqueFiles": 18,
+    "modified": [],
+    "hashSetSha256": "5cdeebbb3b22942916b97034dc0fdc384fe4fca2cb6a29f1622250fe33ca7b28",
+    "archiveSha256": "f39c6d87a9b4e9253bef15ffae460d2652b668e619688e4c01e59bbd2cd3b002",
+    "originalSymlinkTargets": {
+      "tests/bench/build/fake_root/bin/lean": "../../lean_wrapper.py",
+      "tests/compile_bench/rbmap_checkpoint2.lean": "rbmap_checkpoint.lean",
+      "tests/compile_bench/run_test.sh": "../compile/run_test.sh",
+      "tests/elab_bench/big_omega_MT.lean": "big_omega.lean",
+      "tests/elab_bench/iterators.lean": "../compile_bench/iterators.lean",
+      "tests/elab_bench/run_test.sh": "../elab/run_test.sh"
+    },
+    "scope": "All listed source, marker, companion and driver bytes match the original-source hash inventory, following original symlinks. All six upstream symlink targets match the verified release archive directly."
+  }
 }
