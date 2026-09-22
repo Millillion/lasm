@@ -22,6 +22,12 @@ extern "C" lean_obj_res lasm_runtime_eprintln(lean_obj_arg text) {
 }
 
 extern "C" {
+// The WASI guest uses host adapters, without native libuv or OpenSSL. These
+// match upstream's metadata for builds without those libraries. The full
+// Emscripten compiler retains the upstream implementations instead.
+lean_obj_res lean_libuv_version(lean_obj_arg) { return lean_box(0); }
+lean_obj_res lean_openssl_version(lean_obj_arg) { return lean_box(0); }
+
 __attribute__((export_name("lasm_runtime_initialize")))
 void lasm_runtime_initialize() {
     static bool initialized = false;

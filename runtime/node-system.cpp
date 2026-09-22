@@ -26,8 +26,6 @@ O *nul_error(O *s) {
 }
 }
 extern "C" {
-// The private host implements the API version of the pinned libuv dependency.
-O *lean_libuv_version(O*) { return lean_unsigned_to_nat(0x013000); }
 O *lean_uv_get_process_title() { return string_call(120); }
 O *lean_uv_set_process_title(O *value) { if (auto *error = nul_error(value)) return error; return path_call(121, value).result(); }
 O *lean_uv_uptime() { return number_call(122); }

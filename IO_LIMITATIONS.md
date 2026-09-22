@@ -188,6 +188,13 @@ load, and suite conformance still need validation. See
   Six unchanged upstream regressions pass in each engine. These local checks do not establish
   native Windows/macOS filesystem conformance; see
   [the platform evidence](docs/evidence/host-platform-2026-09-21.json).
+  Guest library metadata now also reflects the actual build: the full Emscripten
+  compiler retains upstream's zero libuv version, and packaged WASI mains report
+  zero native libuv/OpenSSL versions. The missing OpenSSL metadata primitive no
+  longer prevents ordinary `Lean.Runtime` imports. Twenty-one unchanged upstream
+  registrations, seven package tests and three released-engine package controls
+  pass. This describes guest libraries, not a guarantee about host API coverage;
+  see [the metadata repair](docs/evidence/runtime-library-metadata-2026-09-22.json).
 - [ ] Windows named time zones other than UTC return an explicit unsupported
   error. Date/time behavior beyond tested UTC HTTP dates needs broader OS coverage.
 - [ ] Complete native Windows, macOS, and ARM64 wall-clock comparisons. On Linux

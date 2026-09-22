@@ -3,10 +3,31 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The v144 Node campaign's latest saved checkpoint records **1,605 passes, zero
-failures or resource aborts, and 2,291 pending registrations**. All 3,896 tests
-remain selected; 3,004 previously unpassed names run first, without importing
-earlier results. Quicksort, four red-black-map variants, server startup, the
+The v145 runtime-library metadata repair passes **21 unchanged upstream
+registrations**: seven each in Node, Deno and the local rebuilt Bun. The full
+compiler retains upstream's `lean_libuv_version` implementation, which reports
+zero for Emscripten. The packaged WASI runtime also reports zero for absent
+native libuv/OpenSSL libraries; adding the missing OpenSSL metadata primitive
+fixes ordinary `Lean.Runtime` imports that previously failed to link.
+
+The new packaged metadata test and six existing IO/main tests pass. Released
+Node, Deno and Bun each run the repaired packaged main successfully. Native and
+old/new full-engine observations retain the actual target-dependent values.
+All 7,267 original source hashes remain intact. Validation peaks at 4.45 GiB,
+with no resource abort, OOM, hard-limit, throttling or swap event. The initial
+package link failure and the earlier broad-campaign failure remain recorded.
+These checks do not complete the full suites, native cross-platform validation,
+or UV loop configuration/aliveness. See
+[the metadata repair evidence](evidence/runtime-library-metadata-2026-09-22.json).
+
+The v144 Node campaign is paused at **1,629 passes, one conformance failure,
+zero resource aborts, and 2,266 pending registrations**. The unchanged
+`elab/libuv.lean` exposed Lasm's hardcoded native-library version: it reported
+1.48.0 although pinned Lean reports zero for its Emscripten build. The failure
+peaked at 1.59 GiB and preserved every original/harness hash. The subsequent
+repair is recorded separately above. All 3,896 tests were selected; 3,004
+previously unpassed names were prioritized, without importing earlier results.
+Quicksort, four red-black-map variants, server startup, the
 dependent-pair iterator, tree maps, union-find, server watchdog and workspace
 symbols pass. All 197 documentation-parser registrations pass, followed by the
 monad-control tutorial, ordering and persistent-array iteration controls.
@@ -34,11 +55,12 @@ Later passes include JSON surrogate handling, kernel interruption and heartbeat
 limits, compiler control flow, natural-number bitwise operations and local
 recursive definitions.
 Every completed attempt preserves all 7,267 original source hashes and the
-compiled-driver/harness hashes. The active unfinished attempt is excluded from
-the saved results. This campaign uses base pages, one build worker and the
+compiled-driver/harness hashes. The paused checkpoint includes only completed
+attempts. This campaign uses base pages, one build worker and the
 separate final-link profile described below. See
-[the 1,605-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1605-2026-09-22.json).
-The [1,505-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1505-2026-09-22.json),
+[the 1,630-attempt checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1630-2026-09-22.json).
+The [1,605-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1605-2026-09-22.json),
+[1,505-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1505-2026-09-22.json),
 [1,403-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1403-2026-09-22.json),
 [1,307-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1307-2026-09-22.json),
 [1,210-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1210-2026-09-22.json),

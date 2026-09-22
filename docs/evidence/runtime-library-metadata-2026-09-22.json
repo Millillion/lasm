@@ -1,0 +1,1053 @@
+{
+  "recordedAt": "2026-09-22T15:06:30.325324+00:00",
+  "scope": "Linux x64 runtime-library metadata repair and ordinary Lean.Runtime import. Original upstream tests and supplementary packaged/native controls; not complete-suite or API conformance.",
+  "findings": [
+    "The v144 broad Node campaign exposed a fabricated 1.48.0 libuv version. Unmodified elab/libuv.lean expects pinned upstream Emscripten metadata (zero). The paused campaign retains 1629 passes and that failure.",
+    "The full runtime no longer overrides lean_libuv_version. A byte-identical copy of upstream libuv.cpp is compiled with only its existing initialization redirect; native-library version reporting uses upstream code.",
+    "The packaged WASI guest now reports zero native libuv/OpenSSL versions. Its missing lean_openssl_version previously prevented ordinary Lean.Runtime imports from linking. Host API adapters do not constitute native libraries inside the guest.",
+    "The same ordinary Lean fixture records native library versions, reproduces old full-engine version metadata, and verifies corrected full-engine values. Emscripten/WASI/native platform metadata remains target-dependent.",
+    "All 21 unchanged upstream registrations pass (seven per engine), including libuv, OpenSSL, ordinary IO, HTTP hang regressions, system information, directory reads and clocks. All 7267 source hashes remain intact.",
+    "The new packaged metadata test and six existing IO/main tests pass. Released Node, Deno and Bun each run the repaired packaged main successfully."
+  ],
+  "retainedDevelopmentAttempts": [
+    "The first supplementary package test failed at link time on missing lean_openssl_version before reaching its libuv assertion. An explicit OpenSSL output assertion was then added to this supplementary fixture; no upstream source/test was changed.",
+    "Initial generated package fixture artifacts were moved intact into .work/full-engine-probe/runtime-metadata-initial-fixture-lake. The maintained test now copies its source into an isolated temporary project."
+  ],
+  "remainingGaps": [
+    "Full Node/Deno/Bun suites remain incomplete. New-profile targeted results are not imported into the paused older campaign.",
+    "Full Bun uses the disclosed local memory64-capacity build and Linux stack helper; packaged checks use released Bun.",
+    "UV loop configuration/aliveness, broader IO behavior, packaged full-runtime integration and native cross-platform validation remain open; this metadata repair does not establish those capabilities."
+  ],
+  "pausedCampaign": {
+    "path": "/home/lastmjs/development/lasm/compiler/docs/evidence/node-broad-v144-split-optimization-checkpoint1630-2026-09-22.json",
+    "sha256": "eed86ef9fcba8e282e946b2691b7f946440106852a95fe76ddbc03b7b758f927"
+  },
+  "metadataComparison": {
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean",
+    "sourceSha256": "97849e2905789bf7b3111119af8d1a658550d566959e4511aacc84a6363639b8",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-validation.resources.json",
+    "scope": "Ordinary Lean library metadata on native Lean and full old/new compiler snapshots. Target/build-library metadata is expected to differ from the native host.",
+    "cases": [
+      {
+        "profile": "native",
+        "engine": "native",
+        "command": [
+          "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean"
+        ],
+        "code": 0,
+        "stdout": "emscripten=false\nlibuv=77824\nopenssl=811597824\n",
+        "stderr": "",
+        "passed": true,
+        "startedAt": "2026-09-22T14:48:33.539872+00:00",
+        "seconds": 0.211175
+      },
+      {
+        "profile": "before",
+        "engine": "node",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v144-split-optimization-r2-native/bin/lean",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean"
+        ],
+        "code": 0,
+        "stdout": "emscripten=true\nlibuv=77824\nopenssl=0\n",
+        "stderr": "",
+        "passed": true,
+        "startedAt": "2026-09-22T14:48:33.751410+00:00",
+        "seconds": 5.013678
+      },
+      {
+        "profile": "before",
+        "engine": "deno",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v144-split-optimization-r2-native/bin/lean",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean"
+        ],
+        "code": 0,
+        "stdout": "emscripten=true\nlibuv=77824\nopenssl=0\n",
+        "stderr": "",
+        "passed": true,
+        "startedAt": "2026-09-22T14:48:38.765409+00:00",
+        "seconds": 5.391664
+      },
+      {
+        "profile": "before",
+        "engine": "bun",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v144-split-optimization-r2-native/bin/lean",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean"
+        ],
+        "code": 0,
+        "stdout": "emscripten=true\nlibuv=77824\nopenssl=0\n",
+        "stderr": "",
+        "passed": true,
+        "startedAt": "2026-09-22T14:48:44.157431+00:00",
+        "seconds": 4.617405
+      },
+      {
+        "profile": "after",
+        "engine": "node",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/bin/lean",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean"
+        ],
+        "code": 0,
+        "stdout": "emscripten=true\nlibuv=0\nopenssl=0\n",
+        "stderr": "",
+        "passed": true,
+        "startedAt": "2026-09-22T14:48:48.775223+00:00",
+        "seconds": 4.948915
+      },
+      {
+        "profile": "after",
+        "engine": "deno",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v145-runtime-metadata-native/bin/lean",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean"
+        ],
+        "code": 0,
+        "stdout": "emscripten=true\nlibuv=0\nopenssl=0\n",
+        "stderr": "",
+        "passed": true,
+        "startedAt": "2026-09-22T14:48:53.724579+00:00",
+        "seconds": 5.446207
+      },
+      {
+        "profile": "after",
+        "engine": "bun",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v145-runtime-metadata-native/bin/lean",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean"
+        ],
+        "code": 0,
+        "stdout": "emscripten=true\nlibuv=0\nopenssl=0\n",
+        "stderr": "",
+        "passed": true,
+        "startedAt": "2026-09-22T14:48:59.171262+00:00",
+        "seconds": 4.763426
+      }
+    ],
+    "sourceUnchanged": true,
+    "passed": true
+  },
+  "packaged": {
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean",
+    "sourceSha256": "97849e2905789bf7b3111119af8d1a658550d566959e4511aacc84a6363639b8",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-package-validation.resources.json",
+    "scope": "Packaged WASI main in released Node, Deno and Bun; guest library metadata and unchanged copied Lean source.",
+    "wasmSha256": "955ad40ff039ad1b859540e7cd9d86a3d2981fb8d3dc4cca4d240d98ac581ece",
+    "cases": [
+      {
+        "engine": "node",
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-package-engines/application/main.mjs"
+        ],
+        "code": 0,
+        "seconds": 0.21969124300000112,
+        "stdout": "emscripten=false\nlibuv=0\nopenssl=0\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "engine": "deno",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-package-engines/application/main.mjs"
+        ],
+        "code": 0,
+        "seconds": 0.31616269399999875,
+        "stdout": "emscripten=false\nlibuv=0\nopenssl=0\n",
+        "stderr": "",
+        "passed": true
+      },
+      {
+        "engine": "bun",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-package-engines/application/main.mjs"
+        ],
+        "code": 0,
+        "seconds": 0.12245827800000553,
+        "stdout": "emscripten=false\nlibuv=0\nopenssl=0\n",
+        "stderr": "",
+        "passed": true
+      }
+    ],
+    "sourceUnchanged": true,
+    "passed": true
+  },
+  "upstream": {
+    "node": {
+      "execution": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-results-node-v145-runtime-metadata/execution.json",
+        "sha256": "cee3ec56ae66d12a798a5bd831670a0e03bb445d1d8591b383ed4cdd92dc35c9"
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "harnessArtifacts": {
+        "before": {
+          "checked": 0,
+          "modified": []
+        },
+        "after": {
+          "checked": 0,
+          "modified": []
+        }
+      },
+      "cases": [
+        {
+          "name": "elab/IO_test.lean",
+          "classname": "elab/IO_test.lean",
+          "time": "5.97785",
+          "status": "run"
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "classname": "elab/async_http_hang_regressions.lean",
+          "time": "10.1126",
+          "status": "run"
+        },
+        {
+          "name": "elab/async_systems_info.lean",
+          "classname": "elab/async_systems_info.lean",
+          "time": "6.78509",
+          "status": "run"
+        },
+        {
+          "name": "elab/libuv.lean",
+          "classname": "elab/libuv.lean",
+          "time": "4.8586",
+          "status": "run"
+        },
+        {
+          "name": "elab/openssl.lean",
+          "classname": "elab/openssl.lean",
+          "time": "4.64159",
+          "status": "run"
+        },
+        {
+          "name": "elab/readDir.lean",
+          "classname": "elab/readDir.lean",
+          "time": "4.78614",
+          "status": "run"
+        },
+        {
+          "name": "elab/timeIO.lean",
+          "classname": "elab/timeIO.lean",
+          "time": "5.71463",
+          "status": "run"
+        }
+      ],
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/runtime-support",
+        "standaloneLinkOptimization": {
+          "level": 1,
+          "providedArchives": [
+            {
+              "path": "lib/lean/libgmp.a",
+              "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+              "bytes": 846928
+            },
+            {
+              "path": "libuv/src/libuv/libuv.a",
+              "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+              "bytes": 183206
+            }
+          ],
+          "compilerLibraryDirectories": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean",
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native/lib/lean"
+          ],
+          "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+        },
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v145-runtime-metadata-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      }
+    },
+    "deno": {
+      "execution": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-results-deno-v145-runtime-metadata/execution.json",
+        "sha256": "5d40f2618246a15e2b1a8e0e67d67fbe471596305c37bf70516f754812b89f8a"
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "harnessArtifacts": {
+        "before": {
+          "checked": 0,
+          "modified": []
+        },
+        "after": {
+          "checked": 0,
+          "modified": []
+        }
+      },
+      "cases": [
+        {
+          "name": "elab/IO_test.lean",
+          "classname": "elab/IO_test.lean",
+          "time": "5.87089",
+          "status": "run"
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "classname": "elab/async_http_hang_regressions.lean",
+          "time": "10.663",
+          "status": "run"
+        },
+        {
+          "name": "elab/async_systems_info.lean",
+          "classname": "elab/async_systems_info.lean",
+          "time": "7.04813",
+          "status": "run"
+        },
+        {
+          "name": "elab/libuv.lean",
+          "classname": "elab/libuv.lean",
+          "time": "5.01265",
+          "status": "run"
+        },
+        {
+          "name": "elab/openssl.lean",
+          "classname": "elab/openssl.lean",
+          "time": "4.89111",
+          "status": "run"
+        },
+        {
+          "name": "elab/readDir.lean",
+          "classname": "elab/readDir.lean",
+          "time": "5.0889",
+          "status": "run"
+        },
+        {
+          "name": "elab/timeIO.lean",
+          "classname": "elab/timeIO.lean",
+          "time": "6.45166",
+          "status": "run"
+        }
+      ],
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "engineArgs": [
+          "run",
+          "-A",
+          "--v8-flags=--stack-size=61440"
+        ],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/runtime-support",
+        "standaloneLinkOptimization": {
+          "level": 1,
+          "providedArchives": [
+            {
+              "path": "lib/lean/libgmp.a",
+              "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+              "bytes": 846928
+            },
+            {
+              "path": "libuv/src/libuv/libuv.a",
+              "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+              "bytes": 183206
+            }
+          ],
+          "compilerLibraryDirectories": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean",
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v145-runtime-metadata-native/lib/lean"
+          ],
+          "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+        },
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v145-runtime-metadata-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      }
+    },
+    "bun": {
+      "execution": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-results-bun-v145-runtime-metadata/execution.json",
+        "sha256": "d6b38d2bbc5c5dbc7535b64a10122e1582269db174c2f0681517d6fc68f6d2bc"
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "harnessArtifacts": {
+        "before": {
+          "checked": 0,
+          "modified": []
+        },
+        "after": {
+          "checked": 0,
+          "modified": []
+        }
+      },
+      "cases": [
+        {
+          "name": "elab/IO_test.lean",
+          "classname": "elab/IO_test.lean",
+          "time": "5.36827",
+          "status": "run"
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "classname": "elab/async_http_hang_regressions.lean",
+          "time": "10.1482",
+          "status": "run"
+        },
+        {
+          "name": "elab/async_systems_info.lean",
+          "classname": "elab/async_systems_info.lean",
+          "time": "6.47275",
+          "status": "run"
+        },
+        {
+          "name": "elab/libuv.lean",
+          "classname": "elab/libuv.lean",
+          "time": "4.61253",
+          "status": "run"
+        },
+        {
+          "name": "elab/openssl.lean",
+          "classname": "elab/openssl.lean",
+          "time": "4.2424",
+          "status": "run"
+        },
+        {
+          "name": "elab/readDir.lean",
+          "classname": "elab/readDir.lean",
+          "time": "4.39704",
+          "status": "run"
+        },
+        {
+          "name": "elab/timeIO.lean",
+          "classname": "elab/timeIO.lean",
+          "time": "5.30012",
+          "status": "run"
+        }
+      ],
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/runtime-support",
+        "standaloneLinkOptimization": {
+          "level": 1,
+          "providedArchives": [
+            {
+              "path": "lib/lean/libgmp.a",
+              "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+              "bytes": 846928
+            },
+            {
+              "path": "libuv/src/libuv/libuv.a",
+              "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+              "bytes": 183206
+            }
+          ],
+          "compilerLibraryDirectories": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean",
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v145-runtime-metadata-native/lib/lean"
+          ],
+          "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+        },
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {
+          "BUN_JSC_useWasmMemory64": "true",
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v145-runtime-metadata-native/bun-stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "stackAdjustment": {
+          "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v145-runtime-metadata-native/bun-stack-reservation.so",
+          "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+          "osThreadStackBytes": 67108864,
+          "jscStackBudgetBytes": 62914560,
+          "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+        },
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v145-runtime-metadata-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      }
+    }
+  },
+  "focusedTests": {
+    "packagedMetadata": 1,
+    "existingPackageIoAndMain": 6
+  },
+  "resources": {
+    "libuv-metadata-package-before": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/libuv-metadata-package-before.resources.json",
+      "sha256": "d79498eafe1b5ab49a703c3e3a706e2b6edec5644f24046febf9d0770a0c26fd",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "node",
+        "--test",
+        "--test-isolation=none",
+        "--test-reporter=spec",
+        "test/runtime-metadata.test.mjs"
+      ],
+      "startedAt": "2026-09-22T14:41:26.389Z",
+      "finishedAt": "2026-09-22T14:41:29.174Z",
+      "peakMemoryBytes": 285782016,
+      "minimumHostAvailable": 28942856192,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    "libuv-metadata-package-after": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/libuv-metadata-package-after.resources.json",
+      "sha256": "0def12a113b56ccbb6004fc314665d4d8d49244a26c13723dee24e956092d2b3",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "node",
+        "--test",
+        "--test-isolation=none",
+        "--test-reporter=spec",
+        "test/runtime-metadata.test.mjs"
+      ],
+      "startedAt": "2026-09-22T14:43:31.176Z",
+      "finishedAt": "2026-09-22T14:44:38.579Z",
+      "peakMemoryBytes": 449699840,
+      "minimumHostAvailable": 28891795456,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    "runtime-metadata-full-build": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-full-build.resources.json",
+      "sha256": "976cde4ccbd026dbbcefd9e4e755e186c1f2ca7abe320c483d215b0e39ea6c8d",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/relink-runtime-metadata-native.py"
+      ],
+      "startedAt": "2026-09-22T14:45:34.145Z",
+      "finishedAt": "2026-09-22T14:46:10.787Z",
+      "peakMemoryBytes": 3273072640,
+      "minimumHostAvailable": 26009964544,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    "runtime-metadata-validation": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-validation.resources.json",
+      "sha256": "48c6f86236c9132a7bf4742f7cb5689e1d4b75ad58f174f86e3b157d223783af",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/run-runtime-metadata-validation.py"
+      ],
+      "startedAt": "2026-09-22T14:48:18.602Z",
+      "finishedAt": "2026-09-22T14:51:14.031Z",
+      "peakMemoryBytes": 4777738240,
+      "minimumHostAvailable": 26237644800,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    "runtime-metadata-package-validation": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-package-validation.resources.json",
+      "sha256": "c79bacac8b0088f126d3c9ae4984fd2e9cb4d345d2959ebea69bd48f8c03cdc2",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/run-runtime-metadata-package-validation.py"
+      ],
+      "startedAt": "2026-09-22T14:51:54.880Z",
+      "finishedAt": "2026-09-22T15:05:19.549Z",
+      "peakMemoryBytes": 824393728,
+      "minimumHostAvailable": 28458639360,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    }
+  },
+  "snapshot": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/snapshot.json",
+    "sha256": "363014147aa271d78b1ff58457a0f95e93d46b20be64d6f85f449601c52b0d83",
+    "wasmSha256": "f376bf7ed4a4ff7475f9bf2f9bd899de1bd7833b8562bbb27ba3e99b53c60b88",
+    "derivation": {
+      "source": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v144-split-optimization-r2-native",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-full-build.resources.json",
+      "scope": "Remove the fabricated host libuv version and restore pinned upstream libuv.cpp unchanged, with only its initialization symbol still redirected to the existing host initializer.",
+      "implementationSha256": "6ccb09ae93bf098307a3ca4b246317126ef25cb8b91c5ed082735dd4d1a1ab68",
+      "commands": [
+        [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/em++",
+          "-DLASM_FULL_NATIVE_THREADS=1",
+          "-D",
+          "LEAN_USE_GMP",
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-D",
+          "LEAN_CHECK_OLEAN_VERSION",
+          "-D",
+          "LEAN_EMSCRIPTEN",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-ffp-contract=off",
+          "-D",
+          "LEAN_MULTI_THREAD",
+          "-DLEAN_BUILD_TYPE=Release",
+          "-DLEAN_EXPORTING",
+          "-D__CLANG__",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/metadata-source",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/include",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/clock-headers",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/libuv/src/libuv/include",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/metadata-source/node-system.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/metadata-source/node-system.cpp.o"
+        ],
+        [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/emar",
+          "r",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean/liblasmhost.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/metadata-source/node-system.cpp.o"
+        ],
+        [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/em++",
+          "-D",
+          "LEAN_USE_GMP",
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-D",
+          "LEAN_CHECK_OLEAN_VERSION",
+          "-D",
+          "LEAN_EMSCRIPTEN",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-ffp-contract=off",
+          "-D",
+          "LEAN_MULTI_THREAD",
+          "-DLEAN_BUILD_TYPE=Release",
+          "-DLEAN_EXPORTING",
+          "-D__CLANG__",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-ftls-model=local-exec",
+          "-Dinitialize_libuv=lasm_original_initialize_libuv",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/metadata-source",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/include",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/clock-headers",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/libuv/src/libuv/include",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/metadata-source/libuv.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/metadata-source/libuv.cpp.o"
+        ],
+        [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/emar",
+          "r",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean/libleanrt.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/metadata-source/libuv.cpp.o"
+        ]
+      ],
+      "linkCommand": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/em++",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/temp/libleanmain.a",
+        "-lc++",
+        "-lc++abi",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean/liblasmnative.a",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean/liblasmtools.a",
+        "-Wl,--whole-archive",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean/liblasmhost.a",
+        "-Wl,--no-whole-archive",
+        "--pre-js",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/runtime-support/host-pre.js",
+        "--js-library",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/runtime-support/host-library.js",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/temp/libleanshell.a",
+        "-lleancpp",
+        "-lInit",
+        "-lStd",
+        "-lLean",
+        "-lnodefs.js",
+        "-lleanrt",
+        "-lc++",
+        "-lc++abi",
+        "-s",
+        "ALLOW_MEMORY_GROWTH=1",
+        "-sMEMORY64=1",
+        "-fwasm-exceptions",
+        "-pthread",
+        "-lnodefs.js",
+        "-s",
+        "EXIT_RUNTIME=1",
+        "-s",
+        "NODERAWFS=1",
+        "-s",
+        "MAIN_MODULE=2",
+        "-s",
+        "ERROR_ON_UNDEFINED_SYMBOLS=0",
+        "-sEXPORTED_FUNCTIONS=@/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lasm-wasm-exports.json",
+        "-sEXPORTED_RUNTIME_METHODS=FS,ENV,callMain,ccall,UTF8ToString,stringToNewUTF8",
+        "-sSTACK_SIZE=16777216",
+        "-sINITIAL_MEMORY=134217728",
+        "-sMAXIMUM_MEMORY=8589934592",
+        "-sPTHREAD_POOL_SIZE=5",
+        "-sPROXY_TO_PTHREAD=1",
+        "--pre-js",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/runtime-support/emscripten-pre.js",
+        "-lLake",
+        "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/include",
+        "-O3",
+        "-DNDEBUG",
+        "-O1",
+        "-g2",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/bin/lean.js",
+        "-L/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native/lib/lean",
+        "-sMALLOC=mimalloc",
+        "-sMAXIMUM_MEMORY=8589934592",
+        "-sPTHREAD_POOL_SIZE=5",
+        "-sGROWABLE_ARRAYBUFFERS=1",
+        "-sSTACK_OVERFLOW_CHECK=2",
+        "-sSTACK_SIZE=67108864",
+        "-Wl,--export=__cpp_exception",
+        "-s",
+        "ALLOW_MEMORY_GROWTH=1",
+        "-sMEMORY64=1",
+        "-fwasm-exceptions",
+        "-pthread",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/lib/lean/libgmp.a",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/libuv/src/libuv/libuv.a",
+        "-lm",
+        "-pthread"
+      ],
+      "flagsSha256": {
+        "CMakeFiles/lasmhost.dir/flags.make": "515eefedfd44bbe4b69d14f6b403460206e132701d92f2998b94392d79507afc",
+        "runtime/CMakeFiles/leanrt.dir/flags.make": "a3454447a33ec2c1c04197ab8d83e2b8e569cd1d0511564601ce9b0f68e82fc5"
+      },
+      "archives": {
+        "lib/lean/liblasmhost.a": {
+          "originalSha256": "123a5a85eb14b0974549b7b7a0ce5b9014622d5cfbda9b8b773d513dc525a169",
+          "sha256": "eb539eb53859ebc734426284cbaefd185bf40e4e9fd579c88ee23b11a7f21435",
+          "members": [
+            "node-io.cpp.o",
+            "node-async.cpp.o",
+            "node-system.cpp.o"
+          ],
+          "replacedMember": "node-system.cpp.o"
+        },
+        "lib/lean/libleanrt.a": {
+          "originalSha256": "16d4349456ad4f9274fc4743b4b8c83c22a115f856125171f2760ac641ac1a35",
+          "sha256": "36bdf3cb605b9cba175d7243a7f3848789ff3efd74a363ba5c1f6ff0e28b542a",
+          "members": [
+            "debug.cpp.o",
+            "thread.cpp.o",
+            "mpz.cpp.o",
+            "utf8.cpp.o",
+            "object.cpp.o",
+            "apply.cpp.o",
+            "exception.cpp.o",
+            "interrupt.cpp.o",
+            "memory.cpp.o",
+            "stackinfo.cpp.o",
+            "compact.cpp.o",
+            "init_module.cpp.o",
+            "io.cpp.o",
+            "hash.cpp.o",
+            "byteslice.cpp.o",
+            "platform.cpp.o",
+            "alloc.cpp.o",
+            "allocprof.cpp.o",
+            "sharecommon.cpp.o",
+            "stack_overflow.cpp.o",
+            "process.cpp.o",
+            "object_ref.cpp.o",
+            "mpn.cpp.o",
+            "mutex.cpp.o",
+            "libuv.cpp.o",
+            "net_addr.cpp.o",
+            "event_loop.cpp.o",
+            "timer.cpp.o",
+            "tcp.cpp.o",
+            "udp.cpp.o",
+            "dns.cpp.o",
+            "system.cpp.o",
+            "signal.cpp.o",
+            "openssl.cpp.o"
+          ],
+          "replacedMember": "libuv.cpp.o"
+        }
+      },
+      "upstreamSourceSha256": "ec9e10a37af399edb33361b205e16cb9d3a6839607ed5de5f1f2368ddae1a5ea",
+      "startedAt": "2026-09-22T14:45:37.633812+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-09-22T14:46:08.617828+00:00"
+    }
+  },
+  "implementationInputs": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/runtime/core.cpp",
+      "sha256": "1bb98977b6b99b73fe05d198f9d151516288158921f3051acd16d2563703a265"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/runtime/node-system.cpp",
+      "sha256": "77b30c63c3834db7630e04b338cafc41f3b46c19aa88722f29fc75ee67097c86"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/test/runtime-metadata.test.mjs",
+      "sha256": "7e02122d730f0374a0f91ad31fec7a75ce2e8e00502e93a4f028e3ca296484fa"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/test/fixtures/runtime-metadata/Main.lean",
+      "sha256": "97849e2905789bf7b3111119af8d1a658550d566959e4511aacc84a6363639b8"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/src/runtime/libuv.cpp",
+      "sha256": "ec9e10a37af399edb33361b205e16cb9d3a6839607ed5de5f1f2368ddae1a5ea"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/src/runtime/openssl.cpp",
+      "sha256": "c23ba19632439691304a1a18510162a0c9164372617e4b5b3c157061109278d3"
+    }
+  ],
+  "retainedLogs": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/libuv-metadata-package-before.log",
+      "sha256": "d1b4369f82b2eb9d9dec4d3f276799b7f6f4d53508e2c2b8847be8c42b3369b3"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/libuv-metadata-package-after.log",
+      "sha256": "db8a02ea35dd9ee1f8e4636dfaab3bebfa7ae08c893db5ec67cafa7977adadf0"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-full-build.log",
+      "sha256": "e521bc91c80201597decb3a1e6463a9fa356d561aa6ae2e1e359d16bfbf60e72"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-validation.log",
+      "sha256": "43940f2e4860f8a075355faeb327bc444281e4d184172f567fec9e5b8b20d932"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/runtime-metadata-package-validation.log",
+      "sha256": "6144bfda70f624841c385994cb99c5250087a4582d15fa133fcdd1e706433f4b"
+    }
+  ]
+}
