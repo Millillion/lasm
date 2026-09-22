@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { root, leanCommit, resolveLean } from '../../src/toolchain.mjs';
 import { patchSdk } from './patch-sdk.mjs';
 import { ensureResourceGuard } from './resource-guard.mjs';
+import { connectLeanSymbolLoader } from './lean-symbol-loader.mjs';
 
 await ensureResourceGuard();
 
@@ -159,4 +160,6 @@ if (stage === 'wasm' || stage === 'wasm64') {
   run('cmake', ['--build', wasm, '--target', 'lasmnative', '-j', String(jobs)]);
   if (is64) run('cmake', ['--build', wasm, '--target', 'lasmtools', '-j', String(jobs)]);
   run('cmake', ['--build', wasm, '--target', 'lean', '-j', String(jobs)], { ...process.env, LEAN_STACK_SIZE_KB: '8192' });
+  const glue = join(wasm, 'bin/lean.js');
+  writeFileSync(glue, connectLeanSymbolLoader(readFileSync(glue, 'utf8'), is64, { allowExisting: true }));
 }

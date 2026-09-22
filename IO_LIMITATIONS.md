@@ -208,6 +208,12 @@ load, and suite conformance still need validation. See
   [the clock comparisons and retained attempts](docs/evidence/wall-clock-2026-09-22.json).
 - [ ] Native FFI dependencies still need Wasm implementations or internal host
   adapters. Build-time Lake plugins do not supply their runtime native externs.
+  A full-compiler loader gap for ordinary compiled Lean plugins is repaired:
+  their internal Lean function imports now use the in-Wasm symbol registry.
+  Six unchanged regressions pass in native Lean and Node, including the three
+  previously failing plugins. Small real plugin controls pass across all three
+  engines; full Deno/Bun regression validation remains in progress. See
+  [the plugin repair evidence](docs/evidence/lean-plugin-symbols-node-2026-09-22.json).
 - [ ] Extend missing-extern diagnostics to dependency libraries outside the pinned
   Lean/Std environment. The upstream audit now maps 954 declaration/symbol pairs
   and associates observed link failures with affected declarations.

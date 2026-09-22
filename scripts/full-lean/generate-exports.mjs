@@ -38,7 +38,9 @@ for (const archive of archives) {
     if (name.startsWith('l_') && 'BDGRS'.includes(type)) dataSymbols.add(name);
   }
 }
-const requested = new Set(['main', 'malloc', 'free']);
+// The dynamic loader needs the same registry as the interpreter when a later
+// plugin imports a compiled Lean function omitted from the JS export surface.
+const requested = new Set(['main', 'malloc', 'free', 'lasm_lookup_lean_symbol']);
 for (const symbol of dataSymbols) requested.add(symbol);
 for (const symbol of symbols) if (!symbol.startsWith('l_') && !symbol.startsWith('lasm_original_')
     && isRuntimeExport(symbol)) requested.add(symbol);
