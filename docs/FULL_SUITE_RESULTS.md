@@ -3,6 +3,18 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The full compiler now preserves native Linux argument ordering when `--run`
+follows file operands. This repairs the unchanged Lake `lean/test.sh` failure
+retained below. The original Node compiler differed in seven of fourteen
+supplementary cases; the first repair passed fifteen of sixteen expanded cases
+but still mishandled a lone `-`. Both attempts remain recorded. The revised
+v127 native-memory64 / v126 lowered compilers pass **all 64 argument comparisons**
+and **24 unchanged upstream controls** across Node, Deno, local Bun, and released
+Bun's separate lowered profile. Every upstream attempt preserves all 7,267
+original source hashes. Peak workload memory was 5.05 GiB, with no resource or
+OOM event. These targeted results do not complete the broad suites or establish
+other-OS CLI parity. See [the argument-ordering evidence](evidence/shell-arguments-2026-09-22.json).
+
 The full-runtime message transport now avoids a large Deno allocation cost.
 The same ordinary-Lean 64 MiB read drops from **5.23 GiB to 1.99 GiB** peak memory
 and from 26.5 to 5.9 seconds. The before/after Wasm binaries are identical;
@@ -29,6 +41,13 @@ source hashes match; test peak memory was 5.91 GiB with no resource event.
 This uses a separately rebuilt engine and the explicit Linux stack adjustment,
 not stock Bun or a package default. The complete suites remain unfinished; see
 [the capacity experiment](evidence/bun-memory64-capacity-2026-09-22.json).
+
+The v123 Node campaign is paused at **14 passes, one failure, zero resource
+aborts, and 3,881 pending registrations**. The unchanged Lake `lean/test.sh`
+exposes a shell argument-ordering difference: an operand before `--run` appears
+as an extra application argument. All 7,267 original source and nine harness
+hashes match before and after every completed test. The original failed attempt
+is retained in [the 15-test checkpoint](evidence/node-broad-v123-checkpoint15-2026-09-22.json).
 
 The v123 Node campaign's first live checkpoint records **eight passes, zero
 failures or resource aborts, and 3,888 pending registrations**. The active test

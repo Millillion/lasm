@@ -481,6 +481,17 @@ function-table optimization allows the original four-worker Node configuration
 to pass those tests without raising the memory cap. Keep these failed resource
 and concurrency experiments separate from passing conformance results.
 
+`probe-shell-arguments.mjs NEW_OUTPUT TOOLCHAIN...` compares sixteen actual
+compiler invocations with native Lean: `--run` after file operands, short option
+groups, option values, empty and lone-dash operands, literal application
+arguments, ordinary compilation, and `POSIXLY_CORRECT` controls. The full-build
+shell patch consumes operands in order, retaining them for compilation and
+discarding preceding operands when parsing stops at `--run`. This avoids musl's
+eager permutation, which otherwise adds an extra filename to Lake's `lean --run`
+application arguments. The probe preserves mismatches and verifies frozen
+compiler inputs; it is separate from unchanged upstream tests. Its native
+reference is Linux glibc, so these comparisons do not establish other-OS parity.
+
 `probe-process-lifetime.mjs NEW_OUTPUT TOOLCHAIN...` compares a supplemental
 ordinary Lean fixture with the native compiler before running each full engine.
 It covers reaped-child errors, an exited child before wait, and process groups

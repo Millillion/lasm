@@ -1,0 +1,1024 @@
+{
+  "recordedAt": "2026-09-22T02:54:12.893220+00:00",
+  "scope": "Frozen v123 Node live checkpoint of completed attempts. Any active attempt remains pending and is excluded from completed result rows. All 3896 registrations remain selected; no other-version passes or separate retries are imported. This parallel harness uses an 1800-second deadline based on the retained v119 builtin-lint timeout and its successful independent longer retry. Original source and internal timing assertions remain unchanged.",
+  "campaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad",
+  "identity": "7205f283c8593be894568af8b6303f113d38c79b915cdbdf9361901936782666",
+  "checkpointSha256": "2c97d7a972e41b011c5183871cefd6e4ce26514e58e7c34d5c6a58606561ef79",
+  "snapshotStatus": "paused",
+  "activeAttemptsNotCounted": true,
+  "counts": {
+    "passed": 14,
+    "failed": 1,
+    "resource-aborted": 0,
+    "harness-failed": 0,
+    "pending": 3881
+  },
+  "toolchain": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "engine": "node",
+    "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+    "engineArgs": [],
+    "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v123-message-envelope-native",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+    "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/sdk",
+    "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v123-message-envelope-native/runtime-support",
+    "leanThreads": 4,
+    "lakeThreads": 1,
+    "bunSmol": false,
+    "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+    "systemAllocator": "mimalloc",
+    "leanAllocator": "mimalloc",
+    "memoryMode": 1,
+    "engineEnvironment": {},
+    "maximumMemoryBytes": 8589934592,
+    "pthreadPoolSize": 5,
+    "backend": "full-lean-wasm64-native",
+    "nativeLeanFallback": false,
+    "environmentAdjustments": {
+      "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v123-message-envelope-native",
+      "LASM_FULL_APP_PATH": "Selected facade entry point",
+      "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+      "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+      "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+    },
+    "externalTools": {
+      "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v123-message-envelope-native/lib",
+      "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v123-message-envelope-native/include",
+      "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v123-message-envelope-native/share",
+      "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v123-message-envelope-native/bin/leanmake",
+      "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+      "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+    }
+  },
+  "snapshot": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+    "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/sdk",
+    "createdAt": "2026-09-22T02:03:40.523423+00:00",
+    "files": {
+      "bin/lean.js": "e3ccabe3c2f39624b4995ad4cf9f3cb63448be7a8414e4da5b67e080754922dc",
+      "bin/lean.cjs": "e3ccabe3c2f39624b4995ad4cf9f3cb63448be7a8414e4da5b67e080754922dc",
+      "bin/lean.wasm": "850e623162e7f7a85ef66543ce082e06d1d65089e97d0ad90039690d04060241",
+      "lasm-wasm-exports.json": "cb3de5b901c1a5da51cea3878c6bcca3b93a9811c6ab627e4563c34878711e1d",
+      "function-table-index.json": "f559c3c6e53008f8aea6bc7872d4fb564194eb38862cbabb685e88ffa3fe149c",
+      "build-provenance.json": "50f2662b81b5d5029cf1aaf3ef04db8c203b65093edf66aa2216676ace6639a2",
+      "sdk/.emscripten": "001c6ae86c1ec65b8a41d0db23c239f7e2348bd5fb68c98fbc628cd86a7c3f65",
+      "sdk/upstream/emscripten/tools/link.py": "2f143e5ca6d8aa560f5b2ea5e1d31a1ea897d068ea7778e50aa07d84ff10e481",
+      "sdk/upstream/emscripten/src/lib/libdylink.js": "711eba55c77409aad5302a05ea48e3d1c15a04dbb0221f34cb80db0979b79d8c",
+      "sdk/upstream/emscripten/src/lib/libpthread.js": "99456db0bf77860dd8eb998a130fb68207a0b16ee0ca6b8d065ab55c7ae262a1",
+      "host/node-host.mjs": "fce5741814643ca0dbd7ad4bd5ed274fc387fa94f80214bf6d593d9cfce53ca6",
+      "host/working-directory.mjs": "de76cfc16206d9e4ea0fd8227225b870812ad37838ddaf38974f422cadcebaaa",
+      "host/handle-table.mjs": "c58518fb2b4e8184edfc113fc68415858918d6fae66753b04e65fe6b7e0bb825",
+      "host/node-network.mjs": "f67a5043a2fe81efc676777e97b7f5129676d34d8f3151d29d1a6eec9a3e24c1",
+      "host/native-tcp.mjs": "5e6df0775ff191a9521622979ee27130cb0a4bdee3917a9e5f679107825926fe",
+      "host/node-process.mjs": "702fe9e848cb2612a551e1d53f35f50d07214cada1f7539f4295c4e77dcd8745",
+      "host/native-process.mjs": "e0281181fa526700cc1a45dc2c0b91e0abfd93630f5a0f989523d93490b7e552",
+      "host/process-launcher.mjs": "39126483f5f87f5a93f3be2e3e42f834e4176c9f50eb203cc56949be2519021e",
+      "host/process-exec.mjs": "c860a0d7271db9f2917317fd04722ee2aca52d4ddad8d79df6a5c2581bd2e3cf",
+      "host/node-udp.mjs": "b4c1cf428bfecceb7386e46da32eb441ebee64920d77c87008c85e5ce9871599",
+      "host/node-system.mjs": "dd4e1c5c1b41ba8ecd41e16ca4ec98bc8026ccc87e9bec6eedfb6df03eb22c24",
+      "host/node-signal.mjs": "44e16fc035abd651c57abdc07ca4e36245c76868e041a23c39e5a0804639da63",
+      "host/thread-id.cjs": "dcec6da112d1cdefebd943e83828b0506d7819167e1b81ae3724ee1effa940d9",
+      "host/native-pthread-factory.cjs": "ad423ab08d5aff4b8358b0863b238ea18ddb6c6bc5891682da6afc69ff66abf3",
+      "host/native-files.mjs": "90b00c2a37cf2a1a3a45d49982211b12de079e39ec34afa46fc215561af70689",
+      "host/native-file-worker.mjs": "ebea284543fa12a3711cb622bff5c0b17495f4af96fcd016b1f512c369aecee1",
+      "host/native-file-worker-pool.mjs": "b2047e050ab6266ad3613dcd0b37107abfcf5fa80857187f2ae1b13cd7c55ca2",
+      "host/native-file-worker-deno.mjs": "c80058f1ced5dbaffabf21515e68015e7d97400334d724aff320ae05a133e544",
+      "host/native-worker-cwd.cjs": "69080ceea6aeac63baf9da1839c4e95913c7e9e893b93e036c4bdca82b09512b",
+      "host/worker-stdio.cjs": "eb5afd5cd4cdaddff135559182f129963ea511fbea37a9a5aedd35b305630dc8",
+      "host/native-dns.mjs": "2380cc0bd99e7f3aef582e39db08954b148a59e93740efb742aa9a64f45b7e16",
+      "host/native-interfaces.mjs": "6a5c99ef69a83f9ef199dfc1136b30ac4dc10b4fd69f2d4a0cf173f2ae23ad2c",
+      "host/native/process/THIRD_PARTY_NOTICES.txt": "c219f317b281119e2da6f2ce28f2b5fc1844d168795fef826a8bd4f764308ac4",
+      "host/native/process/linux-arm64-gnu": "d43417a98ab64fc39e8ae58d2f3befd03e975621ba422f7a04f83170a4d9ad5e",
+      "host/native/process/linux-arm64-musl": "5bf1a1f91a7a63a394df814420471ac92feb5b64a59421c9682b4b8ebf1a97ec",
+      "host/native/process/linux-x64-gnu": "a1d879a39dd61b47db14130dd54e534d9cd204f9d0680d2f32afd5294588e9ce",
+      "host/native/process/linux-x64-musl": "e2b1ba5e8f862220b348b33dfeaf4f858bf7f20555e3474842b2ad69e41f34d3",
+      "host/native/process/manifest.json": "088790daadd43337ccafe46edc0f8d47d553e2374fbd7146aaf81ba9f9155fb1",
+      "host/native/process/process-launcher.c": "dc0287c2d2669a81392a2d370883640bcbe5333adce7faeb694146271076fc98",
+      "runtime-support/run-compiler.mjs": "92023e20d97617f9a520e7172f639d68cebd9aefe1ef407190ffa7b08e477b2f",
+      "runtime-support/cc-driver.mjs": "2fccafc22093fba3281936eb5654bfd67601a447ac6a08e2dd24257416f30c70",
+      "runtime-support/response-args.mjs": "b60e76d8cc39193dc6d15b49d420d9c6b6b3a45b79527b92f8ce3b2c6a45a5ba",
+      "runtime-support/preserve-web-worker.mjs": "f9d9b82f2c593beab41aa1dff6d461ecc4539e3b21741a720ae23edf399a9fd6",
+      "runtime-support/emscripten-pre.js": "491e7960427820704e3d435caf5ec3c8a30c3b1e7d20d2fca81b143553bd8bae",
+      "runtime-support/host-pre.js": "45e0a22ede9b64666bf66fb827d405748f2f8c651beac40b64b3aa1679e795c3",
+      "runtime-support/host-library.js": "f4fc31ae10ef7dc12cb9a4bb5ac6ab4f5a8eeeb824578f8174547eeb466dc1b5",
+      "CMakeCache.txt": "eb3ef4a78701ccdd9f351be3fa87d1621aaaa11bf2946049f4d74a98bd77b9b5",
+      "leanc.sh": "85cb15a18bf667d3a090f9611b3a3e01e4011ea8dba068ddb5037606c8ce3385",
+      "relink.json": "522b51ac92d2815cd9c2153b6f220ccde4f1a927f6f76957376f44cdd999dbcc"
+    },
+    "derivedFrom": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered",
+    "derivation": {
+      "source": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered",
+      "scope": "Native memory64 link of the ArrayBuffer message envelope and unchanged C++/Lean ABI.",
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/sdk/upstream/emscripten/em++",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/temp/libleanmain.a",
+        "-lc++",
+        "-lc++abi",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/liblasmnative.a",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/liblasmtools.a",
+        "-Wl,--whole-archive",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/liblasmhost.a",
+        "-Wl,--no-whole-archive",
+        "--pre-js",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/runtime-support/host-pre.js",
+        "--js-library",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/runtime-support/host-library.js",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/temp/libleanshell.a",
+        "-lleancpp",
+        "-lInit",
+        "-lStd",
+        "-lLean",
+        "-lnodefs.js",
+        "-lleanrt",
+        "-lc++",
+        "-lc++abi",
+        "-s",
+        "ALLOW_MEMORY_GROWTH=1",
+        "-sMEMORY64=1",
+        "-fwasm-exceptions",
+        "-pthread",
+        "-lnodefs.js",
+        "-s",
+        "EXIT_RUNTIME=1",
+        "-s",
+        "NODERAWFS=1",
+        "-s",
+        "MAIN_MODULE=2",
+        "-s",
+        "ERROR_ON_UNDEFINED_SYMBOLS=0",
+        "-sEXPORTED_FUNCTIONS=@/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lasm-wasm-exports.json",
+        "-sEXPORTED_RUNTIME_METHODS=FS,ENV,callMain,ccall,UTF8ToString,stringToNewUTF8",
+        "-sSTACK_SIZE=16777216",
+        "-sINITIAL_MEMORY=134217728",
+        "-sMAXIMUM_MEMORY=8589934592",
+        "-sPTHREAD_POOL_SIZE=5",
+        "-sPROXY_TO_PTHREAD=1",
+        "--pre-js",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/runtime-support/emscripten-pre.js",
+        "-lLake",
+        "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/include",
+        "-O3",
+        "-DNDEBUG",
+        "-O1",
+        "-g2",
+        "-o",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v123-message-envelope-native/bin/lean.js",
+        "-L/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean",
+        "-sMALLOC=mimalloc",
+        "-sMAXIMUM_MEMORY=8589934592",
+        "-sPTHREAD_POOL_SIZE=5",
+        "-sGROWABLE_ARRAYBUFFERS=1",
+        "-sSTACK_OVERFLOW_CHECK=2",
+        "-sSTACK_SIZE=67108864",
+        "-Wl,--export=__cpp_exception",
+        "-s",
+        "ALLOW_MEMORY_GROWTH=1",
+        "-sMEMORY64=1",
+        "-fwasm-exceptions",
+        "-pthread",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libgmp.a",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/libuv/src/libuv/libuv.a",
+        "-lm",
+        "-pthread"
+      ],
+      "archives": {
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libInit.a": "d06b9c787b6e8adde54e666777767d7b77d1baa9e869e1df5d5d3289f6bd4fae",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libLake.a": "0de1e1172b36562ef497d801f042c22a03e4da414d8b37ac5299b7fc63106c11",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libLean.a": "f8a2d85823dbc514ea6b3d98889761ff05813889efca830d6fbd35b47ad438a3",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libLeanIR.a": "24b95d8908224746885ec25e4743bd083c609b92e14ffc0998c75af49b71a2f3",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libLeanc.a": "9e85b79bc298404b711348502ca4a597df6ffb7bebd6bb757b58c50c4abc12b9",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libStd.a": "7dce10dec12243659542587d990f02d6e1da080108091c9ecf54f91f78a42648",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libgmp.a": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/liblasmhost.a": "6b1540c3603af0fa8e0c1eb02cf25b584231c8b0b22e923dca894a981e4362ef",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/liblasmnative.a": "267fed74667da053880f0353b98ae6cf8129c421db1456d14b966a964c4e6a18",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/liblasmtools.a": "b40c257660ab6c935ff05b15e6ca7acf8356ae94447002140f34a229f283d749",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libleancpp.a": "f3000e76ee42fa6612e0f2ab9c8560b0dd47b17603191825205ca35fc394aa67",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/lean/libleanrt.a": "16d4349456ad4f9274fc4743b4b8c83c22a115f856125171f2760ac641ac1a35",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/temp/libleanmain.a": "b0b5c27c8899cf560d37de7f6941c316bf717f5282f4ae4f57b44d9ac7006d77",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/lib/temp/libleanshell.a": "8566f9d90a6ad503eb17cb5cd62f202ec2113ddc2e3bdab3a5f810a3d2aed9b7",
+        "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v122-message-envelope-lowered/libuv/src/libuv/libuv.a": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe"
+      },
+      "startedAt": "2026-09-22T02:03:08.383450+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-09-22T02:03:40.523423+00:00"
+    }
+  },
+  "tests": [
+    {
+      "name": "tests/lake/tests/clone/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00001-6c95c1a7",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:21:20.733Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:23:42.765Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00001-6c95c1a7/resources.json",
+        "peakMemoryBytes": 4591067136,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/clone/test.sh",
+          "classname": "tests/lake/tests/clone/test.sh",
+          "time": "140.334",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "18ba2cad19ec706edd547350796f1262cd0bd7b18419fac070b2f2149dff2881",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/depRenaming/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00002-897c6b6e",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:23:42.771Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:24:03.993Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00002-897c6b6e/resources.json",
+        "peakMemoryBytes": 2231209984,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/depRenaming/test.sh",
+          "classname": "tests/lake/tests/depRenaming/test.sh",
+          "time": "19.42",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "ec240ad1e27b336deae77c9659eecd321a5aebaea146526d99a3176d6d512c7b",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/depTree/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00003-f98d3e55",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:24:04.000Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:25:34.734Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00003-f98d3e55/resources.json",
+        "peakMemoryBytes": 2281435136,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/depTree/test.sh",
+          "classname": "tests/lake/tests/depTree/test.sh",
+          "time": "89.0784",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "ed0fed3932780947d5d5ceaf6622cd028413cd8045ed176b9c3fa6e5e1c8daf3",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/driver/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00004-923cf0fc",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:25:34.739Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:31:39.772Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00004-923cf0fc/resources.json",
+        "peakMemoryBytes": 4009451520,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/driver/test.sh",
+          "classname": "tests/lake/tests/driver/test.sh",
+          "time": "363.379",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "148e2e4f39d6e6b32adf638c31ac1ae2bb0b0a229103ca703eea95ac5604cc5c",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/emptyBuild/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00005-080fe694",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:31:39.778Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:32:27.120Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00005-080fe694/resources.json",
+        "peakMemoryBytes": 2241925120,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/emptyBuild/test.sh",
+          "classname": "tests/lake/tests/emptyBuild/test.sh",
+          "time": "45.6181",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "9423e1d3dc2b60b6ac3d5afa4b41c55cf4c1c77e4da3c6ebad26e4e6d6b19871",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/env/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00006-ef4de5ce",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:32:27.125Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:34:13.558Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00006-ef4de5ce/resources.json",
+        "peakMemoryBytes": 2421444608,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/env/test.sh",
+          "classname": "tests/lake/tests/env/test.sh",
+          "time": "104.763",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "adff22f54aa7cb378fdd1ecc84c9951a184f270eb4f6c1516935dee45bb713ec",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/externLib/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00007-92d3b638",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:34:13.564Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:35:22.844Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00007-92d3b638/resources.json",
+        "peakMemoryBytes": 4576206848,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/externLib/test.sh",
+          "classname": "tests/lake/tests/externLib/test.sh",
+          "time": "67.475",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "7a1b76ebe1278cde5f6e3fc9e1e0ad0cd1792007f118179640b4a95232501611",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/globs/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00008-5021145a",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:35:22.849Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:36:34.665Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00008-5021145a/resources.json",
+        "peakMemoryBytes": 3941027840,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/globs/test.sh",
+          "classname": "tests/lake/tests/globs/test.sh",
+          "time": "70.1591",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "5a9e3515eb1399257b2b3944514b2c9a9f1cc4e428ecfc5709804426f86d150c",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/init/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00009-d21c9aac",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:36:34.672Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:44:07.450Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00009-d21c9aac/resources.json",
+        "peakMemoryBytes": 3976572928,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/init/test.sh",
+          "classname": "tests/lake/tests/init/test.sh",
+          "time": "451.169",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "39ff98d29b47b89a8eabad33b658a990d59ff6b76219e9bf343b1da3a271de3c",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/inputFile/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00010-179aad4a",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:44:07.456Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:45:51.859Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00010-179aad4a/resources.json",
+        "peakMemoryBytes": 3155050496,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/inputFile/test.sh",
+          "classname": "tests/lake/tests/inputFile/test.sh",
+          "time": "102.767",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "329f7b250437368e81b9cdf151cf299cd2bc35be058ad21905c69e8d52801ee2",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/kinds/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00011-c1afb76c",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:45:51.865Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:46:53.248Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00011-c1afb76c/resources.json",
+        "peakMemoryBytes": 3956498432,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/kinds/test.sh",
+          "classname": "tests/lake/tests/kinds/test.sh",
+          "time": "59.7835",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "976edd3a44594b2c51ec5be3f1b583549cf85f773e8ba0f09f0e1eeac1a1aac0",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/lean/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00012-f32e0b73",
+        "status": "failed",
+        "startedAt": "2026-09-22T02:46:53.254Z",
+        "exit": {
+          "code": 8,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:47:32.906Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00012-f32e0b73/resources.json",
+        "peakMemoryBytes": 4607156224,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/lean/test.sh",
+          "classname": "tests/lake/tests/lean/test.sh",
+          "time": "38.0268",
+          "status": "fail",
+          "failures": [
+            {
+              "message": "Failed"
+            }
+          ]
+        }
+      ],
+      "resourceSha256": "da01f71472d2677b95d1d8c2056cc73e2afae9728b3c6084eeff784cf6ec3bfa",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/llvm-bitcode-gen/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00013-a8fc8eb0",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:47:32.912Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:47:58.712Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00013-a8fc8eb0/resources.json",
+        "peakMemoryBytes": 4650246144,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/llvm-bitcode-gen/test.sh",
+          "classname": "tests/lake/tests/llvm-bitcode-gen/test.sh",
+          "time": "24.1757",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "4ced68e581fb039f19c61dbb3580e138a61f559c8eb21d282c94a91c6049dd10",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/lock/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00014-01a6b949",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:47:58.719Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:48:00.331Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00014-01a6b949/resources.json",
+        "peakMemoryBytes": 110546944,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/lock/test.sh",
+          "classname": "tests/lake/tests/lock/test.sh",
+          "time": "0.0053651",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "b5d1879a361806169a3b969d71d1b3774dce6d1eabd8ef8f8a92b0a7bf4914b2",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    {
+      "name": "tests/lake/tests/logLevel/test.sh",
+      "attempt": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00015-c015845c",
+        "status": "passed",
+        "startedAt": "2026-09-22T02:48:00.336Z",
+        "exit": {
+          "code": 0,
+          "signal": null
+        },
+        "finishedAt": "2026-09-22T02:53:29.902Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v123-message-envelope-broad/00015-c015845c/resources.json",
+        "peakMemoryBytes": 4341940224,
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": []
+          },
+          "after": {
+            "checked": 7267,
+            "modified": []
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 9,
+            "modified": []
+          },
+          "after": {
+            "checked": 9,
+            "modified": []
+          }
+        }
+      },
+      "junit": [
+        {
+          "name": "tests/lake/tests/logLevel/test.sh",
+          "classname": "tests/lake/tests/logLevel/test.sh",
+          "time": "327.923",
+          "status": "run",
+          "failures": []
+        }
+      ],
+      "resourceSha256": "f50002611b4a44576c57c1facd57c3df86c940ae6bae80ee8aa67854830d37ef",
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    }
+  ],
+  "maximumPeakBytes": 4650246144
+}

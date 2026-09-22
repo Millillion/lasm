@@ -1,0 +1,58 @@
+--- a/src/util/shell.cpp
++++ b/src/util/shell.cpp
+@@ -308,16 +308,41 @@
+ 
+     int rc;
+     object_ref shell_opts;
++#ifdef __EMSCRIPTEN__
++    // musl permutes non-options immediately; glibc defers that permutation.
++    // Lean stops at --run, so eager permutation wrongly includes earlier file
++    // operands in the application's arguments. Consume operands in order and
++    // retain them only when compilation reaches the normal end of options.
++    std::vector<char *> shell_args;
++    std::string wasm_opt_str = std::string(getenv("POSIXLY_CORRECT") ? "+" : "-") + g_opt_str;
++#endif
+     try {
+         shell_opts = mk_shell_options();
+         for (;;) {
++#ifdef __EMSCRIPTEN__
++            if (wasm_opt_str[0] == '-' && optind < argc &&
++                argv[optind][0] == '-' && argv[optind][1] == '\0') {
++                shell_args.push_back(argv[optind++]);
++                continue;
++            }
++            int c = getopt_long(argc, argv, wasm_opt_str.c_str(), g_long_options, NULL);
++            if (c == 1) {
++                shell_args.push_back(optarg);
++                continue;
++            }
++#else
+             int c = getopt_long(argc, argv, g_opt_str, g_long_options, NULL);
++#endif
+             if (c == -1)
+                 break; // end of command line
+             if (process_shell_option(shell_opts, c, optarg, rc))
+                 return rc; // option processing triggered an early exit
+-            if (get_shell_run(shell_opts))
++            if (get_shell_run(shell_opts)) {
++#ifdef __EMSCRIPTEN__
++                shell_args.clear();
++#endif
+                 break; // stop consuming arguments after `--run`
++            }
+         }
+     } catch (lean::throwable & ex) {
+         std::cerr << "error: " << ex.what() << std::endl;
+@@ -334,7 +359,12 @@
+     scoped_task_manager scope_task_man(get_shell_num_threads(shell_opts));
+ 
+     try {
++#ifdef __EMSCRIPTEN__
++        shell_args.insert(shell_args.end(), argv + optind, argv + argc);
++        return run_shell_main(static_cast<int>(shell_args.size()), shell_args.data(), shell_opts);
++#else
+         return run_shell_main(argc - optind, argv + optind, shell_opts);
++#endif
+     } catch (lean::throwable & ex) {
+         std::cerr << ex.what() << "\n";
+     } catch (std::bad_alloc & ex) {
