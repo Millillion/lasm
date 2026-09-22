@@ -1,0 +1,206 @@
+{
+  "recordedAt": "2026-09-22T09:43:30.429560+00:00",
+  "scope": "Maintainer resource monitor teardown handling. No increase to resource limits and no reclassification of the stopped campaign.",
+  "findings": [
+    "The original parser CTest passed but a final cgroup read reported ENODEV during unit collection. Its completed ExecStopPost capture records success, zero OOM/limit/throttling/swap events and a 2.92 GiB peak. The original harness-failed classification remains preserved.",
+    "Only an ENODEV/ENOENT from cgroup sampling, paired with an already-written complete final capture for the same cgroup, is recognized as retirement. Missing/incomplete captures and unrelated IO errors keep the existing failure path.",
+    "Four unit tests and replay of the actual captured final sample pass. The unchanged parser retry passes at 2.94 GiB, preserving all source/harness hashes. Two tiny real CTest controls verify inherited base-page/build settings, rejection of changed settings, and checkpoint resume without allocating near a memory limit."
+  ],
+  "original": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v139-shared-broad/00035-47545882/resources.json",
+    "sha256": "a613f38030b11a79b6ef5db8c8a785bc09123ff295a2e9fbb8d97aae383e771e"
+  },
+  "parserRetry": {
+    "resources": {
+      "startedAt": "2026-09-22T09:39:28.728Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "node",
+        "scripts/full-lean/run-suite.mjs",
+        "--suite",
+        ".work/full-suite-node-v139-shared-standalone-driver",
+        "--results",
+        ".work/full-results-node-v139-parser-retirement",
+        "--jobs",
+        "1",
+        "--filter",
+        "^compile_bench/parser\\.lean$"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "3a6a2fe4-62c7-4d45-9b8b-c5d411efebbe",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 29536608256
+      },
+      "minimumHostAvailable": 26174898176,
+      "peakMemoryBytes": 3161006080,
+      "peakTasks": 39,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cgroup-retirement-parser-retry.resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-22T09:39:57.771Z",
+        "memoryBytes": 786432,
+        "peakMemoryBytes": 3161006080,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 0,
+          "file": 61440,
+          "kernel": 114688,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 61440,
+          "slab": 68872
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-22T09:39:57.812Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 12636160,
+        "peakMemoryBytes": 3161006080,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10231808,
+          "file": 61440,
+          "kernel": 1011712,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 61440,
+          "slab": 165992
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-22T09:39:57.839Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "execution": {
+      "startedAt": "2026-09-22T09:39:29.484Z",
+      "finishedAt": "2026-09-22T09:39:57.752Z",
+      "backend": "node",
+      "registered": 3896,
+      "command": [
+        "--test-dir",
+        "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v139-shared-standalone-driver/run",
+        "-j",
+        "1",
+        "--output-on-failure",
+        "--output-junit",
+        "/home/lastmjs/development/lasm/compiler/.work/full-results-node-v139-parser-retirement/results.xml",
+        "-R",
+        "^compile_bench/parser\\.lean$"
+      ],
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "harnessArtifacts": {
+        "before": {
+          "checked": 10,
+          "modified": []
+        },
+        "after": {
+          "checked": 10,
+          "modified": []
+        }
+      },
+      "leftoverProcessCleanup": [],
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cgroup-retirement-parser-retry.resources.json",
+      "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+    }
+  },
+  "campaignControls": {
+    "passed": true,
+    "scope": "Actual CTest child and grandchild page policy and build-worker limits, immutable resume, and rejection of changed or invalid settings.",
+    "counts": {
+      "passed": 2,
+      "failed": 0,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 0
+    },
+    "resourceAdjustments": {
+      "pagePolicy": {
+        "kind": "base-pages",
+        "wrapper": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+        "sha256": "f983bcfb3473b1f14fb733a40d26bc934bfbcee9adf4bcd929bec266194c8c7a"
+      },
+      "buildJobs": 1
+    },
+    "peakMemoryBytes": 27176960
+  },
+  "capturedReplay": {
+    "source": ".work/full-campaign-node-v139-shared-broad/00035-47545882/resources.json",
+    "error": "ENODEV: no such device, read",
+    "withFinalCapture": true,
+    "withoutFinalCapture": false
+  },
+  "unitTests": {
+    "passed": 4,
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/cgroup-retirement-unit-tests.log",
+      "sha256": "99357e61d259c426dff46b5cd2004f700b252e85cfbdfbcce962564e914fcc57"
+    }
+  },
+  "inputs": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-bounded.mjs",
+      "sha256": "04e4271e32a6864519d636fa274167a0513e32d154ca01438bba1c08f1964018"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/completed-cgroup.mjs",
+      "sha256": "b4367ce9388eb075115bec563842c223238686ee0dd59bb5fcd8cd0e6ef0f532"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/test/completed-cgroup.test.mjs",
+      "sha256": "8ba3afe8a79c880e6be8d0464f33641893c4e84fd3a15e5f69c8ff11aef5ae51"
+    }
+  ]
+}

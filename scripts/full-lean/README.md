@@ -55,6 +55,12 @@ not a Lean conformance failure. `execution-started.json` links suite runs to
 their resource report even if the run is interrupted. Preserve incomplete logs;
 do not count their unfinished registrations as passes. See
 [the crash diagnosis](../../docs/RESOURCE_FAILURES.md).
+If a final cgroup read returns `ENODEV` or `ENOENT`, the monitor recognizes
+teardown only when this workload's complete `ExecStopPost` capture already
+exists for the same cgroup. Incomplete captures and unrelated IO errors retain
+the existing failure path. This prevents a completed parser test from becoming
+a spurious harness failure; it does not raise a limit or discard resource events.
+See [the guarded retry and controls](../../docs/evidence/cgroup-retirement-2026-09-22.json).
 
 The guard caps Emscripten cache builds at two jobs using `EMCC_CORES`; suite
 children retain that setting. CMake and Binaryen limits alone do not constrain
@@ -140,6 +146,15 @@ to the unchanged 8 GiB proactive stop threshold. The private build-only
 `LASM_FULL_APPLICATION_LINK=standalone` setting can request the same choice
 from the compiler adapter; unknown values fail explicitly. Use a new driver
 and suite directory when changing this profile.
+
+Use ordinary standalone application linking for broad-suite execution on this
+host. The opt-in shared runtime exceeded the 8 GiB proactive budget in the
+unchanged synchronous-channel benchmark. The same compiler and four-worker
+settings pass that test with standalone linking at 3.40 GiB, retaining the
+original dedicated-thread requests. The compiler/source tests are unchanged;
+the shared path remains an experimental optimization with a substantial memory
+cost for this workload. See
+[the comparison](../../docs/evidence/channel-standalone-2026-09-22.json).
 
 A proactive workload-budget stop is recorded as `resource-aborted`, never as a
 test failure or pass. Host pressure, actual OOM, monitoring failures, and source

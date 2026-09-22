@@ -40,8 +40,28 @@ abort, OOM, memory-limit, throttling, or swap events. These targeted passes are
 not imported into the broad campaign. See
 [the clock evidence](evidence/wall-clock-2026-09-22.json).
 
-The v139 Node campaign selects all **3,896 registrations**. Its saved checkpoint records
-**20 passes, zero failures or resource aborts, and 3,876 pending registrations**.
+The v139 Node campaign stopped with **33 passes, zero conformance failures,
+one resource abort, one harness failure, and 3,861 pending registrations**.
+The synchronous-channel benchmark reached the proactive 8 GiB budget at an
+8.06 GiB peak. The parser registration passed CTest, but its final cgroup read
+reported `ENODEV` during unit collection, so the conservative supervisor recorded
+a harness failure and stopped. All original and harness hashes remain intact;
+there were no OOM, hard-limit, throttling, or swap events. The complete
+[stopped checkpoint](evidence/node-broad-v139-stopped35-2026-09-22.json) remains
+unchanged. Retrying or repairing these cases does not rewrite that campaign.
+
+The unchanged channel test passes with the same frozen compiler and four Lean
+workers when application linking uses the ordinary standalone path: **3.40 GiB**
+peak, with the test's original dedicated-thread requests retained. This is a
+resource-profile difference, not an established Lean behavior failure or a
+fundamental limit. See [the isolated comparison](evidence/channel-standalone-2026-09-22.json).
+The monitor now recognizes removal only when its complete final capture for the
+same cgroup is already written. Four unit controls, replay of the actual capture,
+and small guarded campaign controls pass; the unchanged parser retry passes at
+2.94 GiB. Limits are unchanged. See
+[the monitor repair](evidence/cgroup-retirement-2026-09-22.json).
+
+The preceding saved checkpoint records 20 passes and 3,876 pending registrations.
 It uses shared application linking, the separately compiled standalone server
 driver, four Lean workers, base pages, and one build worker. The 3,040 test names
 not attempted in earlier Node campaigns run first; no earlier passes are imported.
@@ -49,7 +69,8 @@ The initial group covers further persistent-map, sorting, reuse, thunk, trie,
 integer, and Unicode-path regressions. All source and harness hashes match;
 the maximum peak is 2.92 GiB with no memory-limit, OOM, or swap events. See
 [the new campaign checkpoint](evidence/node-broad-v139-shared-checkpoint20-2026-09-22.json).
-The same frozen campaign resumed after the separate clock/allocation checks.
+Its continuation after the separate clock/allocation checks produced the stopped
+checkpoint above. A new standalone profile is being prepared with both fixes.
 
 The v127 Node campaign with base pages and one build worker is gracefully paused at
 **twenty-seven passes, zero failures or resource aborts, and 3,869 pending registrations**.

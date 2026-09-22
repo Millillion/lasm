@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { GiB, hostMemory, currentCgroup } from './resource-guard.mjs';
+import { completedCgroupRemoval } from './completed-cgroup.mjs';
 
 const args = process.argv.slice(2);
 const self = fileURLToPath(import.meta.url);
@@ -113,7 +114,18 @@ if (args[0] === '--capture') {
         if (path) cgroup = join('/sys/fs/cgroup', path);
       }
       if (!cgroup) return;
-      const sample = usage(cgroup);
+      let sample;
+      try { sample = usage(cgroup); }
+      catch (error) {
+        let finalSample;
+        try { finalSample = JSON.parse(readFileSync(report + '.service.json', 'utf8')); }
+        catch { /* Missing/incomplete final evidence cannot justify a lost sample. */ }
+        if (!completedCgroupRemoval(error, cgroup, finalSample)) throw error;
+        evidence.cgroupRemovedAfterExit = { at: new Date().toISOString(), code: error.code,
+          message: error.message, capturedAt: finalSample.capturedAt };
+        save();
+        return;
+      }
       evidence.status = 'running'; evidence.cgroup = cgroup;
       evidence.peakMemoryBytes = Math.max(evidence.peakMemoryBytes, sample.peakMemoryBytes);
       evidence.peakTasks = Math.max(evidence.peakTasks, sample.tasks);
