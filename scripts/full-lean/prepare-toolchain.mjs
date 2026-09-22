@@ -8,6 +8,7 @@ import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 const argv = process.argv.slice(2);
 const option = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };
 const engine = option('--engine', 'node');
+const sharedApplications = argv.includes('--shared-applications');
 const bunSmol = argv.includes('--bun-smol');
 if (bunSmol && engine !== 'bun') throw new Error('--bun-smol is only supported by the Bun facade');
 const leanThreads = Number(option('--lean-threads', '4'));
@@ -50,6 +51,37 @@ if (poolMatches.length !== 1) throw new Error('Cannot determine the compiled wor
 const pthreadPoolSize = Number(poolMatches[0][1]);
 const memoryMode = Number(buildConfig.match(/^LASM_MEMORY64:STRING=([12])$/m)?.[1]);
 if (![1, 2].includes(memoryMode)) throw new Error('The full suite requires a 64-bit Lean value layout');
+let applicationRuntime;
+if (sharedApplications) {
+  const runtime = join(build, 'application-runtime');
+  const recorded = snapshot?.files?.['application-runtime/snapshot.json'];
+  if (!recorded || !existsSync(join(runtime, 'snapshot.json')))
+    throw new Error('Shared applications require a composite frozen artifact with a recorded application runtime');
+  const bytes = readFileSync(join(runtime, 'snapshot.json'));
+  if (createHash('sha256').update(bytes).digest('hex') !== recorded)
+    throw new Error('Shared application snapshot changed');
+  const runtimeSnapshot = JSON.parse(bytes);
+  if (runtimeSnapshot.leanCommit !== leanCommit)
+    throw new Error('Shared application runtime must use the pinned Lean commit');
+  for (const [name, hash] of Object.entries(runtimeSnapshot.files))
+    if (snapshot.files['application-runtime/' + name] !== hash)
+      throw new Error(`Shared application input is absent from the composite snapshot: ${name}`);
+  const runtimeConfig = readFileSync(join(runtime, 'CMakeCache.txt'), 'utf8');
+  if (Number(runtimeConfig.match(/^LASM_MEMORY64:STRING=([12])$/m)?.[1]) !== memoryMode)
+    throw new Error('Compiler and shared application pointer layouts differ');
+  const provenance = JSON.parse(readFileSync(join(runtime, 'build-provenance.json')));
+  if (!provenance.sharedProgramEntryPrototype && !provenance.sharedProgramEntry)
+    throw new Error('Application runtime lacks the recorded C-main entry point');
+  const providedArchives = JSON.parse(readFileSync(join(build, 'build-provenance.json'))).applicationRuntime?.providedArchives ?? [];
+  for (const { path, sha256, bytes } of providedArchives)
+    if (!Number.isInteger(bytes) || bytes < 0 || snapshot.files[path] !== sha256
+        || snapshot.files['application-runtime/' + path] !== sha256)
+      throw new Error(`Unrecorded shared runtime archive: ${path}`);
+  applicationRuntime = { build: runtime, protocol: 'emscripten-c-main-v1', snapshotSha256: recorded,
+    providedArchives,
+    compilerLibraryDirectories: [join(build, 'lib/lean'), join(output, 'lib/lean')],
+    scope: 'Opt-in shared linking for generated Lean C with the recorded runtime libraries; other inputs retain standalone Wasm linking.' };
+}
 const engineEnvironment = engine === 'bun' && memoryMode === 1 ? { BUN_JSC_useWasmMemory64: 'true' } : {};
 if (bunSmol) engineEnvironment.LASM_BUN_SMOL = '1';
 // This is an explicit Linux harness resource adjustment, not an implicit change
@@ -126,6 +158,7 @@ for (const [name, tool] of Object.entries({ 'llvm-ar': 'emar', ar: 'emar', ranli
 for (const name of ['cadical', 'leantar']) if (existsSync(join(native.prefix, 'bin', name))) links['bin/' + name] = join(native.prefix, 'bin', name);
 for (const [name, target] of Object.entries(links)) if (!existsSync(join(output, name))) symlinkSync(target, join(output, name));
 writeFileSync(join(output, 'toolchain.json'), JSON.stringify({ leanCommit, engine, executable, engineArgs, build, source, sdk, runtimeSupport,
+  ...(applicationRuntime ? { prefix: output, applicationRuntime } : {}),
   leanThreads, lakeThreads, bunSmol,
   sourceBuild: snapshot?.sourceBuild ?? build,
   systemAllocator: buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMALLOC=(\w+)/m)?.[1] ?? 'dlmalloc',

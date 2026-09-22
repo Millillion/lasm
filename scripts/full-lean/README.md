@@ -281,7 +281,42 @@ new index file separate from source symlinks and verifies source hashes afterwar
 `probe-index-derivation.mjs NEW_DIRECTORY` checks that behavior with a preexisting
 source index and an independently validated synthetic Wasm module.
 
-New `freeze-build.mjs` snapshots apply this optimization and record
+An opt-in shared application runtime avoids relinking the entire Lean runtime
+for each generated application. Build it from a frozen native-memory64 compiler,
+then derive a composite artifact and prepare a fresh toolchain facade:
+
+```sh
+node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py python3 scripts/full-lean/build-shared-runtime.py FROZEN_COMPILER .work/shared-runtime
+node scripts/full-lean/derive-application-runtime.mjs FROZEN_COMPILER .work/shared-runtime .work/compiler-with-shared-runtime
+node scripts/full-lean/prepare-toolchain.mjs --engine node --build .work/compiler-with-shared-runtime --output .work/shared-toolchain --shared-applications --lean-threads 4 --lake-threads 1
+```
+
+Use new output directories. The builder uses one build/Binaryen worker and one
+precreated pthread; ordinary Lean execution still defaults to four workers.
+The original generated C `main` runs through a private loader before compiler
+initialization. No public Lean API or syntax changes, and no native Lean fallback
+is involved. The ordinary compiler retains its smaller export set. The composite
+snapshot records the complete application runtime, so campaign integrity checks
+cover both artifacts. Source snapshots are verified before and after derivation.
+
+Shared linking requires generated Lean C and verified runtime library inputs.
+Runtime archives are recognized by content hash and size, and library search
+directories must resolve to the recorded compiler libraries. Custom sources,
+objects, libraries, runtime search paths, and additional linker semantics keep
+standalone Wasm linking. Each application records its decision in
+`OUTPUT.lasm-link.json`. This is maintainer infrastructure, not yet the packaged
+application path. Retained full-export link warnings for libuv internals remain
+an open validation issue.
+
+Five original Node registrations pass with four Lean workers, including HTTP
+hang regressions and cross-process closure serialization. One worker is not a
+general replacement: the HTTP regression times out in all 22 cases with one
+worker even in native Lean. Keep the earlier one-worker experiments separate
+from four-worker results. The maintained builder reproduces the tested prototype's
+exact Wasm, and 15 selector tests cover shared linking and conservative fallback.
+See [the retained evidence](../../docs/evidence/shared-application-adapter-2026-09-22.json).
+
+New `freeze-build.mjs` snapshots apply function-table indexing and record
 `function-table-index.json`; the input build remains unchanged. Both paths stream
 large-file hashes and skip Wasm code/data when reading metadata. Run
 `probe-engines.mjs NEW_DIRECTORY --function-table-index` to apply it to all 54

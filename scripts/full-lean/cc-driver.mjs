@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { expandResponseArgs } from './response-args.mjs';
 import { preserveWebWorker } from './preserve-web-worker.mjs';
+import { applicationLinkMode, isRuntimeLibrary, isRuntimeArchive } from './application-link-mode.mjs';
 
 const config = JSON.parse(readFileSync(process.env.LASM_FULL_TOOLCHAIN_CONFIG));
 const original = expandResponseArgs(process.argv.slice(2));
@@ -15,7 +16,7 @@ const shared = original.includes('-shared');
 const driver = join(config.sdk, 'upstream/emscripten', process.env.LASM_CC_LANGUAGE === 'c++' ? 'em++' : 'emcc');
 let output = 'a.out';
 let explicitOutput = false;
-const args = [];
+let args = [];
 const runtimePaths = [];
 let embeddedLeanLibraries = false;
 let embeddedLake = false;
@@ -56,6 +57,10 @@ for (let i = 0; i < original.length; i++) {
   }
   args.push(arg);
 }
+const applicationMode = !compileOnly && !shared
+  ? applicationLinkMode(args, runtimePaths, config.applicationRuntime) : undefined;
+const sharedApplication = applicationMode?.mode === 'shared';
+if (sharedApplication) args = args.filter(arg => !isRuntimeLibrary(arg) && !isRuntimeArchive(arg, config.applicationRuntime));
 args.push(`-sMEMORY64=${config.memoryMode ?? 2}`, '-pthread', '-fwasm-exceptions');
 // Include the Lean C++ runtime without changing the selected compiler driver.
 // emcc classifies C/C++ sources by suffix. Injecting per-file -x switches makes
@@ -63,12 +68,12 @@ args.push(`-sMEMORY64=${config.memoryMode ?? 2}`, '-pthread', '-fwasm-exceptions
 if (!compileOnly) args.push('-sDEFAULT_TO_CXX=1', '-Wno-experimental', '-Wno-pthreads-mem-growth');
 if (compileOnly) {
   if (explicitOutput) args.push('-o', output);
-} else if (shared) {
+} else if (shared || sharedApplication) {
   // Dynamic Lean plugins may expose any declaration to the interpreter later.
   // Retain their public definitions just as a native shared library does.
   // A side module uses its caller's memory and stack. Leanc may forward the
   // compiler executable's stack setting, which has no meaning for this link.
-  args.push('-sSIDE_MODULE=1', '-sSTACK_SIZE=0', '-o', output);
+  args.push('-sSIDE_MODULE=1', '-sSTACK_SIZE=0', '-o', sharedApplication ? resolve(output + '.wasm') : output);
 } else {
   const glue = resolve(output + '.cjs');
   const exportFile = resolve(output + '.exports.json');
@@ -97,7 +102,24 @@ if (compileOnly) {
 const execution = spawnSync(driver, args, { stdio: 'inherit' });
 if (execution.error) throw execution.error;
 if (execution.status !== 0) process.exit(execution.status ?? 1);
-if (!compileOnly && !shared) {
+if (sharedApplication) {
+  const quote = text => "'" + text.replaceAll("'", "'\\''") + "'";
+  const runtime = config.applicationRuntime.build;
+  const command = [config.executable, ...config.engineArgs,
+    join(runtime, 'runtime-support/run-compiler.mjs'), '--prefix', runtime];
+  writeFileSync(output, `#!/usr/bin/env bash
+export LASM_FULL_ENTRYPOINT='compiled'
+export LASM_FULL_PROGRAM=${quote(resolve(output + '.wasm'))}
+export LASM_FULL_APP_PATH=${quote(resolve(output))}
+export LASM_FULL_ARGV0="$0"
+if [ -z "\${LEAN_SYSROOT+x}" ]; then export LEAN_SYSROOT=${quote(config.prefix)}; fi
+export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-65536}"
+export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-${config.leanThreads ?? 4}}"
+${Object.entries(config.engineEnvironment ?? {}).map(([key, value]) => `export ${key}=${quote(value)}`).join('\n')}
+exec ${command.map(quote).join(' ')} "$@"
+`);
+  chmodSync(output, 0o755);
+} else if (!compileOnly && !shared) {
   preserveWebWorker(resolve(output + '.cjs'));
   const quote = text => "'" + text.replaceAll("'", "'\\''") + "'";
   const frozenHost = join(config.build, 'host/node-host.mjs');
@@ -108,9 +130,12 @@ if (!compileOnly && !shared) {
 export LASM_FULL_HOST_MODULE=${quote(hostUrl)}
 export LASM_FULL_APP_PATH=${quote(resolve(output))}
 export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-65536}"
-export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-4}"
+export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-${config.leanThreads ?? 4}}"
 ${Object.entries(config.engineEnvironment ?? {}).map(([key, value]) => `export ${key}=${quote(value)}`).join('\n')}
 exec ${command.map(quote).join(' ')} "$@"
 `);
   chmodSync(output, 0o755);
 }
+if (applicationMode && config.applicationRuntime)
+  writeFileSync(output + '.lasm-link.json', JSON.stringify({ ...applicationMode,
+    ...(sharedApplication ? { runtime: config.applicationRuntime } : {}) }, null, 2) + '\n');

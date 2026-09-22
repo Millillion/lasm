@@ -4,15 +4,15 @@ Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
 The v127 Node campaign with base pages and one build worker is gracefully paused at
-**twenty-six passes, zero failures or resource aborts, and 3,870 pending registrations**.
+**twenty-seven passes, zero failures or resource aborts, and 3,869 pending registrations**.
 The unchanged cross-process closure serialization test passes, followed by
 compactor-chain, dependent-region, expression, escape-analysis, and floating-point
 controls. The original filesystem read-overflow test also returns its expected
 structured `resourceExhausted` error. All 3,896 registrations remain selected;
 no earlier results are imported. Every completed
 attempt preserves all 7,267 source and nine harness hashes, with no memory-limit
-or swap events and a 5.10 GiB maximum peak. No test remains active and the guard's
-cgroup has been released; see [the twenty-six-test base-page checkpoint](evidence/node-broad-v127-base-pages-checkpoint26-2026-09-22.json).
+or swap events and a 5.10 GiB maximum peak. Its last attempt completed and
+released the guard; see [the twenty-seven-test base-page checkpoint](evidence/node-broad-v127-base-pages-checkpoint27-2026-09-22.json).
 Both incremental snapshot controls pass: command-granular reuse takes 756.91
 seconds, and fallback after a changed import header takes 760.64 seconds. Two
 initialization regressions pass afterward. A separate compiled API-dependency
@@ -23,8 +23,9 @@ The large-closure and Lake-linking regressions also pass, in 762.98 and 750.25
 seconds respectively. The same checkpoint includes passing lazy-list, shared-list,
 compile-time-only import, natural-number shift, and overflow controls.
 Further overflow, partial-function, and persistent-hash-map controls pass too;
-`compile/phashmap2.lean` takes 740.69 seconds. The campaign pauses here for a
-separate, unvalidated experiment in reusing the frozen Wasm runtime for AOT
+`compile/phashmap2.lean` takes 740.69 seconds and `compile/phashmap3.lean`
+takes 730.31 seconds. The campaign pauses here for a
+separate experiment in reusing the frozen Wasm runtime for AOT
 applications. The existing compiler, campaign, and original sources remain
 unchanged. The [twenty-one-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint21-2026-09-22.json)
 preserves the preceding results.
@@ -62,6 +63,28 @@ bytes or upstream tests changed in that bookkeeping incident; the original
 untracked linker log was lost and is not used as evidence. Shared-runtime linking
 also retains warnings for unresolved libuv internals. See the complete
 [shared-runtime and compact-index evidence](evidence/shared-program-runtime-2026-09-22.json).
+
+The maintained shared-application adapter subsequently passes **five unchanged
+Node CTest registrations with four Lean workers**: cross-process closure
+serialization, expressions, filesystem read overflow, Lake linking, and the
+HTTP hang regressions. Peaks range from 2.08 to 6.30 GiB, with no resource aborts,
+memory-limit events, OOMs, or swap. The original source hashes match throughout.
+The three selected large compilation tests take 50.41, 37.69, and 29.46 seconds,
+compared with 740.85, 773.32, and 750.25 seconds in earlier standalone runs.
+These individual timings measure the recorded profiles, not a general benchmark.
+The maintained build recipe reproduces the prototype's exact Wasm SHA-256, and
+15 focused link-selection tests pass. Custom objects/libraries, explicit runtime
+search paths, and C embedding retain the existing standalone Wasm link path.
+
+An earlier one-worker integration experiment passed four compilation controls
+and five of six IO/FFI controls, but all 22 HTTP hang-regression cases timed out.
+The unchanged test also fails all 22 cases in native Lean with one worker and
+passes with four. Node passes with four both directly and through CTest, without
+changing the test's internal deadlines. General compiler/application defaults
+therefore remain four workers. The earlier failure remains recorded; these
+targeted results do not add passes to the paused broad campaign. Full-suite,
+language-server, cross-engine facade, and packaged integration remain separate
+gates. See [the adapter and worker-profile evidence](evidence/shared-application-adapter-2026-09-22.json).
 
 The v127 Node campaign stopped at **54 passes, zero conformance failures, one
 resource abort, and 3,841 pending registrations**. The guard interrupted

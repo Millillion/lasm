@@ -45,7 +45,7 @@ for (const name of ['node-host.mjs', 'working-directory.mjs', 'handle-table.mjs'
   copyFileSync(join(root, 'src', name), join(output, 'host', name)); files.push('host/' + name);
 }
 for (const name of copyProcessLauncherBundle(root, join(output, 'host'))) files.push('host/' + name);
-for (const name of ['run-compiler.mjs', 'cc-driver.mjs', 'response-args.mjs', 'preserve-web-worker.mjs', 'emscripten-pre.js', 'host-pre.js', 'host-library.js']) {
+for (const name of ['run-compiler.mjs', 'cc-driver.mjs', 'application-link-mode.mjs', 'response-args.mjs', 'preserve-web-worker.mjs', 'emscripten-pre.js', 'host-pre.js', 'host-library.js']) {
   copyFileSync(join(root, 'scripts/full-lean', name), join(output, 'runtime-support', name)); files.push('runtime-support/' + name);
 }
 const hashes = {};
