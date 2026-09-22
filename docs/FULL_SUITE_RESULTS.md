@@ -3,6 +3,16 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The v139 Node campaign selects all **3,896 registrations** and is paused after
+**20 passes, zero failures or resource aborts, and 3,876 pending registrations**.
+It uses shared application linking, the separately compiled standalone server
+driver, four Lean workers, base pages, and one build worker. The 3,040 test names
+not attempted in earlier Node campaigns run first; no earlier passes are imported.
+The initial group covers further persistent-map, sorting, reuse, thunk, trie,
+integer, and Unicode-path regressions. All source and harness hashes match;
+the maximum peak is 2.92 GiB with no memory-limit, OOM, or swap events. See
+[the new campaign checkpoint](evidence/node-broad-v139-shared-checkpoint20-2026-09-22.json).
+
 The v127 Node campaign with base pages and one build worker is gracefully paused at
 **twenty-seven passes, zero failures or resource aborts, and 3,869 pending registrations**.
 The unchanged cross-process closure serialization test passes, followed by
