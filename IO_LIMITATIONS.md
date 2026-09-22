@@ -211,6 +211,11 @@ load, and suite conformance still need validation. See
   DNS and UDP host implementations now exist; selected original tests pass in
   Node. This does not establish complete networking parity. There is no `IO.HTTP`
   API; identify the actual Lean library before making TLS/WebSocket support claims.
+  Fourteen additional unchanged HTTP registrations now pass in the full Node
+  compiler, including incremental parsing, parser fuzzing, RFC compliance,
+  dispatch, headers, framing, trailers and URIs. This expands observed coverage;
+  it does not complete the API or other-engine validation. See
+  [the 296-test Node checkpoint](docs/evidence/node-broad-v144-split-optimization-checkpoint296-2026-09-22.json).
 - [ ] Implement remaining UV loop configuration/aliveness primitives. Network
   interface enumeration now matches native Lean's records and ordering in Node,
   Deno, and Bun on Linux x64; other OSs still require validation.

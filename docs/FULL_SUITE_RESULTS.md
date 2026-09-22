@@ -3,19 +3,26 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The v144 Node campaign's latest saved checkpoint records **211 passes, zero
-failures or resource aborts, and 3,685 pending registrations**. All 3,896 tests
+The v144 Node campaign's latest saved checkpoint records **296 passes, zero
+failures or resource aborts, and 3,600 pending registrations**. All 3,896 tests
 remain selected; 3,004 previously unpassed names run first, without importing
 earlier results. Quicksort, four red-black-map variants, server startup, the
 dependent-pair iterator, tree maps, union-find, server watchdog and workspace
 symbols pass. All 197 documentation-parser registrations pass, followed by the
 monad-control tutorial, ordering and persistent-array iteration controls.
+Fourteen further original HTTP registrations pass, covering body/response
+framing, dispatch, encoding, Expect handling, incremental parsing, parser fuzzing,
+RFC compliance, headers, request lines, quoting, trailers and URIs. Core async
+functions, selection, stream mapping, sleep and system-information controls pass
+too. These are observed Node results; complete API and cross-engine parity remain
+open.
 Every completed attempt preserves all 7,267 original source hashes and the
 compiled-driver/harness hashes. The active unfinished attempt is excluded from
 the saved results. This campaign uses base pages, one build worker and the
 separate final-link profile described below. See
-[the 211-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint211-2026-09-22.json).
-The [102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint102-2026-09-22.json),
+[the 296-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint296-2026-09-22.json).
+The [211-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint211-2026-09-22.json),
+[102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint102-2026-09-22.json),
 [54-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint54-2026-09-22.json)
 and [initial ten-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint10-2026-09-22.json)
 remain unchanged.
