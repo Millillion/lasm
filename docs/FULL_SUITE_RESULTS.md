@@ -3,15 +3,17 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The v127 Node campaign's first live checkpoint records **11 passes, zero failures
-or resource aborts, and 3,885 pending registrations**. It includes Lake's archive,
-manifest, module rebuild, release-fallback, and package-override checks. All 3,896
+The v127 Node campaign's latest live checkpoint records **28 passes, zero failures
+or resource aborts, and 3,868 pending registrations**. Its prioritized Lake group,
+the upstream lint registration, and the first documentation example pass. All 3,896
 registrations remain selected; 3,241 names unattempted in earlier Node broad
 campaigns run first, without importing their results. Every completed attempt
-preserves all 7,267 source and nine harness hashes. Peak memory was 3.76 GiB, with
+preserves all 7,267 source and nine harness hashes. Peak memory was 5.59 GiB, with
 no memory-limit events; the active attempt is excluded. The harness retains the
 documented 1,800-second deadline and unchanged internal test timings. See
-[the 11-test live checkpoint](evidence/node-broad-v127-checkpoint11-2026-09-22.json).
+[the 28-test live checkpoint](evidence/node-broad-v127-checkpoint28-2026-09-22.json).
+The [earlier 11-test checkpoint](evidence/node-broad-v127-checkpoint11-2026-09-22.json)
+remains intact.
 
 The full compiler now preserves native Linux argument ordering when `--run`
 follows file operands. This repairs the unchanged Lake `lean/test.sh` failure
