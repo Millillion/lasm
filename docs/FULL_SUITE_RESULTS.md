@@ -4,7 +4,7 @@ Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
 The new v127 Node campaign with base pages and one build worker records
-**fourteen passes, zero failures or resource aborts, and 3,882 pending registrations**.
+**twenty-one passes, zero failures or resource aborts, and 3,875 pending registrations**.
 The unchanged cross-process closure serialization test passes, followed by
 compactor-chain, dependent-region, expression, escape-analysis, and floating-point
 controls. The original filesystem read-overflow test also returns its expected
@@ -12,13 +12,18 @@ structured `resourceExhausted` error. All 3,896 registrations remain selected;
 no earlier results are imported. Every completed
 attempt preserves all 7,267 source and nine harness hashes, with no memory-limit
 or swap events and a 5.10 GiB maximum peak. The active attempt is excluded from
-this checkpoint; see [the fourteen-test base-page checkpoint](evidence/node-broad-v127-base-pages-checkpoint14-2026-09-22.json).
+this checkpoint; see [the twenty-one-test base-page checkpoint](evidence/node-broad-v127-base-pages-checkpoint21-2026-09-22.json).
 Both incremental snapshot controls pass: command-granular reuse takes 756.91
 seconds, and fallback after a changed import header takes 760.64 seconds. Two
 initialization regressions pass afterward. A separate compiled API-dependency
 inventory ran during a graceful campaign pause; the identical frozen campaign
 then resumed. Those audit runs are not counted as upstream tests. See
 [the dependency audit](compatibility/API_DEPENDENCIES.md).
+The large-closure and Lake-linking regressions also pass, in 762.98 and 750.25
+seconds respectively. The same checkpoint includes passing lazy-list, shared-list,
+compile-time-only import, natural-number shift, and overflow controls.
+The [fourteen-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint14-2026-09-22.json)
+preserves the earlier snapshot results.
 The [ten-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint10-2026-09-22.json)
 and [initial five-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint5-2026-09-22.json)
 remain intact.
