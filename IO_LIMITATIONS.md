@@ -190,6 +190,12 @@ load, and suite conformance still need validation. See
   [the platform evidence](docs/evidence/host-platform-2026-09-21.json).
 - [ ] Windows named time zones other than UTC return an explicit unsupported
   error. Date/time behavior beyond tested UTC HTTP dates needs broader OS coverage.
+- [ ] Preserve the host wall clock's submillisecond precision. Static inspection
+  shows that the timestamp adapter converts `Date.now()` milliseconds into
+  nanoseconds, while pinned native Lean obtains a `std::chrono::system_clock`
+  duration in nanoseconds. The actual native resolution and the resulting
+  observable difference still need guarded comparisons on each supported OS.
+  This is an implementation/validation gap, not a fundamental JavaScript limit.
 - [ ] Native FFI dependencies still need Wasm implementations or internal host
   adapters. Build-time Lake plugins do not supply their runtime native externs.
 - [ ] Extend missing-extern diagnostics to dependency libraries outside the pinned
