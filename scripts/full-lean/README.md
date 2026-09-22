@@ -20,7 +20,7 @@ The Linux systemd/cgroup-v2 runner includes every descendant in one 10 GiB
 kernel memory cap, stops the workload proactively at 8 GiB, and stops on low
 host headroom or rising memory pressure. Smaller hosts/budgets receive a lower
 cap. A fixed service name prevents overlapping workloads in this checkout.
-CTest defaults to one job; builds and Binaryen default to two. Keep those
+CTest, builds, Emscripten cache builds and Binaryen default to one job. Keep those
 settings on this host, including when a test itself starts several compilers.
 Missing cgroup support fails closed; this is a Linux maintainer tool, not an
 application runtime installation requirement.
@@ -62,9 +62,10 @@ the existing failure path. This prevents a completed parser test from becoming
 a spurious harness failure; it does not raise a limit or discard resource events.
 See [the guarded retry and controls](../../docs/evidence/cgroup-retirement-2026-09-22.json).
 
-The guard caps Emscripten cache builds at two jobs using `EMCC_CORES`; suite
+The guard defaults Emscripten cache builds to one job using `EMCC_CORES`; suite
 children retain that setting. CMake and Binaryen limits alone do not constrain
-Emscripten's internally generated Ninja builds. Full links use one as shown above.
+Emscripten's internally generated Ninja builds. Keep the explicit one-worker
+campaign setting too: it records that policy in the immutable campaign identity.
 When preparing a frozen compiler, its recorded SDK takes precedence over the
 builder's inherited `LASM_EMSDK`. The development SDK setting still applies to
 an unfrozen build.
@@ -306,6 +307,31 @@ indices use format 2. This derivation still requires unindexed input glue. It ke
 new index file separate from source symlinks and verifies source hashes afterward.
 `probe-index-derivation.mjs NEW_DIRECTORY` checks that behavior with a preexisting
 source index and an independently validated synthetic Wasm module.
+
+For standalone applications, `prepare-toolchain.mjs --standalone-link-optimization 1`
+separates C compilation from final WebAssembly linking. Generated Lean C retains
+its original compiler flags, including `-O3 -DNDEBUG` when supplied by the
+upstream suite. The final link uses `-O1`, avoiding the pinned SDK's expensive
+whole-runtime Binaryen optimization. The default build path remains unchanged.
+This option changes the final optimization profile, so use a new facade, suite,
+and campaign; do not combine its results with an earlier profile.
+
+The option requires a frozen adapter that implements it. To reuse an older
+compiler without recompiling its Wasm:
+
+```sh
+node scripts/full-lean/run-bounded.mjs -- python3 scripts/full-lean/base-pages.py node scripts/full-lean/derive-cc-driver.mjs FROZEN_COMPILER .work/compiler-with-split-link
+node scripts/full-lean/prepare-toolchain.mjs --engine node --build .work/compiler-with-split-link --output .work/split-link-toolchain --standalone-link-optimization 1 --lean-threads 4 --lake-threads 1
+```
+
+Only one generated Lean C source with verified runtime libraries qualifies.
+Custom source, object, archive or library inputs, runtime search paths, LTO,
+instrumentation and auxiliary compiler outputs keep the original build path.
+`OUTPUT.lasm-optimization.json` records the decision and, for split builds,
+both actual commands, exit statuses and elapsed times. The adapter removes its
+temporary object after linking. The option cannot be combined with shared
+application linking. This is a maintainer suite option; package integration
+and full-suite parity remain unfinished.
 
 An opt-in shared application runtime avoids relinking the entire Lean runtime
 for each generated application. Build it from a frozen native-memory64 compiler,

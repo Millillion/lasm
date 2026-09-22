@@ -37,7 +37,8 @@ experiment, not a successful protection check.
 
 ## Corrected execution policy
 
-- One heavy workload per checkout; one CTest job and at most two build jobs.
+- One heavy workload per checkout; one CTest job and one build/Binaryen worker
+  for full Wasm links and suites. The guard now defaults all build limits to one.
 - A kernel cap of at most 10 GiB covers the entire descendant process tree.
 - The supervisor stops the workload at 80% of its cap (normally 8 GiB).
 - No `MemoryHigh` throttling. Stop instead if the workload's 10-second pressure
@@ -289,3 +290,18 @@ each attempt. Two synthetic child/grandchild controls and four existing
 ordering/resume controls pass. Guard thresholds and host settings are unchanged.
 The stopped campaign and successful retry remain separate in
 [the pressure-stop and retry evidence](evidence/compact-closure-base-pages-2026-09-22.json).
+
+The subsequent final-link experiment exposed a settings mismatch: direct guard
+runs still defaulted to two build workers, although the current full-link policy
+requires one. The completed two-test smoke and manually interrupted follow-up
+remain recorded separately. The interruption occurred at 3.87 GiB with no OOM,
+memory-limit, throttling or swap events; all source hashes remained intact.
+An explicit one-worker retry passes all eleven selected Node registrations.
+Eight further controls pass sequentially in Deno and the local Bun build.
+
+The guard now defaults CMake, Emscripten and Binaryen to one worker. A small
+direct child/grandchild control verifies those actual defaults; campaign policy,
+resume and rejection controls pass too, peaking at about 26 MiB. No pressure
+or allocation stress is used. Full-suite profiles still explicitly record
+`--base-pages --build-jobs 1`. See
+[the settings correction and retained attempts](evidence/standalone-link-optimization-2026-09-22.json).

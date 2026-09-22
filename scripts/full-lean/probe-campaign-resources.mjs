@@ -67,10 +67,19 @@ assert.equal(final.counts.passed, 2);
 assert.ok(final.tests.every(test => test.attempts.length === 1 && test.status === 'passed'));
 assert.equal(digest(readFileSync(firstExecution)), firstExecutionHash);
 const resources = final.tests.map(test => JSON.parse(readFileSync(test.attempts[0].resourceReport)));
+// A direct probe must inherit the same conservative defaults even when no
+// campaign --build-jobs option or explicit `env` command supplies them.
+const defaultReport = join(output, 'default-worker-resources.json');
+const defaults = spawnSync(process.execPath, ['scripts/full-lean/run-bounded.mjs', '--report', defaultReport,
+  '--', 'python3', 'scripts/full-lean/base-pages.py', 'python3', fixture], { encoding: 'utf8', timeout: 30_000 });
+writeFileSync(join(output, 'default-workers.log'), defaults.stdout + defaults.stderr);
+assert.equal(defaults.status, 0, defaults.error?.message ?? defaults.stdout + defaults.stderr);
+resources.push(JSON.parse(readFileSync(defaultReport)));
 assert.ok(resources.every(resource => resource.unitReleased && !resource.resourceLimited && !resource.memoryThrottled
   && ['high', 'max', 'oom', 'oom_kill', 'oom_group_kill'].every(key => resource.service.memoryEvents[key] === 0)));
 writeFileSync(join(output, 'verification.json'), JSON.stringify({ passed: true,
-  scope: 'Actual CTest child and grandchild page policy and build-worker limits, immutable resume, and rejection of changed or invalid settings.',
+  scope: 'Actual CTest child and grandchild page policy and build-worker limits, direct guard defaults, immutable resume, and rejection of changed or invalid settings.',
+  directGuardDefaultBuildJobs: 1,
   counts: final.counts, resourceAdjustments: final.resourceAdjustments,
   peakMemoryBytes: Math.max(...resources.map(resource => resource.peakMemoryBytes)) }, null, 2) + '\n');
 console.log('Campaign resource policy, descendant inheritance, resume, and rejection checks passed');

@@ -40,7 +40,7 @@ for (const name of readdirSync(source)) {
   if (['runtime-support', 'snapshot.json', 'build-provenance.json'].includes(name)) continue;
   symlinkSync(join(source, name), join(output, name));
 }
-const replaced = ['cc-driver.mjs', 'application-link-mode.mjs'];
+const replaced = ['cc-driver.mjs', 'application-link-mode.mjs', 'standalone-link-optimization.mjs'];
 for (const name of readdirSync(join(source, 'runtime-support')))
   if (!replaced.includes(name)) symlinkSync(join(source, 'runtime-support', name), join(output, 'runtime-support', name));
 for (const name of replaced) {

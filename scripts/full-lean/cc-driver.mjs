@@ -1,13 +1,14 @@
 // Maintainer toolchain adapter: upstream Leanc and Lake still run as Lean/Wasm.
 // This replaces their external C toolchain and wraps resulting Wasm executables
 // for the chosen engine. Test sources and expected output are never rewritten.
-import { readFileSync, writeFileSync, chmodSync, existsSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { readFileSync, writeFileSync, chmodSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { resolve, join, dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { expandResponseArgs } from './response-args.mjs';
 import { preserveWebWorker } from './preserve-web-worker.mjs';
 import { applicationLinkMode, isRuntimeLibrary, isRuntimeArchive } from './application-link-mode.mjs';
+import { standaloneOptimizationPlan, standaloneOptimizationCommands } from './standalone-link-optimization.mjs';
 
 const config = JSON.parse(readFileSync(process.env.LASM_FULL_TOOLCHAIN_CONFIG));
 const original = expandResponseArgs(process.argv.slice(2));
@@ -60,8 +61,11 @@ for (let i = 0; i < original.length; i++) {
 const applicationMode = !compileOnly && !shared
   ? applicationLinkMode(args, runtimePaths, config.applicationRuntime, process.env.LASM_FULL_APPLICATION_LINK) : undefined;
 const sharedApplication = applicationMode?.mode === 'shared';
+const optimization = !compileOnly && !shared && !sharedApplication && config.standaloneLinkOptimization
+  ? standaloneOptimizationPlan(args, runtimePaths, config.standaloneLinkOptimization) : undefined;
 if (sharedApplication) args = args.filter(arg => !isRuntimeLibrary(arg) && !isRuntimeArchive(arg, config.applicationRuntime));
 args.push(`-sMEMORY64=${config.memoryMode ?? 2}`, '-pthread', '-fwasm-exceptions');
+const compileArgs = optimization?.mode === 'split' ? [...args] : undefined;
 // Include the Lean C++ runtime without changing the selected compiler driver.
 // emcc classifies C/C++ sources by suffix. Injecting per-file -x switches makes
 // the pinned SDK attempt to compile existing .o inputs as sources.
@@ -99,7 +103,25 @@ if (compileOnly) {
     '--pre-js', join(config.runtimeSupport, 'host-pre.js'),
     '--js-library', join(config.runtimeSupport, 'host-library.js'));
 }
-const execution = spawnSync(driver, args, { stdio: 'inherit' });
+let execution;
+if (optimization?.mode === 'split') {
+  const temporary = mkdtempSync(join(dirname(resolve(output)), '.lasm-link-'));
+  const stages = standaloneOptimizationCommands(compileArgs, args, optimization, join(temporary, 'source.o'));
+  const evidence = { ...optimization, commands: [] };
+  try {
+    for (const [stage, flags] of Object.entries(stages)) {
+      const started = Date.now();
+      execution = spawnSync(driver, flags, { stdio: 'inherit' });
+      evidence.commands.push({ stage, command: [driver, ...flags], code: execution.status,
+        signal: execution.signal, error: execution.error?.message, milliseconds: Date.now() - started });
+      writeFileSync(output + '.lasm-optimization.json', JSON.stringify(evidence, null, 2) + '\n');
+      if (execution.error || execution.status !== 0) break;
+    }
+  } finally { rmSync(temporary, { recursive: true, force: true }); }
+} else {
+  execution = spawnSync(driver, args, { stdio: 'inherit' });
+  if (optimization) writeFileSync(output + '.lasm-optimization.json', JSON.stringify(optimization, null, 2) + '\n');
+}
 if (execution.error) throw execution.error;
 if (execution.status !== 0) process.exit(execution.status ?? 1);
 if (sharedApplication) {

@@ -24,6 +24,8 @@ preserveWebWorker(join(output, 'bin/lean.js'));
 copyFileSync(join(output, 'bin/lean.js'), join(output, 'bin/lean.cjs'));
 writeFileSync(join(output, 'function-table-index.json'), JSON.stringify(functionTableIndex, null, 2) + '\n');
 const files = ['bin/lean.js', 'bin/lean.cjs', 'bin/lean.wasm', 'lasm-wasm-exports.json', 'function-table-index.json'];
+for (const name of ['lib/lean/libgmp.a', 'libuv/src/libuv/libuv.a'])
+  if (existsSync(join(output, name))) files.push(name);
 const provenanceFile = join(dirname(build), 'build-provenance.json');
 const provenance = existsSync(provenanceFile) ? JSON.parse(readFileSync(provenanceFile)) : {};
 const sdk = resolve(process.env.LASM_EMSDK ?? provenance.sdk ?? join(root, '.cache/emsdk-6.0.9'));
@@ -45,7 +47,7 @@ for (const name of ['node-host.mjs', 'working-directory.mjs', 'handle-table.mjs'
   copyFileSync(join(root, 'src', name), join(output, 'host', name)); files.push('host/' + name);
 }
 for (const name of copyProcessLauncherBundle(root, join(output, 'host'))) files.push('host/' + name);
-for (const name of ['run-compiler.mjs', 'cc-driver.mjs', 'application-link-mode.mjs', 'response-args.mjs', 'preserve-web-worker.mjs', 'emscripten-pre.js', 'host-pre.js', 'host-library.js']) {
+for (const name of ['run-compiler.mjs', 'cc-driver.mjs', 'application-link-mode.mjs', 'standalone-link-optimization.mjs', 'response-args.mjs', 'preserve-web-worker.mjs', 'emscripten-pre.js', 'host-pre.js', 'host-library.js']) {
   copyFileSync(join(root, 'scripts/full-lean', name), join(output, 'runtime-support', name)); files.push('runtime-support/' + name);
 }
 const hashes = {};

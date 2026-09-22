@@ -3,6 +3,28 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The v144 standalone final-link profile passes **nineteen unchanged upstream
+registrations**: eleven in Node and four each in Deno and the local rebuilt Bun.
+Coverage includes channel/parser benchmarks, native FFI and reverse FFI,
+cross-process closure serialization, compiler/Lake imports, filesystem overflow,
+ordinary IO and HTTP hang regressions. All 7,267 source hashes match throughout.
+The compiler Wasm is identical to v142. Generated C retains its original flags;
+eligible standalone applications compile C separately and use `-O1` for the final
+WebAssembly link. Custom FFI links retain their original build path. This is an
+explicit maintainer option, not a package default or a complete-suite result.
+
+With one build worker, the original Node parser registration takes 38.89 seconds
+versus 714 seconds in the preceding default-link campaign. These are individual
+profile measurements, not a general benchmark. The targeted validation peaks at
+4.56 GiB without resource aborts, OOM, hard-limit, throttling or swap events.
+All 35 focused selector/option tests pass. A synthetic child/grandchild control
+also verifies the guard's new one-worker defaults and immutable campaign resume.
+An initial preparation missing two archive inventory entries, a two-worker
+smoke run, and a manually stopped two-worker regression attempt remain recorded.
+Neither incomplete attempt is counted as a conformance failure. Cross-platform,
+released-Bun full-compiler and complete-suite validation remain open. See
+[the standalone optimization evidence](evidence/standalone-link-optimization-2026-09-22.json).
+
 The v142 private file-worker repair passes **eighteen unchanged registrations**:
 ordinary IO, HTTP hang regressions, line reads, file locking, directory reads,
 and real paths in each engine. All 7,267 original source hashes remain intact.
@@ -61,6 +83,16 @@ and small guarded campaign controls pass; the unchanged parser retry passes at
 2.94 GiB. Limits are unchanged. See
 [the monitor repair](evidence/cgroup-retirement-2026-09-22.json).
 
+The v142 standalone Node campaign is gracefully paused at **three passes, zero
+failures or resource aborts, and 3,893 pending registrations**. Channel, parser
+and persistent-hash-map benchmarks pass with all source and harness hashes
+intact. The maximum peak is 5.08 GiB, with no OOM, memory-limit, throttling or
+swap events. This profile includes the clock and file-worker fixes. The parser
+and map tests each spend roughly twelve minutes in the original build path;
+the pause allows a separate final-link optimization experiment. No passes are
+imported into a different profile. See
+[the standalone checkpoint](evidence/node-broad-v142-standalone-checkpoint3-2026-09-22.json).
+
 The preceding saved checkpoint records 20 passes and 3,876 pending registrations.
 It uses shared application linking, the separately compiled standalone server
 driver, four Lean workers, base pages, and one build worker. The 3,040 test names
@@ -70,7 +102,7 @@ integer, and Unicode-path regressions. All source and harness hashes match;
 the maximum peak is 2.92 GiB with no memory-limit, OOM, or swap events. See
 [the new campaign checkpoint](evidence/node-broad-v139-shared-checkpoint20-2026-09-22.json).
 Its continuation after the separate clock/allocation checks produced the stopped
-checkpoint above. A new standalone profile is being prepared with both fixes.
+checkpoint above. The subsequent v142 standalone checkpoint is recorded above.
 
 The v127 Node campaign with base pages and one build worker is gracefully paused at
 **twenty-seven passes, zero failures or resource aborts, and 3,869 pending registrations**.

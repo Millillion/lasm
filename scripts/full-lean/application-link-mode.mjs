@@ -41,12 +41,10 @@ function isGeneratedLeanC(path) {
   finally { if (fd !== undefined) closeSync(fd); }
 }
 
-export function applicationLinkMode(args, runtimePaths, sharedRuntime, override) {
-  const standalone = reason => ({ mode: 'standalone', reason });
-  if (override !== undefined && override !== 'standalone')
-    throw new Error('LASM_FULL_APPLICATION_LINK must be standalone when supplied');
-  if (override === 'standalone') return standalone('Explicit standalone application link requested');
-  if (!sharedRuntime) return standalone('No shared application runtime selected');
+// Shared runtimes and split optimization both require known runtime inputs.
+export function runtimeLinkInputs(args, runtimePaths, sharedRuntime) {
+  const standalone = reason => ({ eligible: false, reason });
+  if (!sharedRuntime) return standalone('No verified runtime inputs supplied');
   if (runtimePaths.length) return standalone('Explicit runtime library search paths');
   if (args.some(arg => /^-l/.test(arg) && !isRuntimeLibrary(arg)))
     return standalone('Custom linked library');
@@ -74,5 +72,15 @@ export function applicationLinkMode(args, runtimePaths, sharedRuntime, override)
     return standalone('Custom or precompiled link input');
   const sources = args.filter(arg => !arg.startsWith('-') && arg.endsWith('.c'));
   if (!sources.length || !sources.every(isGeneratedLeanC)) return standalone('Link inputs are not exclusively generated Lean C');
-  return { mode: 'shared', reason: 'Generated Lean C using the pinned runtime libraries' };
+  return { eligible: true, sources, reason: 'Generated Lean C using the pinned runtime libraries' };
+}
+
+export function applicationLinkMode(args, runtimePaths, sharedRuntime, override) {
+  const standalone = reason => ({ mode: 'standalone', reason });
+  if (override !== undefined && override !== 'standalone')
+    throw new Error('LASM_FULL_APPLICATION_LINK must be standalone when supplied');
+  if (override === 'standalone') return standalone('Explicit standalone application link requested');
+  if (!sharedRuntime) return standalone('No shared application runtime selected');
+  const selection = runtimeLinkInputs(args, runtimePaths, sharedRuntime);
+  return { mode: selection.eligible ? 'shared' : 'standalone', reason: selection.reason };
 }

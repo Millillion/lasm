@@ -9,6 +9,11 @@ const argv = process.argv.slice(2);
 const option = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };
 const engine = option('--engine', 'node');
 const sharedApplications = argv.includes('--shared-applications');
+const linkOptimization = option('--standalone-link-optimization');
+if (argv.includes('--standalone-link-optimization') && linkOptimization !== '1')
+  throw new Error('--standalone-link-optimization currently accepts only 1');
+if (linkOptimization !== undefined && sharedApplications)
+  throw new Error('Choose standalone link optimization or shared applications, not both');
 const bunSmol = argv.includes('--bun-smol');
 if (bunSmol && engine !== 'bun') throw new Error('--bun-smol is only supported by the Bun facade');
 const leanThreads = Number(option('--lean-threads', '4'));
@@ -51,6 +56,21 @@ if (poolMatches.length !== 1) throw new Error('Cannot determine the compiled wor
 const pthreadPoolSize = Number(poolMatches[0][1]);
 const memoryMode = Number(buildConfig.match(/^LASM_MEMORY64:STRING=([12])$/m)?.[1]);
 if (![1, 2].includes(memoryMode)) throw new Error('The full suite requires a 64-bit Lean value layout');
+let standaloneLinkOptimization;
+if (linkOptimization !== undefined) {
+  if (!snapshot?.files?.['runtime-support/standalone-link-optimization.mjs']
+    || !readFileSync(join(runtimeSupport, 'cc-driver.mjs'), 'utf8').includes('config.standaloneLinkOptimization'))
+    throw new Error('Standalone link optimization requires a frozen adapter that implements it');
+  const providedArchives = ['lib/lean/libgmp.a', 'libuv/src/libuv/libuv.a'].map(path => {
+    const bytes = readFileSync(join(build, path));
+    const sha256 = createHash('sha256').update(bytes).digest('hex');
+    if (snapshot.files[path] !== sha256) throw new Error(`Unverified runtime archive: ${path}`);
+    return { path, sha256, bytes: bytes.length };
+  });
+  standaloneLinkOptimization = { level: 1, providedArchives,
+    compilerLibraryDirectories: [join(build, 'lib/lean'), join(output, 'lib/lean')],
+    scope: 'Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path.' };
+}
 let applicationRuntime;
 if (sharedApplications) {
   const runtime = join(build, 'application-runtime');
@@ -159,6 +179,7 @@ for (const name of ['cadical', 'leantar']) if (existsSync(join(native.prefix, 'b
 for (const [name, target] of Object.entries(links)) if (!existsSync(join(output, name))) symlinkSync(target, join(output, name));
 writeFileSync(join(output, 'toolchain.json'), JSON.stringify({ leanCommit, engine, executable, engineArgs, build, source, sdk, runtimeSupport,
   ...(applicationRuntime ? { prefix: output, applicationRuntime } : {}),
+  ...(standaloneLinkOptimization ? { standaloneLinkOptimization } : {}),
   leanThreads, lakeThreads, bunSmol,
   sourceBuild: snapshot?.sourceBuild ?? build,
   systemAllocator: buildConfig.match(/^LEAN_EXTRA_LINKER_FLAGS:STRING=.*?-sMALLOC=(\w+)/m)?.[1] ?? 'dlmalloc',
