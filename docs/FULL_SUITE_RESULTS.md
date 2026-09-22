@@ -3,7 +3,24 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The v127 Node campaign's latest live checkpoint records **28 passes, zero failures
+The v127 Node campaign stopped at **54 passes, zero conformance failures, one
+resource abort, and 3,841 pending registrations**. The guard interrupted
+`compile/compact_closure.lean` on a 5.17% memory-pressure signal at a 2.15 GiB peak,
+while more than 21 GiB of host memory remained available. There were no OOM,
+hard-limit, throttling, or swap events. All 7,267 original source and nine harness
+hashes were independently verified after the interruption. The incomplete test
+is not counted as a pass or conformance failure; see
+[the stopped-campaign evidence](evidence/node-broad-v127-stopped55-2026-09-22.json).
+A separate base-page retry passes that unchanged test in **485.68 seconds**, at
+a 5.07 GiB peak. All original source and harness hashes match. Sampled descendants
+report huge pages disabled; recorded kernel allocation-stall, compaction,
+huge-page, and OOM counters did not increase. The original abort and successful
+retry remain separate. Six synthetic campaign controls verify resource-policy
+inheritance, immutable resume, and existing ordering behavior. New campaigns
+use `--base-pages --build-jobs 1`, with guard thresholds and tests unchanged; see
+[the retry and harness evidence](evidence/compact-closure-base-pages-2026-09-22.json).
+
+The v127 Node campaign's earlier live checkpoint records **28 passes, zero failures
 or resource aborts, and 3,868 pending registrations**. Its prioritized Lake group,
 the upstream lint registration, and the first documentation example pass. All 3,896
 registrations remain selected; 3,241 names unattempted in earlier Node broad

@@ -1,0 +1,1229 @@
+{
+  "recordedAt": "2026-09-22T04:26:06.708603+00:00",
+  "scope": "Unchanged compacted-closure test passes under a separate process-local base-page retry. The original pressure abort remains part of its stopped campaign, not a conformance failure. No tests, expected outputs, deadlines, or guard thresholds changed.",
+  "interpretation": "The retry used the existing two-worker compiler limit to isolate the page-policy adjustment. Sampled descendants had THP disabled; recorded global allocation-stall, compaction, huge-page, and OOM counters did not increase. This supports the mitigation but does not prove the earlier pressure spike had no other cause. New broad campaigns additionally select one build worker as the existing full-link policy requires.",
+  "before": {
+    "startedAt": "2026-09-22T04:12:22.127Z",
+    "command": [
+      "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+      "--suite",
+      "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v127-shell-arguments-r2-compiled-driver",
+      "--results",
+      "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v127-shell-arguments-r2-broad/00055-8a807e6f/results",
+      "--jobs",
+      "1",
+      "--filter",
+      "^compile/compact_closure\\.lean$"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "ba4b67af-af75-4dba-8e01-bc6a30c16c81",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 25305026560
+    },
+    "minimumHostAvailable": 23445098496,
+    "peakMemoryBytes": 2313269248,
+    "peakTasks": 51,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v127-shell-arguments-r2-broad/00055-8a807e6f/resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-22T04:12:36.747Z",
+      "memoryBytes": 287354880,
+      "peakMemoryBytes": 2313269248,
+      "swapBytes": 0,
+      "tasks": 11,
+      "memoryBreakdown": {
+        "anon": 88354816,
+        "file": 190427136,
+        "kernel": 7774208,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 190337024,
+        "slab": 5862744
+      },
+      "pressureSomeAvg10": 5.17,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "stoppedBecause": "Workload memory pressure reached 5 percent",
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "exit-code",
+      "exitCode": "exited",
+      "exitStatus": "1",
+      "capturedAt": "2026-09-22T04:12:36.825Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 208572416,
+      "peakMemoryBytes": 2313269248,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10215424,
+        "file": 190431232,
+        "kernel": 6631424,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 190341120,
+        "slab": 5774624
+      },
+      "pressureSomeAvg10": 5.17,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-22T04:12:36.853Z",
+    "result": {
+      "code": 1,
+      "signal": null
+    },
+    "resourceLimited": true,
+    "memoryThrottled": false
+  },
+  "after": {
+    "startedAt": "2026-09-22T04:15:09.775Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "python3",
+      ".work/full-engine-probe/retry-compact-closure-base-pages.py"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "f01f414e-3518-4868-949f-0a5eb028b0fc",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 25718558720
+    },
+    "minimumHostAvailable": 20222095360,
+    "peakMemoryBytes": 5445050368,
+    "peakTasks": 53,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/compact-closure-base-pages.resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-22T04:23:16.987Z",
+      "memoryBytes": 205254656,
+      "peakMemoryBytes": 5445050368,
+      "swapBytes": 0,
+      "tasks": 13,
+      "memoryBreakdown": {
+        "anon": 67182592,
+        "file": 131362816,
+        "kernel": 5619712,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 129908736,
+        "slab": 4152288
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-22T04:23:17.097Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 148058112,
+      "peakMemoryBytes": 5445050368,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10219520,
+        "file": 131371008,
+        "kernel": 4849664,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 129916928,
+        "slab": 4033200
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-22T04:23:17.122Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "retry": {
+    "startedAt": "2026-09-22T04:15:09.872145+00:00",
+    "scope": "Separate unchanged compact_closure retry with process-local transparent huge pages disabled. The original resource abort is retained. Guard thresholds, timeout, one CTest job, and at most two build workers are unchanged.",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/compact-closure-base-pages.resources.json",
+    "processSamples": [
+      {
+        "pid": 2342898,
+        "name": "python3",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2342900,
+        "name": "MainThread",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2342945,
+        "name": "ctest",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2342947,
+        "name": "bash",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2342951,
+        "name": "MainThread",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2342987,
+        "name": "MainThread",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2343003,
+        "name": "MainThread",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2343016,
+        "name": "python3",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2343018,
+        "name": "clang",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2343020,
+        "name": "wasm-ld",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2343037,
+        "name": "wasm-emscripten",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2343060,
+        "name": "MainThread",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2343067,
+        "name": "wasm-opt",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2344319,
+        "name": "MainThread",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2344333,
+        "name": "wasm-metadce",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2344455,
+        "name": "MainThread",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2344471,
+        "name": "bash",
+        "THP_enabled": "0"
+      },
+      {
+        "pid": 2344472,
+        "name": "MainThread",
+        "THP_enabled": "0"
+      }
+    ],
+    "kernelBefore": {
+      "oom_kill": 60,
+      "compact_stall": 97075,
+      "compact_fail": 72232,
+      "compact_success": 24843,
+      "thp_fault_alloc": 1428720,
+      "thp_fault_fallback": 21256,
+      "allocstall_normal": 39407,
+      "pgscan_direct": 470639282
+    },
+    "command": [
+      "node",
+      "scripts/full-lean/run-suite.mjs",
+      "--suite",
+      ".work/full-suite-node-v127-shell-arguments-r2-compiled-driver",
+      "--results",
+      ".work/full-engine-probe/compact-closure-base-pages-results",
+      "--jobs",
+      "1",
+      "--filter",
+      "^compile/compact_closure\\.lean$"
+    ],
+    "exitCode": 0,
+    "kernelAfter": {
+      "oom_kill": 60,
+      "compact_stall": 97075,
+      "compact_fail": 72232,
+      "compact_success": 24843,
+      "thp_fault_alloc": 1428720,
+      "thp_fault_fallback": 21256,
+      "allocstall_normal": 39407,
+      "pgscan_direct": 470639282
+    },
+    "kernelDelta": {
+      "oom_kill": 0,
+      "compact_stall": 0,
+      "compact_fail": 0,
+      "compact_success": 0,
+      "thp_fault_alloc": 0,
+      "thp_fault_fallback": 0,
+      "allocstall_normal": 0,
+      "pgscan_direct": 0
+    },
+    "finishedAt": "2026-09-22T04:23:17.051306+00:00"
+  },
+  "execution": {
+    "startedAt": "2026-09-22T04:15:10.577Z",
+    "finishedAt": "2026-09-22T04:23:17.041Z",
+    "backend": "node",
+    "registered": 3896,
+    "command": [
+      "--test-dir",
+      "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v127-shell-arguments-r2-compiled-driver/run",
+      "-j",
+      "1",
+      "--output-on-failure",
+      "--output-junit",
+      "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/compact-closure-base-pages-results/results.xml",
+      "-R",
+      "^compile/compact_closure\\.lean$"
+    ],
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "originalSources": {
+      "before": {
+        "checked": 7267,
+        "modified": []
+      },
+      "after": {
+        "checked": 7267,
+        "modified": []
+      }
+    },
+    "harnessArtifacts": {
+      "before": {
+        "checked": 9,
+        "modified": []
+      },
+      "after": {
+        "checked": 9,
+        "modified": []
+      }
+    },
+    "leftoverProcessCleanup": [],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/compact-closure-base-pages.resources.json",
+    "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+  },
+  "junit": [
+    {
+      "name": "compile/compact_closure.lean",
+      "classname": "compile/compact_closure.lean",
+      "time": "485.684",
+      "status": "run"
+    }
+  ],
+  "originalAbortCheckpoint": "docs/evidence/node-broad-v127-stopped55-2026-09-22.json",
+  "independentPostAbortIntegrity": {
+    "sources": {
+      "checked": 7267,
+      "modified": []
+    },
+    "harness": {
+      "checked": 9,
+      "modified": []
+    }
+  },
+  "sourceHashes": {
+    "scripts/full-lean/run-campaign.mjs": "11ad31a9fad76e582aaac7bd5e619dbac81ebe43890e7fdbcc43d1bc6220e6e6",
+    "scripts/full-lean/base-pages.py": "f983bcfb3473b1f14fb733a40d26bc934bfbcee9adf4bcd929bec266194c8c7a",
+    "scripts/full-lean/probe-campaign-resources.mjs": "1e13d689600061d18aedfcfd206b1d8dfc96afa596927ce937b883039eacd7ba",
+    "scripts/full-lean/probe-campaign-order.mjs": "81b7d898231df94ed0a4b281927c2231190358af9877334014e04ca18dba5a17"
+  },
+  "controls": [
+    {
+      "directory": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls",
+      "verification": {
+        "passed": true,
+        "scope": "Actual CTest child and grandchild page policy and build-worker limits, immutable resume, and rejection of changed or invalid settings.",
+        "counts": {
+          "passed": 2,
+          "failed": 0,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 0
+        },
+        "resourceAdjustments": {
+          "pagePolicy": {
+            "kind": "base-pages",
+            "wrapper": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+            "sha256": "f983bcfb3473b1f14fb733a40d26bc934bfbcee9adf4bcd929bec266194c8c7a"
+          },
+          "buildJobs": 1
+        },
+        "peakMemoryBytes": 26927104
+      },
+      "state": {
+        "identity": "989c75efc5323a33c2a573aa8437c383244b041fc76b74f3b8672ddfb185b4a5",
+        "suite": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls",
+        "filter": ".*",
+        "resourceAdjustments": {
+          "pagePolicy": {
+            "kind": "base-pages",
+            "wrapper": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+            "sha256": "f983bcfb3473b1f14fb733a40d26bc934bfbcee9adf4bcd929bec266194c8c7a"
+          },
+          "buildJobs": 1
+        },
+        "backend": "Synthetic resource controls; not Lean conformance",
+        "createdAt": "2026-09-22T04:24:26.356Z",
+        "registered": 2,
+        "selected": 2,
+        "tests": [
+          {
+            "name": "first-policy-check",
+            "attempts": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls/campaign/00001-7e835a6f",
+                "status": "passed",
+                "startedAt": "2026-09-22T04:24:26.357Z",
+                "exit": {
+                  "code": 0,
+                  "signal": null
+                },
+                "finishedAt": "2026-09-22T04:24:26.679Z",
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls/campaign/00001-7e835a6f/resources.json",
+                "peakMemoryBytes": 26398720,
+                "originalSources": {
+                  "before": {
+                    "checked": 1,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 1,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                }
+              }
+            ],
+            "status": "passed"
+          },
+          {
+            "name": "resumed-policy-check",
+            "attempts": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls/campaign/00002-ce5893fd",
+                "status": "passed",
+                "startedAt": "2026-09-22T04:24:26.829Z",
+                "exit": {
+                  "code": 0,
+                  "signal": null
+                },
+                "finishedAt": "2026-09-22T04:24:27.141Z",
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls/campaign/00002-ce5893fd/resources.json",
+                "peakMemoryBytes": 26927104,
+                "originalSources": {
+                  "before": {
+                    "checked": 1,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 1,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                }
+              }
+            ],
+            "status": "passed"
+          }
+        ],
+        "status": "complete",
+        "updatedAt": "2026-09-22T04:24:27.142Z",
+        "counts": {
+          "passed": 2,
+          "failed": 0,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 0
+        }
+      },
+      "resources": [
+        {
+          "startedAt": "2026-09-22T04:24:26.396Z",
+          "command": [
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+            "env",
+            "BINARYEN_CORES=1",
+            "EMCC_CORES=1",
+            "CMAKE_BUILD_PARALLEL_LEVEL=1",
+            "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+            "--suite",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls",
+            "--results",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls/campaign/00001-7e835a6f/results",
+            "--jobs",
+            "1",
+            "--filter",
+            "^first-policy-check$"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "c6b3edc0-576e-4ee9-a37e-ef54a7eef753",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 25640202240
+          },
+          "minimumHostAvailable": 25618530304,
+          "peakMemoryBytes": 26398720,
+          "peakTasks": 6,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls/campaign/00001-7e835a6f/resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T04:24:26.620Z",
+            "memoryBytes": 7323648,
+            "peakMemoryBytes": 26398720,
+            "swapBytes": 0,
+            "tasks": 6,
+            "memoryBreakdown": {
+              "anon": 5820416,
+              "file": 40960,
+              "kernel": 733184,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 40960,
+              "slab": 140656
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T04:24:26.641Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 12156928,
+            "peakMemoryBytes": 26398720,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10215424,
+              "file": 40960,
+              "kernel": 974848,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 40960,
+              "slab": 154304
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T04:24:26.669Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        {
+          "startedAt": "2026-09-22T04:24:26.873Z",
+          "command": [
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+            "env",
+            "BINARYEN_CORES=1",
+            "EMCC_CORES=1",
+            "CMAKE_BUILD_PARALLEL_LEVEL=1",
+            "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+            "--suite",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls",
+            "--results",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls/campaign/00002-ce5893fd/results",
+            "--jobs",
+            "1",
+            "--filter",
+            "^resumed-policy-check$"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "1fc32712-e9ed-423e-a179-0a54b365f03e",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 25630736384
+          },
+          "minimumHostAvailable": 25604530176,
+          "peakMemoryBytes": 26927104,
+          "peakTasks": 7,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-base-pages-controls/campaign/00002-ce5893fd/resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T04:24:27.097Z",
+            "memoryBytes": 9748480,
+            "peakMemoryBytes": 26927104,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 7512064,
+              "file": 32768,
+              "kernel": 819200,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 32768,
+              "slab": 140304
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T04:24:27.109Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 12709888,
+            "peakMemoryBytes": 26927104,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10211328,
+              "file": 32768,
+              "kernel": 974848,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 32768,
+              "slab": 154720
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T04:24:27.133Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      ]
+    },
+    {
+      "directory": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages",
+      "verification": {
+        "passed": true,
+        "scope": "Synthetic CTest controls: stable priority ordering, all original registrations retained, immutable resume, and rejection of changed ordering.",
+        "order": [
+          "priority-first",
+          "priority-last",
+          "ordinary-first",
+          "ordinary-last"
+        ],
+        "counts": {
+          "passed": 4,
+          "failed": 0,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 0
+        },
+        "peakMemoryBytes": 25878528
+      },
+      "state": {
+        "identity": "f34b9badf685ab432973dde7854bcdda954e0a4840c974098dd1bd729617e9f6",
+        "suite": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages",
+        "filter": ".*",
+        "prioritize": "^priority-",
+        "backend": "Synthetic order controls; not Lean conformance",
+        "createdAt": "2026-09-22T04:24:46.588Z",
+        "registered": 4,
+        "selected": 4,
+        "tests": [
+          {
+            "name": "priority-first",
+            "attempts": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00001-279e8095",
+                "status": "passed",
+                "startedAt": "2026-09-22T04:24:46.589Z",
+                "exit": {
+                  "code": 0,
+                  "signal": null
+                },
+                "finishedAt": "2026-09-22T04:24:46.930Z",
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00001-279e8095/resources.json",
+                "peakMemoryBytes": 25141248,
+                "originalSources": {
+                  "before": {
+                    "checked": 4,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 4,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                }
+              }
+            ],
+            "status": "passed"
+          },
+          {
+            "name": "priority-last",
+            "attempts": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00002-53c979a7",
+                "status": "passed",
+                "startedAt": "2026-09-22T04:24:47.016Z",
+                "exit": {
+                  "code": 0,
+                  "signal": null
+                },
+                "finishedAt": "2026-09-22T04:24:47.250Z",
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00002-53c979a7/resources.json",
+                "peakMemoryBytes": 25878528,
+                "originalSources": {
+                  "before": {
+                    "checked": 4,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 4,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                }
+              }
+            ],
+            "status": "passed"
+          },
+          {
+            "name": "ordinary-first",
+            "attempts": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00003-9a56de08",
+                "status": "passed",
+                "startedAt": "2026-09-22T04:24:47.288Z",
+                "exit": {
+                  "code": 0,
+                  "signal": null
+                },
+                "finishedAt": "2026-09-22T04:24:47.542Z",
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00003-9a56de08/resources.json",
+                "peakMemoryBytes": 25866240,
+                "originalSources": {
+                  "before": {
+                    "checked": 4,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 4,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                }
+              }
+            ],
+            "status": "passed"
+          },
+          {
+            "name": "ordinary-last",
+            "attempts": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00004-76e09cb3",
+                "status": "passed",
+                "startedAt": "2026-09-22T04:24:47.543Z",
+                "exit": {
+                  "code": 0,
+                  "signal": null
+                },
+                "finishedAt": "2026-09-22T04:24:47.813Z",
+                "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00004-76e09cb3/resources.json",
+                "peakMemoryBytes": 25284608,
+                "originalSources": {
+                  "before": {
+                    "checked": 4,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 4,
+                    "modified": []
+                  }
+                },
+                "harnessArtifacts": {
+                  "before": {
+                    "checked": 0,
+                    "modified": []
+                  },
+                  "after": {
+                    "checked": 0,
+                    "modified": []
+                  }
+                }
+              }
+            ],
+            "status": "passed"
+          }
+        ],
+        "status": "complete",
+        "updatedAt": "2026-09-22T04:24:47.813Z",
+        "counts": {
+          "passed": 4,
+          "failed": 0,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 0
+        }
+      },
+      "resources": [
+        {
+          "startedAt": "2026-09-22T04:24:46.668Z",
+          "command": [
+            "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+            "--suite",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages",
+            "--results",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00001-279e8095/results",
+            "--jobs",
+            "1",
+            "--filter",
+            "^priority-first$"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "d7eed770-5f46-45c9-a5a0-2dfd2d71657a",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 25536520192
+          },
+          "minimumHostAvailable": 25536520192,
+          "peakMemoryBytes": 25141248,
+          "peakTasks": 0,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00001-279e8095/resources.json",
+          "status": "finished",
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T04:24:46.886Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 11673600,
+            "peakMemoryBytes": 25141248,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10125312,
+              "file": 40960,
+              "kernel": 946176,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 40960,
+              "slab": 157504
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T04:24:46.922Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        {
+          "startedAt": "2026-09-22T04:24:47.055Z",
+          "command": [
+            "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+            "--suite",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages",
+            "--results",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00002-53c979a7/results",
+            "--jobs",
+            "1",
+            "--filter",
+            "^priority-last$"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "01f099e8-440a-44e6-954f-1024265c661a",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 25637392384
+          },
+          "minimumHostAvailable": 25637392384,
+          "peakMemoryBytes": 25878528,
+          "peakTasks": 0,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00002-53c979a7/resources.json",
+          "status": "finished",
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T04:24:47.220Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 12079104,
+            "peakMemoryBytes": 25878528,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10211328,
+              "file": 32768,
+              "kernel": 978944,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 32768,
+              "slab": 156032
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T04:24:47.244Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        {
+          "startedAt": "2026-09-22T04:24:47.326Z",
+          "command": [
+            "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+            "--suite",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages",
+            "--results",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00003-9a56de08/results",
+            "--jobs",
+            "1",
+            "--filter",
+            "^ordinary-first$"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "7928970e-3b0c-41b2-8f43-9a36b37ddf64",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 25641668608
+          },
+          "minimumHostAvailable": 25641668608,
+          "peakMemoryBytes": 25866240,
+          "peakTasks": 0,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00003-9a56de08/resources.json",
+          "status": "finished",
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T04:24:47.507Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 12353536,
+            "peakMemoryBytes": 25866240,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10211328,
+              "file": 32768,
+              "kernel": 974848,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 32768,
+              "slab": 151040
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T04:24:47.535Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        {
+          "startedAt": "2026-09-22T04:24:47.594Z",
+          "command": [
+            "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+            "--suite",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages",
+            "--results",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00004-76e09cb3/results",
+            "--jobs",
+            "1",
+            "--filter",
+            "^ordinary-last$"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "68536c40-669f-4d06-b76b-cfac4f52cc1d",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 25655279616
+          },
+          "minimumHostAvailable": 25655279616,
+          "peakMemoryBytes": 25284608,
+          "peakTasks": 0,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/campaign-order-after-base-pages/campaign/00004-76e09cb3/resources.json",
+          "status": "finished",
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T04:24:47.781Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 12439552,
+            "peakMemoryBytes": 25284608,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10211328,
+              "file": 32768,
+              "kernel": 983040,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 32768,
+              "slab": 156096
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T04:24:47.808Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      ]
+    }
+  ]
+}

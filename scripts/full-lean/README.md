@@ -88,6 +88,17 @@ the prior selection is retained in checkpoint history. Completed results and
 their evidence are preserved without rerunning them.
 Completed failures are retained and require a separate rerun after a fix.
 
+For campaigns that compile full Wasm applications on this Linux host, add
+`--base-pages --build-jobs 1`. The first option runs the guarded suite through
+`base-pages.py`; the second sets CMake, Emscripten, and Binaryen worker limits
+inside the guard. Original tests, timeout settings, the one-CTest-job limit,
+and memory/pressure thresholds remain unchanged. Both adjustments and the
+page-policy wrapper's SHA-256 become part of the campaign identity, so switching
+policies requires a new output directory. The wrapper is checked before each
+attempt. This resource profile does not change application runtime defaults.
+`probe-campaign-resources.mjs NEW_OUTPUT` verifies effective settings in a CTest
+child and grandchild, immutable resume, and rejection of changed settings.
+
 For an explicitly separate language-server harness, the original two-line Lean
 test driver can be compiled ahead of time in the selected engine:
 

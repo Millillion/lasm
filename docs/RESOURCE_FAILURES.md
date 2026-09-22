@@ -265,3 +265,27 @@ and executes the requested command. A small control verifies inheritance across
 exec without allocation stress. Kernel caps, pressure thresholds, and host-wide
 settings are unchanged. Both aborted builds and the passing preparation remain
 in [the cwd milestone evidence](evidence/cwd-tracking-2026-09-21.json).
+
+On 2026-09-22, the v127 Node campaign stopped at 54 passes when
+`compile/compact_closure.lean` reached 5.17% workload memory pressure at a
+2.15 GiB peak. The test invokes the full Wasm linker indirectly; that campaign
+had not inherited the build wrapper's page policy. More than 21 GiB of host
+memory remained available, and all hard-limit, throttling, OOM, and swap counters
+were zero. The guard stopped the process tree and released its service. All
+7,267 original source files and nine harness artifacts matched afterward.
+
+A separate unchanged-test retry through `base-pages.py` passed in 485.68 seconds
+at a 5.07 GiB peak. It retained the original two-worker compiler limit to isolate
+the page-policy adjustment. All 18 sampled descendants reported `THP_enabled: 0`;
+recorded global allocation-stall, compaction, huge-page, and OOM counters did not
+increase. This supports the mitigation, without proving the earlier stall had
+no other cause. The slow stage was whole-program Wasm optimization, which
+completed successfully. No timeout or expected output was changed.
+
+Campaigns now accept `--base-pages --build-jobs 1` for the host's existing
+full-link resource policy. They record both settings and the wrapper hash in
+their identity, reject a changed policy on resume, and check the wrapper before
+each attempt. Two synthetic child/grandchild controls and four existing
+ordering/resume controls pass. Guard thresholds and host settings are unchanged.
+The stopped campaign and successful retry remain separate in
+[the pressure-stop and retry evidence](evidence/compact-closure-base-pages-2026-09-22.json).

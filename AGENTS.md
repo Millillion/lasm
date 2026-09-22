@@ -18,6 +18,9 @@
 - For full Wasm linker builds on this host, use `scripts/full-lean/base-pages.py`
   inside the resource guard, with one build/Binaryen worker. This avoids observed
   huge-page allocation pressure without changing host settings or guard limits.
+  Compiler-suite tests also invoke the linker: run their campaigns with
+  `--base-pages --build-jobs 1`. Keep earlier pressure-aborted campaigns intact
+  and use a new output directory when changing the resource profile.
 - The user approved the recommendations in `docs/PLAN.md`; proceed through the
   implementation milestones. Do not present a limited implementation as a
   complete Lean runtime port or production compiler.

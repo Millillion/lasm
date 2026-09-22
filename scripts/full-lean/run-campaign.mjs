@@ -8,9 +8,9 @@ import { spawn } from 'node:child_process';
 
 if (process.env.LASM_RESOURCE_UNIT) throw new Error('Run this supervisor directly; each test applies its own resource guard');
 const args = process.argv.slice(2);
-const allowed = new Set(['--suite', '--output', '--filter', '--max-tests', '--prioritize']);
+const allowed = new Set(['--suite', '--output', '--filter', '--max-tests', '--prioritize', '--build-jobs']);
 for (let i = 0; i < args.length; i++) {
-  if (args[i] === '--extend-selection') continue;
+  if (args[i] === '--extend-selection' || args[i] === '--base-pages') continue;
   if (!allowed.has(args[i]) || args[i + 1] === undefined) throw new Error(`Invalid option: ${args[i]}`);
   i++;
 }
@@ -21,6 +21,10 @@ const filter = option('--filter', '.*');
 const selection = new RegExp(filter);
 const prioritize = option('--prioritize');
 const priority = prioritize === undefined ? null : new RegExp(prioritize);
+const basePages = args.includes('--base-pages');
+const buildJobsArg = option('--build-jobs');
+const buildJobs = buildJobsArg === undefined ? undefined : Number(buildJobsArg);
+if (buildJobs !== undefined && ![1, 2].includes(buildJobs)) throw new Error('--build-jobs must be 1 or 2');
 const maximum = Number(option('--max-tests', 'Infinity'));
 if (!(maximum === Infinity || Number.isInteger(maximum) && maximum > 0)) throw new Error('--max-tests must be a positive integer');
 const manifestPath = join(suite, 'parallel-suite.json');
@@ -32,6 +36,13 @@ const selected = manifest.tests.filter(test => selection.test(test.name)).map(te
 if (priority) selected.sort((a, b) => Number(priority.test(b)) - Number(priority.test(a)));
 if (!selected.length || new Set(selected).size !== selected.length) throw new Error('Selection must contain unique registered test names');
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+const basePagesWrapper = fileURLToPath(new URL('./base-pages.py', import.meta.url));
+const resourceAdjustments = {
+  ...(basePages ? { pagePolicy: { kind: 'base-pages', wrapper: basePagesWrapper,
+    sha256: digest(readFileSync(basePagesWrapper)) } } : {}),
+  ...(buildJobs === undefined ? {} : { buildJobs }),
+};
+const hasResourceAdjustments = Object.keys(resourceAdjustments).length !== 0;
 const configPath = join(manifest.prefix, 'toolchain.json');
 const config = existsSync(configPath) ? JSON.parse(readFileSync(configPath)) : null;
 let snapshot;
@@ -47,7 +58,8 @@ if (config) {
   }
 }
 const identityFor = filter => digest(JSON.stringify({ manifest: digest(manifestBytes), filter, config, snapshot,
-  ...(prioritize === undefined ? {} : { prioritize }) }));
+  ...(prioritize === undefined ? {} : { prioritize }),
+  ...(hasResourceAdjustments ? { resourceAdjustments } : {}) }));
 const identity = identityFor(filter);
 mkdirSync(output, { recursive: true });
 // The workload guard prevents concurrent compilers; this separate lock prevents
@@ -73,7 +85,8 @@ process.on('exit', () => {
 });
 const statePath = join(output, 'campaign.json');
 const state = existsSync(statePath) ? JSON.parse(readFileSync(statePath)) : {
-  identity, suite, filter, ...(prioritize === undefined ? {} : { prioritize }), backend: manifest.backend, createdAt: new Date().toISOString(),
+  identity, suite, filter, ...(prioritize === undefined ? {} : { prioritize }),
+  ...(hasResourceAdjustments ? { resourceAdjustments } : {}), backend: manifest.backend, createdAt: new Date().toISOString(),
   registered: manifest.registered, selected: selected.length,
   tests: selected.map(name => ({ name, attempts: [] })),
 };
@@ -118,6 +131,10 @@ save();
 for (const [index, test] of state.tests.entries()) {
   if (test.status && test.status !== 'pending') continue;
   if (executed >= maximum || interrupted || pauseRequested) break;
+  if (basePages && digest(readFileSync(basePagesWrapper)) !== resourceAdjustments.pagePolicy.sha256) {
+    state.stoppedBecause = 'Resource page-policy wrapper changed';
+    break;
+  }
   // A previous desktop interruption may have left a running attempt. Keep its
   // evidence and retry only that unfinished test, never overwrite its files.
   for (const attempt of test.attempts) if (attempt.status === 'running') attempt.status = 'interrupted';
@@ -128,8 +145,12 @@ for (const [index, test] of state.tests.entries()) {
   const attempt = { directory, status: 'running', startedAt: new Date().toISOString() };
   test.attempts.push(attempt);
   save();
-  const command = [runner, '--report', resourcePath, '--', process.execPath, suiteRunner,
+  const workload = [
+    ...(basePages ? ['python3', basePagesWrapper] : []),
+    ...(buildJobs === undefined ? [] : ['env', `BINARYEN_CORES=${buildJobs}`, `EMCC_CORES=${buildJobs}`, `CMAKE_BUILD_PARALLEL_LEVEL=${buildJobs}`]),
+    process.execPath, suiteRunner,
     '--suite', suite, '--results', results, '--jobs', '1', '--filter', `^${escaped(test.name)}$`];
+  const command = [runner, '--report', resourcePath, '--', ...workload];
   const log = createWriteStream(join(directory, 'supervisor.log'));
   console.log(`[${index + 1}/${state.selected}] ${test.name}`);
   child = spawn(process.execPath, command, { stdio: ['ignore', 'pipe', 'pipe'] });
