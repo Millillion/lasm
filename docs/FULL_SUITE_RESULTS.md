@@ -3,6 +3,25 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The v142 private file-worker repair passes **eighteen unchanged registrations**:
+ordinary IO, HTTP hang regressions, line reads, file locking, directory reads,
+and real paths in each engine. All 7,267 original source hashes remain intact.
+Previously, a three-byte result or EOF cloned the entire requested backing
+buffer, observed at 1, 16, and 64 MiB in every engine. The worker now transfers
+only returned bytes for partial/pooled views and preserves direct transfers for
+full allocations. Four maintained host tests, twenty-four before/after native
+and full-engine controls, and nine packaged released-engine controls pass.
+The full compiler Wasm is byte-identical to v141; only the private worker changes.
+
+Individual 64 MiB short-read runs peak at 1.89→1.63 GiB in Node,
+2.16→1.84 GiB in Deno, and 2.40→1.90 GiB in local rebuilt Bun. No resource
+abort, OOM, memory-limit, throttling, or swap event occurs. Native read capacity
+and the remaining C++/Lean copies still need broader analysis. A supplementary
+package harness initially failed while scanning unrelated permission-denied
+experiment directories; its isolated byte-identical fixture retry passes.
+Full-suite and native cross-platform coverage remain open. See
+[the allocation evidence](evidence/short-read-allocation-2026-09-22.json).
+
 The separate v141 clock validation passes **twelve unchanged registrations**:
 `timeIO`, `timeNegative`, HTTP hang regressions, and file locking in each engine.
 All 7,267 original source hashes match before and after execution. Ordinary
@@ -21,7 +40,7 @@ abort, OOM, memory-limit, throttling, or swap events. These targeted passes are
 not imported into the broad campaign. See
 [the clock evidence](evidence/wall-clock-2026-09-22.json).
 
-The v139 Node campaign selects all **3,896 registrations** and is paused after
+The v139 Node campaign selects all **3,896 registrations**. Its saved checkpoint records
 **20 passes, zero failures or resource aborts, and 3,876 pending registrations**.
 It uses shared application linking, the separately compiled standalone server
 driver, four Lean workers, base pages, and one build worker. The 3,040 test names
@@ -30,6 +49,7 @@ The initial group covers further persistent-map, sorting, reuse, thunk, trie,
 integer, and Unicode-path regressions. All source and harness hashes match;
 the maximum peak is 2.92 GiB with no memory-limit, OOM, or swap events. See
 [the new campaign checkpoint](evidence/node-broad-v139-shared-checkpoint20-2026-09-22.json).
+The same frozen campaign resumed after the separate clock/allocation checks.
 
 The v127 Node campaign with base pages and one build worker is gracefully paused at
 **twenty-seven passes, zero failures or resource aborts, and 3,869 pending registrations**.

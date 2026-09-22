@@ -343,10 +343,18 @@ load, and suite conformance still need validation. See
   regression uses synthetic lengths without large buffers; the high-address
   bridge controls move small payloads. Real responses still clone across a
   worker port and copy through a temporary C++ vector before constructing Lean
-  data. Initial ordinary-Lean reads through 256 MiB now pass; larger payloads,
-  short-read backing-buffer costs, and copy reduction still require measurements
-  under the unchanged memory guard. This remains an implementation and validation
-  gap, not an established fundamental restriction.
+  data. Initial ordinary-Lean reads through 256 MiB now pass. Short-read worker
+  responses now carry only returned bytes: a three-byte result or EOF previously
+  cloned the entire requested 64 MiB allocation in every engine. The identical
+  Lean controls pass before and after; measured 64 MiB request peaks fall from
+  1.89 to 1.63 GiB in Node, 2.16 to 1.84 GiB in Deno, and 2.40 to 1.90 GiB in
+  local rebuilt Bun. These are individual runs, not a statistical benchmark.
+  Nine packaged controls and eighteen unchanged upstream registrations pass.
+  The native read still reserves its requested capacity; larger payloads and
+  remaining response/C++/Lean copies need further measurements under the same
+  guard. See [the short-read evidence](docs/evidence/short-read-allocation-2026-09-22.json).
+  This remains an implementation and validation gap, not an established
+  fundamental restriction.
 - [x] Avoid Deno's per-byte traversal of full-runtime message payloads. Private
   messages now carry ArrayBuffers plus numeric view bounds. The same ordinary
   Lean 64 MiB read falls from a 5.23 GiB workload peak to 1.99 GiB in Deno, with

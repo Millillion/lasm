@@ -1,0 +1,3766 @@
+{
+  "recordedAt": "2026-09-22T09:25:45.024451+00:00",
+  "scope": "Linux x64 private file-worker allocation repair. Bounded short-read comparisons, packaged mains and targeted unchanged upstream tests; not complete filesystem or memory-capacity parity.",
+  "findings": [
+    "Before the repair, a three-byte read and a zero-byte EOF result each carried a backing allocation equal to the requested 1, 16, or 64 MiB in Node, Deno and released Bun. The response cloner copied unused capacity.",
+    "The worker now copies only returned bytes from partial or pooled views into a fresh Uint8Array, then transfers it. Full independent allocations retain their direct transfer path. Observed backing sizes are now 3 and 0 bytes in every engine.",
+    "The identical ordinary Lean short-read, EOF and zero-length-read fixture passes all twelve native/full-engine controls both before and after. Released-engine packaged mains pass nine further controls.",
+    "Four maintained host tests cover short and full reads, EOF, pooled line results, retained earlier results, and errors followed by successful operations. Eighteen unchanged upstream IO, filesystem and HTTP registrations pass with all 7267 original hashes intact."
+  ],
+  "measurementLimits": "Each memory peak is one isolated guarded run, not a statistical benchmark. Requests never exceed 64 MiB. The native fread allocation still reserves the requested capacity; this repair removes copies and retained capacity at worker response boundaries.",
+  "retainedDevelopmentAttempts": [
+    "The first package probe placed its source beside unrelated permission-denied experiment directories. Project fingerprinting failed before compilation. The retry builds a byte-identical source in an isolated fixture directory; the failed attempt remains retained."
+  ],
+  "remainingGaps": [
+    "Native Windows, macOS and ARM64 validation remains unexecuted.",
+    "Full Bun compiler comparisons use the disclosed local memory64-capacity build and Linux stack helper; direct host and packaged checks use released Bun.",
+    "Multi-GiB IO equivalence, complete upstream suites and packaged full-runtime integration remain unfinished. No remaining difference is established fundamental."
+  ],
+  "fullRuntimeComparisons": {
+    "before": [
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:15:40.910087+00:00",
+          "engine": "native",
+          "phase": "before",
+          "requestedBytes": 1048576,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "1048576"
+          ],
+          "toolchain": null,
+          "engineBinary": {
+            "path": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-native-1048576.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 1048576 passed\n",
+          "stderr": "",
+          "seconds": 0.3673556159483269,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-native-1048576.resources.json",
+          "sha256": "658bd9883ff4659b3c8411e682d7ef78d58fca0364a42811a83ba1b29dc54f5a",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "native",
+            "1048576"
+          ],
+          "startedAt": "2026-09-22T09:15:40.819Z",
+          "finishedAt": "2026-09-22T09:15:41.365Z",
+          "peakMemoryBytes": 68984832,
+          "minimumHostAvailable": 29446381568,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:15:41.514712+00:00",
+          "engine": "node",
+          "phase": "before",
+          "requestedBytes": 1048576,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v141-clock-r2-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "1048576"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v141-clock-r2-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "sha256": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-node-1048576.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 1048576 passed\n",
+          "stderr": "",
+          "seconds": 5.454762049019337,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-node-1048576.resources.json",
+          "sha256": "6b4e6795b9204191c2794d2bbc8083be2f0c49ac1f00fac6536b8371c8392097",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "node",
+            "1048576"
+          ],
+          "startedAt": "2026-09-22T09:15:41.410Z",
+          "finishedAt": "2026-09-22T09:15:47.619Z",
+          "peakMemoryBytes": 1796878336,
+          "minimumHostAvailable": 27732762624,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:15:47.742794+00:00",
+          "engine": "deno",
+          "phase": "before",
+          "requestedBytes": 1048576,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v141-clock-r2-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "1048576"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v141-clock-r2-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "sha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-deno-1048576.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 1048576 passed\n",
+          "stderr": "",
+          "seconds": 5.801922721089795,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-deno-1048576.resources.json",
+          "sha256": "c7f073abfca8a4a2d89d52e450323c291c8b66860bc66b7714b07d278978a03e",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "deno",
+            "1048576"
+          ],
+          "startedAt": "2026-09-22T09:15:47.659Z",
+          "finishedAt": "2026-09-22T09:15:54.064Z",
+          "peakMemoryBytes": 1994256384,
+          "minimumHostAvailable": 27342397440,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:15:54.186689+00:00",
+          "engine": "bun",
+          "phase": "before",
+          "requestedBytes": 1048576,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "1048576"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {
+              "BUN_JSC_useWasmMemory64": "true",
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "sha256": "8199c4efa1c3217d2229bcb35f0699e3fa6946d12edde13df9f871502d26ae1a"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-bun-1048576.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 1048576 passed\n",
+          "stderr": "",
+          "seconds": 4.860758377006277,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-bun-1048576.resources.json",
+          "sha256": "f2b3d7e73ead63f590c443e98568b70b269ee9be28ff2431d2d937ca74fc6613",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "bun",
+            "1048576"
+          ],
+          "startedAt": "2026-09-22T09:15:54.103Z",
+          "finishedAt": "2026-09-22T09:16:00.245Z",
+          "peakMemoryBytes": 2159144960,
+          "minimumHostAvailable": 27183632384,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:16:00.370957+00:00",
+          "engine": "native",
+          "phase": "before",
+          "requestedBytes": 16777216,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "16777216"
+          ],
+          "toolchain": null,
+          "engineBinary": {
+            "path": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-native-16777216.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 16777216 passed\n",
+          "stderr": "",
+          "seconds": 0.3276176860090345,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-native-16777216.resources.json",
+          "sha256": "69403f19482f3db59c5d0c713e9c7dce780e92dad4c3bdad0dc1a7bfe010646c",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "native",
+            "16777216"
+          ],
+          "startedAt": "2026-09-22T09:16:00.284Z",
+          "finishedAt": "2026-09-22T09:16:00.774Z",
+          "peakMemoryBytes": 69222400,
+          "minimumHostAvailable": 28980994048,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:16:00.911391+00:00",
+          "engine": "node",
+          "phase": "before",
+          "requestedBytes": 16777216,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v141-clock-r2-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "16777216"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v141-clock-r2-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "sha256": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-node-16777216.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 16777216 passed\n",
+          "stderr": "",
+          "seconds": 5.356512353057042,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-node-16777216.resources.json",
+          "sha256": "f4e9461e482c8244565b0800fb3e81cf30dca05dbdc8d15e76b3f1923abcf371",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "node",
+            "16777216"
+          ],
+          "startedAt": "2026-09-22T09:16:00.817Z",
+          "finishedAt": "2026-09-22T09:16:06.839Z",
+          "peakMemoryBytes": 1843044352,
+          "minimumHostAvailable": 27614285824,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:16:07.065608+00:00",
+          "engine": "deno",
+          "phase": "before",
+          "requestedBytes": 16777216,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v141-clock-r2-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "16777216"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v141-clock-r2-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "sha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-deno-16777216.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 16777216 passed\n",
+          "stderr": "",
+          "seconds": 5.760607769945636,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-deno-16777216.resources.json",
+          "sha256": "33eef21f65f59c67b8d1701ddc44036b03406aea89c354ed898b889c3aebae21",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "deno",
+            "16777216"
+          ],
+          "startedAt": "2026-09-22T09:16:06.885Z",
+          "finishedAt": "2026-09-22T09:16:13.374Z",
+          "peakMemoryBytes": 2083475456,
+          "minimumHostAvailable": 27300204544,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:16:13.508085+00:00",
+          "engine": "bun",
+          "phase": "before",
+          "requestedBytes": 16777216,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "16777216"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {
+              "BUN_JSC_useWasmMemory64": "true",
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "sha256": "8199c4efa1c3217d2229bcb35f0699e3fa6946d12edde13df9f871502d26ae1a"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-bun-16777216.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 16777216 passed\n",
+          "stderr": "",
+          "seconds": 5.0515183879761025,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-bun-16777216.resources.json",
+          "sha256": "e4a9d831b369f38ae19c5f9444ae230d93aecdf05d1c9e291b13ca4a30087517",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "bun",
+            "16777216"
+          ],
+          "startedAt": "2026-09-22T09:16:13.425Z",
+          "finishedAt": "2026-09-22T09:16:19.674Z",
+          "peakMemoryBytes": 2166575104,
+          "minimumHostAvailable": 27109654528,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:16:19.792702+00:00",
+          "engine": "native",
+          "phase": "before",
+          "requestedBytes": 67108864,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "67108864"
+          ],
+          "toolchain": null,
+          "engineBinary": {
+            "path": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-native-67108864.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 67108864 passed\n",
+          "stderr": "",
+          "seconds": 0.3209886560216546,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-native-67108864.resources.json",
+          "sha256": "cc22451c9c8bd4424c2ffbf26478b92099200b1533588a421a0841fe301c1dae",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "native",
+            "67108864"
+          ],
+          "startedAt": "2026-09-22T09:16:19.716Z",
+          "finishedAt": "2026-09-22T09:16:20.186Z",
+          "peakMemoryBytes": 69677056,
+          "minimumHostAvailable": 29164965888,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:16:20.313120+00:00",
+          "engine": "node",
+          "phase": "before",
+          "requestedBytes": 67108864,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v141-clock-r2-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "67108864"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v141-clock-r2-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "sha256": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-node-67108864.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 67108864 passed\n",
+          "stderr": "",
+          "seconds": 5.656244709971361,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-node-67108864.resources.json",
+          "sha256": "e8889d4bc734295cd836bc9023115d47026a57d5ee792e1f9a4d312095c999f8",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "node",
+            "67108864"
+          ],
+          "startedAt": "2026-09-22T09:16:20.228Z",
+          "finishedAt": "2026-09-22T09:16:26.528Z",
+          "peakMemoryBytes": 2025123840,
+          "minimumHostAvailable": 27276017664,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:16:26.646164+00:00",
+          "engine": "deno",
+          "phase": "before",
+          "requestedBytes": 67108864,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v141-clock-r2-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "67108864"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v141-clock-r2-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "sha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-deno-67108864.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 67108864 passed\n",
+          "stderr": "",
+          "seconds": 6.249072887003422,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-deno-67108864.resources.json",
+          "sha256": "d84ba6bfd0ab72cfdf8d87938e285e484dbc6ee5dda0dde971ff7401653336a7",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "deno",
+            "67108864"
+          ],
+          "startedAt": "2026-09-22T09:16:26.567Z",
+          "finishedAt": "2026-09-22T09:16:33.349Z",
+          "peakMemoryBytes": 2321338368,
+          "minimumHostAvailable": 27044573184,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:16:33.490719+00:00",
+          "engine": "bun",
+          "phase": "before",
+          "requestedBytes": 67108864,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "67108864"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {
+              "BUN_JSC_useWasmMemory64": "true",
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v141-clock-r2-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "sha256": "8199c4efa1c3217d2229bcb35f0699e3fa6946d12edde13df9f871502d26ae1a"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-bun-67108864.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 67108864 passed\n",
+          "stderr": "",
+          "seconds": 5.031852949061431,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-before-bun-67108864.resources.json",
+          "sha256": "5f793815c43545b93aa922fb944518120bf04566287318e2d0cdf912ee9f3c2b",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "before",
+            "bun",
+            "67108864"
+          ],
+          "startedAt": "2026-09-22T09:16:33.387Z",
+          "finishedAt": "2026-09-22T09:16:39.599Z",
+          "peakMemoryBytes": 2574454784,
+          "minimumHostAvailable": 26489339904,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      }
+    ],
+    "after": [
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:12.880448+00:00",
+          "engine": "native",
+          "phase": "after",
+          "requestedBytes": 1048576,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "1048576"
+          ],
+          "toolchain": null,
+          "engineBinary": {
+            "path": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-native-1048576.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 1048576 passed\n",
+          "stderr": "",
+          "seconds": 0.34511697001289576,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-native-1048576.resources.json",
+          "sha256": "ace93618966cd8f08b4a934e882853397f77bab791373504322decedcb7f81ac",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "native",
+            "1048576"
+          ],
+          "startedAt": "2026-09-22T09:20:12.796Z",
+          "finishedAt": "2026-09-22T09:20:13.313Z",
+          "peakMemoryBytes": 69713920,
+          "minimumHostAvailable": 29494853632,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:13.451755+00:00",
+          "engine": "node",
+          "phase": "after",
+          "requestedBytes": 1048576,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v142-short-read-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "1048576"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v142-short-read-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "sha256": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-node-1048576.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 1048576 passed\n",
+          "stderr": "",
+          "seconds": 5.681777653982863,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-node-1048576.resources.json",
+          "sha256": "b3f7c0c59be90e459e917220e9973925ec32101a2fd5f051e680a4325d7dd0aa",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "node",
+            "1048576"
+          ],
+          "startedAt": "2026-09-22T09:20:13.360Z",
+          "finishedAt": "2026-09-22T09:20:19.740Z",
+          "peakMemoryBytes": 1726214144,
+          "minimumHostAvailable": 27760967680,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:19.877521+00:00",
+          "engine": "deno",
+          "phase": "after",
+          "requestedBytes": 1048576,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v142-short-read-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "1048576"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v142-short-read-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "sha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-deno-1048576.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 1048576 passed\n",
+          "stderr": "",
+          "seconds": 5.892094640992582,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-deno-1048576.resources.json",
+          "sha256": "5fd21f2885cf855b55506c9d1ecd66a01224c844df9491293a170552baf16ee1",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "deno",
+            "1048576"
+          ],
+          "startedAt": "2026-09-22T09:20:19.788Z",
+          "finishedAt": "2026-09-22T09:20:26.243Z",
+          "peakMemoryBytes": 1964167168,
+          "minimumHostAvailable": 27473965056,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:26.371820+00:00",
+          "engine": "bun",
+          "phase": "after",
+          "requestedBytes": 1048576,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "1048576"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {
+              "BUN_JSC_useWasmMemory64": "true",
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "sha256": "8199c4efa1c3217d2229bcb35f0699e3fa6946d12edde13df9f871502d26ae1a"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-bun-1048576.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 1048576 passed\n",
+          "stderr": "",
+          "seconds": 4.894034859025851,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-bun-1048576.resources.json",
+          "sha256": "e1c80b2f8bca945f0c1c52eae270ad9964b4f0a7ac52c107df4791a67d14745e",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "bun",
+            "1048576"
+          ],
+          "startedAt": "2026-09-22T09:20:26.287Z",
+          "finishedAt": "2026-09-22T09:20:32.336Z",
+          "peakMemoryBytes": 2036482048,
+          "minimumHostAvailable": 27258220544,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:32.456698+00:00",
+          "engine": "native",
+          "phase": "after",
+          "requestedBytes": 16777216,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "16777216"
+          ],
+          "toolchain": null,
+          "engineBinary": {
+            "path": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-native-16777216.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 16777216 passed\n",
+          "stderr": "",
+          "seconds": 0.3155431130435318,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-native-16777216.resources.json",
+          "sha256": "6d60b95a19dce28664ffd2b64bbee912b0517c1f2d17a3b608c918f5a7f98989",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "native",
+            "16777216"
+          ],
+          "startedAt": "2026-09-22T09:20:32.375Z",
+          "finishedAt": "2026-09-22T09:20:32.854Z",
+          "peakMemoryBytes": 69255168,
+          "minimumHostAvailable": 29183979520,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:32.975749+00:00",
+          "engine": "node",
+          "phase": "after",
+          "requestedBytes": 16777216,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v142-short-read-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "16777216"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v142-short-read-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "sha256": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-node-16777216.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 16777216 passed\n",
+          "stderr": "",
+          "seconds": 5.516402933048084,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-node-16777216.resources.json",
+          "sha256": "300540a2e4eb7b117e9e73f4575071c2eea40052601eec66b308e920c9f344e7",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "node",
+            "16777216"
+          ],
+          "startedAt": "2026-09-22T09:20:32.901Z",
+          "finishedAt": "2026-09-22T09:20:39.049Z",
+          "peakMemoryBytes": 1736052736,
+          "minimumHostAvailable": 27569766400,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:39.178711+00:00",
+          "engine": "deno",
+          "phase": "after",
+          "requestedBytes": 16777216,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v142-short-read-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "16777216"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v142-short-read-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "sha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-deno-16777216.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 16777216 passed\n",
+          "stderr": "",
+          "seconds": 5.77496168599464,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-deno-16777216.resources.json",
+          "sha256": "90418dcb7b7945ba3ee752d31eb6727f72fad633ecded41c5b04e47ae0428532",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "deno",
+            "16777216"
+          ],
+          "startedAt": "2026-09-22T09:20:39.090Z",
+          "finishedAt": "2026-09-22T09:20:45.413Z",
+          "peakMemoryBytes": 1948823552,
+          "minimumHostAvailable": 27383640064,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:45.535685+00:00",
+          "engine": "bun",
+          "phase": "after",
+          "requestedBytes": 16777216,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "16777216"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {
+              "BUN_JSC_useWasmMemory64": "true",
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "sha256": "8199c4efa1c3217d2229bcb35f0699e3fa6946d12edde13df9f871502d26ae1a"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-bun-16777216.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 16777216 passed\n",
+          "stderr": "",
+          "seconds": 5.036344441934489,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-bun-16777216.resources.json",
+          "sha256": "d32a86a40421d684af4376b6a643ede7b123ed260a94bb1638f3fb692148d079",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "bun",
+            "16777216"
+          ],
+          "startedAt": "2026-09-22T09:20:45.453Z",
+          "finishedAt": "2026-09-22T09:20:51.685Z",
+          "peakMemoryBytes": 2057482240,
+          "minimumHostAvailable": 27335086080,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:51.801779+00:00",
+          "engine": "native",
+          "phase": "after",
+          "requestedBytes": 67108864,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "67108864"
+          ],
+          "toolchain": null,
+          "engineBinary": {
+            "path": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-native-67108864.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 67108864 passed\n",
+          "stderr": "",
+          "seconds": 0.3157481859670952,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-native-67108864.resources.json",
+          "sha256": "f39c7272c5f3ac167c83db99cbfd50fd7aa68387b2454c93c541ed0b381627a2",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "native",
+            "67108864"
+          ],
+          "startedAt": "2026-09-22T09:20:51.725Z",
+          "finishedAt": "2026-09-22T09:20:52.193Z",
+          "peakMemoryBytes": 69275648,
+          "minimumHostAvailable": 29281804288,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:52.321492+00:00",
+          "engine": "node",
+          "phase": "after",
+          "requestedBytes": 67108864,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v142-short-read-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "67108864"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v142-short-read-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "sha256": "d95de52ccb76fb2c5775bf176f29f3025e4b19352c092aad51ce5d930717359f"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-node-67108864.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 67108864 passed\n",
+          "stderr": "",
+          "seconds": 5.468871993944049,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-node-67108864.resources.json",
+          "sha256": "0489f807a55efa5ff80d56c33943ad827ee27129acd0f847fbfad41b2bd89715",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "node",
+            "67108864"
+          ],
+          "startedAt": "2026-09-22T09:20:52.230Z",
+          "finishedAt": "2026-09-22T09:20:58.363Z",
+          "peakMemoryBytes": 1750786048,
+          "minimumHostAvailable": 27613466624,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:20:58.499778+00:00",
+          "engine": "deno",
+          "phase": "after",
+          "requestedBytes": 67108864,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v142-short-read-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "67108864"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "engineArgs": [
+              "run",
+              "-A",
+              "--v8-flags=--stack-size=61440"
+            ],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v142-short-read-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "sha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-deno-67108864.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 67108864 passed\n",
+          "stderr": "",
+          "seconds": 5.944633451988921,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-deno-67108864.resources.json",
+          "sha256": "8e739668616cf4b9883a97d071028aef0862c8011c7d703309b0cc457cb2ab0a",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "deno",
+            "67108864"
+          ],
+          "startedAt": "2026-09-22T09:20:58.412Z",
+          "finishedAt": "2026-09-22T09:21:04.915Z",
+          "peakMemoryBytes": 1977679872,
+          "minimumHostAvailable": 27366158336,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      },
+      {
+        "result": {
+          "scope": "Supplementary ordinary-Lean pipe short read, EOF, and zero-length read with a bounded requested capacity. No upstream source changes.",
+          "startedAt": "2026-09-22T09:21:05.041516+00:00",
+          "engine": "bun",
+          "phase": "after",
+          "requestedBytes": 67108864,
+          "source": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+          },
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+            "67108864"
+          ],
+          "toolchain": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {
+              "BUN_JSC_useWasmMemory64": "true",
+              "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bun-stack-reservation.so",
+              "BUN_JSC_maxPerThreadStackUsage": "62914560"
+            },
+            "stackAdjustment": {
+              "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bun-stack-reservation.so",
+              "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+              "osThreadStackBytes": 67108864,
+              "jscStackBudgetBytes": 62914560,
+              "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+            },
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "engineBinary": {
+            "path": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+            "sha256": "8199c4efa1c3217d2229bcb35f0699e3fa6946d12edde13df9f871502d26ae1a"
+          },
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-bun-67108864.resources.json",
+          "code": 0,
+          "stdout": "short read and EOF with capacity 67108864 passed\n",
+          "stderr": "",
+          "seconds": 4.967416869942099,
+          "sourceUnchanged": true,
+          "engineUnchanged": true,
+          "passed": true
+        },
+        "resource": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-after-bun-67108864.resources.json",
+          "sha256": "74884e82248b8038f10165f2ce8d98cb949259b8784211601e67e244b75b80a3",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read.py",
+            "after",
+            "bun",
+            "67108864"
+          ],
+          "startedAt": "2026-09-22T09:21:04.962Z",
+          "finishedAt": "2026-09-22T09:21:11.109Z",
+          "peakMemoryBytes": 2036064256,
+          "minimumHostAvailable": 27258269696,
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "unitReleased": true
+        }
+      }
+    ]
+  },
+  "workerBoundary": {
+    "before": {
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-host-before.resources.json",
+      "host": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/host",
+      "workerSha256": "ebea284543fa12a3711cb622bff5c0b17495f4af96fcd016b1f512c369aecee1",
+      "cases": [
+        {
+          "engine": "node",
+          "command": [
+            "node",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read-host.mjs",
+            ".work/full-artifacts/wasm64-v141-clock-r2-native/host"
+          ],
+          "code": 0,
+          "stdout": "{\"engine\":\"node\",\"rows\":[{\"count\":1048576,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":1048576,\"byteOffset\":0},{\"count\":1048576,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":1048576,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":16777216,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":16777216,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":67108864,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":67108864,\"byteOffset\":0}]}\n",
+          "stderr": "",
+          "observed": {
+            "engine": "node",
+            "rows": [
+              {
+                "count": 1048576,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 1048576,
+                "byteOffset": 0
+              },
+              {
+                "count": 1048576,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 1048576,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 16777216,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 16777216,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 67108864,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 67108864,
+                "byteOffset": 0
+              }
+            ]
+          }
+        },
+        {
+          "engine": "deno",
+          "command": [
+            ".cache/js-runtimes/deno-2.9.7/deno",
+            "run",
+            "-A",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read-host.mjs",
+            ".work/full-artifacts/wasm64-v141-clock-r2-native/host"
+          ],
+          "code": 0,
+          "stdout": "{\"engine\":\"deno\",\"rows\":[{\"count\":1048576,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":1048576,\"byteOffset\":0},{\"count\":1048576,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":1048576,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":16777216,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":16777216,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":67108864,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":67108864,\"byteOffset\":0}]}\n",
+          "stderr": "",
+          "observed": {
+            "engine": "deno",
+            "rows": [
+              {
+                "count": 1048576,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 1048576,
+                "byteOffset": 0
+              },
+              {
+                "count": 1048576,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 1048576,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 16777216,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 16777216,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 67108864,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 67108864,
+                "byteOffset": 0
+              }
+            ]
+          }
+        },
+        {
+          "engine": "bun",
+          "command": [
+            ".cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read-host.mjs",
+            ".work/full-artifacts/wasm64-v141-clock-r2-native/host"
+          ],
+          "code": 0,
+          "stdout": "{\"engine\":\"bun\",\"rows\":[{\"count\":1048576,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":1048576,\"byteOffset\":0},{\"count\":1048576,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":1048576,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":16777216,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":16777216,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":67108864,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":67108864,\"byteOffset\":0}]}\n",
+          "stderr": "",
+          "observed": {
+            "engine": "bun",
+            "rows": [
+              {
+                "count": 1048576,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 1048576,
+                "byteOffset": 0
+              },
+              {
+                "count": 1048576,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 1048576,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 16777216,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 16777216,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 67108864,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 67108864,
+                "byteOffset": 0
+              }
+            ]
+          }
+        }
+      ],
+      "workerUnchanged": true
+    },
+    "after": {
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-prepare.resources.json",
+      "host": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/host",
+      "workerSha256": "fc7c9390b9cf4e006898ecae9a2b95c08d9c99d3e21692563d6398f6814f8d0b",
+      "cases": [
+        {
+          "engine": "node",
+          "command": [
+            "node",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read-host.mjs",
+            ".work/full-artifacts/wasm64-v142-short-read-native/host"
+          ],
+          "code": 0,
+          "stdout": "{\"engine\":\"node\",\"rows\":[{\"count\":1048576,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":3,\"byteOffset\":0},{\"count\":1048576,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":0,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":3,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":0,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":3,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":0,\"byteOffset\":0}]}\n",
+          "stderr": "",
+          "observed": {
+            "engine": "node",
+            "rows": [
+              {
+                "count": 1048576,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 3,
+                "byteOffset": 0
+              },
+              {
+                "count": 1048576,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 0,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 3,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 0,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 3,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 0,
+                "byteOffset": 0
+              }
+            ]
+          }
+        },
+        {
+          "engine": "deno",
+          "command": [
+            ".cache/js-runtimes/deno-2.9.7/deno",
+            "run",
+            "-A",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read-host.mjs",
+            ".work/full-artifacts/wasm64-v142-short-read-native/host"
+          ],
+          "code": 0,
+          "stdout": "{\"engine\":\"deno\",\"rows\":[{\"count\":1048576,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":3,\"byteOffset\":0},{\"count\":1048576,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":0,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":3,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":0,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":3,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":0,\"byteOffset\":0}]}\n",
+          "stderr": "",
+          "observed": {
+            "engine": "deno",
+            "rows": [
+              {
+                "count": 1048576,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 3,
+                "byteOffset": 0
+              },
+              {
+                "count": 1048576,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 0,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 3,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 0,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 3,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 0,
+                "byteOffset": 0
+              }
+            ]
+          }
+        },
+        {
+          "engine": "bun",
+          "command": [
+            ".cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read-host.mjs",
+            ".work/full-artifacts/wasm64-v142-short-read-native/host"
+          ],
+          "code": 0,
+          "stdout": "{\"engine\":\"bun\",\"rows\":[{\"count\":1048576,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":3,\"byteOffset\":0},{\"count\":1048576,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":0,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":3,\"byteOffset\":0},{\"count\":16777216,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":0,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"short\",\"byteLength\":3,\"backingBytes\":3,\"byteOffset\":0},{\"count\":67108864,\"mode\":\"eof\",\"byteLength\":0,\"backingBytes\":0,\"byteOffset\":0}]}\n",
+          "stderr": "",
+          "observed": {
+            "engine": "bun",
+            "rows": [
+              {
+                "count": 1048576,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 3,
+                "byteOffset": 0
+              },
+              {
+                "count": 1048576,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 0,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 3,
+                "byteOffset": 0
+              },
+              {
+                "count": 16777216,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 0,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "short",
+                "byteLength": 3,
+                "backingBytes": 3,
+                "byteOffset": 0
+              },
+              {
+                "count": 67108864,
+                "mode": "eof",
+                "byteLength": 0,
+                "backingBytes": 0,
+                "byteOffset": 0
+              }
+            ]
+          }
+        }
+      ],
+      "workerUnchanged": true
+    }
+  },
+  "packaged": {
+    "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+    "sourceSha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-regressions-r2.resources.json",
+    "scope": "Supplementary packaged ordinary Lean short-read, EOF and zero-read controls in released engines.",
+    "wasmSha256": "b829081e24d0e47f814f3285c62631e495e17a87fbee8cf23ef3ee1129373b84",
+    "workerSha256": "fc7c9390b9cf4e006898ecae9a2b95c08d9c99d3e21692563d6398f6814f8d0b",
+    "cases": [
+      {
+        "engine": "node",
+        "count": 1048576,
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-package-r2/application/main.mjs",
+          "1048576"
+        ],
+        "code": 0,
+        "stdout": "short read and EOF with capacity 1048576 passed\n",
+        "stderr": "",
+        "seconds": 0.2572530879999977,
+        "passed": true
+      },
+      {
+        "engine": "node",
+        "count": 16777216,
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-package-r2/application/main.mjs",
+          "16777216"
+        ],
+        "code": 0,
+        "stdout": "short read and EOF with capacity 16777216 passed\n",
+        "stderr": "",
+        "seconds": 0.2464733750000014,
+        "passed": true
+      },
+      {
+        "engine": "node",
+        "count": 67108864,
+        "command": [
+          "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-package-r2/application/main.mjs",
+          "67108864"
+        ],
+        "code": 0,
+        "stdout": "short read and EOF with capacity 67108864 passed\n",
+        "stderr": "",
+        "seconds": 0.24969085999999516,
+        "passed": true
+      },
+      {
+        "engine": "deno",
+        "count": 1048576,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-package-r2/application/main.mjs",
+          "1048576"
+        ],
+        "code": 0,
+        "stdout": "short read and EOF with capacity 1048576 passed\n",
+        "stderr": "",
+        "seconds": 0.3301519639999897,
+        "passed": true
+      },
+      {
+        "engine": "deno",
+        "count": 16777216,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-package-r2/application/main.mjs",
+          "16777216"
+        ],
+        "code": 0,
+        "stdout": "short read and EOF with capacity 16777216 passed\n",
+        "stderr": "",
+        "seconds": 0.2512444639999885,
+        "passed": true
+      },
+      {
+        "engine": "deno",
+        "count": 67108864,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-package-r2/application/main.mjs",
+          "67108864"
+        ],
+        "code": 0,
+        "stdout": "short read and EOF with capacity 67108864 passed\n",
+        "stderr": "",
+        "seconds": 0.26636895899999946,
+        "passed": true
+      },
+      {
+        "engine": "bun",
+        "count": 1048576,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-package-r2/application/main.mjs",
+          "1048576"
+        ],
+        "code": 0,
+        "stdout": "short read and EOF with capacity 1048576 passed\n",
+        "stderr": "",
+        "seconds": 0.15254515299999913,
+        "passed": true
+      },
+      {
+        "engine": "bun",
+        "count": 16777216,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-package-r2/application/main.mjs",
+          "16777216"
+        ],
+        "code": 0,
+        "stdout": "short read and EOF with capacity 16777216 passed\n",
+        "stderr": "",
+        "seconds": 0.1550339449999883,
+        "passed": true
+      },
+      {
+        "engine": "bun",
+        "count": 67108864,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-package-r2/application/main.mjs",
+          "67108864"
+        ],
+        "code": 0,
+        "stdout": "short read and EOF with capacity 67108864 passed\n",
+        "stderr": "",
+        "seconds": 0.1586697290000011,
+        "passed": true
+      }
+    ],
+    "sourceUnchanged": true
+  },
+  "upstream": {
+    "node": {
+      "execution": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-results-node-v142-short-read/execution.json",
+        "sha256": "3d0c153d85bf313a9dcfc401d7fab9f7417609e874cb694bffa9f0e9e7f337d9"
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "harnessArtifacts": {
+        "before": {
+          "checked": 0,
+          "modified": []
+        },
+        "after": {
+          "checked": 0,
+          "modified": []
+        }
+      },
+      "cases": [
+        {
+          "name": "elab/IO_test.lean",
+          "classname": "elab/IO_test.lean",
+          "time": "5.67369",
+          "status": "run"
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "classname": "elab/async_http_hang_regressions.lean",
+          "time": "9.92924",
+          "status": "run"
+        },
+        {
+          "name": "elab/getline_crash.lean",
+          "classname": "elab/getline_crash.lean",
+          "time": "5.6438",
+          "status": "run"
+        },
+        {
+          "name": "elab/handleLocking.lean",
+          "classname": "elab/handleLocking.lean",
+          "time": "5.27176",
+          "status": "run"
+        },
+        {
+          "name": "elab/readDir.lean",
+          "classname": "elab/readDir.lean",
+          "time": "4.92302",
+          "status": "run"
+        },
+        {
+          "name": "elab/realPath.lean",
+          "classname": "elab/realPath.lean",
+          "time": "5.13519",
+          "status": "run"
+        }
+      ],
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "node",
+        "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v142-short-read-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      }
+    },
+    "deno": {
+      "execution": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-results-deno-v142-short-read/execution.json",
+        "sha256": "ba62144a54e4771ee6fe859b14593c0063730bb89e999a4106a28e9cd3c2fb5f"
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "harnessArtifacts": {
+        "before": {
+          "checked": 0,
+          "modified": []
+        },
+        "after": {
+          "checked": 0,
+          "modified": []
+        }
+      },
+      "cases": [
+        {
+          "name": "elab/IO_test.lean",
+          "classname": "elab/IO_test.lean",
+          "time": "5.88265",
+          "status": "run"
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "classname": "elab/async_http_hang_regressions.lean",
+          "time": "10.5237",
+          "status": "run"
+        },
+        {
+          "name": "elab/getline_crash.lean",
+          "classname": "elab/getline_crash.lean",
+          "time": "5.82302",
+          "status": "run"
+        },
+        {
+          "name": "elab/handleLocking.lean",
+          "classname": "elab/handleLocking.lean",
+          "time": "5.43946",
+          "status": "run"
+        },
+        {
+          "name": "elab/readDir.lean",
+          "classname": "elab/readDir.lean",
+          "time": "5.11047",
+          "status": "run"
+        },
+        {
+          "name": "elab/realPath.lean",
+          "classname": "elab/realPath.lean",
+          "time": "5.36093",
+          "status": "run"
+        }
+      ],
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "deno",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "engineArgs": [
+          "run",
+          "-A",
+          "--v8-flags=--stack-size=61440"
+        ],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {},
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v142-short-read-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      }
+    },
+    "bun": {
+      "execution": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-results-bun-v142-short-read/execution.json",
+        "sha256": "573723c12f78044ddea38c27cd22f29cb1886dd959e0c750bb577cba467e1853"
+      },
+      "originalSources": {
+        "before": {
+          "checked": 7267,
+          "modified": []
+        },
+        "after": {
+          "checked": 7267,
+          "modified": []
+        }
+      },
+      "harnessArtifacts": {
+        "before": {
+          "checked": 0,
+          "modified": []
+        },
+        "after": {
+          "checked": 0,
+          "modified": []
+        }
+      },
+      "cases": [
+        {
+          "name": "elab/IO_test.lean",
+          "classname": "elab/IO_test.lean",
+          "time": "5.26607",
+          "status": "run"
+        },
+        {
+          "name": "elab/async_http_hang_regressions.lean",
+          "classname": "elab/async_http_hang_regressions.lean",
+          "time": "10.0428",
+          "status": "run"
+        },
+        {
+          "name": "elab/getline_crash.lean",
+          "classname": "elab/getline_crash.lean",
+          "time": "5.0893",
+          "status": "run"
+        },
+        {
+          "name": "elab/handleLocking.lean",
+          "classname": "elab/handleLocking.lean",
+          "time": "4.71052",
+          "status": "run"
+        },
+        {
+          "name": "elab/readDir.lean",
+          "classname": "elab/readDir.lean",
+          "time": "4.38674",
+          "status": "run"
+        },
+        {
+          "name": "elab/realPath.lean",
+          "classname": "elab/realPath.lean",
+          "time": "4.54382",
+          "status": "run"
+        }
+      ],
+      "config": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "engine": "bun",
+        "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+        "engineArgs": [],
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+        "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/runtime-support",
+        "leanThreads": 4,
+        "lakeThreads": 1,
+        "bunSmol": false,
+        "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+        "systemAllocator": "mimalloc",
+        "leanAllocator": "mimalloc",
+        "memoryMode": 1,
+        "engineEnvironment": {
+          "BUN_JSC_useWasmMemory64": "true",
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bun-stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "stackAdjustment": {
+          "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native/bun-stack-reservation.so",
+          "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+          "osThreadStackBytes": 67108864,
+          "jscStackBudgetBytes": 62914560,
+          "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+        },
+        "maximumMemoryBytes": 8589934592,
+        "pthreadPoolSize": 5,
+        "backend": "full-lean-wasm64-native",
+        "nativeLeanFallback": false,
+        "environmentAdjustments": {
+          "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v142-short-read-native",
+          "LASM_FULL_APP_PATH": "Selected facade entry point",
+          "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+          "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+          "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+        },
+        "externalTools": {
+          "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/lib",
+          "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/include",
+          "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/share",
+          "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/bin/leanmake",
+          "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+          "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+        }
+      }
+    }
+  },
+  "focusedTests": {
+    "passed": 4,
+    "log": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-host-tests.log",
+      "sha256": "a7ed17335e2d7088e33a66bae6b9fe9e7b19dccdc8b4d9c02e10ea5a4770bca2"
+    }
+  },
+  "resources": {
+    "short-read-host-before": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-host-before.resources.json",
+      "sha256": "b329094db40e0e59f697d7a047f7c6d8e05835ffcda1de454b592fa867d9ee15",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/run-short-read-host.py",
+        "before",
+        ".work/full-artifacts/wasm64-v141-clock-r2-native/host"
+      ],
+      "startedAt": "2026-09-22T09:17:25.647Z",
+      "finishedAt": "2026-09-22T09:17:26.905Z",
+      "peakMemoryBytes": 325554176,
+      "minimumHostAvailable": 29134700544,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    "short-read-host-tests": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-host-tests.resources.json",
+      "sha256": "ed06f67687073678d13353b75a54d29108a44c0b84877cf5263357358fd69a99",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/node-file-worker.test.mjs"
+      ],
+      "startedAt": "2026-09-22T09:19:03.691Z",
+      "finishedAt": "2026-09-22T09:19:04.014Z",
+      "peakMemoryBytes": 41517056,
+      "minimumHostAvailable": 29511204864,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    "short-read-prepare": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-prepare.resources.json",
+      "sha256": "477ace20b85771e59ff536624dbce5b0cc2b291e452dc220418b1c2fcd4200e7",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/prepare-short-read-profiles.py"
+      ],
+      "startedAt": "2026-09-22T09:19:38.904Z",
+      "finishedAt": "2026-09-22T09:19:41.166Z",
+      "peakMemoryBytes": 64552960,
+      "minimumHostAvailable": 29399101440,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    "short-read-regressions": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-regressions.resources.json",
+      "sha256": "73c8b4339aad5e79feba8f0936a95ef2b712b4b3519854170728da9a1801283e",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/run-short-read-regressions.py"
+      ],
+      "startedAt": "2026-09-22T09:21:32.457Z",
+      "finishedAt": "2026-09-22T09:21:32.834Z",
+      "peakMemoryBytes": 24809472,
+      "minimumHostAvailable": 29537480704,
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    },
+    "short-read-regressions-r2": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/short-read-regressions-r2.resources.json",
+      "sha256": "304f529f99cebf7c86f6ae3dcacfc85b8b8b67153a65e43d0f90fadc85e583e9",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/run-short-read-regressions.py"
+      ],
+      "startedAt": "2026-09-22T09:22:01.342Z",
+      "finishedAt": "2026-09-22T09:25:12.961Z",
+      "peakMemoryBytes": 4785639424,
+      "minimumHostAvailable": 26243457024,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true
+    }
+  },
+  "snapshot": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v142-short-read-native/snapshot.json",
+    "sha256": "aa9927bc42525b9ea03d5292e96a0e4ed5d32fc7f52e64925fd7308465486ac6",
+    "wasmSha256": "c0bead0241ebf32eaf4bb05e5514c4a9eb89d29ff1fcaae25443feaaf432c628",
+    "derivation": {
+      "scope": "Private host modules only; unchanged Lean sources, Wasm, and embedded/link-time dispatch.",
+      "changed": [
+        "host/native-file-worker.mjs"
+      ],
+      "parentDerivation": {
+        "source": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/clock-native-relink-r2.resources.json",
+        "scope": "Only the host IO object and wall-clock host adapter change; frozen Lean/runtime libraries, scheduling and public Lean APIs remain otherwise unchanged.",
+        "implementationSha256": "9036001a92203210448ca22fc24a5731340403ae488949af23fe0d63faad17a1",
+        "commands": [
+          [
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/em++",
+            "-DLASM_FULL_NATIVE_THREADS=1",
+            "-D",
+            "LEAN_USE_GMP",
+            "-Wall",
+            "-Wextra",
+            "-std=c++20",
+            "-D",
+            "LEAN_CHECK_OLEAN_VERSION",
+            "-D",
+            "LEAN_EMSCRIPTEN",
+            "-s",
+            "ALLOW_MEMORY_GROWTH=1",
+            "-sMEMORY64=1",
+            "-fwasm-exceptions",
+            "-pthread",
+            "-ffp-contract=off",
+            "-D",
+            "LEAN_MULTI_THREAD",
+            "-DLEAN_BUILD_TYPE=Release",
+            "-DLEAN_EXPORTING",
+            "-D__CLANG__",
+            "-fPIC",
+            "-O3",
+            "-DNDEBUG",
+            "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/clock-source",
+            "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+            "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/clock-headers",
+            "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native",
+            "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/libuv/src/libuv/include",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/clock-source/node-io.cpp",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/clock-source/node-io.cpp.o"
+          ],
+          [
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/emar",
+            "r",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib/lean/liblasmhost.a",
+            "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/clock-source/node-io.cpp.o"
+          ]
+        ],
+        "linkCommand": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/em++",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib/temp/libleanmain.a",
+          "-lc++",
+          "-lc++abi",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib/lean/liblasmnative.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib/lean/liblasmtools.a",
+          "-Wl,--whole-archive",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib/lean/liblasmhost.a",
+          "-Wl,--no-whole-archive",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support/host-pre.js",
+          "--js-library",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support/host-library.js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib/temp/libleanshell.a",
+          "-lleancpp",
+          "-lInit",
+          "-lStd",
+          "-lLean",
+          "-lnodefs.js",
+          "-lleanrt",
+          "-lc++",
+          "-lc++abi",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-lnodefs.js",
+          "-s",
+          "EXIT_RUNTIME=1",
+          "-s",
+          "NODERAWFS=1",
+          "-s",
+          "MAIN_MODULE=2",
+          "-s",
+          "ERROR_ON_UNDEFINED_SYMBOLS=0",
+          "-sEXPORTED_FUNCTIONS=@/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lasm-wasm-exports.json",
+          "-sEXPORTED_RUNTIME_METHODS=FS,ENV,callMain,ccall,UTF8ToString,stringToNewUTF8",
+          "-sSTACK_SIZE=16777216",
+          "-sINITIAL_MEMORY=134217728",
+          "-sMAXIMUM_MEMORY=8589934592",
+          "-sPTHREAD_POOL_SIZE=5",
+          "-sPROXY_TO_PTHREAD=1",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/runtime-support/emscripten-pre.js",
+          "-lLake",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/include",
+          "-O3",
+          "-DNDEBUG",
+          "-O1",
+          "-g2",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/bin/lean.js",
+          "-L/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v141-clock-r2-native/lib/lean",
+          "-sMALLOC=mimalloc",
+          "-sMAXIMUM_MEMORY=8589934592",
+          "-sPTHREAD_POOL_SIZE=5",
+          "-sGROWABLE_ARRAYBUFFERS=1",
+          "-sSTACK_OVERFLOW_CHECK=2",
+          "-sSTACK_SIZE=67108864",
+          "-Wl,--export=__cpp_exception",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/lib/lean/libgmp.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/libuv/src/libuv/libuv.a",
+          "-lm",
+          "-pthread"
+        ],
+        "flagsSha256": "515eefedfd44bbe4b69d14f6b403460206e132701d92f2998b94392d79507afc",
+        "headerSource": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+        "headers": {
+          "stdlib_flags.h": "ea23e161e21231081217f582f3b48523b03257b8de642348b7411d274a605c45",
+          "library/annotation.h": "77095b1c3a52977b6ca6d479dc744cf4ab6e2ecbefa2bc2bd4fedb881d5f38e8",
+          "library/constants.h": "938c30f0f600ebb2de1c737d45b4b2a2e1a17cf75f08065974f2321704124d71",
+          "library/print.h": "39d7e2a1ae420285a72c5adf5edb0c081dc05e6a0dae62ec7d9eec1fee96a629",
+          "library/formatter.h": "b9b0fea7aa52902c198dce49da34bcb4800ef892f555fdd27ad85b7caa4de0b5",
+          "library/bin_app.h": "8d5aadef7b88ec3d21c46afee19fc886f74245db48da5144f8e22224eef0e856",
+          "library/init_module.h": "5d5b877b7f7e5a993fe15cf3a76d85ba8f6921ec1623ecee716878eaa32a2d7d",
+          "library/dynlib.h": "79c5a695f0c4aa194eed04800fe0cec258f8887cc15ce9d79d3553217252f688",
+          "library/max_sharing.h": "78454714638a9b3f9b056536af86577dc907476d435d657874a57fcc63c65eb5",
+          "library/expr_lt.h": "5d0b2e6a076a7e876533badca64e015356bd3f5c5aebf0acf1990d6545b3ac58",
+          "library/ir_types.h": "e493acd2584f0951f2475157183fe9273478d9f3a7eb4cb7eb602215f2f1c8a5",
+          "library/profiling.h": "c1537cf2f6a8ee53b56a520591d4a7ad5283347461d64ad0fb8747d0d9ffe8b7",
+          "library/num.h": "3adb1a1d229acca598bb035ca31dfc55b3808e289ee277ec6ddffaa4dae1f2cf",
+          "library/elab_environment.h": "3035a8335a39d4262167f36b4c15f3c12fcf410b8d4c03e55d94089a640dbea2",
+          "library/init_attribute.h": "ae811272da6ec6dc22822abff4768efaa3689419eb3f7e53fef913a21799a999",
+          "library/replace_visitor.h": "859a5ca35b7dd85b31ecdf9f4829a25ca22320028e74877084d6a74b6a746da0",
+          "library/ir_interpreter.h": "d2de52d3e55718740a5603e2f7125514db4173304f04781c47d1eb62ee1f0292",
+          "library/module.h": "6934a733bf52d2350590ca949c329e0761039d062fd8344191d7d36c37941d5c",
+          "library/util.h": "82911dea3e2b60c3876f8dda2bc10ffc59b0a6254a5b5c55bb70439e56f958e3",
+          "library/expr_pair_maps.h": "5bfcba1640ca9fd0a2aeee7544424e168f16b8e2b403aa67bb7db853dbd55513",
+          "library/scope_cache.h": "6927904c79723a7271df4b99099ff5cdf95ae3a4be3c8cc63e5ed04f0afd9f0e",
+          "library/suffixes.h": "06ba7a3f08d932b8d931f0a5eec40a920d42a7283c67d9897afd38f20afb86b3",
+          "library/expr_unsigned_map.h": "8b612be2cfcb10c15ef66ac647a7ad0c83a53650b0a41932a566640a39b2e2db",
+          "library/time_task.h": "44726bb0c74c6b9b887e26c00abe8913885c40556b58c21adb3e949a9ceb7b2e",
+          "library/expr_pair.h": "8adbc87abb27e6dfd1197ea9a73d079486cb019e5287564df71fbec45c4dc018",
+          "runtime/interrupt.h": "15558f09a19d42e149b2fbdc505ccc24224594a3f1e2cc2f4745a011cc036168",
+          "runtime/apply.h": "712c1104bd8f89c66053b1c7502d71950fbae075d999b21a03cfb2a13f7ffe81",
+          "runtime/io.h": "336b5987c52cd5d6dc2b52937fa14e057bc21fa12277654a17fec36b3952c1a8",
+          "runtime/init_module.h": "095cf46f19f2c17482a13fcb73d9ba63b208f44c751fd7eafeeafa4ffc582458",
+          "runtime/memory.h": "bb5ad661f13da089cc2613105bdf4d43da9f02985dde4881b4f2d176e7397fb7",
+          "runtime/pair_ref.h": "bfff9b9fe8c9f9eabbb1c19c7a1ea50b2fbcb2097fe869d0ab87fb04c7b46d57",
+          "runtime/process.h": "0cfaa2ce2357ca18928e1e24145b85702fd9d3d8fc464599ddd981036763e1d4",
+          "runtime/string_ref.h": "a970beded7021919ba0b5be211941c42e67ad0f6cd212e1d9fd6ad557d1c9f5e",
+          "runtime/compact.h": "89c7868a99e9f494313a5ce6286cf41194e60fea0e0c7178947a0f8ad3673ab6",
+          "runtime/alloc.h": "8f9f900c2bff6a908084ef4301a3c10efd8d72eb72044702ac024132b12211b1",
+          "runtime/debug.h": "c3a490a0f1bd1a3e5a81168993c8f5b27a88cda5d1e3b5071259fa2e8d556b68",
+          "runtime/mutex.h": "f98501392d7280a7f737b13e311cd5b55e4eb45c71c3ac07674a70d97c97ffca",
+          "runtime/buffer.h": "9fac1c6513f865a514d62c6773c3a44b651d9179841bcb03cf57572da9e57f1b",
+          "runtime/platform.h": "321b81d14add0fad94445f011a1519c42d63fabde74674d7edb763bbc7690a00",
+          "runtime/byteslice.h": "c65aafe56d1f8b2750ad3c564075b5894941e23895b792476f9dd7208ddd6a70",
+          "runtime/object.h": "cc791a834258f0d090f244a653fe8f07b27ffe731f7b3a1284aff4a340cf068d",
+          "runtime/optional.h": "5b7203ed999f38ff8de98af5e78c1be8a0bcb49999db6ccd83a686fc79d83012",
+          "runtime/mpn.h": "5460f152eb6ce3cb36426323fe409e2fc334e0752814c8686fc54ea0a2327643",
+          "runtime/int.h": "03f06e9ef0d52d6e12b6b88c1f4cc6cd7b8b4eb0c99bf82638a8df32169639dc",
+          "runtime/openssl.h": "805a25414cc0232a11c24d43d20ea2e5e1fb51db6ebb0f9473fa3174da4d9869",
+          "runtime/hash.h": "fe27044afcc40e24c69287cbd7c5b6ac4989221cdfb839dd00c8b3831609155a",
+          "runtime/mpz.h": "55c75c2ccec025dfbadd15c9331a320cebe0f391f4aa36305845ca6b1dc2cb98",
+          "runtime/thread.h": "d57462a8b21e00df4016a3d7805a609487d004f69319d1f6189c91618ef98269",
+          "runtime/exception.h": "58834ad1df155aa675726aed25e84fcd36201dc2cfdeead8d85fb1836ef4bd87",
+          "runtime/flet.h": "d0f0157089320ebe2db1890432810aba0ed1e2915681dbfd01660c7240babc87",
+          "runtime/option_ref.h": "e4664b6095c48f86afe33af03bfbd99c1322453c48c7a59742963f2dc476aa41",
+          "runtime/array_ref.h": "70c503a619e4088f9b3c1cabd9fc5537fa5eae1e0974a4ccc4993110cc685cc9",
+          "runtime/sharecommon.h": "f84596bdc8e58b4c3df436f7ff3eaf0f07accd74a9b335d66937fc1261d1e60e",
+          "runtime/utf8.h": "b058ce07b43a3def7af16ad8061127336340ce7a5bb219b13468414d1ffd1b48",
+          "runtime/sstream.h": "16734d5b8c46bc9a33e0bbdc506c23f5eea93c0cd31336d319f4ea16843cdf75",
+          "runtime/libuv.h": "2385b844bc0f26fb40e4d3d72cbf7b32383cf523b72cd577bc93bf829c428062",
+          "runtime/list_ref.h": "7982bc536e7a039395e08689676a4ea414196804a6a05ab4e4b5709cfcc27f61",
+          "runtime/stack_overflow.h": "06163784341b6d50df5f201406991031af75764faad53e61be3cefab5109fe8d",
+          "runtime/allocprof.h": "95f9b60d85c3966161b01d298dd2f1b65f9a3dad913356fc71775bedff9a3b18",
+          "runtime/stackinfo.h": "0533c89253e1cc74122575e5a47c58e9b9d412e2a146d9ca5f9eae994879e3f1",
+          "runtime/object_ref.h": "7acbddd207cf4932f810b6d7f96691aa95d5a1d58a0257b44911281bd10a77d5",
+          "initialize/init.h": "aae57f746cbdbdc97cc068dde4b70a0f7355338f0d40b07709c66c435c1318aa",
+          "lasm/node.hpp": "12756d4ab0f75c72bb3cb02311e2d6dd471dc027e3278458b8af6c0ccf4aa3f3",
+          "util/output_channel.h": "9967d8fefd118ef62743ac53d51d3696279fd6da84785a2eddaf5a6a758a90f1",
+          "util/options.h": "1d46ed726dd37c90d4c45df5314d70238e40bbc6fabfb1e99dc4510c05df8116",
+          "util/option_declarations.h": "76c13a078331a7a2f42c09eaaedb99041853675009f9849b796aecc7af83cc69",
+          "util/io.h": "eaf2368487d36852ad6700d0dbc67985f39fef780eb69d20916b460891c61136",
+          "util/timeit.h": "f6746d415d2ab3d1942baebe95ac94d2df55984c29a4f81d0cac7470efe4d9b2",
+          "util/name_map.h": "92809c2116ad28a22a69a8c0864790aae7fc5e8d70e6f461e3c9c5ca729c8f8b",
+          "util/init_module.h": "4db26a91d7ccd9b4af29d4d5c4b2ea83fb3d4d59b4ad3c3f7e330b7ae93c7e47",
+          "util/bit_tricks.h": "10f8503ee3e3b77fb49d8b17a12441de8fa6c7937c8cd6a5c233a3e038d3ef28",
+          "util/macros.h": "e2fcf3995cae6bde05672486a81d237d5c9d1800c6e31bce8919700bd563ea43",
+          "util/unit.h": "de048993362e8d4e0bbe15a84d8589973e7b379757e955fc36fa11e7ae863770",
+          "util/exception_with_pos.h": "167ed7652f4b9726b559c0afa34f2dae1124a96e42cd7465fc50b52c32913553",
+          "util/alloc.h": "4f748fb10e008242068a25806ce9ab072c8107b6775321a9920b72c009129aa6",
+          "util/ascii.h": "485086905e99fb305a8b83acdcc4fe91a74152bfcf4993249ff682cd4e9ac26b",
+          "util/list_fn.h": "2476fcbb0b7f4f55b66f68d4f0cd1fa9fde57bf0250673af0ec0c7b0e25e5805",
+          "util/message_definitions.h": "de0946255475f6f5d9a82ca5b875fc7c962dc1c91ff4de8ce0159415843b2598",
+          "util/test.h": "735ac28dc3100a15a7400330c687882dff3d8b1ee7bb6193db4a121e727c51f0",
+          "util/map_foreach.h": "b2e37ae85180290065d8e42cd5fc79cffa4d03a2fd5528e36627407f2b53da62",
+          "util/null_ostream.h": "a58cf49c525389fe050a5d8ce5335a36662293ff9548af1b730526c30a355c73",
+          "util/rb_tree.h": "ee5c325ab1d6ef9c20ff2a4c4be6d7778f715def97087adea2cfad3f39dbb78b",
+          "util/freset.h": "8e65187adfe773ad6857d308f4c0d03d590c4ab2c9212ffa3ca29dd5e8a8788d",
+          "util/unlock_guard.h": "44c078c7fe129c5404a4bcca114009c455e30163a87cf46db566417095caaff2",
+          "util/list.h": "7d44417a7748eeae8ba8c561bba9e2273dbdadc35b9d9f70181bd6baff68ae8e",
+          "util/nat.h": "f83a35081ce5a9e866dfc2142f94440a3ab037a279dd757b3b64806698f3acbe",
+          "util/name_hash_set.h": "7f88372821f5c6a6f92bd9f30711fcccfc7a0ed900aaade0108ae2c9c230139f",
+          "util/name_set.h": "8dae7819c11a9c49a56e5d2661a5c56de642f139d73307b3866d4d63a105a886",
+          "util/rb_map.h": "d5d942aa362b4efad6b71142c02a1f4f691287f047daa3391ddef042641575ab",
+          "util/rc.h": "117237ffad3f83082da016822f16e443ab794ac54c9acbdbb2ef5eb40a5aa388",
+          "util/name_generator.h": "eb5cb15bc7ea5120163c685d2bbf1536d2acccef5aa5d6f287f51c21fbd60858",
+          "util/kvmap.h": "6cae76290df9ebc70ae126c5e9561c3e18d8b5963defbbf703472d821068eaab",
+          "util/timer.h": "d9b74fa1f5db02c51743c2922483c5d5326a69e2d44f1945fdaf39258bd9076e",
+          "util/escaped.h": "05e7d5a1495291d995c7d404131dd036008ad31c369c7f4f1db104cf6e5e50e8",
+          "util/name.h": "604f5351cfcd65019f8a30c4c09b917204bc1b9dc53d123d6f530627d75cfd98",
+          "util/lbool.h": "db705d9d3b62927452d66deb08d4bc2a2f62242013d08e4c8e0039f82a1b249f",
+          "util/pair.h": "790cde8c11b1ef6605413be349b16f4468cbf2d80aa16d7d2816495eb5cd4b18",
+          "util/name_hash_map.h": "cbc2b8204ff715c58ecdbc049e816e8ab8a96eda8113bd0b5af0edd505845168",
+          "util/path.h": "7b3c32ea67d68a18162322e05da3cab81028ce11ac5fb45f4ec1264ddc1800d0",
+          "kernel/level.h": "ee14a60344736656c45f7ac8df0dd2f305a49dc0eda1d410de9f6ee81bee6386",
+          "kernel/declaration.h": "eb9c497bb19dab26550cbb5196a13e0a925896c6d357a8faa2f3794c1e798a51",
+          "kernel/environment.h": "95e9b7aad9f138830197972c1812ca206317dae059ace9b7815674beec8500ed",
+          "kernel/kernel_exception.h": "58facd4e272a08b5b646fe1af1d26c60a9fad3185928326fa53479068dd1e24c",
+          "kernel/expr_maps.h": "9407344e004017991dbcd91bde689aa78be2e012254899c49aafc2f531272f2d",
+          "kernel/init_module.h": "0e7d2fe1c9d51b0d0f3df183bd7b76320bd7e1d3da82b70534bd8beb580fa9ff",
+          "kernel/expr_cache.h": "99fa32315261934532693eeeac05b979ea3ce7419d42e521a70f02f2eea7d2b2",
+          "kernel/replace_fn.h": "6b3a850ce10b5646a8d40011ff228f6d3223dc9a79136417bc586588d1aa8e76",
+          "kernel/expr.h": "1656fb21db578f6d2e8f3e2c0b2268f08c4ed285bf8b5f6440a483c3ced85f48",
+          "kernel/expr_sets.h": "e17ecdf51f54fd58331e8e6f02429f3abc5ea030aca3849f07d86167ffd5e7cb",
+          "kernel/instantiate.h": "82c29aeb56dfbdb68fc0266df21805a891c28b4c4ed9032e70602e709b532264",
+          "kernel/for_each_fn.h": "4a794526ef4deb15e42bb5f32669dcf737a830773f5862eff2449cfc2edb9162",
+          "kernel/local_ctx.h": "eeb577638aa32f799a8dfe15fdc1194413e8902fd854a739546dcae11f638b77",
+          "kernel/trace.h": "e94af418fd934153c6ddb99950a315c5d54e6c0155abba8b9263a0f7b1f76e45",
+          "kernel/abstract.h": "d1792dd710faadc3afabe587fd6b0c2679faca898465940386f0feda48a7caf2",
+          "kernel/equiv_manager.h": "1fb019d51aa2f2e505844d75a509a839e21c04db8f92f264a0ca0d0d21b4ec16",
+          "kernel/quot.h": "17105c835e79ccb397194e9663dba71b5515edbc89c9698b0d58a95dc30a8243",
+          "kernel/find_fn.h": "deaa2f562ebb63644e37244f5bf9db6f349385527d765b67a07a9524ed47eff9",
+          "kernel/inductive.h": "0c800b0377e7aa74a8a53a9f98ce61ab9df02ea62f917fc8e59db07189fddc98",
+          "kernel/expr_eq_fn.h": "ad010ccbc56f48abb3b94c3009e7c2d04ac0455f5d12a6ad7b7a797e39f65f3b",
+          "kernel/type_checker.h": "2e0d3a93e413f37f7a3249fb9e111bce0ac812e966ebe254283d7acd224592b1",
+          "library/constructions/init_module.h": "132cfbcf8d632f0fd28f07e9488ec74537b8d0d622777e4eb0e869eabcbe9707",
+          "library/constructions/no_confusion.h": "b84044552e39dc861cbf59d1f25413f4cc9cafc3df54bd03d0cbc5f19d19ba9a",
+          "library/constructions/util.h": "a3f02d9c2524a1d09333b7de4d9f32385dcfb4ec6a8d7d7ca4f2cf5f88670cc1",
+          "library/constructions/cases_on.h": "adf0e61ec9c1b36fb9295c06df255ae2ab0ac0692e8d6b025b01458ed2deb850",
+          "runtime/uv/udp.h": "6084b39c43f5b15956638e6d594bc685f743b045746e3b5441d1669af9fcdb87",
+          "runtime/uv/tcp.h": "99948620a9abaac8a58d26e086f97d2ee58a387c9541615223252bc97be77aa3",
+          "runtime/uv/dns.h": "a9b84050b0f1d2d15eb4c8f7e2132162894a15b54b9b0c6187730d6120d62d5a",
+          "runtime/uv/event_loop.h": "f55920ffb3779a6ef36f8c19c55abe58e835de938264589b4d7f193149f78ca2",
+          "runtime/uv/signal.h": "d8ecb35bca78f0cdb54cec2c2a0cfb20a5e6cc046a727f8eaaeb6d575c9908ff",
+          "runtime/uv/net_addr.h": "451557925b9052d21ad906d25ee92e2ec935a4a1e6cf1b9d7d904b96318b088d",
+          "runtime/uv/timer.h": "1b86d58e6180eb4973b5978a8c416a7db77955a48acd3995eb070afcd87f2d99",
+          "runtime/uv/system.h": "b6de08b1b576da7739f7e1829370c5425b2ea5c1207ffffc5c802a53008b7111",
+          "include/lean/lean_libuv.h": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "include/lean/lean_gmp.h": "f4dd6a073992fa8b9d776e9ff44b70133afdfd68f72823b19d1bfe63b247939d",
+          "include/lean/lean.h": "4686c58939defda8658959c2e402baf988f4bbb2d570d8dcf44240e757f32230"
+        },
+        "originalArchiveSha256": "6b1540c3603af0fa8e0c1eb02cf25b584231c8b0b22e923dca894a981e4362ef",
+        "archiveSha256": "123a5a85eb14b0974549b7b7a0ce5b9014622d5cfbda9b8b773d513dc525a169",
+        "archiveMembers": [
+          "node-io.cpp.o",
+          "node-async.cpp.o",
+          "node-system.cpp.o"
+        ],
+        "startedAt": "2026-09-22T08:49:51.626766+00:00",
+        "exitCode": 0,
+        "finishedAt": "2026-09-22T08:50:36.890225+00:00"
+      },
+      "wasmSha256": "c0bead0241ebf32eaf4bb05e5514c4a9eb89d29ff1fcaae25443feaaf432c628",
+      "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot."
+    }
+  },
+  "inputs": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/src/native-file-worker.mjs",
+      "sha256": "fc7c9390b9cf4e006898ecae9a2b95c08d9c99d3e21692563d6398f6814f8d0b"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/test/node-file-worker.test.mjs",
+      "sha256": "3fba5ad66ef0068412b154bdb3315ddf5ce41ab5e5c084087e605ea2d1681e73"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/ShortReadAllocation.lean",
+      "sha256": "533eea016b0a57d8a2cc5e02cc96a8b04550c95627a0874eaac314e21c0f1169"
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/probe-short-read-host.mjs",
+      "sha256": "765878a879eabd02022b67e977ab886bf6794b8b4c9b4543378995e0cbc38683"
+    }
+  ]
+}

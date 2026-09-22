@@ -16,10 +16,15 @@ port.on('message', async ({ operation, args }) => {
     if (!operations.has(operation)) throw new Error(`Invalid native file operation: ${operation}`);
     let value = await files[operation](...args);
     if (operation === 'open') value = { stream: value.stream, fd: value.fd, type: value.type };
-    // Large read buffers can move without a second allocation. Small pooled
-    // Buffer slabs are cloned because other live buffers may share their storage.
-    const transfer = Buffer.isBuffer(value) && value.byteOffset === 0
-      && value.byteLength === value.buffer.byteLength ? [value.buffer] : [];
+    // Move full allocations directly. A short read or pooled Buffer must copy
+    // only its returned bytes: cloning the view would clone its entire backing
+    // allocation, even at EOF. A fresh Uint8Array also leaves pooled peers live.
+    const transfer = [];
+    if (Buffer.isBuffer(value)) {
+      if (value.byteOffset !== 0 || value.byteLength !== value.buffer.byteLength)
+        value = new Uint8Array(value);
+      transfer.push(value.buffer);
+    }
     port.postMessage({ ok: true, value }, transfer);
   } catch (error) {
     port.postMessage({ ok: false, error: { message: error.message,
