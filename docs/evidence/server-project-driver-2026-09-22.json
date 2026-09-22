@@ -1,0 +1,3342 @@
+{
+  "recordedAt": "2026-09-22T20:48:18.831846+00:00",
+  "scope": "Optional parallel harness compiles the byte-identical original Lean test driver once and forwards the exact server_project -p FILE and server_interactive FILE arguments. Original test sources, server/compiler children, expectations, four-worker defaults and guard limits remain unchanged.",
+  "baseline": {
+    "test": {
+      "name": "misc_dir/server_project",
+      "attempts": [
+        {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v145-runtime-metadata-broad/01342-d7818af0",
+          "status": "resource-aborted",
+          "startedAt": "2026-09-22T18:31:12.539Z",
+          "exit": {
+            "code": 125,
+            "signal": null
+          },
+          "finishedAt": "2026-09-22T18:32:40.063Z",
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v145-runtime-metadata-broad/01342-d7818af0/resources.json",
+          "peakMemoryBytes": 8604389376,
+          "originalSources": {
+            "before": {
+              "checked": 7267,
+              "modified": []
+            },
+            "after": {
+              "checked": 7267,
+              "modified": []
+            }
+          },
+          "harnessArtifacts": {
+            "before": {
+              "checked": 10,
+              "modified": []
+            },
+            "after": {
+              "checked": 10,
+              "modified": []
+            }
+          }
+        }
+      ],
+      "status": "resource-aborted"
+    },
+    "resources": {
+      "startedAt": "2026-09-22T18:31:12.594Z",
+      "command": [
+        "python3",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+        "env",
+        "BINARYEN_CORES=1",
+        "EMCC_CORES=1",
+        "CMAKE_BUILD_PARALLEL_LEVEL=1",
+        "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+        "--suite",
+        "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v145-runtime-metadata-driver",
+        "--results",
+        "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v145-runtime-metadata-broad/01342-d7818af0/results",
+        "--jobs",
+        "1",
+        "--filter",
+        "^misc_dir/server_project$"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "805f7fba-b74f-4d3e-a69a-a789b0148886",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 28435927040
+      },
+      "minimumHostAvailable": 20810915840,
+      "peakMemoryBytes": 8604389376,
+      "peakTasks": 109,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v145-runtime-metadata-broad/01342-d7818af0/resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-22T18:32:39.913Z",
+        "memoryBytes": 97366016,
+        "peakMemoryBytes": 8604389376,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 69283840,
+          "file": 25636864,
+          "kernel": 2179072,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 25636864,
+          "slab": 313056
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "highWaterProcesses": {
+        "at": "2026-09-22T18:31:51.057Z",
+        "processes": [
+          {
+            "pid": 2679598,
+            "name": "MainThread",
+            "residentBytes": 2373820416,
+            "threads": 18
+          },
+          {
+            "pid": 2679678,
+            "name": "MainThread",
+            "residentBytes": 1544503296,
+            "threads": 22
+          },
+          {
+            "pid": 2679654,
+            "name": "MainThread",
+            "residentBytes": 1239470080,
+            "threads": 18
+          },
+          {
+            "pid": 2679630,
+            "name": "MainThread",
+            "residentBytes": 1111732224,
+            "threads": 16
+          },
+          {
+            "pid": 2679705,
+            "name": "MainThread",
+            "residentBytes": 630996992,
+            "threads": 12
+          },
+          {
+            "pid": 2679454,
+            "name": "MainThread",
+            "residentBytes": 114610176,
+            "threads": 11
+          },
+          {
+            "pid": 2679467,
+            "name": "ctest",
+            "residentBytes": 34287616,
+            "threads": 2
+          },
+          {
+            "pid": 2679469,
+            "name": "bash",
+            "residentBytes": 3895296,
+            "threads": 1
+          },
+          {
+            "pid": 2679597,
+            "name": "bash",
+            "residentBytes": 2547712,
+            "threads": 1
+          }
+        ]
+      },
+      "stoppedBecause": "Workload reached its proactive memory budget",
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-22T18:32:40.032Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 38141952,
+        "peakMemoryBytes": 8604389376,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10240000,
+          "file": 25640960,
+          "kernel": 1060864,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 25640960,
+          "slab": 227872
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-22T18:32:40.058Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": true,
+      "memoryThrottled": false
+    },
+    "limitation": "The retained budget stop used v145; successful controls use the separately recorded v146 plugin-loader repair as well as the expanded compiled-driver harness. This is not a fresh same-build interpreted-driver performance comparison."
+  },
+  "engines": [
+    {
+      "engine": "native",
+      "campaign": "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver",
+      "identity": "3d1979d24b44e03ed5e83cbed769707c402b8b8e0bd6d180e8e2f0dd9fd3acfe",
+      "driver": {
+        "version": 1,
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "prefix": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0",
+        "engine": "native",
+        "config": null,
+        "linkStrategy": "Ordinary Leanc invocation.",
+        "source": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean",
+        "sourceSha256": "56410b1b00e9f04bb326741df718a7e3c6bf51de85481ce1cb2aff2304cd8fff",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/server-driver-native-v146-lean-symbol-loader/driver",
+        "scope": "Unchanged upstream server-test driver compiled ahead of time. Server and test sources still use the selected full compiler; this is an optional parallel harness.",
+        "startedAt": "2026-09-22T20:38:55.732Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-native-build.resources.json",
+        "commands": [
+          {
+            "command": [
+              "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+              "-Dlinter.all=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-native-v146-lean-symbol-loader/driver.c",
+              "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean"
+            ],
+            "startedAt": "2026-09-22T20:38:55.732Z",
+            "finishedAt": "2026-09-22T20:38:56.112Z",
+            "code": 0,
+            "signal": null
+          },
+          {
+            "command": [
+              "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leanc",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-native-v146-lean-symbol-loader/driver",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-native-v146-lean-symbol-loader/driver.c"
+            ],
+            "startedAt": "2026-09-22T20:38:56.112Z",
+            "finishedAt": "2026-09-22T20:38:56.774Z",
+            "code": 0,
+            "signal": null
+          }
+        ],
+        "artifacts": {
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-native-v146-lean-symbol-loader/driver": "f82401b807b0bb52ecf220e5c81d3ac4f8f2b26abf35e108b1edc1b47b97babc",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-native-v146-lean-symbol-loader/driver.c": "fdb21d4c18d1e1edcc6f1283029f60bb96e3960a337ddde8e05d1726e4cc160e"
+        },
+        "finishedAt": "2026-09-22T20:38:57.112Z"
+      },
+      "suiteChanges": [
+        "Generated environment points to the selected toolchain and isolated source copy.",
+        "LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.",
+        "Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.",
+        "The exact server_interactive and misc_dir/server_project run_test.lean invocations use their byte-identical unchanged source compiled ahead of time in the selected engine, preserving all driver arguments. Server/compiler children and expected outputs are unchanged. This is a distinct optional harness; its driver artifacts are verified before and after each run.",
+        "Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.",
+        "A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.",
+        "MAKEFLAGS supplies LEAN_AR=/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/llvm-ar instead of the release builder path embedded in lean.mk.",
+        "CTest timeout is explicit; no test or expected-output source is edited."
+      ],
+      "controls": [
+        {
+          "name": "server_interactive/cancellation_empty_by.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00001-94c3b26b",
+            "status": "passed",
+            "startedAt": "2026-09-22T20:39:02.627Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T20:39:05.035Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00001-94c3b26b/resources.json",
+            "peakMemoryBytes": 314105856,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 5,
+                "modified": []
+              },
+              "after": {
+                "checked": 5,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "startedAt": "2026-09-22T20:39:02.672Z",
+            "command": [
+              "python3",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+              "env",
+              "BINARYEN_CORES=1",
+              "EMCC_CORES=1",
+              "CMAKE_BUILD_PARALLEL_LEVEL=1",
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-lean-symbol-loader-driver",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00001-94c3b26b/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/cancellation_empty_by\\.lean$"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "bb7472e8-b753-474d-9a16-d94821430f1e",
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 28638523392
+            },
+            "minimumHostAvailable": 28334678016,
+            "peakMemoryBytes": 314105856,
+            "peakTasks": 38,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00001-94c3b26b/resources.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-22T20:39:04.878Z",
+              "memoryBytes": 114995200,
+              "peakMemoryBytes": 314105856,
+              "swapBytes": 0,
+              "tasks": 11,
+              "memoryBreakdown": {
+                "anon": 103182336,
+                "file": 8544256,
+                "kernel": 2330624,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 7020544,
+                "slab": 384568
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "unitReleased": true,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T20:39:05.003Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 21843968,
+              "peakMemoryBytes": 314105856,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10231808,
+                "file": 8548352,
+                "kernel": 1142784,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 7024640,
+                "slab": 298648
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-22T20:39:05.028Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          },
+          "execution": {
+            "startedAt": "2026-09-22T20:39:03.333Z",
+            "finishedAt": "2026-09-22T20:39:04.951Z",
+            "backend": "native",
+            "registered": 3896,
+            "command": [
+              "--test-dir",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-lean-symbol-loader-driver/run",
+              "-j",
+              "1",
+              "--no-tests=error",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00001-94c3b26b/results/results.xml",
+              "-R",
+              "^server_interactive/cancellation_empty_by\\.lean$"
+            ],
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 5,
+                "modified": []
+              },
+              "after": {
+                "checked": 5,
+                "modified": []
+              }
+            },
+            "leftoverProcessCleanup": [],
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00001-94c3b26b/resources.json",
+            "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+          },
+          "junit": [
+            {
+              "name": "server_interactive/cancellation_empty_by.lean",
+              "classname": "server_interactive/cancellation_empty_by.lean",
+              "time": "0.936792",
+              "status": "run"
+            }
+          ]
+        },
+        {
+          "name": "misc_dir/server_project",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00002-9df51376",
+            "status": "passed",
+            "startedAt": "2026-09-22T20:39:05.035Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T20:39:13.439Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00002-9df51376/resources.json",
+            "peakMemoryBytes": 486244352,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 5,
+                "modified": []
+              },
+              "after": {
+                "checked": 5,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "startedAt": "2026-09-22T20:39:05.077Z",
+            "command": [
+              "python3",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+              "env",
+              "BINARYEN_CORES=1",
+              "EMCC_CORES=1",
+              "CMAKE_BUILD_PARALLEL_LEVEL=1",
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-lean-symbol-loader-driver",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00002-9df51376/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^misc_dir/server_project$"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "f076634d-a080-429a-9313-aff991761fed",
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 28351766528
+            },
+            "minimumHostAvailable": 28157042688,
+            "peakMemoryBytes": 486244352,
+            "peakTasks": 43,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00002-9df51376/resources.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-22T20:39:13.297Z",
+              "memoryBytes": 109912064,
+              "peakMemoryBytes": 486244352,
+              "swapBytes": 0,
+              "tasks": 11,
+              "memoryBreakdown": {
+                "anon": 105906176,
+                "file": 409600,
+                "kernel": 2256896,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 331776,
+                "slab": 339568
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "unitReleased": true,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T20:39:13.408Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12808192,
+              "peakMemoryBytes": 486244352,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10231808,
+                "file": 413696,
+                "kernel": 1064960,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 335872,
+                "slab": 229480
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-22T20:39:13.434Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          },
+          "execution": {
+            "startedAt": "2026-09-22T20:39:05.731Z",
+            "finishedAt": "2026-09-22T20:39:13.359Z",
+            "backend": "native",
+            "registered": 3896,
+            "command": [
+              "--test-dir",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-lean-symbol-loader-driver/run",
+              "-j",
+              "1",
+              "--no-tests=error",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00002-9df51376/results/results.xml",
+              "-R",
+              "^misc_dir/server_project$"
+            ],
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 5,
+                "modified": []
+              },
+              "after": {
+                "checked": 5,
+                "modified": []
+              }
+            },
+            "leftoverProcessCleanup": [],
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-native-v146-lean-symbol-loader-driver/00002-9df51376/resources.json",
+            "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+          },
+          "junit": [
+            {
+              "name": "misc_dir/server_project",
+              "classname": "misc_dir/server_project",
+              "time": "6.97706",
+              "status": "run"
+            }
+          ]
+        }
+      ],
+      "preparation": {
+        "build": {
+          "startedAt": "2026-09-22T20:38:55.535Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/build-server-driver.mjs",
+            "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0",
+            ".work/server-driver-native-v146-lean-symbol-loader"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "a4169b42-42fe-4f09-b355-35f764981daa",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 28862803968
+          },
+          "minimumHostAvailable": 28746108928,
+          "peakMemoryBytes": 483102720,
+          "peakTasks": 29,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-native-build.resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T20:38:57.144Z",
+            "memoryBytes": 128389120,
+            "peakMemoryBytes": 483102720,
+            "swapBytes": 0,
+            "tasks": 6,
+            "memoryBreakdown": {
+              "anon": 3252224,
+              "file": 120467456,
+              "kernel": 4169728,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 368640,
+              "slab": 3665264
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T20:38:57.177Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 135909376,
+            "peakMemoryBytes": 483102720,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10235904,
+              "file": 120467456,
+              "kernel": 4501504,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 368640,
+              "slab": 3694536
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T20:38:57.206Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        "prepare": {
+          "startedAt": "2026-09-22T20:38:57.247Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/prepare-suite.mjs",
+            "--prefix",
+            "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0",
+            "--backend",
+            "native",
+            "--output",
+            ".work/full-suite-native-v146-lean-symbol-loader-driver",
+            "--include-excluded",
+            "--timeout",
+            "1800",
+            "--compiled-server-driver",
+            ".work/server-driver-native-v146-lean-symbol-loader/driver.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "a773aace-051b-44c3-b409-f0bc287fc26e",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 29037359104
+          },
+          "minimumHostAvailable": 28719800320,
+          "peakMemoryBytes": 855310336,
+          "peakTasks": 13,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-native-prepare.resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T20:39:02.455Z",
+            "memoryBytes": 828051456,
+            "peakMemoryBytes": 855310336,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 83849216,
+              "file": 695742464,
+              "kernel": 47616000,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 695742464,
+              "slab": 44827864
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T20:39:02.543Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 758718464,
+            "peakMemoryBytes": 855310336,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10235904,
+              "file": 701374464,
+              "kernel": 45711360,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 701374464,
+              "slab": 44877016
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T20:39:02.568Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "engine": "node",
+      "campaign": "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver",
+      "identity": "2995c8f7228d313006117df779d248045ed18e28e914a2d325487182424c0f5f",
+      "driver": {
+        "version": 1,
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "prefix": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v146-lean-symbol-loader-native",
+        "engine": "node",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/runtime-support",
+          "standaloneLinkOptimization": {
+            "level": 1,
+            "providedArchives": [
+              {
+                "path": "lib/lean/libgmp.a",
+                "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+                "bytes": 846928
+              },
+              {
+                "path": "libuv/src/libuv/libuv.a",
+                "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+                "bytes": 183206
+              }
+            ],
+            "compilerLibraryDirectories": [
+              "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/lean",
+              "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v146-lean-symbol-loader-native/lib/lean"
+            ],
+            "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+          },
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v146-lean-symbol-loader-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "applicationLinkMode": "standalone",
+        "linkAdjustment": "Compile the unchanged test driver as a standalone Wasm application to reduce the memory retained while compiler/server children run.",
+        "linkStrategy": "Ordinary Leanc invocation.",
+        "toolchainConfigSha256": "7a97a811ff2c661a895e754b0c66efe2947cf3f75d61832685edac030f95c40b",
+        "source": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean",
+        "sourceSha256": "56410b1b00e9f04bb326741df718a7e3c6bf51de85481ce1cb2aff2304cd8fff",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver",
+        "scope": "Unchanged upstream server-test driver compiled ahead of time. Server and test sources still use the selected full compiler; this is an optional parallel harness.",
+        "startedAt": "2026-09-22T20:39:14.249Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-node-build.resources.json",
+        "commands": [
+          {
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v146-lean-symbol-loader-native/bin/lean",
+              "-Dlinter.all=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.c",
+              "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean"
+            ],
+            "startedAt": "2026-09-22T20:39:14.249Z",
+            "finishedAt": "2026-09-22T20:39:20.973Z",
+            "code": 0,
+            "signal": null
+          },
+          {
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v146-lean-symbol-loader-native/bin/leanc",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.c"
+            ],
+            "startedAt": "2026-09-22T20:39:20.973Z",
+            "finishedAt": "2026-09-22T20:39:46.727Z",
+            "code": 0,
+            "signal": null
+          }
+        ],
+        "artifacts": {
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver": "bca6d1aa710672b97024a44d5bd57319d25e23faaaf4499a2d1b217c6252f684",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.c": "fdb21d4c18d1e1edcc6f1283029f60bb96e3960a337ddde8e05d1726e4cc160e",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.cjs": "7e7238c9fff1c79da4fe8883d600fea1ae86bc2461f1cada38618c0848cb9ba0",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.exports.json": "2d7201b079a96c62619890434567a1ae048b2e47e035a2ac46d75fc43fe59754",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.lasm-optimization.json": "7c917586043d27dd6ca2310f30128aa18577f6a3ed98798ef7066cc819c9e561",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.rpaths.js": "4e3a19f5b8ad344bf45e723addf12849f371580df11fe448bb0fda722f93395a",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.wasm": "6e0809d087c07b19a762edc0b45c6c285532fa05ed48ce2e9bec8ddea0f0706d"
+        },
+        "finishedAt": "2026-09-22T20:39:47.165Z"
+      },
+      "suiteChanges": [
+        "Generated environment points to the selected toolchain and isolated source copy.",
+        "LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.",
+        "Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.",
+        "The exact server_interactive and misc_dir/server_project run_test.lean invocations use their byte-identical unchanged source compiled ahead of time in the selected engine, preserving all driver arguments. Server/compiler children and expected outputs are unchanged. This is a distinct optional harness; its driver artifacts are verified before and after each run.",
+        "Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.",
+        "A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.",
+        "MAKEFLAGS supplies LEAN_AR=/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v146-lean-symbol-loader-native/bin/llvm-ar instead of the release builder path embedded in lean.mk.",
+        "CTest timeout is explicit; no test or expected-output source is edited."
+      ],
+      "controls": [
+        {
+          "name": "server_interactive/cancellation_empty_by.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00001-aea7e75b",
+            "status": "passed",
+            "startedAt": "2026-09-22T20:39:53.476Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T20:40:15.601Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00001-aea7e75b/resources.json",
+            "peakMemoryBytes": 6705868800,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "startedAt": "2026-09-22T20:39:53.516Z",
+            "command": [
+              "python3",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+              "env",
+              "BINARYEN_CORES=1",
+              "EMCC_CORES=1",
+              "CMAKE_BUILD_PARALLEL_LEVEL=1",
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v146-lean-symbol-loader-driver",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00001-aea7e75b/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/cancellation_empty_by\\.lean$"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "882c028b-8056-4550-be67-b24a36bd6f40",
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 28618575872
+            },
+            "minimumHostAvailable": 22372081664,
+            "peakMemoryBytes": 6705868800,
+            "peakTasks": 93,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00001-aea7e75b/resources.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-22T20:40:15.558Z",
+              "memoryBytes": 79810560,
+              "peakMemoryBytes": 6705868800,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 9666560,
+                "file": 68104192,
+                "kernel": 978944,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 68104192,
+                "slab": 178000
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "highWaterProcesses": {
+              "at": "2026-09-22T20:40:12.753Z",
+              "processes": [
+                {
+                  "pid": 2726026,
+                  "name": "MainThread",
+                  "residentBytes": 3583447040,
+                  "threads": 27
+                },
+                {
+                  "pid": 2725962,
+                  "name": "MainThread",
+                  "residentBytes": 1588908032,
+                  "threads": 19
+                },
+                {
+                  "pid": 2725946,
+                  "name": "MainThread",
+                  "residentBytes": 1311522816,
+                  "threads": 17
+                },
+                {
+                  "pid": 2725926,
+                  "name": "MainThread",
+                  "residentBytes": 114171904,
+                  "threads": 11
+                },
+                {
+                  "pid": 2725939,
+                  "name": "ctest",
+                  "residentBytes": 34385920,
+                  "threads": 2
+                },
+                {
+                  "pid": 2725941,
+                  "name": "bash",
+                  "residentBytes": 3883008,
+                  "threads": 1
+                },
+                {
+                  "pid": 2725945,
+                  "name": "bash",
+                  "residentBytes": 2600960,
+                  "threads": 1
+                }
+              ]
+            },
+            "unitReleased": true,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T20:40:15.562Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 80334848,
+              "peakMemoryBytes": 6705868800,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 9666560,
+                "file": 68104192,
+                "kernel": 978944,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 68104192,
+                "slab": 178000
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-22T20:40:15.592Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          },
+          "execution": {
+            "startedAt": "2026-09-22T20:39:54.268Z",
+            "finishedAt": "2026-09-22T20:40:15.508Z",
+            "backend": "node",
+            "registered": 3896,
+            "command": [
+              "--test-dir",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v146-lean-symbol-loader-driver/run",
+              "-j",
+              "1",
+              "--no-tests=error",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00001-aea7e75b/results/results.xml",
+              "-R",
+              "^server_interactive/cancellation_empty_by\\.lean$"
+            ],
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            },
+            "leftoverProcessCleanup": [],
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00001-aea7e75b/resources.json",
+            "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+          },
+          "junit": [
+            {
+              "name": "server_interactive/cancellation_empty_by.lean",
+              "classname": "server_interactive/cancellation_empty_by.lean",
+              "time": "20.4502",
+              "status": "run"
+            }
+          ]
+        },
+        {
+          "name": "misc_dir/server_project",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00002-eff02198",
+            "status": "passed",
+            "startedAt": "2026-09-22T20:40:15.602Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T20:42:11.206Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00002-eff02198/resources.json",
+            "peakMemoryBytes": 8098107392,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "startedAt": "2026-09-22T20:40:15.651Z",
+            "command": [
+              "python3",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+              "env",
+              "BINARYEN_CORES=1",
+              "EMCC_CORES=1",
+              "CMAKE_BUILD_PARALLEL_LEVEL=1",
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v146-lean-symbol-loader-driver",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00002-eff02198/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^misc_dir/server_project$"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "9fc4cc85-9680-468c-8f03-2d66da53c936",
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 28910084096
+            },
+            "minimumHostAvailable": 21052342272,
+            "peakMemoryBytes": 8098107392,
+            "peakTasks": 108,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00002-eff02198/resources.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-22T20:42:11.009Z",
+              "memoryBytes": 75919360,
+              "peakMemoryBytes": 8098107392,
+              "swapBytes": 0,
+              "tasks": 11,
+              "memoryBreakdown": {
+                "anon": 59179008,
+                "file": 13381632,
+                "kernel": 1613824,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 13365248,
+                "slab": 292128
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "highWaterProcesses": {
+              "at": "2026-09-22T20:40:51.507Z",
+              "processes": [
+                {
+                  "pid": 2726360,
+                  "name": "MainThread",
+                  "residentBytes": 1844068352,
+                  "threads": 25
+                },
+                {
+                  "pid": 2726280,
+                  "name": "MainThread",
+                  "residentBytes": 1311817728,
+                  "threads": 17
+                },
+                {
+                  "pid": 2726336,
+                  "name": "MainThread",
+                  "residentBytes": 1310883840,
+                  "threads": 18
+                },
+                {
+                  "pid": 2726296,
+                  "name": "MainThread",
+                  "residentBytes": 1121509376,
+                  "threads": 16
+                },
+                {
+                  "pid": 2726385,
+                  "name": "MainThread",
+                  "residentBytes": 1068093440,
+                  "threads": 12
+                },
+                {
+                  "pid": 2726135,
+                  "name": "MainThread",
+                  "residentBytes": 114622464,
+                  "threads": 11
+                },
+                {
+                  "pid": 2726148,
+                  "name": "ctest",
+                  "residentBytes": 34414592,
+                  "threads": 2
+                },
+                {
+                  "pid": 2726150,
+                  "name": "bash",
+                  "residentBytes": 3895296,
+                  "threads": 1
+                },
+                {
+                  "pid": 2726279,
+                  "name": "bash",
+                  "residentBytes": 2547712,
+                  "threads": 1
+                }
+              ]
+            },
+            "unitReleased": true,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T20:42:11.171Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 25686016,
+              "peakMemoryBytes": 8098107392,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10231808,
+                "file": 13402112,
+                "kernel": 1056768,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 13402112,
+                "slab": 222408
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-22T20:42:11.199Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          },
+          "execution": {
+            "startedAt": "2026-09-22T20:40:16.419Z",
+            "finishedAt": "2026-09-22T20:42:11.116Z",
+            "backend": "node",
+            "registered": 3896,
+            "command": [
+              "--test-dir",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-node-v146-lean-symbol-loader-driver/run",
+              "-j",
+              "1",
+              "--no-tests=error",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00002-eff02198/results/results.xml",
+              "-R",
+              "^misc_dir/server_project$"
+            ],
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            },
+            "leftoverProcessCleanup": [],
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-node-v146-lean-symbol-loader-driver/00002-eff02198/resources.json",
+            "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+          },
+          "junit": [
+            {
+              "name": "misc_dir/server_project",
+              "classname": "misc_dir/server_project",
+              "time": "113.835",
+              "status": "run"
+            }
+          ]
+        }
+      ],
+      "preparation": {
+        "build": {
+          "startedAt": "2026-09-22T20:39:13.487Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/build-server-driver.mjs",
+            ".work/full-toolchains/node-v146-lean-symbol-loader-native",
+            ".work/server-driver-node-v146-lean-symbol-loader",
+            "--standalone-link"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "1809f648-8b6f-4b33-80a0-bf68513cdcdd",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 28635598848
+          },
+          "minimumHostAvailable": 24413884416,
+          "peakMemoryBytes": 4233728000,
+          "peakTasks": 48,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-node-build.resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T20:39:47.134Z",
+            "memoryBytes": 211243008,
+            "peakMemoryBytes": 4233728000,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 51707904,
+              "file": 152666112,
+              "kernel": 5881856,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 152666112,
+              "slab": 4734056
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T20:39:47.216Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 169340928,
+            "peakMemoryBytes": 4233728000,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10240000,
+              "file": 152666112,
+              "kernel": 5505024,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 152666112,
+              "slab": 4678136
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T20:39:47.240Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        "prepare": {
+          "startedAt": "2026-09-22T20:39:47.282Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/prepare-suite.mjs",
+            "--prefix",
+            ".work/full-toolchains/node-v146-lean-symbol-loader-native",
+            "--backend",
+            "node",
+            "--output",
+            ".work/full-suite-node-v146-lean-symbol-loader-driver",
+            "--include-excluded",
+            "--timeout",
+            "1800",
+            "--compiled-server-driver",
+            ".work/server-driver-node-v146-lean-symbol-loader/driver.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "4d50c545-ff5d-43fc-b9a1-1af44cba9797",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 28533547008
+          },
+          "minimumHostAvailable": 28321660928,
+          "peakMemoryBytes": 851529728,
+          "peakTasks": 13,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-node-prepare.resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T20:39:52.693Z",
+            "memoryBytes": 752750592,
+            "peakMemoryBytes": 851529728,
+            "swapBytes": 0,
+            "tasks": 6,
+            "memoryBreakdown": {
+              "anon": 5173248,
+              "file": 701231104,
+              "kernel": 45436928,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 701231104,
+              "slab": 44855864
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T20:39:52.714Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 758190080,
+            "peakMemoryBytes": 851529728,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10231808,
+              "file": 701231104,
+              "kernel": 45694976,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 701231104,
+              "slab": 44869824
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T20:39:52.739Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "engine": "deno",
+      "campaign": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver",
+      "identity": "701f86ea87514db1330c2ae97c4520e047f660d018392b41ff90017bd34ebaf3",
+      "driver": {
+        "version": 1,
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "prefix": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v146-lean-symbol-loader-native",
+        "engine": "deno",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/runtime-support",
+          "standaloneLinkOptimization": {
+            "level": 1,
+            "providedArchives": [
+              {
+                "path": "lib/lean/libgmp.a",
+                "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+                "bytes": 846928
+              },
+              {
+                "path": "libuv/src/libuv/libuv.a",
+                "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+                "bytes": 183206
+              }
+            ],
+            "compilerLibraryDirectories": [
+              "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/lean",
+              "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v146-lean-symbol-loader-native/lib/lean"
+            ],
+            "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+          },
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v146-lean-symbol-loader-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "applicationLinkMode": "standalone",
+        "linkAdjustment": "Compile the unchanged test driver as a standalone Wasm application to reduce the memory retained while compiler/server children run.",
+        "linkStrategy": "Ordinary Leanc invocation.",
+        "toolchainConfigSha256": "581123c3b4cfdda1bb3a53c1372d7b49b7fc53839a837ca43378ce6a691d5321",
+        "source": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean",
+        "sourceSha256": "56410b1b00e9f04bb326741df718a7e3c6bf51de85481ce1cb2aff2304cd8fff",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver",
+        "scope": "Unchanged upstream server-test driver compiled ahead of time. Server and test sources still use the selected full compiler; this is an optional parallel harness.",
+        "startedAt": "2026-09-22T20:42:12.016Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-deno-build.resources.json",
+        "commands": [
+          {
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v146-lean-symbol-loader-native/bin/lean",
+              "-Dlinter.all=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.c",
+              "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean"
+            ],
+            "startedAt": "2026-09-22T20:42:12.017Z",
+            "finishedAt": "2026-09-22T20:42:19.432Z",
+            "code": 0,
+            "signal": null
+          },
+          {
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v146-lean-symbol-loader-native/bin/leanc",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.c"
+            ],
+            "startedAt": "2026-09-22T20:42:19.432Z",
+            "finishedAt": "2026-09-22T20:42:44.284Z",
+            "code": 0,
+            "signal": null
+          }
+        ],
+        "artifacts": {
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver": "2a52068b92dc12d82ca382a1894ef35cee71d39bb6bb5a9ebe188488708c391c",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.c": "fdb21d4c18d1e1edcc6f1283029f60bb96e3960a337ddde8e05d1726e4cc160e",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.cjs": "fdecebc4e35d03f698d57893996fae85d9452b767375905a316cd7f9f1b8f78f",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.exports.json": "2d7201b079a96c62619890434567a1ae048b2e47e035a2ac46d75fc43fe59754",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.lasm-optimization.json": "d15cccdc33b0e8ad45c21fd4a1d85193ef8a8d282b3c4066dd1d088fbb6cc11b",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.rpaths.js": "4e3a19f5b8ad344bf45e723addf12849f371580df11fe448bb0fda722f93395a",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.wasm": "416e61300b485fcfb8032e6b996c095a4725e2aae4ce4473d960f23c07abb124"
+        },
+        "finishedAt": "2026-09-22T20:42:44.708Z"
+      },
+      "suiteChanges": [
+        "Generated environment points to the selected toolchain and isolated source copy.",
+        "LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.",
+        "Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.",
+        "The exact server_interactive and misc_dir/server_project run_test.lean invocations use their byte-identical unchanged source compiled ahead of time in the selected engine, preserving all driver arguments. Server/compiler children and expected outputs are unchanged. This is a distinct optional harness; its driver artifacts are verified before and after each run.",
+        "Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.",
+        "A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.",
+        "MAKEFLAGS supplies LEAN_AR=/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v146-lean-symbol-loader-native/bin/llvm-ar instead of the release builder path embedded in lean.mk.",
+        "CTest timeout is explicit; no test or expected-output source is edited."
+      ],
+      "controls": [
+        {
+          "name": "server_interactive/cancellation_empty_by.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00001-5d38dda2",
+            "status": "passed",
+            "startedAt": "2026-09-22T20:42:50.983Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T20:43:14.721Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00001-5d38dda2/resources.json",
+            "peakMemoryBytes": 6615138304,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "startedAt": "2026-09-22T20:42:51.019Z",
+            "command": [
+              "python3",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+              "env",
+              "BINARYEN_CORES=1",
+              "EMCC_CORES=1",
+              "CMAKE_BUILD_PARALLEL_LEVEL=1",
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v146-lean-symbol-loader-driver",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00001-5d38dda2/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/cancellation_empty_by\\.lean$"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "e18df2a1-cf86-40d9-b6d7-76e78af3eeb4",
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 28812750848
+            },
+            "minimumHostAvailable": 21856202752,
+            "peakMemoryBytes": 6615138304,
+            "peakTasks": 89,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00001-5d38dda2/resources.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-22T20:43:14.653Z",
+              "memoryBytes": 2084864,
+              "peakMemoryBytes": 6615138304,
+              "swapBytes": 0,
+              "tasks": 1,
+              "memoryBreakdown": {
+                "anon": 0,
+                "file": 1515520,
+                "kernel": 98304,
+                "shmem": 0,
+                "file_mapped": 0,
+                "inactive_file": 1515520,
+                "slab": 43072
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "highWaterProcesses": {
+              "at": "2026-09-22T20:43:12.251Z",
+              "processes": [
+                {
+                  "pid": 2726834,
+                  "name": "deno",
+                  "residentBytes": 3552755712,
+                  "threads": 26
+                },
+                {
+                  "pid": 2726816,
+                  "name": "deno",
+                  "residentBytes": 1735856128,
+                  "threads": 18
+                },
+                {
+                  "pid": 2726799,
+                  "name": "deno",
+                  "residentBytes": 1214971904,
+                  "threads": 13
+                },
+                {
+                  "pid": 2726779,
+                  "name": "MainThread",
+                  "residentBytes": 114769920,
+                  "threads": 11
+                },
+                {
+                  "pid": 2726792,
+                  "name": "ctest",
+                  "residentBytes": 34500608,
+                  "threads": 2
+                },
+                {
+                  "pid": 2726794,
+                  "name": "bash",
+                  "residentBytes": 3837952,
+                  "threads": 1
+                },
+                {
+                  "pid": 2726798,
+                  "name": "bash",
+                  "residentBytes": 2555904,
+                  "threads": 1
+                }
+              ]
+            },
+            "unitReleased": true,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T20:43:14.689Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 13783040,
+              "peakMemoryBytes": 6615138304,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10231808,
+                "file": 1515520,
+                "kernel": 983040,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 1515520,
+                "slab": 159856
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-22T20:43:14.715Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          },
+          "execution": {
+            "startedAt": "2026-09-22T20:42:51.741Z",
+            "finishedAt": "2026-09-22T20:43:14.617Z",
+            "backend": "deno",
+            "registered": 3896,
+            "command": [
+              "--test-dir",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v146-lean-symbol-loader-driver/run",
+              "-j",
+              "1",
+              "--no-tests=error",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00001-5d38dda2/results/results.xml",
+              "-R",
+              "^server_interactive/cancellation_empty_by\\.lean$"
+            ],
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            },
+            "leftoverProcessCleanup": [],
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00001-5d38dda2/resources.json",
+            "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+          },
+          "junit": [
+            {
+              "name": "server_interactive/cancellation_empty_by.lean",
+              "classname": "server_interactive/cancellation_empty_by.lean",
+              "time": "22.1206",
+              "status": "run"
+            }
+          ]
+        },
+        {
+          "name": "misc_dir/server_project",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00002-89149d52",
+            "status": "passed",
+            "startedAt": "2026-09-22T20:43:14.722Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T20:45:37.572Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00002-89149d52/resources.json",
+            "peakMemoryBytes": 7516585984,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "startedAt": "2026-09-22T20:43:14.765Z",
+            "command": [
+              "python3",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+              "env",
+              "BINARYEN_CORES=1",
+              "EMCC_CORES=1",
+              "CMAKE_BUILD_PARALLEL_LEVEL=1",
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v146-lean-symbol-loader-driver",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00002-89149d52/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^misc_dir/server_project$"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "b570df1d-6874-42e7-a604-6944256351ec",
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 28191698944
+            },
+            "minimumHostAvailable": 21643239424,
+            "peakMemoryBytes": 7516585984,
+            "peakTasks": 101,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00002-89149d52/resources.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-22T20:45:37.523Z",
+              "memoryBytes": 8806400,
+              "peakMemoryBytes": 7516585984,
+              "swapBytes": 0,
+              "tasks": 6,
+              "memoryBreakdown": {
+                "anon": 6352896,
+                "file": 741376,
+                "kernel": 876544,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 741376,
+                "slab": 228120
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "highWaterProcesses": {
+              "at": "2026-09-22T20:43:52.611Z",
+              "processes": [
+                {
+                  "pid": 2727125,
+                  "name": "deno",
+                  "residentBytes": 2026848256,
+                  "threads": 24
+                },
+                {
+                  "pid": 2727108,
+                  "name": "deno",
+                  "residentBytes": 1476435968,
+                  "threads": 17
+                },
+                {
+                  "pid": 2727062,
+                  "name": "deno",
+                  "residentBytes": 1224658944,
+                  "threads": 16
+                },
+                {
+                  "pid": 2727091,
+                  "name": "deno",
+                  "residentBytes": 1127170048,
+                  "threads": 15
+                },
+                {
+                  "pid": 2727149,
+                  "name": "deno",
+                  "residentBytes": 941674496,
+                  "threads": 14
+                },
+                {
+                  "pid": 2726942,
+                  "name": "MainThread",
+                  "residentBytes": 114356224,
+                  "threads": 11
+                },
+                {
+                  "pid": 2726955,
+                  "name": "ctest",
+                  "residentBytes": 34328576,
+                  "threads": 2
+                },
+                {
+                  "pid": 2726957,
+                  "name": "bash",
+                  "residentBytes": 3928064,
+                  "threads": 1
+                },
+                {
+                  "pid": 2727061,
+                  "name": "bash",
+                  "residentBytes": 2592768,
+                  "threads": 1
+                }
+              ]
+            },
+            "unitReleased": true,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T20:45:37.541Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 13262848,
+              "peakMemoryBytes": 7516585984,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10231808,
+                "file": 741376,
+                "kernel": 1077248,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 741376,
+                "slab": 237944
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-22T20:45:37.567Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          },
+          "execution": {
+            "startedAt": "2026-09-22T20:43:15.505Z",
+            "finishedAt": "2026-09-22T20:45:37.482Z",
+            "backend": "deno",
+            "registered": 3896,
+            "command": [
+              "--test-dir",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v146-lean-symbol-loader-driver/run",
+              "-j",
+              "1",
+              "--no-tests=error",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00002-89149d52/results/results.xml",
+              "-R",
+              "^misc_dir/server_project$"
+            ],
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            },
+            "leftoverProcessCleanup": [],
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v146-lean-symbol-loader-driver/00002-89149d52/resources.json",
+            "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+          },
+          "junit": [
+            {
+              "name": "misc_dir/server_project",
+              "classname": "misc_dir/server_project",
+              "time": "141.204",
+              "status": "run"
+            }
+          ]
+        }
+      ],
+      "preparation": {
+        "build": {
+          "startedAt": "2026-09-22T20:42:11.274Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/build-server-driver.mjs",
+            ".work/full-toolchains/deno-v146-lean-symbol-loader-native",
+            ".work/server-driver-deno-v146-lean-symbol-loader",
+            "--standalone-link"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "3010956d-5899-4e02-8800-8c5424adb684",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 29120724992
+          },
+          "minimumHostAvailable": 24819044352,
+          "peakMemoryBytes": 4307062784,
+          "peakTasks": 48,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-deno-build.resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T20:42:44.720Z",
+            "memoryBytes": 157970432,
+            "peakMemoryBytes": 4307062784,
+            "swapBytes": 0,
+            "tasks": 1,
+            "memoryBreakdown": {
+              "anon": 0,
+              "file": 152768512,
+              "kernel": 4792320,
+              "shmem": 0,
+              "file_mapped": 0,
+              "inactive_file": 152768512,
+              "slab": 4682384
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T20:42:44.765Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 169791488,
+            "peakMemoryBytes": 4307062784,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10235904,
+              "file": 152768512,
+              "kernel": 5488640,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 152768512,
+              "slab": 4673160
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T20:42:44.791Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        "prepare": {
+          "startedAt": "2026-09-22T20:42:44.831Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/prepare-suite.mjs",
+            "--prefix",
+            ".work/full-toolchains/deno-v146-lean-symbol-loader-native",
+            "--backend",
+            "deno",
+            "--output",
+            ".work/full-suite-deno-v146-lean-symbol-loader-driver",
+            "--include-excluded",
+            "--timeout",
+            "1800",
+            "--compiled-server-driver",
+            ".work/server-driver-deno-v146-lean-symbol-loader/driver.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "394352ce-1c17-4a2c-a573-75bd616bb04e",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 29079437312
+          },
+          "minimumHostAvailable": 28868583424,
+          "peakMemoryBytes": 858492928,
+          "peakTasks": 13,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-deno-prepare.resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T20:42:50.045Z",
+            "memoryBytes": 823631872,
+            "peakMemoryBytes": 858492928,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 83849216,
+              "file": 692047872,
+              "kernel": 47312896,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 692047872,
+              "slab": 44710960
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T20:42:50.196Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 758231040,
+            "peakMemoryBytes": 858492928,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10235904,
+              "file": 701259776,
+              "kernel": 45699072,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 701259776,
+              "slab": 44868720
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T20:42:50.223Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "engine": "bun",
+      "campaign": "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver",
+      "identity": "26a08b727785174659c9a9523e16c926cafb3982eef752bf419126e2e3dae7ec",
+      "driver": {
+        "version": 1,
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "prefix": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v146-lean-symbol-loader-native",
+        "engine": "bun",
+        "config": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/runtime-support",
+          "standaloneLinkOptimization": {
+            "level": 1,
+            "providedArchives": [
+              {
+                "path": "lib/lean/libgmp.a",
+                "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+                "bytes": 846928
+              },
+              {
+                "path": "libuv/src/libuv/libuv.a",
+                "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+                "bytes": 183206
+              }
+            ],
+            "compilerLibraryDirectories": [
+              "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/lean",
+              "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v146-lean-symbol-loader-native/lib/lean"
+            ],
+            "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+          },
+          "leanThreads": 4,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {
+            "BUN_JSC_useWasmMemory64": "true",
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v146-lean-symbol-loader-native/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v146-lean-symbol-loader-native/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 5,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v146-lean-symbol-loader-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "applicationLinkMode": "standalone",
+        "linkAdjustment": "Compile the unchanged test driver as a standalone Wasm application to reduce the memory retained while compiler/server children run.",
+        "linkStrategy": "Ordinary Leanc invocation.",
+        "toolchainConfigSha256": "03724b0420be91e9ca19f3065778f1d64f7d9ea0500c8527cc9415b51b0086be",
+        "source": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean",
+        "sourceSha256": "56410b1b00e9f04bb326741df718a7e3c6bf51de85481ce1cb2aff2304cd8fff",
+        "executable": "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver",
+        "scope": "Unchanged upstream server-test driver compiled ahead of time. Server and test sources still use the selected full compiler; this is an optional parallel harness.",
+        "startedAt": "2026-09-22T20:45:38.382Z",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-bun-build.resources.json",
+        "commands": [
+          {
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v146-lean-symbol-loader-native/bin/lean",
+              "-Dlinter.all=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.c",
+              "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean"
+            ],
+            "startedAt": "2026-09-22T20:45:38.383Z",
+            "finishedAt": "2026-09-22T20:45:44.743Z",
+            "code": 0,
+            "signal": null
+          },
+          {
+            "command": [
+              "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v146-lean-symbol-loader-native/bin/leanc",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver",
+              "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.c"
+            ],
+            "startedAt": "2026-09-22T20:45:44.743Z",
+            "finishedAt": "2026-09-22T20:46:09.158Z",
+            "code": 0,
+            "signal": null
+          }
+        ],
+        "artifacts": {
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver": "e08723975d2c1c69541bf130e2087ee9dc050a7fdea0c8150328b31cdf91e636",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.c": "fdb21d4c18d1e1edcc6f1283029f60bb96e3960a337ddde8e05d1726e4cc160e",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.cjs": "35ab06f1f7d46c7dc3808248ef50d8a60293f59501e542acc85927392e33c7f9",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.exports.json": "2d7201b079a96c62619890434567a1ae048b2e47e035a2ac46d75fc43fe59754",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.lasm-optimization.json": "2cbd5ffe39589c9c1a18281f49b1f9cb5fd6cf7455ad50ccfd413ed612a782a5",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.rpaths.js": "4e3a19f5b8ad344bf45e723addf12849f371580df11fe448bb0fda722f93395a",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.wasm": "e7c3dc3bfceb8091f2ebe694bc9dc91bd53be3fbf9a3b5c2fa17ae2ebc9e99c0"
+        },
+        "finishedAt": "2026-09-22T20:46:09.587Z"
+      },
+      "suiteChanges": [
+        "Generated environment points to the selected toolchain and isolated source copy.",
+        "LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.",
+        "Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.",
+        "The exact server_interactive and misc_dir/server_project run_test.lean invocations use their byte-identical unchanged source compiled ahead of time in the selected engine, preserving all driver arguments. Server/compiler children and expected outputs are unchanged. This is a distinct optional harness; its driver artifacts are verified before and after each run.",
+        "Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.",
+        "A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.",
+        "MAKEFLAGS supplies LEAN_AR=/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v146-lean-symbol-loader-native/bin/llvm-ar instead of the release builder path embedded in lean.mk.",
+        "CTest timeout is explicit; no test or expected-output source is edited."
+      ],
+      "controls": [
+        {
+          "name": "server_interactive/cancellation_empty_by.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00001-05ceae5d",
+            "status": "passed",
+            "startedAt": "2026-09-22T20:46:15.977Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T20:46:36.915Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00001-05ceae5d/resources.json",
+            "peakMemoryBytes": 6857056256,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "startedAt": "2026-09-22T20:46:16.015Z",
+            "command": [
+              "python3",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+              "env",
+              "BINARYEN_CORES=1",
+              "EMCC_CORES=1",
+              "CMAKE_BUILD_PARALLEL_LEVEL=1",
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v146-lean-symbol-loader-driver",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00001-05ceae5d/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^server_interactive/cancellation_empty_by\\.lean$"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "eee2c5c1-743a-4d4a-a230-0d6833d6a795",
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 28475236352
+            },
+            "minimumHostAvailable": 22105661440,
+            "peakMemoryBytes": 6857056256,
+            "peakTasks": 205,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00001-05ceae5d/resources.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-22T20:46:36.869Z",
+              "memoryBytes": 10551296,
+              "peakMemoryBytes": 6857056256,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 7860224,
+                "file": 315392,
+                "kernel": 958464,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 315392,
+                "slab": 172288
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "highWaterProcesses": {
+              "at": "2026-09-22T20:46:33.864Z",
+              "processes": [
+                {
+                  "pid": 2727806,
+                  "name": "bun",
+                  "residentBytes": 3347988480,
+                  "threads": 55
+                },
+                {
+                  "pid": 2727758,
+                  "name": "bun",
+                  "residentBytes": 1732476928,
+                  "threads": 34
+                },
+                {
+                  "pid": 2727717,
+                  "name": "bun",
+                  "residentBytes": 1395679232,
+                  "threads": 31
+                },
+                {
+                  "pid": 2727697,
+                  "name": "MainThread",
+                  "residentBytes": 114634752,
+                  "threads": 11
+                },
+                {
+                  "pid": 2727710,
+                  "name": "ctest",
+                  "residentBytes": 34402304,
+                  "threads": 2
+                },
+                {
+                  "pid": 2727712,
+                  "name": "bash",
+                  "residentBytes": 3829760,
+                  "threads": 1
+                },
+                {
+                  "pid": 2727716,
+                  "name": "bash",
+                  "residentBytes": 2551808,
+                  "threads": 1
+                }
+              ]
+            },
+            "unitReleased": true,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T20:46:36.881Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12648448,
+              "peakMemoryBytes": 6857056256,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10231808,
+                "file": 315392,
+                "kernel": 987136,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 315392,
+                "slab": 165128
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-22T20:46:36.909Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          },
+          "execution": {
+            "startedAt": "2026-09-22T20:46:16.754Z",
+            "finishedAt": "2026-09-22T20:46:36.829Z",
+            "backend": "bun",
+            "registered": 3896,
+            "command": [
+              "--test-dir",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v146-lean-symbol-loader-driver/run",
+              "-j",
+              "1",
+              "--no-tests=error",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00001-05ceae5d/results/results.xml",
+              "-R",
+              "^server_interactive/cancellation_empty_by\\.lean$"
+            ],
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            },
+            "leftoverProcessCleanup": [],
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00001-05ceae5d/resources.json",
+            "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+          },
+          "junit": [
+            {
+              "name": "server_interactive/cancellation_empty_by.lean",
+              "classname": "server_interactive/cancellation_empty_by.lean",
+              "time": "19.336",
+              "status": "run"
+            }
+          ]
+        },
+        {
+          "name": "misc_dir/server_project",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00002-b4872d74",
+            "status": "passed",
+            "startedAt": "2026-09-22T20:46:36.916Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T20:48:18.619Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00002-b4872d74/resources.json",
+            "peakMemoryBytes": 7759523840,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            }
+          },
+          "resources": {
+            "startedAt": "2026-09-22T20:46:36.957Z",
+            "command": [
+              "python3",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+              "env",
+              "BINARYEN_CORES=1",
+              "EMCC_CORES=1",
+              "CMAKE_BUILD_PARALLEL_LEVEL=1",
+              "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+              "--suite",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v146-lean-symbol-loader-driver",
+              "--results",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00002-b4872d74/results",
+              "--jobs",
+              "1",
+              "--filter",
+              "^misc_dir/server_project$"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler",
+            "unit": "lasm-heavy-a79a4e3ab9f2.service",
+            "id": "a432d931-912c-4b47-9818-9db4299b5d24",
+            "limits": {
+              "memoryMax": 10737418240,
+              "memoryHigh": "infinity",
+              "stopMemoryBytes": 8589934592,
+              "memorySwapMax": 0,
+              "tasksMax": 1024,
+              "nice": 0
+            },
+            "hostAtStart": {
+              "total": 33456926720,
+              "available": 28363497472
+            },
+            "minimumHostAvailable": 21228183552,
+            "peakMemoryBytes": 7759523840,
+            "peakTasks": 232,
+            "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00002-b4872d74/resources.json",
+            "status": "finished",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "lastSample": {
+              "at": "2026-09-22T20:48:18.528Z",
+              "memoryBytes": 72323072,
+              "peakMemoryBytes": 7759523840,
+              "swapBytes": 0,
+              "tasks": 11,
+              "memoryBreakdown": {
+                "anon": 46395392,
+                "file": 2035712,
+                "kernel": 2179072,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 2027520,
+                "slab": 321024
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "highWaterProcesses": {
+              "at": "2026-09-22T20:47:09.216Z",
+              "processes": [
+                {
+                  "pid": 2728420,
+                  "name": "bun",
+                  "residentBytes": 1789263872,
+                  "threads": 54
+                },
+                {
+                  "pid": 2728371,
+                  "name": "bun",
+                  "residentBytes": 1562222592,
+                  "threads": 46
+                },
+                {
+                  "pid": 2728325,
+                  "name": "bun",
+                  "residentBytes": 1442586624,
+                  "threads": 41
+                },
+                {
+                  "pid": 2728283,
+                  "name": "bun",
+                  "residentBytes": 1407504384,
+                  "threads": 38
+                },
+                {
+                  "pid": 2728480,
+                  "name": "bun",
+                  "residentBytes": 576094208,
+                  "threads": 20
+                },
+                {
+                  "pid": 2727987,
+                  "name": "MainThread",
+                  "residentBytes": 114298880,
+                  "threads": 11
+                },
+                {
+                  "pid": 2728000,
+                  "name": "ctest",
+                  "residentBytes": 34455552,
+                  "threads": 2
+                },
+                {
+                  "pid": 2728002,
+                  "name": "bash",
+                  "residentBytes": 3846144,
+                  "threads": 1
+                },
+                {
+                  "pid": 2728282,
+                  "name": "bash",
+                  "residentBytes": 2560000,
+                  "threads": 1
+                }
+              ]
+            },
+            "unitReleased": true,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T20:48:18.587Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 14815232,
+              "peakMemoryBytes": 7759523840,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10244096,
+                "file": 2035712,
+                "kernel": 1069056,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 2035712,
+                "slab": 225256
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "finishedAt": "2026-09-22T20:48:18.613Z",
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "resourceLimited": false,
+            "memoryThrottled": false
+          },
+          "execution": {
+            "startedAt": "2026-09-22T20:46:37.703Z",
+            "finishedAt": "2026-09-22T20:48:18.527Z",
+            "backend": "bun",
+            "registered": 3896,
+            "command": [
+              "--test-dir",
+              "/home/lastmjs/development/lasm/compiler/.work/full-suite-bun-v146-lean-symbol-loader-driver/run",
+              "-j",
+              "1",
+              "--no-tests=error",
+              "--output-on-failure",
+              "--output-junit",
+              "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00002-b4872d74/results/results.xml",
+              "-R",
+              "^misc_dir/server_project$"
+            ],
+            "result": {
+              "code": 0,
+              "signal": null
+            },
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": []
+              },
+              "after": {
+                "checked": 7267,
+                "modified": []
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            },
+            "leftoverProcessCleanup": [],
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-bun-v146-lean-symbol-loader-driver/00002-b4872d74/resources.json",
+            "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+          },
+          "junit": [
+            {
+              "name": "misc_dir/server_project",
+              "classname": "misc_dir/server_project",
+              "time": "100.048",
+              "status": "run"
+            }
+          ]
+        }
+      ],
+      "preparation": {
+        "build": {
+          "startedAt": "2026-09-22T20:45:37.623Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/build-server-driver.mjs",
+            ".work/full-toolchains/bun-v146-lean-symbol-loader-native",
+            ".work/server-driver-bun-v146-lean-symbol-loader",
+            "--standalone-link"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "a95a2421-09e6-467f-9412-b38b8ca6fd5a",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 29214449664
+          },
+          "minimumHostAvailable": 24541503488,
+          "peakMemoryBytes": 4462477312,
+          "peakTasks": 75,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-bun-build.resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T20:46:09.477Z",
+            "memoryBytes": 208650240,
+            "peakMemoryBytes": 4462477312,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 49385472,
+              "file": 152502272,
+              "kernel": 5898240,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 152502272,
+              "slab": 4732136
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T20:46:09.643Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 169418752,
+            "peakMemoryBytes": 4462477312,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10231808,
+              "file": 152502272,
+              "kernel": 5517312,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 152502272,
+              "slab": 4670800
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T20:46:09.675Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        "prepare": {
+          "startedAt": "2026-09-22T20:46:09.715Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/prepare-suite.mjs",
+            "--prefix",
+            ".work/full-toolchains/bun-v146-lean-symbol-loader-native",
+            "--backend",
+            "bun",
+            "--output",
+            ".work/full-suite-bun-v146-lean-symbol-loader-driver",
+            "--include-excluded",
+            "--timeout",
+            "1800",
+            "--compiled-server-driver",
+            ".work/server-driver-bun-v146-lean-symbol-loader/driver.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "0ae50c6d-b252-4a96-8301-cbcca46e5019",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 28825509888
+          },
+          "minimumHostAvailable": 28455137280,
+          "peakMemoryBytes": 874520576,
+          "peakTasks": 13,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-project-bun-prepare.resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-22T20:46:15.126Z",
+            "memoryBytes": 821694464,
+            "peakMemoryBytes": 874520576,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 77725696,
+              "file": 695627776,
+              "kernel": 47538176,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 695627776,
+              "slab": 44823816
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-22T20:46:15.223Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 758480896,
+            "peakMemoryBytes": 874520576,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10235904,
+              "file": 701202432,
+              "kernel": 45723648,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 701202432,
+              "slab": 44871200
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-22T20:46:15.247Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    }
+  ],
+  "maximumPeakBytes": 8098107392,
+  "unitControl": {
+    "command": [
+      "node",
+      "test/full-server-driver-shim.test.mjs"
+    ],
+    "observedPassed": 1,
+    "scope": "Exact arguments, quoted paths, project flag and fallback for unrelated invocations.",
+    "sourceSha256": "a03fc854d3dd8353027ea2175821c2e47b4e440f9ffec97da0bd06069e5c5e1b"
+  },
+  "implementationSha256": {
+    "scripts/full-lean/server-driver-shim.mjs": "2ff4dd124f73aab196de491714f3b05eacc26d7c7c63f0d131f15e7c83fc84cd",
+    "scripts/full-lean/prepare-suite.mjs": "55b1404f07ecc34a361890014c324f9ecb0589ebb07bc2ec1cb0aa4f3764a14f"
+  },
+  "limitations": [
+    "Optional compiled-driver results remain separate from interpreted-driver resource stops.",
+    "Full Bun uses the local rebuilt engine and Linux stack helper.",
+    "No complete JavaScript upstream suite or native cross-platform conformance is claimed."
+  ]
+}

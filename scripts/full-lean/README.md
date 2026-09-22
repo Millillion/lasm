@@ -117,7 +117,10 @@ node scripts/full-lean/run-campaign.mjs --suite .work/suite-node-compiled-driver
 
 The builder and suite preparation apply the resource guard automatically. Use
 fresh output directories. This opt-in mode replaces only the exact
-`lean -Dlinter.all=false --run run_test.lean TEST` call in `server_interactive`.
+`lean -Dlinter.all=false --run run_test.lean TEST` call in `server_interactive`
+and the corresponding `--run run_test.lean -p FILE` call in
+`misc_dir/server_project`. Both upstream entry-point files must have the same
+verified hash as the compiled driver; their arguments are forwarded unchanged.
 The original driver source is compiled without edits; server/compiler children,
 test files, and expected outputs remain unchanged. The driver uses the same
 four Lean workers and 64 MiB stack default as the ordinary full-engine facade.
@@ -125,6 +128,11 @@ The selected toolchain must match the recorded driver build, and driver files
 and generated wrappers are checked before and after each run. Keep its results
 separate from the interpreted-driver campaigns. A passing compiled-driver run
 does not erase an original-driver memory stop or establish full conformance.
+The server-project and cancellation controls pass with this harness in native
+Lean, Node, Deno and the local rebuilt Bun, preserving every original and
+harness hash. Node's server-project run peaks at 7.54 GiB below the unchanged
+8 GiB proactive budget; the earlier interpreted-driver stop remains recorded.
+See [the separate comparison](../../docs/evidence/server-project-driver-2026-09-22.json).
 `probe-driver-integrity.mjs NEW_DIRECTORY` checks unchanged inputs and drift
 before/during execution using three tiny private CTest controls, each guarded
 individually; run that supervisor directly.
@@ -307,6 +315,17 @@ indices use format 2. This derivation still requires unindexed input glue. It ke
 new index file separate from source symlinks and verifies source hashes afterward.
 `probe-index-derivation.mjs NEW_DIRECTORY` checks that behavior with a preexisting
 source index and an independently validated synthetic Wasm module.
+
+Compiled Lean plugins also need functions intentionally omitted from the
+JavaScript export surface. `generate-exports.mjs` exports the existing in-Wasm
+registry, and `lean-symbol-loader.mjs` connects Emscripten's global resolver to
+it after normal symbol lookup. All Lean data remain explicit Wasm exports,
+preserving their Global type; only missing compiled functions use table entries
+from the registry. Unknown symbols and weak imports retain their ordinary
+loader behavior. Build and freeze entry points apply the connection, rejecting
+unexpected loader changes. `probe-lean-symbol-loader.mjs NEW_OUTPUT FROZEN_SDK`
+checks real native/Wasm plugins with direct calls, function pointers, shared
+data, weak imports and worker loading, under the resource guard.
 
 For standalone applications, `prepare-toolchain.mjs --standalone-link-optimization 1`
 separates C compilation from final WebAssembly linking. Generated Lean C retains

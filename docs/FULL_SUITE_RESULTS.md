@@ -3,6 +3,18 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The optional compiled-server harness now covers the exact
+`misc_dir/server_project` invocation as well as `server_interactive`. Both
+upstream driver files are byte-identical; the harness verifies their hashes
+and forwards the original arguments, including `-p FILE`, unchanged. The
+server-project and cancellation controls pass in **native Lean, Node, Deno,
+and local rebuilt Bun**: eight original registrations, with all source and
+driver/harness hashes intact and no resource, OOM, throttling, or swap event.
+Node's server-project check peaks at 7.54 GiB under the unchanged 8 GiB proactive
+budget. The earlier v145 interpreted-driver abort remains recorded separately;
+the passing v146 controls also include the plugin-loader repair. See
+[the server-driver evidence](evidence/server-project-driver-2026-09-22.json).
+
 The v146 compiler repair passes **six original regressions each in native Lean,
 Node, Deno, and the local rebuilt Bun**, including all three plugin failures
 found below. Late-loaded

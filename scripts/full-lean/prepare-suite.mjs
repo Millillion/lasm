@@ -8,6 +8,7 @@ import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
 
 import { ensureResourceGuard } from './resource-guard.mjs';
 import { verifyDriverArtifacts } from './driver-artifacts.mjs';
+import { serverDriverShim } from './server-driver-shim.mjs';
 
 await ensureResourceGuard();
 
@@ -104,20 +105,14 @@ const addEnvironment = text => rewriteEnvironment(text).replace('export ',
 writeFileSync(environment, addEnvironment(readFileSync(originalEnvironment,'utf8')));
 let harnessArtifacts;
 if (compiledServerDriver) {
-  const driverSource = join(source, 'tests/server_interactive/run_test.lean');
-  if (digest(readFileSync(driverSource)) !== compiledServerDriver.sourceSha256)
-    throw new Error('Compiled driver does not match the unchanged upstream source');
+  for (const relative of ['tests/server_interactive/run_test.lean', 'tests/misc_dir/server_project/run_test.lean']) {
+    if (digest(readFileSync(join(source, relative))) !== compiledServerDriver.sourceSha256)
+      throw new Error(`Compiled driver does not match the unchanged upstream source: ${relative}`);
+  }
   const shimDirectory = join(output, 'compiled-driver-bin');
   mkdirSync(shimDirectory, { recursive: true });
   const shim = join(shimDirectory, 'lean');
-  writeFileSync(shim, `#!/usr/bin/env bash
-if [ "$PWD" = ${shellQuote(join(source, 'tests/server_interactive'))} ] && [ "$#" -eq 4 ] && [ "$1" = '-Dlinter.all=false' ] && [ "$2" = '--run' ] && [ "$3" = 'run_test.lean' ]; then
-  export LEAN_NUM_THREADS="\${LEAN_NUM_THREADS:-4}"
-  export LEAN_STACK_SIZE_KB="\${LEAN_STACK_SIZE_KB:-65536}"
-  exec ${shellQuote(compiledServerDriver.executable)} "$4"
-fi
-exec ${shellQuote(join(prefix, 'bin/lean'))} "$@"
-`);
+  writeFileSync(shim, serverDriverShim(source, prefix, compiledServerDriver.executable));
   chmodSync(shim, 0o755);
   const current = readFileSync(environment, 'utf8'), needle = " PATH='";
   if (current.split(needle).length !== 2) throw new Error('Upstream PATH environment layout changed');
@@ -163,7 +158,7 @@ writeFileSync(join(output,'parallel-suite.json'),JSON.stringify({leanCommit,back
   changes:['Generated environment points to the selected toolchain and isolated source copy.',
     'LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.',
     'Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.',
-    ...(compiledServerDriver ? ['The exact server_interactive run_test.lean invocation uses its unchanged source compiled ahead of time in the selected engine. Server/compiler children and expected outputs are unchanged. This is a distinct optional harness; its driver artifacts are verified before and after each run.'] : []),
+    ...(compiledServerDriver ? ['The exact server_interactive and misc_dir/server_project run_test.lean invocations use their byte-identical unchanged source compiled ahead of time in the selected engine, preserving all driver arguments. Server/compiler children and expected outputs are unchanged. This is a distinct optional harness; its driver artifacts are verified before and after each run.'] : []),
     ...(networkLock ? [`A shared flock at ${networkLock} serializes the original fixed-port TCP/UDP tests across engine runs.`] : []),
     ...(extraRegistrations.length ? ['Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.',
       'A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.'] : []),
