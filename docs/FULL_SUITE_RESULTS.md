@@ -3,15 +3,28 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The fresh v146 Node campaign selects **all 3,896 original registrations**,
+The v147 host repair preserves temporary-path spelling and symlink traversal,
+uses POSIX atomic creation with the upstream filename template, and matches
+Lean's environment precedence and libuv errors. The full Wasm compiler binary
+is unchanged. Ten ordinary Lean cases match native output in **Node, Deno and
+local rebuilt Bun**; each also passes a safe-error check where native Lean
+crashes. The same cases pass in packaged mains using released Node, Deno and
+stock Bun, alongside an instance-cwd/permissions control. All six unchanged
+upstream IO regressions pass with 7,267 regular hashes and six original symlinks
+intact. No resource/OOM/throttling/swap event occurred. Native Windows/macOS
+validation and broader edge cases remain open. See
+[the temporary-file repair evidence](evidence/temporary-files-2026-09-22.json).
+
+The preserved v146 Node campaign selects **all 3,896 original registrations**,
 prioritizing 877 names not passed in the earlier v144/v145 runs. It imports no
 passes from other profiles or targeted validations. Its latest saved checkpoint
-has **11 Lake registrations passing**, including initialization, plugins,
-input files, LLVM bitcode, locking and logging/replay, with no failures or
+has **23 Lake registrations passing**, including initialization, external libraries,
+module rebuilds, dependency requirements, overrides, post-update hooks and
+precompiled linking, with no failures or
 resource aborts and all original and harness hashes intact. This is a checkpoint, not a
 completed suite. Each test uses its own guard, base pages, one CTest job and
 one build worker. See
-[the 11-test v146 checkpoint](evidence/node-broad-v146-lean-symbol-loader-checkpoint11-2026-09-22.json).
+[the 23-test v146 checkpoint](evidence/node-broad-v146-lean-symbol-loader-checkpoint23-2026-09-22.json).
 
 The registration count comprises 3,891 upstream CTest tests and five opt-in
 tests that upstream explicitly excludes as flaky. Seven additional benchmark

@@ -80,6 +80,22 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     // particular, link/../file is not equivalent to lexical path normalization.
     return directory.path(value, state);
   }
+  async function createTemporary(isDirectory, state) {
+    // uv_os_tmpdir checks presence, including empty values, in this order.
+    // Avoid path.join: lexical normalization changes symlink/.. traversal.
+    let base = ['TMPDIR', 'TMP', 'TEMP', 'TEMPDIR'].map(name => process.env[name])
+      .find(value => value !== undefined) ?? '/tmp';
+    if (Buffer.byteLength(base) >= (process.platform === 'darwin' ? 1024 : 4096))
+      throw Object.assign(error('ENOBUFS', ''), { errno: -nativeFiles().errno('ENOBUFS') });
+    if (base.length > 1 && base.endsWith('/')) base = base.slice(0, -1);
+    if (!base) throw Object.assign(error('ENOENT', ''), { errno: -nativeFiles().errno('ENOENT') });
+    const template = base + (base.endsWith('/') ? '' : '/') + 'tmp.XXXXXXXX';
+    const result = await nativeFiles().createTemporary(directory.path(template, state), isDirectory);
+    // Creation uses the retained guest cwd; the returned name preserves the
+    // original relative spelling rather than exposing the internal fd anchor.
+    const name = template.slice(0, -6) + result.path.slice(-6);
+    return isDirectory ? Buffer.from(name) : Buffer.concat([numbers(add(result.file)), Buffer.from(name)]);
+  }
   function serial(file, action) {
     file.pending = (file.pending ?? 0) + 1;
     const promise = file.tail.then(action).finally(() => file.pending--);
@@ -183,10 +199,12 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     });
     case 19: return fsp.chmod(path(bytes), n).then(() => empty, err => { throw nativeFiles().fromNodeError(err); });
     case 20: return (async () => {
+      if (process.platform !== 'win32') return createTemporary(false, state);
       const name = join(tmpdir(), 'lean-' + randomBytes(16).toString('hex'));
       return Buffer.concat([numbers(add(await nativeFiles().open(name, 5, 0o600))), Buffer.from(name)]);
     })();
-    case 21: return fsp.mkdtemp(join(tmpdir(), 'lean-')).then(name => Buffer.from(name));
+    case 21: return process.platform !== 'win32' ? createTemporary(true, state)
+      : fsp.mkdtemp(join(tmpdir(), 'lean-')).then(name => Buffer.from(name));
     case 22: {
       // Lean returns none before consulting getenv when the name contains NUL.
       // Some engines truncate the key in process.env; others reject it.
@@ -245,7 +263,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       if (closed) throw error('ECANCELED', 'Lean runtime disposed');
       // Only path-based operations need this lease. A long-lived socket read
       // or timer must not retain every directory that was current at startup.
-      if (op === 1 || op >= 10 && op <= 19 || op === 23 || op === 29 || op === 80)
+      if (op === 1 || op >= 10 && op <= 21 || op === 23 || op === 29 || op === 80)
         state = directory.retain();
       const result = dispatch(op, id, arg, Buffer.from(bytes), context, state);
       if (result?.then) {

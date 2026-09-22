@@ -46,6 +46,13 @@ export function nativeFiles({ synchronous = false } = {}) {
   const strerror = bind('strerror', 'str', ['int']);
   const free = bind('free', 'void', ['void *']);
   const realpath = windows ? null : bind('realpath', 'void *', ['str', 'void *']);
+  const mkdtemp = windows ? null : bind('mkdtemp', 'void *', ['void *']);
+  const mkstemp = windows ? null : bind('mkstemp', 'int', ['void *']);
+  let mkostemp;
+  if (!windows) {
+    // Match libuv's optional lookup and fallback on older POSIX hosts.
+    try { mkostemp = bind('mkostemp', 'int', ['void *', 'int']); } catch { /* use mkstemp */ }
+  }
   const strlen = windows ? null : bind('strlen', 'size_t', ['void *']);
   const scanDirectory = windows ? null : libc.func('int scandir(str path, _Out_ void **entries, void *filter, void *compare)');
   const accessAt = windows ? null : libc.func('int faccessat(int directory, str path, int mode, int flags)');
@@ -107,6 +114,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   }
   const adapter = {
     error: failure,
+    errno: name => ffi.os.errno[name],
     fromNodeError,
     // libc exit can destroy engine mutexes while its worker threads are live.
     // Flush CRT streams first, then let the engine coordinate normal shutdown.
@@ -129,6 +137,41 @@ export function nativeFiles({ synchronous = false } = {}) {
     },
     outOfMemory() { return failure(ffi.os.errno.ENOMEM); },
     strerror,
+    async createTemporary(path, directory = false) {
+      if (windows) throw failure(ffi.os.errno.ENOSYS);
+      const bytes = Buffer.from(path + '\0');
+      let fd;
+      try {
+        if (directory) {
+          const result = await call(mkdtemp, bytes);
+          if (!result.value) throw failure(result.errno);
+        } else {
+          let result = mkostemp
+            ? await call(mkostemp, bytes, process.platform === 'darwin' ? 0x1000000 : 0x80000)
+            : { value: -1, errno: ffi.os.errno.EINVAL };
+          if (result.value < 0 && result.errno === ffi.os.errno.EINVAL) {
+            result = await call(mkstemp, bytes);
+            if (result.value >= 0 && fcntl(result.value, 2, 1) < 0) {
+              const error = failure(); closeFd(result.value); throw error;
+            }
+          }
+          if (result.value < 0) throw failure(result.errno);
+          fd = result.value;
+        }
+        const name = bytes.subarray(0, bytes.indexOf(0)).toString();
+        if (directory) return { path: name };
+        const file = adapter.openDescriptor(fd, 'r+');
+        fd = undefined;
+        return { path: name, file };
+      } catch (error) {
+        if (fd !== undefined) closeFd(fd);
+        // These Lean operations use libuv's negative error numbers/messages,
+        // unlike ordinary fopen/fread primitives, which expose libc errno.
+        if (error.nativeMessage && error.errno > 0)
+          throw Object.assign(error, { errno: -error.errno, nativeMessage: false });
+        throw error;
+      }
+    },
     async checkDirectorySearch(path) {
       // chdir checks search permission with effective credentials, without
       // requiring read permission. The packaged host has an instance-local
@@ -322,6 +365,11 @@ export function nativeFiles({ synchronous = false } = {}) {
   implementation = { ...adapter,
     async open(...args) {
       return { ...await callNativeFile('open', args), tail: Promise.resolve() };
+    },
+    async createTemporary(...args) {
+      const result = await callNativeFile('createTemporary', args);
+      if (result.file) result.file.tail = Promise.resolve();
+      return result;
     },
     async closeAsync(file, discardOutput = false) {
       const stream = file.stream;

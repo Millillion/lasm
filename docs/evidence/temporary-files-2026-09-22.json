@@ -1,0 +1,2265 @@
+{
+  "recordedAt": "2026-09-22T22:16:51.963082+00:00",
+  "scope": "Linux x64 temporary files/directories in ordinary Lean. Ten parity cases plus one safe-error check per JavaScript engine, in both packaged and full compilers; six unchanged upstream IO regressions. No complete JavaScript suite or native Windows/macOS parity is claimed.",
+  "repair": "POSIX mkostemp/mkstemp and mkdtemp use the original tmp.XXXXXXXX template and atomic exclusive creation. The adapter preserves symlink/dot segments and relative spelling, retains the instance cwd for pending operations, honors first-present TMPDIR/TMP/TEMP/TEMPDIR including empty values, and returns libuv error codes/messages.",
+  "nativeDefect": "Pinned native createTempFile crashes with SIGSEGV for a missing temporary directory: lean_decode_uv_error(UV_ENOENT, nullptr) dereferences its null filename. The full comparison records this as a native defect, not a parity pass. Lasm returns the structured ENOENT produced by native Lean in the empty-TMPDIR case, whose filename argument is valid. This is an intentional upstream-bug difference, not a fundamental JavaScript limitation.",
+  "before": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/comparison.json",
+    "sha256": "d6091fc35c7a5a3160a629892007243c83ec3604a3321a4f0d3c7da949bf5776",
+    "comparison": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/temporary-files/Main.lean",
+      "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/fixture.lean",
+      "sourceSha256": "f5fbd574bac80598dd104311a69722b825849afa8c9b0de5ea3d07c8e0331097",
+      "scope": "Supplementary temporary-file/directory path, environment, contents and structured error comparison; not an upstream-suite result.",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2.resources.json",
+      "results": [
+        {
+          "name": "native",
+          "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+          "cases": [
+            {
+              "name": "absolute",
+              "seconds": 0.375626596,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            },
+            {
+              "name": "symlink-parent",
+              "seconds": 0.34655864299999994,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/link/../temporary\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/physical/temporary\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/link/../temporary\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/physical/temporary\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            },
+            {
+              "name": "trailing-separators",
+              "seconds": 0.3552283000000001,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain/\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain/\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            },
+            {
+              "name": "relative",
+              "seconds": 0.3416895370000002,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"relative//.\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/guest/relative\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"relative//.\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/guest/relative\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            },
+            {
+              "name": "empty-first-variable",
+              "seconds": 0.323887823,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            },
+            {
+              "name": "empty-second-variable",
+              "seconds": 0.3270436659999998,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            },
+            {
+              "name": "tempdir-fallback",
+              "seconds": 0.3361101749999998,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            },
+            {
+              "name": "missing-directory",
+              "seconds": 0.4452171859999999,
+              "code": null,
+              "signal": "SIGSEGV",
+              "stdout": "",
+              "stderr": "",
+              "nativeBug": "Pinned Lean ENOENT decoder dereferences a null filename; not a fundamental JavaScript limitation.",
+              "passed": false
+            },
+            {
+              "name": "not-a-directory",
+              "seconds": 0.36070242099999994,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndirectory: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            },
+            {
+              "name": "permission-denied",
+              "seconds": 0.3423096639999999,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            },
+            {
+              "name": "directory-buffer-limit",
+              "seconds": 0.3297677580000004,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ndirectory: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": true
+            }
+          ],
+          "passed": true,
+          "counts": {
+            "matching": 10,
+            "nativeBugs": 1,
+            "safetyChecks": 0
+          }
+        },
+        {
+          "name": "node",
+          "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v146-lean-symbol-loader-native/bin/lean",
+          "config": {
+            "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+            "engine": "node",
+            "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "engineArgs": [],
+            "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+            "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+            "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/runtime-support",
+            "standaloneLinkOptimization": {
+              "level": 1,
+              "providedArchives": [
+                {
+                  "path": "lib/lean/libgmp.a",
+                  "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+                  "bytes": 846928
+                },
+                {
+                  "path": "libuv/src/libuv/libuv.a",
+                  "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+                  "bytes": 183206
+                }
+              ],
+              "compilerLibraryDirectories": [
+                "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/lean",
+                "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v146-lean-symbol-loader-native/lib/lean"
+              ],
+              "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+            },
+            "leanThreads": 4,
+            "lakeThreads": 1,
+            "bunSmol": false,
+            "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+            "systemAllocator": "mimalloc",
+            "leanAllocator": "mimalloc",
+            "memoryMode": 1,
+            "engineEnvironment": {},
+            "maximumMemoryBytes": 8589934592,
+            "pthreadPoolSize": 5,
+            "backend": "full-lean-wasm64-native",
+            "nativeLeanFallback": false,
+            "environmentAdjustments": {
+              "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v146-lean-symbol-loader-native",
+              "LASM_FULL_APP_PATH": "Selected facade entry point",
+              "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+              "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+              "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+            },
+            "externalTools": {
+              "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib",
+              "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/include",
+              "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/share",
+              "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/bin/leanmake",
+              "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+              "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+            }
+          },
+          "cases": [
+            {
+              "name": "absolute",
+              "seconds": 5.579432083,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: nativePrefix=false nameLength=37\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: nativePrefix=false nameLength=11\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            },
+            {
+              "name": "symlink-parent",
+              "seconds": 5.424664573,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/temporary\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/temporary\"\nfile: nativePrefix=false nameLength=37\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/temporary\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/temporary\"\ndirectory: nativePrefix=false nameLength=11\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            },
+            {
+              "name": "trailing-separators",
+              "seconds": 5.673771048000001,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: nativePrefix=false nameLength=37\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: nativePrefix=false nameLength=11\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            },
+            {
+              "name": "relative",
+              "seconds": 5.556546708999998,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"relative\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/guest/relative\"\nfile: nativePrefix=false nameLength=37\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"relative\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/guest/relative\"\ndirectory: nativePrefix=false nameLength=11\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            },
+            {
+              "name": "empty-first-variable",
+              "seconds": 5.538454045000003,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: nativePrefix=false nameLength=37\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: nativePrefix=false nameLength=11\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            },
+            {
+              "name": "empty-second-variable",
+              "seconds": 5.422201331,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\nfile: nativePrefix=false nameLength=37\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2/paths/plain\"\ndirectory: nativePrefix=false nameLength=11\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            },
+            {
+              "name": "tempdir-fallback",
+              "seconds": 5.522861850000001,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: parent=some \"/tmp\"\nfile: physicalParent=some \"/tmp\"\nfile: nativePrefix=false nameLength=37\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/tmp\"\ndirectory: physicalParent=some \"/tmp\"\ndirectory: nativePrefix=false nameLength=11\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            },
+            {
+              "name": "missing-directory",
+              "seconds": 5.477763389,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 2 \"No such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "safetyOracle": "Native empty-first-variable: ENOENT with a valid empty filename.",
+              "safetyPassed": false,
+              "passed": false
+            },
+            {
+              "name": "not-a-directory",
+              "seconds": 5.698736567,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: error=IO.Error.inappropriateType none 20 \"Not a directory\"\ndirectory: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            },
+            {
+              "name": "permission-denied",
+              "seconds": 5.504971366999999,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: error=IO.Error.permissionDenied none 13 \"Permission denied\"\ndirectory: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            },
+            {
+              "name": "directory-buffer-limit",
+              "seconds": 5.602196222999999,
+              "code": 0,
+              "signal": null,
+              "stdout": "file: error=IO.Error.invalidArgument none 36 \"File name too long\"\ndirectory: error=IO.Error.invalidArgument none 4294967260 \"name too long\"\ntemporary-files comparison completed\n",
+              "stderr": "",
+              "passed": false
+            }
+          ],
+          "passed": false,
+          "counts": {
+            "matching": 0,
+            "nativeBugs": 0,
+            "safetyChecks": 0
+          }
+        }
+      ],
+      "executedSourceUnchanged": true,
+      "finishedAt": "2026-09-22T22:04:06.919Z"
+    },
+    "resource": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before-r2.resources.json",
+      "sha256": "01eacfd38c5dc682d91cf7f8239a8b263287b577d3b9d8f5431b9876547a4ca1",
+      "peakMemoryBytes": 1803767808,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-22T22:04:06.979Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 12836864,
+        "peakMemoryBytes": 1803767808,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10235904,
+          "file": 94208,
+          "kernel": 999424,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 94208,
+          "slab": 170432
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true
+    },
+    "initialDiagnostic": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v146-before/comparison.json"
+  },
+  "packaged": {
+    "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-package.log",
+    "logSha256": "50e6d359697b3bbb42943a1cc15cbc51bfcba14b06b69e16754428533291ca2d",
+    "testCount": 35,
+    "ordinaryLeanCases": 33,
+    "engines": [
+      "Node 24.13.1",
+      "Deno 2.9.7",
+      "stock Bun 1.4.2"
+    ],
+    "coverage": "Ten native output comparisons and one safe-error check each; direct instance-cwd/permissions control also passes.",
+    "resource": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-package.resources.json",
+      "sha256": "c751996d0732d501a381252577ebfc7d17ac34519e4c3df34f20a0e86a1bcb14",
+      "peakMemoryBytes": 476839936,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-22T22:08:48.052Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 37490688,
+        "peakMemoryBytes": 476839936,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10244096,
+          "file": 23724032,
+          "kernel": 1884160,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 18980864,
+          "slab": 1064760
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true
+    }
+  },
+  "full": {
+    "node": {
+      "comparisonPath": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/comparison.json",
+      "comparisonSha256": "cae97567be90840ecdbaacc02e2b3a9bb4e9abaa32ef602b43af1341b606abff",
+      "comparison": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/temporary-files/Main.lean",
+        "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/fixture.lean",
+        "sourceSha256": "f5fbd574bac80598dd104311a69722b825849afa8c9b0de5ea3d07c8e0331097",
+        "scope": "Supplementary temporary-file/directory path, environment, contents and structured error comparison; not an upstream-suite result.",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-node-comparison.resources.json",
+        "results": [
+          {
+            "name": "native",
+            "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "cases": [
+              {
+                "name": "absolute",
+                "seconds": 0.33390618,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "symlink-parent",
+                "seconds": 0.33991112700000004,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/link/../temporary\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/physical/temporary\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/link/../temporary\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/physical/temporary\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "trailing-separators",
+                "seconds": 0.3493891170000001,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain/\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain/\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "relative",
+                "seconds": 0.3252955669999999,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"relative//.\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/guest/relative\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"relative//.\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/guest/relative\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-first-variable",
+                "seconds": 0.33639770599999996,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-second-variable",
+                "seconds": 0.3250236020000002,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "tempdir-fallback",
+                "seconds": 0.32510281900000015,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "missing-directory",
+                "seconds": 0.46186482299999987,
+                "code": null,
+                "signal": "SIGSEGV",
+                "stdout": "",
+                "stderr": "",
+                "nativeBug": "Pinned Lean ENOENT decoder dereferences a null filename; not a fundamental JavaScript limitation.",
+                "passed": false
+              },
+              {
+                "name": "not-a-directory",
+                "seconds": 0.32031761600000025,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndirectory: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "permission-denied",
+                "seconds": 0.336818362,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "directory-buffer-limit",
+                "seconds": 0.32574096999999985,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ndirectory: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              }
+            ],
+            "passed": false,
+            "validated": true,
+            "counts": {
+              "matching": 10,
+              "nativeBugs": 1,
+              "safetyChecks": 0
+            }
+          },
+          {
+            "name": "node",
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v147-temporary-files-native/bin/lean",
+            "config": {
+              "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+              "engine": "node",
+              "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+              "engineArgs": [],
+              "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native",
+              "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+              "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+              "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/runtime-support",
+              "standaloneLinkOptimization": {
+                "level": 1,
+                "providedArchives": [
+                  {
+                    "path": "lib/lean/libgmp.a",
+                    "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+                    "bytes": 846928
+                  },
+                  {
+                    "path": "libuv/src/libuv/libuv.a",
+                    "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+                    "bytes": 183206
+                  }
+                ],
+                "compilerLibraryDirectories": [
+                  "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/lib/lean",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v147-temporary-files-native/lib/lean"
+                ],
+                "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+              },
+              "leanThreads": 4,
+              "lakeThreads": 1,
+              "bunSmol": false,
+              "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+              "systemAllocator": "mimalloc",
+              "leanAllocator": "mimalloc",
+              "memoryMode": 1,
+              "engineEnvironment": {},
+              "maximumMemoryBytes": 8589934592,
+              "pthreadPoolSize": 5,
+              "backend": "full-lean-wasm64-native",
+              "nativeLeanFallback": false,
+              "environmentAdjustments": {
+                "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v147-temporary-files-native",
+                "LASM_FULL_APP_PATH": "Selected facade entry point",
+                "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+                "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+                "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+              },
+              "externalTools": {
+                "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/lib",
+                "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/include",
+                "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/share",
+                "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/bin/leanmake",
+                "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+                "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+              }
+            },
+            "cases": [
+              {
+                "name": "absolute",
+                "seconds": 5.6568160690000004,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "symlink-parent",
+                "seconds": 5.604655167000001,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/link/../temporary\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/physical/temporary\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/link/../temporary\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/physical/temporary\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "trailing-separators",
+                "seconds": 5.550168650000002,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain/\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain/\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "relative",
+                "seconds": 5.397069020999999,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"relative//.\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/guest/relative\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"relative//.\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/guest/relative\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-first-variable",
+                "seconds": 5.425985776000001,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-second-variable",
+                "seconds": 5.621751372000002,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "tempdir-fallback",
+                "seconds": 5.660113753999998,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-node/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "missing-directory",
+                "seconds": 5.5608962580000005,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "safetyOracle": "Native empty-first-variable: ENOENT with a valid empty filename.",
+                "safetyPassed": true,
+                "passed": false
+              },
+              {
+                "name": "not-a-directory",
+                "seconds": 5.459909859,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndirectory: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "permission-denied",
+                "seconds": 5.477906125000001,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "directory-buffer-limit",
+                "seconds": 5.558311087999995,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ndirectory: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              }
+            ],
+            "passed": false,
+            "validated": true,
+            "counts": {
+              "matching": 10,
+              "nativeBugs": 0,
+              "safetyChecks": 1
+            }
+          }
+        ],
+        "executedSourceUnchanged": true,
+        "finishedAt": "2026-09-22T22:11:40.712Z"
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-node-comparison.resources.json",
+        "sha256": "7a8c9691ea0ba87febb43003680a275a3855d29d7b7d9e23d4868f0d40b5b3a8",
+        "peakMemoryBytes": 1809670144,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-22T22:11:40.765Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12541952,
+          "peakMemoryBytes": 1809670144,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10235904,
+            "file": 90112,
+            "kernel": 1007616,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 90112,
+            "slab": 170928
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true
+      },
+      "upstreamCampaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v147-temporary-files/campaign.json",
+      "upstreamCounts": {
+        "passed": 2,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "upstreamTests": [
+        {
+          "name": "elab/IO_test.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v147-temporary-files/00001-3d12c820",
+            "status": "passed",
+            "startedAt": "2026-09-22T22:11:46.506Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T22:11:53.094Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v147-temporary-files/00001-3d12c820/resources.json",
+            "peakMemoryBytes": 1803722752,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resource": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v147-temporary-files/00001-3d12c820/resources.json",
+            "sha256": "da13acba98b86c7c4216193727223e53f267cf7c87a23e61b88c2dff3e062440",
+            "peakMemoryBytes": 1803722752,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T22:11:53.062Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12562432,
+              "peakMemoryBytes": 1803722752,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10248192,
+                "file": 81920,
+                "kernel": 995328,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 81920,
+                "slab": 179152
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "unitReleased": true
+          },
+          "junit": [
+            {
+              "name": "elab/IO_test.lean",
+              "classname": "elab/IO_test.lean",
+              "time": "5.86033",
+              "status": "run"
+            }
+          ]
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v147-temporary-files/00002-818acd40",
+            "status": "passed",
+            "startedAt": "2026-09-22T22:11:53.094Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T22:11:59.812Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v147-temporary-files/00002-818acd40/resources.json",
+            "peakMemoryBytes": 1796222976,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resource": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v147-temporary-files/00002-818acd40/resources.json",
+            "sha256": "bbbb767020f9fa1c533dc462ae27fe7f2cb75ababd568498a277dd34ce0fcf8f",
+            "peakMemoryBytes": 1796222976,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T22:11:59.782Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12304384,
+              "peakMemoryBytes": 1796222976,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10240000,
+                "file": 32768,
+                "kernel": 978944,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 32768,
+                "slab": 152008
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "unitReleased": true
+          },
+          "junit": [
+            {
+              "name": "elab/tempfile.lean",
+              "classname": "elab/tempfile.lean",
+              "time": "5.97431",
+              "status": "run"
+            }
+          ]
+        }
+      ]
+    },
+    "deno": {
+      "comparisonPath": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/comparison.json",
+      "comparisonSha256": "0a92a1cca23667ab4f11a330e1cce48c1997ed53f627c133a2a8ef996dcaf869",
+      "comparison": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/temporary-files/Main.lean",
+        "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/fixture.lean",
+        "sourceSha256": "f5fbd574bac80598dd104311a69722b825849afa8c9b0de5ea3d07c8e0331097",
+        "scope": "Supplementary temporary-file/directory path, environment, contents and structured error comparison; not an upstream-suite result.",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-deno-comparison.resources.json",
+        "results": [
+          {
+            "name": "native",
+            "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "cases": [
+              {
+                "name": "absolute",
+                "seconds": 0.352701503,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "symlink-parent",
+                "seconds": 0.328627629,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/link/../temporary\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/physical/temporary\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/link/../temporary\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/physical/temporary\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "trailing-separators",
+                "seconds": 0.3385843379999999,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain/\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain/\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "relative",
+                "seconds": 0.40428413,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"relative//.\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/guest/relative\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"relative//.\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/guest/relative\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-first-variable",
+                "seconds": 0.349059659,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-second-variable",
+                "seconds": 0.347390369,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "tempdir-fallback",
+                "seconds": 0.3652529089999998,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "missing-directory",
+                "seconds": 0.4576420290000001,
+                "code": null,
+                "signal": "SIGSEGV",
+                "stdout": "",
+                "stderr": "",
+                "nativeBug": "Pinned Lean ENOENT decoder dereferences a null filename; not a fundamental JavaScript limitation.",
+                "passed": false
+              },
+              {
+                "name": "not-a-directory",
+                "seconds": 0.35122825999999985,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndirectory: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "permission-denied",
+                "seconds": 0.3287919439999996,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "directory-buffer-limit",
+                "seconds": 0.33832520900000007,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ndirectory: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              }
+            ],
+            "passed": false,
+            "validated": true,
+            "counts": {
+              "matching": 10,
+              "nativeBugs": 1,
+              "safetyChecks": 0
+            }
+          },
+          {
+            "name": "deno",
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v147-temporary-files-native/bin/lean",
+            "config": {
+              "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+              "engine": "deno",
+              "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+              "engineArgs": [
+                "run",
+                "-A",
+                "--v8-flags=--stack-size=61440"
+              ],
+              "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native",
+              "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+              "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+              "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/runtime-support",
+              "standaloneLinkOptimization": {
+                "level": 1,
+                "providedArchives": [
+                  {
+                    "path": "lib/lean/libgmp.a",
+                    "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+                    "bytes": 846928
+                  },
+                  {
+                    "path": "libuv/src/libuv/libuv.a",
+                    "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+                    "bytes": 183206
+                  }
+                ],
+                "compilerLibraryDirectories": [
+                  "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/lib/lean",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v147-temporary-files-native/lib/lean"
+                ],
+                "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+              },
+              "leanThreads": 4,
+              "lakeThreads": 1,
+              "bunSmol": false,
+              "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+              "systemAllocator": "mimalloc",
+              "leanAllocator": "mimalloc",
+              "memoryMode": 1,
+              "engineEnvironment": {},
+              "maximumMemoryBytes": 8589934592,
+              "pthreadPoolSize": 5,
+              "backend": "full-lean-wasm64-native",
+              "nativeLeanFallback": false,
+              "environmentAdjustments": {
+                "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v147-temporary-files-native",
+                "LASM_FULL_APP_PATH": "Selected facade entry point",
+                "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+                "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+                "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+              },
+              "externalTools": {
+                "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/lib",
+                "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/include",
+                "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/share",
+                "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/bin/leanmake",
+                "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+                "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+              }
+            },
+            "cases": [
+              {
+                "name": "absolute",
+                "seconds": 6.111075800999999,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "symlink-parent",
+                "seconds": 6.007060644999999,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/link/../temporary\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/physical/temporary\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/link/../temporary\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/physical/temporary\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "trailing-separators",
+                "seconds": 5.873026172000002,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain/\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain/\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "relative",
+                "seconds": 6.175201809000002,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"relative//.\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/guest/relative\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"relative//.\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/guest/relative\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-first-variable",
+                "seconds": 6.040566401,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-second-variable",
+                "seconds": 5.813033147999995,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "tempdir-fallback",
+                "seconds": 5.9828892090000005,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-deno/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "missing-directory",
+                "seconds": 5.930029759999997,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "safetyOracle": "Native empty-first-variable: ENOENT with a valid empty filename.",
+                "safetyPassed": true,
+                "passed": false
+              },
+              {
+                "name": "not-a-directory",
+                "seconds": 5.966027772000001,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndirectory: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "permission-denied",
+                "seconds": 6.070366453000003,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "directory-buffer-limit",
+                "seconds": 6.107335228000004,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ndirectory: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              }
+            ],
+            "passed": false,
+            "validated": true,
+            "counts": {
+              "matching": 10,
+              "nativeBugs": 0,
+              "safetyChecks": 1
+            }
+          }
+        ],
+        "executedSourceUnchanged": true,
+        "finishedAt": "2026-09-22T22:13:11.089Z"
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-deno-comparison.resources.json",
+        "sha256": "dec1e393a88f7ed7b5b21d7dabcc88696954951a00088bdf3dd211d35c47b87f",
+        "peakMemoryBytes": 2027331584,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-22T22:13:11.136Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 13283328,
+          "peakMemoryBytes": 2027331584,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10235904,
+            "file": 380928,
+            "kernel": 1011712,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 380928,
+            "slab": 175560
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true
+      },
+      "upstreamCampaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v147-temporary-files/campaign.json",
+      "upstreamCounts": {
+        "passed": 2,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "upstreamTests": [
+        {
+          "name": "elab/IO_test.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v147-temporary-files/00001-1a2513c8",
+            "status": "passed",
+            "startedAt": "2026-09-22T22:13:16.858Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T22:13:23.477Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v147-temporary-files/00001-1a2513c8/resources.json",
+            "peakMemoryBytes": 2021216256,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resource": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v147-temporary-files/00001-1a2513c8/resources.json",
+            "sha256": "8daec7fa242af750fe24a4e8a2926c3f03498703989843bb51856d22a95b994a",
+            "peakMemoryBytes": 2021216256,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T22:13:23.445Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12369920,
+              "peakMemoryBytes": 2021216256,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10231808,
+                "file": 163840,
+                "kernel": 1015808,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 163840,
+                "slab": 169360
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "unitReleased": true
+          },
+          "junit": [
+            {
+              "name": "elab/IO_test.lean",
+              "classname": "elab/IO_test.lean",
+              "time": "5.90255",
+              "status": "run"
+            }
+          ]
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v147-temporary-files/00002-7b139939",
+            "status": "passed",
+            "startedAt": "2026-09-22T22:13:23.477Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T22:13:30.449Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v147-temporary-files/00002-7b139939/resources.json",
+            "peakMemoryBytes": 2024497152,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resource": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v147-temporary-files/00002-7b139939/resources.json",
+            "sha256": "5959fa903792874e4c9c5fe4f3376d3e5c7fa1b3cfe3870b7c0a392d41a13959",
+            "peakMemoryBytes": 2024497152,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T22:13:30.420Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12701696,
+              "peakMemoryBytes": 2024497152,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10244096,
+                "file": 122880,
+                "kernel": 987136,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 122880,
+                "slab": 157896
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "unitReleased": true
+          },
+          "junit": [
+            {
+              "name": "elab/tempfile.lean",
+              "classname": "elab/tempfile.lean",
+              "time": "6.25346",
+              "status": "run"
+            }
+          ]
+        }
+      ]
+    },
+    "bun": {
+      "comparisonPath": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/comparison.json",
+      "comparisonSha256": "1db1477a44a673c0898064fea92563b79b4ac15f1f85caf89556eb54fd8e289f",
+      "comparison": {
+        "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+        "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/temporary-files/Main.lean",
+        "executedSource": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/fixture.lean",
+        "sourceSha256": "f5fbd574bac80598dd104311a69722b825849afa8c9b0de5ea3d07c8e0331097",
+        "scope": "Supplementary temporary-file/directory path, environment, contents and structured error comparison; not an upstream-suite result.",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-bun-comparison.resources.json",
+        "results": [
+          {
+            "name": "native",
+            "executable": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean",
+            "cases": [
+              {
+                "name": "absolute",
+                "seconds": 0.35098211900000004,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "symlink-parent",
+                "seconds": 0.33940218800000005,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/link/../temporary\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/physical/temporary\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/link/../temporary\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/physical/temporary\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "trailing-separators",
+                "seconds": 0.324125353,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain/\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain/\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "relative",
+                "seconds": 0.3223836409999999,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"relative//.\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/guest/relative\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"relative//.\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/guest/relative\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-first-variable",
+                "seconds": 0.331046106,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-second-variable",
+                "seconds": 0.32655005800000025,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "tempdir-fallback",
+                "seconds": 0.3310571619999996,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "missing-directory",
+                "seconds": 0.5334377089999998,
+                "code": null,
+                "signal": "SIGSEGV",
+                "stdout": "",
+                "stderr": "",
+                "nativeBug": "Pinned Lean ENOENT decoder dereferences a null filename; not a fundamental JavaScript limitation.",
+                "passed": false
+              },
+              {
+                "name": "not-a-directory",
+                "seconds": 0.33315617500000005,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndirectory: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "permission-denied",
+                "seconds": 0.33330244800000036,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "directory-buffer-limit",
+                "seconds": 0.34123175999999966,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ndirectory: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              }
+            ],
+            "passed": false,
+            "validated": true,
+            "counts": {
+              "matching": 10,
+              "nativeBugs": 1,
+              "safetyChecks": 0
+            }
+          },
+          {
+            "name": "bun",
+            "executable": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v147-temporary-files-native/bin/lean",
+            "config": {
+              "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+              "engine": "bun",
+              "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+              "engineArgs": [],
+              "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native",
+              "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+              "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+              "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/runtime-support",
+              "standaloneLinkOptimization": {
+                "level": 1,
+                "providedArchives": [
+                  {
+                    "path": "lib/lean/libgmp.a",
+                    "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+                    "bytes": 846928
+                  },
+                  {
+                    "path": "libuv/src/libuv/libuv.a",
+                    "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+                    "bytes": 183206
+                  }
+                ],
+                "compilerLibraryDirectories": [
+                  "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/lib/lean",
+                  "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v147-temporary-files-native/lib/lean"
+                ],
+                "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+              },
+              "leanThreads": 4,
+              "lakeThreads": 1,
+              "bunSmol": false,
+              "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+              "systemAllocator": "mimalloc",
+              "leanAllocator": "mimalloc",
+              "memoryMode": 1,
+              "engineEnvironment": {
+                "BUN_JSC_useWasmMemory64": "true",
+                "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v147-temporary-files-native/bun-stack-reservation.so",
+                "BUN_JSC_maxPerThreadStackUsage": "62914560"
+              },
+              "stackAdjustment": {
+                "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v147-temporary-files-native/bun-stack-reservation.so",
+                "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+                "osThreadStackBytes": 67108864,
+                "jscStackBudgetBytes": 62914560,
+                "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+              },
+              "maximumMemoryBytes": 8589934592,
+              "pthreadPoolSize": 5,
+              "backend": "full-lean-wasm64-native",
+              "nativeLeanFallback": false,
+              "environmentAdjustments": {
+                "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v147-temporary-files-native",
+                "LASM_FULL_APP_PATH": "Selected facade entry point",
+                "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+                "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+                "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+              },
+              "externalTools": {
+                "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/lib",
+                "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/include",
+                "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/share",
+                "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v147-temporary-files-native/bin/leanmake",
+                "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+                "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+              }
+            },
+            "cases": [
+              {
+                "name": "absolute",
+                "seconds": 5.183327938,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "symlink-parent",
+                "seconds": 5.208953468,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/link/../temporary\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/physical/temporary\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/link/../temporary\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/physical/temporary\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "trailing-separators",
+                "seconds": 5.186182767999998,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain/\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain/\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "relative",
+                "seconds": 5.208767776,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"relative//.\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/guest/relative\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"relative//.\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/guest/relative\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-first-variable",
+                "seconds": 5.251605011,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "empty-second-variable",
+                "seconds": 5.3334606509999976,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "tempdir-fallback",
+                "seconds": 5.264522758999999,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\nfile: nativePrefix=true nameLength=12\nfile: contents=\"temporary \u03bb\\n\"\ndirectory: parent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: physicalParent=some \"/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-v147-bun/paths/plain\"\ndirectory: nativePrefix=true nameLength=12\ndirectory: isDir=true\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "missing-directory",
+                "seconds": 5.2902364299999975,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ndirectory: error=IO.Error.noFileOrDirectory \"\" 4294967294 \"no such file or directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "safetyOracle": "Native empty-first-variable: ENOENT with a valid empty filename.",
+                "safetyPassed": true,
+                "passed": false
+              },
+              {
+                "name": "not-a-directory",
+                "seconds": 5.397183249999995,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ndirectory: error=IO.Error.inappropriateType none 4294967276 \"not a directory\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "permission-denied",
+                "seconds": 5.363821402999995,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ndirectory: error=IO.Error.permissionDenied none 4294967283 \"permission denied\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              },
+              {
+                "name": "directory-buffer-limit",
+                "seconds": 5.250185643999997,
+                "code": 0,
+                "signal": null,
+                "stdout": "file: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ndirectory: error=IO.Error.resourceExhausted none 4294967191 \"no buffer space available\"\ntemporary-files comparison completed\n",
+                "stderr": "",
+                "passed": true
+              }
+            ],
+            "passed": false,
+            "validated": true,
+            "counts": {
+              "matching": 10,
+              "nativeBugs": 0,
+              "safetyChecks": 1
+            }
+          }
+        ],
+        "executedSourceUnchanged": true,
+        "finishedAt": "2026-09-22T22:14:33.528Z"
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/temporary-files-bun-comparison.resources.json",
+        "sha256": "ae2337fafcf4ef7ce0245f1f7073e108de74d7dda8b765551ccd9e55c26695e0",
+        "peakMemoryBytes": 2104975360,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-22T22:14:33.577Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 12447744,
+          "peakMemoryBytes": 2104975360,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10186752,
+            "file": 98304,
+            "kernel": 1003520,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 98304,
+            "slab": 161360
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true
+      },
+      "upstreamCampaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v147-temporary-files/campaign.json",
+      "upstreamCounts": {
+        "passed": 2,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "upstreamTests": [
+        {
+          "name": "elab/IO_test.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v147-temporary-files/00001-d2c6f4fd",
+            "status": "passed",
+            "startedAt": "2026-09-22T22:14:39.370Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T22:14:45.593Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v147-temporary-files/00001-d2c6f4fd/resources.json",
+            "peakMemoryBytes": 2164101120,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resource": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v147-temporary-files/00001-d2c6f4fd/resources.json",
+            "sha256": "b17cc7f0c31e91430b0bda9a7259a109675257872a1e0d409dd81a45e36a80dd",
+            "peakMemoryBytes": 2164101120,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T22:14:45.563Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12668928,
+              "peakMemoryBytes": 2164101120,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10248192,
+                "file": 77824,
+                "kernel": 1007616,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 77824,
+                "slab": 171672
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "unitReleased": true
+          },
+          "junit": [
+            {
+              "name": "elab/IO_test.lean",
+              "classname": "elab/IO_test.lean",
+              "time": "5.50199",
+              "status": "run"
+            }
+          ]
+        },
+        {
+          "name": "elab/tempfile.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v147-temporary-files/00002-5f4d75ae",
+            "status": "passed",
+            "startedAt": "2026-09-22T22:14:45.593Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T22:14:51.922Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v147-temporary-files/00002-5f4d75ae/resources.json",
+            "peakMemoryBytes": 2234920960,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 0,
+                "modified": []
+              },
+              "after": {
+                "checked": 0,
+                "modified": []
+              }
+            }
+          },
+          "resource": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-bun-v147-temporary-files/00002-5f4d75ae/resources.json",
+            "sha256": "4199cffe2693e49865421f0344bee6693c90e9bc3b0c39f28cc5a673f7713492",
+            "peakMemoryBytes": 2234920960,
+            "service": {
+              "serviceResult": "success",
+              "exitCode": "exited",
+              "exitStatus": "0",
+              "capturedAt": "2026-09-22T22:14:51.891Z",
+              "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+              "memoryBytes": 12713984,
+              "peakMemoryBytes": 2234920960,
+              "swapBytes": 0,
+              "tasks": 7,
+              "memoryBreakdown": {
+                "anon": 10235904,
+                "file": 32768,
+                "kernel": 974848,
+                "shmem": 0,
+                "file_mapped": 86016,
+                "inactive_file": 32768,
+                "slab": 154240
+              },
+              "pressureSomeAvg10": 0,
+              "memoryEvents": {
+                "low": 0,
+                "high": 0,
+                "max": 0,
+                "oom": 0,
+                "oom_kill": 0,
+                "oom_group_kill": 0
+              }
+            },
+            "unitReleased": true
+          },
+          "junit": [
+            {
+              "name": "elab/tempfile.lean",
+              "classname": "elab/tempfile.lean",
+              "time": "5.61893",
+              "status": "run"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "snapshot": {
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+    "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+    "createdAt": "2026-09-22T22:10:34.111Z",
+    "files": {
+      "bin/lean.js": "81610c236a75025056c271ffa1987a9e94322139f2b242a2efec4fa805b1e564",
+      "bin/lean.cjs": "81610c236a75025056c271ffa1987a9e94322139f2b242a2efec4fa805b1e564",
+      "bin/lean.wasm": "9a58c4b949a62fa9f66560fb51cdabfb15c1d684b091aab8d3199db7f75ef0bc",
+      "lasm-wasm-exports.json": "5d5d88fb5477d278708fbd89b2fa9d91a8468f7fc75dc02a42806fdbf4c0fd74",
+      "function-table-index.json": "4bfbc4fa43e749671fc0a9ee28410494a699b25d16e577328b78d1ca9ba1a2e3",
+      "build-provenance.json": "40228d0c328b35dd92d5ab66111b322318bf790226b986fbb7079cc755f9b23a",
+      "sdk/.emscripten": "001c6ae86c1ec65b8a41d0db23c239f7e2348bd5fb68c98fbc628cd86a7c3f65",
+      "sdk/upstream/emscripten/tools/link.py": "2f143e5ca6d8aa560f5b2ea5e1d31a1ea897d068ea7778e50aa07d84ff10e481",
+      "sdk/upstream/emscripten/src/lib/libdylink.js": "711eba55c77409aad5302a05ea48e3d1c15a04dbb0221f34cb80db0979b79d8c",
+      "sdk/upstream/emscripten/src/lib/libpthread.js": "99456db0bf77860dd8eb998a130fb68207a0b16ee0ca6b8d065ab55c7ae262a1",
+      "host/node-host.mjs": "76b4b2e7409e7f68e686c8ad5a1efa1a7db90c62014fe774da9876a53556e2d0",
+      "host/working-directory.mjs": "de76cfc16206d9e4ea0fd8227225b870812ad37838ddaf38974f422cadcebaaa",
+      "host/handle-table.mjs": "c58518fb2b4e8184edfc113fc68415858918d6fae66753b04e65fe6b7e0bb825",
+      "host/node-network.mjs": "f67a5043a2fe81efc676777e97b7f5129676d34d8f3151d29d1a6eec9a3e24c1",
+      "host/native-tcp.mjs": "5e6df0775ff191a9521622979ee27130cb0a4bdee3917a9e5f679107825926fe",
+      "host/node-process.mjs": "702fe9e848cb2612a551e1d53f35f50d07214cada1f7539f4295c4e77dcd8745",
+      "host/native-process.mjs": "e0281181fa526700cc1a45dc2c0b91e0abfd93630f5a0f989523d93490b7e552",
+      "host/process-launcher.mjs": "39126483f5f87f5a93f3be2e3e42f834e4176c9f50eb203cc56949be2519021e",
+      "host/process-exec.mjs": "c860a0d7271db9f2917317fd04722ee2aca52d4ddad8d79df6a5c2581bd2e3cf",
+      "host/node-udp.mjs": "b4c1cf428bfecceb7386e46da32eb441ebee64920d77c87008c85e5ce9871599",
+      "host/node-system.mjs": "dd4e1c5c1b41ba8ecd41e16ca4ec98bc8026ccc87e9bec6eedfb6df03eb22c24",
+      "host/node-signal.mjs": "44e16fc035abd651c57abdc07ca4e36245c76868e041a23c39e5a0804639da63",
+      "host/thread-id.cjs": "dcec6da112d1cdefebd943e83828b0506d7819167e1b81ae3724ee1effa940d9",
+      "host/native-pthread-factory.cjs": "ad423ab08d5aff4b8358b0863b238ea18ddb6c6bc5891682da6afc69ff66abf3",
+      "host/native-files.mjs": "e8efc929aeaba39aa51795f09fd95f0f67cbf58f8dcf168d9e860f9c4a2e2fdc",
+      "host/native-file-worker.mjs": "e18a55ebc7e8f145f47515165e53f4841a8e09581bf0e45818400ceeabab9ffb",
+      "host/native-file-worker-pool.mjs": "b2047e050ab6266ad3613dcd0b37107abfcf5fa80857187f2ae1b13cd7c55ca2",
+      "host/native-file-worker-deno.mjs": "c80058f1ced5dbaffabf21515e68015e7d97400334d724aff320ae05a133e544",
+      "host/native-worker-cwd.cjs": "69080ceea6aeac63baf9da1839c4e95913c7e9e893b93e036c4bdca82b09512b",
+      "host/worker-stdio.cjs": "eb5afd5cd4cdaddff135559182f129963ea511fbea37a9a5aedd35b305630dc8",
+      "host/native-dns.mjs": "2380cc0bd99e7f3aef582e39db08954b148a59e93740efb742aa9a64f45b7e16",
+      "host/native-interfaces.mjs": "6a5c99ef69a83f9ef199dfc1136b30ac4dc10b4fd69f2d4a0cf173f2ae23ad2c",
+      "host/native/process/THIRD_PARTY_NOTICES.txt": "c219f317b281119e2da6f2ce28f2b5fc1844d168795fef826a8bd4f764308ac4",
+      "host/native/process/linux-arm64-gnu": "d43417a98ab64fc39e8ae58d2f3befd03e975621ba422f7a04f83170a4d9ad5e",
+      "host/native/process/linux-arm64-musl": "5bf1a1f91a7a63a394df814420471ac92feb5b64a59421c9682b4b8ebf1a97ec",
+      "host/native/process/linux-x64-gnu": "a1d879a39dd61b47db14130dd54e534d9cd204f9d0680d2f32afd5294588e9ce",
+      "host/native/process/linux-x64-musl": "e2b1ba5e8f862220b348b33dfeaf4f858bf7f20555e3474842b2ad69e41f34d3",
+      "host/native/process/manifest.json": "088790daadd43337ccafe46edc0f8d47d553e2374fbd7146aaf81ba9f9155fb1",
+      "host/native/process/process-launcher.c": "dc0287c2d2669a81392a2d370883640bcbe5333adce7faeb694146271076fc98",
+      "runtime-support/run-compiler.mjs": "92023e20d97617f9a520e7172f639d68cebd9aefe1ef407190ffa7b08e477b2f",
+      "runtime-support/cc-driver.mjs": "bc040f77112ce557272510c4deb38337e80113bb48379a883c5890baf7ef548e",
+      "runtime-support/response-args.mjs": "b60e76d8cc39193dc6d15b49d420d9c6b6b3a45b79527b92f8ce3b2c6a45a5ba",
+      "runtime-support/preserve-web-worker.mjs": "f9d9b82f2c593beab41aa1dff6d461ecc4539e3b21741a720ae23edf399a9fd6",
+      "runtime-support/emscripten-pre.js": "491e7960427820704e3d435caf5ec3c8a30c3b1e7d20d2fca81b143553bd8bae",
+      "runtime-support/host-pre.js": "45e0a22ede9b64666bf66fb827d405748f2f8c651beac40b64b3aa1679e795c3",
+      "runtime-support/host-library.js": "f4fc31ae10ef7dc12cb9a4bb5ac6ab4f5a8eeeb824578f8174547eeb466dc1b5",
+      "CMakeCache.txt": "f0e50d0778c777361ead779bd85800498f8c618a3abb233cc35fa487013809f7",
+      "leanc.sh": "63478eeacc41d3896244808352725e6c5dcdecd62455ea8021a1ceac99de1aca",
+      "relink.json": "b541bac580a869ee01a4c0888fdc9f6d8e72f83720822139fe621e2093e7b21c",
+      "lib/lean/liblasmhost.a": "eb539eb53859ebc734426284cbaefd185bf40e4e9fd579c88ee23b11a7f21435",
+      "host/native-clock.mjs": "38b7e6227a153b345597c9785ea083aacbcf038be718f23de01a5267b3132fdf",
+      "clock-source/node-io.cpp": "ec253c27e341779f1bf86749792b57a77865d686b980ae8bee681adb0b678590",
+      "clock-source/node.hpp": "12756d4ab0f75c72bb3cb02311e2d6dd471dc027e3278458b8af6c0ccf4aa3f3",
+      "clock-source/gmp.h": "3dbb60d43782095ceb760010d76585948281d9ca23ea30506a5fe67bd4e0e185",
+      "clock-source/node-io.cpp.o": "5085957bdf529f9d52380a56916d5b2959bd6225fd7858545303e7e0e21d95d2",
+      "clock-headers/stdlib_flags.h": "ea23e161e21231081217f582f3b48523b03257b8de642348b7411d274a605c45",
+      "clock-headers/library/annotation.h": "77095b1c3a52977b6ca6d479dc744cf4ab6e2ecbefa2bc2bd4fedb881d5f38e8",
+      "clock-headers/library/constants.h": "938c30f0f600ebb2de1c737d45b4b2a2e1a17cf75f08065974f2321704124d71",
+      "clock-headers/library/print.h": "39d7e2a1ae420285a72c5adf5edb0c081dc05e6a0dae62ec7d9eec1fee96a629",
+      "clock-headers/library/formatter.h": "b9b0fea7aa52902c198dce49da34bcb4800ef892f555fdd27ad85b7caa4de0b5",
+      "clock-headers/library/bin_app.h": "8d5aadef7b88ec3d21c46afee19fc886f74245db48da5144f8e22224eef0e856",
+      "clock-headers/library/init_module.h": "5d5b877b7f7e5a993fe15cf3a76d85ba8f6921ec1623ecee716878eaa32a2d7d",
+      "clock-headers/library/dynlib.h": "79c5a695f0c4aa194eed04800fe0cec258f8887cc15ce9d79d3553217252f688",
+      "clock-headers/library/max_sharing.h": "78454714638a9b3f9b056536af86577dc907476d435d657874a57fcc63c65eb5",
+      "clock-headers/library/expr_lt.h": "5d0b2e6a076a7e876533badca64e015356bd3f5c5aebf0acf1990d6545b3ac58",
+      "clock-headers/library/ir_types.h": "e493acd2584f0951f2475157183fe9273478d9f3a7eb4cb7eb602215f2f1c8a5",
+      "clock-headers/library/profiling.h": "c1537cf2f6a8ee53b56a520591d4a7ad5283347461d64ad0fb8747d0d9ffe8b7",
+      "clock-headers/library/num.h": "3adb1a1d229acca598bb035ca31dfc55b3808e289ee277ec6ddffaa4dae1f2cf",
+      "clock-headers/library/elab_environment.h": "3035a8335a39d4262167f36b4c15f3c12fcf410b8d4c03e55d94089a640dbea2",
+      "clock-headers/library/init_attribute.h": "ae811272da6ec6dc22822abff4768efaa3689419eb3f7e53fef913a21799a999",
+      "clock-headers/library/replace_visitor.h": "859a5ca35b7dd85b31ecdf9f4829a25ca22320028e74877084d6a74b6a746da0",
+      "clock-headers/library/ir_interpreter.h": "d2de52d3e55718740a5603e2f7125514db4173304f04781c47d1eb62ee1f0292",
+      "clock-headers/library/module.h": "6934a733bf52d2350590ca949c329e0761039d062fd8344191d7d36c37941d5c",
+      "clock-headers/library/util.h": "82911dea3e2b60c3876f8dda2bc10ffc59b0a6254a5b5c55bb70439e56f958e3",
+      "clock-headers/library/expr_pair_maps.h": "5bfcba1640ca9fd0a2aeee7544424e168f16b8e2b403aa67bb7db853dbd55513",
+      "clock-headers/library/scope_cache.h": "6927904c79723a7271df4b99099ff5cdf95ae3a4be3c8cc63e5ed04f0afd9f0e",
+      "clock-headers/library/suffixes.h": "06ba7a3f08d932b8d931f0a5eec40a920d42a7283c67d9897afd38f20afb86b3",
+      "clock-headers/library/expr_unsigned_map.h": "8b612be2cfcb10c15ef66ac647a7ad0c83a53650b0a41932a566640a39b2e2db",
+      "clock-headers/library/time_task.h": "44726bb0c74c6b9b887e26c00abe8913885c40556b58c21adb3e949a9ceb7b2e",
+      "clock-headers/library/expr_pair.h": "8adbc87abb27e6dfd1197ea9a73d079486cb019e5287564df71fbec45c4dc018",
+      "clock-headers/runtime/interrupt.h": "15558f09a19d42e149b2fbdc505ccc24224594a3f1e2cc2f4745a011cc036168",
+      "clock-headers/runtime/apply.h": "712c1104bd8f89c66053b1c7502d71950fbae075d999b21a03cfb2a13f7ffe81",
+      "clock-headers/runtime/io.h": "336b5987c52cd5d6dc2b52937fa14e057bc21fa12277654a17fec36b3952c1a8",
+      "clock-headers/runtime/init_module.h": "095cf46f19f2c17482a13fcb73d9ba63b208f44c751fd7eafeeafa4ffc582458",
+      "clock-headers/runtime/memory.h": "bb5ad661f13da089cc2613105bdf4d43da9f02985dde4881b4f2d176e7397fb7",
+      "clock-headers/runtime/pair_ref.h": "bfff9b9fe8c9f9eabbb1c19c7a1ea50b2fbcb2097fe869d0ab87fb04c7b46d57",
+      "clock-headers/runtime/process.h": "0cfaa2ce2357ca18928e1e24145b85702fd9d3d8fc464599ddd981036763e1d4",
+      "clock-headers/runtime/string_ref.h": "a970beded7021919ba0b5be211941c42e67ad0f6cd212e1d9fd6ad557d1c9f5e",
+      "clock-headers/runtime/compact.h": "89c7868a99e9f494313a5ce6286cf41194e60fea0e0c7178947a0f8ad3673ab6",
+      "clock-headers/runtime/alloc.h": "8f9f900c2bff6a908084ef4301a3c10efd8d72eb72044702ac024132b12211b1",
+      "clock-headers/runtime/debug.h": "c3a490a0f1bd1a3e5a81168993c8f5b27a88cda5d1e3b5071259fa2e8d556b68",
+      "clock-headers/runtime/mutex.h": "f98501392d7280a7f737b13e311cd5b55e4eb45c71c3ac07674a70d97c97ffca",
+      "clock-headers/runtime/buffer.h": "9fac1c6513f865a514d62c6773c3a44b651d9179841bcb03cf57572da9e57f1b",
+      "clock-headers/runtime/platform.h": "321b81d14add0fad94445f011a1519c42d63fabde74674d7edb763bbc7690a00",
+      "clock-headers/runtime/byteslice.h": "c65aafe56d1f8b2750ad3c564075b5894941e23895b792476f9dd7208ddd6a70",
+      "clock-headers/runtime/object.h": "cc791a834258f0d090f244a653fe8f07b27ffe731f7b3a1284aff4a340cf068d",
+      "clock-headers/runtime/optional.h": "5b7203ed999f38ff8de98af5e78c1be8a0bcb49999db6ccd83a686fc79d83012",
+      "clock-headers/runtime/mpn.h": "5460f152eb6ce3cb36426323fe409e2fc334e0752814c8686fc54ea0a2327643",
+      "clock-headers/runtime/int.h": "03f06e9ef0d52d6e12b6b88c1f4cc6cd7b8b4eb0c99bf82638a8df32169639dc",
+      "clock-headers/runtime/openssl.h": "805a25414cc0232a11c24d43d20ea2e5e1fb51db6ebb0f9473fa3174da4d9869",
+      "clock-headers/runtime/hash.h": "fe27044afcc40e24c69287cbd7c5b6ac4989221cdfb839dd00c8b3831609155a",
+      "clock-headers/runtime/mpz.h": "55c75c2ccec025dfbadd15c9331a320cebe0f391f4aa36305845ca6b1dc2cb98",
+      "clock-headers/runtime/thread.h": "d57462a8b21e00df4016a3d7805a609487d004f69319d1f6189c91618ef98269",
+      "clock-headers/runtime/exception.h": "58834ad1df155aa675726aed25e84fcd36201dc2cfdeead8d85fb1836ef4bd87",
+      "clock-headers/runtime/flet.h": "d0f0157089320ebe2db1890432810aba0ed1e2915681dbfd01660c7240babc87",
+      "clock-headers/runtime/option_ref.h": "e4664b6095c48f86afe33af03bfbd99c1322453c48c7a59742963f2dc476aa41",
+      "clock-headers/runtime/array_ref.h": "70c503a619e4088f9b3c1cabd9fc5537fa5eae1e0974a4ccc4993110cc685cc9",
+      "clock-headers/runtime/sharecommon.h": "f84596bdc8e58b4c3df436f7ff3eaf0f07accd74a9b335d66937fc1261d1e60e",
+      "clock-headers/runtime/utf8.h": "b058ce07b43a3def7af16ad8061127336340ce7a5bb219b13468414d1ffd1b48",
+      "clock-headers/runtime/sstream.h": "16734d5b8c46bc9a33e0bbdc506c23f5eea93c0cd31336d319f4ea16843cdf75",
+      "clock-headers/runtime/libuv.h": "2385b844bc0f26fb40e4d3d72cbf7b32383cf523b72cd577bc93bf829c428062",
+      "clock-headers/runtime/list_ref.h": "7982bc536e7a039395e08689676a4ea414196804a6a05ab4e4b5709cfcc27f61",
+      "clock-headers/runtime/stack_overflow.h": "06163784341b6d50df5f201406991031af75764faad53e61be3cefab5109fe8d",
+      "clock-headers/runtime/allocprof.h": "95f9b60d85c3966161b01d298dd2f1b65f9a3dad913356fc71775bedff9a3b18",
+      "clock-headers/runtime/stackinfo.h": "0533c89253e1cc74122575e5a47c58e9b9d412e2a146d9ca5f9eae994879e3f1",
+      "clock-headers/runtime/object_ref.h": "7acbddd207cf4932f810b6d7f96691aa95d5a1d58a0257b44911281bd10a77d5",
+      "clock-headers/initialize/init.h": "aae57f746cbdbdc97cc068dde4b70a0f7355338f0d40b07709c66c435c1318aa",
+      "clock-headers/lasm/node.hpp": "12756d4ab0f75c72bb3cb02311e2d6dd471dc027e3278458b8af6c0ccf4aa3f3",
+      "clock-headers/util/output_channel.h": "9967d8fefd118ef62743ac53d51d3696279fd6da84785a2eddaf5a6a758a90f1",
+      "clock-headers/util/options.h": "1d46ed726dd37c90d4c45df5314d70238e40bbc6fabfb1e99dc4510c05df8116",
+      "clock-headers/util/option_declarations.h": "76c13a078331a7a2f42c09eaaedb99041853675009f9849b796aecc7af83cc69",
+      "clock-headers/util/io.h": "eaf2368487d36852ad6700d0dbc67985f39fef780eb69d20916b460891c61136",
+      "clock-headers/util/timeit.h": "f6746d415d2ab3d1942baebe95ac94d2df55984c29a4f81d0cac7470efe4d9b2",
+      "clock-headers/util/name_map.h": "92809c2116ad28a22a69a8c0864790aae7fc5e8d70e6f461e3c9c5ca729c8f8b",
+      "clock-headers/util/init_module.h": "4db26a91d7ccd9b4af29d4d5c4b2ea83fb3d4d59b4ad3c3f7e330b7ae93c7e47",
+      "clock-headers/util/bit_tricks.h": "10f8503ee3e3b77fb49d8b17a12441de8fa6c7937c8cd6a5c233a3e038d3ef28",
+      "clock-headers/util/macros.h": "e2fcf3995cae6bde05672486a81d237d5c9d1800c6e31bce8919700bd563ea43",
+      "clock-headers/util/unit.h": "de048993362e8d4e0bbe15a84d8589973e7b379757e955fc36fa11e7ae863770",
+      "clock-headers/util/exception_with_pos.h": "167ed7652f4b9726b559c0afa34f2dae1124a96e42cd7465fc50b52c32913553",
+      "clock-headers/util/alloc.h": "4f748fb10e008242068a25806ce9ab072c8107b6775321a9920b72c009129aa6",
+      "clock-headers/util/ascii.h": "485086905e99fb305a8b83acdcc4fe91a74152bfcf4993249ff682cd4e9ac26b",
+      "clock-headers/util/list_fn.h": "2476fcbb0b7f4f55b66f68d4f0cd1fa9fde57bf0250673af0ec0c7b0e25e5805",
+      "clock-headers/util/message_definitions.h": "de0946255475f6f5d9a82ca5b875fc7c962dc1c91ff4de8ce0159415843b2598",
+      "clock-headers/util/test.h": "735ac28dc3100a15a7400330c687882dff3d8b1ee7bb6193db4a121e727c51f0",
+      "clock-headers/util/map_foreach.h": "b2e37ae85180290065d8e42cd5fc79cffa4d03a2fd5528e36627407f2b53da62",
+      "clock-headers/util/null_ostream.h": "a58cf49c525389fe050a5d8ce5335a36662293ff9548af1b730526c30a355c73",
+      "clock-headers/util/rb_tree.h": "ee5c325ab1d6ef9c20ff2a4c4be6d7778f715def97087adea2cfad3f39dbb78b",
+      "clock-headers/util/freset.h": "8e65187adfe773ad6857d308f4c0d03d590c4ab2c9212ffa3ca29dd5e8a8788d",
+      "clock-headers/util/unlock_guard.h": "44c078c7fe129c5404a4bcca114009c455e30163a87cf46db566417095caaff2",
+      "clock-headers/util/list.h": "7d44417a7748eeae8ba8c561bba9e2273dbdadc35b9d9f70181bd6baff68ae8e",
+      "clock-headers/util/nat.h": "f83a35081ce5a9e866dfc2142f94440a3ab037a279dd757b3b64806698f3acbe",
+      "clock-headers/util/name_hash_set.h": "7f88372821f5c6a6f92bd9f30711fcccfc7a0ed900aaade0108ae2c9c230139f",
+      "clock-headers/util/name_set.h": "8dae7819c11a9c49a56e5d2661a5c56de642f139d73307b3866d4d63a105a886",
+      "clock-headers/util/rb_map.h": "d5d942aa362b4efad6b71142c02a1f4f691287f047daa3391ddef042641575ab",
+      "clock-headers/util/rc.h": "117237ffad3f83082da016822f16e443ab794ac54c9acbdbb2ef5eb40a5aa388",
+      "clock-headers/util/name_generator.h": "eb5cb15bc7ea5120163c685d2bbf1536d2acccef5aa5d6f287f51c21fbd60858",
+      "clock-headers/util/kvmap.h": "6cae76290df9ebc70ae126c5e9561c3e18d8b5963defbbf703472d821068eaab",
+      "clock-headers/util/timer.h": "d9b74fa1f5db02c51743c2922483c5d5326a69e2d44f1945fdaf39258bd9076e",
+      "clock-headers/util/escaped.h": "05e7d5a1495291d995c7d404131dd036008ad31c369c7f4f1db104cf6e5e50e8",
+      "clock-headers/util/name.h": "604f5351cfcd65019f8a30c4c09b917204bc1b9dc53d123d6f530627d75cfd98",
+      "clock-headers/util/lbool.h": "db705d9d3b62927452d66deb08d4bc2a2f62242013d08e4c8e0039f82a1b249f",
+      "clock-headers/util/pair.h": "790cde8c11b1ef6605413be349b16f4468cbf2d80aa16d7d2816495eb5cd4b18",
+      "clock-headers/util/name_hash_map.h": "cbc2b8204ff715c58ecdbc049e816e8ab8a96eda8113bd0b5af0edd505845168",
+      "clock-headers/util/path.h": "7b3c32ea67d68a18162322e05da3cab81028ce11ac5fb45f4ec1264ddc1800d0",
+      "clock-headers/kernel/level.h": "ee14a60344736656c45f7ac8df0dd2f305a49dc0eda1d410de9f6ee81bee6386",
+      "clock-headers/kernel/declaration.h": "eb9c497bb19dab26550cbb5196a13e0a925896c6d357a8faa2f3794c1e798a51",
+      "clock-headers/kernel/environment.h": "95e9b7aad9f138830197972c1812ca206317dae059ace9b7815674beec8500ed",
+      "clock-headers/kernel/kernel_exception.h": "58facd4e272a08b5b646fe1af1d26c60a9fad3185928326fa53479068dd1e24c",
+      "clock-headers/kernel/expr_maps.h": "9407344e004017991dbcd91bde689aa78be2e012254899c49aafc2f531272f2d",
+      "clock-headers/kernel/init_module.h": "0e7d2fe1c9d51b0d0f3df183bd7b76320bd7e1d3da82b70534bd8beb580fa9ff",
+      "clock-headers/kernel/expr_cache.h": "99fa32315261934532693eeeac05b979ea3ce7419d42e521a70f02f2eea7d2b2",
+      "clock-headers/kernel/replace_fn.h": "6b3a850ce10b5646a8d40011ff228f6d3223dc9a79136417bc586588d1aa8e76",
+      "clock-headers/kernel/expr.h": "1656fb21db578f6d2e8f3e2c0b2268f08c4ed285bf8b5f6440a483c3ced85f48",
+      "clock-headers/kernel/expr_sets.h": "e17ecdf51f54fd58331e8e6f02429f3abc5ea030aca3849f07d86167ffd5e7cb",
+      "clock-headers/kernel/instantiate.h": "82c29aeb56dfbdb68fc0266df21805a891c28b4c4ed9032e70602e709b532264",
+      "clock-headers/kernel/for_each_fn.h": "4a794526ef4deb15e42bb5f32669dcf737a830773f5862eff2449cfc2edb9162",
+      "clock-headers/kernel/local_ctx.h": "eeb577638aa32f799a8dfe15fdc1194413e8902fd854a739546dcae11f638b77",
+      "clock-headers/kernel/trace.h": "e94af418fd934153c6ddb99950a315c5d54e6c0155abba8b9263a0f7b1f76e45",
+      "clock-headers/kernel/abstract.h": "d1792dd710faadc3afabe587fd6b0c2679faca898465940386f0feda48a7caf2",
+      "clock-headers/kernel/equiv_manager.h": "1fb019d51aa2f2e505844d75a509a839e21c04db8f92f264a0ca0d0d21b4ec16",
+      "clock-headers/kernel/quot.h": "17105c835e79ccb397194e9663dba71b5515edbc89c9698b0d58a95dc30a8243",
+      "clock-headers/kernel/find_fn.h": "deaa2f562ebb63644e37244f5bf9db6f349385527d765b67a07a9524ed47eff9",
+      "clock-headers/kernel/inductive.h": "0c800b0377e7aa74a8a53a9f98ce61ab9df02ea62f917fc8e59db07189fddc98",
+      "clock-headers/kernel/expr_eq_fn.h": "ad010ccbc56f48abb3b94c3009e7c2d04ac0455f5d12a6ad7b7a797e39f65f3b",
+      "clock-headers/kernel/type_checker.h": "2e0d3a93e413f37f7a3249fb9e111bce0ac812e966ebe254283d7acd224592b1",
+      "clock-headers/library/constructions/init_module.h": "132cfbcf8d632f0fd28f07e9488ec74537b8d0d622777e4eb0e869eabcbe9707",
+      "clock-headers/library/constructions/no_confusion.h": "b84044552e39dc861cbf59d1f25413f4cc9cafc3df54bd03d0cbc5f19d19ba9a",
+      "clock-headers/library/constructions/util.h": "a3f02d9c2524a1d09333b7de4d9f32385dcfb4ec6a8d7d7ca4f2cf5f88670cc1",
+      "clock-headers/library/constructions/cases_on.h": "adf0e61ec9c1b36fb9295c06df255ae2ab0ac0692e8d6b025b01458ed2deb850",
+      "clock-headers/runtime/uv/udp.h": "6084b39c43f5b15956638e6d594bc685f743b045746e3b5441d1669af9fcdb87",
+      "clock-headers/runtime/uv/tcp.h": "99948620a9abaac8a58d26e086f97d2ee58a387c9541615223252bc97be77aa3",
+      "clock-headers/runtime/uv/dns.h": "a9b84050b0f1d2d15eb4c8f7e2132162894a15b54b9b0c6187730d6120d62d5a",
+      "clock-headers/runtime/uv/event_loop.h": "f55920ffb3779a6ef36f8c19c55abe58e835de938264589b4d7f193149f78ca2",
+      "clock-headers/runtime/uv/signal.h": "d8ecb35bca78f0cdb54cec2c2a0cfb20a5e6cc046a727f8eaaeb6d575c9908ff",
+      "clock-headers/runtime/uv/net_addr.h": "451557925b9052d21ad906d25ee92e2ec935a4a1e6cf1b9d7d904b96318b088d",
+      "clock-headers/runtime/uv/timer.h": "1b86d58e6180eb4973b5978a8c416a7db77955a48acd3995eb070afcd87f2d99",
+      "clock-headers/runtime/uv/system.h": "b6de08b1b576da7739f7e1829370c5425b2ea5c1207ffffc5c802a53008b7111",
+      "clock-headers/include/lean/lean_libuv.h": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "clock-headers/include/lean/lean_gmp.h": "f4dd6a073992fa8b9d776e9ff44b70133afdfd68f72823b19d1bfe63b247939d",
+      "clock-headers/include/lean/lean.h": "4686c58939defda8658959c2e402baf988f4bbb2d570d8dcf44240e757f32230",
+      "lib/lean/libgmp.a": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+      "libuv/src/libuv/libuv.a": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+      "runtime-support/application-link-mode.mjs": "de4ba33887abd29f782f71d9eb0aa7ed70db0e0c1ef147f9314790a9b30d6af9",
+      "runtime-support/standalone-link-optimization.mjs": "a2df18d23eca3f96f5b8355415e3916d405f25ddbd8e8fd9c9e1fe8ccad43596",
+      "lib/lean/libleanrt.a": "36bdf3cb605b9cba175d7243a7f3848789ff3efd74a363ba5c1f6ff0e28b542a",
+      "metadata-source/node-system.cpp": "77b30c63c3834db7630e04b338cafc41f3b46c19aa88722f29fc75ee67097c86",
+      "metadata-source/node.hpp": "12756d4ab0f75c72bb3cb02311e2d6dd471dc027e3278458b8af6c0ccf4aa3f3",
+      "metadata-source/libuv.cpp": "ec9e10a37af399edb33361b205e16cb9d3a6839607ed5de5f1f2368ddae1a5ea",
+      "metadata-source/gmp.h": "3dbb60d43782095ceb760010d76585948281d9ca23ea30506a5fe67bd4e0e185",
+      "metadata-source/node-system.cpp.o": "b2c93481b6f898b8193ebda0fe1bd4cf74a5c8a551d212b5cea8995eacdf245e",
+      "metadata-source/libuv.cpp.o": "b448de47fef590cf4cc6827b2030b1e63261df8926f929744a053bf6804b115c"
+    },
+    "derivedFrom": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native",
+    "derivation": {
+      "scope": "Private host modules only; unchanged Lean sources, Wasm, and embedded/link-time dispatch.",
+      "changed": [
+        "host/node-host.mjs",
+        "host/native-files.mjs",
+        "host/native-file-worker.mjs"
+      ],
+      "parentDerivation": {
+        "source": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v145-runtime-metadata-native",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/lean-symbol-loader-full-build.resources.json",
+        "scope": "Export the existing in-Wasm Lean symbol registry and connect late-loaded plugin imports; compiler and runtime object files remain unchanged.",
+        "implementationSha256": "3ec08ad1fc584fc72be2cbe0e5a26fa271579d3fec43a7a175506cf09d2c3696",
+        "linkCommand": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/em++",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/temp/libleanmain.a",
+          "-lc++",
+          "-lc++abi",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/lean/liblasmnative.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/lean/liblasmtools.a",
+          "-Wl,--whole-archive",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/lean/liblasmhost.a",
+          "-Wl,--no-whole-archive",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/runtime-support/host-pre.js",
+          "--js-library",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/runtime-support/host-library.js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/temp/libleanshell.a",
+          "-lleancpp",
+          "-lInit",
+          "-lStd",
+          "-lLean",
+          "-lnodefs.js",
+          "-lleanrt",
+          "-lc++",
+          "-lc++abi",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-lnodefs.js",
+          "-s",
+          "EXIT_RUNTIME=1",
+          "-s",
+          "NODERAWFS=1",
+          "-s",
+          "MAIN_MODULE=2",
+          "-s",
+          "ERROR_ON_UNDEFINED_SYMBOLS=0",
+          "-sEXPORTED_FUNCTIONS=@/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lasm-wasm-exports.json",
+          "-sEXPORTED_RUNTIME_METHODS=FS,ENV,callMain,ccall,UTF8ToString,stringToNewUTF8",
+          "-sSTACK_SIZE=16777216",
+          "-sINITIAL_MEMORY=134217728",
+          "-sMAXIMUM_MEMORY=8589934592",
+          "-sPTHREAD_POOL_SIZE=5",
+          "-sPROXY_TO_PTHREAD=1",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/runtime-support/emscripten-pre.js",
+          "-lLake",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/include",
+          "-O3",
+          "-DNDEBUG",
+          "-O1",
+          "-g2",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/bin/lean.js",
+          "-L/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v146-lean-symbol-loader-native/lib/lean",
+          "-sMALLOC=mimalloc",
+          "-sMAXIMUM_MEMORY=8589934592",
+          "-sPTHREAD_POOL_SIZE=5",
+          "-sGROWABLE_ARRAYBUFFERS=1",
+          "-sSTACK_OVERFLOW_CHECK=2",
+          "-sSTACK_SIZE=67108864",
+          "-Wl,--export=__cpp_exception",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/lib/lean/libgmp.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/libuv/src/libuv/libuv.a",
+          "-lm",
+          "-pthread"
+        ],
+        "loaderSha256": "9373a3bd4863233f49467a2cb2507218547812d8ce10760683b1e22e608f1092",
+        "startedAt": "2026-09-22T20:07:00.344949+00:00",
+        "exitCode": 0,
+        "finishedAt": "2026-09-22T20:07:44.445720+00:00"
+      },
+      "wasmSha256": "9a58c4b949a62fa9f66560fb51cdabfb15c1d684b091aab8d3199db7f75ef0bc",
+      "sharedFrozenInputs": "Unchanged inputs are symlinked to the immutable source snapshot."
+    }
+  },
+  "maximumValidationPeakBytes": 2234920960,
+  "limitations": [
+    "Windows retains the earlier temporary-file adapter and needs a separate repair and validation.",
+    "The POSIX implementation is not yet validated on native macOS or ARM64.",
+    "Raw non-UTF8 environment variables and near-limit relative paths need separate investigation.",
+    "Full Bun uses the local rebuilt capacity8g engine and Linux stack helper; the packaged tests use stock Bun.",
+    "Full engine campaigns and integration of the full runtime into the package remain open."
+  ]
+}

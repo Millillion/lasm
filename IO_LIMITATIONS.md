@@ -50,6 +50,15 @@ and do not establish full-suite conformance. See
 
 ## Standard API coverage
 
+- [ ] Complete temporary-file/directory parity on Windows and validate native
+  macOS/ARM64, raw non-UTF8 environment values and near-limit relative paths.
+  On Linux x64, POSIX atomic creation now preserves symlink/dot traversal,
+  relative spelling and the instance cwd, honors empty variables and the
+  `TEMPDIR` fallback, and matches libuv errors. Ten ordinary Lean cases match
+  native output in all three packaged and full engines, with a separate
+  safe-error check for the native missing-directory crash. All six unchanged
+  upstream IO controls pass. Windows retains the earlier adapter; see
+  [the temporary-file evidence](docs/evidence/temporary-files-2026-09-22.json).
 - [ ] Complete a declaration-by-declaration compatibility audit; the implemented
   primitives and tested higher-level APIs are not all of Lean IO. The pinned
   inventory now lists 193 `IO.FS` and 1,938 `Std.Http` declarations. All 20 direct
@@ -121,7 +130,10 @@ and do not establish full-suite conformance. See
   dereferences a null filename. Lasm returns a structured error safely; the
   separate native crash and three-engine safety checks are recorded in the
   directory-identity evidence. This intentional difference is an upstream bug,
-  not a fundamental JavaScript limitation. `IO.currentDir` has a different native
+  not a fundamental JavaScript limitation. The same decoder also crashes native
+  `IO.FS.createTempFile` when its temporary directory is missing. The separate
+  temporary-file comparisons retain that crash and verify a structured ENOENT
+  in Lasm; this is a safety check, not native-output parity. `IO.currentDir` has a different native
   error and Lasm now preserves that distinction.
 - [ ] Expand stdin, terminal, redirected-console, and interactive backpressure tests.
   Ordinary redirected stdout now uses native FILE buffering; stderr remains

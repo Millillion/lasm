@@ -10,12 +10,14 @@ const port = parentPort ?? {
   postMessage(value, transfer) { globalThis.postMessage(value, transfer); },
 };
 const operations = new Set(['open', 'read', 'write', 'flush', 'rewind', 'truncate', 'getLine',
-  'closeAsync', 'readDirectory', 'realPath', 'groupInfo', 'checkDirectorySearch']);
+  'closeAsync', 'readDirectory', 'realPath', 'groupInfo', 'checkDirectorySearch', 'createTemporary']);
 port.on('message', async ({ operation, args }) => {
   try {
     if (!operations.has(operation)) throw new Error(`Invalid native file operation: ${operation}`);
     let value = await files[operation](...args);
     if (operation === 'open') value = { stream: value.stream, fd: value.fd, type: value.type };
+    if (operation === 'createTemporary' && value.file)
+      value.file = { stream: value.file.stream, fd: value.file.fd, type: value.file.type };
     // Move full allocations directly. A short read or pooled Buffer must copy
     // only its returned bytes: cloning the view would clone its entire backing
     // allocation, even at EOF. A fresh Uint8Array also leaves pooled peers live.

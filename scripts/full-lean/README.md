@@ -445,6 +445,15 @@ Use a fresh output directory. The probe records the SDK patch and source hashes;
 it does not replace any upstream Lean test. The retained profile and comparisons
 are in [the symbol-lookup evidence](../../docs/evidence/symbol-lookup-2026-09-21.json).
 
+`probe-temporary-files.mjs NEW_OUTPUT FULL_TOOLCHAIN...` compares ordinary Lean
+temporary paths, environment precedence, contents and structured errors against
+native Lean. Ten cases require identical fixture output. A separate missing-
+directory case records the pinned native ENOENT-decoder crash and checks Lasm's
+safe error against native's valid empty-directory error path. This is explicitly
+a safety check, not a parity pass. Linux x64 checks pass in packaged and full
+Node, Deno and Bun; full Bun uses the local engine build and stack helper. See
+[the temporary-file evidence](../../docs/evidence/temporary-files-2026-09-22.json).
+
 `probe-realpath.mjs NEW_OUTPUT FULL_TOOLCHAIN...` compares 17 ordinary Lean
 path cases against native Lean, including symlink/parent traversal, missing and
 non-directory components, empty paths, permissions, and malformed filename
