@@ -3,19 +3,20 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The v144 Node campaign's latest saved checkpoint records **54 passes, zero
-failures or resource aborts, and 3,842 pending registrations**. All 3,896 tests
+The v144 Node campaign's latest saved checkpoint records **102 passes, zero
+failures or resource aborts, and 3,794 pending registrations**. All 3,896 tests
 remain selected; 3,004 previously unpassed names run first, without importing
 earlier results. Quicksort, four red-black-map variants, server startup, the
 dependent-pair iterator, tree maps, union-find, server watchdog and workspace
-symbols pass. The first 43 documentation-parser registrations pass too.
+symbols pass. The first 91 documentation-parser registrations pass too.
 Every completed attempt preserves all 7,267 original source hashes and the
 compiled-driver/harness hashes. The active unfinished attempt is excluded from
 the saved results. This campaign uses base pages, one build worker and the
 separate final-link profile described below. See
-[the 54-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint54-2026-09-22.json).
-The [initial ten-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint10-2026-09-22.json)
-remains unchanged.
+[the 102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint102-2026-09-22.json).
+The [54-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint54-2026-09-22.json)
+and [initial ten-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint10-2026-09-22.json)
+remain unchanged.
 
 The v144 standalone final-link profile passes **nineteen unchanged upstream
 registrations**: eleven in Node and four each in Deno and the local rebuilt Bun.
