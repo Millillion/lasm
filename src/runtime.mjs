@@ -33,7 +33,7 @@ export async function instantiate(bytes, manifest, { host = {}, wasi: suppliedWa
     failure = error;
     disposed = true;
     scheduler.stop(error);
-    nodeRuntime?.close();
+    nodeRuntime?.close(error);
     e = null;
     instance = null;
     wasi = null;

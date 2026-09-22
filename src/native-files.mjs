@@ -24,6 +24,12 @@ export function nativeFiles({ synchronous = false } = {}) {
   const pipe = windows ? libc.func('int _pipe(_Out_ int *fds, uint size, int mode)')
     : libc.func('int pipe(_Out_ int *fds)');
   const fclose = bind('fclose', 'int', ['void *']);
+  // Discard buffered IO while the FILE still owns its descriptor. Closing the
+  // descriptor first would let another host thread reuse it before fclose.
+  // Windows has no corresponding documented CRT primitive; its embedded
+  // forced-exit buffer-discard behavior remains an explicit compatibility gap.
+  const purge = windows ? null : bind(process.platform === 'darwin' ? 'fpurge' : '__fpurge',
+    process.platform === 'darwin' ? 'int' : 'void', ['void *']);
   const fileno = bind(windows ? '_fileno' : 'fileno', 'int', ['void *']);
   const fread = bind('fread', 'size_t', ['void *', 'size_t', 'size_t', 'void *']);
   const fwrite = bind('fwrite', 'size_t', ['void *', 'size_t', 'size_t', 'void *']);
@@ -225,13 +231,15 @@ export function nativeFiles({ synchronous = false } = {}) {
       if (!windows && fcntl(owned, 2, 1) < 0) { const error = failure(); closeFd(owned); throw error; }
       return adapter.openDescriptor(owned, mode);
     },
-    close(file) {
+    close(file, discardOutput = false) {
       const stream = file.stream;
+      if (stream && discardOutput && purge && purge(stream) === -1) throw failure();
       file.stream = null;
       if (stream) fclose(stream);
     },
-    async closeAsync(file) {
+    async closeAsync(file, discardOutput = false) {
       const stream = file.stream;
+      if (stream && discardOutput && purge && purge(stream) === -1) throw failure();
       file.stream = null;
       // fclose can flush a buffered pipe and wait for its reader. The full
       // runtime blocks only the calling Lean thread while this worker runs.
@@ -315,10 +323,10 @@ export function nativeFiles({ synchronous = false } = {}) {
     async open(...args) {
       return { ...await callNativeFile('open', args), tail: Promise.resolve() };
     },
-    async closeAsync(file) {
+    async closeAsync(file, discardOutput = false) {
       const stream = file.stream;
       file.stream = null;
-      if (stream) await callNativeFile('closeAsync', [{ stream }]);
+      if (stream) await callNativeFile('closeAsync', [{ stream }, discardOutput]);
     },
     async read(file, count) {
       if (!count) return Buffer.alloc(0);

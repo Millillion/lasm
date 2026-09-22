@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, readFileSync, statSync, writeFileSync, opendirSync
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { createNodeRuntimeHost } from '../src/node-host.mjs';
+import { createNodeRuntimeHost, LeanExit } from '../src/node-host.mjs';
 
 for (const removedCwd of [false, true]) test(`four blocked FIFO readers leave dependent writes able to run in each installed engine${removedCwd ? ' after cwd removal' : ''}`,
   { skip: process.platform === 'win32' }, t => {
@@ -66,6 +66,30 @@ function setup(t) {
   return { directory, host, call, ok, open };
 }
 
+test('embedded exit closes owned stdout after pending and completed writes in each installed engine',
+  { timeout: 60_000 }, async t => {
+    for (const [name, executable, prefix] of [
+      ['node', process.execPath, []],
+      ['deno', '.cache/js-runtimes/deno-2.9.7/deno', ['run', '-A']],
+      ['bun', '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun', []],
+    ]) {
+      if (!existsSync(executable)) continue;
+      for (const mode of ['normal', 'force']) for (const timing of ['pending', 'settled']) {
+        await t.test(`${name}: ${mode}, ${timing}`, {
+          skip: mode === 'force' && process.platform === 'win32' ? 'Windows CRT buffer discard is not implemented' : false,
+        }, () => {
+          const result = spawnSync(executable, [...prefix, 'test/fixtures/stdio-exit-host.mjs', mode, timing],
+            { encoding: 'utf8', timeout: 10_000, killSignal: 'SIGKILL' });
+          assert.equal(result.error, undefined);
+          assert.equal(result.signal, null);
+          assert.equal(result.status, 0, result.stderr);
+          assert.equal(result.stdout, mode === 'force' ? '' : 'buffered stdout\n');
+          assert.equal(result.stderr, 'unbuffered stderr\n');
+        });
+      }
+    }
+  });
+
 test('Lean handles use buffered writes, flush, rewind, and the actual stream position for truncate', async t => {
   const { directory, host, ok, open } = setup(t);
   const file = join(directory, 'data');
@@ -118,6 +142,21 @@ test('full-runtime finalization waits for pending writes and flushes before comp
   // A repeated release must not pass a freed FILE pointer to fclose again.
   await host.releaseAsync(h);
 });
+
+for (const force of [false, true]) test(`embedded ${force ? 'forced' : 'normal'} exit preserves queued file-write cleanup`,
+  { skip: force && process.platform === 'win32' ? 'Windows CRT buffer discard is not implemented' : false }, async t => {
+    const { directory, host, ok, open } = setup(t);
+    const h = await open('queued-exit', 1);
+    const writing = ok(3, h, 0, 'still buffered');
+    host.close(new LeanExit(19, force));
+    // Repeated disposal must neither close the stream twice nor turn a forced
+    // exit back into an ordinary flushing close while its write is pending.
+    host.close();
+    await writing;
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(readFileSync(join(directory, 'queued-exit'), 'utf8'), force ? '' : 'still buffered');
+    assert.equal(host.stats().resources, 0);
+  });
 
 test('line reading preserves embedded NUL and invalid UTF-8 for Lean string decoding', async t => {
   const { directory, ok, open } = setup(t);

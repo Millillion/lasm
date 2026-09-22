@@ -1223,6 +1223,24 @@ Stock Bun, packaged full-runtime integration, full-suite completion, broader IO
 coverage, and native Windows/macOS/ARM64 validation remain open. See
 [all attempts, hashes, dependencies, and resource reports](evidence/bun-memory64-capacity-2026-09-22.json).
 
+## Embedded forced-exit cleanup, September 22 UTC
+
+The packaged runtime previously flushed open files while disposing an embedded
+guest after `IO.Process.forceExit`. The supplementary native comparison records
+that mismatch in Node, Deno, and Bun. Cleanup now retains the exit reason and
+purges pending native stream buffers before closing them on Linux/macOS. It waits
+for queued file operations, including stdout writes whose stream has not yet been
+created, and repeated disposal preserves the original exit mode.
+
+On Linux x64, all 12 native/engine comparison cases now pass, including host
+survival in each embedded case. The generated Wasm is byte-identical before and
+after the host repair. All 63 file, console, host, and process-exit regressions
+pass with zero skips; peak memory across comparison and regression runs is
+0.54 GiB with no resource event. These are supplementary application checks,
+not upstream-suite registrations. Windows discard remains unimplemented and the
+macOS branch still needs native validation. See
+[the complete cleanup evidence](evidence/embedded-force-exit-2026-09-22.json).
+
 ## Host platform and compilation target, September 21
 
 The full runtime now answers `System.Platform.isWindows` and `isOSX` using

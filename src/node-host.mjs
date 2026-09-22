@@ -50,13 +50,13 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   const directory = createWorkingDirectory(cwd, propagateCwd);
   const resources = new HandleTable({ first: 10,
     entries: [0, 1, 2].map(fd => [fd, { type: 'file', fd, standardId: fd, tail: Promise.resolve() }]) });
-  let closed = false;
+  let closed = false, discardOutput = false;
   function closeResource(resource, asynchronous = false) {
     if (resource.type === 'file') {
       const close = () => {
         try {
-          if (asynchronous) return nativeFiles().closeAsync(resource).catch(() => {});
-          nativeFiles().close(resource);
+          if (asynchronous) return nativeFiles().closeAsync(resource, discardOutput).catch(() => {});
+          nativeFiles().close(resource, discardOutput);
         } catch { /* finalizers cannot report IO errors */ }
       };
       return resource.pending ? resource.tail.then(close) : close();
@@ -276,7 +276,19 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       if (!pending.has(id)) throw new Error('Unknown asynchronous host request');
       return Promise.resolve(pending.get(id));
     },
-    close() { closed = true; directory.close(); for (const value of resources.values()) value.cancelled = true; for (const id of resources.keys()) release(id); for (const id of [0,1,2]) { const f = resources.get(id); if (f.stream) closeResource(f, true); } pending.clear(); },
+    close(reason) {
+      if (closed) return;
+      discardOutput = reason instanceof LeanExit && reason.force;
+      closed = true;
+      directory.close();
+      for (const value of resources.values()) value.cancelled = true;
+      for (const id of resources.keys()) release(id);
+      for (const id of [0, 1, 2]) {
+        const file = resources.get(id);
+        if (file.stream || file.pending) closeResource(file, true);
+      }
+      pending.clear();
+    },
     stats() { return { resources: resources.size - 3 }; },
   };
 }

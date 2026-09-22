@@ -53,12 +53,15 @@ console.log('host still running');
           assert.deepEqual(run(name + '-source', executable,
             [...prefix, join(root, `lasm-${name}.js`), source, '--'], mode), expected[mode]);
         });
-        await t.test(`${name}: embedded ${mode} preserves host process`, () => {
+        await t.test(`${name}: embedded ${mode} preserves host process`, async t => {
           const result = run(name + '-embedded', executable, [...prefix, embedded], mode);
           assert.equal(result.code, 0);
           assert.equal(result.stderr, '');
           assert.equal(result.stdout,
             JSON.stringify({code, force: mode === 'force', disposed: true}) + '\n' + 'host still running\n');
+          await t.test('open-file contents match native exit', {
+            skip: mode === 'force' && process.platform === 'win32' ? 'Windows CRT buffer discard is not implemented' : false,
+          }, () => assert.equal(result.file, expected[mode].file));
         });
       }
     }

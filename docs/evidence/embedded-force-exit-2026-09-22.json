@@ -1,0 +1,808 @@
+{
+  "recordedAt": "2026-09-22T00:58:28.305297+00:00",
+  "scope": "Linux x64 embedded forced-exit cleanup repair, preserving the host process and discarding unflushed native streams. Supplementary ordinary Lean and adapter regressions, not upstream-suite registrations.",
+  "before": {
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-exit/Main.lean",
+    "sourceSha256": "dd92748ea5a39c290b6401bed4f7276b417cd7383f790c9dd4752c2618250048",
+    "scope": "Supplementary Linux file-buffer and host-survival comparison for embedded Lean mains; not an upstream-suite result.",
+    "cases": [
+      {
+        "name": "native",
+        "mode": "return",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered stdout\n",
+          "stderr": "unbuffered stderr\n",
+          "file": "buffered file\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "native",
+        "mode": "exit",
+        "actual": {
+          "code": 17,
+          "signal": null,
+          "stdout": "buffered stdout\n",
+          "stderr": "unbuffered stderr\n",
+          "file": "buffered file\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "native",
+        "mode": "force",
+        "actual": {
+          "code": 19,
+          "signal": null,
+          "stdout": "",
+          "stderr": "unbuffered stderr\n",
+          "file": ""
+        },
+        "passed": true
+      },
+      {
+        "name": "node",
+        "mode": "return",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "node",
+        "mode": "exit",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "node",
+        "mode": "force",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "",
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": false
+      },
+      {
+        "name": "deno",
+        "mode": "return",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "mode": "exit",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "mode": "force",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "",
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": false
+      },
+      {
+        "name": "bun",
+        "mode": "return",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "mode": "exit",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "mode": "force",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "",
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": false
+      }
+    ],
+    "build": {
+      "output": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-exit/.lake/lasm/mains/e1a9d7df27bcbcd5/dist",
+      "manifestSha256": "53842e325bcd8d0337d2fc1dd7b6702e516f00d292205fafe44657c41d09a202"
+    },
+    "sourceUnchanged": true,
+    "passed": false
+  },
+  "after": {
+    "source": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-exit/Main.lean",
+    "sourceSha256": "dd92748ea5a39c290b6401bed4f7276b417cd7383f790c9dd4752c2618250048",
+    "scope": "Supplementary Linux file-buffer and host-survival comparison for embedded Lean mains; not an upstream-suite result.",
+    "cases": [
+      {
+        "name": "native",
+        "mode": "return",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "buffered stdout\n",
+          "stderr": "unbuffered stderr\n",
+          "file": "buffered file\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "native",
+        "mode": "exit",
+        "actual": {
+          "code": 17,
+          "signal": null,
+          "stdout": "buffered stdout\n",
+          "stderr": "unbuffered stderr\n",
+          "file": "buffered file\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "native",
+        "mode": "force",
+        "actual": {
+          "code": 19,
+          "signal": null,
+          "stdout": "",
+          "stderr": "unbuffered stderr\n",
+          "file": ""
+        },
+        "passed": true
+      },
+      {
+        "name": "node",
+        "mode": "return",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "node",
+        "mode": "exit",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "node",
+        "mode": "force",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": ""
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "",
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "mode": "return",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "mode": "exit",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "deno",
+        "mode": "force",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": ""
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "",
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "mode": "return",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":0,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "mode": "exit",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": "buffered file\n"
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "buffered file\n",
+          "stdout": "{\"code\":17,\"force\":false,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      },
+      {
+        "name": "bun",
+        "mode": "force",
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n",
+          "stderr": "",
+          "file": ""
+        },
+        "expected": {
+          "code": 0,
+          "signal": null,
+          "stderr": "",
+          "file": "",
+          "stdout": "{\"code\":19,\"force\":true,\"disposed\":true,\"hostAlive\":true}\n"
+        },
+        "passed": true
+      }
+    ],
+    "build": {
+      "output": "/home/lastmjs/development/lasm/compiler/test/fixtures/process-exit/.lake/lasm/mains/e1a9d7df27bcbcd5/dist",
+      "manifestSha256": "53842e325bcd8d0337d2fc1dd7b6702e516f00d292205fafe44657c41d09a202"
+    },
+    "sourceUnchanged": true,
+    "passed": true
+  },
+  "runtimeInputsBefore": {
+    "scope": "Preserved generated runtime used by the completed pre-fix comparison, before rebuilding its application cache.",
+    "baselineComparisonSha256": "1aba7b92bde6776c7e08f38041d78d0d0d131e2a90da073125bf29f3645a3d9a",
+    "gitCommit": "b17b65d56c82b9200f0644c4c87846780be82d4d",
+    "files": {
+      "runtime.mjs": "2ddeddadbbc85704a46ef4443a8b8aeceb312ea49942d62c4667e4b335a0e5b0",
+      "node-host.mjs": "750422b70e01a4965df35fb752f9d8aec3c02a3bd58b703b4c8d168949b4c4e9",
+      "native-files.mjs": "04c0adf59f30862556611b83496bdf22db7744e5398ee39460caa0fb77bf525b",
+      "native-file-worker.mjs": "ebea284543fa12a3711cb622bff5c0b17495f4af96fcd016b1f512c369aecee1",
+      "native-file-worker-pool.mjs": "b2047e050ab6266ad3613dcd0b37107abfcf5fa80857187f2ae1b13cd7c55ca2",
+      "index.mjs": "16fcd64a514966c86b16e26b4ab523895f9b48f085cbad9195fabfe5d98fb6ee",
+      "manifest.json": "53842e325bcd8d0337d2fc1dd7b6702e516f00d292205fafe44657c41d09a202",
+      "main.mjs": "e37a2a50944991574f670f3acab5917f0c9f2af553c6e693d78db68cee9323b7",
+      "module.wasm": "d111cd30b5753fca19621030d6ab3c735ab4a800029544ecd07bb138b0e88cb0"
+    }
+  },
+  "runtimeInputsAfter": {
+    "scope": "Preserved generated runtime from the passing post-fix comparison.",
+    "comparisonSha256": "87f2f198130a90805762d237efddad8346eeb2abff25058ae02ffc554e2d91d9",
+    "files": {
+      "runtime.mjs": "0275b4754fe81813338e43bd6d510ff1671b4ae575f0177e316274224d428296",
+      "node-host.mjs": "fce5741814643ca0dbd7ad4bd5ed274fc387fa94f80214bf6d593d9cfce53ca6",
+      "native-files.mjs": "90b00c2a37cf2a1a3a45d49982211b12de079e39ec34afa46fc215561af70689",
+      "native-file-worker.mjs": "ebea284543fa12a3711cb622bff5c0b17495f4af96fcd016b1f512c369aecee1",
+      "native-file-worker-pool.mjs": "b2047e050ab6266ad3613dcd0b37107abfcf5fa80857187f2ae1b13cd7c55ca2",
+      "index.mjs": "16fcd64a514966c86b16e26b4ab523895f9b48f085cbad9195fabfe5d98fb6ee",
+      "manifest.json": "53842e325bcd8d0337d2fc1dd7b6702e516f00d292205fafe44657c41d09a202",
+      "main.mjs": "e37a2a50944991574f670f3acab5917f0c9f2af553c6e693d78db68cee9323b7",
+      "module.wasm": "d111cd30b5753fca19621030d6ab3c735ab4a800029544ecd07bb138b0e88cb0"
+    },
+    "wasmUnchanged": true
+  },
+  "resources": {
+    "before": {
+      "startedAt": "2026-09-22T00:39:38.737Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "env",
+        "BINARYEN_CORES=1",
+        "EMCC_CORES=1",
+        "CMAKE_BUILD_PARALLEL_LEVEL=1",
+        "node",
+        ".work/full-engine-probe/probe-embedded-force-exit.mjs",
+        ".work/full-engine-probe/embedded-force-exit-before"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "959382f1-1631-4a32-b6ef-5f44fa8ba794",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 26676785152
+      },
+      "minimumHostAvailable": 26375692288,
+      "peakMemoryBytes": 93118464,
+      "peakTasks": 38,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/embedded-force-exit-before.resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-22T00:39:41.751Z",
+        "memoryBytes": 52961280,
+        "peakMemoryBytes": 93118464,
+        "swapBytes": 0,
+        "tasks": 28,
+        "memoryBreakdown": {
+          "anon": 44945408,
+          "file": 4653056,
+          "kernel": 2367488,
+          "shmem": 0,
+          "file_mapped": 835584,
+          "inactive_file": 3710976,
+          "slab": 490536
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-22T00:39:41.873Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 17330176,
+        "peakMemoryBytes": 93118464,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 4657152,
+          "kernel": 991232,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 3710976,
+          "slab": 161208
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-22T00:39:41.902Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "after": {
+      "startedAt": "2026-09-22T00:53:33.295Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "env",
+        "BINARYEN_CORES=1",
+        "EMCC_CORES=1",
+        "CMAKE_BUILD_PARALLEL_LEVEL=1",
+        "node",
+        ".work/full-engine-probe/probe-embedded-force-exit.mjs",
+        ".work/full-engine-probe/embedded-force-exit-after"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "cdcf0723-a18f-4d75-8c02-ed798c21a79e",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 26514399232
+      },
+      "minimumHostAvailable": 26125053952,
+      "peakMemoryBytes": 579956736,
+      "peakTasks": 28,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/embedded-force-exit-after.resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-22T00:54:44.376Z",
+        "memoryBytes": 346419200,
+        "peakMemoryBytes": 579956736,
+        "swapBytes": 0,
+        "tasks": 8,
+        "memoryBreakdown": {
+          "anon": 139931648,
+          "file": 198131712,
+          "kernel": 6905856,
+          "shmem": 0,
+          "file_mapped": 114688,
+          "inactive_file": 76697600,
+          "slab": 2310688
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-22T00:54:44.567Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 212307968,
+        "peakMemoryBytes": 579956736,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10215424,
+          "file": 198131712,
+          "kernel": 2560000,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 76701696,
+          "slab": 1727752
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-22T00:54:44.592Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "regressions": {
+      "startedAt": "2026-09-22T00:55:26.342Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "env",
+        "BINARYEN_CORES=1",
+        "EMCC_CORES=1",
+        "CMAKE_BUILD_PARALLEL_LEVEL=1",
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "test/native-files.test.mjs",
+        "test/node-host.test.mjs",
+        "test/node-process-exit.test.mjs",
+        "test/node-console-buffering.test.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "33ca5e0a-77b5-457a-8637-55c7a6b6b713",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 26702032896
+      },
+      "minimumHostAvailable": 26117636096,
+      "peakMemoryBytes": 450662400,
+      "peakTasks": 44,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/embedded-force-exit-regressions.resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-22T00:56:52.077Z",
+        "memoryBytes": 21970944,
+        "peakMemoryBytes": 450662400,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 208896,
+          "file": 19218432,
+          "kernel": 753664,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 17555456,
+          "slab": 647616
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-22T00:56:52.114Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 32964608,
+        "peakMemoryBytes": 450662400,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10211328,
+          "file": 19218432,
+          "kernel": 1589248,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 17555456,
+          "slab": 746560
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-22T00:56:52.142Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "regressions": {
+    "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/embedded-force-exit-regressions.log",
+    "logSha256": "81ddc368017f0dde528da3d6a9581fed057ccf0c1759aa608db5eda77b49e97e",
+    "counts": {
+      "tests": 63,
+      "pass": 63,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "finalOutput": "\u2714 IO.sleep preserves durations beyond one Node timeout instead of clamping to 1ms (10.762315ms)\n\u2714 runtime teardown cancels sleeps and releases their Node timers (0.682151ms)\n\u2714 completion readiness preserves the result for its consuming Lean thread (1.326014ms)\n\u2714 Std.Async timers preserve UInt64 delays and reset without overflowing Node timeouts (1.897402ms)\n\u2714 a synchronous exit during request startup leaves no pending result (8.476918ms)\n\u25b6 ordinary Lean process exit preserves status and distinguishes forced buffer discard\n  \u2714 node: return (291.405005ms)\n  \u2714 node: exit (235.935874ms)\n  \u2714 node: force (223.486137ms)\n  \u2714 node: source launcher exit (236.259091ms)\n  \u25b6 node: embedded exit preserves host process\n    \u2714 open-file contents match native exit (3.56411ms)\n  \u2714 node: embedded exit preserves host process (257.743132ms)\n  \u2714 node: source launcher force (245.642023ms)\n  \u25b6 node: embedded force preserves host process\n    \u2714 open-file contents match native exit (0.353162ms)\n  \u2714 node: embedded force preserves host process (235.150192ms)\n  \u2714 deno: return (300.695297ms)\n  \u2714 deno: exit (243.965034ms)\n  \u2714 deno: force (240.235527ms)\n  \u2714 deno: source launcher exit (249.225244ms)\n  \u25b6 deno: embedded exit preserves host process\n    \u2714 open-file contents match native exit (0.179465ms)\n  \u2714 deno: embedded exit preserves host process (247.87856ms)\n  \u2714 deno: source launcher force (255.416379ms)\n  \u25b6 deno: embedded force preserves host process\n    \u2714 open-file contents match native exit (0.31319ms)\n  \u2714 deno: embedded force preserves host process (255.67757ms)\n  \u2714 bun: return (150.5479ms)\n  \u2714 bun: exit (119.839843ms)\n  \u2714 bun: force (126.533472ms)\n  \u2714 bun: source launcher exit (130.231569ms)\n  \u25b6 bun: embedded exit preserves host process\n    \u2714 open-file contents match native exit (0.145587ms)\n  \u2714 bun: embedded exit preserves host process (125.439015ms)\n  \u2714 bun: source launcher force (127.890724ms)\n  \u25b6 bun: embedded force preserves host process\n    \u2714 open-file contents match native exit (0.218415ms)\n  \u2714 bun: embedded force preserves host process (120.351519ms)\n\u2714 ordinary Lean process exit preserves status and distinguishes forced buffer discard (5395.588646ms)\n\u2139 tests 63\n\u2139 suites 0\n\u2139 pass 63\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 85620.345762\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 1min 25.748s\nCPU time consumed: 1min 28.534s\nMemory peak: 429.7M\nMemory swap peak: 0B\n[lasm] Peak 0.42 GiB; success"
+  },
+  "sourceHashes": {
+    "src/runtime.mjs": "0275b4754fe81813338e43bd6d510ff1671b4ae575f0177e316274224d428296",
+    "src/node-host.mjs": "fce5741814643ca0dbd7ad4bd5ed274fc387fa94f80214bf6d593d9cfce53ca6",
+    "src/native-files.mjs": "90b00c2a37cf2a1a3a45d49982211b12de079e39ec34afa46fc215561af70689",
+    "test/native-files.test.mjs": "b143fbfd902774747c92af47d516c507e7a29eb321e84ce974abef2f33057108",
+    "test/node-host.test.mjs": "8644462a20cd0444c642a4ff4f617ee77a4984ce42cd41d76f980c83fac0b6f7",
+    "test/node-process-exit.test.mjs": "ca2852910124c064d8d4cc740328d11346ed92607e50bea476f13c226fab2318",
+    "test/node-console-buffering.test.mjs": "00358f7a750fba2269faf55f9ea2ffe4d03ea9445ca714c1e12c078255e73d66",
+    "test/fixtures/stdio-exit-host.mjs": "c518313741d8344287aca536a468bb2fa792249d78d7d834d4c8bfdd93025a04",
+    "test/fixtures/process-exit/Main.lean": "dd92748ea5a39c290b6401bed4f7276b417cd7383f790c9dd4752c2618250048",
+    "test/fixtures/console-buffering/Main.lean": "a57406c4f3e7529485538c002364986ea7a70954bf8273175570da11db61aef4"
+  },
+  "primaryReferences": [
+    "https://www.gnu.org/software/libc/manual/html_node/Flushing-Buffers.html",
+    "https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/fpurge.3.html"
+  ],
+  "limitations": [
+    "Windows embedded buffer discard remains unimplemented; the new discard assertions explicitly report that missing coverage on Windows rather than claiming parity.",
+    "The documented macOS fpurge branch is implemented but has not been executed on native macOS.",
+    "A pending native read cannot be interrupted safely by purging/freeing its FILE; cleanup waits for outstanding operations.",
+    "Already committed IO and custom JavaScript stdout callbacks cannot be rolled back by an embedded exit."
+  ]
+}

@@ -124,10 +124,15 @@ load, and suite conformance still need validation. See
   engine-coordinated path passes all three affected upstream tests in each
   engine and 33 packaged checks. See
   [the shutdown repair](docs/evidence/engine-exit-shutdown-2026-09-21.json).
-- [ ] Preserve forced-exit buffer discard for an embedded module without
-  terminating its host process. Embedded exits still throw `LeanExit` and dispose
-  the guest; closing its file streams currently flushes buffered output even on
-  forced exit. This is an implementation gap, not a fundamental restriction.
+- [ ] Complete embedded forced-exit buffer discard on Windows and validate the
+  macOS implementation natively. Linux cleanup now purges unflushed native
+  streams after their pending operations settle, preserving the host process.
+  All three engines match native Lean's return, ordinary-exit, and forced-exit
+  file behavior; 63 file, console, lifecycle, and exit regressions pass with no
+  skips. Queued stdout writes and repeated disposal are covered. Windows still
+  flushes on embedded forced exit; macOS has an unverified `fpurge` branch.
+  Pending native reads still require their operation to finish before cleanup.
+  See [the preserved before/after comparison](docs/evidence/embedded-force-exit-2026-09-22.json).
 - [ ] Validate the private Node worker diagnostic adapter on supported Node
   versions and operating systems. Node's default forwarding can change shared
   stdout/stderr pipes to nonblocking mode. Descriptor-backed forwarding now
@@ -311,6 +316,14 @@ load, and suite conformance still need validation. See
   concurrent pthread callers. Broader coverage remains necessary; see
   [the actual bridge checks](docs/evidence/host-bridge-capacity-2026-09-22.json)
   and the capacity evidence for the retained engine failures.
+- [ ] Widen the experimental full-runtime host transfer-length protocol. A
+  static audit found 32-bit input lengths and a signed 32-bit response size in
+  `runtime/node.hpp` and the matching JavaScript imports. Success lengths at
+  2 GiB cross the error sign bit; input sizes above 4 GiB narrow. The passing
+  high-address controls move small payloads and do not test these large lengths.
+  A synthetic ABI reproduction and a copy-allocation audit are still needed
+  before attempting multi-GiB IO under the existing memory guard. This is an
+  implementation gap, not an established fundamental restriction.
 - [ ] A pending C read cannot be safely interrupted by disposing the Wasm
   instance. Blocking file calls now use independent host workers, so reads do
   not fill the shared N-API pool and prevent their dependent writes from running.
