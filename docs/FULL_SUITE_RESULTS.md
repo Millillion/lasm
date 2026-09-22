@@ -3,18 +3,20 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The v144 Node campaign's latest saved checkpoint records **102 passes, zero
-failures or resource aborts, and 3,794 pending registrations**. All 3,896 tests
+The v144 Node campaign's latest saved checkpoint records **211 passes, zero
+failures or resource aborts, and 3,685 pending registrations**. All 3,896 tests
 remain selected; 3,004 previously unpassed names run first, without importing
 earlier results. Quicksort, four red-black-map variants, server startup, the
 dependent-pair iterator, tree maps, union-find, server watchdog and workspace
-symbols pass. The first 91 documentation-parser registrations pass too.
+symbols pass. All 197 documentation-parser registrations pass, followed by the
+monad-control tutorial, ordering and persistent-array iteration controls.
 Every completed attempt preserves all 7,267 original source hashes and the
 compiled-driver/harness hashes. The active unfinished attempt is excluded from
 the saved results. This campaign uses base pages, one build worker and the
 separate final-link profile described below. See
-[the 102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint102-2026-09-22.json).
-The [54-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint54-2026-09-22.json)
+[the 211-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint211-2026-09-22.json).
+The [102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint102-2026-09-22.json),
+[54-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint54-2026-09-22.json)
 and [initial ten-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint10-2026-09-22.json)
 remain unchanged.
 
