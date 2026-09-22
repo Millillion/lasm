@@ -3,8 +3,8 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The v144 Node campaign's latest saved checkpoint records **402 passes, zero
-failures or resource aborts, and 3,494 pending registrations**. All 3,896 tests
+The v144 Node campaign's latest saved checkpoint records **500 passes, zero
+failures or resource aborts, and 3,396 pending registrations**. All 3,896 tests
 remain selected; 3,004 previously unpassed names run first, without importing
 earlier results. Quicksort, four red-black-map variants, server startup, the
 dependent-pair iterator, tree maps, union-find, server watchdog and workspace
@@ -19,12 +19,15 @@ open.
 Subsequent passes cover big integers, bit-vector decision procedures and
 reflection stress, byte arrays/slices, cancellation tokens/contexts, and
 case-analysis regressions.
+Evaluation, string splitting, coercions, coinductive predicates, compiler
+optimizations and congruence tests pass in the next group.
 Every completed attempt preserves all 7,267 original source hashes and the
 compiled-driver/harness hashes. The active unfinished attempt is excluded from
 the saved results. This campaign uses base pages, one build worker and the
 separate final-link profile described below. See
-[the 402-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint402-2026-09-22.json).
-The [296-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint296-2026-09-22.json),
+[the 500-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint500-2026-09-22.json).
+The [402-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint402-2026-09-22.json),
+[296-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint296-2026-09-22.json),
 [211-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint211-2026-09-22.json),
 [102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint102-2026-09-22.json),
 [54-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint54-2026-09-22.json)
