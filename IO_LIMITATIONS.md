@@ -45,6 +45,13 @@ load, and suite conformance still need validation. See
   primitives and tested higher-level APIs are not all of Lean IO. The pinned
   inventory now lists 193 `IO.FS` and 1,938 `Std.Http` declarations. All 20 direct
   `IO.FS` externs have implementations; this is not complete behavioral coverage.
+  The [compiled dependency audit](docs/compatibility/API_DEPENDENCIES.md) now
+  follows all 2,131 inventory roots through 8,980 IR/declaration nodes. Native Lean
+  and the frozen full Node compiler produce identical graphs, including checked
+  paths for `readFile`, `createDirAll`, and HTTP serving. The graph identifies 227
+  extern declarations using 217 C symbols. Generated types/projections without
+  standalone IR, dynamic callbacks, primitive internals, and behavioral coverage
+  remain separate audit concerns; graph agreement does not close this checkbox.
 - [ ] Validate devices, pipes, FIFOs, large files, permission combinations, symlink
   races, and every open/seek/metadata edge case across OSs. Current tests focus on
   regular files and common directory operations. `Handle.truncate` now preserves
