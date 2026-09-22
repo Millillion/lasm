@@ -3,6 +3,11 @@
 This harness registers the complete pinned Lean 4.32.0 CTest suite, including
 compiler, kernel, elaborator, Lake, runtime, and interactive tests. The older
 `scripts/upstream-tests.mjs` runtime adapter is a separate, narrower experiment.
+The 3,891 upstream CTest registrations omit seven inputs marked `.no_test` in
+the benchmark directories. These remain a separate validation item; adding the
+five flaky tests with `--include-excluded` produces 3,896 registrations and does
+not add those benchmark-only inputs. See
+[the source/driver inventory](../../docs/evidence/upstream-benchmark-only-inventory-2026-09-22.json).
 
 ## Resource protection on the maintainer desktop
 

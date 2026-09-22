@@ -12,6 +12,12 @@ completed suite. Each test uses its own guard, base pages, one CTest job and
 one build worker. See
 [the initial v146 checkpoint](evidence/node-broad-v146-lean-symbol-loader-checkpoint2-2026-09-22.json).
 
+The registration count comprises 3,891 upstream CTest tests and five opt-in
+tests that upstream explicitly excludes as flaky. Seven additional benchmark
+inputs carry upstream `.no_test` markers and are outside that count. Their
+sources and original test drivers are inventoried, with separate execution
+still pending; see [the benchmark-only inventory](evidence/upstream-benchmark-only-inventory-2026-09-22.json).
+
 The optional compiled-server harness now covers the exact
 `misc_dir/server_project` invocation as well as `server_interactive`. Both
 upstream driver files are byte-identical; the harness verifies their hashes

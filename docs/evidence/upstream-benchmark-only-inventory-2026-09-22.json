@@ -1,0 +1,95 @@
+{
+  "recordedAt": "2026-09-22T20:58:03.599107+00:00",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "scope": "Read-only inventory of original .no_test markers. Upstream CMake excludes these seven benchmark inputs from test registration; retained original run_test.sh drivers can be checked separately under resource limits without editing markers or source.",
+  "upstreamCtestRegistrations": 3891,
+  "upstreamCmakeSha256": "5dd8974eb87f8df90a5e6081869255912b62e09e3302c06cd70966875cb48d54",
+  "inventorySha256": "e635c627b75abe483a3005bd118d400d6d77a0d5e29641ab28b5945eddfc9adf",
+  "inputs": [
+    {
+      "name": "compile_bench/rbmap_checkpoint2.lean",
+      "sourceBytes": 3185,
+      "sourceSha256": "43288ac1bbc94bf28424a5a00966eb6dc140eb495122473794d218feb6a04627",
+      "markerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testDriver": "tests/compile_bench/run_test.sh",
+      "testDriverSha256": "b70b54a70a3bb123be24067df21e9d2aca530776596a659573d03733398fbae4",
+      "companionFiles": {
+        "tests/compile_bench/rbmap_checkpoint2.lean.no_test": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/compile_bench/rbmap_checkpoint2.lean.init.sh": "28322803409d330a03298c30fe984bb1a9147294132df82d3f6ce907d1b766ca"
+      },
+      "validation": "Not registered as an upstream CTest test; no execution claimed by this inventory."
+    },
+    {
+      "name": "elab_bench/bv_decide_inequality.lean",
+      "sourceBytes": 1755,
+      "sourceSha256": "33ea85cafa78cbd685461e8a183fc2b4f3e67c27607a9a4a88fa34cd75ed287d",
+      "markerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testDriver": "tests/elab_bench/run_test.sh",
+      "testDriverSha256": "6f9f6f4c7e3bfeea42b95237da9b33215b8c09e26ec3da2e1bc7ff256d22fa09",
+      "companionFiles": {
+        "tests/elab_bench/bv_decide_inequality.lean.no_test": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "validation": "Not registered as an upstream CTest test; no execution claimed by this inventory."
+    },
+    {
+      "name": "elab_bench/bv_decide_mod.lean",
+      "sourceBytes": 1057,
+      "sourceSha256": "cc2f6a4f1dfec4379e8538fab887647e465ec5a76f6793ec9efc5092325d3aa0",
+      "markerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testDriver": "tests/elab_bench/run_test.sh",
+      "testDriverSha256": "6f9f6f4c7e3bfeea42b95237da9b33215b8c09e26ec3da2e1bc7ff256d22fa09",
+      "companionFiles": {
+        "tests/elab_bench/bv_decide_mod.lean.no_test": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "validation": "Not registered as an upstream CTest test; no execution claimed by this inventory."
+    },
+    {
+      "name": "elab_bench/cbv_arm_ldst.lean",
+      "sourceBytes": 50968,
+      "sourceSha256": "6d1027cb5d4e5c8d360ebbfd5621f13718bbfe179f80bbe2dd188acd2dbe5075",
+      "markerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testDriver": "tests/elab_bench/run_test.sh",
+      "testDriverSha256": "6f9f6f4c7e3bfeea42b95237da9b33215b8c09e26ec3da2e1bc7ff256d22fa09",
+      "companionFiles": {
+        "tests/elab_bench/cbv_arm_ldst.lean.no_test": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "validation": "Not registered as an upstream CTest test; no execution claimed by this inventory."
+    },
+    {
+      "name": "elab_bench/cbv_system_f.lean",
+      "sourceBytes": 64706,
+      "sourceSha256": "9372ea8719a56c8625d3681760091dd15954d39e6a719310e2802b303f8ef5cc",
+      "markerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testDriver": "tests/elab_bench/run_test.sh",
+      "testDriverSha256": "6f9f6f4c7e3bfeea42b95237da9b33215b8c09e26ec3da2e1bc7ff256d22fa09",
+      "companionFiles": {
+        "tests/elab_bench/cbv_system_f.lean.no_test": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "validation": "Not registered as an upstream CTest test; no execution claimed by this inventory."
+    },
+    {
+      "name": "elab_bench/grind_bitvec2.lean",
+      "sourceBytes": 180844,
+      "sourceSha256": "34d8ac213d8ebacbed2f127cf78eaa9abcdb91f787bd858ff29c284f5cb03b8e",
+      "markerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testDriver": "tests/elab_bench/run_test.sh",
+      "testDriverSha256": "6f9f6f4c7e3bfeea42b95237da9b33215b8c09e26ec3da2e1bc7ff256d22fa09",
+      "companionFiles": {
+        "tests/elab_bench/grind_bitvec2.lean.no_test": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "validation": "Not registered as an upstream CTest test; no execution claimed by this inventory."
+    },
+    {
+      "name": "elab_bench/riscv-ast.lean",
+      "sourceBytes": 56413,
+      "sourceSha256": "c9299023fa24f2e56d45179dc85c97af675076b29b118ab4eb5c7ef5ace5f1f4",
+      "markerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testDriver": "tests/elab_bench/run_test.sh",
+      "testDriverSha256": "6f9f6f4c7e3bfeea42b95237da9b33215b8c09e26ec3da2e1bc7ff256d22fa09",
+      "companionFiles": {
+        "tests/elab_bench/riscv-ast.lean.no_test": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "validation": "Not registered as an upstream CTest test; no execution claimed by this inventory."
+    }
+  ]
+}
