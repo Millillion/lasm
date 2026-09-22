@@ -1,0 +1,828 @@
+{
+  "recordedAt": "2026-09-22T21:19:53.100641+00:00",
+  "scope": "Seven original benchmark-only inputs omitted from upstream CTest by .no_test markers. Runs preserve the upstream run_bench.sh drivers and original Lean/C options and arguments. Their expected-output test drivers are not suitable oracles for these benchmark-only inputs. No complete JavaScript suite is claimed.",
+  "measurementAdjustment": "Host denies perf counters (perf_event_paranoid=4; perf stat -e instructions -- true exits 255). A separately hashed adapter preserves execution, output and status and measures actual wall time, child CPU time and max RSS. Hardware instructions/cycles are omitted. Original source and drivers are unchanged.",
+  "outputComparison": "Exact output, except the seven explicitly formatted cbv and kernel millisecond timings in cbv_system_f.lean. Timings remain in raw evidence and are replaced only in comparisonOutput. Lean diagnostics, values and line numbers remain unchanged.",
+  "countsMeaning": "Benchmark execution successes, not original expected-output CTest passes. Supplementary registrations remain separate from the 3896-entry broad campaign.",
+  "initialHarnessDiagnostic": {
+    "campaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs/campaign.json",
+    "sha256": "007fe29221da49f66cac2753c182839096fd6f5359042e83a661a6030bc34a54",
+    "counts": {
+      "passed": 2,
+      "failed": 1,
+      "resource-aborted": 0,
+      "harness-failed": 0,
+      "pending": 4
+    },
+    "reason": "The initial optional registration used run_test.sh. Native rbmap_checkpoint2 printed 200001 200000 but has no expected-output file, so that driver failed. Two other native inputs passed; then the diagnostic was paused and preserved. Fresh r2 suites use the proper original benchmark drivers."
+  },
+  "engines": {
+    "native": {
+      "campaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2",
+      "campaignSha256": "36d18d7d32b25e2a4d2e3a4b6c94e0f8c36ad55cfb072f0f49f623dbecf6248b",
+      "counts": {
+        "passed": 7,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "identity": "f5d0eda7bd2f50cbde7f75a9924b7a5ce2477c85db2865f8b0533949a1e55b44",
+      "suiteManifestSha256": "6cecbef330e506519727686072617d1deae29bb96228a146ff5bda05dd1940c1",
+      "toolchain": {
+        "prefix": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0"
+      },
+      "resourceAdjustments": {
+        "pagePolicy": {
+          "kind": "base-pages",
+          "wrapper": "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+          "sha256": "f983bcfb3473b1f14fb733a40d26bc934bfbcee9adf4bcd929bec266194c8c7a"
+        },
+        "buildJobs": 1
+      },
+      "maximumPeakBytes": 1819488256,
+      "tests": [
+        {
+          "name": "compile_bench/rbmap_checkpoint2.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00001-1bb834f2",
+            "status": "passed",
+            "startedAt": "2026-09-22T21:16:05.733Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T21:16:08.652Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00001-1bb834f2/resources.json",
+            "peakMemoryBytes": 452648960,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 2,
+                "modified": []
+              },
+              "after": {
+                "checked": 2,
+                "modified": []
+              }
+            }
+          },
+          "resourceSha256": "eb9a791fc7f8614cb7bcd4fbec81b1c5f964ee2f89b6456eb86d92e9d6baafff",
+          "sourceVerification": {
+            "before": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            },
+            "after": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            }
+          },
+          "harnessVerification": {
+            "before": {
+              "checked": 2,
+              "modified": []
+            },
+            "after": {
+              "checked": 2,
+              "modified": []
+            }
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "junit": [
+            {
+              "name": "compile_bench/rbmap_checkpoint2.lean",
+              "classname": "compile_bench/rbmap_checkpoint2.lean",
+              "time": "2.14265",
+              "status": "run"
+            }
+          ],
+          "outputPath": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-benchmark-inputs-r2/lean4-4.32.0/tests/compile_bench/rbmap_checkpoint2.lean.out.produced",
+          "outputSha256": "656455eb6f22130bfc9bb9802839d171198849b23d472f34a62dddb9dd78bd28",
+          "output": "200001 200000\n",
+          "comparisonOutput": "200001 200000\n",
+          "measurements": [
+            {
+              "metric": "compiled/rbmap_checkpoint2//maxrss",
+              "value": 385482752,
+              "unit": "B"
+            },
+            {
+              "metric": "compiled/rbmap_checkpoint2//task-clock",
+              "value": 1.181924,
+              "unit": "s"
+            },
+            {
+              "metric": "compiled/rbmap_checkpoint2//wall-clock",
+              "value": 1.1820202389499173,
+              "unit": "s"
+            },
+            {
+              "metric": "size/compile/.out//bytes",
+              "value": 4214088,
+              "unit": "B"
+            }
+          ]
+        },
+        {
+          "name": "elab_bench/bv_decide_inequality.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00002-3659ce3b",
+            "status": "passed",
+            "startedAt": "2026-09-22T21:16:08.653Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T21:16:29.796Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00002-3659ce3b/resources.json",
+            "peakMemoryBytes": 575815680,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 2,
+                "modified": []
+              },
+              "after": {
+                "checked": 2,
+                "modified": []
+              }
+            }
+          },
+          "resourceSha256": "7fbc840596a59b155c13ee86d99fb145ddee66b7eabb597295544febb60b67f3",
+          "sourceVerification": {
+            "before": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            },
+            "after": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            }
+          },
+          "harnessVerification": {
+            "before": {
+              "checked": 2,
+              "modified": []
+            },
+            "after": {
+              "checked": 2,
+              "modified": []
+            }
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "junit": [
+            {
+              "name": "elab_bench/bv_decide_inequality.lean",
+              "classname": "elab_bench/bv_decide_inequality.lean",
+              "time": "20.3988",
+              "status": "run"
+            }
+          ],
+          "outputPath": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-benchmark-inputs-r2/lean4-4.32.0/tests/elab_bench/bv_decide_inequality.lean.out.produced",
+          "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "output": "",
+          "comparisonOutput": "",
+          "measurements": [
+            {
+              "metric": "elab/bv_decide_inequality//maxrss",
+              "value": 1064488960,
+              "unit": "B"
+            },
+            {
+              "metric": "elab/bv_decide_inequality//task-clock",
+              "value": 20.230932,
+              "unit": "s"
+            },
+            {
+              "metric": "elab/bv_decide_inequality//wall-clock",
+              "value": 20.344846065039746,
+              "unit": "s"
+            }
+          ]
+        },
+        {
+          "name": "elab_bench/bv_decide_mod.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00003-cd83d1fe",
+            "status": "passed",
+            "startedAt": "2026-09-22T21:16:29.796Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T21:17:09.972Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00003-cd83d1fe/resources.json",
+            "peakMemoryBytes": 1819488256,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 2,
+                "modified": []
+              },
+              "after": {
+                "checked": 2,
+                "modified": []
+              }
+            }
+          },
+          "resourceSha256": "6a9baf2fed41c9d8013a75fa30570247d587a72051e84c9502d58b7c1d43b06a",
+          "sourceVerification": {
+            "before": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            },
+            "after": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            }
+          },
+          "harnessVerification": {
+            "before": {
+              "checked": 2,
+              "modified": []
+            },
+            "after": {
+              "checked": 2,
+              "modified": []
+            }
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "junit": [
+            {
+              "name": "elab_bench/bv_decide_mod.lean",
+              "classname": "elab_bench/bv_decide_mod.lean",
+              "time": "39.4827",
+              "status": "run"
+            }
+          ],
+          "outputPath": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-benchmark-inputs-r2/lean4-4.32.0/tests/elab_bench/bv_decide_mod.lean.out.produced",
+          "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "output": "",
+          "comparisonOutput": "",
+          "measurements": [
+            {
+              "metric": "elab/bv_decide_mod//maxrss",
+              "value": 2223042560,
+              "unit": "B"
+            },
+            {
+              "metric": "elab/bv_decide_mod//task-clock",
+              "value": 39.394684,
+              "unit": "s"
+            },
+            {
+              "metric": "elab/bv_decide_mod//wall-clock",
+              "value": 39.42638952995185,
+              "unit": "s"
+            }
+          ]
+        },
+        {
+          "name": "elab_bench/cbv_arm_ldst.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00004-928309a0",
+            "status": "passed",
+            "startedAt": "2026-09-22T21:17:09.972Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T21:17:23.501Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00004-928309a0/resources.json",
+            "peakMemoryBytes": 329531392,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 2,
+                "modified": []
+              },
+              "after": {
+                "checked": 2,
+                "modified": []
+              }
+            }
+          },
+          "resourceSha256": "ca0a9539e7264423c738749c5b2aae9dc9f55ca9922acef1c4a92401fb2cf7f9",
+          "sourceVerification": {
+            "before": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            },
+            "after": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            }
+          },
+          "harnessVerification": {
+            "before": {
+              "checked": 2,
+              "modified": []
+            },
+            "after": {
+              "checked": 2,
+              "modified": []
+            }
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "junit": [
+            {
+              "name": "elab_bench/cbv_arm_ldst.lean",
+              "classname": "elab_bench/cbv_arm_ldst.lean",
+              "time": "12.8168",
+              "status": "run"
+            }
+          ],
+          "outputPath": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-benchmark-inputs-r2/lean4-4.32.0/tests/elab_bench/cbv_arm_ldst.lean.out.produced",
+          "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "output": "",
+          "comparisonOutput": "",
+          "measurements": [
+            {
+              "metric": "elab/cbv_arm_ldst//maxrss",
+              "value": 691728384,
+              "unit": "B"
+            },
+            {
+              "metric": "elab/cbv_arm_ldst//task-clock",
+              "value": 21.833046,
+              "unit": "s"
+            },
+            {
+              "metric": "elab/cbv_arm_ldst//wall-clock",
+              "value": 12.759441502043046,
+              "unit": "s"
+            }
+          ]
+        },
+        {
+          "name": "elab_bench/cbv_system_f.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00005-688fe18b",
+            "status": "passed",
+            "startedAt": "2026-09-22T21:17:23.502Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T21:17:47.358Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00005-688fe18b/resources.json",
+            "peakMemoryBytes": 807432192,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 2,
+                "modified": []
+              },
+              "after": {
+                "checked": 2,
+                "modified": []
+              }
+            }
+          },
+          "resourceSha256": "9331ab00f88080cd55ecf9542b910fea2f3c1596f0722907e5c658dd977f55f8",
+          "sourceVerification": {
+            "before": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            },
+            "after": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            }
+          },
+          "harnessVerification": {
+            "before": {
+              "checked": 2,
+              "modified": []
+            },
+            "after": {
+              "checked": 2,
+              "modified": []
+            }
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "junit": [
+            {
+              "name": "elab_bench/cbv_system_f.lean",
+              "classname": "elab_bench/cbv_system_f.lean",
+              "time": "23.1272",
+              "status": "run"
+            }
+          ],
+          "outputPath": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-benchmark-inputs-r2/lean4-4.32.0/tests/elab_bench/cbv_system_f.lean.out.produced",
+          "outputSha256": "b10d55e8ce99d5ced4ed2259f7728640865e75ee30a72b8e715b8c9b49c3c029",
+          "output": "=== pow2DoubleEq Benchmark ===\npow2DoubleEq 0: cbv 291.647848 ms, kernel 194.121483 ms\npow2DoubleEq 1: cbv 158.911948 ms, kernel 234.150851 ms\npow2DoubleEq 2: cbv 203.690720 ms, kernel 329.843219 ms\npow2DoubleEq 3: cbv 295.666350 ms, kernel 467.506785 ms\npow2DoubleEq 4: cbv 494.529338 ms, kernel 820.437848 ms\npow2DoubleEq 5: cbv 987.889111 ms, kernel 1761.787690 ms\npow2DoubleEq 6: cbv 2645.159276 ms, kernel 4759.215406 ms\n",
+          "comparisonOutput": "=== pow2DoubleEq Benchmark ===\npow2DoubleEq 0: cbv <time> ms, kernel <time> ms\npow2DoubleEq 1: cbv <time> ms, kernel <time> ms\npow2DoubleEq 2: cbv <time> ms, kernel <time> ms\npow2DoubleEq 3: cbv <time> ms, kernel <time> ms\npow2DoubleEq 4: cbv <time> ms, kernel <time> ms\npow2DoubleEq 5: cbv <time> ms, kernel <time> ms\npow2DoubleEq 6: cbv <time> ms, kernel <time> ms\n",
+          "measurements": [
+            {
+              "metric": "elab/cbv_system_f//maxrss",
+              "value": 2196922368,
+              "unit": "B"
+            },
+            {
+              "metric": "elab/cbv_system_f//task-clock",
+              "value": 31.28294,
+              "unit": "s"
+            },
+            {
+              "metric": "elab/cbv_system_f//wall-clock",
+              "value": 23.06379967101384,
+              "unit": "s"
+            }
+          ]
+        },
+        {
+          "name": "elab_bench/grind_bitvec2.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00006-315a967d",
+            "status": "passed",
+            "startedAt": "2026-09-22T21:17:47.358Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T21:18:02.918Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00006-315a967d/resources.json",
+            "peakMemoryBytes": 502448128,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 2,
+                "modified": []
+              },
+              "after": {
+                "checked": 2,
+                "modified": []
+              }
+            }
+          },
+          "resourceSha256": "3d7c9265b07fe7495db872b93cdd1cc67ab585a8b1ac958e34809e2bce12538f",
+          "sourceVerification": {
+            "before": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            },
+            "after": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            }
+          },
+          "harnessVerification": {
+            "before": {
+              "checked": 2,
+              "modified": []
+            },
+            "after": {
+              "checked": 2,
+              "modified": []
+            }
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "junit": [
+            {
+              "name": "elab_bench/grind_bitvec2.lean",
+              "classname": "elab_bench/grind_bitvec2.lean",
+              "time": "14.8209",
+              "status": "run"
+            }
+          ],
+          "outputPath": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-benchmark-inputs-r2/lean4-4.32.0/tests/elab_bench/grind_bitvec2.lean.out.produced",
+          "outputSha256": "f283ca5f8c50507031d16667381da6a70e2e3ed2be8e09e0b77ebe2acc72dda0",
+          "output": "grind_bitvec2.lean:291:8-291:27: warning: declaration uses `sorry`\n",
+          "comparisonOutput": "grind_bitvec2.lean:291:8-291:27: warning: declaration uses `sorry`\n",
+          "measurements": [
+            {
+              "metric": "elab/grind_bitvec2//maxrss",
+              "value": 680632320,
+              "unit": "B"
+            },
+            {
+              "metric": "elab/grind_bitvec2//task-clock",
+              "value": 84.236265,
+              "unit": "s"
+            },
+            {
+              "metric": "elab/grind_bitvec2//wall-clock",
+              "value": 14.756337863043882,
+              "unit": "s"
+            }
+          ]
+        },
+        {
+          "name": "elab_bench/riscv-ast.lean",
+          "attempt": {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00007-6d1fda84",
+            "status": "passed",
+            "startedAt": "2026-09-22T21:18:02.919Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-22T21:18:22.210Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-native-v146-benchmark-inputs-r2/00007-6d1fda84/resources.json",
+            "peakMemoryBytes": 656113664,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 2,
+                "modified": []
+              },
+              "after": {
+                "checked": 2,
+                "modified": []
+              }
+            }
+          },
+          "resourceSha256": "d39ded1a5fc812ef077bb9e394fbf1a7368176b29c43e2919866a28c6f762916",
+          "sourceVerification": {
+            "before": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            },
+            "after": {
+              "checked": 7267,
+              "modified": [],
+              "symlinks": {
+                "checked": 6,
+                "modified": []
+              }
+            }
+          },
+          "harnessVerification": {
+            "before": {
+              "checked": 2,
+              "modified": []
+            },
+            "after": {
+              "checked": 2,
+              "modified": []
+            }
+          },
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "swapBytes": 0,
+          "junit": [
+            {
+              "name": "elab_bench/riscv-ast.lean",
+              "classname": "elab_bench/riscv-ast.lean",
+              "time": "18.5523",
+              "status": "run"
+            }
+          ],
+          "outputPath": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native-v146-benchmark-inputs-r2/lean4-4.32.0/tests/elab_bench/riscv-ast.lean.out.produced",
+          "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "output": "",
+          "comparisonOutput": "",
+          "measurements": [
+            {
+              "metric": "elab/riscv-ast//maxrss",
+              "value": 1270435840,
+              "unit": "B"
+            },
+            {
+              "metric": "elab/riscv-ast//task-clock",
+              "value": 27.465462,
+              "unit": "s"
+            },
+            {
+              "metric": "elab/riscv-ast//wall-clock",
+              "value": 18.492078240960836,
+              "unit": "s"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "matchesNativeOutput": {},
+  "limitations": [
+    "Full engine suites, native cross-platform checks and packaged-full-runtime integration remain open.",
+    "Bun full-compiler controls use the local rebuilt engine and Linux stack helper when present, not stock Bun."
+  ]
+}

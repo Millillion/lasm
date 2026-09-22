@@ -15,8 +15,15 @@ one build worker. See
 The registration count comprises 3,891 upstream CTest tests and five opt-in
 tests that upstream explicitly excludes as flaky. Seven additional benchmark
 inputs carry upstream `.no_test` markers and are outside that count. Their
-sources and original test drivers are inventoried, with separate execution
-still pending; see [the benchmark-only inventory](evidence/upstream-benchmark-only-inventory-2026-09-22.json).
+sources are inventoried separately. All seven now complete with native Lean
+using their unchanged upstream benchmark drivers, peaking at 1.69 GiB without
+resource events. JavaScript comparisons are in progress. The native run's
+separate measurement adapter records actual wall/CPU time and max RSS because
+this host denies `perf` counters; hardware counts are omitted. The initial
+diagnostic with an expected-output test driver remains recorded: a benchmark
+printed output but had no expected-output file. See
+[the native benchmark evidence](evidence/benchmark-inputs-native-2026-09-22.json)
+and [the source inventory](evidence/upstream-benchmark-only-inventory-2026-09-22.json).
 
 Source integrity checks now also verify the six symlink targets from the
 verified original release archive. Two focused controls cover equal-byte

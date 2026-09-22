@@ -1,7 +1,7 @@
 // Prepare a parallel CTest suite. Upstream source tests and expected files remain
 // byte-for-byte unchanged; only generated environment drivers and deadlines vary.
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, symlinkSync, chmodSync } from 'node:fs';
-import { resolve, join, relative } from 'node:path';
+import { resolve, join, relative, dirname, basename } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { root, resolveLean, leanCommit } from '../../src/toolchain.mjs';
@@ -86,12 +86,28 @@ const extraRegistrations = args.includes('--include-excluded') ? [
   'elab/async_select_channel.lean', 'elab/sync_mutex.lean',
   'pkg/signal', 'pkg/test_extern', 'pkg/user_ext',
 ] : [];
-for (const name of extraRegistrations) {
+// These are benchmark inputs, not upstream CTest registrations. Keep their
+// original markers and drivers intact and report this opt-in coverage separately.
+const extraBenchmarkRegistrations = args.includes('--include-benchmark-inputs') ? [
+  'compile_bench/rbmap_checkpoint2.lean',
+  'elab_bench/bv_decide_inequality.lean', 'elab_bench/bv_decide_mod.lean',
+  'elab_bench/cbv_arm_ldst.lean', 'elab_bench/cbv_system_f.lean',
+  'elab_bench/grind_bitvec2.lean', 'elab_bench/riscv-ast.lean',
+] : [];
+const benchmarkWithoutPerf = args.includes('--benchmark-without-perf');
+if (benchmarkWithoutPerf && !extraBenchmarkRegistrations.length)
+  throw new Error('--benchmark-without-perf requires --include-benchmark-inputs');
+for (const name of extraBenchmarkRegistrations) {
+  if (!existsSync(join(source, 'tests', name + '.no_test')) || existsSync(join(source, 'tests', name + '.no_bench')))
+    throw new Error(`Upstream benchmark exclusion changed: ${name}`);
+}
+for (const name of [...extraRegistrations, ...extraBenchmarkRegistrations]) {
   const isFile = name.endsWith('.lean');
-  const directory = join(source, 'tests', isFile ? 'elab' : name);
+  const directory = join(source, 'tests', isFile ? dirname(name) : name);
+  const benchmark = extraBenchmarkRegistrations.includes(name);
   inventory.tests.push({ name,
-    command: ['/usr/bin/bash', join(source, 'tests/with_stage1_test_env.sh'),
-      join(directory, 'run_test.sh'), ...(isFile ? [name.slice('elab/'.length)] : [])],
+    command: ['/usr/bin/bash', join(source, `tests/with_stage1_${benchmark ? 'bench' : 'test'}_env.sh`),
+      join(directory, benchmark ? 'run_bench.sh' : 'run_test.sh'), ...(isFile ? [basename(name)] : [])],
     properties: [{ name: 'WORKING_DIRECTORY', value: directory }, { name: 'RUN_SERIAL', value: true }],
   });
 }
@@ -104,10 +120,30 @@ const rewriteEnvironment = text => text.replaceAll(`SRC_DIR='${harness}'`, `SRC_
   .replaceAll(`SCRIPT_DIR='${harness}/../script'`, `SCRIPT_DIR='${join(source,'script')}'`);
 const originalEnvironment = join(source,'tests/with_stage1_test_env.sh');
 const environment = join(output,'with-test-environment.sh');
+const originalBenchmarkEnvironment = join(source, 'tests/with_stage1_bench_env.sh');
+const benchmarkEnvironment = join(output, 'with-benchmark-environment.sh');
 const addEnvironment = text => rewriteEnvironment(text).replace('export ',
   `export LEAN_SRC_PATH=${shellQuote(sourcePath)} MAKEFLAGS=${shellQuote(makeFlags)} `);
 writeFileSync(environment, addEnvironment(readFileSync(originalEnvironment,'utf8')));
 let harnessArtifacts;
+if (extraBenchmarkRegistrations.length) {
+  let text = addEnvironment(readFileSync(originalBenchmarkEnvironment, 'utf8'));
+  if (benchmarkWithoutPerf) {
+    const support = join(output, 'benchmark-support');
+    mkdirSync(support, { recursive: true });
+    const measure = join(support, 'measure.py');
+    writeFileSync(measure, readFileSync(new URL('./benchmark-measure.py', import.meta.url)));
+    chmodSync(measure, 0o755);
+    const needle = 'source "$TEST_DIR/util.sh"';
+    if (text.split(needle).length !== 2) throw new Error('Upstream benchmark environment layout changed');
+    // util.sh and the original benchmark drivers only use TEST_DIR for measure.py.
+    // Source the original utilities first, then redirect just the measurement tool.
+    text = text.replace(needle, `${needle}\nexport TEST_DIR=${shellQuote(support)}`);
+    harnessArtifacts = { [measure]: digest(readFileSync(measure)) };
+  }
+  writeFileSync(benchmarkEnvironment, text);
+  harnessArtifacts = { ...harnessArtifacts, [benchmarkEnvironment]: digest(readFileSync(benchmarkEnvironment)) };
+}
 if (compiledServerDriver) {
   for (const relative of ['tests/server_interactive/run_test.lean', 'tests/misc_dir/server_project/run_test.lean']) {
     if (digest(readFileSync(join(source, relative))) !== compiledServerDriver.sourceSha256)
@@ -121,7 +157,7 @@ if (compiledServerDriver) {
   const current = readFileSync(environment, 'utf8'), needle = " PATH='";
   if (current.split(needle).length !== 2) throw new Error('Upstream PATH environment layout changed');
   writeFileSync(environment, current.replace(needle, ` PATH=${shellQuote(shimDirectory)}:'`));
-  harnessArtifacts = { ...compiledServerDriver.artifacts,
+  harnessArtifacts = { ...harnessArtifacts, ...compiledServerDriver.artifacts,
     [driverManifest]: digest(readFileSync(driverManifest)), [shim]: digest(readFileSync(shim)),
     [environment]: digest(readFileSync(environment)) };
 }
@@ -133,7 +169,8 @@ if (extraRegistrations.length) writeFileSync(testExternDriver,
   `source ${shellQuote(join(source, 'tests/pkg/test_extern/run_test.sh'))}\n`);
 const registered = [];
 for (const entry of inventory.tests) {
-  let command = entry.command.map(part => part === originalEnvironment ? environment : addEnvironment(part));
+  let command = entry.command.map(part => part === originalEnvironment ? environment
+    : part === originalBenchmarkEnvironment ? benchmarkEnvironment : addEnvironment(part));
   if (extraRegistrations.includes(entry.name) && entry.name === 'pkg/test_extern') command[2] = testExternDriver;
   // These original tests bind fixed loopback ports. A lock shared by separate
   // engine runs prevents their unmodified servers from colliding with each other.
@@ -158,8 +195,10 @@ const lines = registered.flatMap(entry => {
 writeFileSync(join(execution,'CTestTestfile.cmake'),lines.join('\n')+'\n');
 writeFileSync(join(output,'parallel-suite.json'),JSON.stringify({leanCommit,backend,prefix,source,archiveSha256:expected,
   sourceLinks,
-  ...(compiledServerDriver ? { compiledServerDriver, harnessArtifacts } : {}),
-  registered:registered.length,extraRegistrations,networkLock,timeoutSeconds:timeout,testSourceHashes:hashesFile,
+  ...(compiledServerDriver ? { compiledServerDriver } : {}),
+  ...(harnessArtifacts ? { harnessArtifacts } : {}),
+  ...(extraBenchmarkRegistrations.length ? { benchmarkMeasurement: benchmarkWithoutPerf ? 'host-wall-clock-rusage' : 'upstream-perf' } : {}),
+  registered:registered.length,extraRegistrations,extraBenchmarkRegistrations,networkLock,timeoutSeconds:timeout,testSourceHashes:hashesFile,
   changes:['Generated environment points to the selected toolchain and isolated source copy.',
     'LEAN_SRC_PATH selects the matching upstream source tree for source-location and language-server tests.',
     'Harness-only run/test environment tags permit cleanup of leftover subprocesses after a test finishes.',
@@ -167,6 +206,8 @@ writeFileSync(join(output,'parallel-suite.json'),JSON.stringify({leanCommit,back
     ...(networkLock ? [`A shared flock at ${networkLock} serializes the original fixed-port TCP/UDP tests across engine runs.`] : []),
     ...(extraRegistrations.length ? ['Five tests excluded as flaky/nondeterministic by upstream CMake are explicitly added with their original drivers and serial execution.',
       'A parallel wrapper disables inherited pipefail for pkg/test_extern so its intentional failing build reaches the unchanged expected-output comparison; the original driver is sourced without edits.'] : []),
+    ...(extraBenchmarkRegistrations.length ? ['Seven benchmark inputs marked .no_test are explicitly added with their original benchmark drivers, companion files, arguments and serial execution; markers and original CTest registrations remain unchanged. These are supplementary benchmark execution checks, not upstream expected-output tests.'] : []),
+    ...(benchmarkWithoutPerf ? ['A separate measurement adapter preserves commands, arguments, output and exit status while recording wall-clock time, child CPU time and max RSS without perf. Hardware instruction/cycle counts are omitted, not simulated. Benchmark source and drivers remain unchanged.'] : []),
     ...(archiveTool ? [`MAKEFLAGS supplies LEAN_AR=${archiveTool} instead of the release builder path embedded in lean.mk.`] : []),
     'CTest timeout is explicit; no test or expected-output source is edited.'],
   execution,tests:registered},null,2)+'\n');

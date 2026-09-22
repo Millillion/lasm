@@ -46,7 +46,10 @@ load, and suite conformance still need validation. See
   3,896-test campaigns contain the 3,891 registered tests plus five explicitly
   excluded flaky tests. The benchmark sources, markers and original test drivers
   are recorded in [this inventory](docs/evidence/upstream-benchmark-only-inventory-2026-09-22.json).
-  Their separate native and JavaScript executions remain unverified.
+  All seven now complete with native Lean using the original benchmark drivers
+  and a separate measurement adapter for hosts without `perf` permission. These
+  are benchmark execution checks, not expected-output CTest passes. JavaScript
+  comparisons remain open; see [the native control](docs/evidence/benchmark-inputs-native-2026-09-22.json).
 - [ ] Complete a declaration-by-declaration compatibility audit; the implemented
   primitives and tested higher-level APIs are not all of Lean IO. The pinned
   inventory now lists 193 `IO.FS` and 1,938 `Std.Http` declarations. All 20 direct

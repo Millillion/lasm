@@ -16,6 +16,20 @@ target or replacing it with a regular file fails verification even if its bytes
 match. Each run records these checks before and after execution; older result
 files without `symlinks` record only the regular-file checks.
 
+`prepare-suite.mjs --include-benchmark-inputs` adds the seven benchmark inputs
+to a fresh parallel suite, preserving their original `.no_test` markers,
+benchmark drivers, companion files and arguments. Use a separate campaign filtered
+to the names in `extraBenchmarkRegistrations`; these supplementary checks are
+not part of the upstream CTest count. With both optional groups enabled, the
+parallel suite contains 3,903 entries. The active 3,896-entry campaign is not
+changed by this option.
+These are benchmark execution checks, without expected-output assertions.
+`--benchmark-without-perf` selects a separate measurement adapter when the host
+does not permit performance counters. It preserves each command's arguments,
+stdout/stderr and exit status, and records actual wall time, child CPU time and
+max RSS; hardware instruction/cycle counts are omitted. Original sources and
+drivers remain intact, and the adapter is hashed before and after execution.
+
 ## Resource protection on the maintainer desktop
 
 Heavy work must run one workload at a time through `run-bounded.mjs`. Full
