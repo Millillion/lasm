@@ -30,6 +30,16 @@ This uses a separately rebuilt engine and the explicit Linux stack adjustment,
 not stock Bun or a package default. The complete suites remain unfinished; see
 [the capacity experiment](evidence/bun-memory64-capacity-2026-09-22.json).
 
+The v123 Node campaign's first live checkpoint records **eight passes, zero
+failures or resource aborts, and 3,888 pending registrations**. The active test
+is excluded from completed results. All 3,896 registrations remain selected;
+3,256 names unattempted in earlier Node broad campaigns run first, without
+importing any previous passes. Every completed test preserves all 7,267 source
+and nine harness hashes. The parallel harness uses a 1,800-second deadline,
+based on the separately verified long-lint result below; upstream sources and
+internal timing assertions remain unchanged. See
+[the eight-test live checkpoint](evidence/node-broad-v123-checkpoint8-2026-09-22.json).
+
 The recorded v119 Node campaign has **14 passes, one harness timeout,
 zero resource aborts, and 3,881 pending registrations**. It includes the host-platform and mixed
 C-input repairs. All 3,896 registrations remain selected; previously pending
