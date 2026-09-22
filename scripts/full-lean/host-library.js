@@ -30,6 +30,7 @@ addToLibrary({
     response: new Uint8Array(0),
     call: function (kind, operation, handle, argument, input, length) {
       if (!ENVIRONMENT_IS_PTHREAD) throw new Error('Lean host calls require PROXY_TO_PTHREAD');
+      length = Number(length);
       var wt = require('node:worker_threads');
       var nativeThreadId;
       if (operation === 37) {
@@ -68,21 +69,22 @@ addToLibrary({
     },
   },
   lasm_node_call__deps: ['$lasmFullRPC'],
-  lasm_node_call__sig: 'iiijpi',
+  lasm_node_call__sig: 'jiijpp',
   lasm_node_call: function (operation, handle, argument, input, length) {
     var result = lasmFullRPC.call('request', operation, handle, argument, input, length);
     lasmFullRPC.response = result.bytes;
-    return result.error ? -result.bytes.length - 1 : result.bytes.length;
+    var length = BigInt(result.bytes.length);
+    return result.error ? -length - 1n : length;
   },
   lasm_node_copy__deps: ['$lasmFullRPC'],
-  lasm_node_copy__sig: 'vpi',
+  lasm_node_copy__sig: 'vpp',
   lasm_node_copy: function (output, length) {
-    if (length !== lasmFullRPC.response.length) throw new Error('Mismatched Lean host response size');
+    if (Number(length) !== lasmFullRPC.response.length) throw new Error('Mismatched Lean host response size');
     HEAPU8.set(lasmFullRPC.response, Number(output));
     lasmFullRPC.response = new Uint8Array(0);
   },
   lasm_node_start__deps: ['$lasmFullRPC'],
-  lasm_node_start__sig: 'iiijpi',
+  lasm_node_start__sig: 'iiijpp',
   lasm_node_start: function (operation, handle, argument, input, length) {
     return lasmFullRPC.call('start', operation, handle, argument, input, length).id;
   },

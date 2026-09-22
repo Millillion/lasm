@@ -316,14 +316,20 @@ load, and suite conformance still need validation. See
   concurrent pthread callers. Broader coverage remains necessary; see
   [the actual bridge checks](docs/evidence/host-bridge-capacity-2026-09-22.json)
   and the capacity evidence for the retained engine failures.
-- [ ] Widen the experimental full-runtime host transfer-length protocol. A
-  static audit found 32-bit input lengths and a signed 32-bit response size in
-  `runtime/node.hpp` and the matching JavaScript imports. Success lengths at
-  2 GiB cross the error sign bit; input sizes above 4 GiB narrow. The passing
-  high-address controls move small payloads and do not test these large lengths.
-  A synthetic ABI reproduction and a copy-allocation audit are still needed
-  before attempting multi-GiB IO under the existing memory guard. This is an
-  implementation gap, not an established fundamental restriction.
+- [x] Widen the experimental full-runtime host transfer-length protocol.
+  The original ABI failed 36 of 72 synthetic checks: success lengths at 2 GiB
+  crossed the error sign bit and input sizes above 4 GiB narrowed. Pointer-sized
+  counts and signed 64-bit response lengths now pass all 72 checks, including
+  error responses, in Node, Deno, and the local Bun build. Nine actual bridge
+  controls also pass. The packaged Wasm32 ABI retains its existing widths.
+  See [the transfer repair evidence](docs/evidence/host-transfer-width-2026-09-22.json).
+- [ ] Measure and reduce large-payload IO allocation overhead. The wide-count
+  regression uses synthetic lengths without large buffers; the high-address
+  bridge controls move small payloads. Real responses still clone across a
+  worker port and copy through a temporary C++ vector before constructing Lean
+  data. Measure modest ordinary-Lean reads before attempting multi-GiB IO under
+  the unchanged memory guard. This remains an implementation and validation gap,
+  not an established fundamental restriction.
 - [ ] A pending C read cannot be safely interrupted by disposing the Wasm
   instance. Blocking file calls now use independent host workers, so reads do
   not fill the shared N-API pool and prevent their dependent writes from running.

@@ -6,8 +6,8 @@
 #include <dlfcn.h>
 #include <emscripten/emscripten.h>
 
-extern "C" int32_t lasm_node_call(uint32_t, uint32_t, uint64_t, const uint8_t *, uint32_t);
-extern "C" void lasm_node_copy(uint8_t *, uint32_t);
+extern "C" int64_t lasm_node_call(uint32_t, uint32_t, uint64_t, const uint8_t *, size_t);
+extern "C" void lasm_node_copy(uint8_t *, size_t);
 static std::atomic<bool> waiting{false};
 static void *wait_on_host(void *) {
     waiting.store(true);

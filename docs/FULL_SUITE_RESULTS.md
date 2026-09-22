@@ -3,6 +3,14 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The full-runtime host transfer ABI now preserves lengths across the 2 GiB and
+4 GiB boundaries. All **72 synthetic checks** pass after reproducing 36 failures
+in the original ABI. On the rebuilt v121 native-memory64 compiler, Node, Deno,
+and the local 8 GiB Bun each pass **11 unchanged upstream controls**, including
+`instances`; released Bun passes ten controls in the separate v120 lowered
+profile. These selected results do not complete the broad campaigns. See
+[the transfer repair evidence](evidence/host-transfer-width-2026-09-22.json).
+
 The local Bun/WebKit 8 GiB experiment now passes **five unchanged upstream
 controls**, including the previously failing `elab/instances.lean`. All original
 source hashes match; test peak memory was 5.91 GiB with no resource event.
@@ -1243,6 +1251,36 @@ pass with zero skips; peak memory across comparison and regression runs is
 not upstream-suite registrations. Windows discard remains unimplemented and the
 macOS branch still needs native validation. See
 [the complete cleanup evidence](evidence/embedded-force-exit-2026-09-22.json).
+
+## Full-runtime host transfer lengths, September 22 UTC
+
+The original full-host ABI used signed 32-bit response sizes and 32-bit input
+lengths. The same small synthetic fixture reproduces 12 failures per engine at
+the 2 GiB/4 GiB boundaries. Pointer-sized input/copy counts and signed 64-bit
+responses now pass all 24 cases per engine, including success, error, synchronous
+input, and asynchronous input lengths. The maintained probe repeats all 72
+passes. It substitutes length-only RPC responses and never allocates those large
+payloads. Nine separate actual bridge controls also pass with small payloads at
+low addresses and above 2 GiB/4 GiB.
+
+The first compiler link failed because its generated export list still named the
+old private `Reply` constructor. That failed attempt is retained; regenerating
+exports and native registries fixed the link. Frozen v120 keeps the lowered
+4 GiB profile; v121 uses native memory64 with an 8 GiB maximum. On v121, all
+eleven selected unchanged controls pass in each of Node, Deno, and the local Bun
+build. Released Bun passes ten controls on v120; `instances` is covered by the
+three 8 GiB profiles. All 7,267 original source hashes match before and after
+every test, and the largest test peak is 5.75 GiB with no resource event.
+
+All 38 packaged console, ordinary-IO, process-exit, main-entry, task-shutdown,
+and Lake-dependency regressions also pass with zero skips. The shared C++ header
+change invalidated the runtime cache and rebuilt the package artifacts. This run
+peaked at 0.94 GiB, with no OOM, limit, throttling, or swap event.
+
+Worker-message copies, the temporary C++ response vector, and final Lean data
+allocation still require a measured large-payload audit. These results do not
+establish multi-GiB IO equivalence, complete suites, or cross-platform conformance.
+See [the retained before/after evidence](evidence/host-transfer-width-2026-09-22.json).
 
 ## Host platform and compilation target, September 21
 

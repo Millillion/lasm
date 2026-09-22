@@ -645,6 +645,24 @@ replaced runtime definition and keeps Lean's native scheduler, mutexes, and
 thread-local finalizer ordering. This is still experimental: full-suite results,
 not symbol counts or the presence of a wrapper, determine compatibility.
 
+The full-runtime host imports now use pointer-sized input/copy lengths and signed
+64-bit response lengths. `probe-transfer-width.py` exercises the production C++
+declarations and JavaScript imports with length-only RPC responses, so the
+2 GiB/4 GiB boundary checks do not allocate large buffers. Run it through the
+guard with an explicit memory64-capable Bun executable:
+
+```sh
+node scripts/full-lean/run-bounded.mjs --report .work/transfer-width.resources.json -- \
+  python3 scripts/full-lean/base-pages.py python3 scripts/full-lean/probe-transfer-width.py \
+  .work/transfer-width --bun /absolute/path/to/memory64-capable-bun
+```
+
+Use a new output directory to retain previous attempts. The probe snapshots its
+inputs and hashes the engines before and after all 72 checks. These synthetic
+counts and the separate high-address bridge checks do not establish safe
+multi-GiB payload allocation. The packaged Wasm32 ABI remains unchanged; see
+[the repair evidence](../../docs/evidence/host-transfer-width-2026-09-22.json).
+
 The maintained build patch also fixes C++/Lean ABI declaration mismatches exposed
 by strict Wasm validation, retains initialized constants needed by the interpreter,
 and links Emscripten's C++ runtime while preserving C source semantics. The engine probes use the same dynamic-module/thread settings, include exceptions,

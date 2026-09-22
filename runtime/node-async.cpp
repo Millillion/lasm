@@ -8,7 +8,7 @@
 #endif
 
 extern "C" LASM_HOST_IMPORT("node_start")
-uint32_t lasm_node_start(uint32_t op, uint32_t handle, uint64_t argument, const uint8_t *data, uint32_t length);
+uint32_t lasm_node_start(uint32_t op, uint32_t handle, uint64_t argument, const uint8_t *data, LasmHostSize length);
 using namespace lasm;
 namespace {
 O *except(bool failed, O *value) {

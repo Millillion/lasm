@@ -6,9 +6,9 @@
 #include <cstring>
 #include <pthread.h>
 
-extern "C" int32_t lasm_node_call(uint32_t, uint32_t, uint64_t, const uint8_t *, uint32_t);
-extern "C" void lasm_node_copy(uint8_t *, uint32_t);
-extern "C" uint32_t lasm_node_start(uint32_t, uint32_t, uint64_t, const uint8_t *, uint32_t);
+extern "C" int64_t lasm_node_call(uint32_t, uint32_t, uint64_t, const uint8_t *, size_t);
+extern "C" void lasm_node_copy(uint8_t *, size_t);
+extern "C" uint32_t lasm_node_start(uint32_t, uint32_t, uint64_t, const uint8_t *, size_t);
 
 static void *run(void *argument) {
     auto *bytes = static_cast<uint8_t *>(argument);
