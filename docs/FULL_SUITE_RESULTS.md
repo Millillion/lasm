@@ -17,19 +17,20 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **115 registrations passing**, including
+passes. Its latest saved checkpoint has **207 registrations passing**, including
 all 14 prioritized Lake tests, all 69 prioritized compiler regressions, all 16
-prioritized compiled benchmarks, lint, seven documentation examples and eight
+prioritized compiled benchmarks, lint, seven documentation examples and 100
 elaborator regressions. These cover stack-overflow
 handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 3,781 registrations remain pending in that
+harness hash remains intact. The other 3,689 registrations remain pending in that
 snapshot; see
-[the 115-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint115-2026-09-22.json).
+[the 207-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint207-2026-09-22.json).
 The [initial ten-test checkpoint](evidence/node-broad-v147-temporary-files-checkpoint10-2026-09-22.json)
-and [61-test checkpoint](evidence/node-broad-v147-temporary-files-checkpoint61-2026-09-22.json)
+and later [61-test](evidence/node-broad-v147-temporary-files-checkpoint61-2026-09-22.json)
+and [115-test checkpoints](evidence/node-broad-v147-temporary-files-checkpoint115-2026-09-22.json)
 are retained separately.
 Before starting it, both unchanged server-driver controls passed again:
 cancellation and `misc_dir/server_project`, peaking at 7.59 GiB with all 7,267
