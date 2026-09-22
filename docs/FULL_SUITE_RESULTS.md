@@ -17,7 +17,13 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Before starting it, both unchanged server-driver controls passed again:
+passes. Its first saved checkpoint has **10 Lake registrations passing**, covering
+querying, rebuilding, configuration, import fixes, source hashes, executable and
+library targets, and TOML. There are no failures or resource aborts, and every
+original and harness hash remains intact. The other 3,886 registrations remain
+pending in that snapshot; see
+[the 10-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint10-2026-09-22.json).
+Before starting it, both unchanged server-driver controls passed again:
 cancellation and `misc_dir/server_project`, peaking at 7.59 GiB with all 7,267
 regular hashes, six symlink targets and ten harness hashes intact. No resource,
 OOM, throttling or swap event occurred. See
