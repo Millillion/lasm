@@ -10,8 +10,8 @@ This uses a separately rebuilt engine and the explicit Linux stack adjustment,
 not stock Bun or a package default. The complete suites remain unfinished; see
 [the capacity experiment](evidence/bun-memory64-capacity-2026-09-22.json).
 
-The newest frozen v119 Node campaign has **13 passes, one harness timeout,
-zero resource aborts, and 3,882 pending registrations**. It includes the host-platform and mixed
+The recorded v119 Node campaign has **14 passes, one harness timeout,
+zero resource aborts, and 3,881 pending registrations**. It includes the host-platform and mixed
 C-input repairs. All 3,896 registrations remain selected; previously pending
 v114 names run first, and no previous passes are imported. Every source and
 harness hash matched before and after each test; the largest workload peak was
@@ -23,7 +23,10 @@ failure. A separate 1,800-second harness now passes that exact original test in
 with no OOM, limit, throttling, or swap event. The longer deadline is the only
 changed timing setting, and this result is not imported into the broad count.
 See [the successful longer run](evidence/node-long-lint-2026-09-22.json) and
-[the 14-attempt checkpoint](evidence/node-broad-v119-checkpoint14-2026-09-21.json).
+[the 15-attempt checkpoint](evidence/node-broad-v119-checkpoint15-2026-09-22.json).
+The unchanged Lake cache test passes in 694.09 seconds at a 3.86 GiB peak.
+The [prior 14-attempt checkpoint](evidence/node-broad-v119-checkpoint14-2026-09-21.json)
+remains intact.
 The [earlier ten-pass checkpoint](evidence/node-broad-v119-checkpoint10-2026-09-21.json)
 remains intact.
 Its separately compiled original server driver also passes the unchanged
