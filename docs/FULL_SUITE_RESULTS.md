@@ -3,6 +3,15 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The fresh v146 Node campaign selects **all 3,896 original registrations**,
+prioritizing 877 names not passed in the earlier v144/v145 runs. It imports no
+passes from other profiles or targeted validations. Its first two Lake
+registrations, empty-build behavior and environment inheritance, pass with
+all original and harness hashes intact. This is an initial checkpoint, not a
+completed suite. Each test uses its own guard, base pages, one CTest job and
+one build worker. See
+[the initial v146 checkpoint](evidence/node-broad-v146-lean-symbol-loader-checkpoint2-2026-09-22.json).
+
 The optional compiled-server harness now covers the exact
 `misc_dir/server_project` invocation as well as `server_interactive`. Both
 upstream driver files are byte-identical; the harness verifies their hashes
