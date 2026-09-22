@@ -5,24 +5,33 @@ Pinned Lean: **4.32.0**, commit
 
 The fresh v146 Node campaign selects **all 3,896 original registrations**,
 prioritizing 877 names not passed in the earlier v144/v145 runs. It imports no
-passes from other profiles or targeted validations. Its first two Lake
-registrations, empty-build behavior and environment inheritance, pass with
-all original and harness hashes intact. This is an initial checkpoint, not a
+passes from other profiles or targeted validations. Its latest saved checkpoint
+has **11 Lake registrations passing**, including initialization, plugins,
+input files, LLVM bitcode, locking and logging/replay, with no failures or
+resource aborts and all original and harness hashes intact. This is a checkpoint, not a
 completed suite. Each test uses its own guard, base pages, one CTest job and
 one build worker. See
-[the initial v146 checkpoint](evidence/node-broad-v146-lean-symbol-loader-checkpoint2-2026-09-22.json).
+[the 11-test v146 checkpoint](evidence/node-broad-v146-lean-symbol-loader-checkpoint11-2026-09-22.json).
 
 The registration count comprises 3,891 upstream CTest tests and five opt-in
 tests that upstream explicitly excludes as flaky. Seven additional benchmark
 inputs carry upstream `.no_test` markers and are outside that count. Their
-sources are inventoried separately. All seven now complete with native Lean
-using their unchanged upstream benchmark drivers, peaking at 1.69 GiB without
-resource events. JavaScript comparisons are in progress. The native run's
-separate measurement adapter records actual wall/CPU time and max RSS because
-this host denies `perf` counters; hardware counts are omitted. The initial
-diagnostic with an expected-output test driver remains recorded: a benchmark
-printed output but had no expected-output file. See
-[the native benchmark evidence](evidence/benchmark-inputs-native-2026-09-22.json)
+sources are inventoried separately. All seven now complete in **native Lean,
+Node, Deno and local rebuilt Bun** using their unchanged upstream benchmark
+drivers: 28 successful executions, without resource events. Each JavaScript
+engine matches native output exactly after normalizing only the seven printed
+evaluator/kernel timing pairs in the System F benchmark. Raw output remains in
+the evidence, including the native benchmark's `sorry` warning.
+
+Maximum peaks are 1.69 GiB native, 4.49 GiB Node, 4.50 GiB Deno and 4.58 GiB Bun.
+All 7,267 original file hashes, six symlink targets and both measurement-harness
+hashes remain intact before and after every execution. The separate measurement
+adapter records actual wall/CPU time and max RSS because this host denies `perf`
+counters; hardware counts are omitted. These benchmark checks do not add passes
+to the broad 3,896-test campaign. The initial diagnostic with an expected-output
+test driver remains recorded: a benchmark printed output but had no expected
+file. See [the complete benchmark comparison](evidence/benchmark-inputs-all-engines-2026-09-22.json),
+[the initial native control](evidence/benchmark-inputs-native-2026-09-22.json)
 and [the source inventory](evidence/upstream-benchmark-only-inventory-2026-09-22.json).
 
 Source integrity checks now also verify the six symlink targets from the

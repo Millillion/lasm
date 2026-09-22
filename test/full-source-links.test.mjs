@@ -5,7 +5,8 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { originalSourceLinks, verifySourceLinks } from '../scripts/full-lean/source-links.mjs';
 
-test('source verification detects retargeted, replaced and missing links even when bytes match', () => {
+test('source verification detects retargeted, replaced and missing links even when bytes match',
+  { skip: process.platform !== 'linux' }, () => {
   const root = mkdtempSync(join(tmpdir(), 'lasm-source-links-'));
   try {
     writeFileSync(join(root, 'first'), 'same test bytes');

@@ -6,7 +6,8 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { serverDriverShim } from '../scripts/full-lean/server-driver-shim.mjs';
 
-test('the compiled driver preserves exact server arguments and leaves other Lean invocations intact', () => {
+test('the compiled driver preserves exact server arguments and leaves other Lean invocations intact',
+  { skip: process.platform === 'win32' }, () => {
   const root = mkdtempSync(join(tmpdir(), "lasm-driver's test-"));
   try {
     const source = join(root, 'source'), prefix = join(root, 'prefix'), driver = join(root, 'compiled driver');

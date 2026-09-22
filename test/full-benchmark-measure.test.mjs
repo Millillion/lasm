@@ -7,6 +7,8 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const adapter = fileURLToPath(new URL('../scripts/full-lean/benchmark-measure.py', import.meta.url));
+// This is the Linux maintainer harness, not a package/runtime dependency.
+const onLinux = { skip: process.platform !== 'linux' };
 const fixture = callback => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-benchmark-measure-'));
   try { callback(join(directory, 'metrics.jsonl')); }
@@ -15,7 +17,7 @@ const fixture = callback => {
 const run = (output, options, code, args = []) => spawnSync('python3', [adapter,
   '-t', 'control', '-o', output, ...options, '--', 'python3', '-c', code, ...args], { encoding: 'utf8' });
 
-test('benchmark measurements preserve literal arguments and both output streams', () => fixture(output => {
+test('benchmark measurements preserve literal arguments and both output streams', onLinux, () => fixture(output => {
   const args = ['a b', "single'quote", '$(false)', '--flag'];
   const result = run(output, ['-d'], 'import json,sys; print(json.dumps(sys.argv[1:])); print("diagnostic", file=sys.stderr)', args);
   assert.equal(result.status, 0, result.stderr);
@@ -32,7 +34,7 @@ test('benchmark measurements preserve literal arguments and both output streams'
   assert.equal(readFileSync(output, 'utf8').trim().split('\n').length, 4);
 }));
 
-test('failed and signal-terminated commands remain failures without success measurements', () => fixture(output => {
+test('failed and signal-terminated commands remain failures without success measurements', onLinux, () => fixture(output => {
   const failed = run(output, ['-d'], 'import sys; print("failed output"); sys.exit(23)');
   assert.equal(failed.status, 23);
   assert.equal(failed.stdout, 'failed output\n');
@@ -42,7 +44,7 @@ test('failed and signal-terminated commands remain failures without success meas
   assert.equal(existsSync(output), false);
 }));
 
-test('unavailable hardware counters are rejected before executing the command', () => fixture(output => {
+test('unavailable hardware counters are rejected before executing the command', onLinux, () => fixture(output => {
   const result = run(output, ['-m', 'instructions'], 'print("must not run")');
   assert.notEqual(result.status, 0);
   assert.equal(result.stdout, '');

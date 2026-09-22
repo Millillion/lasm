@@ -39,17 +39,17 @@ changing its timings. The earlier failures remain recorded; broader scheduling,
 load, and suite conformance still need validation. See
 [the loader repair evidence](docs/evidence/symbol-lookup-2026-09-21.json).
 
+The seven benchmark-only inputs marked `.no_test` now complete separately in
+native Lean, Node, Deno and local rebuilt Bun on Linux x64. Their original
+benchmark drivers are unchanged; all JavaScript outputs match native after
+normalizing only explicit timing values. The parallel measurement adapter
+records wall/CPU time and max RSS without unavailable `perf` counters. These
+28 successful benchmark executions are separate from the 3,896-test campaigns
+and do not establish full-suite conformance. See
+[the benchmark comparison](docs/evidence/benchmark-inputs-all-engines-2026-09-22.json).
+
 ## Standard API coverage
 
-- [ ] Validate the seven upstream benchmark-only inputs separately. Their
-  `.no_test` markers exclude them from the upstream CTest inventory; the current
-  3,896-test campaigns contain the 3,891 registered tests plus five explicitly
-  excluded flaky tests. The benchmark sources, markers and original test drivers
-  are recorded in [this inventory](docs/evidence/upstream-benchmark-only-inventory-2026-09-22.json).
-  All seven now complete with native Lean using the original benchmark drivers
-  and a separate measurement adapter for hosts without `perf` permission. These
-  are benchmark execution checks, not expected-output CTest passes. JavaScript
-  comparisons remain open; see [the native control](docs/evidence/benchmark-inputs-native-2026-09-22.json).
 - [ ] Complete a declaration-by-declaration compatibility audit; the implemented
   primitives and tested higher-level APIs are not all of Lean IO. The pinned
   inventory now lists 193 `IO.FS` and 1,938 `Std.Http` declarations. All 20 direct
