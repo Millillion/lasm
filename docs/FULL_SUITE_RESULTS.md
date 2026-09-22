@@ -3,8 +3,8 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The v144 Node campaign's latest saved checkpoint records **1,102 passes, zero
-failures or resource aborts, and 2,794 pending registrations**. All 3,896 tests
+The v144 Node campaign's latest saved checkpoint records **1,210 passes, zero
+failures or resource aborts, and 2,686 pending registrations**. All 3,896 tests
 remain selected; 3,004 previously unpassed names run first, without importing
 earlier results. Quicksort, four red-black-map variants, server startup, the
 dependent-pair iterator, tree maps, union-find, server watchdog and workspace
@@ -23,12 +23,15 @@ Evaluation, string splitting, coercions, coinductive predicates, compiler
 optimizations and congruence tests pass in the next group.
 Further passes include constructor and conversion checks, `native_decide`,
 default-instance selection, definitions and delaboration.
+The next group includes arithmetic, matching, pattern-inference and product
+regressions for `grind`.
 Every completed attempt preserves all 7,267 original source hashes and the
 compiled-driver/harness hashes. The active unfinished attempt is excluded from
 the saved results. This campaign uses base pages, one build worker and the
 separate final-link profile described below. See
-[the 1,102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1102-2026-09-22.json).
-The [1,002-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1002-2026-09-22.json),
+[the 1,210-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1210-2026-09-22.json).
+The [1,102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1102-2026-09-22.json),
+[1,002-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1002-2026-09-22.json),
 [903-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint903-2026-09-22.json),
 [801-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint801-2026-09-22.json),
 [704-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint704-2026-09-22.json),
