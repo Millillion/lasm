@@ -18,8 +18,11 @@ harness hash matched before and after each test; the largest workload peak was
 5.45 GiB with no memory-limit events. The unchanged
 `tests/lake/tests/builtin-lint/test.sh` reached its final lint-driver cases but
 exceeded the 900-second parallel-harness deadline. Its timeout is retained as a
-failure and needs a separately documented longer timing profile; it is not
-classified as fundamental. See
+failure. A separate 1,800-second harness now passes that exact original test in
+953.88 seconds, peaking at 5.46 GiB. All 7,267 source and nine harness hashes match,
+with no OOM, limit, throttling, or swap event. The longer deadline is the only
+changed timing setting, and this result is not imported into the broad count.
+See [the successful longer run](evidence/node-long-lint-2026-09-22.json) and
 [the 14-attempt checkpoint](evidence/node-broad-v119-checkpoint14-2026-09-21.json).
 The [earlier ten-pass checkpoint](evidence/node-broad-v119-checkpoint10-2026-09-21.json)
 remains intact.
