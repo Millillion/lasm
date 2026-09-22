@@ -3,6 +3,15 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The new v127 Node campaign with base pages and one build worker records its first
+**five passes, zero failures or resource aborts, and 3,891 pending registrations**.
+The unchanged cross-process closure serialization test now passes, followed by
+compactor-chain, dependent-region, and escape-analysis controls. All 3,896
+registrations remain selected; no earlier results are imported. Every completed
+attempt preserves all 7,267 source and nine harness hashes, with no memory-limit
+or swap events and a 5.10 GiB maximum peak. The active attempt is excluded from
+this checkpoint; see [the base-page campaign evidence](evidence/node-broad-v127-base-pages-checkpoint5-2026-09-22.json).
+
 The v127 Node campaign stopped at **54 passes, zero conformance failures, one
 resource abort, and 3,841 pending registrations**. The guard interrupted
 `compile/compact_closure.lean` on a 5.17% memory-pressure signal at a 2.15 GiB peak,
