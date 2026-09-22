@@ -58,7 +58,7 @@ for (let i = 0; i < original.length; i++) {
   args.push(arg);
 }
 const applicationMode = !compileOnly && !shared
-  ? applicationLinkMode(args, runtimePaths, config.applicationRuntime) : undefined;
+  ? applicationLinkMode(args, runtimePaths, config.applicationRuntime, process.env.LASM_FULL_APPLICATION_LINK) : undefined;
 const sharedApplication = applicationMode?.mode === 'shared';
 if (sharedApplication) args = args.filter(arg => !isRuntimeLibrary(arg) && !isRuntimeArchive(arg, config.applicationRuntime));
 args.push(`-sMEMORY64=${config.memoryMode ?? 2}`, '-pthread', '-fwasm-exceptions');

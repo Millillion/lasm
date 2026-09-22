@@ -22,6 +22,16 @@ test('generated Lean C can share only a selected runtime with its own library di
   assert.equal(applicationLinkMode(normal, [], undefined).mode, 'standalone');
 });
 
+test('an explicit resource adjustment keeps even eligible generated C standalone', () => {
+  assert.equal(applicationLinkMode(normal, [], runtime, 'standalone').mode, 'standalone');
+  assert.equal(applicationLinkMode(normal, [], undefined, 'standalone').mode, 'standalone');
+});
+
+test('unknown link overrides cannot silently select a different runtime', () => {
+  assert.throws(() => applicationLinkMode(normal, [], runtime, 'shared'), /must be standalone/);
+  assert.throws(() => applicationLinkMode(normal, [], runtime, ''), /must be standalone/);
+});
+
 test('only byte-identical recorded runtime archives may be omitted from a shared link', () => {
   const archive = join(directory, 'runtime.a'), copied = join(directory, 'copied.a'), changed = join(directory, 'changed.a');
   const bytes = Buffer.from('recorded archive fixture');

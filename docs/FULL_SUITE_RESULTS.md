@@ -83,8 +83,19 @@ passes with four. Node passes with four both directly and through CTest, without
 changing the test's internal deadlines. General compiler/application defaults
 therefore remain four workers. The earlier failure remains recorded; these
 targeted results do not add passes to the paused broad campaign. Full-suite,
-language-server, cross-engine facade, and packaged integration remain separate
+broader language-server, cross-engine facade, and packaged integration remain separate
 gates. See [the adapter and worker-profile evidence](evidence/shared-application-adapter-2026-09-22.json).
+
+A shared version of the unchanged language-server test driver passes the
+cancellation control, but its 7.97 GiB peak leaves little headroom. The new
+`--standalone-link` driver option retains the original standalone Wasm linking
+path while ordinary application links can reuse the shared runtime. All seven
+subsequent Node controls pass: four cancellation cases, server output, an
+expression application, and HTTP hang regressions. The cancellation control
+falls to a 6.50 GiB peak; the complete group peaks at 6.84 GiB, with no resource
+aborts, memory-limit events, OOMs, or swap. All 7,267 source hashes and the
+recorded driver/harness hashes remain intact. Four Lean workers are retained,
+and 17 link-selection tests pass. See [the driver comparison](evidence/standalone-server-driver-2026-09-22.json).
 
 The v127 Node campaign stopped at **54 passes, zero conformance failures, one
 resource abort, and 3,841 pending registrations**. The guard interrupted

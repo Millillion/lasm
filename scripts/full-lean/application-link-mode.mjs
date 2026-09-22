@@ -41,8 +41,11 @@ function isGeneratedLeanC(path) {
   finally { if (fd !== undefined) closeSync(fd); }
 }
 
-export function applicationLinkMode(args, runtimePaths, sharedRuntime, generated = isGeneratedLeanC) {
+export function applicationLinkMode(args, runtimePaths, sharedRuntime, override) {
   const standalone = reason => ({ mode: 'standalone', reason });
+  if (override !== undefined && override !== 'standalone')
+    throw new Error('LASM_FULL_APPLICATION_LINK must be standalone when supplied');
+  if (override === 'standalone') return standalone('Explicit standalone application link requested');
   if (!sharedRuntime) return standalone('No shared application runtime selected');
   if (runtimePaths.length) return standalone('Explicit runtime library search paths');
   if (args.some(arg => /^-l/.test(arg) && !isRuntimeLibrary(arg)))
@@ -70,6 +73,6 @@ export function applicationLinkMode(args, runtimePaths, sharedRuntime, generated
     && !isRuntimeArchive(arg, sharedRuntime)))
     return standalone('Custom or precompiled link input');
   const sources = args.filter(arg => !arg.startsWith('-') && arg.endsWith('.c'));
-  if (!sources.length || !sources.every(generated)) return standalone('Link inputs are not exclusively generated Lean C');
+  if (!sources.length || !sources.every(isGeneratedLeanC)) return standalone('Link inputs are not exclusively generated Lean C');
   return { mode: 'shared', reason: 'Generated Lean C using the pinned runtime libraries' };
 }

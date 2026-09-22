@@ -130,6 +130,17 @@ whitespace and records the flags without evaluating shell code. This is a
 disclosed preparation adjustment; it does not change how the suite invokes
 Leanc or other Lean tools under test.
 
+For a facade with shared application linking enabled, the driver builder also
+accepts `--standalone-link`. It compiles the same original driver through the
+ordinary standalone Wasm path and records the explicit link decision in its
+manifest. Compiler/server children keep the selected toolchain and four-worker
+defaults. This reduces memory retained by the driver while those children run;
+the shared driver passed a cancellation control but peaked at 7.97 GiB, close
+to the unchanged 8 GiB proactive stop threshold. The private build-only
+`LASM_FULL_APPLICATION_LINK=standalone` setting can request the same choice
+from the compiler adapter; unknown values fail explicitly. Use a new driver
+and suite directory when changing this profile.
+
 A proactive workload-budget stop is recorded as `resource-aborted`, never as a
 test failure or pass. Host pressure, actual OOM, monitoring failures, and source
 drift stop the campaign for investigation. Do not wrap this small supervisor in
