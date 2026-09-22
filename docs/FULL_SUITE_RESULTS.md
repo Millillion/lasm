@@ -3,22 +3,25 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
-The v146 compiler repair passes **six original regressions in native Lean and
-six in Node**, including all three plugin failures found below. Late-loaded
+The v146 compiler repair passes **six original regressions each in native Lean,
+Node, Deno, and the local rebuilt Bun**, including all three plugin failures
+found below. Late-loaded
 plugins can now resolve compiled Lean functions through the same in-Wasm
 registry used by the interpreter. Ordinary global-symbol precedence, explicit
 data exports, and weak-import misses are preserved. Four focused resolver
 tests pass. A small real plugin control also passes natively and in Node,
 Deno, and the local rebuilt Bun, using both native and lowered Memory64.
 
-Full Deno and Bun plugin regression groups are still being checked separately.
 The initial combined validation completed all native and Node tests, then
 reached the proactive memory budget during Deno's benchmark. It stopped at
 8.03 GiB with no OOM, hard-limit, throttling, swap, or monitor event. File cache
-had accumulated across earlier tests in that cgroup. Fresh remaining checks
-use a separate guard per registration. The compiler relink itself peaked at
+had accumulated across earlier tests in that cgroup. Fresh Deno and Bun checks
+pass all twelve registrations with a separate guard per test, peaking at
+6.55 GiB without resource, OOM, throttling, or swap events. The compiler relink itself peaked at
 3.05 GiB; all 7,267 original source hashes remain intact. See
-[the Node repair and retained interrupted attempt](evidence/lean-plugin-symbols-node-2026-09-22.json).
+[the Node repair and retained interrupted attempt](evidence/lean-plugin-symbols-node-2026-09-22.json)
+and [the completed Deno/Bun regression groups](evidence/lean-plugin-symbols-2026-09-22.json).
+These targeted groups do not complete any JavaScript engine's entire upstream suite.
 
 The v145 broad Node run is paused at **1,390 passes, three conformance failures,
 one resource abort, and 2,502 pending registrations**. All 3,896 registrations
