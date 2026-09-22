@@ -3,6 +3,17 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The v144 Node campaign's first saved checkpoint records **ten passes, zero
+failures or resource aborts, and 3,886 pending registrations**. All 3,896 tests
+remain selected; 3,004 previously unpassed names run first, without importing
+earlier results. Quicksort, four red-black-map variants, server startup, the
+dependent-pair iterator, tree maps, union-find and the server watchdog pass.
+Every completed attempt preserves all 7,267 original source hashes and the
+compiled-driver/harness hashes. The active unfinished attempt is excluded from
+the saved results. This campaign uses base pages, one build worker and the
+separate final-link profile described below. See
+[the ten-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint10-2026-09-22.json).
+
 The v144 standalone final-link profile passes **nineteen unchanged upstream
 registrations**: eleven in Node and four each in Deno and the local rebuilt Bun.
 Coverage includes channel/parser benchmarks, native FFI and reverse FFI,
@@ -24,6 +35,15 @@ smoke run, and a manually stopped two-worker regression attempt remain recorded.
 Neither incomplete attempt is counted as a conformance failure. Cross-platform,
 released-Bun full-compiler and complete-suite validation remain open. See
 [the standalone optimization evidence](evidence/standalone-link-optimization-2026-09-22.json).
+
+The same Node profile also passes **four unchanged language-server cancellation
+registrations** with the original upstream test driver compiled ahead of time.
+The driver uses the standalone split-link option; compiler/server children still
+use four Lean workers. All original and harness hashes match. Preparation peaks
+at 2.96 GiB and execution at 6.53 GiB, without resource aborts, memory-limit events,
+OOM, throttling or swap. These targeted results are recorded separately from
+the new full campaign. See
+[the server-driver validation](evidence/standalone-link-server-driver-2026-09-22.json).
 
 The v142 private file-worker repair passes **eighteen unchanged registrations**:
 ordinary IO, HTTP hang regressions, line reads, file locking, directory reads,
