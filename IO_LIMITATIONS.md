@@ -1,6 +1,6 @@
 # Current IO limitations in Lasm
 
-Snapshot: 2026-09-21, `0.1.0-experimental.3`, Lean `4.32.0`.
+Snapshot: 2026-09-22 UTC, `0.1.0-experimental.3`, Lean `4.32.0`.
 Every checkbox below is intentionally empty and describes remaining work, a
 known difference, or a validation gap. These are Lasm limitations, not Lean
 limitations. This list does not promise that every restriction will be removed.
@@ -271,11 +271,11 @@ load, and suite conformance still need validation. See
   probe. The full compiler also passes the unchanged upstream `IO_test` on that
   build. See [the local engine repair](docs/evidence/bun-memory64-local-fix-2026-09-21.json)
   and [isolated full-runtime IO result](docs/evidence/bun-memory64-io-2026-09-21.json).
-  A separate patched release build now also passes ordinary upstream IO,
-  cancellation, and HTTP controls. `instances` still fails: Bun's WebKit fork
+  An earlier patched release build passed ordinary upstream IO,
+  cancellation, and HTTP controls, but `instances` failed: Bun's WebKit fork
   deliberately caps ArrayBuffers and Wasm memory at 4 GiB while some Bun buffer
   paths retain 32-bit lengths. A one-page capacity query confirms this cap without
-  attempting large memory growth. This remaining implementation restriction is
+  attempting large memory growth. That implementation restriction was
   not fundamental; see [the release and capacity evidence](docs/evidence/bun-memory64-release-2026-09-21.json).
   A separate three-byte buffer probe confirmed a Bun offset-narrowing issue:
   `StringDecoder.text` wraps offsets at 4 GiB and differs on negative indexing.
@@ -288,11 +288,25 @@ load, and suite conformance still need validation. See
   4 GiB boundary checks; 22 added decoder cases and 37 worker/memory controls
   pass. One unchanged Bun test expects behavior that differs from Node; its
   failure and a separate native comparison are retained. The ASAN forced-GC
-  case needs a documented longer harness deadline. This does not remove the
+  case needs a documented longer harness deadline. That patch did not remove the
   capacity limit or complete the wider buffer audit; see
   [the decoder repair evidence](docs/evidence/bun-decoder-width-2026-09-21.json).
-  Broader Lean validation on both local builds remains in progress.
-  These full-runtime paths still need integration and comprehensive validation.
+  A subsequent matching WebKit source build raises the local Bun capacity to
+  8 GiB. It passes the unchanged `instances` test and four upstream filesystem,
+  cancellation, and HTTP controls; all 7,267 original source hashes remain intact.
+  Large-buffer correctness checks also pass, but the numeric-index probe did not
+  demonstrate FTL execution above 4 GiB. That coverage failure is retained.
+  This opt-in Linux build uses host ICU 74.2 and the explicit stack adjustment;
+  it is not released Bun or a package default. Its WebKit changes still lack ASAN
+  and other-OS validation. See [the capacity evidence](docs/evidence/bun-memory64-capacity-2026-09-22.json).
+  Full-suite completion and packaged full-runtime integration remain open.
+- [ ] Audit every host transfer path above 4 GiB. Independent probes show that
+  Node 24.13.1 truncates high source offsets in `Buffer.copy` and shared-view
+  cloning. Deno 2.9.7 rejects that copy and truncates offsets in `Buffer.toString`
+  and `Buffer.fill`. Lasm's existing typed-array slice/set and numeric-offset
+  reconstruction paths pass the minimized checks in all three engines; these
+  engine failures are not observed failures of that bridge. Broader coverage
+  remains necessary; see the same capacity evidence for all retained outcomes.
 - [ ] A pending C read cannot be safely interrupted by disposing the Wasm
   instance. Blocking file calls now use independent host workers, so reads do
   not fill the shared N-API pool and prevent their dependent writes from running.

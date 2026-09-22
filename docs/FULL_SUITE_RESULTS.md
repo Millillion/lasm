@@ -3,6 +3,13 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The local Bun/WebKit 8 GiB experiment now passes **five unchanged upstream
+controls**, including the previously failing `elab/instances.lean`. All original
+source hashes match; test peak memory was 5.91 GiB with no resource event.
+This uses a separately rebuilt engine and the explicit Linux stack adjustment,
+not stock Bun or a package default. The complete suites remain unfinished; see
+[the capacity experiment](evidence/bun-memory64-capacity-2026-09-22.json).
+
 The newest frozen v119 Node campaign has **13 passes, one harness timeout,
 zero resource aborts, and 3,882 pending registrations**. It includes the host-platform and mixed
 C-input repairs. All 3,896 registrations remain selected; previously pending
@@ -228,7 +235,7 @@ missed early response bytes; enlarging the preinitialized worker pool alone did
 not resolve it. Native `instances` used approximately 3.44 GiB RSS and passed;
 the full Wasm build's memory failure remains under investigation.
 
-Complete Deno and Bun runs on frozen v23 now cover **3,896 registrations each**
+Full-suite Deno and Bun campaigns on frozen v23 cover **3,896 registrations each**
 (the standard 3,891 plus five explicitly identified exclusions). They use one
 CTest worker per engine, a 1,800-second harness deadline, and a shared file lock
 for unchanged fixed-port TCP/UDP tests. They have not completed. The earlier full
@@ -1153,6 +1160,57 @@ OOM, hard-limit, throttling, or swap error was observed. All guarded attempts ar
 retained, including two validation-helper mistakes. These are engine prerequisite
 checks, not Lean registrations or removal of the 4 GiB capacity limit. See
 [the decoder repair and retained disagreements](evidence/bun-decoder-width-2026-09-21.json).
+
+## Bun capacity experiment, September 22 UTC
+
+A separate source build of the pinned WebKit commit changes its Bun-specific
+ArrayBuffer/Wasm maximum from 4 GiB to 8 GiB, together with the previously
+validated cloning and decoder repairs. The complete engine build took 50 minutes
+48 seconds, peaking at 6.39 GiB. It used one build job, two-CPU affinity, base
+pages, and the unchanged 8 GiB proactive/10 GiB hard guard. Completed WebKit
+object-file cache was released after JSC linked; file contents and global settings
+were unchanged. No OOM, hard-limit, throttling, swap, or resource-abort event occurred.
+
+Twenty JSC configurations pass the memory-growth and byte-value checks, including
+shared/unshared memory at 4 GiB plus 64 KiB. An initial run stopped on a separate
+FTL-coverage assertion: the large numeric-index loop returned correct values but
+did not report final-tier execution. The parallel validation preserves every
+correctness assertion and records that coverage gap, retaining the original
+failed attempt and its inputs. Small controls demonstrate final-tier execution;
+large-index FTL execution remains unverified.
+
+Bun also passes 52 grouped buffer-boundary checks, 40 small-offset comparisons,
+six decoder-width checks, two negative-offset controls, and all 37 worker/memory
+regressions. Its complete decoder file still has 119 passes and the same one
+unchanged test whose expectation disagrees with Node. These are engine controls,
+separate from the following full Lean results:
+
+| Unchanged upstream registration | Result | Seconds | Peak workload memory |
+| --- | --- | ---: | ---: |
+| `elab/instances.lean` | Passed | 42.94 | 5.91 GiB |
+| `elab/IO_test.lean` | Passed | 5.54 | 1.91 GiB |
+| `elab/async_cancellation.lean` | Passed | 8.33 | 2.30 GiB |
+| `elab/async_cancellation_reasons.lean` | Passed | 7.15 | 2.30 GiB |
+| `elab/async_http_hang_regressions.lean` | Passed | 10.06 | 2.37 GiB |
+
+All 7,267 original file hashes match before and after every test. These runs use
+the v119 full compiler, five pthread-pool slots, four Lean workers, and the existing
+Linux stack helper. The frozen engine dynamically links host ICU 74.2; its earlier
+prebuilt-WebKit counterpart used ICU 78.3. This is not a comparison with only one
+changed dependency, and the new WebKit build has not been tested with ASAN.
+
+Independent wide-buffer controls found other pinned-engine differences. Node
+24.13.1 truncates source offsets in `Buffer.copy` above 4 GiB and reproduces the
+known shared-view clone truncation. Deno 2.9.7 rejects that copy and truncates high
+offsets in `Buffer.toString` and `Buffer.fill`. Smaller independent probes preserve
+every failure: Node passes 20/23 large-operation cases, Deno 17/23, and the patched
+Bun build 23/23. All 69 small-operation controls pass. The typed-array slice/set
+and numeric-offset reconstruction paths used by Lasm pass in all three engines;
+these engine findings do not establish a Lasm bridge failure.
+
+Stock Bun, packaged full-runtime integration, full-suite completion, broader IO
+coverage, and native Windows/macOS/ARM64 validation remain open. See
+[all attempts, hashes, dependencies, and resource reports](evidence/bun-memory64-capacity-2026-09-22.json).
 
 ## Host platform and compilation target, September 21
 

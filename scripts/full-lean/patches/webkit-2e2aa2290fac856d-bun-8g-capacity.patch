@@ -1,0 +1,17 @@
+--- a/Source/JavaScriptCore/runtime/PageCount.h
++++ b/Source/JavaScriptCore/runtime/PageCount.h
+@@ -37,10 +37,10 @@
+ #if USE(LARGE_TYPED_ARRAYS)
+ static_assert(sizeof(size_t) == sizeof(uint64_t));
+ #if USE(BUN_JSC_ADDITIONS)
+-// Upstream raised this to 1 << 34 for memory64. Bun's Buffer kMaxLength is this
+-// constant and parts of Bun still keep buffer lengths in 32 bits, so the limit
+-// stays at 4 GB until Bun is audited for larger buffers.
+-#define MAX_ARRAY_BUFFER_SIZE (1ull << 32)
++// Local Lasm capacity experiment, rebuilt with the matching Bun buffer fixes.
++// Keep the experiment at 8 GiB; broader Buffer/API conformance is still under
++// validation and this does not change the released Bun configuration.
++#define MAX_ARRAY_BUFFER_SIZE (1ull << 33)
+ #else
+ #define MAX_ARRAY_BUFFER_SIZE (1ull << 34)
+ #endif

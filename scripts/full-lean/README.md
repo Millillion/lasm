@@ -854,3 +854,34 @@ decoder cases, with only the documented Node-semantics disagreement remaining.
 All 18 cloning controls, 15 neighboring worker tests, and four original memory
 checks pass again. The WebKit capacity constant is unchanged at 4 GiB; these
 engine checks are neither a capacity repair nor full Lean-suite results.
+
+The later `patches/webkit-2e2aa2290fac856d-bun-8g-capacity.patch` is an opt-in
+experiment against WebKit commit `2e2aa2290fac856d6f451ceacb58f7f5b44dd057`.
+Apply it in a separate source checkout, retain both Bun patches, and use Bun's
+supported `BUN_WEBKIT_PATH` / `--webkit=local` build path in a new build directory.
+Rebuild the matching static libraries and Bun; changing downloaded headers alone
+does not change their compiled capacity. Keep the one-job build inside the guard.
+The recorded Linux build uses host ICU 74.2 instead of bundled ICU 78.3.
+
+`probes/memory64-boundary-jsc.js` checks the JSC shell first. Its arguments are
+`shared|unshared PAGES observe-tier|require-final-tier "$LASM_RESOURCE_UNIT"`;
+use `--useWasmMemory64=true`, start at two pages, and only then use 65,537 pages.
+The explicit guard token prevents accidental unguarded large allocations.
+The optional final-tier assertion tests optimizer coverage, not just semantics.
+It remains a recorded failure for the large mixed-offset loop; a separate profile
+keeps all correctness assertions while recording actual observed tiers.
+
+`probes/memory64-buffer-boundaries.cjs` and `probes/buffer-high-offsets.cjs` take
+`shared|unshared [PAGES]`. Run them only inside the guard, starting at two pages.
+The default 65,537-page case requests 4 GiB plus 64 KiB; low physical usage in one
+engine does not guarantee low commitment elsewhere. They test Wasm/typed-array
+access, Buffer operations, filesystem offsets, and shared worker views. The latter
+probe isolates each operation and retains failures instead of stopping at the
+first one. It also checks Lasm's typed-array copy and numeric-offset reconstruction
+paths against known Node/Deno high-offset Buffer/cloning differences.
+
+The frozen local 8 GiB engine passes all five selected unchanged Lean controls,
+including `instances`; the earlier capacity failure remains preserved. Stock Bun,
+ASAN coverage of the new WebKit build, the full Lean suite, package integration,
+and other operating systems/architectures remain separate gates. See
+[the full capacity evidence](../../docs/evidence/bun-memory64-capacity-2026-09-22.json).
