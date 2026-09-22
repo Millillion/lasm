@@ -193,6 +193,7 @@ O *lean_io_mono_ms_now() { return lean_uint64_to_nat(Reply(25).number()); }
 O *lean_io_mono_nanos_now() { return lean_uint64_to_nat(Reply(26).number()); }
 O *lean_get_current_time() {
     auto r = Reply(27);
+    if (r.failed) return r.result();
     return ok(pair(lean_int64_to_int((int64_t)r.number()), lean_int64_to_int((int64_t)r.number(8))));
 }
 O *lean_io_get_random_bytes(size_t n) { auto r = Reply(28, 0, n); return r.failed ? r.result() : ok(r.array()); }

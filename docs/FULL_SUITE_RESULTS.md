@@ -3,6 +3,24 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The separate v141 clock validation passes **twelve unchanged registrations**:
+`timeIO`, `timeNegative`, HTTP hang regressions, and file locking in each engine.
+All 7,267 original source hashes match before and after execution. Ordinary
+`Timestamp.now` now retains native Lean's observed Linux microsecond precision,
+and an injected clock error reaches its ordinary `IO.Error` handler instead of
+being interpreted as a timestamp. Released Node, Deno, and Bun also pass six
+packaged precision/error controls. Ten focused host tests, both new package
+tests, and the six existing ordinary-IO/main tests pass. Full Bun compiler tests
+use the disclosed local memory64-capacity build; native macOS, Windows, and
+ARM64 comparisons remain pending.
+
+The evidence retains an initial supplementary fixture error, a private harness
+setup failure, and an unsuccessful header-copy build. No upstream test was
+edited. The successful combined validation peaks at 4.46 GiB, with no resource
+abort, OOM, memory-limit, throttling, or swap events. These targeted passes are
+not imported into the broad campaign. See
+[the clock evidence](evidence/wall-clock-2026-09-22.json).
+
 The v139 Node campaign selects all **3,896 registrations** and is paused after
 **20 passes, zero failures or resource aborts, and 3,876 pending registrations**.
 It uses shared application linking, the separately compiled standalone server

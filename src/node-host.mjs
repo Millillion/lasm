@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
 import { createNodeNetwork } from './node-network.mjs';
 import { nativeFiles } from './native-files.mjs';
+import { nativeClock } from './native-clock.mjs';
 import { createNodeProcesses } from './node-process.mjs';
 import { createNodeUdp } from './node-udp.mjs';
 import { nativeDns } from './native-dns.mjs';
@@ -197,7 +198,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     case 24: return Buffer.from(appPath);
     case 25: return numbers(process.hrtime.bigint() / 1_000_000n);
     case 26: return numbers(process.hrtime.bigint());
-    case 27: { const ms = BigInt(Date.now()); return numbers(ms / 1000n, ms % 1000n * 1_000_000n); }
+    case 27: { const ns = nativeClock().now(); return numbers(ns / 1_000_000_000n, ns % 1_000_000_000n); }
     case 28: return randomBytes(n);
     case 29: {
       // Unlike IO.FS, native POSIX setCurrentDir uses a C string directly.

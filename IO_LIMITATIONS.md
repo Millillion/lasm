@@ -190,12 +190,15 @@ load, and suite conformance still need validation. See
   [the platform evidence](docs/evidence/host-platform-2026-09-21.json).
 - [ ] Windows named time zones other than UTC return an explicit unsupported
   error. Date/time behavior beyond tested UTC HTTP dates needs broader OS coverage.
-- [ ] Preserve the host wall clock's submillisecond precision. Static inspection
-  shows that the timestamp adapter converts `Date.now()` milliseconds into
-  nanoseconds, while pinned native Lean obtains a `std::chrono::system_clock`
-  duration in nanoseconds. The actual native resolution and the resulting
-  observable difference still need guarded comparisons on each supported OS.
-  This is an implementation/validation gap, not a fundamental JavaScript limit.
+- [ ] Complete native Windows, macOS, and ARM64 wall-clock comparisons. On Linux
+  x64, the private clock bridge now preserves pinned native Lean's microsecond
+  precision; the old `Date.now()` adapter exposed only milliseconds. Full Node,
+  Deno, and local rebuilt Bun comparisons pass, as do packaged mains in released
+  Node, Deno, and Bun. Clock errors now reach ordinary Lean `IO.Error` handling.
+  Twelve unchanged upstream time, HTTP, and file-locking registrations pass.
+  Integer conversion tests cover negative epochs and Windows FILETIME rounding,
+  but do not validate those native OS ABIs. See
+  [the clock comparisons and retained attempts](docs/evidence/wall-clock-2026-09-22.json).
 - [ ] Native FFI dependencies still need Wasm implementations or internal host
   adapters. Build-time Lake plugins do not supply their runtime native externs.
 - [ ] Extend missing-extern diagnostics to dependency libraries outside the pinned
