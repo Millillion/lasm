@@ -3,6 +3,21 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The v145 broad Node run is paused at **1,390 passes, three conformance failures,
+one resource abort, and 2,502 pending registrations**. All 3,896 registrations
+remain selected, without importing other profiles' passes. The failures are
+`bench/mvcgen/sym`, `misc_dir/plugin`, and `pkg/user_plugin`; their compiled
+plugins cannot resolve some internal Lean functions through the JavaScript
+loader. A repair is being validated separately.
+
+`misc_dir/server_project` reached the proactive memory budget at 8.01 GiB;
+the guard stopped it before the 10 GiB kernel limit. Several compiler processes
+were resident together. There were no recorded OOM, hard-limit, throttling,
+swap, or monitor failures. This is a resource abort, not a conformance result.
+All 7,267 original source hashes and ten harness/driver hashes remain intact.
+See [the preserved 1,394-attempt checkpoint](evidence/node-broad-v145-runtime-metadata-checkpoint1394-2026-09-22.json)
+and [the initial 21-test checkpoint](evidence/node-broad-v145-runtime-metadata-checkpoint21-2026-09-22.json).
+
 The v145 runtime-library metadata repair passes **21 unchanged upstream
 registrations**: seven each in Node, Deno and the local rebuilt Bun. The full
 compiler retains upstream's `lean_libuv_version` implementation, which reports
