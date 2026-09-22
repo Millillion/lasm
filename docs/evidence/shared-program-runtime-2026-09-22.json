@@ -1,0 +1,1634 @@
+{
+  "recordedAt": "2026-09-22T07:11:08.173522+00:00",
+  "scope": "Experimental C-main execution through a shared full Lean Wasm runtime. Native comparisons and loader controls, not completed upstream campaigns or a packaged application-runtime release.",
+  "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+  "broadCampaign": {
+    "path": ".work/full-campaign-node-v127-base-pages-broad",
+    "status": "paused",
+    "passed": 26,
+    "pending": 3870,
+    "failed": 0,
+    "resourceAborted": 0
+  },
+  "attempts": [
+    {
+      "name": "shared-program-node-r1",
+      "outcome": "Compiler identity and CLI agree; application main lookup fails with code 127. Wasm export inspection identifies __main_argc_argv.",
+      "comparison": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r1/comparison.json",
+      "comparisonSha256": "545b8aaf21ffe91d848b286ce2812d125f7baa652f80988aaf93765ecb3f0232",
+      "completedComparisons": [
+        {
+          "name": "compiler identity",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "ordinary CLI run",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        }
+      ],
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r1.resources.json",
+        "sha256": "7d8885b933f505c727cb4105047b7e00c607565f6edc5228de13a7c432cf99e7",
+        "peakMemoryBytes": 1833971712,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    },
+    {
+      "name": "shared-program-node-r2",
+      "outcome": "C main lookup succeeds, but execution fails because selective base exports omit standard formatting functions.",
+      "comparison": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r2/comparison.json",
+      "comparisonSha256": "86413cd7f0c90da68e5be03a77522637f06f185071d7f492282b1c6b13496e8d",
+      "completedComparisons": [
+        {
+          "name": "compiler identity",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "ordinary CLI run",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        }
+      ],
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r2.resources.json",
+        "sha256": "0fcb4f8c5ebf7b1887eefe0417eb098331c770030b550218db5ef1bd9af4a9e9",
+        "peakMemoryBytes": 1844428800,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    },
+    {
+      "name": "shared-program-node-r3",
+      "outcome": "Six comparisons pass. Probe intentionally stopped before overlapping large parent/child instances; never counted as complete or a conformance failure.",
+      "comparison": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r3/comparison.json",
+      "comparisonSha256": "8094942f4698e4ed69da8377402ceb893c1926a7150ebb6ed198a30b13f52cc0",
+      "completedComparisons": [
+        {
+          "name": "compiler identity",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "ordinary CLI run",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "arguments-0",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "arguments-1",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "arguments-2",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "expr",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        }
+      ],
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r3.resources.json",
+        "sha256": "b50915a413a3695d68ba7775424197a76154ad5d943fbf4fd34ca095b6899de4",
+        "peakMemoryBytes": 7222935552,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    },
+    {
+      "name": "shared-program-node-r4",
+      "outcome": "Ten native comparisons and missing-module failure control pass with one Lean worker and one precreated pthread; four source hashes unchanged.",
+      "comparison": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/comparison.json",
+      "comparisonSha256": "eb8cfa0d33b4760e496831f6d5dab3fa7215aafd7acca851dc64b5c2067df1d9",
+      "completedComparisons": [
+        {
+          "name": "compiler identity",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "ordinary CLI run",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "arguments-0",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "arguments-1",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "arguments-2",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "expr",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "closure",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true
+        },
+        {
+          "name": "exit-return",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true,
+          "extra": {
+            "file": {
+              "actual": "buffered file\n",
+              "expected": "buffered file\n"
+            }
+          }
+        },
+        {
+          "name": "exit-exit",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true,
+          "extra": {
+            "file": {
+              "actual": "buffered file\n",
+              "expected": "buffered file\n"
+            }
+          }
+        },
+        {
+          "name": "exit-force",
+          "fields": [
+            "exitCode",
+            "stdout",
+            "stderr"
+          ],
+          "passed": true,
+          "extra": {
+            "file": {
+              "actual": "",
+              "expected": ""
+            }
+          }
+        }
+      ],
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4.resources.json",
+        "sha256": "895b173a32367b28c0d0406df37c29cf02d8bca4bddb019e959deb74784add1d",
+        "peakMemoryBytes": 6986727424,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    }
+  ],
+  "memoryComparison": [
+    {
+      "name": "shared-program-named-control",
+      "comparison": {
+        "scope": "Same compiled side module with private ordinal-index runtime; supplementary control only",
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v130-shared-program-r3-native",
+        "leanThreads": 4,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-named-control.resources.json",
+        "cases": [
+          {
+            "name": "identity",
+            "seconds": 9.161696517956443,
+            "exitCode": 0,
+            "stdout": "8c9756b28d64dab099da31a4c09229a9e6a2ef35\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "name": "arguments",
+            "seconds": 8.809408235945739,
+            "exitCode": 0,
+            "stdout": "args=[\"two words\", \"\", \"--flag\", \"\u03bb \ud83d\udc11\", \"-\", \"--run\"]\n",
+            "stderr": "",
+            "passed": true
+          }
+        ],
+        "finishedAt": "2026-09-22T06:49:17.013314+00:00"
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-named-control.resources.json",
+        "sha256": "29e78fbad21c41d0ad68766903947d8a0f6604b31ad571074c2e7b209ad9c77b",
+        "peakMemoryBytes": 4636020736,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    },
+    {
+      "name": "shared-program-ordinal-r1",
+      "comparison": {
+        "scope": "Same compiled side module with private ordinal-index runtime; supplementary control only",
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v131-shared-program-ordinal-native",
+        "leanThreads": 4,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-ordinal-r1.resources.json",
+        "cases": [
+          {
+            "name": "identity",
+            "seconds": 8.417068187962286,
+            "exitCode": 0,
+            "stdout": "8c9756b28d64dab099da31a4c09229a9e6a2ef35\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "name": "arguments",
+            "seconds": 8.880716189974919,
+            "exitCode": 0,
+            "stdout": "args=[\"two words\", \"\", \"--flag\", \"\u03bb \ud83d\udc11\", \"-\", \"--run\"]\n",
+            "stderr": "",
+            "passed": true
+          }
+        ],
+        "finishedAt": "2026-09-22T06:47:46.780528+00:00"
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-ordinal-r1.resources.json",
+        "sha256": "91027ca037c4a641a2a3c8fa79c94c16846618944547ef026a67e50d2eb5676b",
+        "peakMemoryBytes": 4221923328,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    },
+    {
+      "name": "shared-program-one-worker",
+      "comparison": {
+        "scope": "Same compiled side module with private ordinal-index runtime; supplementary control only",
+        "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v132-shared-program-ordinal-one-worker-native",
+        "leanThreads": 1,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-one-worker.resources.json",
+        "cases": [
+          {
+            "name": "identity",
+            "seconds": 9.029810821055435,
+            "exitCode": 0,
+            "stdout": "8c9756b28d64dab099da31a4c09229a9e6a2ef35\n",
+            "stderr": "",
+            "passed": true
+          },
+          {
+            "name": "arguments",
+            "seconds": 12.273006548988633,
+            "exitCode": 0,
+            "stdout": "args=[\"two words\", \"\", \"--flag\", \"\u03bb \ud83d\udc11\", \"-\", \"--run\"]\n",
+            "stderr": "",
+            "passed": true
+          }
+        ],
+        "finishedAt": "2026-09-22T06:51:02.578225+00:00"
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-one-worker.resources.json",
+        "sha256": "4616864f859692a88cadaa95b6d4961cf68a88652f5d230ef97c7711af6bc172",
+        "peakMemoryBytes": 3028987904,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    }
+  ],
+  "engines": [
+    {
+      "name": "node",
+      "profile": "Released engine",
+      "comparison": {
+        "scope": "Reuse the exact previously verified side modules; compare engine execution with recorded native controls. Supplementary checks, not upstream CTest passes.",
+        "toolchain": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "node",
+          "executable": "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/runtime-support",
+          "leanThreads": 1,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 1,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/node-v133-shared-program-maintained-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "1 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "nativeControl": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/comparison.json",
+        "nativeControlSha256": "eb8cfa0d33b4760e496831f6d5dab3fa7215aafd7acca851dc64b5c2067df1d9",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-node.resources.json",
+        "commands": [
+          {
+            "name": "githash",
+            "exitCode": 0,
+            "seconds": 8.983583660097793,
+            "stdout": "8c9756b28d64dab099da31a4c09229a9e6a2ef35\n",
+            "stderr": ""
+          },
+          {
+            "name": "cli-run",
+            "exitCode": 0,
+            "seconds": 19.01264792494476,
+            "stdout": "compiled ShellArguments\nargs=[\"two words\", \"\", \"--flag\", \"\u03bb \ud83d\udc11\"]\n",
+            "stderr": ""
+          },
+          {
+            "name": "arguments-0",
+            "exitCode": 0,
+            "seconds": 12.442830828018486,
+            "stdout": "args=[]\n",
+            "stderr": ""
+          },
+          {
+            "name": "arguments-1",
+            "exitCode": 0,
+            "seconds": 13.101176368072629,
+            "stdout": "args=[\"two words\", \"\", \"--flag\", \"\u03bb \ud83d\udc11\", \"-\", \"--run\"]\n",
+            "stderr": ""
+          },
+          {
+            "name": "arguments-2",
+            "exitCode": 0,
+            "seconds": 12.392712783999741,
+            "stdout": "args=[\"--prefix\", \"literal\"]\n",
+            "stderr": ""
+          },
+          {
+            "name": "expr",
+            "exitCode": 0,
+            "seconds": 12.692168395966291,
+            "stdout": "f a b\nhash: 2008687407\n#[a, b]\n",
+            "stderr": ""
+          },
+          {
+            "name": "closure",
+            "exitCode": 0,
+            "seconds": 40.10693153203465,
+            "stdout": "cross 7\ncross 99\n",
+            "stderr": ""
+          },
+          {
+            "name": "exit-return",
+            "exitCode": 0,
+            "seconds": 13.046769554028288,
+            "stdout": "buffered stdout\n",
+            "stderr": "unbuffered stderr\n"
+          },
+          {
+            "name": "exit-exit",
+            "exitCode": 17,
+            "seconds": 13.749261332093738,
+            "stdout": "buffered stdout\n",
+            "stderr": "unbuffered stderr\n"
+          },
+          {
+            "name": "exit-force",
+            "exitCode": 19,
+            "seconds": 12.13994908798486,
+            "stdout": "",
+            "stderr": "unbuffered stderr\n"
+          },
+          {
+            "name": "missing-module",
+            "exitCode": 127,
+            "seconds": 5.877462077070959,
+            "stdout": "",
+            "stderr": "Cannot load compiled program: could not load dynamic lib: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-node/absent.wasm\nError: ENOENT: no such file or directory, open '/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/bin//home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-node/absent.wasm'\n"
+          }
+        ],
+        "comparisons": [
+          {
+            "name": "compiler identity",
+            "nativeCommand": "native-githash",
+            "passed": true
+          },
+          {
+            "name": "ordinary CLI run",
+            "nativeCommand": "native-cli-run",
+            "passed": true
+          },
+          {
+            "name": "arguments-0",
+            "nativeCommand": "arguments-native-0",
+            "passed": true
+          },
+          {
+            "name": "arguments-1",
+            "nativeCommand": "arguments-native-1",
+            "passed": true
+          },
+          {
+            "name": "arguments-2",
+            "nativeCommand": "arguments-native-2",
+            "passed": true
+          },
+          {
+            "name": "expr",
+            "nativeCommand": "expr-native-execute",
+            "passed": true
+          },
+          {
+            "name": "closure",
+            "nativeCommand": "closure-native-execute",
+            "passed": true
+          },
+          {
+            "name": "exit-return",
+            "nativeCommand": "exit-native-return",
+            "passed": true,
+            "file": {
+              "actual": "buffered file\n",
+              "expected": "buffered file\n"
+            }
+          },
+          {
+            "name": "exit-exit",
+            "nativeCommand": "exit-native-exit",
+            "passed": true,
+            "file": {
+              "actual": "buffered file\n",
+              "expected": "buffered file\n"
+            }
+          },
+          {
+            "name": "exit-force",
+            "nativeCommand": "exit-native-force",
+            "passed": true,
+            "file": {
+              "actual": "",
+              "expected": ""
+            }
+          }
+        ],
+        "modules": [
+          {
+            "fixture": "arguments",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/arguments/program.wasm",
+            "sha256": "5c9774b87f5a1db62c2d74661c91f66167e1345eb3870ef8097c5f369f64c801"
+          },
+          {
+            "fixture": "expr",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/expr/program.wasm",
+            "sha256": "76af9f56b1821a15a8f2c5538ac1041ab3ed244c843596d4715521a95b5ed898"
+          },
+          {
+            "fixture": "closure",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/closure/program.wasm",
+            "sha256": "3b1f8346279dd528799bfd44f8263254e34a4ac798d2f654d3fbbe619a083843"
+          },
+          {
+            "fixture": "exit",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/exit/program.wasm",
+            "sha256": "27d6d3f8e523defa5f14242bf1946266df64ecab56f98aa9494c47d412a7759a"
+          }
+        ],
+        "passed": true,
+        "sourcesUnchanged": true,
+        "finishedAt": "2026-09-22T07:02:51.904012+00:00"
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-node.resources.json",
+        "sha256": "e2766697b8c7afbc28bfc756a75f9cfbd4acb90075e7931b643087c8612dd177",
+        "peakMemoryBytes": 6730899456,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    },
+    {
+      "name": "deno",
+      "profile": "Released engine",
+      "comparison": {
+        "scope": "Reuse the exact previously verified side modules; compare engine execution with recorded native controls. Supplementary checks, not upstream CTest passes.",
+        "toolchain": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "deno",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "engineArgs": [
+            "run",
+            "-A",
+            "--v8-flags=--stack-size=61440"
+          ],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/runtime-support",
+          "leanThreads": 1,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {},
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 1,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v133-shared-program-maintained-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "1 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "nativeControl": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/comparison.json",
+        "nativeControlSha256": "eb8cfa0d33b4760e496831f6d5dab3fa7215aafd7acca851dc64b5c2067df1d9",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-deno.resources.json",
+        "commands": [
+          {
+            "name": "githash",
+            "exitCode": 0,
+            "seconds": 8.383404343039729,
+            "stdout": "8c9756b28d64dab099da31a4c09229a9e6a2ef35\n",
+            "stderr": ""
+          },
+          {
+            "name": "cli-run",
+            "exitCode": 0,
+            "seconds": 14.947485796059482,
+            "stdout": "compiled ShellArguments\nargs=[\"two words\", \"\", \"--flag\", \"\u03bb \ud83d\udc11\"]\n",
+            "stderr": ""
+          },
+          {
+            "name": "arguments-0",
+            "exitCode": 0,
+            "seconds": 10.689254368073307,
+            "stdout": "args=[]\n",
+            "stderr": ""
+          },
+          {
+            "name": "arguments-1",
+            "exitCode": 0,
+            "seconds": 11.290604123962112,
+            "stdout": "args=[\"two words\", \"\", \"--flag\", \"\u03bb \ud83d\udc11\", \"-\", \"--run\"]\n",
+            "stderr": ""
+          },
+          {
+            "name": "arguments-2",
+            "exitCode": 0,
+            "seconds": 10.739103154046461,
+            "stdout": "args=[\"--prefix\", \"literal\"]\n",
+            "stderr": ""
+          },
+          {
+            "name": "expr",
+            "exitCode": 0,
+            "seconds": 11.944398516090587,
+            "stdout": "f a b\nhash: 2008687407\n#[a, b]\n",
+            "stderr": ""
+          },
+          {
+            "name": "closure",
+            "exitCode": 0,
+            "seconds": 34.640903067891486,
+            "stdout": "cross 7\ncross 99\n",
+            "stderr": ""
+          },
+          {
+            "name": "exit-return",
+            "exitCode": 0,
+            "seconds": 11.040058961953036,
+            "stdout": "buffered stdout\n",
+            "stderr": "unbuffered stderr\n"
+          },
+          {
+            "name": "exit-exit",
+            "exitCode": 17,
+            "seconds": 12.396874982048757,
+            "stdout": "buffered stdout\n",
+            "stderr": "unbuffered stderr\n"
+          },
+          {
+            "name": "exit-force",
+            "exitCode": 19,
+            "seconds": 11.08938793395646,
+            "stdout": "",
+            "stderr": "unbuffered stderr\n"
+          },
+          {
+            "name": "missing-module",
+            "exitCode": 127,
+            "seconds": 5.225442455965094,
+            "stdout": "",
+            "stderr": "Cannot load compiled program: could not load dynamic lib: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-deno/absent.wasm\nError: ENOENT: no such file or directory, open '/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/bin//home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-deno/absent.wasm'\n"
+          }
+        ],
+        "comparisons": [
+          {
+            "name": "compiler identity",
+            "nativeCommand": "native-githash",
+            "passed": true
+          },
+          {
+            "name": "ordinary CLI run",
+            "nativeCommand": "native-cli-run",
+            "passed": true
+          },
+          {
+            "name": "arguments-0",
+            "nativeCommand": "arguments-native-0",
+            "passed": true
+          },
+          {
+            "name": "arguments-1",
+            "nativeCommand": "arguments-native-1",
+            "passed": true
+          },
+          {
+            "name": "arguments-2",
+            "nativeCommand": "arguments-native-2",
+            "passed": true
+          },
+          {
+            "name": "expr",
+            "nativeCommand": "expr-native-execute",
+            "passed": true
+          },
+          {
+            "name": "closure",
+            "nativeCommand": "closure-native-execute",
+            "passed": true
+          },
+          {
+            "name": "exit-return",
+            "nativeCommand": "exit-native-return",
+            "passed": true,
+            "file": {
+              "actual": "buffered file\n",
+              "expected": "buffered file\n"
+            }
+          },
+          {
+            "name": "exit-exit",
+            "nativeCommand": "exit-native-exit",
+            "passed": true,
+            "file": {
+              "actual": "buffered file\n",
+              "expected": "buffered file\n"
+            }
+          },
+          {
+            "name": "exit-force",
+            "nativeCommand": "exit-native-force",
+            "passed": true,
+            "file": {
+              "actual": "",
+              "expected": ""
+            }
+          }
+        ],
+        "modules": [
+          {
+            "fixture": "arguments",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/arguments/program.wasm",
+            "sha256": "5c9774b87f5a1db62c2d74661c91f66167e1345eb3870ef8097c5f369f64c801"
+          },
+          {
+            "fixture": "expr",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/expr/program.wasm",
+            "sha256": "76af9f56b1821a15a8f2c5538ac1041ab3ed244c843596d4715521a95b5ed898"
+          },
+          {
+            "fixture": "closure",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/closure/program.wasm",
+            "sha256": "3b1f8346279dd528799bfd44f8263254e34a4ac798d2f654d3fbbe619a083843"
+          },
+          {
+            "fixture": "exit",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/exit/program.wasm",
+            "sha256": "27d6d3f8e523defa5f14242bf1946266df64ecab56f98aa9494c47d412a7759a"
+          }
+        ],
+        "passed": true,
+        "sourcesUnchanged": true,
+        "finishedAt": "2026-09-22T07:06:30.739051+00:00"
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-deno.resources.json",
+        "sha256": "a18e10b15116072c963063c462b2c5264e8b447baad04be5bede9cece82625e8",
+        "peakMemoryBytes": 5724684288,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    },
+    {
+      "name": "bun",
+      "profile": "Local rebuilt Bun with native memory64 capacity and explicit Linux stack adjustment",
+      "comparison": {
+        "scope": "Reuse the exact previously verified side modules; compare engine execution with recorded native controls. Supplementary checks, not upstream CTest passes.",
+        "toolchain": {
+          "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+          "engine": "bun",
+          "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2-memory64-capacity8g-release-2026-09-21/bun",
+          "engineArgs": [],
+          "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native",
+          "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+          "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+          "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/runtime-support",
+          "leanThreads": 1,
+          "lakeThreads": 1,
+          "bunSmol": false,
+          "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+          "systemAllocator": "mimalloc",
+          "leanAllocator": "mimalloc",
+          "memoryMode": 1,
+          "engineEnvironment": {
+            "BUN_JSC_useWasmMemory64": "true",
+            "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v133-shared-program-maintained-native/bun-stack-reservation.so",
+            "BUN_JSC_maxPerThreadStackUsage": "62914560"
+          },
+          "stackAdjustment": {
+            "helper": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v133-shared-program-maintained-native/bun-stack-reservation.so",
+            "sha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+            "osThreadStackBytes": 67108864,
+            "jscStackBudgetBytes": 62914560,
+            "scope": "Explicit Linux-only resource-adjusted harness; tests unchanged, not a stock Bun result."
+          },
+          "maximumMemoryBytes": 8589934592,
+          "pthreadPoolSize": 1,
+          "backend": "full-lean-wasm64-native",
+          "nativeLeanFallback": false,
+          "environmentAdjustments": {
+            "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/bun-v133-shared-program-maintained-native",
+            "LASM_FULL_APP_PATH": "Selected facade entry point",
+            "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+            "LEAN_NUM_THREADS": "1 unless explicitly supplied",
+            "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+          },
+          "externalTools": {
+            "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/lib",
+            "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/include",
+            "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/share",
+            "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/bin/leanmake",
+            "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+            "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+          }
+        },
+        "nativeControl": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/comparison.json",
+        "nativeControlSha256": "eb8cfa0d33b4760e496831f6d5dab3fa7215aafd7acca851dc64b5c2067df1d9",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-bun.resources.json",
+        "commands": [
+          {
+            "name": "githash",
+            "exitCode": 0,
+            "seconds": 6.279168628971092,
+            "stdout": "8c9756b28d64dab099da31a4c09229a9e6a2ef35\n",
+            "stderr": ""
+          },
+          {
+            "name": "cli-run",
+            "exitCode": 0,
+            "seconds": 10.68826543004252,
+            "stdout": "compiled ShellArguments\nargs=[\"two words\", \"\", \"--flag\", \"\u03bb \ud83d\udc11\"]\n",
+            "stderr": ""
+          },
+          {
+            "name": "arguments-0",
+            "exitCode": 0,
+            "seconds": 7.533627797034569,
+            "stdout": "args=[]\n",
+            "stderr": ""
+          },
+          {
+            "name": "arguments-1",
+            "exitCode": 0,
+            "seconds": 7.883283349918202,
+            "stdout": "args=[\"two words\", \"\", \"--flag\", \"\u03bb \ud83d\udc11\", \"-\", \"--run\"]\n",
+            "stderr": ""
+          },
+          {
+            "name": "arguments-2",
+            "exitCode": 0,
+            "seconds": 7.630928115919232,
+            "stdout": "args=[\"--prefix\", \"literal\"]\n",
+            "stderr": ""
+          },
+          {
+            "name": "expr",
+            "exitCode": 0,
+            "seconds": 8.101810146006756,
+            "stdout": "f a b\nhash: 2008687407\n#[a, b]\n",
+            "stderr": ""
+          },
+          {
+            "name": "closure",
+            "exitCode": 0,
+            "seconds": 23.975328773027286,
+            "stdout": "cross 7\ncross 99\n",
+            "stderr": ""
+          },
+          {
+            "name": "exit-return",
+            "exitCode": 0,
+            "seconds": 7.783677204046398,
+            "stdout": "buffered stdout\n",
+            "stderr": "unbuffered stderr\n"
+          },
+          {
+            "name": "exit-exit",
+            "exitCode": 17,
+            "seconds": 7.43277851107996,
+            "stdout": "buffered stdout\n",
+            "stderr": "unbuffered stderr\n"
+          },
+          {
+            "name": "exit-force",
+            "exitCode": 19,
+            "seconds": 7.4829067619284615,
+            "stdout": "",
+            "stderr": "unbuffered stderr\n"
+          },
+          {
+            "name": "missing-module",
+            "exitCode": 127,
+            "seconds": 5.126995474100113,
+            "stdout": "",
+            "stderr": "Cannot load compiled program: could not load dynamic lib: /home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-bun/absent.wasm\nError: ENOENT: no such file or directory, open '/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/bin//home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-bun/absent.wasm'\n"
+          }
+        ],
+        "comparisons": [
+          {
+            "name": "compiler identity",
+            "nativeCommand": "native-githash",
+            "passed": true
+          },
+          {
+            "name": "ordinary CLI run",
+            "nativeCommand": "native-cli-run",
+            "passed": true
+          },
+          {
+            "name": "arguments-0",
+            "nativeCommand": "arguments-native-0",
+            "passed": true
+          },
+          {
+            "name": "arguments-1",
+            "nativeCommand": "arguments-native-1",
+            "passed": true
+          },
+          {
+            "name": "arguments-2",
+            "nativeCommand": "arguments-native-2",
+            "passed": true
+          },
+          {
+            "name": "expr",
+            "nativeCommand": "expr-native-execute",
+            "passed": true
+          },
+          {
+            "name": "closure",
+            "nativeCommand": "closure-native-execute",
+            "passed": true
+          },
+          {
+            "name": "exit-return",
+            "nativeCommand": "exit-native-return",
+            "passed": true,
+            "file": {
+              "actual": "buffered file\n",
+              "expected": "buffered file\n"
+            }
+          },
+          {
+            "name": "exit-exit",
+            "nativeCommand": "exit-native-exit",
+            "passed": true,
+            "file": {
+              "actual": "buffered file\n",
+              "expected": "buffered file\n"
+            }
+          },
+          {
+            "name": "exit-force",
+            "nativeCommand": "exit-native-force",
+            "passed": true,
+            "file": {
+              "actual": "",
+              "expected": ""
+            }
+          }
+        ],
+        "modules": [
+          {
+            "fixture": "arguments",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/arguments/program.wasm",
+            "sha256": "5c9774b87f5a1db62c2d74661c91f66167e1345eb3870ef8097c5f369f64c801"
+          },
+          {
+            "fixture": "expr",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/expr/program.wasm",
+            "sha256": "76af9f56b1821a15a8f2c5538ac1041ab3ed244c843596d4715521a95b5ed898"
+          },
+          {
+            "fixture": "closure",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/closure/program.wasm",
+            "sha256": "3b1f8346279dd528799bfd44f8263254e34a4ac798d2f654d3fbbe619a083843"
+          },
+          {
+            "fixture": "exit",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r4/exit/program.wasm",
+            "sha256": "27d6d3f8e523defa5f14242bf1946266df64ecab56f98aa9494c47d412a7759a"
+          }
+        ],
+        "passed": true,
+        "sourcesUnchanged": true,
+        "finishedAt": "2026-09-22T07:10:01.489414+00:00"
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-bun.resources.json",
+        "sha256": "2f5538a52b7a38eb300e3d779d97821b59523a3a3df0150d3c5a7c035efff646",
+        "peakMemoryBytes": 5951950848,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "unitReleased": true,
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "status": "finished"
+      }
+    }
+  ],
+  "intentionalStop": {
+    "recordedAt": "2026-09-22T06:39:11.433156+00:00",
+    "kind": "intentional resource precaution, not conformance failure",
+    "reason": "The all-export base peaked above 6 GiB for a single compiled application. Explicitly stopped the private probe before running its parent/child-process control rather than risk overlapping two large instances. No resource guard thresholds changed.",
+    "partialResults": ".work/full-engine-probe/shared-program-node-r3/comparison.json",
+    "resourceReport": {
+      "startedAt": "2026-09-22T06:36:32.750Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "python3",
+        ".work/full-engine-probe/run-shared-program-probe.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "16f9873d-04fc-4ac5-b543-730037657505",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25364168704
+      },
+      "minimumHostAvailable": 18006962176,
+      "peakMemoryBytes": 7222935552,
+      "peakTasks": 32,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-node-r3.resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-22T06:38:57.152Z",
+        "memoryBytes": 7219331072,
+        "peakMemoryBytes": 7222935552,
+        "swapBytes": 0,
+        "tasks": 32,
+        "memoryBreakdown": {
+          "anon": 6807228416,
+          "file": 300494848,
+          "kernel": 111386624,
+          "shmem": 0,
+          "file_mapped": 643072,
+          "inactive_file": 630784,
+          "slab": 12714000
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "highWaterProcesses": {
+        "at": "2026-09-22T06:38:01.881Z",
+        "processes": [
+          {
+            "pid": 2370605,
+            "name": "MainThread",
+            "residentBytes": 6471692288,
+            "threads": 17
+          },
+          {
+            "pid": 2370243,
+            "name": "python3",
+            "residentBytes": 18042880,
+            "threads": 1
+          },
+          {
+            "pid": 2370211,
+            "name": "python3",
+            "residentBytes": 12857344,
+            "threads": 1
+          }
+        ]
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "killed",
+        "exitStatus": "TERM",
+        "capturedAt": "2026-09-22T06:38:57.206Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 5995773952,
+        "peakMemoryBytes": 7222935552,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 5505933312,
+          "file": 300494848,
+          "kernel": 111325184,
+          "shmem": 0,
+          "file_mapped": 602112,
+          "inactive_file": 630784,
+          "slab": 12511288
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-22T06:38:57.678Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "metadataRecovery": {
+    "recordedAt": "2026-09-22T06:30:41.063247+00:00",
+    "source": ".work/full-artifacts/wasm64-v127-shell-arguments-r2-native",
+    "prototype": ".work/full-artifacts/wasm64-v128-shared-program-prototype-native",
+    "issue": "Experimental relinker symlinked output recipe and log to the source artifact. Source relink.json and its untracked relink.log were overwritten. Compiler bytes, runtime archives, and original tests were unchanged.",
+    "trackedRestoration": {
+      "file": "relink.json",
+      "source": "snapshot.json derivation serialized with original formatting",
+      "sha256": "cc40d17c35364929a23b54345f70dba42a3faecfa4baf8275c52c42447a504db"
+    },
+    "untrackedLog": "Original relink.log bytes are not recoverable from the snapshot. The prototype log remains preserved as its own regular file; source untracked log was already overwritten and is not original-link evidence.",
+    "allRecordedHashesRestoredAndVerified": true
+  },
+  "sources": {
+    "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/ShellArguments.lean": "dfc5f14afbd3a59d3643fff37de431ebd5d462bf29594421e334384d759d43c0",
+    "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/compile/expr.lean": "26ad97293463731d5f7c8f5ab475f5ad8daff730108174c3a2edabdbe9306758",
+    "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/compile/compact_closure_cross.lean": "f737687c4d5d3995367037c4ad3a22a9966a74277b04cc7cf07d1abe531ec08d",
+    "/home/lastmjs/development/lasm/compiler/test/fixtures/process-exit/Main.lean": "dd92748ea5a39c290b6401bed4f7276b417cd7383f790c9dd4752c2618250048"
+  },
+  "sourcesUnchangedAtCollection": true,
+  "maintainedArtifact": {
+    "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native",
+    "snapshot": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+      "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+      "createdAt": "2026-09-22T06:58:00.656722+00:00",
+      "files": {
+        "bin/lean.js": "795ca8ded224c0fed5408a04c8b8cbd7a604cddd77a05c90f4b21401275cb041",
+        "bin/lean.cjs": "795ca8ded224c0fed5408a04c8b8cbd7a604cddd77a05c90f4b21401275cb041",
+        "bin/lean.wasm": "211717d99454713af7cf4e898319e687398cf29a306647e9d098d72d64c33ed0",
+        "lasm-wasm-exports.json": "69b92cde6a9b2a0c7d13f7086350c6c4ed9e5f66edfd6e97311c2947efa72282",
+        "function-table-index.json": "47633e3904f25c7d87f6f7883bc39e8979c4d811e8c2230c639f1464837ff152",
+        "build-provenance.json": "8e9802f6e521d91558964ea3ba94dacecd39fff2aff52faa048b2c3bf2f51066",
+        "sdk/.emscripten": "001c6ae86c1ec65b8a41d0db23c239f7e2348bd5fb68c98fbc628cd86a7c3f65",
+        "sdk/upstream/emscripten/tools/link.py": "2f143e5ca6d8aa560f5b2ea5e1d31a1ea897d068ea7778e50aa07d84ff10e481",
+        "sdk/upstream/emscripten/src/lib/libdylink.js": "711eba55c77409aad5302a05ea48e3d1c15a04dbb0221f34cb80db0979b79d8c",
+        "sdk/upstream/emscripten/src/lib/libpthread.js": "99456db0bf77860dd8eb998a130fb68207a0b16ee0ca6b8d065ab55c7ae262a1",
+        "host/node-host.mjs": "fce5741814643ca0dbd7ad4bd5ed274fc387fa94f80214bf6d593d9cfce53ca6",
+        "host/working-directory.mjs": "de76cfc16206d9e4ea0fd8227225b870812ad37838ddaf38974f422cadcebaaa",
+        "host/handle-table.mjs": "c58518fb2b4e8184edfc113fc68415858918d6fae66753b04e65fe6b7e0bb825",
+        "host/node-network.mjs": "f67a5043a2fe81efc676777e97b7f5129676d34d8f3151d29d1a6eec9a3e24c1",
+        "host/native-tcp.mjs": "5e6df0775ff191a9521622979ee27130cb0a4bdee3917a9e5f679107825926fe",
+        "host/node-process.mjs": "702fe9e848cb2612a551e1d53f35f50d07214cada1f7539f4295c4e77dcd8745",
+        "host/native-process.mjs": "e0281181fa526700cc1a45dc2c0b91e0abfd93630f5a0f989523d93490b7e552",
+        "host/process-launcher.mjs": "39126483f5f87f5a93f3be2e3e42f834e4176c9f50eb203cc56949be2519021e",
+        "host/process-exec.mjs": "c860a0d7271db9f2917317fd04722ee2aca52d4ddad8d79df6a5c2581bd2e3cf",
+        "host/node-udp.mjs": "b4c1cf428bfecceb7386e46da32eb441ebee64920d77c87008c85e5ce9871599",
+        "host/node-system.mjs": "dd4e1c5c1b41ba8ecd41e16ca4ec98bc8026ccc87e9bec6eedfb6df03eb22c24",
+        "host/node-signal.mjs": "44e16fc035abd651c57abdc07ca4e36245c76868e041a23c39e5a0804639da63",
+        "host/thread-id.cjs": "dcec6da112d1cdefebd943e83828b0506d7819167e1b81ae3724ee1effa940d9",
+        "host/native-pthread-factory.cjs": "ad423ab08d5aff4b8358b0863b238ea18ddb6c6bc5891682da6afc69ff66abf3",
+        "host/native-files.mjs": "90b00c2a37cf2a1a3a45d49982211b12de079e39ec34afa46fc215561af70689",
+        "host/native-file-worker.mjs": "ebea284543fa12a3711cb622bff5c0b17495f4af96fcd016b1f512c369aecee1",
+        "host/native-file-worker-pool.mjs": "b2047e050ab6266ad3613dcd0b37107abfcf5fa80857187f2ae1b13cd7c55ca2",
+        "host/native-file-worker-deno.mjs": "c80058f1ced5dbaffabf21515e68015e7d97400334d724aff320ae05a133e544",
+        "host/native-worker-cwd.cjs": "69080ceea6aeac63baf9da1839c4e95913c7e9e893b93e036c4bdca82b09512b",
+        "host/worker-stdio.cjs": "eb5afd5cd4cdaddff135559182f129963ea511fbea37a9a5aedd35b305630dc8",
+        "host/native-dns.mjs": "2380cc0bd99e7f3aef582e39db08954b148a59e93740efb742aa9a64f45b7e16",
+        "host/native-interfaces.mjs": "6a5c99ef69a83f9ef199dfc1136b30ac4dc10b4fd69f2d4a0cf173f2ae23ad2c",
+        "host/native/process/THIRD_PARTY_NOTICES.txt": "c219f317b281119e2da6f2ce28f2b5fc1844d168795fef826a8bd4f764308ac4",
+        "host/native/process/linux-arm64-gnu": "d43417a98ab64fc39e8ae58d2f3befd03e975621ba422f7a04f83170a4d9ad5e",
+        "host/native/process/linux-arm64-musl": "5bf1a1f91a7a63a394df814420471ac92feb5b64a59421c9682b4b8ebf1a97ec",
+        "host/native/process/linux-x64-gnu": "a1d879a39dd61b47db14130dd54e534d9cd204f9d0680d2f32afd5294588e9ce",
+        "host/native/process/linux-x64-musl": "e2b1ba5e8f862220b348b33dfeaf4f858bf7f20555e3474842b2ad69e41f34d3",
+        "host/native/process/manifest.json": "088790daadd43337ccafe46edc0f8d47d553e2374fbd7146aaf81ba9f9155fb1",
+        "host/native/process/process-launcher.c": "dc0287c2d2669a81392a2d370883640bcbe5333adce7faeb694146271076fc98",
+        "runtime-support/run-compiler.mjs": "92023e20d97617f9a520e7172f639d68cebd9aefe1ef407190ffa7b08e477b2f",
+        "runtime-support/cc-driver.mjs": "2fccafc22093fba3281936eb5654bfd67601a447ac6a08e2dd24257416f30c70",
+        "runtime-support/response-args.mjs": "b60e76d8cc39193dc6d15b49d420d9c6b6b3a45b79527b92f8ce3b2c6a45a5ba",
+        "runtime-support/preserve-web-worker.mjs": "f9d9b82f2c593beab41aa1dff6d461ecc4539e3b21741a720ae23edf399a9fd6",
+        "runtime-support/emscripten-pre.js": "491e7960427820704e3d435caf5ec3c8a30c3b1e7d20d2fca81b143553bd8bae",
+        "runtime-support/host-pre.js": "45e0a22ede9b64666bf66fb827d405748f2f8c651beac40b64b3aa1679e795c3",
+        "runtime-support/host-library.js": "f4fc31ae10ef7dc12cb9a4bb5ac6ab4f5a8eeeb824578f8174547eeb466dc1b5",
+        "CMakeCache.txt": "f93a220e58237425e3eb15659d5cf4496128d7c8854c5945d3f1a65fa5ce7c25",
+        "leanc.sh": "78dbc21eca0a67ed34747fdb322d1eda6ea0062f52f7105998ed7b62654dce58",
+        "relink.json": "96309a6a105df844c3af1cc600e9cd1602f6ee469c7f01ee552a1b9e36cb327c",
+        "SharedProgramMain.cpp": "38b1a1a41f2c6be863c76de8ec03fb067ff2c66ff131b47fbdeb03084b6e9bfc",
+        "shared-program-main.o": "1dacd207a23c3e47b4fb73a520967a6f5385c4a96272b6f9412500ea37372b5c",
+        "entry-build.json": "9f01afc225fb3f8f23b973da3861d08a578c063dace0d6a17339fdc25d17064e"
+      },
+      "derivedFrom": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native",
+      "derivation": {
+        "source": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native",
+        "scope": "Isolated shared-program entry experiment; only the C++ executable dispatcher is replaced, with unchanged Lean APIs and test sources.",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/em++",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/shared-program-main.o",
+          "-lc++",
+          "-lc++abi",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/liblasmnative.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/liblasmtools.a",
+          "-Wl,--whole-archive",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/liblasmhost.a",
+          "-Wl,--no-whole-archive",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/runtime-support/host-pre.js",
+          "--js-library",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/runtime-support/host-library.js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/temp/libleanshell.a",
+          "-lleancpp",
+          "-lInit",
+          "-lStd",
+          "-lLean",
+          "-lnodefs.js",
+          "-lleanrt",
+          "-lc++",
+          "-lc++abi",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-lnodefs.js",
+          "-s",
+          "EXIT_RUNTIME=1",
+          "-s",
+          "NODERAWFS=1",
+          "-s",
+          "MAIN_MODULE=2",
+          "-s",
+          "ERROR_ON_UNDEFINED_SYMBOLS=0",
+          "-sEXPORTED_FUNCTIONS=@/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lasm-wasm-exports.json",
+          "-sEXPORTED_RUNTIME_METHODS=FS,ENV,callMain,ccall,UTF8ToString,stringToNewUTF8",
+          "-sSTACK_SIZE=16777216",
+          "-sINITIAL_MEMORY=134217728",
+          "-sMAXIMUM_MEMORY=8589934592",
+          "-sPTHREAD_POOL_SIZE=1",
+          "-sPROXY_TO_PTHREAD=1",
+          "--pre-js",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/runtime-support/emscripten-pre.js",
+          "-lLake",
+          "-I/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/include",
+          "-O3",
+          "-DNDEBUG",
+          "-O1",
+          "-g2",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/bin/lean.js",
+          "-L/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean",
+          "-sMALLOC=mimalloc",
+          "-sMAXIMUM_MEMORY=8589934592",
+          "-sPTHREAD_POOL_SIZE=1",
+          "-sGROWABLE_ARRAYBUFFERS=1",
+          "-sSTACK_OVERFLOW_CHECK=2",
+          "-sSTACK_SIZE=67108864",
+          "-Wl,--export=__cpp_exception",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/lib/lean/libgmp.a",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/libuv/src/libuv/libuv.a",
+          "-lm",
+          "-pthread",
+          "-sPTHREAD_POOL_SIZE=1",
+          "-sMAIN_MODULE=1"
+        ],
+        "entryCommand": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk/upstream/emscripten/em++",
+          "-DLASM_FULL_TOOLS=1",
+          "-D",
+          "LEAN_USE_GMP",
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-D",
+          "LEAN_CHECK_OLEAN_VERSION",
+          "-D",
+          "LEAN_EMSCRIPTEN",
+          "-s",
+          "ALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-ffp-contract=off",
+          "-D",
+          "LEAN_MULTI_THREAD",
+          "-DLEAN_BUILD_TYPE=Release",
+          "-DLEAN_EXPORTING",
+          "-D__CLANG__",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/SharedProgramMain.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v133-shared-program-maintained-native/shared-program-main.o"
+        ],
+        "entrySourceSha256": "38b1a1a41f2c6be863c76de8ec03fb067ff2c66ff131b47fbdeb03084b6e9bfc",
+        "entryObjectSha256": "1dacd207a23c3e47b4fb73a520967a6f5385c4a96272b6f9412500ea37372b5c",
+        "archives": {
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/lib/lean/libgmp.a": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/libuv/src/libuv/libuv.a": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/libInit.a": "d06b9c787b6e8adde54e666777767d7b77d1baa9e869e1df5d5d3289f6bd4fae",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/libLake.a": "0de1e1172b36562ef497d801f042c22a03e4da414d8b37ac5299b7fc63106c11",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/libLean.a": "f8a2d85823dbc514ea6b3d98889761ff05813889efca830d6fbd35b47ad438a3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/libLeanIR.a": "24b95d8908224746885ec25e4743bd083c609b92e14ffc0998c75af49b71a2f3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/libLeanc.a": "9e85b79bc298404b711348502ca4a597df6ffb7bebd6bb757b58c50c4abc12b9",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/libStd.a": "7dce10dec12243659542587d990f02d6e1da080108091c9ecf54f91f78a42648",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/libgmp.a": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/liblasmhost.a": "6b1540c3603af0fa8e0c1eb02cf25b584231c8b0b22e923dca894a981e4362ef",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/liblasmnative.a": "267fed74667da053880f0353b98ae6cf8129c421db1456d14b966a964c4e6a18",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/liblasmtools.a": "b40c257660ab6c935ff05b15e6ca7acf8356ae94447002140f34a229f283d749",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/libleancpp.a": "f3000e76ee42fa6612e0f2ab9c8560b0dd47b17603191825205ca35fc394aa67",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/lean/libleanrt.a": "16d4349456ad4f9274fc4743b4b8c83c22a115f856125171f2760ac641ac1a35",
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v127-shell-arguments-r2-native/lib/temp/libleanshell.a": "75a760e77ab0bdea661e11b98514c7e9a17046d80b272d0b46d33801b7a56ce6"
+        },
+        "startedAt": "2026-09-22T06:57:13.040779+00:00",
+        "exitCode": 0,
+        "finishedAt": "2026-09-22T06:58:00.656722+00:00"
+      }
+    },
+    "wasmMatchesNamedIndexPrototype": true
+  },
+  "loaderTests": {
+    "log": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/compact-function-table-tests.log",
+    "sha256": "1d9d2e59dcd90eb07900ce498adcdbefa149bde190641fb5af752ba79589e9e0",
+    "passed": 25,
+    "buildResource": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/shared-program-maintained-index-build.resources.json",
+      "sha256": "b3ea46290f610777f451b8a8d061f508dc61025dd567938fda504bf514f390cd",
+      "peakMemoryBytes": 3479199744,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "status": "finished"
+    }
+  },
+  "derivationIsolation": {
+    "comparison": {
+      "scope": "Synthetic frozen-artifact derivation with an existing source index",
+      "passed": true,
+      "source": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/index-derivation-isolation/source",
+      "derived": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/index-derivation-isolation/derived",
+      "sourceFilesVerified": 5,
+      "sourceSnapshotUnchanged": true,
+      "outputIndexIsRegularFile": true,
+      "wasmUnchanged": true,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/index-derivation-isolation.resources.json",
+      "implementationSha256": "4d48743037990b1effab8ae12cb180e84f64e95666b0f3e725046d6ab38679dd",
+      "finishedAt": "2026-09-22T07:10:34.815Z"
+    },
+    "resource": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/index-derivation-isolation.resources.json",
+      "sha256": "c7c6a5a73e8fdc37a0c4eda5f9ff39398adb73434e7d31a247ce0a32e8215806",
+      "peakMemoryBytes": 26873856,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "unitReleased": true,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "status": "finished"
+    }
+  },
+  "limitations": [
+    "No new upstream CTest passes are counted here.",
+    "Shared application linking is an experiment; dependency/rpath, C embedding, and broader conformance validation remain.",
+    "Compiler/side-module CLI controls use the recorded one-worker profile; four-worker and original broad-campaign results remain separate.",
+    "Full shared-runtime link exposes unresolved libuv internals in retained linker warnings; tested executions do not call them.",
+    "Bun result is the local rebuilt engine, not stock Bun or a portable package guarantee.",
+    "Native macOS, Windows, ARM64 and packaged integration remain unverified."
+  ]
+}

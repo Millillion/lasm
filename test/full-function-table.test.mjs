@@ -14,11 +14,12 @@ const uleb = value => {
 const string = value => { const bytes = [...Buffer.from(value)]; return [...uleb(bytes.length), ...bytes]; };
 const section = (id, bytes) => [id, ...uleb(bytes.length), ...bytes];
 
-function fixture(memory64 = false) {
+function fixture(memory64 = false, unusualNames = false) {
   // first and alias share function 1 at slots 1 and 3. Function 2 is hidden at
   // slot 4. spare is exported but has no initial slot. The JS import is slot 2.
   const exports = [['first', 0, 1], ['alias$&λ', 0, 1], ['imported', 0, 0],
     ['spare', 0, 3], ['__indirect_function_table', 1, 0]];
+  if (unusualNames) exports.push(['12', 0, 1], ['2', 0, 2], ['__proto__', 0, 1], ['', 0, 3]);
   const bytes = Buffer.from([0, 97, 115, 109, 1, 0, 0, 0,
     ...section(1, [1, 0x60, 0, 1, 0x7f]),
     ...section(2, [1, ...string('env'), ...string('fn'), 0, 0]),
@@ -72,7 +73,8 @@ return { address: getFunctionAddress, scans };`;
 
 for (const memory64 of [false, true]) test(`function table ${memory64 ? 64 : 32}: aliases, imports, unknown functions and fallback`, async () => {
   const { path, module } = fixture(memory64), metadata = await readFunctionTableIndex(path);
-  assert.deepEqual(metadata.exportSeeds, [['first', 3], ['alias$&λ', 3], ['imported', 2]]);
+  assert.deepEqual(metadata.exportSeeds, [['first', 3, 0], ['alias$&λ', 3, 1], ['imported', 2, 2]]);
+  assert.equal(metadata.exportCount, 5);
   assert.deepEqual(metadata.importSeeds, [['env', 'fn', 2]]);
   assert.equal(metadata.segments[0].offsetBits, memory64 ? 64 : 32);
   const host = () => 7, instance = new WebAssembly.Instance(module, { env: { fn: host } });
@@ -119,10 +121,26 @@ test('table extensions before the first lookup preserve canonical addresses', as
 test('mismatched metadata and changed loader semantics fail closed', async () => {
   const { path, module } = fixture(), metadata = await readFunctionTableIndex(path);
   const host = () => 7, instance = new WebAssembly.Instance(module, { env: { fn: host } });
-  const corrupt = { ...metadata, exportSeeds: [['first', 2]] };
+  const corrupt = { ...metadata, exportSeeds: [['first', 2, 0]] };
   assert.throws(() => runtime(instance, host, corrupt).address(instance.exports.first), /metadata mismatch/);
+  assert.throws(() => runtime(instance, host, { ...metadata, exportCount: 100 }).address(instance.exports.first), /export count/);
+  assert.throws(() => runtime(instance, host, { ...metadata, exportSeeds: [['first', 3, 100]] }), /metadata mismatch/);
+  assert.throws(() => runtime(instance, host, { ...metadata, version: 1 }), /metadata mismatch/);
   assert.throws(() => transformFunctionTable(originalLookup.replace('|| 0', '|| 9'), metadata), /semantics/);
   const truncated = join(directory, 'truncated.wasm');
   writeFileSync(truncated, Buffer.from([0, 97, 115, 109, 1, 0, 0, 0, 9, 100]));
   await assert.rejects(readFunctionTableIndex(truncated), /Truncated/);
+});
+
+test('compact ordinals respect integer keys, empty names and prototype-like symbols', async () => {
+  const { path, module } = fixture(false, true), metadata = await readFunctionTableIndex(path);
+  const host = () => 7, instance = new WebAssembly.Instance(module, { env: { fn: host } });
+  const names = Object.keys(instance.exports);
+  for (const [name, , ordinal] of metadata.exportSeeds) assert.equal(names[ordinal], name);
+  const state = runtime(instance, host, metadata);
+  assert.equal(state.address(instance.exports['12']), 3);
+  assert.equal(state.address(instance.exports['2']), 4);
+  assert.equal(state.address(instance.exports.__proto__), 3);
+  assert.equal(state.address(instance.exports['']), 0);
+  assert.deepEqual(state.scans, [{ offset: 5, count: 0 }]);
 });

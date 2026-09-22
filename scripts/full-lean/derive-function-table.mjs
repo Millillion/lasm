@@ -20,7 +20,7 @@ for (const [name, expected] of Object.entries(metadata.files))
   if (await hash(join(source, name)) !== expected) throw new Error(`Frozen input drift: ${name}`);
 mkdirSync(join(output, 'bin'), { recursive: true });
 for (const name of readdirSync(source)) {
-  if (['bin', 'snapshot.json', 'build-provenance.json'].includes(name)) continue;
+  if (['bin', 'snapshot.json', 'build-provenance.json', 'function-table-index.json'].includes(name)) continue;
   symlinkSync(join(source, name), join(output, name));
 }
 for (const name of readdirSync(join(source, 'bin'))) {
@@ -40,5 +40,7 @@ writeFileSync(join(output, 'build-provenance.json'), JSON.stringify({ ...provena
 Object.assign(metadata, { derivedFrom: source, createdAt: new Date().toISOString(), derivation });
 for (const name of ['bin/lean.js', 'bin/lean.cjs', 'function-table-index.json', 'build-provenance.json'])
   metadata.files[name] = await hash(join(output, name));
+for (const [name, expected] of Object.entries(JSON.parse(readFileSync(join(source, 'snapshot.json'))).files))
+  if (await hash(join(source, name)) !== expected) throw new Error(`Source changed during derivation: ${name}`);
 writeFileSync(join(output, 'snapshot.json'), JSON.stringify(metadata, null, 2) + '\n');
 console.log(JSON.stringify({ output, ...derivation }));

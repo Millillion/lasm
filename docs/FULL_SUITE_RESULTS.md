@@ -34,6 +34,35 @@ The [ten-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint10-2026-
 and [initial five-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint5-2026-09-22.json)
 remain intact.
 
+During this pause, a shared-runtime AOT experiment passes **30 native comparisons**:
+ten each in Node, Deno, and the local rebuilt Bun profile. The checks cover ordinary
+CLI execution, literal arguments, an unchanged expression test, cross-process
+closure serialization, console/file buffering, normal return, exit, and force-exit.
+Each engine also rejects a missing application module explicitly. These are
+supplementary controls, not new upstream CTest passes. The profile uses one Lean
+worker and one precreated pthread; peaks are 6.27 GiB in Node, 5.33 GiB in Deno,
+and 5.54 GiB in local Bun, with no memory-limit, OOM, or swap events. Original
+fixture hashes match. Stock Bun, cross-platform execution, shared-library search
+paths, C embedding, and broad-suite use remain separate validation gates.
+
+The experiment exposed a large function-table metadata cost. The maintained
+loader now stores export ordinals instead of repeating long symbol names, while
+retaining address-identity checks and complete-scan fallback. On the same Wasm,
+the generated JavaScript drops from 31.68 to 9.71 MiB. A direct two-control Node
+comparison with unchanged four-worker settings peaks at 4.32 GiB before and
+3.93 GiB after the representation change; the separately adjusted one-worker
+profile peaks at 2.82 GiB. These are individual measurements, not a general
+performance guarantee. All 25 focused loader tests pass, as does an independent
+artifact-derivation check that preserves a preexisting source index.
+
+The retained experiments include initial entry-symbol and missing-export failures,
+an intentional resource precaution stop, and restoration of an experimental
+script's overwritten linker metadata from its verified snapshot. No compiler
+bytes or upstream tests changed in that bookkeeping incident; the original
+untracked linker log was lost and is not used as evidence. Shared-runtime linking
+also retains warnings for unresolved libuv internals. See the complete
+[shared-runtime and compact-index evidence](evidence/shared-program-runtime-2026-09-22.json).
+
 The v127 Node campaign stopped at **54 passes, zero conformance failures, one
 resource abort, and 3,841 pending registrations**. The guard interrupted
 `compile/compact_closure.lean` on a 5.17% memory-pressure signal at a 2.15 GiB peak,

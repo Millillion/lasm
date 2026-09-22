@@ -94,13 +94,14 @@ export async function readFunctionTableIndex(path) {
     }
     input.done();
   }
-  const output = source.get(7);
+  const output = source.get(7), exportProperties = Object.create(null);
   if (output) {
     const names = new Set();
     for (let i = 0, count = output.integer(); i < count; i++) {
       const name = output.string(), kind = output.byte(), index = output.integer();
       if (names.has(name)) throw new Error('Duplicate Wasm export');
       names.add(name);
+      exportProperties[name] = true;
       if (kind === 0) exports.push({ name, index });
       if (name === '__indirect_function_table' && (kind !== 1 || index !== 0)) throw new Error('Unsupported main function table');
     }
@@ -132,9 +133,15 @@ export async function readFunctionTableIndex(path) {
   }
   const hash = createHash('sha256');
   for await (const bytes of createReadStream(path)) hash.update(bytes);
-  return { version: 1, wasmSha256: hash.digest('hex'), initialTableEntries, segments,
+  // Use JavaScript's own property ordering, including integer-like export names.
+  // The runtime already has these names in instance.exports. Repeating hundreds
+  // of thousands of long Lean symbols in each worker's glue wastes memory.
+  const exportOrdinals = new Map(Object.keys(exportProperties).map((name, ordinal) => [name, ordinal]));
+  return { version: 2, wasmSha256: hash.digest('hex'), initialTableEntries, segments,
+    exportCount: exportOrdinals.size,
     functionExports: exports.length, functionImports: imports.length,
-    exportSeeds: exports.filter(entry => positions.has(entry.index)).map(entry => [entry.name, positions.get(entry.index)]),
+    exportSeeds: exports.filter(entry => positions.has(entry.index))
+      .map(entry => [entry.name, positions.get(entry.index), exportOrdinals.get(entry.name)]),
     importSeeds: imports.filter(entry => positions.has(entry.index)).map(entry => [entry.module, entry.name, positions.get(entry.index)]) };
 }
 
@@ -146,7 +153,11 @@ function indexedFunctionAddress(func) {
     lasmKnownUnindexedExports = new WeakSet();
     if (Number(wasmTable.length) < lasmInitialFunctionTable.initialTableEntries)
       throw new Error('Lasm function table is shorter than its verified metadata');
-    for (var [name, index] of lasmInitialFunctionTable.exportSeeds) {
+    var exportNames = Object.keys(lasmMainExports);
+    if (exportNames.length !== lasmInitialFunctionTable.exportCount)
+      throw new Error('Lasm export count differs from verified metadata');
+    for (var [ordinal, index] of lasmInitialFunctionTable.exportSeeds) {
+      var name = exportNames[ordinal];
       var value = lasmMainExports[name];
       if (getWasmTableEntry(index) !== value) throw new Error('Lasm function table metadata mismatch: ' + name);
       functionsInTableMap.set(value, Math.max(functionsInTableMap.get(value) || 0, index));
@@ -183,7 +194,13 @@ export function transformFunctionTable(glue, index) {
     throw new Error('Unexpected Emscripten function-address semantics');
   const original = '    wasmExports = instance.exports;';
   if (glue.split(original).length !== 2) throw new Error('Generated main-instance initialization drift');
-  const runtime = { initialTableEntries: index.initialTableEntries, exportSeeds: index.exportSeeds, importSeeds: index.importSeeds };
+  if (index.version !== 2 || !Number.isInteger(index.exportCount) || index.exportCount < 0
+      || index.exportSeeds.some(([name, slot, ordinal]) => typeof name !== 'string'
+        || !Number.isInteger(slot) || slot < 0 || !Number.isInteger(ordinal)
+        || ordinal < 0 || ordinal >= index.exportCount))
+    throw new Error('Function table metadata mismatch: regenerate the version 2 index');
+  const runtime = { initialTableEntries: index.initialTableEntries, exportCount: index.exportCount,
+    exportSeeds: index.exportSeeds.map(([, slot, ordinal]) => [ordinal, slot]), importSeeds: index.importSeeds };
   const replacement = `var lasmInitialFunctionTable = ${JSON.stringify(runtime)};\nvar lasmMainExports;\nvar lasmKnownUnindexedExports;\nvar lasmTableMapComplete = false;\nvar getFunctionAddress = ${indexedFunctionAddress.toString()};`;
   return glue.replace(original, original + '\n    lasmMainExports = wasmExports;').replace(pattern, () => replacement);
 }

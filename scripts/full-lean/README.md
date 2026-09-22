@@ -271,6 +271,16 @@ their canonical index, dynamically loaded tables are incorporated, and unknown
 functions still use the original complete scan. Unsupported binary layouts or
 changed generated-loader semantics fail explicitly.
 
+Index format 2 stores export-property ordinals in the generated JavaScript,
+instead of repeating long Lean symbol names in every worker. The audit JSON
+retains names, table slots, and ordinals. The loader checks the export count and
+each function's identity at its recorded slot; JavaScript's integer-key ordering
+is accounted for. Existing format-1 snapshots keep their original loader; new
+indices use format 2. This derivation still requires unindexed input glue. It keeps its
+new index file separate from source symlinks and verifies source hashes afterward.
+`probe-index-derivation.mjs NEW_DIRECTORY` checks that behavior with a preexisting
+source index and an independently validated synthetic Wasm module.
+
 New `freeze-build.mjs` snapshots apply this optimization and record
 `function-table-index.json`; the input build remains unchanged. Both paths stream
 large-file hashes and skip Wasm code/data when reading metadata. Run
