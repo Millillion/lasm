@@ -1,5 +1,5 @@
 import { readFile, access } from 'node:fs/promises';
-import { join, dirname } from 'node:path';
+import { join, dirname, posix, win32 } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { provisionArtifact } from './managed-artifacts.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
@@ -9,6 +9,7 @@ export const gitCatalog = JSON.parse(await readFile(new URL('./git-tools.json', 
 /** Keep ordinary Git configuration and authentication; supply its native tools. */
 export function managedGitEnvironment(git, inherited = process.env) {
   const env = { ...inherited };
+  const paths = git.platform === 'win32' ? win32 : posix;
   const priorPath = Object.keys(env).find(key => key.toUpperCase() === 'PATH');
   const path = priorPath === undefined ? '' : env[priorPath];
   // Windows environment keys are case insensitive. Avoid competing Path/PATH
@@ -18,10 +19,10 @@ export function managedGitEnvironment(git, inherited = process.env) {
   env.GIT_EXEC_PATH = git.execPath;
   env.GIT_TEMPLATE_DIR = git.templates;
   if (git.platform !== 'win32' && env.GIT_CONFIG_SYSTEM === undefined)
-    env.GIT_CONFIG_SYSTEM = join(git.prefix, 'etc/gitconfig');
+    env.GIT_CONFIG_SYSTEM = paths.join(git.prefix, 'etc/gitconfig');
   if (git.platform === 'linux') {
     env.PREFIX = git.prefix;
-    if (env.GIT_SSL_CAINFO === undefined) env.GIT_SSL_CAINFO = join(git.prefix, 'ssl/cacert.pem');
+    if (env.GIT_SSL_CAINFO === undefined) env.GIT_SSL_CAINFO = paths.join(git.prefix, 'ssl/cacert.pem');
   }
   return env;
 }
