@@ -31,6 +31,18 @@ and Windows x64. **A native Windows ARM64 distribution remains missing.** The
 installer reports that gap and does not substitute an emulated x64 compiler.
 That missing artifact is an engineering gap, not a fundamental limitation.
 
+## CLI and deployment foundations
+
+The command parser now covers the planned direct-file/run/build forms, options
+before or after the filename, target selection, output directories, and the
+application-argument separator. Nineteen parser checks pass. It remains separate
+from the primary CLI until full-runtime application compilation is integrated.
+
+The full-runtime output helper packages host adapters and native support and
+generates a relative `main.mjs` launcher. Three loader checks cover relocation,
+argument forwarding, working directory and engine mismatch handling. These are
+loader-level controls; actual deployed Wasm applications still need acceptance.
+
 ## Native CI
 
 `managed-tools.yml` tests provisioning on the six required standard native runner

@@ -45,6 +45,8 @@ jobs:
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Provisioning regression tests
         run: node test/managed-artifacts.test.mjs
+      - name: CLI and deployment-loader regressions
+        run: node --test test/cli-arguments.test.mjs test/application-output.test.mjs
       # Windows ARM64 intentionally remains a failing acceptance row until a
       # native Lean artifact is implemented. Do not skip or emulate that gap.
       - name: Native Lean and Lake with only managed tools
