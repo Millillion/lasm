@@ -103,6 +103,16 @@ settings on this host, including when a test itself starts several compilers.
 Missing cgroup support fails closed; this is a Linux maintainer tool, not an
 application runtime installation requirement.
 
+Before advancing, the campaign supervisor also requires a finished resource
+report, confirmed unit cleanup, complete final counters, and zero hard-limit,
+OOM, throttling and swap events. A zero CTest exit cannot override missing
+monitoring. A contained proactive budget stop remains a separate
+`resource-aborted` outcome; pressure and monitor failures stop for review.
+The predicate has 29 small report-only controls and accepts all 3,896 completed
+Node reports, the 109 Deno reports available at validation, and the retained
+safe budget-stop record. No allocation-pressure test was used; see
+[the completion-check evidence](../../docs/evidence/campaign-resource-completion-2026-09-23.json).
+
 Do **not** use `MemoryHigh` throttling or deliberately induce OOM to verify this
 guard. The desktop's ancestor `systemd-oomd` policy killed ChatGPT during the
 first throttled guard probe despite roughly 27 GiB remaining available. The

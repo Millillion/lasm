@@ -1,0 +1,90 @@
+{
+  "recordedAt": "2026-09-23T15:12:19.088621+00:00",
+  "scope": "Future campaign supervisors reject incomplete resource cleanup, missing counters, hard-limit events, swap and capture errors before advancing. No guard limits, original Lean test, frozen runtime, or active Deno process is changed.",
+  "implementation": {
+    "scripts/full-lean/campaign-resource-report.mjs": "d336b18f2372a46d0ce356505b17bd05a11f7b91f29ba52b02805bbb34384f97",
+    "scripts/full-lean/run-campaign.mjs": "d5988f512c599a8b8d8e4c5cbddeb196e5facfecd1b7d696eff779643f7c58e2",
+    "test/full-campaign-resource-report.test.mjs": "389d3418bfcae1d115fbce1391307fe9eee18bffb99d3395f44ab3a17fb192ea"
+  },
+  "unitTests": {
+    "command": [
+      "node",
+      "test/full-campaign-resource-report.test.mjs"
+    ],
+    "passed": 29,
+    "failed": 0,
+    "skipped": 0,
+    "exitCode": 0,
+    "scope": "Synthetic report objects only: valid cleanup, contained proactive abort, missing or incomplete monitoring, each missing/nonzero memory counter, swap, pressure stops, and immutable input records."
+  },
+  "testRunnerControl": {
+    "command": [
+      "node",
+      "--test",
+      "--test-reporter=tap",
+      "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/resource-report-controls/negative.test.mjs"
+    ],
+    "expectedExitCode": 1,
+    "actualExitCode": 1,
+    "assertionRan": true,
+    "scope": "An intentional failure confirms the isolated runner propagates assertion failures despite showing only a file-level summary.",
+    "record": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/resource-report-controls/negative.json",
+    "sha256": "3506b3e1f8df28258c1a05cca9db77d5b942577322ebab5e854b314744d8506c"
+  },
+  "recordedReportValidation": {
+    "checkedAt": "2026-09-23T15:11:22.833Z",
+    "scope": "Read-only classification of retained resource records; no test or allocation is executed.",
+    "summaries": [
+      {
+        "campaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v147-temporary-files-broad",
+        "checkpointSha256": "4ae6612f28b71579af528ff1cdec6a24c219756dbffaaa68ed48a1ef476f3878",
+        "backend": "node",
+        "status": "complete",
+        "counts": {
+          "passed": 3896,
+          "failed": 0,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 0
+        },
+        "acceptedCompletedReports": 3896,
+        "orderedReportIndexSha256": "2f15d2172ab266e28479ea31e597cba200bc5b3c320886708d6c23878fa57319"
+      },
+      {
+        "campaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-deno-v151-system-directories-broad",
+        "checkpointSha256": "5bb55721dfbf8ee8feff53feaa44b620e92c5500e8883503c2ba61cb5e2906eb",
+        "backend": "deno",
+        "status": "running",
+        "counts": {
+          "passed": 109,
+          "failed": 0,
+          "resource-aborted": 0,
+          "harness-failed": 0,
+          "pending": 3787
+        },
+        "acceptedCompletedReports": 109,
+        "orderedReportIndexSha256": "3b3e30f3702c7d2c7bb7d62fa97ee6d57d3535d83c1db36b02a9c508626b776c"
+      }
+    ],
+    "containedBudgetStop": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/lean-symbol-loader-upstream-validation.resources.json",
+      "sha256": "4b1208ed51b24c9da5898a41724aa6e2f729b114d55674c75e98c96b59685189",
+      "resourceLimited": true,
+      "stoppedBecause": "Workload reached its proactive memory budget",
+      "unitReleased": true,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  },
+  "limitations": [
+    "The active Deno supervisor keeps its previously loaded classification code. Its finalized reports pass the stricter read-only check and remain eligible for the independent final audit.",
+    "No new cgroup workload, memory-pressure experiment or Lean suite was started for this change.",
+    "Full supervisor/guard integration continues on the next authorized campaign; the shared predicate and existing report compatibility were checked locally."
+  ]
+}

@@ -5,6 +5,7 @@ import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
+import { campaignResourceIssue } from './campaign-resource-report.mjs';
 
 if (process.env.LASM_RESOURCE_UNIT) throw new Error('Run this supervisor directly; each test applies its own resource guard');
 const args = process.argv.slice(2);
@@ -163,9 +164,8 @@ for (const [index, test] of state.tests.entries()) {
   await new Promise(resolve => log.end(resolve));
   const resource = json(resourcePath), execution = json(join(results, 'execution.json'));
   const progress = json(join(results, 'progress.json'));
-  const events = resource?.service?.memoryEvents;
-  const unsafe = !resource || resource.monitorError || resource.memoryThrottled || (events?.oom ?? 0) > 0
-    || (events?.oom_kill ?? 0) > 0 || resource.stoppedBecause && resource.stoppedBecause !== 'Workload reached its proactive memory budget';
+  const resourceIssue = campaignResourceIssue(resource);
+  const unsafe = resourceIssue !== undefined;
   let status;
   if (interrupted) status = 'interrupted';
   else if (resource?.resourceLimited) status = 'resource-aborted';
@@ -185,7 +185,7 @@ for (const [index, test] of state.tests.entries()) {
   // failure. A safely contained budget stop is evidence for that one test and
   // does not erase completed tests or prevent trying the remaining small tests.
   if (unsafe || status === 'harness-failed' || interrupted) {
-    if (!interrupted) state.stoppedBecause = resource?.stoppedBecause ?? 'Resource, input-integrity, or harness validation failed';
+    if (!interrupted) state.stoppedBecause = resource?.stoppedBecause ?? resourceIssue ?? 'Resource, input-integrity, or harness validation failed';
     break;
   }
 }
