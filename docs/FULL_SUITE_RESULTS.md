@@ -79,25 +79,23 @@ is 7.02 GiB, with all 7,267 original hashes, six symlinks and ten harness hashes
 intact and no resource events. The same base-page, one-build-worker and memory
 limits remain in force. See
 [the Deno preparation and driver-control evidence](evidence/server-project-deno-v151-system-directories-2026-09-23.json).
-The first saved Deno checkpoint has **all 61 prioritized tests passing**, with
-zero failures, resource aborts or harness failures and 3,835 registrations pending.
-This includes all 35 `async_` and all 20 `async_http` registrations, the opt-in
-channel/mutex/signal cases, filesystem/process/console tests, all earlier plugin
-failure cases, the server-project workload, compiler frontend and Lean checker.
-Its largest peak is 7.85 GiB in `pkg/frontend`, below the unchanged proactive
-limit, with no OOM, throttling, swap or monitor events and all source/harness
-hashes intact. The full Deno suite is still incomplete; see
-[the 61-test Deno checkpoint](evidence/deno-broad-v151-system-directories-checkpoint61-2026-09-23.json).
+The latest saved Deno checkpoint has **120/120 first-attempt passes**, including
+**all 56 Lake registrations** and all 61 prioritized registrations. These cover
+all 35 `async_` and all 20 `async_http` tests, filesystem/process/console checks,
+opt-in channel/mutex/signal cases, earlier plugin failures, server-project,
+compiler frontend and Lean checker. Lake's project initialization, linting,
+caching, module visibility/rebuilds, library linking, build targets and toolchain
+updates pass. Lint and two documentation examples pass too.
 
-The next saved Deno checkpoint has **100/100 first-attempt passes**, including
-39 of the 56 Lake registrations. Project initialization, linting, caching,
-drivers, module visibility/rebuilds, logging and dependency-order checks now
-pass alongside the prioritized group. The maintained auditor independently
-checks the same checkpoint and all 100 unskipped JUnit results. There are zero
-failures, resource aborts or harness failures, all source/harness checks remain
-intact, and the maximum peak remains 7.85 GiB. The other 3,796 registrations
-remain pending in this snapshot; see
-[the 100-test Deno checkpoint](evidence/deno-broad-v151-system-directories-checkpoint100-2026-09-23.json).
+The maintained auditor independently checks the same checkpoint and all 120
+unskipped JUnit results. There are zero failures, resource aborts or harness
+failures; all 7,267 original hashes, six symlinks and ten harness hashes remain
+intact. The largest peak is still 7.85 GiB in `pkg/frontend`, with no OOM,
+throttling, swap or monitor events. The other **3,776 registrations remain pending**
+in this snapshot; see [the Lake-complete Deno checkpoint](evidence/deno-broad-v151-system-directories-checkpoint120-2026-09-23.json).
+The earlier [61-test](evidence/deno-broad-v151-system-directories-checkpoint61-2026-09-23.json)
+and [100-test](evidence/deno-broad-v151-system-directories-checkpoint100-2026-09-23.json)
+checkpoints remain preserved separately.
 
 The separate v151 repair makes POSIX home/temporary-directory queries preserve
 empty values, environment precedence, raw bytes and Lean's buffer-limit errors.
