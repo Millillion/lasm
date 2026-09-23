@@ -1,0 +1,149 @@
+{
+  "scope": "Linux x64 managed native build-time compiler checks; no deployed application pass implied",
+  "lean": "4.34.0",
+  "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35923900539",
+  "commit": "68ebef117fc86902e57de1803eeabfe154d54396",
+  "priorEvidence": "upstream-native-build-time-r3-2026-09-23.json",
+  "combinedCoverage": {
+    "registered": 3497,
+    "passedInPriorRun": 3495,
+    "passedInThisRun": 2,
+    "notCompleted": 0
+  },
+  "sourceLinkRepair": "Resolve expected file-content hashes through the immutable source manifest; original symlink text and target bytes still verified before and after",
+  "shardRepair": "Explicit selection/index/count arguments survive the resource boundary and are checked against the prepared manifest",
+  "logSha256": "e4cdabe7ab2f150824121195647ff07873ccf670b6ed89386a889c64284e51b5",
+  "reports": [
+    {
+      "job": "Native shard 1",
+      "counts": {
+        "passed": 1
+      },
+      "cases": [
+        {
+          "name": "elab_bench/iterators.lean",
+          "category": "native-build-time",
+          "command": [
+            "/bin/bash",
+            "/home/runner/work/lasm/lasm/.work/upstream-native-ci/native-environment.sh",
+            "/home/runner/work/lasm/lasm/.work/upstream-native-ci/source/tests/elab_bench/run_test.sh",
+            "iterators.lean"
+          ],
+          "startedAt": "2026-09-23T21:42:14.241Z",
+          "finishedAt": "2026-09-23T21:42:14.755Z",
+          "exitCode": 0,
+          "signal": null,
+          "status": "passed",
+          "sourceSha256": "133ad6d9d1de5056ef4ae7eb21106277d2b825b9bc11f50222a1a7db38c1ea71",
+          "sourceUnchanged": true
+        }
+      ],
+      "originalSources": {
+        "before": {
+          "checked": 7669,
+          "modified": []
+        },
+        "after": {
+          "checked": 7669,
+          "modified": []
+        }
+      },
+      "harness": {
+        "before": {
+          "/home/runner/work/lasm/lasm/scripts/application-tests/run.mjs": "1979d680b20ab89cd58a671edb24fb540427a4881455d7f6824674cfaece3008",
+          "/home/runner/work/lasm/lasm/scripts/application-tests/case.mjs": "ba66207bebb0197863c9c5785648b575cd03d21f17713078113c53a1ebc0bd9a",
+          "/home/runner/work/lasm/lasm/scripts/application-tests/compile-case.sh": "3020f0107f5fe50c8ea84bfd7d0ceac35d105b861ad273927ca4f4ea9eaf2453",
+          "/home/runner/work/lasm/lasm/.work/upstream-native-ci/native-environment.sh": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6"
+        },
+        "changed": []
+      },
+      "resources": {
+        "limits": {
+          "memoryMax": 6865027072,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5492021657,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 166330368,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    {
+      "job": "Native shard 0",
+      "counts": {
+        "passed": 1
+      },
+      "cases": [
+        {
+          "name": "elab_bench/big_omega_MT.lean",
+          "category": "native-build-time",
+          "command": [
+            "/bin/bash",
+            "/home/runner/work/lasm/lasm/.work/upstream-native-ci/native-environment.sh",
+            "/home/runner/work/lasm/lasm/.work/upstream-native-ci/source/tests/elab_bench/run_test.sh",
+            "big_omega_MT.lean"
+          ],
+          "startedAt": "2026-09-23T21:42:13.137Z",
+          "finishedAt": "2026-09-23T21:42:17.037Z",
+          "exitCode": 0,
+          "signal": null,
+          "status": "passed",
+          "sourceSha256": "5a1e7e2bff6f82f95ada35273e36613a53838e96aba2ad2b469234fc5571ff48",
+          "sourceUnchanged": true
+        }
+      ],
+      "originalSources": {
+        "before": {
+          "checked": 7669,
+          "modified": []
+        },
+        "after": {
+          "checked": 7669,
+          "modified": []
+        }
+      },
+      "harness": {
+        "before": {
+          "/home/runner/work/lasm/lasm/scripts/application-tests/run.mjs": "1979d680b20ab89cd58a671edb24fb540427a4881455d7f6824674cfaece3008",
+          "/home/runner/work/lasm/lasm/scripts/application-tests/case.mjs": "ba66207bebb0197863c9c5785648b575cd03d21f17713078113c53a1ebc0bd9a",
+          "/home/runner/work/lasm/lasm/scripts/application-tests/compile-case.sh": "3020f0107f5fe50c8ea84bfd7d0ceac35d105b861ad273927ca4f4ea9eaf2453",
+          "/home/runner/work/lasm/lasm/.work/upstream-native-ci/native-environment.sh": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6"
+        },
+        "changed": []
+      },
+      "resources": {
+        "limits": {
+          "memoryMax": 7005536256,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5604429004,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 313819136,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  ]
+}

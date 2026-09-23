@@ -1,7 +1,7 @@
 {
   "scope": "CLI parsing, help/usage without tool downloads, and child exit handling; installed application compilation remains separate",
-  "run": "https://github.com/Millillion/lasm/actions/runs/35920590067",
-  "commit": "f85cce3",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35922721108",
+  "commit": "278cd48e112bcdaeed78296160289c49d64d208b",
   "node": "26.10.0",
   "testFiles": [
     "test/application-launcher.test.mjs",
@@ -9,42 +9,88 @@
   ],
   "platforms": [
     {
-      "platform": "linux-arm64",
-      "passed": 22,
+      "platform": "linux-x64",
+      "passed": 23,
       "failed": 0,
       "skipped": 0
     },
     {
-      "platform": "linux-x64",
-      "passed": 22,
+      "platform": "linux-arm64",
+      "passed": 23,
       "failed": 0,
       "skipped": 0
     },
     {
       "platform": "darwin-arm64",
-      "passed": 22,
-      "failed": 0,
-      "skipped": 0
-    },
-    {
-      "platform": "win32-arm64",
-      "passed": 22,
-      "failed": 0,
-      "skipped": 0
-    },
-    {
-      "platform": "darwin-x64",
-      "passed": 22,
+      "passed": 23,
       "failed": 0,
       "skipped": 0
     },
     {
       "platform": "win32-x64",
-      "passed": 22,
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "platform": "win32-arm64",
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "platform": "darwin-x64",
+      "passed": 23,
       "failed": 0,
       "skipped": 0
     }
   ],
   "localLog": ".work/product-acceptance/application-launcher-unit-r2.log",
-  "installedAcceptance": "pending"
+  "installedAcceptance": "pending",
+  "previousRuns": [
+    {
+      "run": "https://github.com/Millillion/lasm/actions/runs/35920590067",
+      "commit": "f85cce3",
+      "platforms": [
+        {
+          "platform": "linux-arm64",
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "platform": "linux-x64",
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "platform": "darwin-arm64",
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "platform": "win32-arm64",
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "platform": "darwin-x64",
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "platform": "win32-x64",
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0
+        }
+      ]
+    }
+  ],
+  "checksAdded": "Missing execution engine fails before download/build-cache creation; build-only commands retain Node/npm-only behavior",
+  "nativeLog": ".work/product-acceptance/application-launcher-preflight-native-r1.log"
 }

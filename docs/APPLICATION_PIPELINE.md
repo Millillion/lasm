@@ -139,15 +139,15 @@ earlier `[--rebuild] [--verbose] Main.lean [--] arguments…` syntax. Running a
 wrapper under Deno/Bun invokes Node for compilation and then the exact original
 engine executable for the application; Node must be on PATH. Node can also run
 any of the three wrapper files, with the selected deployment engine on PATH.
-Help and usage errors perform no tool downloads. The 22 parser/launcher controls
+Help and usage errors perform no tool downloads. The 23 parser/launcher controls
 now pass on all six native platforms; see the
 [launcher evidence](evidence/application-launchers-2026-09-23.json).
 Real installed-candidate launcher acceptance is pending. The
 earlier 4.32 implementation and its regression fixtures remain explicitly legacy.
 Run commands now check that the selected engine starts before creating a build
 cache or downloading tools. Build-only commands still require only Node/npm.
-The added missing-engine check brings the local CLI/launcher controls to 23;
-the linked earlier native record retains its original 22-check scope.
+The added missing-engine check passes on all six hosts; the evidence also
+retains the earlier 22-check run.
 
 The full-runtime output helper packages host adapters and native support and
 generates a relative `main.mjs` launcher. Three loader checks cover relocation,
@@ -196,8 +196,8 @@ OS file locks; output delivery has a separate destination lock for builds from
 different projects. Locks release when their owning process exits, including
 abrupt termination. Empty lock files remain to prevent separate lock identities
 for existing waiters. Three small controls cover concurrent updates, interrupted
-owners and exception cleanup. Native six-platform validation and full concurrent
-CLI builds are separate acceptance checks; the already running installed-package
+owners and exception cleanup. These controls pass on all six native platforms;
+full concurrent CLI builds remain a separate acceptance check. The running installed-package
 campaign still uses its original code.
 
 The first real primary-CLI Node check passes ordinary console/filesystem/tasks,
@@ -315,7 +315,11 @@ The initial [upstream application inventory](UPSTREAM_APPLICATION_TESTS.md) now
 records all 4,066 default CTest registrations and separately identifies upstream
 exclusions and unregistered drivers. All 7,669 original test/example/helper
 files and links match the pinned archive. This is an inventory milestone;
-application-suite execution and the complete API audit remain pending.
+All 3,497 managed native build-time registrations pass on Linux x64, with
+unchanged upstream files and assertions; the
+[combined native evidence](evidence/upstream-native-build-time-complete-2026-09-23.json)
+keeps those compiler checks separate from deployed behavior. Application-suite
+execution and complete API differential coverage remain unfinished.
 
 These are implementation milestones, not replacements for any acceptance
 requirement in the plan. Broader compiler-in-Wasm research is checkpointed and

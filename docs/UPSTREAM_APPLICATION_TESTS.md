@@ -36,7 +36,7 @@ their interpreter settings. These cases require an explained parallel harness
 where appropriate; they are neither successes nor fundamental Lasm limitations.
 
 - [x] Record unchanged default registrations, exclusions and source integrity.
-- [ ] Run native build-time checks with the managed tools.
+- [x] Run all native build-time registrations with the managed tools on Linux x64.
 - [ ] Run application cases and compiled drivers through the shipping AOT path.
 - [ ] Finish per-driver classification of mixed shell/Lake/package tests.
 - [ ] Execute separately identified upstream exclusions without changing tests.
@@ -65,3 +65,14 @@ toolchain pin. The parallel suite now supplies a nearer generated release pin,
 retaining the original pin and all 7,669 original entries. This is an explicit
 harness adaptation, not a changed test or expected result. Broader registrations,
 native compiler coverage and all-API differential coverage remain open.
+
+All **3,497 native build-time registrations now pass** with managed Lean 4.34.0
+on a standard Linux x64 CI runner. The broad run passed 3,495; the two symlink
+inputs then passed after correcting the parallel harness's expected-content
+lookup. Both runs verify all 7,669 original files/links before and after, and
+preserve the original drivers, outputs and assertions. The
+[combined evidence](evidence/upstream-native-build-time-complete-2026-09-23.json)
+retains the earlier guarded resource stop and both harness defects. The completed
+broad run peaked at 2.32 GiB without resource events. This result covers native
+compilation and evaluation; it does not validate those same APIs when deployed
+in JavaScript engines or establish the remaining platform results.
