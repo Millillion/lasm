@@ -251,6 +251,12 @@ and do not establish full-suite conformance. See
   dispatch, headers, framing, trailers and URIs. This expands observed coverage;
   it does not complete the API or other-engine validation. See
   [the 296-test Node checkpoint](docs/evidence/node-broad-v144-split-optimization-checkpoint296-2026-09-22.json).
+  The v147 campaign also passes unchanged HTTP body, fuzzing, limit, random-input,
+  hang and keepalive registrations, together with DNS, socket/timer selection,
+  TCP error/half-close/server-client and UDP controls. These passing Node tests
+  retain their original assertions and timings; full-suite completion and other
+  engines remain separate gates. See
+  [the 768-test v147 checkpoint](docs/evidence/node-broad-v147-temporary-files-checkpoint768-2026-09-23.json).
 - [ ] Implement remaining UV loop configuration/aliveness primitives. Network
   interface enumeration now matches native Lean's records and ordering in Node,
   Deno, and Bun on Linux x64; other OSs still require validation.
