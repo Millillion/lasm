@@ -199,6 +199,18 @@ coverage, and the six native platform matrix remain acceptance gates. The packag
 assembler preserves the older callable-library target with its original Lean
 4.32 requirements.
 
+The same npm-installed candidate now compiles the ordinary three-module Lake
+HTTP server for Node, Deno and stock Bun. Each engine passes all 20 Vitest checks
+(ten deployed tests and ten native controls), with no failures or skips. These
+cover routing, validation, binary bodies, concurrent persisted mutations,
+streaming/cancellation and graceful restart. All three runs use the candidate's
+packaged runtime and host support, with no maintainer runtime override; managed
+tools are reused from the cold installation. Peaks were 3.20, 4.05 and 3.88 GiB,
+respectively, with no resource events. See the
+[installed HTTP evidence](evidence/installed-http-three-engines-2026-09-23.json).
+This closes the Linux installed-package HTTP example check; the broader API,
+callable/Express, dependency and platform requirements remain open.
+
 ## Native CI
 
 `managed-tools.yml` tests provisioning on the six required standard native runner

@@ -17,6 +17,8 @@ below retain their original, narrower scope.
 - [x] Verify a cold npm candidate install with only Node/npm, automatic tool
   provisioning, and a separate deployment denied access to source/build tools
   on Linux x64; the remaining native platforms are tracked below.
+- [x] Build the ordinary Lean HTTP Lake example with the installed candidate and
+  pass its native/deployed Vitest checks on stock Node, Deno and Bun on Linux x64.
 - [ ] Finish and package the primary `lasm Main.lean` / `lasm build Main.lean`
   pipeline with automatic tools, Lake dependencies and reliable cache reuse.
 - [ ] Validate the HTTP and Express examples and callable JS/TypeScript bindings

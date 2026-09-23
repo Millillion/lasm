@@ -1,0 +1,208 @@
+{
+  "recordedAt": "2026-09-23T19:20:29.561579+00:00",
+  "scope": "The exact npm-installed local candidate compiles the ordinary three-module Lake HTTP server for each stock engine on Linux x64. Twenty assertions per engine comprise ten deployed tests and ten native controls, not sixty unique test cases.",
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r1/lasm-compiler-0.1.0-experimental.4.tgz",
+    "sha256": "0c40a44f62ecebf2d33322b4e5244a2f5f19e47d87e2e6fa6f6e08196526c9ee",
+    "compressedBytes": 124725186,
+    "installedBytes": 626280248,
+    "files": 2657,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-package-r1-resources.json",
+    "recordedAt": "2026-09-23T18:39:57.324Z"
+  },
+  "checks": [
+    {
+      "engine": "node",
+      "result": {
+        "scope": "Primary CLI with ordinary Lake dependency discovery and full HTTP differential checks",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/project/node_modules/@lasm/compiler",
+        "target": "node",
+        "engineVersion": "v26.10.0",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "b6966242264a5e4a82956f97222ba7f36fdc1142e9d23b240b4727cf9148f1c4",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+App.Model",
+              "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+              "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+            },
+            {
+              "module": "+App.Server",
+              "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+              "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+            },
+            {
+              "module": "Main.lean",
+              "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+              "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+            }
+          ],
+          "signature": "dd5749c3c01c04e806629861bc6ed18094a013727b19bfe5e78499162c1cf0ea",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+        },
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/installed-http-node-r1-resources.json",
+        "recordedAt": "2026-09-23T19:12:36.470Z"
+      },
+      "wasmSha256": "94094005c7a1e068bf14061809b51a7876b99096bcf6a20379e2dbf85aa50fc9",
+      "peakMemoryBytes": 3436847104,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "result": {
+        "scope": "Primary CLI with ordinary Lake dependency discovery and full HTTP differential checks",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/project/node_modules/@lasm/compiler",
+        "target": "deno",
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "b6966242264a5e4a82956f97222ba7f36fdc1142e9d23b240b4727cf9148f1c4",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+App.Model",
+              "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+              "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+            },
+            {
+              "module": "+App.Server",
+              "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+              "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+            },
+            {
+              "module": "Main.lean",
+              "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+              "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+            }
+          ],
+          "signature": "e6b6a2df021035ba0e6dbc06f366918124351bf54666d8deeac2893b4d8ed34b",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+        },
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/installed-http-deno-r1-resources.json",
+        "recordedAt": "2026-09-23T19:14:52.464Z"
+      },
+      "wasmSha256": "94094005c7a1e068bf14061809b51a7876b99096bcf6a20379e2dbf85aa50fc9",
+      "peakMemoryBytes": 4346302464,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "result": {
+        "scope": "Primary CLI with ordinary Lake dependency discovery and full HTTP differential checks",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/project/node_modules/@lasm/compiler",
+        "target": "bun",
+        "engineVersion": "1.4.2",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "b6966242264a5e4a82956f97222ba7f36fdc1142e9d23b240b4727cf9148f1c4",
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "+App.Model",
+              "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+              "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+            },
+            {
+              "module": "+App.Server",
+              "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+              "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+            },
+            {
+              "module": "Main.lean",
+              "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+              "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+            }
+          ],
+          "signature": "63c6ce4e6e57664f1d91691be949a7ce125b5cd22077774a0a897be434408cdc",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+        },
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/installed-http-bun-r1-resources.json",
+        "recordedAt": "2026-09-23T19:17:15.984Z"
+      },
+      "wasmSha256": "ddd6afeb21226e25650fd3ff927bfc09c187126ec8e39bd1300d3c6439b845e8",
+      "peakMemoryBytes": 4168327168,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    }
+  ],
+  "sourceAndHarnessSha256": {
+    "examples/lean-server-latest/Main.lean": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+    "examples/lean-server-latest/App/Model.lean": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+    "examples/lean-server-latest/App/Server.lean": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+    "examples/lean-server-latest/lakefile.toml": "9a30561c35549a04e08eb96c2b4a54815e0d38d331e7ef408996f3f5184d1b33",
+    "examples/lean-server-latest/test/server.test.mjs": "faa83f12123f666cb94febe6b6bf516c5e93064ac87c49e6c96a6712259a5b60",
+    "integration/managed-http.mjs": "7c4f1cd282e120647daa2cb38f679bf98da1df5cca7641c1edc25927efa4e085"
+  },
+  "limits": [
+    "HTTP builds reuse the verified managed cache from the separate cold-install test.",
+    "This HTTP campaign restricts build PATH to Node, but does not use the separate Landlock deployment boundary.",
+    "Long-duration resource endurance, latest callable JS bindings, Express integration, other native platforms and the full API/upstream suite remain open."
+  ]
+}
