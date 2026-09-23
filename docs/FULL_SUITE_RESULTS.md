@@ -1,5 +1,10 @@
 # Full upstream Lean suite
 
+These are preserved **compiler-in-Wasm research** results. The current
+[product plan](PLAN.md) requires separate application-pipeline acceptance on
+Lean 4.34.0 and stock latest engines. Earlier passes below do not satisfy that
+new version or product scope. Broad research campaigns are now paused.
+
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
@@ -70,7 +75,7 @@ remain preserved separately. Both original server-driver controls also passed
 before this campaign, peaking at 7.59 GiB without resource events; see
 [the v147 server controls](evidence/server-project-v147-temporary-files-2026-09-22.json).
 
-A fresh full **Deno v151 campaign is running** with all 3,896 registrations
+A fresh full **Deno v151 campaign is paused** with all 3,896 registrations
 selected. It imports no Node or targeted-control passes and prioritizes 61 IO,
 async, overflow, plugin and larger server/frontend/checker registrations.
 The unchanged server-driver build and suite preparation passed first, followed
@@ -79,20 +84,25 @@ is 7.02 GiB, with all 7,267 original hashes, six symlinks and ten harness hashes
 intact and no resource events. The same base-page, one-build-worker and memory
 limits remain in force. See
 [the Deno preparation and driver-control evidence](evidence/server-project-deno-v151-system-directories-2026-09-23.json).
-The latest saved Deno checkpoint has **120/120 first-attempt passes**, including
+The latest saved Deno checkpoint has **164/164 first-attempt passes**, including
 **all 56 Lake registrations** and all 61 prioritized registrations. These cover
 all 35 `async_` and all 20 `async_http` tests, filesystem/process/console checks,
 opt-in channel/mutex/signal cases, earlier plugin failures, server-project,
 compiler frontend and Lean checker. Lake's project initialization, linting,
 caching, module visibility/rebuilds, library linking, build targets and toolchain
-updates pass. Lint and two documentation examples pass too.
+updates pass. Lint, seven documentation examples and additional compiler
+regressions pass too. On adoption of the updated product plan, the supervisor
+finished its current test (`compile/overflow1.lean`), saved its checkpoint,
+released the resource guard and exited successfully. No test was interrupted.
 
-The maintained auditor independently checks the same checkpoint and all 120
+The maintained auditor independently checks the same checkpoint and all 164
 unskipped JUnit results. There are zero failures, resource aborts or harness
 failures; all 7,267 original hashes, six symlinks and ten harness hashes remain
 intact. The largest peak is still 7.85 GiB in `pkg/frontend`, with no OOM,
-throttling, swap or monitor events. The other **3,776 registrations remain pending**
-in this snapshot; see [the Lake-complete Deno checkpoint](evidence/deno-broad-v151-system-directories-checkpoint120-2026-09-23.json).
+throttling, swap or monitor events. The other **3,732 registrations remain pending**
+in this snapshot; see [the paused Deno checkpoint](evidence/deno-broad-v151-system-directories-checkpoint164-2026-09-23.json).
+The [120-test Lake-complete checkpoint](evidence/deno-broad-v151-system-directories-checkpoint120-2026-09-23.json)
+is preserved. Pending research is neither a failure nor a fundamental limitation.
 The earlier [61-test](evidence/deno-broad-v151-system-directories-checkpoint61-2026-09-23.json)
 and [100-test](evidence/deno-broad-v151-system-directories-checkpoint100-2026-09-23.json)
 checkpoints remain preserved separately.
