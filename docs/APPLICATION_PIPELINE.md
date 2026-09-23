@@ -163,6 +163,12 @@ commits and the acceptance Node version is fixed at 26.10.0.
 - [ ] Classify unchanged upstream tests for the application pipeline, and add
   native differential coverage for standard APIs beyond the upstream suite.
 
+The initial [upstream application inventory](UPSTREAM_APPLICATION_TESTS.md) now
+records all 4,066 default CTest registrations and separately identifies upstream
+exclusions and unregistered drivers. All 7,669 original test/example/helper
+files and links match the pinned archive. This is an inventory milestone;
+application-suite execution and the complete API audit remain pending.
+
 These are implementation milestones, not replacements for any acceptance
 requirement in the plan. Broader compiler-in-Wasm research is checkpointed and
 paused while this product work proceeds.
