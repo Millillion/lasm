@@ -63,6 +63,9 @@ function cleanArchivePath(name) {
 }
 
 async function extract(artifact, archive, directory) {
+  // macOS /var and Windows short-path temp directories are aliases. Compare
+  // resolved link targets with the same physical root, not its lexical alias.
+  directory = await realpath(directory);
   let error, total = 0;
   const seen = new Set();
   const links = [];
@@ -124,6 +127,7 @@ async function extract(artifact, archive, directory) {
 }
 
 async function inventory(directory) {
+  directory = await realpath(directory);
   const files = {};
   async function walk(base) {
     for (const entry of (await readdir(base, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {

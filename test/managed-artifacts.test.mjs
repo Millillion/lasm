@@ -145,6 +145,18 @@ test('forward hardlinks retain file contents', async t => {
   assert.equal(await readFile(join(installed.directory, 'first'), 'utf8'), 'library');
 });
 
+test('cache parents may use OS path aliases without misclassifying internal links as escapes', async t => {
+  const f = await fixture(t);
+  const physical = join(f.base, 'physical-cache'), alias = join(f.base, 'cache-alias');
+  await mkdir(physical);
+  await symlink(physical, alias, process.platform === 'win32' ? 'junction' : 'dir');
+  const bytes = archive([{ path: 'tool/alias', type: 'Link', linkpath: 'tool/real' }, { path: 'tool/real', body: 'compiler' }]);
+  const artifact = description(bytes), options = { ...f.options, cache: alias, fetch: async () => new Response(bytes) };
+  const installed = await provisionArtifact(artifact, options);
+  assert.equal(await readFile(join(installed.directory, 'alias'), 'utf8'), 'compiler');
+  assert.equal((await provisionArtifact(artifact, options)).cacheHit, true);
+});
+
 test('symlink directory aliases cannot redirect extracted files', { skip: process.platform === 'win32' }, async t => {
   const f = await fixture(t);
   const bytes = archive([
