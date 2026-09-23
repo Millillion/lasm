@@ -72,8 +72,8 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **1,506 registrations passing**, completing
-all 854 prioritized names and 652 further registrations. This includes
+passes. Its latest saved checkpoint has **1,753 registrations passing**, completing
+all 854 prioritized names and 899 further registrations. This includes
 all 56 Lake tests, all 69 compiler regressions, all 27 compiled benchmarks,
 all 657 prioritized elaborator regressions,
 all 78 prioritized interactive server tests, lint, seven documentation examples,
@@ -82,12 +82,13 @@ handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 2,390 registrations remain pending in that
+harness hash remains intact. The other 2,143 registrations remain pending in that
 snapshot; see
-[the 1,506-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint1506-2026-09-23.json).
+[the 1,753-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint1753-2026-09-23.json).
 All 197 documentation-parser registrations also pass in this checkpoint.
 Additional evaluator, coercion, compiler simplification, decidability, definition,
-pretty-printing and dependent-elimination regressions pass their original tests.
+pretty-printing, dependent-elimination, derivation, iteration, floating-point and
+function-induction regressions pass their original tests.
 All three earlier plugin failures now pass within this campaign. The server-project
 workload also passes under the same 8 GiB proactive budget; it is this checkpoint's
 largest peak at 7.56 GiB. Cancellation, completions, navigation, references, hover,
