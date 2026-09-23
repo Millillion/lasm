@@ -2,7 +2,14 @@
 
 - Keep work in this local repository on `main` unless the user directs otherwise.
 - Make unsigned commits at meaningful milestones (`git -c commit.gpgsign=false commit`).
-- Do not create a remote or push without an explicit user request.
+  Never GPG-sign commits; keep local commit signing disabled.
+- The user authorized `origin` at `git@github.com:Millillion/lasm.git`. Push after
+  every commit and keep `main` synchronized with `origin/main`; never force-push
+  or discard remote work. Push failures must not pause development or local
+  commits. If SSH authentication expires, wait for restored credentials before
+  retrying authenticated pushes; then push accumulated commits. Other push
+  failures likewise must not block local progress. npm publication remains
+  unauthorized.
 - Separate experimentally verified behavior from design proposals and open questions.
 - Keep downloaded toolchains, third-party source trees, caches, and generated
   experiment artifacts in ignored `.cache/` or `.work/` directories.

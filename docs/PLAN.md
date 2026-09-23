@@ -1,5 +1,182 @@
 # Lasm implementation plan
 
+## Current product plan — 2026-09-23
+
+This is the agreed product direction and acceptance plan, not a claim that every
+requirement is implemented. It supersedes conflicting decisions in the historical
+plan retained below. Updating this document does not start or stop running work.
+
+Lasm compiles ordinary Lean applications ahead of time:
+
+```text
+Native Lean/Lake + managed build tools
+→ application Wasm + JavaScript loaders and host support
+→ Node, Deno, or Bun
+```
+
+Running the Lean compiler itself in Wasm remains separate research. The default
+product compiles and executes the application, rather than interpreting its source
+through a Wasm Lean compiler.
+
+Node, Deno, and Bun are the current deployment targets. Browser support is deferred;
+preserve existing browser work without making it a current implementation gate.
+
+### Complete Lean compatibility
+
+The goal is the entire Lean language and all standard libraries and APIs in each
+of Node, Deno, and Bun, for every advertised supported Lean version and platform.
+This includes all of `IO.FS`, `Std.Http`, async/concurrency, and the other shipped
+library APIs, not merely the subset exercised by existing examples or tests.
+Preserve native Lean behavior on the corresponding operating system, including
+errors, resource lifetime, and concurrency semantics.
+
+Continue fixing all nonfundamental gaps. Missing implementations, difficult
+engineering, unavailable test runners, engine bugs, packaging work, timeouts, or
+resource aborts are not evidence of a fundamental limitation. Do not hide gaps
+behind stubs, weakened tests, or reduced acceptance scope.
+
+If full compatibility is blocked by a demonstrated fundamental limitation, work
+may stop and the blocker must be reported. Include a reproducible case, native
+versus target behavior, affected APIs/platforms, and why permitted Wasm, host
+adapter, and managed native-helper approaches cannot resolve it. Respect resource
+safety limits throughout; a safety stop is not a compatibility conclusion.
+
+### Installation and build platforms
+
+- Developers install only Node/npm. Lasm automatically supplies pinned native
+  Lean/Lake, compiler/linker tools, libraries, and every supporting dependency in
+  a managed local cache. No manual SDK setup or global system changes.
+- Verify downloads and cache contents, preserve redistribution notices, and record
+  resolved tool versions and checksums for reproducibility.
+- Compilation must work on Windows, macOS, and Linux, each on x86-64 and ARM64.
+  Verify all six combinations; report missing native validation explicitly.
+- Use ordinary Lean files, Lake projects, standard APIs, and main entry points.
+  Ordinary applications require no Lasm-specific Lean APIs, annotations, or
+  configuration.
+
+### Developer API
+
+```sh
+npx lasm Main.lean
+npx lasm build Main.lean
+```
+
+`lasm Main.lean` provisions tools as needed, discovers Lake, compiles into its
+build cache, and immediately runs the compiled application. Unchanged runs reuse
+the cache. `lasm build Main.lean` uses the same compilation pipeline and produces
+deployable files in `dist/`; it does not run the application.
+
+Both commands accept `--target node|deno|bun`, defaulting to `node`:
+
+```sh
+npx lasm Main.lean --target deno
+npx lasm Main.lean --target bun
+npx lasm build Main.lean --target bun
+```
+
+Application arguments follow `--`, for example `npx lasm Main.lean -- hello`.
+Keep callable Lean libraries with generated JavaScript bindings and TypeScript
+declarations. Engine-specific launcher filenames are compatibility entry points,
+not the primary getting-started workflow.
+
+### Version policy
+
+- Select Lean through the standard `lean-toolchain` file, for example
+  `leanprover/lean4:v4.32.0`. Lasm supplies that exact supported toolchain and
+  matching target libraries. Without a pin, use the Lasm release's documented
+  supported default. Reject unsupported versions clearly; never silently change
+  the project's Lean version.
+- Do not add Node, Deno, or Bun version-selection syntax or a runtime
+  version manager. `--target` selects the environment only. Use the installed
+  selected engine; report a missing engine clearly.
+- Check runtime compatibility and document a tested engine support matrix.
+  Building a target does not require its execution engine to be installed.
+- Lasm manages compiler/linker, sysroot, runtime-library, and optimizer versions
+  internally. Record build inputs; invalidate caches when relevant inputs change.
+
+### Deployment
+
+The application entry point is `dist/main.mjs`. Run output built for the selected
+environment normally:
+
+```sh
+node dist/main.mjs
+deno run -A dist/main.mjs
+bun dist/main.mjs
+```
+
+Deno permissions may be narrowed to the application's needs. Running requires
+the selected engine; building any target requires only Node/npm.
+
+Deploy the complete `dist/` directory, including Wasm, loaders, workers, assets,
+and necessary host support. Execution must not depend on build tools, source
+files, this checkout, or absolute development paths.
+
+The target selects adapters and Wasm features. Reuse artifacts where compatible;
+do not require one universal binary. Native build-time plugins may execute on the
+build machine; foreign code needed by the deployed application requires a Wasm
+implementation or host adapter. All shipped standard-library dependencies are
+part of the full-compatibility goal.
+
+### Implementation and validation
+
+Preserve the compiler-in-Wasm work and evidence. Reuse its proven runtime, IO,
+async, threading, ABI, and linking improvements. Do not revert to the older
+limited implementation merely to simplify packaging. Select memory width and
+threading by application requirements and verified target support.
+
+Validate the shipping pipeline with:
+
+- Clean installation with only Node/npm present, automatic tool provisioning,
+  and ordinary Lake dependency builds.
+- Native-versus-compiled-Wasm behavior across the entire language and standard
+  API surface, including console, filesystem, HTTP, async, errors, and cleanup.
+- The existing all-Lean HTTP server and Express/Lean examples, plus callable
+  library bindings.
+- Deployment into a separate environment without source or build tools.
+- Stock Node, Deno, Bun, and native CI coverage for all six build
+  platforms. Label unverified platforms and emulation explicitly.
+- Inventory the entire unchanged upstream Lean suite. Execute application/runtime
+  checks through the shipping compiled-application path and identify native
+  build-time/compiler checks separately. Keep compiler-in-Wasm results separate
+  from application compatibility claims. Preserve original tests and expected
+  outputs; document parallel harness adaptations and remaining gaps.
+- Audit all standard APIs and add meaningful differential coverage where the
+  upstream suite lacks it. Passing the suite alone does not prove complete API
+  compatibility.
+
+When the working implementation task adopts this plan, finish its current test,
+checkpoint/pause broad compiler-in-Wasm campaigns, and prioritize this product
+pipeline. Preserve evidence and follow the existing resource guard and
+single-heavy-workload rules. Do not risk another OOM.
+
+### Git workflow and delivery
+
+Implement and verify a reproducible local package. Keep work on `main` and make
+meaningful unsigned commits. Never GPG-sign commits; use
+`git -c commit.gpgsign=false commit` and disable commit signing in local config.
+
+The authorized remote is `git@github.com:Millillion/lasm.git`, named `origin`.
+Configure it and track `origin/main`. Push after every commit and keep local and
+remote history synchronized without force-pushing or discarding remote work.
+
+Push failures must not pause development: report the failure, keep implementing
+and committing locally, and push the backlog when access is restored. If SSH
+authentication expires, stop attempting authenticated pushes until the user
+restores credentials; continue local work. Transient network or remote failures
+likewise must not block local progress. Never request or expose private keys.
+
+Git pushes are authorized; npm publication is not. Use a local tarball until
+package publication is explicitly authorized.
+
+---
+
+# Historical implementation plan — 2026-09-17
+
+The following material records the earlier plan and its historical implementation
+claims. It is retained for context, not as the current product contract. The plan
+above governs where the two differ.
+
 Status: the user accepted these recommendations on 2026-09-17. The experimental
 runtime, callable modules, Lean IO, Lake integration, local release packaging,
 and browser/Workers adapters are implemented. Validation covers Linux x64 builds,
