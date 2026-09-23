@@ -3,6 +3,21 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The separate v150 host repair retains raw POSIX temporary-directory bytes through
+creation, cwd anchoring and worker replies. Six ordinary Lean cases match native
+output and independently checked file locations in all three full engines;
+v149 differed on four per engine. Node and Bun previously created entries in
+replacement-character directories in two cases. All 54 packaged checks pass,
+including released Node, Deno and stock Bun, and nine unchanged upstream IO
+registrations pass with all 7,267 original hashes and six symlinks intact.
+The older full-runtime controls also retain ten native matches and one safe-error
+check per engine for a known native crash. The largest validation peak is
+3.74 GiB, with no resource/OOM/throttling/swap or monitor event. Native Lean's
+returned FilePath itself is lossy for malformed bytes; the repair preserves that
+behavior while creating the object in the correct raw directory. Native
+cross-platform and near-limit relative-path validation remain open. See
+[the raw temporary-path evidence](evidence/temporary-path-bytes-2026-09-23.json).
+
 The separate v149 host repair preserves POSIX environment bytes for `IO.getEnv`,
 UV environment queries and inherited child processes. The same eight ordinary
 Lean cases now match native output in full Node, Deno and local rebuilt Bun;
@@ -17,7 +32,7 @@ PATH and executable-text behavior. The full comparisons peak at 2.01 GiB and
 the unchanged upstream controls at 3.77 GiB, with no resource/OOM/throttling/swap
 or monitoring event.
 These results remain separate from the frozen v147 broad campaign below.
-Raw temporary-path bytes, unusual environment names, concurrent native mutation
+Unusual environment names, concurrent native mutation
 and native cross-platform validation remain open. See
 [the environment-byte comparison and retained attempts](evidence/environment-bytes-2026-09-23.json).
 
@@ -35,8 +50,8 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **874 registrations passing**, completing
-all 854 prioritized names and 20 further registrations. This includes
+passes. Its latest saved checkpoint has **893 registrations passing**, completing
+all 854 prioritized names and 39 further registrations. This includes
 all 14 prioritized Lake tests, all 69 prioritized compiler regressions, all 16
 prioritized compiled benchmarks, all 657 prioritized elaborator regressions,
 all 78 prioritized interactive server tests, lint, seven documentation examples,
@@ -45,9 +60,9 @@ handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 3,022 registrations remain pending in that
+harness hash remains intact. The other 3,003 registrations remain pending in that
 snapshot; see
-[the 874-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint874-2026-09-23.json).
+[the 893-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint893-2026-09-23.json).
 All three earlier plugin failures now pass within this campaign. The server-project
 workload also passes under the same 8 GiB proactive budget; it is this checkpoint's
 largest peak at 7.56 GiB. Cancellation, completions, navigation, references, hover,

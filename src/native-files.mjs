@@ -204,7 +204,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     strerror,
     async createTemporary(path, directory = false) {
       if (windows) throw failure(ffi.os.errno.ENOSYS);
-      const bytes = Buffer.from(path + '\0');
+      const bytes = Buffer.concat([Buffer.from(path), Buffer.from([0])]);
       let fd;
       try {
         if (directory) {
@@ -223,7 +223,7 @@ export function nativeFiles({ synchronous = false } = {}) {
           if (result.value < 0) throw failure(result.errno);
           fd = result.value;
         }
-        const name = bytes.subarray(0, bytes.indexOf(0)).toString();
+        const name = Buffer.from(bytes.subarray(0, bytes.indexOf(0)));
         if (directory) return { path: name };
         const file = adapter.openDescriptor(fd, 'r+');
         fd = undefined;
@@ -433,6 +433,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     },
     async createTemporary(...args) {
       const result = await callNativeFile('createTemporary', args);
+      result.path = buffer(result.path);
       if (result.file) result.file.tail = Promise.resolve();
       return result;
     },

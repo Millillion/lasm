@@ -20,7 +20,17 @@ export function createWorkingDirectory(cwd, propagate) {
     value.retired = true;
     if (value.users === 0 && value.fd !== undefined) nativeFiles().closeDescriptor(value.fd);
   };
-  const path = (value, directory) => !value || isAbsolute(value) ? value : location(directory) + sep + value;
+  const path = (value, directory) => {
+    // POSIX temporary-directory environment values can contain arbitrary
+    // non-NUL bytes. Retain them while adding the instance's cwd anchor.
+    if (value instanceof Uint8Array) {
+      if (process.platform === 'win32') throw new TypeError('Byte paths are POSIX-only');
+      const bytes = Buffer.from(value.buffer, value.byteOffset, value.byteLength);
+      return !bytes.length || bytes[0] === 47 ? bytes
+        : Buffer.concat([Buffer.from(location(directory) + sep), bytes]);
+    }
+    return !value || isAbsolute(value) ? value : location(directory) + sep + value;
+  };
   return {
     retain() {
       if (closed) throw unavailable();

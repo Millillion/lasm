@@ -83,18 +83,22 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   async function createTemporary(isDirectory, state) {
     // uv_os_tmpdir checks presence, including empty values, in this order.
     // Avoid path.join: lexical normalization changes symlink/.. traversal.
-    let base = ['TMPDIR', 'TMP', 'TEMP', 'TEMPDIR'].map(name => process.env[name])
-      .find(value => value !== undefined) ?? '/tmp';
-    if (Buffer.byteLength(base) >= (process.platform === 'darwin' ? 1024 : 4096))
+    let base;
+    for (const name of ['TMPDIR', 'TMP', 'TEMP', 'TEMPDIR']) {
+      base = nativeFiles().environmentValue(name);
+      if (base !== undefined) break;
+    }
+    base ??= Buffer.from('/tmp');
+    if (base.length >= (process.platform === 'darwin' ? 1024 : 4096))
       throw Object.assign(error('ENOBUFS', ''), { errno: -nativeFiles().errno('ENOBUFS') });
-    if (base.length > 1 && base.endsWith('/')) base = base.slice(0, -1);
-    if (!base) throw Object.assign(error('ENOENT', ''), { errno: -nativeFiles().errno('ENOENT') });
-    const template = base + (base.endsWith('/') ? '' : '/') + 'tmp.XXXXXXXX';
+    if (base.length > 1 && base[base.length - 1] === 47) base = base.subarray(0, -1);
+    if (!base.length) throw Object.assign(error('ENOENT', ''), { errno: -nativeFiles().errno('ENOENT') });
+    const template = Buffer.concat([base, Buffer.from(base[base.length - 1] === 47 ? '' : '/'), Buffer.from('tmp.XXXXXXXX')]);
     const result = await nativeFiles().createTemporary(directory.path(template, state), isDirectory);
     // Creation uses the retained guest cwd; the returned name preserves the
     // original relative spelling rather than exposing the internal fd anchor.
-    const name = template.slice(0, -6) + result.path.slice(-6);
-    return isDirectory ? Buffer.from(name) : Buffer.concat([numbers(add(result.file)), Buffer.from(name)]);
+    const name = Buffer.concat([template.subarray(0, -6), result.path.subarray(-6)]);
+    return isDirectory ? name : Buffer.concat([numbers(add(result.file)), name]);
   }
   function serial(file, action) {
     file.pending = (file.pending ?? 0) + 1;

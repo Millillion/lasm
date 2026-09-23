@@ -55,6 +55,13 @@ registrations. The corresponding packaged test is
 `test/node-environment-bytes.test.mjs`; native environment-name and concurrency
 coverage remains separate from the tested malformed-value cases.
 
+`probe-temporary-path-bytes.py NEW_OUTPUT FROZEN_FACADE` uses the same guarded
+invocation for six Linux temporary-directory byte cases. It compares unchanged
+ordinary Lean output and independently inspects raw and decoy directory entries,
+permissions and contents. Only random leaf names in those external observations
+are excluded from comparison. The shared fixture also drives
+`test/node-temporary-path-bytes.test.mjs`; original upstream tests are untouched.
+
 The Linux systemd/cgroup-v2 runner includes every descendant in one 10 GiB
 kernel memory cap, stops the workload proactively at 8 GiB, and stops on low
 host headroom or rising memory pressure. Smaller hosts/budgets receive a lower
