@@ -17,24 +17,31 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **768 registrations passing**, including
+passes. Its latest saved checkpoint has **854 registrations passing**, completing
+all 854 prioritized names. This includes
 all 14 prioritized Lake tests, all 69 prioritized compiler regressions, all 16
 prioritized compiled benchmarks, all 657 prioritized elaborator regressions,
-lint, seven documentation examples and four command-line checks. These cover stack-overflow
+all 78 prioritized interactive server tests, lint, seven documentation examples,
+and package, plugin and command-line checks. These cover stack-overflow
 handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 3,128 registrations remain pending in that
+harness hash remains intact. The other 3,042 registrations remain pending in that
 snapshot; see
-[the 768-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint768-2026-09-23.json).
+[the 854-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint854-2026-09-23.json).
+All three earlier plugin failures now pass within this campaign. The server-project
+workload also passes under the same 8 GiB proactive budget; it is this checkpoint's
+largest peak at 7.56 GiB. Cancellation, completions, navigation, references, hover,
+incremental edits and server standard output pass their original assertions.
+There are no recorded OOM, hard-limit, throttling, swap or monitor events.
 The unchanged IO/async registrations now also pass cancellation and reasons, DNS,
 HTTP bodies, three HTTP fuzzing groups, hang regressions, keepalive, socket/timer
 selection, TCP errors and half-close, TCP server/client exchanges, UDP, file paths,
 file-handle locking, shared mutexes and temporary-file creation. These are observed
 Node results; the entire suite and other-engine validation remain open.
 Earlier checkpoints, including the
-[501-test snapshot](evidence/node-broad-v147-temporary-files-checkpoint501-2026-09-23.json),
+[768-test snapshot](evidence/node-broad-v147-temporary-files-checkpoint768-2026-09-23.json),
 remain preserved separately.
 Before starting it, both unchanged server-driver controls passed again:
 cancellation and `misc_dir/server_project`, peaking at 7.59 GiB with all 7,267

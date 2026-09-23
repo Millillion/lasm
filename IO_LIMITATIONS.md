@@ -289,6 +289,13 @@ and do not establish full-suite conformance. See
   tests now pass within the existing memory guard, using the same Wasm and four
   Lean workers. Broader server/project workloads and full-suite completion
   remain open; see [the comparisons](docs/evidence/function-table-index-2026-09-21.json).
+  The v147 broad Node campaign now passes all 78 prioritized interactive server
+  registrations and `misc_dir/server_project`, including cancellation, edits,
+  completion, navigation, hover and standard output. Its largest completed-test
+  peak is 7.56 GiB, with no resource abort or OOM/throttling/swap event. This uses
+  the documented original compiled-driver harness; full-suite completion and
+  other-engine validation remain open. See
+  [the 854-test checkpoint](docs/evidence/node-broad-v147-temporary-files-checkpoint854-2026-09-23.json).
 - [ ] Validate all task-drop/cancellation propagation behavior against the native
   scheduler, beyond explicit cooperative cancellation and tested task/promise
   lifetimes. Do not infer complete scheduling equivalence from server tests.
