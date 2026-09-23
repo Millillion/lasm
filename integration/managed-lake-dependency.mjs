@@ -1,7 +1,7 @@
 // A real Lake project with a pinned Git dependency and non-default source roots.
 // Run inside run-bounded.mjs and base-pages.py; no compiler mocks are used.
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync, readFileSync, existsSync, statSync, renameSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, existsSync, statSync, renameSync, symlinkSync } from 'node:fs';
 import { resolve, join, dirname, delimiter } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -35,7 +35,13 @@ const revision = gitRun(['rev-parse', 'HEAD']);
 writeFileSync(join(project, 'lakefile.toml'), `name = "consumer"\nversion = "0.1.0"\nsrcDir = "app"\n\n[[require]]\nname = "dependency"\ngit = ${JSON.stringify(pathToFileURL(dependency).href)}\nrev = ${JSON.stringify(revision)}\n\n[[lean_lib]]\nname = "Local"\n\n[[lean_exe]]\nname = "consumer"\nroot = "Main"\n`);
 writeFileSync(join(project, 'app/Local.lean'), 'import Dependency\ndef localValue : Nat := dependencyValue + 5\n');
 const source = join(project, 'app/Main.lean');
-writeFileSync(source, 'import Local\ndef main (args : List String) : IO Unit := do\n  IO.println s!"dependency={localValue}; args={String.intercalate "|" args}"\n');
+const mainText = 'import Local\ndef main (args : List String) : IO Unit := do\n  IO.println s!"dependency={localValue}; args={String.intercalate "|" args}"\n';
+if (process.platform === 'win32') writeFileSync(source, mainText);
+else {
+  mkdirSync(join(project, 'entry sources'));
+  writeFileSync(join(project, 'entry sources/Main.lean'), mainText);
+  symlinkSync('../entry sources/Main.lean', source);
+}
 const cli = args => execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), ...args],
   { cwd: project, env, encoding: 'utf8', timeout: 1800_000, stdio: ['ignore', 'pipe', 'inherit'] });
 cli(['build', source, '--target', target, '--output', dist]);
@@ -61,14 +67,16 @@ const nativeEnv = managedGitEnvironment(git, { ...nativeLeanEnvironment(lean), .
 execFileSync(lean.lake, ['--no-cache', '--keep-toolchain', 'build', 'consumer'],
   { cwd: project, env: nativeEnv, stdio: 'inherit', timeout: 900_000 });
 const native = join(project, '.lake/build/bin', process.platform === 'win32' ? 'consumer.exe' : 'consumer');
-const args = ['λ 日本語', '', 'two words'];
+// A literal Deno executable path must not cause its child-process compatibility
+// layer to reinterpret the following application data as engine arguments.
+const args = ['λ 日本語', '', 'two words', engine, '--target', 'literal'];
 const compare = (file, argv) => {
   const result = spawnSync(file, argv, { cwd: base, env: { ...env, PATH: '', LEAN_NUM_THREADS: '2' },
     encoding: 'utf8', timeout: 90_000, maxBuffer: 1024 * 1024 });
   assert.ifError(result.error); return { code: result.status, stdout: result.stdout, stderr: result.stderr };
 };
 const expected = compare(native, args);
-assert.equal(expected.code, 0); assert.equal(expected.stdout, 'dependency=43; args=λ 日本語||two words\n');
+assert.equal(expected.code, 0); assert.equal(expected.stdout, 'dependency=43; args=' + args.join('|') + '\n');
 // The filename alias uses the same managed application pipeline. Deno/Bun
 // invoke Node for compilation and return to this exact engine to run output.
 const launcher = spawnSync(engine, [...(target === 'deno' ? ['run', '-A'] : []),
@@ -88,7 +96,9 @@ const result = { scope: 'Ordinary Lake Git dependency through application CLI, n
   engineVersion: execFileSync(engine, ['--version'], { encoding: 'utf8' }).trim(), compiler,
   dependencyRevision: revision, gitIdentity: git.identity, build: JSON.parse(readFileSync(join(deployed, 'build-info.json'), 'utf8')),
   wasmSha256: await hashFile(join(deployed, 'program.wasm')), expected, actual,
-  checks: { pinnedGitDependency: 'passed', nonDefaultSourceRoots: 'passed', exactCacheReuse: 'passed', sourceInvalidation: 'passed', addedAssetsPreserved: 'passed', compatibilityLauncher: 'passed', relocatedDeployment: 'passed' },
+  checks: { pinnedGitDependency: 'passed', nonDefaultSourceRoots: 'passed',
+    sourceSymlink: process.platform === 'win32' ? 'not-run: Windows link creation needs separate coverage' : 'passed',
+    exactCacheReuse: 'passed', sourceInvalidation: 'passed', addedAssetsPreserved: 'passed', compatibilityLauncher: 'passed', relocatedDeployment: 'passed' },
   resourceReport: process.env.LASM_RESOURCE_REPORT, recordedAt: new Date().toISOString() };
 writeFileSync(join(base, 'result.json'), JSON.stringify(result, null, 2) + '\n');
 console.log(JSON.stringify(result, null, 2));

@@ -1,0 +1,332 @@
+{
+  "scope": "Installed local npm candidate: ordinary Lake dependency and relocated application acceptance on Linux x64 only",
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r6/lasm-compiler-0.1.0-experimental.9.tgz",
+    "sha256": "32b2b17f9222b12e1fd4fb4786f44035ef341be74c7682e90426e8a118dd27ff",
+    "compressedBytes": 124914694,
+    "installedBytes": 627355565,
+    "files": 2667,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-package-r6-resources.json",
+    "recordedAt": "2026-09-23T23:15:52.406Z"
+  },
+  "runs": [
+    {
+      "scope": "Ordinary Lake Git dependency through application CLI, native control and relocated deployment",
+      "target": "node",
+      "platform": "linux-x64",
+      "node": "v26.10.0",
+      "engineVersion": "v26.10.0",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r8/workspace/project/node_modules/@lasm/compiler",
+      "dependencyRevision": "f5fce376fbe02d8a66adfeadb8a9d3687a28cad6",
+      "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "e15faf201abdb24f8eddf7a9ef677842d4db67474973b4017e634af3a66e8ebf",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "+Dependency",
+            "sourceSha256": "5c1b52b73aa9ee5b528e65682495628435842b52490a8b0f22009c8a1141cb5e",
+            "cSha256": "f4e9c0b7fa1ae43c4864d32456bb4039e4a54eb42891967e6c7eb3019ed21606"
+          },
+          {
+            "module": "+Local",
+            "sourceSha256": "809fcc46281f7554db0ac513a67abe07ca9ce973377f2a09ad1c80aa8442b4de",
+            "cSha256": "9805a272f2f62da1b110e6eacd32e0bcd6673eef7d8886e3dd842019358ad5d9"
+          },
+          {
+            "module": "/+Main",
+            "sourceSha256": "0563d8bcf5b84121bfca726fa3053b72561288287a34663ccc796084dc3f6673",
+            "cSha256": "061b16fa86df4d4e3703cad3101ed6ef971b344351e145da7dfb68e512f1c4fb"
+          }
+        ],
+        "signature": "dc58297a126efbee2b9763a659b4254f6060fbb2a59a40c4ad983e1dd11f7bc6",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "1393b71002f11446f4addc74fe4330f4b807868d68735ee405d2192f67cc7b49",
+      "expected": {
+        "code": 0,
+        "stdout": "dependency=43; args=\u03bb \u65e5\u672c\u8a9e||two words|/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node|--target|literal\n",
+        "stderr": ""
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "dependency=43; args=\u03bb \u65e5\u672c\u8a9e||two words|/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node|--target|literal\n",
+        "stderr": ""
+      },
+      "checks": {
+        "pinnedGitDependency": "passed",
+        "nonDefaultSourceRoots": "passed",
+        "sourceSymlink": "passed",
+        "exactCacheReuse": "passed",
+        "sourceInvalidation": "passed",
+        "addedAssetsPreserved": "passed",
+        "compatibilityLauncher": "passed",
+        "relocatedDeployment": "passed"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-dependency-three-engines-r1-resources.json",
+      "recordedAt": "2026-09-23T23:28:56.050Z"
+    },
+    {
+      "scope": "Ordinary Lake Git dependency through application CLI, native control and relocated deployment",
+      "target": "deno",
+      "platform": "linux-x64",
+      "node": "v26.10.0",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r8/workspace/project/node_modules/@lasm/compiler",
+      "dependencyRevision": "e73946fa4641c0c55edcde63116b920262ddaa6f",
+      "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "e15faf201abdb24f8eddf7a9ef677842d4db67474973b4017e634af3a66e8ebf",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "+Dependency",
+            "sourceSha256": "5c1b52b73aa9ee5b528e65682495628435842b52490a8b0f22009c8a1141cb5e",
+            "cSha256": "f4e9c0b7fa1ae43c4864d32456bb4039e4a54eb42891967e6c7eb3019ed21606"
+          },
+          {
+            "module": "+Local",
+            "sourceSha256": "809fcc46281f7554db0ac513a67abe07ca9ce973377f2a09ad1c80aa8442b4de",
+            "cSha256": "9805a272f2f62da1b110e6eacd32e0bcd6673eef7d8886e3dd842019358ad5d9"
+          },
+          {
+            "module": "/+Main",
+            "sourceSha256": "0563d8bcf5b84121bfca726fa3053b72561288287a34663ccc796084dc3f6673",
+            "cSha256": "061b16fa86df4d4e3703cad3101ed6ef971b344351e145da7dfb68e512f1c4fb"
+          }
+        ],
+        "signature": "0d0298268ec15b631f468e7ca78599c3e104dbbcee19c5133e832b4b7e736578",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "1393b71002f11446f4addc74fe4330f4b807868d68735ee405d2192f67cc7b49",
+      "expected": {
+        "code": 0,
+        "stdout": "dependency=43; args=\u03bb \u65e5\u672c\u8a9e||two words|/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno|--target|literal\n",
+        "stderr": ""
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "dependency=43; args=\u03bb \u65e5\u672c\u8a9e||two words|/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno|--target|literal\n",
+        "stderr": ""
+      },
+      "checks": {
+        "pinnedGitDependency": "passed",
+        "nonDefaultSourceRoots": "passed",
+        "sourceSymlink": "passed",
+        "exactCacheReuse": "passed",
+        "sourceInvalidation": "passed",
+        "addedAssetsPreserved": "passed",
+        "compatibilityLauncher": "passed",
+        "relocatedDeployment": "passed"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-dependency-three-engines-r1-resources.json",
+      "recordedAt": "2026-09-23T23:21:42.557Z"
+    },
+    {
+      "scope": "Ordinary Lake Git dependency through application CLI, native control and relocated deployment",
+      "target": "bun",
+      "platform": "linux-x64",
+      "node": "v26.10.0",
+      "engineVersion": "1.4.2",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r8/workspace/project/node_modules/@lasm/compiler",
+      "dependencyRevision": "18e763feaf003ca13375a110d03725b6d7a0cce7",
+      "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "e15faf201abdb24f8eddf7a9ef677842d4db67474973b4017e634af3a66e8ebf",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "+Dependency",
+            "sourceSha256": "5c1b52b73aa9ee5b528e65682495628435842b52490a8b0f22009c8a1141cb5e",
+            "cSha256": "f4e9c0b7fa1ae43c4864d32456bb4039e4a54eb42891967e6c7eb3019ed21606"
+          },
+          {
+            "module": "+Local",
+            "sourceSha256": "809fcc46281f7554db0ac513a67abe07ca9ce973377f2a09ad1c80aa8442b4de",
+            "cSha256": "9805a272f2f62da1b110e6eacd32e0bcd6673eef7d8886e3dd842019358ad5d9"
+          },
+          {
+            "module": "/+Main",
+            "sourceSha256": "0563d8bcf5b84121bfca726fa3053b72561288287a34663ccc796084dc3f6673",
+            "cSha256": "061b16fa86df4d4e3703cad3101ed6ef971b344351e145da7dfb68e512f1c4fb"
+          }
+        ],
+        "signature": "12d3e96d74c82e987880480dc1250eee4d09de69acc932fcc82d3d680283905c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "a07676aba45f978cd21e77c50cfeffe9cfbad76a045ba4c6dcb15f545af70327",
+      "expected": {
+        "code": 0,
+        "stdout": "dependency=43; args=\u03bb \u65e5\u672c\u8a9e||two words|/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun|--target|literal\n",
+        "stderr": ""
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "dependency=43; args=\u03bb \u65e5\u672c\u8a9e||two words|/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun|--target|literal\n",
+        "stderr": ""
+      },
+      "checks": {
+        "pinnedGitDependency": "passed",
+        "nonDefaultSourceRoots": "passed",
+        "sourceSymlink": "passed",
+        "exactCacheReuse": "passed",
+        "sourceInvalidation": "passed",
+        "addedAssetsPreserved": "passed",
+        "compatibilityLauncher": "passed",
+        "relocatedDeployment": "passed"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-dependency-three-engines-r1-resources.json",
+      "recordedAt": "2026-09-23T23:25:52.375Z"
+    }
+  ],
+  "resources": {
+    "startedAt": "2026-09-23T23:18:34.461Z",
+    "command": [
+      "/usr/bin/env",
+      "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+      "/bin/bash",
+      ".work/run-lake-three-engines-r1.sh"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "56275647-c132-4542-a57c-781bf08e51b7",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 25753939968
+    },
+    "minimumHostAvailable": 22091538432,
+    "peakMemoryBytes": 5208125440,
+    "peakTasks": 79,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-dependency-three-engines-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-23T23:28:56.022Z",
+      "memoryBytes": 2076356608,
+      "peakMemoryBytes": 5208125440,
+      "swapBytes": 0,
+      "tasks": 12,
+      "memoryBreakdown": {
+        "anon": 122400768,
+        "file": 1898385408,
+        "kernel": 55193600,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1829920768,
+        "slab": 52934448
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-23T23:28:56.121Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 1964851200,
+      "peakMemoryBytes": 5208125440,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11653120,
+        "file": 1898393600,
+        "kernel": 53747712,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1829928960,
+        "slab": 52798824
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-23T23:28:56.147Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "unitControls": {
+    "passed": 7,
+    "files": [
+      "test/application-launcher.test.mjs",
+      "test/application-output.test.mjs"
+    ]
+  },
+  "preservedEarlierEvidence": {
+    "symlinkQuery": ".work/product-acceptance/lake-module-identity-r2-resources.json",
+    "denoLauncherFailure": ".work/product-acceptance/lake-dependency-other-engines-r1.log",
+    "denoArgumentProbe": ".work/product-acceptance/deno-launcher-argv-r1.log"
+  },
+  "primarySource": "https://raw.githubusercontent.com/denoland/deno/v2.9.7/ext/node/polyfills/internal/child_process.ts",
+  "open": [
+    "Native platform matrix",
+    "Remote Lake dependency transports end to end",
+    "Concurrent full CLI builds",
+    "Complete upstream and standard API equivalence"
+  ]
+}

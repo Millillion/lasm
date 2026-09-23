@@ -26,8 +26,12 @@ export async function launch(target) {
       if (actual !== target) throw new Error(`lasm-${target}.js requires Node or ${target}; this process is running ${actual}`);
       // Compilation remains in Node; deployment uses the exact Deno/Bun that
       // invoked this wrapper, even when that executable is absent from PATH.
+      // Deno's child-process compatibility layer rewrites a bare Deno binary
+      // path appearing in argv into a Node-mode invocation. This is data for
+      // our private bridge, so encode it rather than exposing a command token.
       process.exitCode = await runApplicationChild('node',
-        [fileURLToPath(new URL('./launcher-node.mjs', import.meta.url)), target, process.execPath, ...args],
+        [fileURLToPath(new URL('./launcher-node.mjs', import.meta.url)),
+          JSON.stringify({ target, executable: process.execPath, args })],
         'Building Lean applications requires Node/npm. Put Node on PATH; Lean and the compiler SDK are provisioned automatically.');
     }
   } catch (error) { reportCliError(error); process.exitCode = 1; }

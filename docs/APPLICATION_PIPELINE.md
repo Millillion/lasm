@@ -142,7 +142,8 @@ any of the three wrapper files, with the selected deployment engine on PATH.
 Help and usage errors perform no tool downloads. The 23 parser/launcher controls
 now pass on all six native platforms; see the
 [launcher evidence](evidence/application-launchers-2026-09-23.json).
-Real installed-candidate launcher acceptance is pending. The
+Real installed-candidate launcher acceptance now passes on Linux x64 in all
+three engines, as recorded below. The
 earlier 4.32 implementation and its regression fixtures remain explicitly legacy.
 Run commands now check that the selected engine starts before creating a build
 cache or downloading tools. Build-only commands still require only Node/npm.
@@ -167,7 +168,7 @@ data remains distinct from function-table addresses.
 Lake's own `transImports`, `c`, and `lean` facets discover dependencies and
 generate application inputs. Standalone files use Lean's `--src-deps` parser.
 Lake projects now provision [managed native Git](MANAGED_GIT.md) automatically;
-its transport tests and pending end-to-end dependency checks are recorded
+its transport tests and end-to-end dependency checks are recorded
 separately from the already installed application candidates.
 Build identities include the native compiler, SDK catalog and repairs, complete
 runtime manifest, application C and source hashes, target, and shipped host code.
@@ -180,8 +181,9 @@ directories. Modified generated files, asset collisions, malformed receipts and
 symbolic links cause a descriptive refusal before replacement. Five filesystem
 controls verify preservation, restoration of missing generated files and removal
 of obsolete generated support. They now pass in the source tree on all six
-native platforms as part of the managed Git matrix. This repair is
-not part of the installed `experimental.5` upstream campaign already in progress.
+native platforms as part of the managed Git matrix. This repair is included in
+installed candidate `experimental.9`; the earlier `experimental.5` upstream
+campaign keeps its original package identity.
 
 Native file/descriptor checks exposed incorrect fixed-arity bindings for POSIX
 `open` and `fcntl` on macOS ARM64. The repaired variadic bindings pass file
@@ -265,6 +267,25 @@ temporarily disabled during this child startup; original visible values are
 restored before the application starts. See the
 [repair evidence](evidence/application-self-launch-2026-09-23.json). This exact
 self-path mapping still needs broader alias/other-deployment/platform coverage.
+
+Installed candidate `0.1.0-experimental.9` now passes an ordinary three-module
+Lake project with a pinned local Git dependency in stock Node, Deno and Bun on
+Linux x64. Each run verifies non-default source roots, a symlinked entry source,
+exact cache reuse, dependency-source invalidation, preservation of added assets,
+the engine-specific compatibility launcher, and relocated deployment with an
+empty PATH. Output, errors and exit status match the native Lake executable.
+Arguments include Unicode, empty strings, spaces, the literal engine path and
+option-like data. The sequential guarded campaign peaked at 4.85 GiB without
+resource events. See the [installed Lake evidence](evidence/installed-lake-three-engines-2026-09-23.json).
+
+Two real failures led to these repairs. Lake's file query resolves symlinks before
+looking up the module, which loses a configured entry whose destination is outside
+`srcDir`. A private build-time Lean helper now asks the evaluated Lake workspace
+for the configured module, checking its resolved file. Deno's child-process shim
+also rewrote a literal Deno executable path inside application arguments. The
+private Node build bridge now receives one JSON payload, preserving those strings.
+Earlier failures remain recorded. Other native platforms, remote Lake transports,
+and concurrent full CLI builds still require end-to-end validation.
 
 ## Native CI
 

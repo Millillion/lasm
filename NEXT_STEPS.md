@@ -23,6 +23,9 @@ below retain their original, narrower scope.
   on Linux x64; the remaining native platforms are tracked below.
 - [x] Build the ordinary Lean HTTP Lake example with the installed candidate and
   pass its native/deployed Vitest checks on stock Node, Deno and Bun on Linux x64.
+- [x] Verify an installed candidate's pinned Lake Git dependency, custom source
+  roots, symlinked main, cache reuse/invalidation, asset preservation, compatibility
+  launchers and relocated deployment in all three stock engines on Linux x64.
 - [ ] Finish and package the primary `lasm Main.lean` / `lasm build Main.lean`
   pipeline with automatic tools, Lake dependencies and reliable cache reuse.
 - [ ] Validate the HTTP and Express examples and callable JS/TypeScript bindings

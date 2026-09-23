@@ -2,6 +2,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, realpathSync } from
 import { dirname, join, resolve, relative, delimiter } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import { insideDirectory } from './platform.mjs';
 import { managedGitEnvironment } from './managed-git.mjs';
 
@@ -35,7 +36,10 @@ export function applicationSources(source, lean, work, { log = console.error, gi
   if (project) {
     const query = target => JSON.parse(run(lean.lake,
       ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', target], project));
-    const entry = relative(project, source).replaceAll('\\', '/');
+    const configuredSource = resolve(realpathSync(project), relative(project, source));
+    const entry = JSON.parse(run(lean.lean, ['-j1', '-s8192', '--run',
+      fileURLToPath(new URL('./lake-module.lean', import.meta.url)), configuredSource], project));
+    if (typeof entry !== 'string' || !entry.startsWith('/+')) throw new Error('Unexpected Lake module identity');
     const modules = query(entry + ':transImports');
     if (!Array.isArray(modules) || modules.some(module => typeof module !== 'string'))
       throw new Error('Unexpected Lake transitive module inventory');

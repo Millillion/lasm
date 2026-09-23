@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile, lstat, rename, rm, copyFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, stat, rename, rm, copyFile } from 'node:fs/promises';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,7 +36,7 @@ async function buildDriverIdentity() {
 /** Managed native elaboration and AOT linking, with content-verified build reuse. */
 export async function buildApplication(file, options = {}) {
   const source = resolve(file);
-  if (!source.endsWith('.lean') || !(await lstat(source)).isFile()) throw new Error(`Expected an existing Lean source: ${source}`);
+  if (!source.endsWith('.lean') || !(await stat(source)).isFile()) throw new Error(`Expected an existing Lean source: ${source}`);
   const directory = findApplicationProject(source) ?? dirname(source);
   return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), () => buildLockedApplication(source, options));
 }
