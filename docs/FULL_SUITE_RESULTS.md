@@ -72,19 +72,20 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **893 registrations passing**, completing
-all 854 prioritized names and 39 further registrations. This includes
-all 14 prioritized Lake tests, all 69 prioritized compiler regressions, all 16
-prioritized compiled benchmarks, all 657 prioritized elaborator regressions,
+passes. Its latest saved checkpoint has **1,003 registrations passing**, completing
+all 854 prioritized names and 149 further registrations. This includes
+all 56 Lake tests, all 69 compiler regressions, all 27 compiled benchmarks,
+all 657 prioritized elaborator regressions,
 all 78 prioritized interactive server tests, lint, seven documentation examples,
 and package, plugin and command-line checks. These cover stack-overflow
 handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 3,003 registrations remain pending in that
+harness hash remains intact. The other 2,893 registrations remain pending in that
 snapshot; see
-[the 893-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint893-2026-09-23.json).
+[the 1,003-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint1003-2026-09-23.json).
+This checkpoint also includes 96 of the 197 documentation-parser registrations.
 All three earlier plugin failures now pass within this campaign. The server-project
 workload also passes under the same 8 GiB proactive budget; it is this checkpoint's
 largest peak at 7.56 GiB. Cancellation, completions, navigation, references, hover,
