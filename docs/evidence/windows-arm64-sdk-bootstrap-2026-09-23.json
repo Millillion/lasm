@@ -1,0 +1,104 @@
+{
+  "scope": "Native Windows ARM64 LLVM/Binaryen source bootstrap; not a packaged SDK or Lean application pass",
+  "recordedAt": "2026-09-23T22:24:45.548Z",
+  "ci": {
+    "run": 35916758341,
+    "url": "https://github.com/Millillion/lasm/actions/runs/35916758341",
+    "commit": "7b560f0",
+    "runner": "windows-11-arm",
+    "conclusion": "success"
+  },
+  "logSha256": "638c982a08457e9f183ae937e7d93bfcd6216e238afe2ddabe9094813315c99c",
+  "result": {
+    "scope": "Native Windows ARM64 LLVM/Binaryen source bootstrap; not a packaged SDK or Lean application pass",
+    "node": "v26.10.0",
+    "platform": "win32-arm64",
+    "llvmCommit": "b158b0ae6c559f87be325b8f427c5588e6a48823",
+    "binaryenCommit": "d03c25ea43d8f147fc222f9b88ff3bf641abe8da",
+    "versions": {
+      "clang": "clang version 24.0.0git\nTarget: unknown\nThread model: posix\nInstalledDir: C:/a/lasm/lasm/.work/windows-arm64-sdk/llvm-build/bin",
+      "wasm-ld": "LLD 24.0.0 (C:/a/lasm/lasm/.work/windows-arm64-sdk/llvm-project/llvm b158b0ae6c559f87be325b8f427c5588e6a48823)",
+      "wasm-opt": "wasm-opt version 132"
+    },
+    "headers": {
+      "clang": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "wasm-ld": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "wasm-opt": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    "hashes": {
+      "clang": "c55c24c300d90d241b83dd1f3f595e26ded033a394018c6285ec030c047accf4",
+      "wasm-ld": "06bf4287405403170a5ff81b007808d56f0f90cca9074abf88afff3425c203b4",
+      "wasm-opt": "562ab7c8f3b87d5f74cb4c8eace7b0204fd236c35b181012361b3473e29d12d7"
+    },
+    "checks": [
+      {
+        "target": "wasm32",
+        "compileLinkOptimizeExecute": "passed",
+        "wasmSha256": "3a729a8f3e2f1a29dee215583ae9edea59069c81670245a1a08d52cd5afc949e",
+        "optimizedSha256": "01332fcc4e6b9da5dc20f3ce2b377a8e91843d1f501105a60071723a8c3a3271"
+      },
+      {
+        "target": "wasm64",
+        "compileLinkOptimizeExecute": "passed",
+        "wasmSha256": "153f42f92cec8384b412868ec6257f843c104fc240d87d7085a5e44efbfa89bc",
+        "optimizedSha256": "67c5b456368e4a53202f8721274f16a7bb980de3537ccecaee915bdebe56cc16"
+      }
+    ],
+    "emscriptenReleasesCommit": "f04ea239d533260dd1db760dd2d668d5f9a88d6b",
+    "limitations": [
+      "Emscripten driver/sysroot integration, relocatable native dependency packaging and application builds remain required.",
+      "MSYS2 x64 shell utilities were used during this maintainer bootstrap; resulting compiler tools are checked for ARM64 PE headers."
+    ],
+    "recordedAt": "2026-09-23T22:24:45.548Z"
+  },
+  "resources": {
+    "status": "passed",
+    "command": [
+      "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+      "--login",
+      "scripts/full-lean/bootstrap-windows-arm64-sdk.sh"
+    ],
+    "hostAtStart": {
+      "total": 17169428480,
+      "available": 12804694016
+    },
+    "limits": {
+      "jobCommittedBytes": 8584714240,
+      "stopCommittedBytes": 6867771392,
+      "hostReserveBytes": 2147483648
+    },
+    "peakCommittedBytes": 974254080,
+    "minimumHostAvailable": 11516952576,
+    "startedAt": 1790195859.6511025,
+    "pid": 6612,
+    "lastSampleAt": 1790202285.422609,
+    "exitCode": 0,
+    "finishedAt": 1790202285.6016698
+  },
+  "costControls": {
+    "standardPublicRepositoryRunner": true,
+    "artifactUploads": false,
+    "actionsCaches": false
+  },
+  "remaining": [
+    "Relocatable native compiler and DLL packaging",
+    "Full Emscripten driver/sysroot integration and managed cache validation",
+    "Managed Lean Windows ARM64 distribution",
+    "Node/npm-only install and complete Lean application acceptance"
+  ]
+}

@@ -292,6 +292,16 @@ The native Lean compiler, its generated executable, dependencies and missing
 ARM64 `leantar` packaging still need verification. No CI artifacts or caches are
 uploaded by this workflow.
 
+The separate [Windows ARM64 SDK bootstrap](evidence/windows-arm64-sdk-bootstrap-2026-09-23.json)
+now passes on that native runner. Clang/LLD 24 and Binaryen 132 have verified
+ARM64 PE headers; both Wasm32 and Wasm64 compilation, linking, optimization and
+execution pass under stock Node 26.10.0. The one-worker source build took 107
+minutes and peaked at 0.91 GiB committed memory within its Windows Job Object.
+This establishes that the native compiler tools can be built and run. Relocatable
+DLL packaging, Emscripten sysroot integration, managed downloads and full Lean
+application validation are still required. The workflow uploaded no artifacts
+or Actions caches.
+
 The repository was verified public and runner eligibility was checked against
 [GitHub's standard-runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
 and [billing rules](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
