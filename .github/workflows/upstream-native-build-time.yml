@@ -1,6 +1,12 @@
 name: Unchanged upstream native build-time checks
 on:
   workflow_dispatch:
+    inputs:
+      selection:
+        type: choice
+        options: [all, remaining-2026-09-23]
+        default: all
+        description: Entire category or every uncompleted case in the preserved first campaign
 permissions:
   contents: read
 concurrency:
@@ -11,6 +17,16 @@ jobs:
     if: github.event.repository.visibility == 'public'
     runs-on: ubuntu-24.04
     timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        shard: [0, 1, 2, 3]
+    name: Native shard ${{ matrix.shard }}
+    env:
+      LASM_NATIVE_SELECTION: ${{ inputs.selection }}
+      LASM_NATIVE_SHARD: ${{ matrix.shard }}
+      LASM_NATIVE_SHARDS: 4
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -33,10 +49,14 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Prepare the exact shard within the resource boundary
+        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-prepare-resources.json -- /bin/bash scripts/application-tests/native-ci.sh prepare
       - name: Execute one bounded native campaign
-        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-resources.json -- /bin/bash scripts/application-tests/native-ci.sh
+        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-resources.json -- /bin/bash scripts/application-tests/native-ci.sh run
       - name: Preserve evidence in logs and a compact summary
         if: always()
-        run: node scripts/application-tests/report-ci.mjs .work/upstream-native-ci .work/upstream-native-ci-resources.json
+        run: |
+          node scripts/application-tests/report-ci.mjs .work/upstream-native-ci .work/upstream-native-ci-resources.json
+          node -e "const f=require('node:fs');for(const p of ['.work/upstream-native-ci/shard.json','.work/upstream-native-ci-prepare-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
       # Native build-time evidence only. A standard public Linux runner, one
       # process-tree resource boundary and one CTest job; no storage uploads.

@@ -4,8 +4,16 @@
   "originalRun": {
     "url": "https://github.com/Millillion/lasm/actions/runs/35917343234",
     "commit": "0bf2e26",
-    "passed": ["linux-x64", "linux-arm64", "darwin-x64", "win32-x64", "win32-arm64"],
-    "failed": ["darwin-arm64"],
+    "passed": [
+      "linux-x64",
+      "linux-arm64",
+      "darwin-x64",
+      "win32-x64",
+      "win32-arm64"
+    ],
+    "failed": [
+      "darwin-arm64"
+    ],
     "failure": "All eight file/lock controls failed on macOS ARM64 while reopening a newly created lock file, with EACCES.",
     "diagnosis": "POSIX open and fcntl were incorrectly bound as fixed-arity functions. Darwin ARM64 passes unnamed arguments on the stack. The corrected bindings use explicit variadic types; no permission or lock assertion was removed."
   },
@@ -16,7 +24,11 @@
   "localControl": {
     "host": "linux-x64",
     "node": "26.10.0",
-    "files": ["test/native-file-abi.test.mjs", "test/application-lock.test.mjs", "test/application-files.test.mjs"],
+    "files": [
+      "test/native-file-abi.test.mjs",
+      "test/application-lock.test.mjs",
+      "test/application-files.test.mjs"
+    ],
     "passed": 12,
     "failed": 0,
     "skipped": 0,
@@ -24,5 +36,48 @@
     "sandboxAttempt": "The first attempt passed 11 controls but could not create a loopback socket under the restricted sandbox (EPERM); rerun with authorized loopback access passed all 12.",
     "resourceScope": "Lightweight IO tests only, main JS heap 128 MiB and fixture child heaps 64 MiB; no compiler or additional engine suite."
   },
-  "nativeRepairMatrix": "pending"
+  "nativeRepairMatrix": {
+    "url": "https://github.com/Millillion/lasm/actions/runs/35918689692",
+    "commit": "3e44e8d72e9285347e1878e9bc13756686b4db87",
+    "conclusion": "success",
+    "results": [
+      {
+        "platform": "linux-x64",
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "platform": "linux-arm64",
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "platform": "darwin-x64",
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "platform": "darwin-arm64",
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "platform": "win32-x64",
+        "passed": 10,
+        "failed": 0,
+        "skipped": 2
+      },
+      {
+        "platform": "win32-arm64",
+        "passed": 10,
+        "failed": 0,
+        "skipped": 2
+      }
+    ],
+    "skipScope": "The two POSIX-only pipe/socket controls do not apply on Windows; all file-creation, lock and output controls pass there."
+  }
 }

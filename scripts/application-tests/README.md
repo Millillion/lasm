@@ -49,3 +49,18 @@ delete failure evidence to make room.
 a safe preflight-refusal check without allocating disk space. For broad campaigns
 disable core dumps in the bounded command with `ulimit -c 0`; the original test
 assertions still run, while intentional native crashes cannot fill the disk.
+
+The native CI workflow partitions registrations across four standard runners,
+with at most two jobs running at once. Every runner still executes one CTest
+job. Tool/source preparation and execution are sequential, separately guarded
+phases, each preserving the same host headroom and proactive memory policy.
+Preparation's download/extraction allocations do not remain in the execution
+process tree. Both resource reports remain in the workflow log.
+
+The first broad native campaign passed 1,813 of 3,497 registrations before the
+proactive memory guard stopped it, with no OOM or throttling events. The
+`remaining-2026-09-23` selection checks that preserved evidence against the
+unchanged inventory and assigns every one of its 1,684 uncompleted cases to
+exactly one shard. `all` assigns the complete category. No test, timeout, driver,
+or expected output is changed by partitioning. Native compiler passes are not
+deployed application passes.
