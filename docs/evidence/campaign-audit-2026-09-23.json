@@ -1,0 +1,80 @@
+{
+  "recordedAt": "2026-09-23T14:22:51.569547+00:00",
+  "scope": "Maintained read-only campaign evidence auditor; no upstream test, frozen runtime, memory guard, or active Deno workload is changed. This checks local evidence consistency, not API or platform coverage.",
+  "auditorFiles": {
+    "scripts/full-lean/audit-campaign.py": "e35255219533cc0ad7220e3f71bc2b8babb62080eeba75bc83dc52a3d622187a",
+    "scripts/full-lean/test-audit-campaign.py": "a9e78c619b302c9d72399f4ffdddb3389805f8d83f77832f4be9d3221e6a6c70"
+  },
+  "controls": {
+    "command": [
+      "python3",
+      "-B",
+      "scripts/full-lean/test-audit-campaign.py"
+    ],
+    "passed": 19,
+    "failed": 0,
+    "exitCode": 0,
+    "coverage": [
+      "All registered versus filtered or pending selections",
+      "Skipped, failed, missing, and additional JUnit results",
+      "Nonzero execution status",
+      "Resource aborts, lost monitoring, memory events and incomplete cleanup",
+      "Source, symlink, harness and frozen runtime changes",
+      "Identity/count consistency, duplicates and empty selections",
+      "Interrupted retries distinguished from first-attempt passes",
+      "Exclusive output creation and active supervisor completion gate"
+    ]
+  },
+  "completedNodeAudit": {
+    "command": [
+      "python3",
+      "-B",
+      "scripts/full-lean/audit-campaign.py",
+      ".work/full-campaign-node-v147-temporary-files-broad",
+      "--require-all-passed",
+      "--verify-inputs",
+      "--output",
+      ".work/full-engine-probe/node-v147-maintained-audit-r2-2026-09-23.json"
+    ],
+    "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/node-v147-maintained-audit-r2-2026-09-23.json",
+    "sha256": "1581c0b824f01320a55c537f2f1b7fcf33c7d6f4bda0b67cef405505c526a6c1",
+    "summary": {
+      "auditedAt": "2026-09-23T14:22:09.791310+00:00",
+      "campaign": "/home/lastmjs/development/lasm/compiler/.work/full-campaign-node-v147-temporary-files-broad",
+      "checkpointSha256": "4ae6612f28b71579af528ff1cdec6a24c219756dbffaaa68ed48a1ef476f3878",
+      "identity": "1feccaf169fcd3e26fb63fe91d13de98da312d3e1793f5ed31967ca0065c770c",
+      "backend": "node",
+      "sourceHashesSha256": "5cdeebbb3b22942916b97034dc0fdc384fe4fca2cb6a29f1622250fe33ca7b28",
+      "status": "complete",
+      "registered": 3896,
+      "selected": 3896,
+      "counts": {
+        "passed": 3896,
+        "failed": 0,
+        "resource-aborted": 0,
+        "harness-failed": 0,
+        "pending": 0
+      },
+      "allSelectedPassed": true,
+      "allRegisteredPassed": true,
+      "firstAttemptPasses": 3896,
+      "maximumPeakBytes": 8352096256,
+      "liveInputVerification": {
+        "originalFiles": 7267,
+        "originalSymlinks": 6,
+        "harnessArtifacts": 10,
+        "frozenRuntimeFiles": 201
+      }
+    },
+    "auditMaximumRssKiB": 59200,
+    "auditExitCode": 0,
+    "measurement": ".work/full-engine-probe/node-v147-maintained-audit-r2.time"
+  },
+  "earlierAuditRetained": ".work/full-engine-probe/node-v147-maintained-audit-2026-09-23.json",
+  "limitations": [
+    "Original source hash inventories remain local evidence, not a third-party attestation.",
+    "Every final passing attempt is checked; older attempt descriptors are retained without reexecuting them.",
+    "A checkpoint excludes the active unfinished attempt.",
+    "The Node result is the frozen v147 experimental full runtime on Linux x64; Deno and Bun full completion and packaged integration remain separate."
+  ]
+}

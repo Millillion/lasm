@@ -19,6 +19,29 @@ target or replacing it with a regular file fails verification even if its bytes
 match. Each run records these checks before and after execution; older result
 files without `symlinks` record only the regular-file checks.
 
+`audit-campaign.py CAMPAIGN` independently checks the saved counts, input
+identity, and each completed test's final attempt against its resource,
+execution, progress and JUnit records. It rejects passing results with skips,
+missing executions, changed source/driver hashes, memory events or lost resource
+monitoring. Pending attempts are excluded; aborted workloads retain their own
+category. Earlier attempt descriptors are retained, and first-attempt passes
+are counted separately. The audit reads evidence only and starts no workload.
+
+For a completed campaign, require every registered test to pass and stream-hash
+the current original sources, symlinks, harness and frozen runtime inputs:
+
+```sh
+python3 -B scripts/full-lean/audit-campaign.py CAMPAIGN --require-all-passed --verify-inputs --output NEW_AUDIT.json
+```
+
+An active supervisor lock prevents this completion check. A passing filtered
+subset cannot satisfy the full-suite gate, and an existing output is never
+overwritten. The small evidence-only regression controls run with
+`python3 -B scripts/full-lean/test-audit-campaign.py`; they do not start compilers
+or acquire the guarded workload slot. Live audits can report checkpoints while
+the sole heavy campaign continues. They validate local evidence consistency,
+not untested APIs, engine/platform combinations, or third-party attestations.
+
 `prepare-suite.mjs --include-benchmark-inputs` adds the seven benchmark inputs
 to a fresh parallel suite, preserving their original `.no_test` markers,
 benchmark drivers, companion files and arguments. Use a separate campaign filtered

@@ -31,6 +31,13 @@ test timing assertions are unchanged; the documented parallel harness compiles
 the original server driver, uses the selected full Node compiler, and supplies
 its separate CTest timeout and resource controls.
 
+The maintained `audit-campaign.py` independently confirms all 3,896 final passing
+attempts and repeats the live source, symlink, harness and frozen-runtime checks.
+Its 19 evidence-only controls reject inconsistent results, skipped JUnit cases,
+incomplete selections and unsafe resource records. The read-only Node audit
+uses 57.8 MiB peak RSS; see [the audit validation](evidence/campaign-audit-2026-09-23.json)
+and [the reproducible command](../scripts/full-lean/README.md).
+
 Each test ran alone with base pages, one CTest job, one build/Binaryen worker and
 four Lean workers under the unchanged 8 GiB proactive / 10 GiB hard memory limits.
 The largest peak is **7.78 GiB**, from `pkg/frontend`; it builds and runs a compiler
