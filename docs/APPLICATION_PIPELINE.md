@@ -1,0 +1,60 @@
+# Application pipeline implementation status
+
+The [current product plan](PLAN.md) governs this work. The older packaged
+Wasm32/cooperative compiler remains available while the full application pipeline
+is integrated; it does not acquire the separate compiler-in-Wasm suite results.
+Neither pipeline is yet a complete implementation of the current product plan.
+
+## Managed native tools
+
+`src/managed-lean.mjs` finds the nearest ordinary `lean-toolchain`, chooses the
+matching versioned catalog entry, and supplies Lean/Lake in a private cache. The
+initial catalog selects Lean 4.34.0. Unsupported pins fail without modifying the
+project. This module is not yet wired into the primary application CLI.
+
+Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
+downloads and extraction stream their data. Installation stages privately and
+publishes only a complete tree. Subsequent use hashes every recorded file and
+checks links, executable bits, missing files and unexpected additions. Notices
+are retained. No Elan installation, global configuration or system SDK is changed.
+`LASM_TOOLCHAIN_CACHE` can relocate the cache.
+
+On Linux x64, stock Node 26.10.0 successfully provisions native Lean 4.34.0 and
+runs both a Lean main and Lake with global Lean/SDK paths excluded. Verified cache
+reuse passes. The real release archive exposed a chained-symlink extraction bug;
+the regression and deferred-link fix pass. The final guarded run peaks at
+3.78 GiB with no OOM, pressure-stop, swap or monitoring events. See the
+[provisioning evidence](evidence/managed-lean-provisioning-2026-09-23.json).
+
+The official Lean release has native downloads for Linux and macOS on x64/ARM64,
+and Windows x64. **A native Windows ARM64 distribution remains missing.** The
+installer reports that gap and does not substitute an emulated x64 compiler.
+That missing artifact is an engineering gap, not a fundamental limitation.
+
+## Native CI
+
+`managed-tools.yml` tests provisioning on the six required standard native runner
+types. Windows ARM64 remains a failing acceptance row until its distribution is
+implemented. CI provisioning results do not constitute Wasm application passes.
+
+The repository was verified public and runner eligibility was checked against
+[GitHub's standard-runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
+and [billing rules](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
+on 2026-09-23. This workflow uses no paid runners, artifact uploads or Actions
+caches; reports stay in logs and job summaries. Actions are pinned to immutable
+commits and the acceptance Node version is fixed at 26.10.0.
+
+## Outstanding product work
+
+- [ ] Wire managed compiler/linker/runtime artifacts into the primary CLI.
+- [ ] Build and validate matching full Lean 4.34 application libraries.
+- [ ] Produce portable `dist/main.mjs` output and callable bindings for stock
+  Node, Deno and Bun; preserve full threading/IO semantics.
+- [ ] Supply and validate the Windows ARM64 native compiler distribution.
+- [ ] Verify the entire native OS/architecture matrix and source-free deployment.
+- [ ] Classify unchanged upstream tests for the application pipeline, and add
+  native differential coverage for standard APIs beyond the upstream suite.
+
+These are implementation milestones, not replacements for any acceptance
+requirement in the plan. Broader compiler-in-Wasm research is checkpointed and
+paused while this product work proceeds.

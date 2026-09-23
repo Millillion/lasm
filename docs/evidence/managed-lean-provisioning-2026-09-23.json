@@ -1,0 +1,150 @@
+{
+  "result": {
+    "scope": "Native Lean/Lake provisioning, not compiled-Wasm application acceptance",
+    "recordedAt": "2026-09-23T16:06:21.483Z",
+    "platform": "linux-x64",
+    "node": "v26.10.0",
+    "lean": "Lean (version 4.34.0, x86_64-unknown-linux-gnu, commit 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b, Release)",
+    "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "identity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+    "firstCacheHit": false,
+    "verifiedReuse": true,
+    "firstMilliseconds": 39080,
+    "recordedCacheEntries": 18380,
+    "installedBytes": 3067799197,
+    "archive": {
+      "name": "lean-4.34.0-linux.tar.zst",
+      "root": "lean-4.34.0-linux",
+      "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-linux.tar.zst",
+      "sha256": "caaa98356098c85dc0fcbbd28e1ec66f39eb6551829972b752ff20e1286b646b",
+      "bytes": 580367391,
+      "format": "tar.zst",
+      "maximumExtractedBytes": 8589934592
+    },
+    "nativeMain": "passed",
+    "lakeMain": "passed",
+    "notices": "preserved"
+  },
+  "resources": {
+    "startedAt": "2026-09-23T16:05:28.803Z",
+    "command": [
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      "integration/managed-lean.mjs",
+      ".cache/product-baseline/managed-lean-linux-x64",
+      ".cache/downloads/lean-4.34.0-linux.tar.zst"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "d3ac8441-0114-465a-88fd-c095c0e4ca85",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24933462016
+    },
+    "minimumHostAvailable": 24618975232,
+    "peakMemoryBytes": 4055134208,
+    "peakTasks": 20,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/provision-lean-4.34-r3-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-23T16:06:21.484Z",
+      "memoryBytes": 3418845184,
+      "peakMemoryBytes": 4055134208,
+      "swapBytes": 0,
+      "tasks": 11,
+      "memoryBreakdown": {
+        "anon": 174149632,
+        "file": 3116216320,
+        "kernel": 128020480,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 3116216320,
+        "slab": 124298448
+      },
+      "pressureSomeAvg10": 0.36,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-23T16:06:21.559Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 3252547584,
+      "peakMemoryBytes": 4055134208,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10235904,
+        "file": 3116220416,
+        "kernel": 124936192,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 3116220416,
+        "slab": 124090672
+      },
+      "pressureSomeAvg10": 0.36,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-23T16:06:21.589Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "resourceReportSha256": "0148cfa00a4ebe2c8152ceb8abc5a2beb506aa211bb03476819b440fec1824f6",
+  "regressionTests": {
+    "command": ".cache/js-runtimes/node-26.10.0/bin/node test/managed-artifacts.test.mjs",
+    "passed": 24,
+    "failed": 0
+  },
+  "scope": "Native tool provisioning only. New default CLI and full application pipeline integration are unfinished. Linux x64 verified; other native platforms await CI; Windows ARM64 native tool distribution missing. No Wasm application acceptance claim.",
+  "archiveReplay": "The final probe replayed the official archive retained after an HTTPS download whose SHA256 matches the upstream release digest. It exercised the same streaming download/hash/extraction implementation via a local Response body. CI runs the complete HTTPS path.",
+  "earlierFailures": [
+    {
+      "report": ".work/product-acceptance/provision-lean-4.34-r1-resources.json",
+      "reason": "Chained library symlinks rejected during extraction; concurrent cleanup obscured error."
+    },
+    {
+      "report": ".work/product-acceptance/provision-lean-4.34-r2-resources.json",
+      "reason": "Retained original TAR_SYMLINK_ERROR on libunwind.so -> libunwind.so.1 -> libunwind.so.1.0; fixed by deferred link creation."
+    }
+  ],
+  "officialSources": [
+    "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+    "https://api.github.com/repos/leanprover/lean4/releases/tags/v4.34.0",
+    "https://nodejs.org/en/blog/release/v26.10.0"
+  ],
+  "implementationHashes": {
+    "src/managed-artifacts.mjs": "fd40e042989f435faec6fa23b9b7b9945ac937b9a75a62f1d8b6b5368fcdecc2",
+    "src/managed-lean.mjs": "f0e7e3582be87141895f94d982bf038bd8c3e23893c9b39514f95b1eb30ce08c",
+    "src/toolchains.json": "40af60e3d4c9d3d3b40a859ec815114c844239a418caa90b305e80c78e819da4",
+    "integration/managed-lean.mjs": "9b2f5f8c2e408d914eca3ad627463afc684956049290e6238029e401cdf06cf5",
+    "test/managed-artifacts.test.mjs": "6b3ff5aaee11cc2d7a30446518995188afa4a613ba010df9aeaa7da409b540d7"
+  }
+}

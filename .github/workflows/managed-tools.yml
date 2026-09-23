@@ -1,0 +1,54 @@
+name: Managed Lean tool provisioning
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: managed-tools-${{ github.ref }}
+  cancel-in-progress: false
+
+# Provisioning coverage only. Application runtime acceptance remains separate.
+# Public-repository standard runners have no compute charge. Do not add cache
+# or artifact uploads here: logs and job summaries preserve this small report
+# without drawing on shared artifact storage allowances.
+jobs:
+  provision:
+    if: github.event.repository.visibility == 'public'
+    name: Native ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+          - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
+          - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
+          - { platform: win32-x64, runner: windows-2022, arch: x64 }
+          - { platform: win32-arm64, runner: windows-11-arm, arch: arm64 }
+    env:
+      LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - name: Check native Node architecture
+        run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch, process.env.LASM_EXPECT_PLATFORM)"
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Provisioning regression tests
+        run: node test/managed-artifacts.test.mjs
+      # Windows ARM64 intentionally remains a failing acceptance row until a
+      # native Lean artifact is implemented. Do not skip or emulate that gap.
+      - name: Native Lean and Lake with only managed tools
+        run: node integration/managed-lean.mjs .work/managed-lean-ci
+      - name: Preserve the provisioning result in the job summary
+        if: always()
+        run: node -e "const f=require('node:fs');const p='.work/managed-lean-ci/result.json';f.appendFileSync(process.env.GITHUB_STEP_SUMMARY, f.existsSync(p) ? 'Managed native tool provisioning only (not Wasm acceptance)\n\n'+f.readFileSync(p,'utf8') : 'Provisioning did not complete. See the failing step; this is not a platform compatibility pass.\n')"

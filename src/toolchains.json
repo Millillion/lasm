@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "defaultLean": "4.34.0",
+  "lean": {
+    "4.34.0": {
+      "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "release": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "publishedAt": "2026-09-14T14:04:36Z",
+      "verifiedAt": "2026-09-23",
+      "artifacts": {
+        "linux-x64": {
+          "name": "lean-4.34.0-linux.tar.zst",
+          "root": "lean-4.34.0-linux",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-linux.tar.zst",
+          "sha256": "caaa98356098c85dc0fcbbd28e1ec66f39eb6551829972b752ff20e1286b646b",
+          "bytes": 580367391,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "linux-arm64": {
+          "name": "lean-4.34.0-linux_aarch64.tar.zst",
+          "root": "lean-4.34.0-linux_aarch64",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-linux_aarch64.tar.zst",
+          "sha256": "40b04fdb7fb849d3c80e10c3bbeebc7b7354b6d3f07450b9168c2149b40d2a82",
+          "bytes": 581973544,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "darwin-x64": {
+          "name": "lean-4.34.0-darwin.tar.zst",
+          "root": "lean-4.34.0-darwin",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-darwin.tar.zst",
+          "sha256": "e90afe84c0a2aa3583f3ecd08e51fb7eeebb84d36f99b7cac5d3c067fa8640b0",
+          "bytes": 564239871,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "darwin-arm64": {
+          "name": "lean-4.34.0-darwin_aarch64.tar.zst",
+          "root": "lean-4.34.0-darwin_aarch64",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-darwin_aarch64.tar.zst",
+          "sha256": "69f263fa6e21bbc2466bbfb1affcd92479ee2714c883a07de548e099a5922932",
+          "bytes": 561666156,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        },
+        "win32-x64": {
+          "name": "lean-4.34.0-windows.tar.zst",
+          "root": "lean-4.34.0-windows",
+          "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-windows.tar.zst",
+          "sha256": "c07e88d1fe4839ec96a79f54637b2a3a983ea6c5b7e82ff35afa22a7700a86b7",
+          "bytes": 588837341,
+          "format": "tar.zst",
+          "maximumExtractedBytes": 8589934592
+        }
+      },
+      "unavailable": {
+        "win32-arm64": "Upstream publishes no native Windows ARM64 archive; Lasm must supply and validate a native build."
+      }
+    }
+  }
+}
