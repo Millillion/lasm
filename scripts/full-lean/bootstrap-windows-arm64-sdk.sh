@@ -57,3 +57,8 @@ cmake --build "$base/binaryen-build" --parallel 1
 
 "$node_binary" scripts/full-lean/check-windows-arm64-sdk.mjs \
   "$(cygpath -m "$base")" "$llvm_commit" "$binaryen_commit"
+
+fetch_source https://github.com/emscripten-core/emscripten.git \
+  4e4223852a0835923411059a3929907d7df1232e "$base/emscripten"
+"$node_binary" scripts/full-lean/package-windows-arm64-sdk.mjs \
+  "$(cygpath -m "$base")" "$(cygpath -m /clangarm64/bin)"
