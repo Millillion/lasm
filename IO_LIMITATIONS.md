@@ -12,14 +12,19 @@ Lasm imports or custom annotations. See [Node applications](docs/NODE_APPS.md)
 and [the full Lean server](examples/lean-server/README.md).
 The [upstream audit](docs/UPSTREAM_RESULTS.md) records all 620 selected runtime
 candidates, including every failure or unfinished compatibility gate. Lean's full
-native compiler/LSP/Lake test suite has not been ported to this Node runtime.
+native compiler/LSP/Lake test suite has not been ported to the packaged application
+runtime.
 The full-suite effort now has a [parallel upstream CTest harness](scripts/full-lean/README.md)
 with all 3,891 registrations and original-source integrity checks. Its complete
 native control passed 3,891/3,891 tests with all 7,267 original file hashes
-unchanged; see [the full-suite results](docs/FULL_SUITE_RESULTS.md). The full Wasm
-compiler and JavaScript conformance runs remain in progress. Application checks now
-also pass in [Deno and Bun](docs/JS_ENGINES.md); full-suite conformance in all three
-engines remains unverified. There are currently two execution paths: the packaged
+unchanged; see [the full-suite results](docs/FULL_SUITE_RESULTS.md). The frozen v147
+experimental full Node runtime now passes all 3,896 registrations, including the
+five opt-in cases, on their first attempts with no skips or resource aborts.
+Original source/harness hashes and all 201 frozen runtime inputs remain intact;
+its maximum peak is 7.78 GiB. This Linux x64 result does not apply to the packaged
+cooperative runtime. Application checks also pass in [Deno and Bun](docs/JS_ENGINES.md);
+complete full-runtime suites in those engines remain unverified.
+There are currently two execution paths: the packaged
 application runtime still uses a cooperative Wasm32 scheduler; the experimental
 full compiler preserves native 64-bit Lean values and runs Lean's real scheduler
 on Wasm pthreads. New DNS, UDP, system, signal, and thread-ID host implementations
@@ -282,8 +287,8 @@ and do not establish full-suite conformance. See
   The v147 campaign also passes unchanged HTTP body, fuzzing, limit, random-input,
   hang and keepalive registrations, together with DNS, socket/timer selection,
   TCP error/half-close/server-client and UDP controls. These passing Node tests
-  retain their original assertions and timings; full-suite completion and other
-  engines remain separate gates. See
+  retain their original assertions and timings. The full v147 Node campaign has
+  since passed all 3,896 registrations; other-engine completion remains open. See
   [the 768-test v147 checkpoint](docs/evidence/node-broad-v147-temporary-files-checkpoint768-2026-09-23.json).
 - [ ] Implement remaining UV loop configuration/aliveness primitives. Network
   interface enumeration now matches native Lean's records and ordering in Node,
@@ -315,15 +320,15 @@ and do not establish full-suite conformance. See
   A private loader index removes the eager JavaScript scan of all 261,062
   function-table entries in each worker. Three unchanged Node cancellation
   tests now pass within the existing memory guard, using the same Wasm and four
-  Lean workers. Broader server/project workloads and full-suite completion
-  remain open; see [the comparisons](docs/evidence/function-table-index-2026-09-21.json).
-  The v147 broad Node campaign now passes all 78 prioritized interactive server
-  registrations and `misc_dir/server_project`, including cancellation, edits,
-  completion, navigation, hover and standard output. Its largest completed-test
-  peak is 7.56 GiB, with no resource abort or OOM/throttling/swap event. This uses
-  the documented original compiled-driver harness; full-suite completion and
-  other-engine validation remain open. See
-  [the 854-test checkpoint](docs/evidence/node-broad-v147-temporary-files-checkpoint854-2026-09-23.json).
+  Lean workers; see [the earlier comparisons](docs/evidence/function-table-index-2026-09-21.json).
+  The completed v147 Node campaign passes all 142 interactive server registrations,
+  all four server tests and `misc_dir/server_project`, including cancellation,
+  edits, completion, navigation, hover, diagnostics and standard output.
+  The full 3,896-test campaign peaks at 7.78 GiB in `pkg/frontend`; the server-project
+  test peaks at 7.56 GiB. No resource abort, OOM, throttling, swap or monitor event
+  occurred. This uses the documented original compiled-driver harness; complete
+  other-engine/platform validation and broader memory stress cases remain open.
+  See [the completed Node campaign](docs/evidence/node-broad-v147-temporary-files-checkpoint3896-2026-09-23.json).
 - [ ] Validate all task-drop/cancellation propagation behavior against the native
   scheduler, beyond explicit cooperative cancellation and tested task/promise
   lifetimes. Do not infer complete scheduling equivalence from server tests.
@@ -332,8 +337,9 @@ and do not establish full-suite conformance. See
   task that spawns more ordinary work after shutdown begins can behave differently.
 - [ ] Complete `Std.Async` coverage. Process, signal, UDP and system host primitives
   now exist; the full runtime also retains native `Std.BaseSharedMutex`. Selected
-  checks pass, but the entire scheduler, cancellation, and signal test suites have
-  not passed in all three engines. Passing HTTP tests does not cover these libraries.
+  checks pass in all three engines. Full Node now passes all upstream registrations,
+  including all 35 `async_` tests and opt-in mutex/signal cases; complete Deno/Bun
+  runs and behavior outside these tests remain open.
 - [ ] Standard Node tasks currently require Asyncify. JSPI remains available for
   the legacy custom-host bridge only, with a separate artifact and engine support.
 - [ ] CPU-bound Lean code cannot be interrupted by an AbortSignal or a timer;

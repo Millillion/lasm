@@ -3,6 +3,66 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The frozen v147 Node campaign is **complete: 3,896/3,896 passed**, including
+all 3,891 ordinary upstream registrations and all five opt-in registrations
+excluded by upstream as flaky. Every registration passed on its first attempt,
+with one passing, unskipped JUnit result. No earlier or other-profile passes were
+imported. All 854 previously unpassed names were prioritized only to change the
+execution order. There are **zero failures, resource aborts, harness failures,
+and pending registrations**. See
+[the complete Node result and final audit](evidence/node-broad-v147-temporary-files-checkpoint3896-2026-09-23.json).
+
+| Group | Passed |
+| --- | ---: |
+| Lake | 56 |
+| Compiler regressions / compiled benchmarks | 69 / 27 |
+| Elaborator / elaborator benchmarks / expected-error elaborator | 2,995 / 40 / 315 |
+| Documentation parser / documentation examples | 197 / 8 |
+| Server / interactive server | 4 / 142 |
+| Packages | 34 |
+| Lint / miscellaneous / miscellaneous directories / additional benchmark | 1 / 5 / 2 / 1 |
+| **Total** | **3,896** |
+
+Every attempt verifies all 7,267 original regular-file hashes, six symlink targets,
+and ten parallel-harness hashes before and after execution. The final read-only
+audit rehashed all 201 frozen runtime inputs after the supervisor and its guarded
+children exited. All hashes remain intact. Original tests, expected output and
+test timing assertions are unchanged; the documented parallel harness compiles
+the original server driver, uses the selected full Node compiler, and supplies
+its separate CTest timeout and resource controls.
+
+Each test ran alone with base pages, one CTest job, one build/Binaryen worker and
+four Lean workers under the unchanged 8 GiB proactive / 10 GiB hard memory limits.
+The largest peak is **7.78 GiB**, from `pkg/frontend`; it builds and runs a compiler
+frontend and checks shared module initializers through executable and interpreter
+paths. The server-project test peaks at 7.56 GiB. There are no recorded OOM,
+hard-limit, throttling, swap, pressure-stop or monitor events. The longer
+incremental-tactic server test also passes unchanged in about 108 seconds at
+6.16 GiB. Lean's checker package passes its valid-module, invalid-module and
+fresh-check assertions.
+
+All 20 `async_http` and all 35 `async_` registrations pass, including the final
+opt-in async-channel selection test. The mutex and signal opt-in checks pass too.
+The suite covers ordinary filesystem reads, stream redirection and restoration,
+file locking, temporary-file creation, DNS, TCP/UDP, HTTP bodies, framing,
+headers, dispatch, fuzzing, keepalive, cancellation and task behavior. All three
+earlier plugin failures now pass in this campaign. Stack-overflow handling and
+the expected file-read `resourceExhausted` error also pass without OOM events.
+
+This establishes the pinned suite result for the **experimental full Node runtime
+on Linux x64**, not complete behavioral equivalence for every IO API. The packaged
+Wasm32 cooperative runtime is separate and has not gained this result. The later
+v149-v151 host repairs have their own targeted evidence above; their passes are
+not imported into this frozen v147 result. Complete Deno and local rebuilt Bun
+campaigns, native other-OS/ARM64 validation, untested API gaps and packaged
+full-runtime integration remain open.
+
+Earlier checkpoints, including the
+[854-test snapshot](evidence/node-broad-v147-temporary-files-checkpoint854-2026-09-23.json),
+remain preserved separately. Both original server-driver controls also passed
+before this campaign, peaking at 7.59 GiB without resource events; see
+[the v147 server controls](evidence/server-project-v147-temporary-files-2026-09-22.json).
+
 The separate v151 repair makes POSIX home/temporary-directory queries preserve
 empty values, environment precedence, raw bytes and Lean's buffer-limit errors.
 Temporary creation shares the same selection routine. Fifteen ordinary Lean API
@@ -70,79 +130,6 @@ intact. No resource/OOM/throttling/swap event occurred. Native Windows/macOS
 validation and broader edge cases remain open. See
 [the temporary-file repair evidence](evidence/temporary-files-2026-09-22.json).
 
-The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
-854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **3,795 registrations passing**, completing
-all 854 prioritized names and 2,941 further registrations. This includes
-all 56 Lake tests, all 69 compiler regressions, all 27 compiled benchmarks,
-all 657 prioritized elaborator regressions,
-all 78 prioritized interactive server tests, lint, seven documentation examples,
-and package, plugin and command-line checks. These cover stack-overflow
-handling in the main and task threads, arrays, closures, compaction, incremental
-compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
-file-read-overflow test returns Lean's expected `resourceExhausted` error without
-an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 101 registrations remain pending in that
-snapshot; see
-[the 3,795-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint3795-2026-09-23.json).
-All 2,993 ordinary `elab` registrations now pass; the two opt-in
-`async_select_channel` and `sync_mutex` registrations remain scheduled later.
-All 40 elaborator benchmarks pass, including large matching and dependent
-structures, bit-vector circuits and multiplication, AES evaluation, merge sort,
-Omega stress tests and workspace symbols. All 315 expected-error
-elaborator registrations also match their original diagnostics, including
-error positions, recovery, macros, syntax, termination and type errors.
-All 197 documentation-parser registrations also pass in this checkpoint.
-Additional evaluator, coercion, compiler simplification, decidability, definition,
-pretty-printing, dependent-elimination, derivation, iteration, floating-point and
-function-induction regressions pass their original tests.
-All 387 `elab/grind` registrations pass in this checkpoint, covering integer and
-rational arithmetic, field normalization, arrays, finite values, equality,
-matching, conditionals, standard-library linting and expected trace output.
-The index-map trace test passes in 57.33 seconds at a 2.09 GiB peak, with no
-resource events.
-All 101 registrations beginning with `elab/simp` also pass, including simplifier
-and simplification-procedure tests for integer/character evaluation, caching,
-matching, local hypotheses, trace output, configuration and timeout handling.
-The unchanged NUL-byte IO registration checks filesystem `invalidArgument`
-errors and an environment lookup returning `none`; it and the random-byte IO
-registration pass. Further debugger, import, induction, inlining, integer and
-metavariable regressions also pass in this checkpoint.
-The latest additions include kernel interruption and maximum-heartbeat checks,
-JSON surrogates, iterators, valid/invalid `main` signatures, lazy evaluation,
-library suggestions, pattern matching and metaprogramming. Unchanged network-address
-and network-interface registrations also pass, along with mutual recursion,
-verification-condition generation, partial fixpoints, pretty-printing and
-name-resolution regressions. These remain observations of this Linux x64 Node
-profile, not complete cross-engine or platform conformance.
-The unchanged standard-output/error and redirected-file-stream checks also pass,
-including restoration after an exception and file readback. Synchronization
-barriers, channels, notifications and recursive mutexes pass, alongside task
-state, iteration and IO checks. Date/time arithmetic, parsing, formats and
-timezone-file parsing also pass their original tests.
-All three earlier plugin failures now pass within this campaign. The server-project
-workload also passes under the same 8 GiB proactive budget; it is this checkpoint's
-largest peak at 7.56 GiB. Cancellation, completions, navigation, references, hover,
-incremental edits and server standard output pass their original assertions.
-There are no recorded OOM, hard-limit, throttling, swap or monitor events.
-All 20 `async_http` registrations now pass, including framing, dispatch, encoding,
-expectation handling, request/response headers and request-line parsing. Of the
-35 `async_` registrations, 34 pass; the opt-in `async_select_channel` case remains
-scheduled later in the campaign. The unchanged IO/async registrations also pass
-cancellation and reasons, DNS,
-HTTP bodies, three HTTP fuzzing groups, hang regressions, keepalive, socket/timer
-selection, TCP errors and half-close, TCP server/client exchanges, UDP, file paths,
-file-handle locking, shared mutexes and temporary-file creation. These are observed
-Node results; the entire suite and other-engine validation remain open.
-Earlier checkpoints, including the
-[854-test snapshot](evidence/node-broad-v147-temporary-files-checkpoint854-2026-09-23.json),
-remain preserved separately.
-Before starting it, both unchanged server-driver controls passed again:
-cancellation and `misc_dir/server_project`, peaking at 7.59 GiB with all 7,267
-regular hashes, six symlink targets and ten harness hashes intact. No resource,
-OOM, throttling or swap event occurred. See
-[the v147 server controls](evidence/server-project-v147-temporary-files-2026-09-22.json).
-
 The preserved v146 Node campaign selects **all 3,896 original registrations**,
 prioritizing 877 names not passed in the earlier v144/v145 runs. It imports no
 passes from other profiles or targeted validations. Its latest saved checkpoint
@@ -178,7 +165,7 @@ and [the source inventory](evidence/upstream-benchmark-only-inventory-2026-09-22
 Source integrity checks now also verify the six symlink targets from the
 verified original release archive. Two focused controls cover equal-byte
 retargeting, link replacement, missing links, and archive/revision mismatches.
-The ongoing campaign's new execution records include these checks before and
+The completed v147 Node campaign's execution records include these checks before and
 after each test, alongside all 7,267 regular-file hashes. Older attempts without
 the `symlinks` field retain their original, narrower verification scope.
 

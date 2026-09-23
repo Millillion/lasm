@@ -52,8 +52,12 @@ are used when available; otherwise the executables are found through `PATH`.
 
 These checks establish application behavior for the current runtime slice.
 They do not establish complete Lean compiler, kernel, Lake, LSP, or OS API parity.
-The full upstream suite is being prepared separately; existing gaps remain in
-[IO_LIMITATIONS.md](../IO_LIMITATIONS.md).
+The separate experimental full Node runtime now passes all 3,896 pinned upstream
+registrations on Linux x64, with no skips, failures or resource aborts. That
+Memory64/pthread result does not apply to the packaged cooperative runtime used
+by the commands above. Complete full-runtime Deno and local rebuilt Bun campaigns
+remain pending. See [the full-suite result](FULL_SUITE_RESULTS.md) and the open
+[IO limitations](../IO_LIMITATIONS.md).
 
 One test-runner difference remains under investigation: Deno's `node:test` mock
 timer cleanup leaks between two unchanged host unit tests in a combined run.
