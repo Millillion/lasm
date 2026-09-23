@@ -1,0 +1,48 @@
+name: Managed compiler SDK provisioning
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: managed-sdk-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  sdk:
+    if: github.event.repository.visibility == 'public'
+    name: SDK ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+          - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
+          - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
+          - { platform: win32-x64, runner: windows-2022, arch: x64 }
+          - { platform: win32-arm64, runner: windows-11-arm, arch: arm64 }
+    env:
+      LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Native executable header checks
+        run: node test/native-program.test.mjs
+      - name: Check the native Node host
+        run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
+      # One small C-to-Wasm fixture, one compiler/Binaryen worker. No full Lean
+      # build is scheduled here. Win ARM64 fails explicitly at its missing SDK.
+      - name: Provision and use the managed SDK
+        run: node integration/managed-sdk.mjs .work/managed-sdk-ci
+      - name: Preserve result in job summary
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');const p='.work/managed-sdk-ci/result.json';f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,f.existsSync(p)?f.readFileSync(p,'utf8'):'SDK check did not complete. See the failing step.\n')"
+      # Public standard runners only. No storage uploads/caches or publication.

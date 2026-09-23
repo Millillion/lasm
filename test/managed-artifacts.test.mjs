@@ -182,7 +182,7 @@ test('symlink directory aliases cannot redirect extracted files', { skip: proces
 test('artifact descriptors require fixed hashes, sizes and HTTPS', async t => {
   const f = await fixture(t);
   for (const change of [{ name: '../tool' }, { root: '..' }, { sha256: 'x' }, { bytes: -1 },
-    { maximumExtractedBytes: Infinity }, { format: 'zip' }, { url: 'http://example.invalid/x' },
+    { maximumExtractedBytes: Infinity }, { format: 'rar' }, { url: 'http://example.invalid/x' },
     { url: 'https://user:secret@example.invalid/x' }]) assert.throws(() => validateArtifact({ ...f.artifact, ...change }));
   assert.equal(managedCacheDirectory({ LASM_TOOLCHAIN_CACHE: f.cache }), f.cache);
 });

@@ -44,6 +44,21 @@ license under the standard-library directory. The revised check searches the
 verified inventory and records the actual notice paths; its rerun is pending.
 This supplies one SDK dependency, not the complete managed linker distribution.
 
+`src/managed-sdk.mjs` provisions the pinned Emscripten 6.0.9 native tools for the
+five upstream-supported hosts. SHA256/size pins were computed by streaming the
+exact official emsdk download URLs. XZ and ZIP use the private Python as a
+streaming decoder; the existing installer still validates every extracted entry
+and the complete immutable cache. Generated compiler caches/configuration live
+in a separate directory. Executable headers are checked for a matching native
+ELF, Mach-O or PE architecture before use. Six decoder regressions and three
+executable-header checks pass locally. The new SDK CI matrix is pending.
+
+This initial SDK module is pristine upstream Emscripten. Applying the recorded
+Lasm runtime repairs and coupling it to verified application-library bundles
+remains unfinished. Its C-to-Wasm smoke is deliberately separate from full Lean
+application acceptance. Native Windows ARM64 LLVM/Binaryen is another missing
+upstream artifact, not a fundamental limitation.
+
 ## CLI and deployment foundations
 
 The command parser now covers the planned direct-file/run/build forms, options

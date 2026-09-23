@@ -6,6 +6,8 @@ import { createHash } from 'node:crypto';
 import { Readable, Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress, createGunzip } from 'node:zlib';
+import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { x as extractTar } from 'tar';
 
 const digest = value => createHash('sha256').update(value).digest('hex');
@@ -36,7 +38,7 @@ export function validateArtifact(artifact) {
       || !/^[a-f0-9]{64}$/.test(artifact.sha256 ?? '')
       || !Number.isSafeInteger(artifact.bytes) || artifact.bytes <= 0
       || !Number.isSafeInteger(artifact.maximumExtractedBytes) || artifact.maximumExtractedBytes <= 0
-      || !['tar.zst', 'tar.gz'].includes(artifact.format)) throw new Error('Invalid managed artifact description');
+      || !['tar.zst', 'tar.gz', 'tar.xz', 'zip'].includes(artifact.format)) throw new Error('Invalid managed artifact description');
   const url = new URL(artifact.url);
   if (url.protocol !== 'https:' || url.username || url.password) throw new Error('Managed artifacts require an HTTPS URL without credentials');
   return digest(JSON.stringify(artifact));
@@ -62,7 +64,7 @@ function cleanArchivePath(name) {
   return !!name && !/[\\:\0]/.test(name) && parts.every(part => part && part !== '.' && part !== '..');
 }
 
-async function extract(artifact, archive, directory) {
+async function extract(artifact, archive, directory, python) {
   // macOS /var and Windows short-path temp directories are aliases. Compare
   // resolved link targets with the same physical root, not its lexical alias.
   directory = await realpath(directory);
@@ -99,8 +101,29 @@ async function extract(artifact, archive, directory) {
       return true;
     },
   });
-  const decompressor = artifact.format === 'tar.gz' ? createGunzip() : createZstdDecompress();
-  await pipeline(createReadStream(archive), decompressor, unpack);
+  if (['tar.xz', 'zip'].includes(artifact.format)) {
+    const child = spawn(python, ['-I', '-B', fileURLToPath(new URL('./archive-stream.py', import.meta.url)), artifact.format, archive],
+      { stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+    let diagnostic = '';
+    child.stderr.setEncoding('utf8');
+    child.stderr.on('data', text => { diagnostic = (diagnostic + text).slice(-8192); });
+    const finished = new Promise(resolve => {
+      child.once('error', error => resolve({ error }));
+      child.once('close', (code, signal) => resolve({ code, signal }));
+    });
+    try {
+      await pipeline(child.stdout, unpack);
+      const result = await finished;
+      if (result.error) throw result.error;
+      if (result.code !== 0) throw new Error(`SDK archive decoder failed (${result.code ?? result.signal}): ${diagnostic}`);
+    } finally {
+      if (child.exitCode === null && child.signalCode === null) child.kill();
+      await finished;
+    }
+  } else {
+    const decompressor = artifact.format === 'tar.gz' ? createGunzip() : createZstdDecompress();
+    await pipeline(createReadStream(archive), decompressor, unpack);
+  }
   if (error) throw error;
   for (const entry of links) {
     const parent = dirname(join(directory, entry.name));
@@ -166,8 +189,10 @@ async function verify(directory, identity) {
  * Concurrent processes may download twice but can never observe partial output.
  * No cache lock can be left behind by an interrupted process.
  */
-export async function provisionArtifact(artifact, { cache = managedCacheDirectory(), fetch: fetch_ = fetch, log = console.error } = {}) {
+export async function provisionArtifact(artifact, { cache = managedCacheDirectory(), fetch: fetch_ = fetch, log = console.error, python } = {}) {
   const identity = validateArtifact(artifact);
+  if (['tar.xz', 'zip'].includes(artifact.format) && (!python || !isAbsolute(python)))
+    throw new Error('SDK archives require the absolute path to a managed Python executable');
   const directory = resolve(cache, 'artifacts', identity);
   const key = directory;
   if (pending.has(key)) return pending.get(key);
@@ -190,7 +215,7 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
       log(`Downloading verified ${artifact.name}…`);
       await download(artifact, archive, fetch_);
       await mkdir(tree);
-      await extract(artifact, archive, tree);
+      await extract(artifact, archive, tree, python);
       const files = await inventory(tree);
       if (!Object.keys(files).length) throw new Error('Managed artifact is empty');
       const receipt = { schema: 1, identity, artifact, files };
