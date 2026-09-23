@@ -1,0 +1,43 @@
+{
+  "scope": "Managed native Git transport, not Lean/Wasm application acceptance",
+  "recordedAt": "2026-09-23T20:14:47.447Z",
+  "platform": "linux-x64",
+  "node": "v26.10.0",
+  "git": "git version 2.53.0",
+  "distribution": "v2.53.0-4",
+  "identity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+  "native": {
+    "platform": "linux",
+    "architectures": [
+      "x64"
+    ]
+  },
+  "archive": {
+    "name": "dugite-native-v2.53.0-4098283-ubuntu-x64.tar.gz",
+    "root": ".",
+    "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-ubuntu-x64.tar.gz",
+    "sha256": "cca76aa31ad9e835e771ee7f55b73934777fbd8d16757a10d307ba06de860901",
+    "bytes": 65269219,
+    "format": "tar.gz",
+    "maximumExtractedBytes": 536870912
+  },
+  "verifiedReuse": true,
+  "firstMilliseconds": 2953,
+  "checks": {
+    "cloneFileUrlWithSpaces": "passed",
+    "fetchAndPinnedCheckout": "passed",
+    "httpsTlsRemote": "passed"
+  },
+  "original": "f64cfdaf8e98d2152721ca85747050a81d8f2f15",
+  "updated": "a147fe2cc63202a109fc109ced9c8c1ac1b11b4e",
+  "remote": "4098283a7ecb8a227b9d43580336c78a06f90e5d\trefs/tags/v2.53.0-4",
+  "source": "/home/lastmjs/development/lasm/compiler/.work/managed-git-linux-r1/source with spaces",
+  "clone": "/home/lastmjs/development/lasm/compiler/.work/managed-git-linux-r1/clone with spaces",
+  "notices": [
+    "libexec/git-core/NOTICE"
+  ],
+  "limitations": [
+    "No SSH-client provisioning or private credential flow is claimed.",
+    "Lake dependency compilation and deployed execution are separate checks."
+  ]
+}

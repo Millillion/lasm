@@ -34,7 +34,7 @@ export async function hashFile(file) {
 
 export function validateArtifact(artifact) {
   if (!artifact || !/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(artifact.name ?? '')
-      || !/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(artifact.root ?? '')
+      || !(artifact.root === '.' || /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(artifact.root ?? ''))
       || !/^[a-f0-9]{64}$/.test(artifact.sha256 ?? '')
       || !Number.isSafeInteger(artifact.bytes) || artifact.bytes <= 0
       || !Number.isSafeInteger(artifact.maximumExtractedBytes) || artifact.maximumExtractedBytes <= 0
@@ -69,13 +69,15 @@ async function extract(artifact, archive, directory, python) {
   // resolved link targets with the same physical root, not its lexical alias.
   directory = await realpath(directory);
   let error, total = 0;
+  const rootless = artifact.root === '.';
   const seen = new Set();
   const links = [];
-  const unpack = extractTar({ cwd: directory, strip: 1, strict: true, preservePaths: false, preserveOwner: false,
+  const unpack = extractTar({ cwd: directory, strip: rootless ? 0 : 1, strict: true, preservePaths: false, preserveOwner: false,
     filter(name, entry) {
       if (error) return false;
-      const canonical = name.replace(/\/$/, '');
-      const valid = cleanArchivePath(name) && (canonical === artifact.root || canonical.startsWith(artifact.root + '/'))
+      const canonical = (rootless ? name.replace(/^\.\//, '') : name).replace(/\/$/, '');
+      if (rootless && (canonical === '.' || canonical === '') && entry.type === 'Directory') return false;
+      const valid = cleanArchivePath(canonical) && (rootless || canonical === artifact.root || canonical.startsWith(artifact.root + '/'))
         && !seen.has(canonical) && ['File', 'Directory', 'SymbolicLink', 'Link'].includes(entry.type);
       if (!valid) { error = new Error(`Unsafe or duplicate archive entry: ${name}`); return false; }
       seen.add(canonical);
@@ -83,11 +85,11 @@ async function extract(artifact, archive, directory, python) {
         const target = entry.linkpath;
         const destination = entry.type === 'Link' ? posix.normalize(target) : posix.join(posix.dirname(canonical), target);
         if (!target || /[\\:\0]/.test(target) || posix.isAbsolute(target)
-            || !destination.startsWith(artifact.root + '/')) {
+            || !(rootless ? cleanArchivePath(destination) : destination.startsWith(artifact.root + '/'))) {
           error = new Error(`Archive link escapes its toolchain: ${name}`); return false;
         }
-        links.push({ name: canonical.slice(artifact.root.length + 1), target,
-          destination: destination.slice(artifact.root.length + 1), type: entry.type });
+        links.push({ name: rootless ? canonical : canonical.slice(artifact.root.length + 1), target,
+          destination: rootless ? destination : destination.slice(artifact.root.length + 1), type: entry.type });
         // Create links only after every ordinary file has finished extracting.
         // Official compiler archives contain safe chains such as libunwind.so
         // -> libunwind.so.1 -> libunwind.so.1.0. Tar's hardened writer rejects

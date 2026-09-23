@@ -1,0 +1,47 @@
+name: Managed Git dependency transport
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: managed-git-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  git:
+    if: github.event.repository.visibility == 'public'
+    name: Git ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+          - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
+          - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
+          - { platform: win32-x64, runner: windows-2022, arch: x64 }
+          - { platform: win32-arm64, runner: windows-11-arm, arch: arm64 }
+    env:
+      LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Verify native host and small provisioning regressions
+        run: |
+          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
+          node --max-old-space-size=128 --test --test-isolation=none test/managed-git.test.mjs test/managed-artifacts.test.mjs test/application-files.test.mjs
+      - name: Verified native Git with no system tools on PATH
+        run: node --max-old-space-size=128 integration/managed-git.mjs .work/managed-git-ci
+      - name: Preserve result in logs and summary
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');const p='.work/managed-git-ci/result.json';const t=f.existsSync(p)?f.readFileSync(p,'utf8'):'Managed Git check did not complete. See the failing step.\n';console.log(t);f.appendFileSync(process.env.GITHUB_STEP_SUMMARY,t)"
+      # Standard public-repository runners only; no cache/artifact storage.
+      # This checks Git transport, not native Lean or deployed Wasm behavior.

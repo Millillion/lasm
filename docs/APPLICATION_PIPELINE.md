@@ -150,6 +150,9 @@ data remains distinct from function-table addresses.
 
 Lake's own `transImports`, `c`, and `lean` facets discover dependencies and
 generate application inputs. Standalone files use Lean's `--src-deps` parser.
+Lake projects now provision [managed native Git](MANAGED_GIT.md) automatically;
+its transport tests and pending end-to-end dependency checks are recorded
+separately from the already installed application candidates.
 Build identities include the native compiler, SDK catalog and repairs, complete
 runtime manifest, application C and source hashes, target, and shipped host code.
 Successful deployments have content inventories checked on reuse. Cached builds

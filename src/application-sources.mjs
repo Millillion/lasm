@@ -3,6 +3,7 @@ import { dirname, join, resolve, relative, delimiter } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { insideDirectory } from './platform.mjs';
+import { managedGitEnvironment } from './managed-git.mjs';
 
 /** A nested toolchain pin starts an independent project, even inside a checkout. */
 export function findApplicationProject(source) {
@@ -24,9 +25,10 @@ export function nativeLeanEnvironment(lean) {
   return env;
 }
 
-export function applicationSources(source, lean, work, { log = console.error } = {}) {
+export function applicationSources(source, lean, work, { log = console.error, git } = {}) {
   source = resolve(source);
-  const project = findApplicationProject(source), env = nativeLeanEnvironment(lean);
+  const project = findApplicationProject(source);
+  const env = git ? managedGitEnvironment(git, nativeLeanEnvironment(lean)) : nativeLeanEnvironment(lean);
   const run = (program, args, cwd) => execFileSync(program, args,
     { cwd, env, windowsHide: true, encoding: 'utf8', timeout: 900_000, maxBuffer: 32 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'inherit'] }).trim();

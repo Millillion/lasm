@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import { provisionLean, selectLeanVersion, toolchainCatalog } from './managed-lean.mjs';
 import { provisionSdk, sdkCatalog } from './managed-sdk.mjs';
+import { provisionGit } from './managed-git.mjs';
 import { hashFile } from './managed-artifacts.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject } from './application-sources.mjs';
@@ -45,9 +46,10 @@ export async function buildApplication(file, { target = 'node', output, rebuild 
   const lean = await provisionLean(source, { cache, log });
   if (sdkCatalog.version !== runtime.manifest.emscripten) throw new Error('The managed SDK and application runtime do not match');
   const project = findApplicationProject(source), directory = project ?? dirname(source);
+  const git = project ? await provisionGit({ cache, log }) : undefined;
   const work = join(directory, '.lake/lasm/applications', digest(source).slice(0, 16));
   await mkdir(work, { recursive: true });
-  const generated = applicationSources(source, lean, work, { log: verbose ? log : () => {} });
+  const generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
   const modules = [];
   for (let i = 0; i < generated.sources.length; i++) modules.push({
     module: generated.inputs[i].module, sourceSha256: await hashFile(generated.inputs[i].source),
@@ -56,7 +58,8 @@ export async function buildApplication(file, { target = 'node', output, rebuild 
   const memoryMode = target === 'bun' ? 2 : 1;
   const recipe = { schema: 1, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     emscripten: sdkCatalog.version, sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)),
-    runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(), target, memoryMode, modules };
+    runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
+    ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}), target, memoryMode, modules };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)

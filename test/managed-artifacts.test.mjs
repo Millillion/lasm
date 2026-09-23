@@ -73,6 +73,35 @@ test('gzip bootstrap archives need no external decompression executable', async 
     { ...options, fetch: async () => new Response(bytes.subarray(0, -3)) }), /checksum or size/);
 });
 
+test('rootless portable archives preserve notices and forward hardlinks without stripping directories', async t => {
+  const f = await fixture(t);
+  const bytes = archive([
+    { path: './', type: 'Directory' },
+    { path: './bin/alias', type: 'Link', linkpath: './bin/git' },
+    { path: './bin/git', body: 'portable executable' },
+    { path: './share/NOTICE', body: 'portable notices' },
+  ]);
+  const artifact = { ...description(bytes), root: '.' };
+  const options = { ...f.options, fetch: async () => new Response(bytes) };
+  const installed = await provisionArtifact(artifact, options);
+  assert.equal(await readFile(join(installed.directory, 'bin/alias'), 'utf8'), 'portable executable');
+  assert.equal(await readFile(join(installed.directory, 'share/NOTICE'), 'utf8'), 'portable notices');
+  assert.equal((await provisionArtifact(artifact, options)).cacheHit, true);
+});
+
+for (const [name, entries] of [
+  ['traversal', [{ path: './../escape', body: 'outside' }]],
+  ['absolute', [{ path: '/bin/git', body: 'outside' }]],
+  ['duplicate spelling', [{ path: './bin/git', body: 'one' }, { path: 'bin/git', body: 'two' }]],
+  ['escaping link', [{ path: './bin/link', type: 'SymbolicLink', linkpath: '../../outside' }]],
+  ['escaping hardlink', [{ path: './bin/link', type: 'Link', linkpath: '../outside' }]],
+]) test(`rootless archives reject ${name}`, async t => {
+  const f = await fixture(t), bytes = archive(entries);
+  await assert.rejects(provisionArtifact({ ...description(bytes), root: '.' },
+    { ...f.options, fetch: async () => new Response(bytes) }), /Unsafe|escapes|TAR_/);
+  assert.deepEqual(await readdir(join(f.cache, 'artifacts')), []);
+});
+
 for (const mode of ['digest', 'truncated', 'oversized', 'http-error', 'interrupted']) {
   test(`${mode} downloads leave no completed artifact or staging directory`, async t => {
     const f = await fixture(t);
