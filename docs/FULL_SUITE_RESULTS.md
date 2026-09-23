@@ -72,8 +72,8 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **2,901 registrations passing**, completing
-all 854 prioritized names and 2,047 further registrations. This includes
+passes. Its latest saved checkpoint has **3,057 registrations passing**, completing
+all 854 prioritized names and 2,203 further registrations. This includes
 all 56 Lake tests, all 69 compiler regressions, all 27 compiled benchmarks,
 all 657 prioritized elaborator regressions,
 all 78 prioritized interactive server tests, lint, seven documentation examples,
@@ -82,9 +82,9 @@ handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 995 registrations remain pending in that
+harness hash remains intact. The other 839 registrations remain pending in that
 snapshot; see
-[the 2,901-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint2901-2026-09-23.json).
+[the 3,057-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint3057-2026-09-23.json).
 All 197 documentation-parser registrations also pass in this checkpoint.
 Additional evaluator, coercion, compiler simplification, decidability, definition,
 pretty-printing, dependent-elimination, derivation, iteration, floating-point and
@@ -94,6 +94,9 @@ rational arithmetic, field normalization, arrays, finite values, equality,
 matching, conditionals, standard-library linting and expected trace output.
 The index-map trace test passes in 57.33 seconds at a 2.09 GiB peak, with no
 resource events.
+All 101 registrations beginning with `elab/simp` also pass, including simplifier
+and simplification-procedure tests for integer/character evaluation, caching,
+matching, local hypotheses, trace output, configuration and timeout handling.
 The unchanged NUL-byte IO registration checks filesystem `invalidArgument`
 errors and an environment lookup returning `none`; it and the random-byte IO
 registration pass. Further debugger, import, induction, inlining, integer and
