@@ -72,8 +72,8 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **2,166 registrations passing**, completing
-all 854 prioritized names and 1,312 further registrations. This includes
+passes. Its latest saved checkpoint has **2,403 registrations passing**, completing
+all 854 prioritized names and 1,549 further registrations. This includes
 all 56 Lake tests, all 69 compiler regressions, all 27 compiled benchmarks,
 all 657 prioritized elaborator regressions,
 all 78 prioritized interactive server tests, lint, seven documentation examples,
@@ -82,9 +82,9 @@ handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 1,730 registrations remain pending in that
+harness hash remains intact. The other 1,493 registrations remain pending in that
 snapshot; see
-[the 2,166-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint2166-2026-09-23.json).
+[the 2,403-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint2403-2026-09-23.json).
 All 197 documentation-parser registrations also pass in this checkpoint.
 Additional evaluator, coercion, compiler simplification, decidability, definition,
 pretty-printing, dependent-elimination, derivation, iteration, floating-point and
@@ -93,6 +93,10 @@ All 387 `elab/grind` registrations pass in this checkpoint, covering integer and
 arithmetic, field normalization, arrays, finite values, equality, matching,
 conditionals, standard-library linting and expected trace output. The index-map trace test passes in
 57.33 seconds at a 2.09 GiB peak, with no resource events.
+The unchanged NUL-byte IO registration checks filesystem `invalidArgument`
+errors and an environment lookup returning `none`; it and the random-byte IO
+registration pass. Further debugger, import, induction, inlining, integer and
+metavariable regressions also pass in this checkpoint.
 All three earlier plugin failures now pass within this campaign. The server-project
 workload also passes under the same 8 GiB proactive budget; it is this checkpoint's
 largest peak at 7.56 GiB. Cancellation, completions, navigation, references, hover,
