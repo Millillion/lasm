@@ -37,5 +37,7 @@ jobs:
         run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
       - name: Native file ABI, OS lock, and deployment preservation controls
         run: node --max-old-space-size=128 --test --test-isolation=none test/native-file-abi.test.mjs test/application-lock.test.mjs test/application-files.test.mjs
+      - name: CLI and compatibility launcher controls without tool downloads
+        run: node --max-old-space-size=128 --test --test-isolation=none test/cli-arguments.test.mjs test/application-launcher.test.mjs
       # Lightweight filesystem checks only; child fixtures each use a 64 MiB
       # JS heap cap. No compiler builds, artifacts or Actions caches.

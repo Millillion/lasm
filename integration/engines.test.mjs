@@ -30,13 +30,16 @@ function execute(engine, args, options = {}) {
   });
 }
 
-for (const name of selected) test(`${name}: source launcher, Unicode arguments, ordinary IO, tasks, errors and cached execution`, { timeout: 650_000 }, async t => {
+// Preserve the earlier callable-runtime regression independently of the current
+// public filename launchers, whose managed AOT checks live in managed-lake-dependency.
+const legacyLauncher = join(root, 'test/fixtures/legacy-main-launcher.mjs');
+for (const name of selected) test(`${name}: legacy Lean 4.32 main, Unicode arguments, ordinary IO, tasks, errors and cached execution`, { timeout: 650_000 }, async t => {
   const directory = await mkdtemp(join(tmpdir(), `lasm-${name}-日本語 `));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const source = join(directory, 'Main.lean');
   await cp(join(root, 'test/fixtures/engine-main/Main.lean'), source);
   const data = join(directory, 'data');
-  const args = [join(root, `lasm-${name}.js`), source, data, 'λ 日本語', '', 'a b'];
+  const args = [legacyLauncher, source, data, 'λ 日本語', '', 'a b'];
   for (let run = 0; run < 2; run++) {
     const result = await execute(engines[name], args, { cwd: root });
     assert.equal(result.code, 7, result.stderr);
@@ -47,7 +50,7 @@ for (const name of selected) test(`${name}: source launcher, Unicode arguments, 
     if (run === 1) assert.doesNotMatch(result.stderr, /Building /);
     assert.equal(existsSync(join(data, 'roundtrip.txt')), false);
   }
-  const failure = await execute(engines[name], [join(root, `lasm-${name}.js`), source, data, 'fail'], { cwd: root });
+  const failure = await execute(engines[name], [legacyLauncher, source, data, 'fail'], { cwd: root });
   assert.equal(failure.code, 1);
   assert.equal(failure.stderr.trim(), 'uncaught exception: ordinary failure λ');
 });

@@ -133,6 +133,16 @@ application-argument separator. Nineteen parser checks pass. The primary CLI now
 uses the parser and the managed full-runtime application builder. JSON binding
 configurations still select the preserved older callable-library implementation.
 
+The source-tree `lasm-node.js`, `lasm-deno.js` and `lasm-bun.js` compatibility
+filenames now call that same managed application pipeline. They preserve the
+earlier `[--rebuild] [--verbose] Main.lean [--] arguments…` syntax. Running a
+wrapper under Deno/Bun invokes Node for compilation and then the exact original
+engine executable for the application; Node must be on PATH. Node can also run
+any of the three wrapper files, with the selected deployment engine on PATH.
+Help and usage errors perform no tool downloads. The 22 parser/launcher controls
+pass locally; real installed-candidate launcher acceptance is pending. The
+earlier 4.32 implementation and its regression fixtures remain explicitly legacy.
+
 The full-runtime output helper packages host adapters and native support and
 generates a relative `main.mjs` launcher. Three loader checks cover relocation,
 argument forwarding, working directory and engine mismatch handling. These are

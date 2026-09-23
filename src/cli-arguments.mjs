@@ -6,9 +6,9 @@ Options: --rebuild, --verbose, --help
 Application arguments must follow --. The default target is node.`;
 
 /** Parse independently of provisioning: help/errors must never download tools. */
-export function parseLasmArguments(argv) {
+export function parseLasmArguments(argv, { defaultTarget = 'node' } = {}) {
   const tokens = [...argv];
-  const result = { command: 'run', target: 'node', rebuild: false, verbose: false, args: [] };
+  const result = { command: 'run', target: defaultTarget, rebuild: false, verbose: false, args: [] };
   if (['build', 'run'].includes(tokens[0])) result.command = tokens.shift();
   const positional = [], supplied = new Set();
   for (let i = 0; i < tokens.length; i++) {
