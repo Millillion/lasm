@@ -1,7 +1,7 @@
 // Connect Emscripten's late-loaded plugins to the compiler's in-Wasm symbol
 // registry. generate-exports.mjs exports every Lean data symbol separately;
 // only compiled functions are omitted to avoid engine export-count limits.
-export function connectLeanSymbolLoader(glue, memory64, { allowExisting = false } = {}) {
+export function connectLeanSymbolLoader(glue, memory64, { allowExisting = false, packageSymbols = false } = {}) {
   if (typeof memory64 !== 'boolean') throw new Error('Specify the compiler pointer ABI');
   const existing = glue.includes('var lasmResolveLeanSymbol =');
   if (existing && !allowExisting) throw new Error('Lean symbol loader already connected');
@@ -18,7 +18,7 @@ export function connectLeanSymbolLoader(glue, memory64, { allowExisting = false 
   };
 };`;
   const lookup = `var lasmResolveLeanSymbol = symName => {
-  if (!symName.startsWith("l_") || !wasmExports) return;
+  if (${packageSymbols ? '!/^lp?_/.test(symName)' : '!symName.startsWith("l_")'} || !wasmExports) return;
   // Data globals and explicit externs retain their exact Wasm export type.
   // Never interpret a data address as an indirect-function-table index.
   if (Object.prototype.hasOwnProperty.call(wasmExports, symName)) return wasmExports[symName];

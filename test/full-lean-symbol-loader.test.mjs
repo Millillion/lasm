@@ -15,7 +15,7 @@ var resolveGlobalSymbol = (symName, direct = false) => {
   };
 };`;
 
-function fixture(memory64, registry) {
+function fixture(memory64, registry, options) {
   const imports = {}, exports = {}, outstanding = new Map(), queried = [], table = new Map();
   let next = 16;
   exports.lasm_lookup_lean_symbol = pointer => {
@@ -23,7 +23,7 @@ function fixture(memory64, registry) {
     const name = outstanding.get(Number(pointer)); queried.push(name);
     return registry(name);
   };
-  const resolve = runInNewContext(connectLeanSymbolLoader(original, memory64) + '\nresolveGlobalSymbol;', {
+  const resolve = runInNewContext(connectLeanSymbolLoader(original, memory64, options) + '\nresolveGlobalSymbol;', {
     wasmImports: imports, wasmExports: exports,
     isSymbolDefined: name => Boolean(imports[name] && !imports[name].stub),
     allocateName: name => { outstanding.set(next, name); return next++; },
@@ -32,6 +32,19 @@ function fixture(memory64, registry) {
   });
   return { imports, exports, outstanding, queried, table, resolve: name => resolve(name).sym };
 }
+
+test('Lean 4.34 Lake package functions and data use the same checked registry', () => {
+  const fn = () => 43;
+  const state = fixture(true, name => name === 'lp_example_answer' ? 10n : 0n, { packageSymbols: true });
+  state.table.set(10, fn);
+  state.exports.lp_example_data = new WebAssembly.Global({ value: 'i64' }, 5678n);
+  assert.equal(state.resolve('lp_example_answer'), fn);
+  assert.equal(state.resolve('lp_example_data'), state.exports.lp_example_data);
+  assert.equal(state.resolve('lp_example_absent'), undefined);
+  assert.equal(state.resolve('unrelated'), undefined);
+  assert.deepEqual(state.queried, ['lp_example_answer', 'lp_example_absent']);
+  assert.equal(state.outstanding.size, 0);
+});
 
 for (const memory64 of [false, true]) {
   test(`plugin registry lookup preserves function identity, exports and precedence (${memory64 ? 64 : 32}-bit)`, () => {

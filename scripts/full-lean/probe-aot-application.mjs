@@ -7,6 +7,9 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { ensureResourceGuard } from './resource-guard.mjs';
 import { preserveWebWorker } from './preserve-web-worker.mjs';
+import { connectLeanSymbolLoader } from './lean-symbol-loader.mjs';
+import { indexFunctionTable } from './function-table-index.mjs';
+import { optimizeMainTableGrowth } from './table-growth.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint } from '../../src/application-output.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 
@@ -31,14 +34,32 @@ const run = (program, argv, options = {}) => execFileSync(program, argv, { cwd: 
 mkdirSync(output, { recursive: true });
 const work = join(output, 'build'), dist = join(work, 'dist');
 mkdirSync(dist, { recursive: true });
-const c = join(work, 'Main.c'), object = join(work, 'Main.o');
-run(join(nativePrefix, 'bin/lean'), ['-j2', '-s8192', '-R', dirname(source), '-Dcompiler.postponeCompile=false', '-c', c, source]);
-run(join(nativePrefix, 'bin/leanc'), ['-O2', c, '-o', join(work, 'native-main')]);
+const c = join(work, 'Main.c');
+const cInputsFile = option('--c-inputs');
+const cInputs = cInputsFile ? JSON.parse(readFileSync(resolve(cInputsFile))) : [c];
+if (!Array.isArray(cInputs) || !cInputs.length || cInputs.some(file => typeof file !== 'string')) throw new Error('Invalid C input list');
+if (!cInputsFile) run(join(nativePrefix, 'bin/lean'), ['-j2', '-s8192', '-R', dirname(source), '-Dcompiler.postponeCompile=false', '-c', c, source]);
+run(join(nativePrefix, 'bin/leanc'), ['-O2', ...cInputs, '-o', join(work, 'native-main')]);
 const exportsFile = join(work, 'exports.json'); writeFileSync(exportsFile, JSON.stringify(['_main', '_malloc', '_free']));
-run(join(sdk, 'upstream/emscripten/emcc'), ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC',
-  '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1', '-I', join(build, 'include'), '-c', c, '-o', object]);
-const link = [object, '-O1', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${memory}`, '-sMALLOC=mimalloc',
+const objects = cInputs.map((file, index) => {
+  const object = join(work, `module-${index}.o`);
+  run(join(sdk, 'upstream/emscripten/emcc'), ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC',
+    '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1', '-I', join(build, 'include'), '-c', file, '-o', object]);
+  return object;
+});
+const registry = join(work, 'lean-symbols.c');
+const symbolInputs = join(work, 'symbol-inputs.json');
+writeFileSync(symbolInputs, JSON.stringify({ objects, sources: cInputs }));
+run(process.execPath, [join(root, 'scripts/full-lean/generate-exports.mjs'), build, exportsFile,
+  '--native-lean', join(nativePrefix, 'bin/lean'), '--lake', '--application-inputs', symbolInputs, '--registry', registry],
+  { env: { ...process.env, LASM_EMSDK: sdk, LEAN_NUM_THREADS: '2' } });
+const registryObject = join(work, 'lean-symbols.o');
+run(join(sdk, 'upstream/emscripten/emcc'), ['-O1', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC',
+  '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1', '-I', join(build, 'include'), '-c', registry, '-o', registryObject]);
+objects.push(registryObject);
+const link = [...objects, '-O1', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${memory}`, '-sMALLOC=mimalloc',
   '-sMAIN_MODULE=2', `-sEXPORTED_FUNCTIONS=@${exportsFile}`, '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=4',
+  '-sEXPORTED_RUNTIME_METHODS=stringToNewUTF8',
   '-sEXIT_RUNTIME=1', '-sNODERAWFS=1', '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=1',
   '-sSTACK_OVERFLOW_CHECK=2', '-Wl,--export-if-defined=__cpp_exception', '-sINITIAL_MEMORY=134217728',
   `-sMAXIMUM_MEMORY=${memory === 1 ? 8589934592 : 4294967296}`, '-sSTACK_SIZE=67108864',
@@ -50,6 +71,10 @@ const link = [object, '-O1', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${memo
   '--js-library', join(root, 'scripts/full-lean/host-library.js'), '-o', join(dist, 'program.cjs')];
 writeFileSync(join(output, 'link-command.json'), JSON.stringify(link, null, 2) + '\n');
 run(join(sdk, 'upstream/emscripten/em++'), link);
+writeFileSync(join(dist, 'program.cjs'), connectLeanSymbolLoader(readFileSync(join(dist, 'program.cjs'), 'utf8'), true, { packageSymbols: true }));
+const tableIndex = await indexFunctionTable(join(dist, 'program.wasm'), join(dist, 'program.cjs'));
+writeFileSync(join(work, 'function-table-index.json'), JSON.stringify(tableIndex, null, 2) + '\n');
+writeFileSync(join(dist, 'program.cjs'), optimizeMainTableGrowth(readFileSync(join(dist, 'program.cjs'), 'utf8')));
 preserveWebWorker(join(dist, 'program.cjs'));
 copyApplicationHost(dist); writeApplicationEntrypoint(dist, target);
 const notices = [
@@ -69,6 +94,16 @@ writeFileSync(join(dist, 'build-info.json'), JSON.stringify({ lean: input.lean, 
   target, memoryMode: memory, emscripten: input.emscripten, sourceSha256: await hashFile(source),
   nativeArtifactIdentity: input.nativeArtifactIdentity }, null, 2) + '\n');
 const deploy = join(output, 'deployed'); renameSync(dist, deploy);
+if (args.includes('--build-only')) {
+  const result = { lean: input.lean, leanCommit: input.leanCommit, target, deployed: deploy,
+    nativeExecutable: join(work, 'native-main'), sourceSha256: await hashFile(source),
+    cInputs: await Promise.all(cInputs.map(async path => ({ path, sha256: await hashFile(path) }))),
+    memoryMode: memory, wasmSha256: await hashFile(join(deploy, 'program.wasm')),
+    resourceReport: process.env.LASM_RESOURCE_REPORT };
+  writeFileSync(join(output, 'build-result.json'), JSON.stringify(result, null, 2) + '\n');
+  console.log(JSON.stringify(result, null, 2));
+  process.exit(0);
+}
 // Execute in a different working directory with neither a source copy nor any
 // build tool on PATH. The selected engine is the only executable explicitly used.
 const nativeCwd = join(output, 'native-cwd'), targetCwd = join(output, 'target-cwd');

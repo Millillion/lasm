@@ -1,0 +1,225 @@
+{
+  "scope": "Linux x64 maintainer AOT application build and relocated deployment, not completed managed CLI or complete API acceptance",
+  "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+  "fixtureSha256": {
+    "Main.lean": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+    "App/Model.lean": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+    "App/Server.lean": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+    "lakefile.toml": "9a30561c35549a04e08eb96c2b4a54815e0d38d331e7ef408996f3f5184d1b33",
+    "lean-toolchain": "8733782dc070a99b312039cda424f601b80f3be6f6f512627da5ba25adc27632"
+  },
+  "originalLeanSourcesUnchanged": true,
+  "suiteSha256": "faa83f12123f666cb94febe6b6bf516c5e93064ac87c49e6c96a6712259a5b60",
+  "hostPreludeSha256": "8e396e8357ff7566c6527bc507c4c97f0e8d6e20999d3ab8e197dddf1118c131",
+  "checks": [
+    "routing and HTTP metadata",
+    "JSON and Unicode validation",
+    "CRUD and revision checks",
+    "24 concurrent persistent mutations",
+    "binary bodies",
+    "chunked request bodies",
+    "event streaming and cancellation",
+    "body limits and malformed protocol",
+    "HTTP pipelining",
+    "graceful shutdown, restart and persistence"
+  ],
+  "rows": [
+    {
+      "target": "node",
+      "engineVersion": "26.10.0",
+      "lean": "4.34.0",
+      "wasmSha256": "bef1ad3b025ca1bcd3b9716940181ab2d5133a9c159da0618850ee3b1ca1ab46",
+      "glueSha256": "17439079bc70a0d2a8c5c390c4f35048837603c91c35de023f7aafeaa3623a97",
+      "memoryMode": 1,
+      "passed": 20,
+      "nativeChecks": 10,
+      "deployedChecks": 10,
+      "failed": 0,
+      "skipped": 0,
+      "startupSeconds": [
+        {
+          "mode": "wasm",
+          "seconds": 2.03
+        },
+        {
+          "mode": "wasm",
+          "seconds": 1.982
+        },
+        {
+          "mode": "native",
+          "seconds": 0.037
+        },
+        {
+          "mode": "native",
+          "seconds": 0.071
+        }
+      ],
+      "resources": [
+        {
+          "peakMemoryBytes": 3827306496,
+          "resourceLimited": false,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "finishedAt": "2026-09-23T18:01:16.516Z"
+        }
+      ],
+      "buildManifest": ".work/aot-http-node-4.34-r5/application/build-result.json",
+      "testReport": ".work/aot-http-node-4.34-r5/vitest.json"
+    },
+    {
+      "target": "deno",
+      "engineVersion": "2.9.7",
+      "lean": "4.34.0",
+      "wasmSha256": "bef1ad3b025ca1bcd3b9716940181ab2d5133a9c159da0618850ee3b1ca1ab46",
+      "glueSha256": "17439079bc70a0d2a8c5c390c4f35048837603c91c35de023f7aafeaa3623a97",
+      "memoryMode": 1,
+      "passed": 20,
+      "nativeChecks": 10,
+      "deployedChecks": 10,
+      "failed": 0,
+      "skipped": 0,
+      "startupSeconds": [
+        {
+          "mode": "wasm",
+          "seconds": 2.405
+        },
+        {
+          "mode": "wasm",
+          "seconds": 2.189
+        },
+        {
+          "mode": "native",
+          "seconds": 0.04
+        },
+        {
+          "mode": "native",
+          "seconds": 0.071
+        }
+      ],
+      "resources": [
+        {
+          "peakMemoryBytes": 3670884352,
+          "resourceLimited": false,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "finishedAt": "2026-09-23T17:57:01.519Z"
+        },
+        {
+          "peakMemoryBytes": 1917554688,
+          "resourceLimited": false,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "finishedAt": "2026-09-23T17:57:37.312Z"
+        }
+      ],
+      "buildManifest": ".work/aot-http-deno-4.34-r3/application/build-result.json",
+      "testReport": ".work/product-acceptance/aot-http-deno-test-r4.json"
+    },
+    {
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "lean": "4.34.0",
+      "wasmSha256": "537bd4ad05c367413cf05781418fc53ff4a718580baf821ba4dd4cac539cc1f3",
+      "glueSha256": "ad4dcd0f1262f375f02b3ddfc22efa4e0e1ef8b40ff8791f6860c5ee4e941e08",
+      "memoryMode": 2,
+      "passed": 20,
+      "nativeChecks": 10,
+      "deployedChecks": 10,
+      "failed": 0,
+      "skipped": 0,
+      "startupSeconds": [
+        {
+          "mode": "wasm",
+          "seconds": 2.108
+        },
+        {
+          "mode": "wasm",
+          "seconds": 1.945
+        },
+        {
+          "mode": "native",
+          "seconds": 0.038
+        },
+        {
+          "mode": "native",
+          "seconds": 0.07
+        }
+      ],
+      "resources": [
+        {
+          "peakMemoryBytes": 3852357632,
+          "resourceLimited": false,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          },
+          "finishedAt": "2026-09-23T18:03:13.194Z"
+        }
+      ],
+      "buildManifest": ".work/aot-http-bun-4.34-r3/application/build-result.json",
+      "testReport": ".work/aot-http-bun-4.34-r3/vitest.json"
+    }
+  ],
+  "deploymentControls": [
+    "Entire deployed directory moved out of build output",
+    "Separate process working directory",
+    "Empty PATH and Lean toolchain environment removed",
+    "Complete relative host support and redistribution notices bundled"
+  ],
+  "parallelHarness": [
+    "Original Lean example and tests preserved",
+    "90-second cold startup deadline and 180-second restart deadline",
+    "All HTTP assertions and request deadlines unchanged",
+    "Original cooperative-runtime resource-accounting endurance test remains separate"
+  ],
+  "earlierFailures": [
+    {
+      "target": "bun",
+      "reason": "Original 10-second startup deadline; unoptimized full registry took 36.320 seconds",
+      "preservedReports": [
+        ".work/product-acceptance/aot-http-bun-test-r1.json",
+        ".work/product-acceptance/aot-http-bun-test-r2.json"
+      ],
+      "resolution": "Verified table metadata and bulk slot allocation; unchanged Wasm, stock engine"
+    },
+    {
+      "target": "deno",
+      "reason": "Main and stdio flush finished but two TCP handles kept host alive",
+      "preservedReports": [
+        ".work/product-acceptance/aot-http-deno-test-r2.json",
+        ".work/product-acceptance/aot-http-deno-test-r3.json",
+        ".work/product-acceptance/aot-http-deno-exit-diagnostic-r1.log"
+      ],
+      "resolution": "Release remaining host resources after final stdio flush; retain status-zero shutdown assertion"
+    }
+  ],
+  "limitations": [
+    "Primary managed CLI is not wired to these maintainer scripts",
+    "Cross-platform application acceptance pending",
+    "Full standard-API audit and upstream application suite pending",
+    "Source-free deployment used a separate directory on this machine, not a separate OS environment",
+    "Stock Bun lowered mode retains a four-GiB linear-memory ceiling, an open engineering gap"
+  ]
+}

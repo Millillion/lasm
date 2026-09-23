@@ -6,9 +6,14 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   var lasmPreviousOnExit = Module["onExit"];
   Module["onExit"] = function (code) {
     lasmPreviousOnExit?.(code);
-    // Emscripten records the exit status and lets the host event loop drain.
-    // Native file workers keep these final flushes alive without blocking it.
-    lasmFullHost?.then(host => host.flushStdIO()).catch(() => {});
+    // Native process exit releases descriptors even when a Lean value remains
+    // reachable from a background task. Emscripten lets the host loop drain;
+    // leaving a TCP listener alive here can otherwise prevent Deno from exiting.
+    // Flush first, without blocking pipe readers, then close remaining handles.
+    return lasmFullHost?.then(async host => {
+      try { await host.flushStdIO(); }
+      finally { host.close(); }
+    }).catch(() => {});
   };
   Module.lasmFullHostRequest = async function (request) {
     const { port, signalPointer } = request;

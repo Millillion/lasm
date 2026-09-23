@@ -82,8 +82,11 @@ response-file change now passes on Windows x64. The
 [corrected native SDK matrix](evidence/managed-sdk-native-ci-2026-09-23.json)
 also passes Linux x64/ARM64 and macOS ARM64. macOS x64 reached its first libc
 build but exceeded the smoke harness's three-minute compiler deadline. A
-separate run raises that cold-build deadline to fifteen minutes with the same
-fixture, assertions and one worker. Windows ARM64 still needs its native SDK.
+separate run raised that cold-build deadline to fifteen minutes with the same
+fixture, assertions and one worker, and passed (135.44 seconds in its compiler
+phase). Managed SDK installation, C-to-Wasm execution and verified immutable
+cache reuse now pass natively on all five hosts with upstream SDK bundles.
+Windows ARM64 still needs its native SDK.
 
 ## CLI and deployment foundations
 
@@ -107,6 +110,22 @@ memory mode while retaining Lean's 64-bit layout; its current 4 GiB linear-memor
 ceiling and large-memory behavior remain open work. These small application
 passes do not establish full API compatibility, a finished managed CLI, or the
 other native platform results.
+
+The ordinary three-module Lean 4.34 HTTP application now uses Lake C generation
+and the full threaded runtime, including the compiler/reflection symbol registry.
+Lean 4.34's package-qualified symbols are included in that registry. All three
+stock engines pass the twenty-check parallel Vitest suite (ten deployed HTTP
+checks and ten corresponding native checks per engine), covering persistence,
+concurrent writes, validation, streaming, cancellation and shutdown. The
+[HTTP evidence](evidence/application-http-three-engines-2026-09-23.json) records
+exact artifacts, tests, deadlines and resources.
+
+Reusing the verified function-table index and bulk allocation optimization cut
+stock Bun's first server startup from 36.32 seconds to about two seconds with
+unchanged Wasm. The initial timeout runs remain preserved separately. This is
+Linux x64 maintainer-build evidence; primary CLI packaging, callable libraries,
+full API coverage, long-duration cleanup and the six-platform application matrix
+remain unfinished.
 
 The command parser now covers the planned direct-file/run/build forms, options
 before or after the filename, target selection, output directories, and the

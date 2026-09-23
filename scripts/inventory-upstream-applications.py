@@ -11,6 +11,7 @@ import collections
 import datetime
 import hashlib
 import json
+import os
 import subprocess
 import tarfile
 
@@ -117,7 +118,9 @@ for test in inventory['tests']:
         row['sha256'] = originals[driver]['sha256']
     driver = next((part for part in test.get('command', []) if part.endswith('/run_test.sh')), None)
     if driver:
-        row['driver'] = str(Path(driver).resolve().relative_to(source.resolve()))
+        # Keep a registered symlink's own name: compile_bench/run_test.sh points
+        # to compile/run_test.sh, but both upstream driver paths are registered.
+        row['driver'] = str(Path(os.path.abspath(driver)).relative_to(source.resolve()))
     elif row['source'].endswith('/test.sh'):
         row['driver'] = row['source']
     if 'driver' in row:

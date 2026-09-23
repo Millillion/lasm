@@ -1,5 +1,33 @@
 # Next steps
 
+## Current application product plan — 2026-09-23
+
+These items follow the [updated plan](docs/PLAN.md); the historical milestones
+below retain their original, narrower scope.
+
+- [x] Pin the latest stable acceptance baseline: Lean 4.34.0, Node 26.10.0,
+  Deno 2.9.7 and stock Bun 1.4.2.
+- [x] Provision and verify native Lean/Lake and the compiler SDK on the five
+  platforms with upstream distributions; verify private Python on all six.
+- [x] Build the matching full runtime and all 2,516 shipped Lean library modules.
+- [x] Verify the first ordinary compiled Lean main in all three stock engines.
+- [x] Inventory all 4,066 unchanged upstream test registrations and exclusions.
+- [ ] Finish and package the primary `lasm Main.lean` / `lasm build Main.lean`
+  pipeline with automatic tools, Lake dependencies and reliable cache reuse.
+- [ ] Validate the HTTP and Express examples and callable JS/TypeScript bindings
+  through that shipping pipeline.
+- [ ] Supply and validate native Windows ARM64 Lean and compiler SDK bundles.
+- [ ] Run unchanged upstream tests through their appropriate native build-time
+  and compiled-application paths; finish mixed-driver classification.
+- [ ] Audit and differentially test all standard APIs, including IO.FS and Std.Http.
+- [ ] Complete source-free deployment and native six-platform acceptance for
+  stock Node, Deno and Bun.
+
+See [implementation evidence and open work](docs/APPLICATION_PIPELINE.md).
+Passing provisioning or maintainer probes does not close the shipping gates.
+
+## Historical experimental milestones
+
 - [x] Integrate Lake projects, dependencies, and compiler options.
 - [x] Finish release packaging: versioned target archives and Wasm sysroot,
   installation tests, package-manager support, and supported-platform checks.
@@ -22,9 +50,9 @@ See [developer workflow](docs/DEVELOPER_WORKFLOW.md),
 - [ ] Validate native Linux ARM64 installation and execution.
 - [ ] Confirm every matrix result before describing the package as cross-platform supported.
 
-The CI workflow is prepared locally and has not run. It requires a future
-authorized remote and manual dispatch. Wine checks, if performed, are separate
-compatibility evidence and do not check off native Windows acceptance.
+This checklist refers to the older cooperative-runtime package. Current managed
+tool CI runs on the authorized GitHub repository, as recorded above. Wine checks,
+if performed, remain separate from native Windows acceptance.
 
 ## Application development improvements
 

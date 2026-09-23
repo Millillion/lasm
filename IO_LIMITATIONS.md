@@ -1,5 +1,20 @@
 # Current IO limitations in Lasm
 
+The [current product plan](docs/PLAN.md) targets full ordinary Lean 4.34.0
+applications in stock Node 26.10.0, Deno 2.9.7 and Bun 1.4.2 on all six native
+build platforms. Its [application pipeline status](docs/APPLICATION_PIPELINE.md)
+and [unchanged upstream inventory](docs/UPSTREAM_APPLICATION_TESTS.md) are tracked
+separately from the earlier runtime evidence below.
+
+- [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
+  application path; earlier 4.32 results do not transfer automatically.
+- [ ] Complete the latest-release declaration/API audit and native differential
+  coverage in all three stock engines and all six OS/architecture combinations.
+- [ ] Finish managed application packaging, native Windows ARM64 tools and
+  deployment validation without source or build tools.
+
+## Earlier runtime evidence and remaining compatibility work
+
 Snapshot: 2026-09-23 UTC, `0.1.0-experimental.3`, Lean `4.32.0`.
 Every checkbox below is intentionally empty and describes remaining work, a
 known difference, or a validation gap. These are Lasm limitations, not Lean

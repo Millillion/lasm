@@ -209,5 +209,62 @@
       "failure": "Cold libc build exceeded the 180-second harness deadline; no behavior mismatch established."
     }
   ],
-  "costControls": "Public standard runners; no artifact uploads or Actions caches."
+  "costControls": "Public standard runners; no artifact uploads or Actions caches.",
+  "macosX64Followup": {
+    "run": "https://github.com/Millillion/lasm/actions/runs/35897436028",
+    "commit": "065b276aded203caea837306452cdaa7ad503238",
+    "conclusion": "success",
+    "compilerDeadlineSeconds": 900,
+    "result": {
+      "scope": "Managed SDK C-to-Wasm smoke; full Lean application acceptance remains separate",
+      "recordedAt": "2026-09-23T17:48:20.056Z",
+      "platform": "darwin-x64",
+      "node": "v26.10.0",
+      "sdk": "6.0.9",
+      "identity": "eca285097db8c138e4acef4ae85a7e10df44f30762592494dd92a2a6836a662c",
+      "archive": {
+        "name": "emscripten-6.0.9-darwin-x64",
+        "root": "install",
+        "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/mac/f04ea239d533260dd1db760dd2d668d5f9a88d6b/wasm-binaries.tar.xz",
+        "sha256": "4d069a21f0527ae9e6decccb12933b0a68a0314d66253dee2f9b4a5c9c418613",
+        "bytes": 264076300,
+        "format": "tar.xz",
+        "maximumExtractedBytes": 5000000000
+      },
+      "driverIdentity": "8e35e89920d74887d0378814160cada6dfc9ccc51e140c0fff55fe51173e20a0",
+      "runtimePatchesApplied": true,
+      "nativePrograms": {
+        "clang": {
+          "platform": "darwin",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "wasm-ld": {
+          "platform": "darwin",
+          "architectures": [
+            "x64"
+          ]
+        },
+        "wasm-opt": {
+          "platform": "darwin",
+          "architectures": [
+            "x64"
+          ]
+        }
+      },
+      "python": "3.13.15",
+      "verifiedReuse": true,
+      "output": "managed SDK application",
+      "exit": 7,
+      "compileSeconds": 135.442404993
+    }
+  },
+  "verifiedPlatforms": [
+    "linux-x64",
+    "win32-x64",
+    "darwin-arm64",
+    "linux-arm64",
+    "darwin-x64"
+  ]
 }

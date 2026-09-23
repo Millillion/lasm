@@ -12,16 +12,24 @@ await ensureResourceGuard();
 
 const build = resolve(process.argv[2] ?? '.work/lean-full/wasm');
 const output = resolve(process.argv[3] ?? join(build, 'lasm-wasm-exports.json'));
+const options = process.argv.slice(4);
+const option = name => { const i = options.indexOf(name); return i < 0 ? undefined : options[i + 1]; };
+const applicationHook = option('--application-hook');
+if (applicationHook && !/^[A-Za-z_][A-Za-z0-9_]*$/.test(applicationHook)) throw new Error('Invalid application registry hook');
 const sdk = resolve(process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9'));
 const nm = process.env.LASM_LLVM_NM ?? join(sdk, 'upstream/bin/llvm-nm');
-const stems = JSON.parse(execFileSync(resolveLean(root).lean, [join(root, 'scripts/full-lean/ExternSymbols.lean')],
+const nativeLean = option('--native-lean') ?? resolveLean(root).lean;
+const stems = JSON.parse(execFileSync(nativeLean, ['-j2', '-s8192', join(root, 'scripts/full-lean/ExternSymbols.lean')],
   { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 }));
 const linked = new Set(['libInit.a', 'libStd.a', 'libLean.a', 'libleancpp.a', 'libleanrt.a',
   'libleanmain.a', 'libleanshell.a', 'libleaninitialize.a']);
 if (/^LASM_HOST_BRIDGE:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'))) linked.add('liblasmhost.a');
-if (/^LASM_LINK_LAKE:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'))) linked.add('libLake.a');
+if (options.includes('--lake') || /^LASM_LINK_LAKE:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'))) linked.add('libLake.a');
 const archives = [join(build, 'lib/lean'), join(build, 'lib/temp')].flatMap(dir =>
   readdirSync(dir).filter(name => linked.has(name)).map(name => join(dir, name)));
+const applicationFile = option('--application-inputs');
+const application = applicationFile ? JSON.parse(readFileSync(applicationFile, 'utf8')) : { objects: [], sources: [] };
+archives.push(...application.objects);
 const memory64 = /^LASM_MEMORY64:STRING=[12]$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'));
 // A compiler can load C/C++ libraries that were not known when it was linked.
 // Export the native runtime ABI too, while retaining Lean declarations in the
@@ -31,18 +39,20 @@ const mimalloc = /^USE_MIMALLOC:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeC
 archives.push(...runtimeAbiArchives(sdk, memory64, mimalloc));
 const symbols = new Set();
 const dataSymbols = new Set();
+// Lean 4.34 also uses lp_<package>_... for declarations from Lake packages.
+const isLeanSymbol = name => /^lp?_/.test(name);
 for (const archive of archives) {
   for (const { name, type } of definedAbiSymbols(archive, nm)) {
     symbols.add(name);
     // Initialized constants have no executable IR body to fall back to.
-    if (name.startsWith('l_') && 'BDGRS'.includes(type)) dataSymbols.add(name);
+    if (isLeanSymbol(name) && 'BDGRS'.includes(type)) dataSymbols.add(name);
   }
 }
 // The dynamic loader needs the same registry as the interpreter when a later
 // plugin imports a compiled Lean function omitted from the JS export surface.
 const requested = new Set(['main', 'malloc', 'free', 'lasm_lookup_lean_symbol']);
 for (const symbol of dataSymbols) requested.add(symbol);
-for (const symbol of symbols) if (!symbol.startsWith('l_') && !symbol.startsWith('lasm_original_')
+for (const symbol of symbols) if (!isLeanSymbol(symbol) && !symbol.startsWith('lasm_original_')
     && isRuntimeExport(symbol)) requested.add(symbol);
 for (const entry of stems) {
   if (symbols.has(entry.stem)) requested.add(entry.stem);
@@ -59,21 +69,23 @@ console.log(JSON.stringify({ output, exported: exports.length, defined: symbols.
 const generated = existsSync(join(build, 'generated-c')) ? join(build, 'generated-c') : join(build, 'lib/temp');
 const files = dir => readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? files(join(dir, e.name)) : [join(dir, e.name)]);
 const declarations = new Map();
-for (const path of files(generated).filter(path => path.endsWith('.c'))) {
+for (const path of [...files(generated).filter(path => path.endsWith('.c')), ...application.sources]) {
   const source = readFileSync(path, 'utf8');
-  for (const match of source.matchAll(/^(?:LEAN_EXPORT\s+)?(?:extern\s+)?((?:const\s+)?(?:lean_object\s*\*|uint\d+_t|size_t|double|float|void)\s+(l_[A-Za-z0-9_]+)(?:\([^\n;{}]*\))?)\s*[;{=]/gm)) {
+  for (const match of source.matchAll(/^(?:LEAN_EXPORT\s+)?(?:extern\s+)?((?:const\s+)?(?:lean_object\s*\*|uint\d+_t|size_t|double|float|void)\s+(lp?_[A-Za-z0-9_]+)(?:\([^\n;{}]*\))?)\s*[;{=]/gm)) {
     if (symbols.has(match[2])) declarations.set(match[2], `extern ${match[1]};`);
   }
 }
-const names = [...symbols].filter(name => name.startsWith('l_')).sort();
+const names = [...symbols].filter(isLeanSymbol).sort();
 const missing = names.filter(name => !declarations.has(name));
 if (missing.length) throw new Error(`Missing generated C declarations for ${missing.length} symbols: ${missing.slice(0, 30).join(', ')}`);
 const registry = `// Generated from verified C declarations and linked archive symbols.\n#include <lean/lean.h>\n#include <string.h>\n${names.map(name => declarations.get(name)).join('\n')}
+${applicationHook ? `extern void *${applicationHook}(const char *);` : ''}
 struct lasm_symbol { const char *name; void *address; };
 static const struct lasm_symbol lasm_symbols[] = {
 ${names.map(name => `  {"${name}", (void *)&${name}},`).join('\n')}
 };
 void *lasm_lookup_lean_symbol(const char *name) {
+${applicationHook ? `    void *application = ${applicationHook}(name);\n    if (application) return application;` : ''}
     size_t first = 0, end = sizeof(lasm_symbols) / sizeof(lasm_symbols[0]);
     while (first < end) {
         size_t middle = first + (end - first) / 2;
@@ -84,6 +96,6 @@ void *lasm_lookup_lean_symbol(const char *name) {
     return NULL;
 }
 `;
-const registryPath = join(build, 'lasm-native-symbols.c');
+const registryPath = option('--registry') ?? join(build, 'lasm-native-symbols.c');
 if (!existsSync(registryPath) || readFileSync(registryPath, 'utf8') !== registry) writeFileSync(registryPath, registry);
 console.log(JSON.stringify({ registry: registryPath, symbols: names.length }));

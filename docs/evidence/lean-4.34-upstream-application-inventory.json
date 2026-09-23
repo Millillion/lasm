@@ -3,7 +3,7 @@
   "lean": "4.34.0",
   "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
   "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
-  "recordedAt": "2026-09-23T17:47:00.555337+00:00",
+  "recordedAt": "2026-09-23T17:48:48.018158+00:00",
   "scope": "Upstream default CTest registrations and explicit exclusions; inventory only, no test passes",
   "registrations": 4066,
   "verifiedOriginalFilesAndLinks": 7669,
@@ -113,8 +113,6 @@
     }
   ],
   "unregisteredTestDriversForReview": [
-    "tests/compile_bench/run_test.sh",
-    "tests/elab_bench/run_test.sh",
     "tests/lake/examples/bootstrap/test.sh",
     "tests/lake/run_test.sh",
     "tests/lake/tests/online/test.sh",
@@ -1662,7 +1660,7 @@
         "tests/compile_bench/binarytrees.lean.init.sh",
         "tests/compile_bench/binarytrees.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1676,7 +1674,7 @@
         "tests/compile_bench/binarytrees.st.lean.init.sh",
         "tests/compile_bench/binarytrees.st.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1690,7 +1688,7 @@
         "tests/compile_bench/channel.lean.init.sh",
         "tests/compile_bench/channel.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1704,7 +1702,7 @@
         "tests/compile_bench/const_fold.lean.init.sh",
         "tests/compile_bench/const_fold.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1718,7 +1716,7 @@
         "tests/compile_bench/deriv.lean.init.sh",
         "tests/compile_bench/deriv.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1732,7 +1730,7 @@
         "tests/compile_bench/hashmap.lean.init.sh",
         "tests/compile_bench/hashmap.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1746,7 +1744,7 @@
         "tests/compile_bench/http_server.lean.init.sh",
         "tests/compile_bench/http_server.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1760,7 +1758,7 @@
         "tests/compile_bench/http_server_tcp.lean.init.sh",
         "tests/compile_bench/http_server_tcp.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1778,7 +1776,7 @@
         "tests/compile_bench/identifier_completion.lean.no_compile",
         "tests/compile_bench/identifier_completion.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": false,
       "upstreamInterpretEnabled": true
     },
@@ -1792,7 +1790,7 @@
         "tests/compile_bench/ilean_roundtrip.lean.init.sh",
         "tests/compile_bench/ilean_roundtrip.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1806,7 +1804,7 @@
         "tests/compile_bench/incr_header_load.lean.before.sh",
         "tests/compile_bench/incr_header_load.lean.init.sh"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1819,7 +1817,7 @@
       "sidecars": [
         "tests/compile_bench/incr_header_save.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1833,7 +1831,7 @@
         "tests/compile_bench/io_compute.lean.no_interpret",
         "tests/compile_bench/io_compute.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": false
     },
@@ -1847,7 +1845,7 @@
         "tests/compile_bench/iterators.lean.do_interpret",
         "tests/compile_bench/iterators.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1862,7 +1860,7 @@
         "tests/compile_bench/liasolver.lean.init.sh",
         "tests/compile_bench/liasolver.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1876,7 +1874,7 @@
         "tests/compile_bench/nat_repr.lean.init.sh",
         "tests/compile_bench/nat_repr.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1889,7 +1887,7 @@
       "sidecars": [
         "tests/compile_bench/parser.lean.init.sh"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1903,7 +1901,7 @@
         "tests/compile_bench/phashmap.lean.init.sh",
         "tests/compile_bench/phashmap.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1916,7 +1914,7 @@
       "sidecars": [
         "tests/compile_bench/qsort.lean.init.sh"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1930,7 +1928,7 @@
         "tests/compile_bench/rbmap.lean.init.sh",
         "tests/compile_bench/rbmap.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1944,7 +1942,7 @@
         "tests/compile_bench/rbmap_checkpoint.lean.init.sh",
         "tests/compile_bench/rbmap_checkpoint.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1958,7 +1956,7 @@
         "tests/compile_bench/rbmap_fbip.lean.init.sh",
         "tests/compile_bench/rbmap_fbip.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1972,7 +1970,7 @@
         "tests/compile_bench/rbmap_library.lean.init.sh",
         "tests/compile_bench/rbmap_library.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1986,7 +1984,7 @@
         "tests/compile_bench/select.lean.init.sh",
         "tests/compile_bench/select.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -1999,7 +1997,7 @@
       "sidecars": [
         "tests/compile_bench/server_startup.lean.log"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -2013,7 +2011,7 @@
         "tests/compile_bench/sigmaIterator.lean.init.sh",
         "tests/compile_bench/sigmaIterator.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -2027,7 +2025,7 @@
         "tests/compile_bench/treemap.lean.init.sh",
         "tests/compile_bench/treemap.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -2041,7 +2039,7 @@
         "tests/compile_bench/unionfind.lean.init.sh",
         "tests/compile_bench/unionfind.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -2051,7 +2049,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/compile_bench/watchdogRss.lean",
       "sha256": "df4d5f68f66f885231afef3574a7140f629ec0103477a2ef77cc5d8e6aee8bc0",
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -2064,7 +2062,7 @@
       "sidecars": [
         "tests/compile_bench/workspaceSymbolsNewRanges.lean.out.expected"
       ],
-      "driver": "tests/compile/run_test.sh",
+      "driver": "tests/compile_bench/run_test.sh",
       "upstreamCompileEnabled": true,
       "upstreamInterpretEnabled": true
     },
@@ -32299,7 +32297,7 @@
       "sidecars": [
         "tests/elab_bench/big_beq.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_beq_rec.lean",
@@ -32310,7 +32308,7 @@
       "sidecars": [
         "tests/elab_bench/big_beq_rec.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_deceq.lean",
@@ -32321,7 +32319,7 @@
       "sidecars": [
         "tests/elab_bench/big_deceq.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_deceq_rec.lean",
@@ -32332,7 +32330,7 @@
       "sidecars": [
         "tests/elab_bench/big_deceq_rec.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_do.lean",
@@ -32343,7 +32341,7 @@
       "sidecars": [
         "tests/elab_bench/big_do.lean.out.expected"
       ],
-      "driver": "tests/elab/run_test.sh",
+      "driver": "tests/elab_bench/run_test.sh",
       "deployedRuntimeCoverageRequired": true
     },
     {
@@ -32355,7 +32353,7 @@
       "sidecars": [
         "tests/elab_bench/big_match.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_match_nat.lean",
@@ -32366,7 +32364,7 @@
       "sidecars": [
         "tests/elab_bench/big_match_nat.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_match_nat_split.lean",
@@ -32377,7 +32375,7 @@
       "sidecars": [
         "tests/elab_bench/big_match_nat_split.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_match_partial.lean",
@@ -32388,7 +32386,7 @@
       "sidecars": [
         "tests/elab_bench/big_match_partial.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_omega.lean",
@@ -32396,7 +32394,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/big_omega.lean",
       "sha256": "5a1e7e2bff6f82f95ada35273e36613a53838e96aba2ad2b469234fc5571ff48",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_omega_MT.lean",
@@ -32407,7 +32405,7 @@
       "sidecars": [
         "tests/elab_bench/big_omega_MT.lean.init.sh"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_struct.lean",
@@ -32415,7 +32413,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/big_struct.lean",
       "sha256": "9961e694224b77ba5f60aaf8ca2d43ee80bc2db64db344a6b020549d3010c497",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_struct_dep.lean",
@@ -32423,7 +32421,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/big_struct_dep.lean",
       "sha256": "7713107cb5706da4d88b43e6c0c21621806b27898887ff8b92f05c45260b4023",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/big_struct_dep1.lean",
@@ -32431,7 +32429,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/big_struct_dep1.lean",
       "sha256": "0ef98f6cf82a7d1508ce92d3359acb1cbd85b893f80ec2e6fabfefe68434d4bc",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/bv_decide_large_aig.lean",
@@ -32442,7 +32440,7 @@
       "sidecars": [
         "tests/elab_bench/bv_decide_large_aig.lean.out.expected"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/bv_decide_mul.lean",
@@ -32450,7 +32448,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/bv_decide_mul.lean",
       "sha256": "bcf8ff470d6fd112411a7387810b1ef1e1a04d3e9bb54ac2bcfe78760b802f3d",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/bv_decide_realworld.lean",
@@ -32458,7 +32456,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/bv_decide_realworld.lean",
       "sha256": "422959870f97ca16ac95c4d423ed7eb1a524bad24e3545b105a826efc7f6c393",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/bv_decide_rewriter.lean",
@@ -32466,7 +32464,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/bv_decide_rewriter.lean",
       "sha256": "6ebb698fe45e4d31cbaec67b373b6babf77abc57392f76c0ff70e0288b9187ed",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/bv_stress_replicate.lean",
@@ -32474,7 +32472,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/bv_stress_replicate.lean",
       "sha256": "178b68ff194ed9f0efb947790e3692fe52fb82083ec9a1cf41ba04ab6f7f8414",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/bv_stress_structures_1.lean",
@@ -32482,7 +32480,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/bv_stress_structures_1.lean",
       "sha256": "37c0d85a55e771467deb43b525c8e286ea4723273f464ede1924f62edcde083b",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/bv_stress_structures_2.lean",
@@ -32490,7 +32488,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/bv_stress_structures_2.lean",
       "sha256": "78fb616a13f6557fcf9865bb735f507b6e2bc3bd510de5c6c1e53c93fa2f4e4a",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/cbv_aes.lean",
@@ -32498,7 +32496,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/cbv_aes.lean",
       "sha256": "7be9bbcad8335c8ae589ab5e0c608660bfb75da108d1cb4164d7f4df1ecb4a06",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/cbv_decide.lean",
@@ -32509,7 +32507,7 @@
       "sidecars": [
         "tests/elab_bench/cbv_decide.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh",
+      "driver": "tests/elab_bench/run_test.sh",
       "deployedRuntimeCoverageRequired": true
     },
     {
@@ -32518,7 +32516,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/cbv_dedup.lean",
       "sha256": "2c6390a6c7d014fea25a1f81f9c44d71477734a67c2eb7d7cf11945fab45b5de",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/cbv_divisors.lean",
@@ -32529,7 +32527,7 @@
       "sidecars": [
         "tests/elab_bench/cbv_divisors.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh",
+      "driver": "tests/elab_bench/run_test.sh",
       "deployedRuntimeCoverageRequired": true
     },
     {
@@ -32541,7 +32539,7 @@
       "sidecars": [
         "tests/elab_bench/cbv_leroy.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh",
+      "driver": "tests/elab_bench/run_test.sh",
       "deployedRuntimeCoverageRequired": true
     },
     {
@@ -32553,7 +32551,7 @@
       "sidecars": [
         "tests/elab_bench/cbv_merge_sort.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh",
+      "driver": "tests/elab_bench/run_test.sh",
       "deployedRuntimeCoverageRequired": true
     },
     {
@@ -32565,7 +32563,7 @@
       "sidecars": [
         "tests/elab_bench/charactersIn.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh",
+      "driver": "tests/elab_bench/run_test.sh",
       "deployedRuntimeCoverageRequired": true
     },
     {
@@ -32574,7 +32572,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/delayed_assign.lean",
       "sha256": "10f7804d66591aa1602f3eaf43ad235aceaef21733ffa44b50364d6a14fda654",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/delayed_lift.lean",
@@ -32582,7 +32580,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/delayed_lift.lean",
       "sha256": "c27b612ab55b83da15e2092176b47cdc4b010f6e40889bc302a3307417a29fff",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/delayed_sharing.lean",
@@ -32590,7 +32588,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/delayed_sharing.lean",
       "sha256": "9af9a18634dd10cb117f74290a7f7143800178ddb6334668c160bb4cbd5bdce3",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/grind_list2.lean",
@@ -32598,7 +32596,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/grind_list2.lean",
       "sha256": "c112e75f7bb6f9604db5bd0559681e06587e598e56039bf3a9b0f6c225b7f446",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/grind_ring_5.lean",
@@ -32606,7 +32604,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/grind_ring_5.lean",
       "sha256": "af4a6750cab8b62555e4b1dfd9a90c910c09b06d791a69e995f329fd5f196a5a",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/iterators.lean",
@@ -32614,7 +32612,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/iterators.lean",
       "sha256": null,
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/mut_rec_wf.lean",
@@ -32625,7 +32623,7 @@
       "sidecars": [
         "tests/elab_bench/mut_rec_wf.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/omega_stress.lean",
@@ -32636,7 +32634,7 @@
       "sidecars": [
         "tests/elab_bench/omega_stress.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/reduceMatch.lean",
@@ -32644,7 +32642,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/reduceMatch.lean",
       "sha256": "59d44a960bb16741562867a1adac12e06b7b4ce5f39480986ba5b9ae551bcce8",
-      "driver": "tests/elab/run_test.sh",
+      "driver": "tests/elab_bench/run_test.sh",
       "deployedRuntimeCoverageRequired": true
     },
     {
@@ -32653,7 +32651,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/simp_arith1.lean",
       "sha256": "bf63b208e94279d1fa98866b265f2f37fcb8721e5c932bc1a26158bf0c1133ba",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/simp_bubblesort_256.lean",
@@ -32661,7 +32659,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/simp_bubblesort_256.lean",
       "sha256": "a1f21f8609ac1d6878e5928e223daa624e559ecf4fa69031a5db167440700cad",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/simp_congr.lean",
@@ -32672,7 +32670,7 @@
       "sidecars": [
         "tests/elab_bench/simp_congr.lean.init.sh"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/simp_local.lean",
@@ -32680,7 +32678,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/simp_local.lean",
       "sha256": "3f969a0511f560106aed1dff2546ed62557a8a02b2291d2f74551f91d2fa3926",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/simp_subexpr.lean",
@@ -32691,7 +32689,7 @@
       "sidecars": [
         "tests/elab_bench/simp_subexpr.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/string_simp_ne.lean",
@@ -32702,7 +32700,7 @@
       "sidecars": [
         "tests/elab_bench/string_simp_ne.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/verina.lean",
@@ -32713,7 +32711,7 @@
       "sidecars": [
         "tests/elab_bench/verina.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/whnfMatcherImplicitTransparencyCaching.lean",
@@ -32721,7 +32719,7 @@
       "status": "not-run-through-product-pipeline",
       "source": "tests/elab_bench/whnfMatcherImplicitTransparencyCaching.lean",
       "sha256": "f89045c4d18a0dd4c12c211ab1fb7e511d644a7da25c16c2a6c18ac3557daf0a",
-      "driver": "tests/elab/run_test.sh"
+      "driver": "tests/elab_bench/run_test.sh"
     },
     {
       "name": "elab_bench/workspaceSymbols.lean",
@@ -32732,7 +32730,7 @@
       "sidecars": [
         "tests/elab_bench/workspaceSymbols.lean.out.ignored"
       ],
-      "driver": "tests/elab/run_test.sh",
+      "driver": "tests/elab_bench/run_test.sh",
       "deployedRuntimeCoverageRequired": true
     },
     {
