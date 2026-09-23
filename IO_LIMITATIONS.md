@@ -20,6 +20,14 @@ separately from the earlier runtime evidence below.
   `Std.Internal.UV.Loop.alive`. The compiled library declarations are present,
   but their Emscripten C implementations still reject the operation or abort;
   shipping all library archives is not complete API support.
+- [ ] Complete large-stack/high-address parity in every engine and platform.
+  The latest installed Node candidate now preserves the original upstream
+  4 GiB thread-stack setting for `const_fold`; allocation, reclamation and
+  unchanged SDK regression checks pass. See the
+  [targeted repair evidence](docs/evidence/application-large-stack-node-2026-09-23.json).
+  Bun's lowered-memory backend still has a 4 GiB capacity ceiling; replacing
+  that backend or resolving its stock-engine integration is open engineering
+  work, not a demonstrated fundamental limitation.
 
 ## Earlier runtime evidence and remaining compatibility work
 

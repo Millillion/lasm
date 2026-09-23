@@ -79,12 +79,31 @@ in JavaScript engines or establish the remaining platform results.
 
 The first complete installed-application Node campaign finished all 101
 registrations: **96 passed, four retained upstream's compilation-disabled
-markers, and one failed**. `compile_bench/const_fold.lean` hit an intermittent
+markers, and one failed**. `compile_bench/const_fold.lean` hit an
 Emscripten worker-mailbox exception (`wait.value.then is not a function`); its
-native output is preserved and the runtime defect remains open. All original
+native output and initial failing deployment are preserved. All original
 files/links and harness hashes remained unchanged. The 4.10 GiB peak caused no
 OOM, throttling or proactive stop. The
 [per-case record](evidence/upstream-applications-node-r1-2026-09-23.json) is the
 authoritative count; earlier progress updates missed that failure. It also
 identifies the six compiled fixtures that deliberately launch native Lean child
 processes, keeping those compiler operations separate from deployed behavior.
+
+The [large-stack investigation and repair](evidence/application-large-stack-node-2026-09-23.json)
+now reproduce that failure with the original `LEAN_STACK_SIZE_KB=4194304`
+sidecar setting. Emscripten's backing allocator retained 32-bit limits and masks,
+and pthread creation used its null allocation. Pointer-width bookkeeping and
+proper allocation rejection fix that cause. An additional repeated-thread check
+exposed asynchronous reclamation after joining; joined threads now reclaim their
+storage before returning, while detached self-cleanup retains its asynchronous
+path. The tentative mailbox retry was removed.
+
+Installed candidate `0.1.0-experimental.7` passes thirty unchanged benchmark
+repetitions against native compiled/interpreted controls, and the original suite
+driver passes separately with all 7,669 original entries intact. Fourteen
+unchanged SDK allocator/thread controls pass in Wasm32 and Wasm64. Sparse
+large-allocation controls retain a failing original-allocator comparison. Peaks
+were 1.05 GiB for the sparse controls, 0.85 GiB for SDK regressions, 3.40 GiB for
+the installed repetitions and 3.55 GiB for the suite-driver rerun, without
+resource events. This is targeted Node/Linux x64 evidence; full repaired-package,
+other-engine and platform campaigns remain required.

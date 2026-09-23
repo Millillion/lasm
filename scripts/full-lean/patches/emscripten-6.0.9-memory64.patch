@@ -36,21 +36,7 @@
            start >>>= 0;
            stop >>>= 0;
  #else
---- a/src/lib/libpthread.js
-+++ b/src/lib/libpthread.js
-@@ -610,6 +610,9 @@
-     worker.onmessage = (e) => {
- #if ASSERTIONS
-       var cmd = e.data.cmd;
-+      // Joined/detached pthreads may finish concurrently with process exit.
-+      // Their normal completion packets can already be queued at terminate().
-+      if (cmd === {{{ CMD_CLEANUP_THREAD }}} || cmd === {{{ CMD_MARK_AS_FINISHED }}}) return;
-       err(`received "${cmd}" command from terminated worker: ${worker.workerID}`);
- #endif
-     };
---- a/src/lib/libdylink.js
-+++ b/src/lib/libdylink.js
-@@ -1366,8 +1366,14 @@
+@@ -1363,8 +1366,14 @@
  #if ASSERTIONS
      assert(lib, `Tried to dlsym() from an unopened handle: ${handle}`);
  #endif
@@ -65,7 +51,7 @@
        dlSetError(`Tried to lookup unknown symbol "${symbol}" in dynamic lib: ${lib.name}`)
        return 0;
      }
-@@ -1403,6 +1409,10 @@
+@@ -1400,6 +1409,10 @@
          // function the second argument will not be needed.  If it's a JS
          // function we rely on the `sig` attribute being set based on the
          // `<func>__sig` specified in library JS file.
@@ -76,3 +62,144 @@
          result = addFunction(result, result.sig);
  #if DYLINK_DEBUG
          dbg('adding symbol to table:',  symbol);
+--- a/src/lib/libpthread.js
++++ b/src/lib/libpthread.js
+@@ -610,11 +610,20 @@
+     worker.onmessage = (e) => {
+ #if ASSERTIONS
+       var cmd = e.data.cmd;
++      // Joined/detached pthreads may finish concurrently with process exit.
++      // Their normal completion packets can already be queued at terminate().
++      if (cmd === {{{ CMD_CLEANUP_THREAD }}} || cmd === {{{ CMD_MARK_AS_FINISHED }}}) return;
+       err(`received "${cmd}" command from terminated worker: ${worker.workerID}`);
+ #endif
+     };
+   },
+ 
++  $cleanupThreadProxied__internal: true,
++  $cleanupThreadProxied__proxy: 'sync',
++  $cleanupThreadProxied__deps: ['$cleanupThread'],
++  $cleanupThreadProxied: (thread) => cleanupThread(thread),
++
++  _emscripten_thread_cleanup__deps: ['$cleanupThreadProxied', 'pthread_self'],
+   _emscripten_thread_cleanup: (thread) => {
+     // Called when a thread needs to be cleaned up so it can be reused.
+     // A thread is considered reusable when it either returns from its
+@@ -625,6 +634,11 @@
+     dbg(`_emscripten_thread_cleanup: ${ptrToString(thread)}`)
+ #endif
+     if (!ENVIRONMENT_IS_PTHREAD) cleanupThread(thread);
++    // A joining thread must reclaim the old stack before returning, so an
++    // immediate replacement thread can reuse its reservation. A detached
++    // thread clears pthread_self before requesting its own cleanup and must
++    // keep the asynchronous path: its proxy wait data lives on that stack.
++    else if (_pthread_self()) cleanupThreadProxied(thread);
+     else postMessage({ cmd: {{{ CMD_CLEANUP_THREAD }}}, thread });
+   },
+ 
+--- a/system/lib/emmalloc.c
++++ b/system/lib/emmalloc.c
+@@ -97,11 +97,12 @@
+ // memory regions backwards and forwards. Because each allocation must be at least a multiple of 4 bytes, the lowest two bits of
+ // each size field is unused. Free regions are distinguished from used regions by having the FREE_REGION_FLAG bit present
+ // in the size field. I.e. for free regions, the size field is odd, and for used regions, the size field reads even.
+-#define FREE_REGION_FLAG 0x1u
++#define FREE_REGION_FLAG ((size_t)1)
+ 
+ // Attempts to malloc() more than this many bytes would cause an overflow when calculating the size of a region,
+ // therefore allocations larger than this are short-circuited immediately on entry.
+-#define MAX_ALLOC_SIZE 0xFFFFFFC7u
++// Keep region bookkeeping and signed sbrk growth within the pointer width.
++#define MAX_ALLOC_SIZE (MIN(SIZE_MAX, INT64_MAX) - 3 * sizeof(Region) - MALLOC_ALIGNMENT)
+ 
+ // A free region has the following structure:
+ // <size:size_t> <prevptr> <nextptr> ... <size:size_t>
+@@ -119,7 +120,7 @@
+ // list of all RootRegions in the program, starting with `listOfAllRegions`
+ // below.
+ typedef struct RootRegion {
+-  uint32_t size;
++  size_t size;
+   struct RootRegion *next;
+   uint8_t* endPtr;
+ } RootRegion;
+@@ -244,7 +245,10 @@
+ static_assert(NUM_FREE_BUCKETS == 64, "Following function is tailored specifically for NUM_FREE_BUCKETS == 64 case");
+ static int compute_free_list_bucket(size_t allocSize) {
+   if (allocSize < 128) return (allocSize >> 3) - 1;
+-  int clz = __builtin_clz(allocSize);
++  // Larger memory64 regions all belong in the final bucket. Clamp before
++  // the 32-bit leading-zero operation so high size bits cannot be lost.
++  if (allocSize >= 134217728) return NUM_FREE_BUCKETS - 1;
++  int clz = __builtin_clz((unsigned)allocSize);
+   int bucketIndex =
+     (clz > 19)
+       ?     110 - (clz<<2) + ((allocSize >> (29-clz)) ^ 4)
+@@ -470,6 +474,8 @@
+   // region.
+   numBytes = (size_t)ALIGN_UP(numBytes, MALLOC_ALIGNMENT);
+ 
++  // Reject impossible reservations before signed sbrk address arithmetic.
++  if (numBytes > emscripten_get_heap_max()) return false;
+   // Claim memory via sbrk
+   assert((int64_t)numBytes >= 0);
+   uint8_t *startPtr = (uint8_t*)_sbrk64((int64_t)numBytes);
+@@ -679,7 +685,7 @@
+     return 0;
+   }
+ 
+-  if (size > MAX_ALLOC_SIZE) {
++  if (size > MAX_ALLOC_SIZE || alignment > MAX_ALLOC_SIZE) {
+ #ifdef EMMALLOC_VERBOSE
+     MAIN_THREAD_ASYNC_EM_ASM(out('Allocation failed: attempted allocation size is too large: ' + Number($0) + 'bytes! (negative integer wraparound?)'), size);
+ #endif
+@@ -782,6 +788,7 @@
+   // in a free list). As a compromise however it seems reasonable in practice as
+   // a way to handle large aligned regions to avoid even worse waste.
+   if (alignment > MALLOC_ALIGNMENT) {
++    if (alignment > MAX_ALLOC_SIZE - size) return 0;
+     numBytesToClaim += alignment;
+   }
+   assert(numBytesToClaim > size); // 32-bit wraparound should not happen here, allocation size has been validated above!
+@@ -1140,6 +1147,7 @@
+ EMMALLOC_ALIAS(posix_memalign, emmalloc_posix_memalign);
+ 
+ void *emmalloc_calloc(size_t num, size_t size) {
++  if (size && num > SIZE_MAX / size) return 0;
+   size_t bytes = num*size;
+   void *ptr = emmalloc_memalign(MALLOC_ALIGNMENT, bytes);
+   if (ptr) {
+@@ -1407,7 +1415,11 @@
+       ++numFreeMemoryRegions;
+       size_t freeDynamicMemory = freeRegion->size - REGION_HEADER_SIZE;
+       if (freeDynamicMemory > 0) {
+-        ++freeMemorySizeMap[31-__builtin_clz(freeDynamicMemory)];
++        // The public histogram has 32 entries; its last bucket includes
++        // memory64 regions of 2 GiB and above.
++        int index = freeDynamicMemory >= ((size_t)1 << 31) ? 31
++                    : 31 - __builtin_clz((unsigned)freeDynamicMemory);
++        ++freeMemorySizeMap[index];
+       } else {
+         ++freeMemorySizeMap[0];
+       }
+--- a/system/lib/pthread/pthread_create.c
++++ b/system/lib/pthread/pthread_create.c
+@@ -151,6 +151,10 @@
+   size_t zero_size = size;
+   if (!attr._a_stackaddr) {
+     guard_size = attr._a_guardsize;
++    // Reject impossible stack sizes before addition can wrap.
++    if (guard_size > SIZE_MAX - size - (STACK_ALIGN - 1) ||
++        attr._a_stacksize > SIZE_MAX - size - (STACK_ALIGN - 1) - guard_size)
++      return EAGAIN;
+     size += guard_size + attr._a_stacksize + STACK_ALIGN - 1;
+     zero_size += guard_size;
+   }
+@@ -158,6 +162,7 @@
+   // Allocate all the data for the new thread and zero-initialize all parts
+   // except for the stack.
+   unsigned char* block = emscripten_builtin_malloc(size);
++  if (!block) return EAGAIN;
+   memset(block, 0, zero_size);
+ 
+   uintptr_t offset = (uintptr_t)block;

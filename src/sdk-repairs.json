@@ -1,6 +1,6 @@
 {
   "version": "6.0.9",
-  "patchSha256": "a132e6482a95d97d23e2d4c90866a0a36f32990b651a8b80fcc8e4d5941051eb",
+  "patchSha256": "60ea09f4d915423899c2497f257e108601b35fbbc12041b3aa21833ff6334a1e",
   "files": [
     {
       "path": "tools/link.py",
@@ -42,9 +42,17 @@
         {
           "before": "    worker.onmessage = (e) => {\n#if ASSERTIONS\n      var cmd = e.data.cmd;\n      err(`received \"${cmd}\" command from terminated worker: ${worker.workerID}`);\n#endif\n    };\n",
           "after": "    worker.onmessage = (e) => {\n#if ASSERTIONS\n      var cmd = e.data.cmd;\n      // Joined/detached pthreads may finish concurrently with process exit.\n      // Their normal completion packets can already be queued at terminate().\n      if (cmd === {{{ CMD_CLEANUP_THREAD }}} || cmd === {{{ CMD_MARK_AS_FINISHED }}}) return;\n      err(`received \"${cmd}\" command from terminated worker: ${worker.workerID}`);\n#endif\n    };\n"
+        },
+        {
+          "before": "  _emscripten_thread_cleanup: (thread) => {\n",
+          "after": "  $cleanupThreadProxied__internal: true,\n  $cleanupThreadProxied__proxy: 'sync',\n  $cleanupThreadProxied__deps: ['$cleanupThread'],\n  $cleanupThreadProxied: (thread) => cleanupThread(thread),\n\n  _emscripten_thread_cleanup__deps: ['$cleanupThreadProxied', 'pthread_self'],\n  _emscripten_thread_cleanup: (thread) => {\n"
+        },
+        {
+          "before": "    if (!ENVIRONMENT_IS_PTHREAD) cleanupThread(thread);\n    else postMessage({ cmd: {{{ CMD_CLEANUP_THREAD }}}, thread });",
+          "after": "    if (!ENVIRONMENT_IS_PTHREAD) cleanupThread(thread);\n    // A joining thread must reclaim the old stack before returning, so an\n    // immediate replacement thread can reuse its reservation. A detached\n    // thread clears pthread_self before requesting its own cleanup and must\n    // keep the asynchronous path: its proxy wait data lives on that stack.\n    else if (_pthread_self()) cleanupThreadProxied(thread);\n    else postMessage({ cmd: {{{ CMD_CLEANUP_THREAD }}}, thread });"
         }
       ],
-      "patchedSha256": "99456db0bf77860dd8eb998a130fb68207a0b16ee0ca6b8d065ab55c7ae262a1",
+      "patchedSha256": "a447ff4703487d57998372b675efd85c98897c200f93a4c803bd3910528f2f44",
       "originalSha256": "9b762d32a9473f720fe75f64a5bd56108a91654b9833cc8842553c631288d6a9"
     },
     {
@@ -87,10 +95,71 @@
           "after": "def exec_process(cmd):\n  print_compiler_stage(cmd)\n  # Keep Clang argument batches below the Windows CreateProcess limit, including\n  # the expanded source paths from internal SDK response files.\n  if utils.WINDOWS and len(subprocess.list2cmdline(cmd).encode(\"utf-16-le\")) // 2 > 24000:\n    from . import response_file\n    cmd = [cmd[0], \"@\" + response_file.create_response_file(cmd[1:], TEMP_DIR)]\n  utils.exec(cmd)\n"
         }
       ]
+    },
+    {
+      "path": "system/lib/emmalloc.c",
+      "originalSha256": "00eb577cbef51a3359c309f45a7c99a814b8c6151ab75c9a3c78a56f0169146b",
+      "patchedSha256": "a2eb6a0686335e3120edb59f31812b9349591042f3b29a74f59daaf99d0984ae",
+      "replacements": [
+        {
+          "before": "#define FREE_REGION_FLAG 0x1u",
+          "after": "#define FREE_REGION_FLAG ((size_t)1)"
+        },
+        {
+          "before": "#define MAX_ALLOC_SIZE 0xFFFFFFC7u",
+          "after": "// Keep region bookkeeping and signed sbrk growth within the pointer width.\n#define MAX_ALLOC_SIZE (MIN(SIZE_MAX, INT64_MAX) - 3 * sizeof(Region) - MALLOC_ALIGNMENT)"
+        },
+        {
+          "before": "typedef struct RootRegion {\n  uint32_t size;",
+          "after": "typedef struct RootRegion {\n  size_t size;"
+        },
+        {
+          "before": "  if (allocSize < 128) return (allocSize >> 3) - 1;\n  int clz = __builtin_clz(allocSize);",
+          "after": "  if (allocSize < 128) return (allocSize >> 3) - 1;\n  // Larger memory64 regions all belong in the final bucket. Clamp before\n  // the 32-bit leading-zero operation so high size bits cannot be lost.\n  if (allocSize >= 134217728) return NUM_FREE_BUCKETS - 1;\n  int clz = __builtin_clz((unsigned)allocSize);"
+        },
+        {
+          "before": "  if (alignment > MALLOC_ALIGNMENT) {\n    numBytesToClaim += alignment;",
+          "after": "  if (alignment > MALLOC_ALIGNMENT) {\n    if (alignment > MAX_ALLOC_SIZE - size) return 0;\n    numBytesToClaim += alignment;"
+        },
+        {
+          "before": "  size_t bytes = num*size;\n",
+          "after": "  if (size && num > SIZE_MAX / size) return 0;\n  size_t bytes = num*size;\n"
+        },
+        {
+          "before": "        ++freeMemorySizeMap[31-__builtin_clz(freeDynamicMemory)];",
+          "after": "        // The public histogram has 32 entries; its last bucket includes\n        // memory64 regions of 2 GiB and above.\n        int index = freeDynamicMemory >= ((size_t)1 << 31) ? 31\n                    : 31 - __builtin_clz((unsigned)freeDynamicMemory);\n        ++freeMemorySizeMap[index];"
+        },
+        {
+          "before": "  // Claim memory via sbrk\n  assert((int64_t)numBytes >= 0);",
+          "after": "  // Reject impossible reservations before signed sbrk address arithmetic.\n  if (numBytes > emscripten_get_heap_max()) return false;\n  // Claim memory via sbrk\n  assert((int64_t)numBytes >= 0);"
+        },
+        {
+          "before": "  if (size > MAX_ALLOC_SIZE) {\n#ifdef EMMALLOC_VERBOSE\n    MAIN_THREAD_ASYNC_EM_ASM(out('Allocation failed: attempted allocation size is too large: ' + Number($0) + 'bytes! (negative integer wraparound?)'), size);\n#endif\n    return 0;\n  }\n\n  alignment = validate_alloc_alignment(alignment);",
+          "after": "  if (size > MAX_ALLOC_SIZE || alignment > MAX_ALLOC_SIZE) {\n#ifdef EMMALLOC_VERBOSE\n    MAIN_THREAD_ASYNC_EM_ASM(out('Allocation failed: attempted allocation size is too large: ' + Number($0) + 'bytes! (negative integer wraparound?)'), size);\n#endif\n    return 0;\n  }\n\n  alignment = validate_alloc_alignment(alignment);"
+        }
+      ]
+    },
+    {
+      "path": "system/lib/pthread/pthread_create.c",
+      "originalSha256": "06e10210681c2f0b92c1e98f9185a4faabcd57f053e949c65ff9ad74b12b65cf",
+      "patchedSha256": "2d57cff529827c3b77b7104b68c658a30ad4b1b99da435d09ae0dac86bd08082",
+      "replacements": [
+        {
+          "before": "    size += guard_size + attr._a_stacksize + STACK_ALIGN - 1;\n",
+          "after": "    // Reject impossible stack sizes before addition can wrap.\n    if (guard_size > SIZE_MAX - size - (STACK_ALIGN - 1) ||\n        attr._a_stacksize > SIZE_MAX - size - (STACK_ALIGN - 1) - guard_size)\n      return EAGAIN;\n    size += guard_size + attr._a_stacksize + STACK_ALIGN - 1;\n"
+        },
+        {
+          "before": "  unsigned char* block = emscripten_builtin_malloc(size);\n  memset(block, 0, zero_size);",
+          "after": "  unsigned char* block = emscripten_builtin_malloc(size);\n  if (!block) return EAGAIN;\n  memset(block, 0, zero_size);"
+        }
+      ]
     }
   ],
   "archiveVersion": "6.0.9-git",
   "versionNormalization": "The official emsdk installer writes the stable release version resolved from this archive hash into emscripten-version.txt.",
   "internalCompilerLaunches": "Use private Python directly with -B -E -s for recursive SDK tools; avoid shell-wrapper bytecode writes and retain strict whole-cache verification.",
-  "windowsCommandLines": "Convert expanded native compiler commands above 24000 UTF-16 code units into the SDK's ordinary LLVM response files before CreateProcess."
+  "windowsCommandLines": "Convert expanded native compiler commands above 24000 UTF-16 code units into the SDK's ordinary LLVM response files before CreateProcess.",
+  "memory64Allocator": "Use pointer-width allocator metadata, masks and size bounds; clamp bucket lookup before 32-bit leading-zero operations and reject overflowing aligned/calloc requests.",
+  "pthreadAllocation": "Return EAGAIN for overflowing or failed stack allocations before writing thread metadata; preserve requested stack sizes.",
+  "joinedThreadCleanup": "Synchronously reclaim joined-thread storage before returning; detached self-cleanup remains asynchronous after pthread_self is cleared."
 }
