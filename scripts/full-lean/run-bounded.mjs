@@ -11,6 +11,17 @@ import { completedCgroupRemoval } from './completed-cgroup.mjs';
 const args = process.argv.slice(2);
 const self = fileURLToPath(import.meta.url);
 const root = fileURLToPath(new URL('../../', import.meta.url));
+if (process.platform === 'win32') {
+  // Native CI uses a Windows Job Object for the same process-tree boundary.
+  // Python is provisioned privately; no system Python installation is needed.
+  const { provisionPython } = await import('../../src/managed-python.mjs');
+  const python = await provisionPython();
+  const child = spawn(python.executable, ['-I', '-B', join(root, 'scripts/full-lean/run-bounded-windows.py'), ...args], { stdio: 'inherit' });
+  const code = await new Promise((resolve, reject) => {
+    child.once('error', reject); child.once('exit', code => resolve(code ?? 1));
+  });
+  process.exit(code);
+}
 function counters(file) {
   return Object.fromEntries(readFileSync(file, 'utf8').trim().split('\n').map(line => {
     const [key, value] = line.split(' '); return [key, Number(value)];

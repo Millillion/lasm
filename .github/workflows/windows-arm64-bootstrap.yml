@@ -1,0 +1,55 @@
+name: Native Windows ARM64 Lean bootstrap
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-arm64-bootstrap
+  cancel-in-progress: false
+jobs:
+  bootstrap:
+    if: github.event.repository.visibility == 'public'
+    runs-on: windows-11-arm
+    timeout-minutes: 330
+    env:
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
+      MSYSTEM: CLANGARM64
+      CHERE_INVOKING: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: arm64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Check the native host
+        run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-arm64')"
+      - name: Check descendant memory accounting below the cap
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-guard-control.json -- node test/fixtures/windows-guard.mjs
+      - name: Verify the guard control
+        run: node -e "const r=require('./.work/windows-guard-control.json');const a=require('node:assert/strict');a.equal(r.status,'passed');a.ok(r.peakCommittedBytes>=64*1024*1024);a.ok(r.peakCommittedBytes<r.limits.stopCommittedBytes)"
+      - uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2.32.0
+        id: msys2
+        with:
+          msystem: CLANGARM64
+          cache: false
+          path-type: minimal
+          install: >-
+            make git tar diffutils binutils
+            mingw-w64-clang-aarch64-cmake
+            mingw-w64-clang-aarch64-clang
+            mingw-w64-clang-aarch64-gmp
+            mingw-w64-clang-aarch64-libuv
+            mingw-w64-clang-aarch64-openssl
+      - name: Build with one worker in a capped Windows Job Object
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
+          node scripts/full-lean/run-bounded.mjs --report .work/windows-arm64-bootstrap-resources.json -- $bash --login scripts/full-lean/bootstrap-windows-arm64.sh
+      - name: Preserve bounded bootstrap results in logs
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-guard-control.json','.work/windows-arm64-bootstrap-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+      # No artifact upload, Actions cache, paid runner or publication.

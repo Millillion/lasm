@@ -1,2 +1,3 @@
 # Unified patches contain context lines whose leading space is significant.
 *.patch -whitespace
+*.sh text eol=lf

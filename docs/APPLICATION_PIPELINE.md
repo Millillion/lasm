@@ -62,8 +62,21 @@ The [first native matrix result](evidence/managed-lean-native-ci-2026-09-23.json
 verifies automatic downloads, whole-cache integrity, ordinary Lean execution and
 Lake execution on **Linux x64/ARM64, macOS x64/ARM64 and Windows x64**, with Node
 26.10.0 and Lean 4.34.0. Windows ARM64 fails at the documented missing artifact.
-The next revision adds native C generation, compilation and linking with the
-same restricted PATH; those checks are not imported into the earlier result.
+The [next native matrix run](https://github.com/Millillion/lasm/actions/runs/35889527229)
+also passes C generation, native compilation and linking with the same restricted
+PATH on all five platforms. Windows ARM64 remains the sole failing row because
+Lean's upstream archive is missing. Those additional checks are not imported
+into the earlier evidence file.
+
+The separate Windows ARM64 bootstrap workflow builds native Lean from the pinned
+source on `windows-11-arm`. It first validates a Windows Job Object guard using
+small allocations in a parent and child. The build has one worker, a hard memory
+cap no larger than half the runner's RAM, and a proactive stop at 80% of that cap.
+MSYS2's Clang tools target native ARM64; its POSIX shell/make utilities are x64
+helpers. This experiment is **not** an all-native managed distribution pass.
+The native Lean compiler, its generated executable, dependencies and missing
+ARM64 `leantar` packaging still need verification. No CI artifacts or caches are
+uploaded by this workflow.
 
 The repository was verified public and runner eligibility was checked against
 [GitHub's standard-runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
