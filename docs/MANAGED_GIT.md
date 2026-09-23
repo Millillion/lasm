@@ -24,10 +24,15 @@ component is validated by Lasm.
 The Linux x64 control passes streamed installation, verified reuse, cloning a
 file URL with spaces, fetching and switching pinned revisions, and HTTPS/TLS
 remote lookup. Only managed Git and Node directories are on its PATH. The
-six-platform workflow runs the same controls natively, without Actions cache or
-artifact storage. This is Git transport evidence, not a full application pass.
+six-platform workflow now passes the same controls natively, without Actions
+cache or artifact storage; see the [native matrix evidence](evidence/managed-git-native-ci-2026-09-23.json).
+The first Windows run exposed a host-dependent path join in the environment
+helper. The repaired run passes all six rows, including native ARM64 Windows
+executables. The Linux ARM64 provider archive reports `2.53.0.dirty`; its exact
+upstream archive checksum and native executable header are recorded. This is
+Git transport evidence, not a full application pass.
 
-- [ ] Complete the native six-platform transport campaign.
+- [x] Complete the native six-platform transport campaign.
 - [ ] Validate an ordinary pinned Git dependency through Lake and deployed AOT.
 - [ ] Supply any missing SSH-client dependencies and verify private repositories.
 - [ ] Validate submodules, custom helpers and the optional LFS/credential flows.

@@ -1,0 +1,426 @@
+{
+  "scope": "Native managed Git provisioning and transport only; not Lean/Wasm application acceptance",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35915152430",
+  "commit": "5b03863c086f5975643598f90f23d2f554fea409",
+  "conclusion": "success",
+  "hosts": [
+    {
+      "job": "Git darwin-arm64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35915152430/job/107364661008",
+      "scope": "Managed native Git transport, not Lean/Wasm application acceptance",
+      "recordedAt": "2026-09-23T20:20:05.658Z",
+      "platform": "darwin-arm64",
+      "node": "v26.10.0",
+      "git": "git version 2.53.0",
+      "distribution": "v2.53.0-4",
+      "identity": "865164a104f9fcbfcd2fc9d1bda65f0311c79a31ab6b396763d0895fbc3c0234",
+      "native": {
+        "platform": "darwin",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "archive": {
+        "name": "dugite-native-v2.53.0-4098283-macOS-arm64.tar.gz",
+        "root": ".",
+        "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-macOS-arm64.tar.gz",
+        "sha256": "f9dc64635a5b62fbd7ad95db73268bbb8912255ac516d65d37bf7af22fcb8ffe",
+        "bytes": 62348987,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 536870912
+      },
+      "verifiedReuse": true,
+      "firstMilliseconds": 4681,
+      "checks": {
+        "cloneFileUrlWithSpaces": "passed",
+        "fetchAndPinnedCheckout": "passed",
+        "httpsTlsRemote": "passed"
+      },
+      "original": "0aca1d370dea31adc812de1dfb8710c7c3c47057",
+      "updated": "3719b52f0b0db826796d31aba4657e13ff93dfeb",
+      "remote": "4098283a7ecb8a227b9d43580336c78a06f90e5d\trefs/tags/v2.53.0-4",
+      "source": "/Users/runner/work/lasm/lasm/.work/managed-git-ci/source with spaces",
+      "clone": "/Users/runner/work/lasm/lasm/.work/managed-git-ci/clone with spaces",
+      "notices": [
+        "libexec/git-core/NOTICE"
+      ],
+      "limitations": [
+        "No SSH-client provisioning or private credential flow is claimed.",
+        "Lake dependency compilation and deployed execution are separate checks."
+      ]
+    },
+    {
+      "job": "Git linux-x64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35915152430/job/107364661172",
+      "scope": "Managed native Git transport, not Lean/Wasm application acceptance",
+      "recordedAt": "2026-09-23T20:19:41.921Z",
+      "platform": "linux-x64",
+      "node": "v26.10.0",
+      "git": "git version 2.53.0",
+      "distribution": "v2.53.0-4",
+      "identity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+      "native": {
+        "platform": "linux",
+        "architectures": [
+          "x64"
+        ]
+      },
+      "archive": {
+        "name": "dugite-native-v2.53.0-4098283-ubuntu-x64.tar.gz",
+        "root": ".",
+        "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-ubuntu-x64.tar.gz",
+        "sha256": "cca76aa31ad9e835e771ee7f55b73934777fbd8d16757a10d307ba06de860901",
+        "bytes": 65269219,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 536870912
+      },
+      "verifiedReuse": true,
+      "firstMilliseconds": 3895,
+      "checks": {
+        "cloneFileUrlWithSpaces": "passed",
+        "fetchAndPinnedCheckout": "passed",
+        "httpsTlsRemote": "passed"
+      },
+      "original": "2d1f0ba6dac797c2c9a890554342d60d2e58786b",
+      "updated": "39c108653b9634a08e180d1981c3bd26828e4f01",
+      "remote": "4098283a7ecb8a227b9d43580336c78a06f90e5d\trefs/tags/v2.53.0-4",
+      "source": "/home/runner/work/lasm/lasm/.work/managed-git-ci/source with spaces",
+      "clone": "/home/runner/work/lasm/lasm/.work/managed-git-ci/clone with spaces",
+      "notices": [
+        "libexec/git-core/NOTICE"
+      ],
+      "limitations": [
+        "No SSH-client provisioning or private credential flow is claimed.",
+        "Lake dependency compilation and deployed execution are separate checks."
+      ]
+    },
+    {
+      "job": "Git win32-arm64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35915152430/job/107364661269",
+      "scope": "Managed native Git transport, not Lean/Wasm application acceptance",
+      "recordedAt": "2026-09-23T20:21:19.323Z",
+      "platform": "win32-arm64",
+      "node": "v26.10.0",
+      "git": "git version 2.53.0.windows.4",
+      "distribution": "v2.53.0-4",
+      "identity": "00d68af4036eca17590e7b526b0c14de2c9a19d8f1acf9ceea7106a2f2b758ab",
+      "native": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "archive": {
+        "name": "dugite-native-v2.53.0-4098283-windows-arm64.tar.gz",
+        "root": ".",
+        "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-windows-arm64.tar.gz",
+        "sha256": "1abbeb3a2ce06e9b80e75bb888dce959b6c73bdb11ccc670a01a71d64f4422a5",
+        "bytes": 45084825,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 536870912
+      },
+      "verifiedReuse": true,
+      "firstMilliseconds": 13441,
+      "checks": {
+        "cloneFileUrlWithSpaces": "passed",
+        "fetchAndPinnedCheckout": "passed",
+        "httpsTlsRemote": "passed"
+      },
+      "original": "b21c93394ca490fba3c52d209453004d43ad47cf",
+      "updated": "50a363f91040cb2e5b866db1f77c6b196322cd57",
+      "remote": "4098283a7ecb8a227b9d43580336c78a06f90e5d\trefs/tags/v2.53.0-4",
+      "source": "C:\\a\\lasm\\lasm\\.work\\managed-git-ci\\source with spaces",
+      "clone": "C:\\a\\lasm\\lasm\\.work\\managed-git-ci\\clone with spaces",
+      "notices": [
+        "clangarm64/doc/git-credential-manager/LICENSE",
+        "clangarm64/doc/git-credential-manager/NOTICE",
+        "clangarm64/share/licenses",
+        "clangarm64/share/licenses/brotli",
+        "clangarm64/share/licenses/brotli/LICENSE",
+        "clangarm64/share/licenses/curl",
+        "clangarm64/share/licenses/curl/LICENSE",
+        "clangarm64/share/licenses/expat",
+        "clangarm64/share/licenses/expat/COPYING",
+        "clangarm64/share/licenses/gettext-runtime",
+        "clangarm64/share/licenses/gettext-runtime/COPYING",
+        "clangarm64/share/licenses/gettext-runtime/intl",
+        "clangarm64/share/licenses/gettext-runtime/intl/COPYING.LIB",
+        "clangarm64/share/licenses/gettext-runtime/libasprintf",
+        "clangarm64/share/licenses/gettext-runtime/libasprintf/COPYING",
+        "clangarm64/share/licenses/gettext-runtime/libasprintf/COPYING.LIB",
+        "clangarm64/share/licenses/libc++",
+        "clangarm64/share/licenses/libc++/LICENSE",
+        "clangarm64/share/licenses/libffi",
+        "clangarm64/share/licenses/libffi/LICENSE",
+        "clangarm64/share/licenses/libiconv",
+        "clangarm64/share/licenses/libiconv/COPYING",
+        "clangarm64/share/licenses/libiconv/COPYING.LIB",
+        "clangarm64/share/licenses/libiconv/libcharset",
+        "clangarm64/share/licenses/libiconv/libcharset/COPYING.LIB",
+        "clangarm64/share/licenses/libiconv/README",
+        "clangarm64/share/licenses/libpsl",
+        "clangarm64/share/licenses/libpsl/COPYING",
+        "clangarm64/share/licenses/libssh2",
+        "clangarm64/share/licenses/libssh2/LICENSE",
+        "clangarm64/share/licenses/libtasn1",
+        "clangarm64/share/licenses/libtasn1/COPYING",
+        "clangarm64/share/licenses/libtasn1/COPYING.LESSERv2",
+        "clangarm64/share/licenses/libunistring",
+        "clangarm64/share/licenses/libunistring/LICENSE",
+        "clangarm64/share/licenses/libunistring/LICENSE.LIB",
+        "clangarm64/share/licenses/libunwind",
+        "clangarm64/share/licenses/libunwind/LICENSE",
+        "clangarm64/share/licenses/nghttp2",
+        "clangarm64/share/licenses/nghttp2/COPYING",
+        "clangarm64/share/licenses/openssl",
+        "clangarm64/share/licenses/openssl/LICENSE",
+        "clangarm64/share/licenses/pcre2",
+        "clangarm64/share/licenses/pcre2/COPYING",
+        "clangarm64/share/licenses/pcre2/LICENCE.md",
+        "clangarm64/share/licenses/zlib",
+        "clangarm64/share/licenses/zlib/LICENSE",
+        "clangarm64/share/licenses/zstd",
+        "clangarm64/share/licenses/zstd/LICENSE",
+        "LICENSE.txt",
+        "usr/share/licenses",
+        "usr/share/licenses/file",
+        "usr/share/licenses/file/COPYING",
+        "usr/share/licenses/gcc-libs",
+        "usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION",
+        "usr/share/licenses/libopenssl",
+        "usr/share/licenses/libopenssl/LICENSE.txt",
+        "usr/share/licenses/libsasl",
+        "usr/share/licenses/libsasl/COPYING",
+        "usr/share/licenses/libsqlite",
+        "usr/share/licenses/libsqlite/LICENSE",
+        "usr/share/licenses/ncurses",
+        "usr/share/licenses/ncurses/LICENSE",
+        "usr/share/licenses/openssh",
+        "usr/share/licenses/openssh/LICENCE",
+        "usr/share/licenses/zlib",
+        "usr/share/licenses/zlib/LICENSE"
+      ],
+      "limitations": [
+        "No SSH-client provisioning or private credential flow is claimed.",
+        "Lake dependency compilation and deployed execution are separate checks."
+      ]
+    },
+    {
+      "job": "Git linux-arm64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35915152430/job/107364661270",
+      "scope": "Managed native Git transport, not Lean/Wasm application acceptance",
+      "recordedAt": "2026-09-23T20:19:39.816Z",
+      "platform": "linux-arm64",
+      "node": "v26.10.0",
+      "git": "git version 2.53.0.dirty",
+      "distribution": "v2.53.0-4",
+      "identity": "045b32d723b7545920e583e3c1a2247e74f1ae0057a074cdff42975c2617e4fa",
+      "native": {
+        "platform": "linux",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "archive": {
+        "name": "dugite-native-v2.53.0-4098283-ubuntu-arm64.tar.gz",
+        "root": ".",
+        "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-ubuntu-arm64.tar.gz",
+        "sha256": "a161f45af4626bb7e0c688854bd4a9aee47cc514bca404cff0a5e3536ef1c0af",
+        "bytes": 23223345,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 536870912
+      },
+      "verifiedReuse": true,
+      "firstMilliseconds": 1319,
+      "checks": {
+        "cloneFileUrlWithSpaces": "passed",
+        "fetchAndPinnedCheckout": "passed",
+        "httpsTlsRemote": "passed"
+      },
+      "original": "c6b81ac6596ba56d6aae82549f36313f04679333",
+      "updated": "2b521756093552921884fba0a20981fda5fcaab2",
+      "remote": "4098283a7ecb8a227b9d43580336c78a06f90e5d\trefs/tags/v2.53.0-4",
+      "source": "/home/runner/work/lasm/lasm/.work/managed-git-ci/source with spaces",
+      "clone": "/home/runner/work/lasm/lasm/.work/managed-git-ci/clone with spaces",
+      "notices": [],
+      "limitations": [
+        "No SSH-client provisioning or private credential flow is claimed.",
+        "Lake dependency compilation and deployed execution are separate checks."
+      ]
+    },
+    {
+      "job": "Git darwin-x64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35915152430/job/107364661301",
+      "scope": "Managed native Git transport, not Lean/Wasm application acceptance",
+      "recordedAt": "2026-09-23T20:20:05.660Z",
+      "platform": "darwin-x64",
+      "node": "v26.10.0",
+      "git": "git version 2.53.0",
+      "distribution": "v2.53.0-4",
+      "identity": "aebe0c1a9cbf2fa6428b50a7ef8c94b6d2c43acadd8f1a4f0aaf46a3d25096ca",
+      "native": {
+        "platform": "darwin",
+        "architectures": [
+          "x64"
+        ]
+      },
+      "archive": {
+        "name": "dugite-native-v2.53.0-4098283-macOS-x64.tar.gz",
+        "root": ".",
+        "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-macOS-x64.tar.gz",
+        "sha256": "ae6686718aa34f4140424db16b92a47dcffd6d1f312eb8b5f3b267f7404e2680",
+        "bytes": 66136060,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 536870912
+      },
+      "verifiedReuse": true,
+      "firstMilliseconds": 6420,
+      "checks": {
+        "cloneFileUrlWithSpaces": "passed",
+        "fetchAndPinnedCheckout": "passed",
+        "httpsTlsRemote": "passed"
+      },
+      "original": "497106fd434d0ab54a641932a6df47236c00b1e8",
+      "updated": "f2d1fa25d345d8ad920b5ffa14e89e0a38918caf",
+      "remote": "4098283a7ecb8a227b9d43580336c78a06f90e5d\trefs/tags/v2.53.0-4",
+      "source": "/Users/runner/work/lasm/lasm/.work/managed-git-ci/source with spaces",
+      "clone": "/Users/runner/work/lasm/lasm/.work/managed-git-ci/clone with spaces",
+      "notices": [
+        "libexec/git-core/NOTICE"
+      ],
+      "limitations": [
+        "No SSH-client provisioning or private credential flow is claimed.",
+        "Lake dependency compilation and deployed execution are separate checks."
+      ]
+    },
+    {
+      "job": "Git win32-x64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35915152430/job/107364661354",
+      "scope": "Managed native Git transport, not Lean/Wasm application acceptance",
+      "recordedAt": "2026-09-23T20:20:13.102Z",
+      "platform": "win32-x64",
+      "node": "v26.10.0",
+      "git": "git version 2.53.0.windows.4",
+      "distribution": "v2.53.0-4",
+      "identity": "396d49f7d452aba700b0724263f4878c744861e5369b845742318f43708ce533",
+      "native": {
+        "platform": "win32",
+        "architectures": [
+          "x64"
+        ]
+      },
+      "archive": {
+        "name": "dugite-native-v2.53.0-4098283-windows-x64.tar.gz",
+        "root": ".",
+        "url": "https://github.com/desktop/dugite-native/releases/download/v2.53.0-4/dugite-native-v2.53.0-4098283-windows-x64.tar.gz",
+        "sha256": "7b76bc5c32c0d7c5984efdc2a8a32697cf1e8a43bc55176fbf9869c0ee995130",
+        "bytes": 47119821,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 536870912
+      },
+      "verifiedReuse": true,
+      "firstMilliseconds": 3117,
+      "checks": {
+        "cloneFileUrlWithSpaces": "passed",
+        "fetchAndPinnedCheckout": "passed",
+        "httpsTlsRemote": "passed"
+      },
+      "original": "056f69656784ca28a458eac3e40661b3931be3f3",
+      "updated": "c79a49e2167cd941267bc81c24a13562d5ec2f92",
+      "remote": "4098283a7ecb8a227b9d43580336c78a06f90e5d\trefs/tags/v2.53.0-4",
+      "source": "D:\\a\\lasm\\lasm\\.work\\managed-git-ci\\source with spaces",
+      "clone": "D:\\a\\lasm\\lasm\\.work\\managed-git-ci\\clone with spaces",
+      "notices": [
+        "LICENSE.txt",
+        "mingw64/doc/git-credential-manager/LICENSE",
+        "mingw64/doc/git-credential-manager/NOTICE",
+        "mingw64/share/licenses",
+        "mingw64/share/licenses/brotli",
+        "mingw64/share/licenses/brotli/LICENSE",
+        "mingw64/share/licenses/curl",
+        "mingw64/share/licenses/curl/LICENSE",
+        "mingw64/share/licenses/expat",
+        "mingw64/share/licenses/expat/COPYING",
+        "mingw64/share/licenses/gcc-libs",
+        "mingw64/share/licenses/gcc-libs/COPYING.LIB",
+        "mingw64/share/licenses/gcc-libs/COPYING.RUNTIME",
+        "mingw64/share/licenses/gcc-libs/COPYING3",
+        "mingw64/share/licenses/gcc-libs/README",
+        "mingw64/share/licenses/gettext-runtime",
+        "mingw64/share/licenses/gettext-runtime/COPYING",
+        "mingw64/share/licenses/gettext-runtime/intl",
+        "mingw64/share/licenses/gettext-runtime/intl/COPYING.LIB",
+        "mingw64/share/licenses/gettext-runtime/libasprintf",
+        "mingw64/share/licenses/gettext-runtime/libasprintf/COPYING",
+        "mingw64/share/licenses/gettext-runtime/libasprintf/COPYING.LIB",
+        "mingw64/share/licenses/libffi",
+        "mingw64/share/licenses/libffi/LICENSE",
+        "mingw64/share/licenses/libiconv",
+        "mingw64/share/licenses/libiconv/COPYING",
+        "mingw64/share/licenses/libiconv/COPYING.LIB",
+        "mingw64/share/licenses/libiconv/libcharset",
+        "mingw64/share/licenses/libiconv/libcharset/COPYING.LIB",
+        "mingw64/share/licenses/libiconv/README",
+        "mingw64/share/licenses/libpsl",
+        "mingw64/share/licenses/libpsl/COPYING",
+        "mingw64/share/licenses/libssh2",
+        "mingw64/share/licenses/libssh2/LICENSE",
+        "mingw64/share/licenses/libtasn1",
+        "mingw64/share/licenses/libtasn1/COPYING",
+        "mingw64/share/licenses/libtasn1/COPYING.LESSERv2",
+        "mingw64/share/licenses/libunistring",
+        "mingw64/share/licenses/libunistring/LICENSE",
+        "mingw64/share/licenses/libunistring/LICENSE.LIB",
+        "mingw64/share/licenses/libwinpthread",
+        "mingw64/share/licenses/libwinpthread/COPYING",
+        "mingw64/share/licenses/nghttp2",
+        "mingw64/share/licenses/nghttp2/COPYING",
+        "mingw64/share/licenses/openssl",
+        "mingw64/share/licenses/openssl/LICENSE",
+        "mingw64/share/licenses/pcre2",
+        "mingw64/share/licenses/pcre2/COPYING",
+        "mingw64/share/licenses/pcre2/LICENCE.md",
+        "mingw64/share/licenses/zlib",
+        "mingw64/share/licenses/zlib/LICENSE",
+        "mingw64/share/licenses/zstd",
+        "mingw64/share/licenses/zstd/LICENSE",
+        "usr/share/licenses",
+        "usr/share/licenses/file",
+        "usr/share/licenses/file/COPYING",
+        "usr/share/licenses/gcc-libs",
+        "usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION",
+        "usr/share/licenses/libopenssl",
+        "usr/share/licenses/libopenssl/LICENSE.txt",
+        "usr/share/licenses/libsasl",
+        "usr/share/licenses/libsasl/COPYING",
+        "usr/share/licenses/libsqlite",
+        "usr/share/licenses/libsqlite/LICENSE",
+        "usr/share/licenses/ncurses",
+        "usr/share/licenses/ncurses/LICENSE",
+        "usr/share/licenses/openssh",
+        "usr/share/licenses/openssh/LICENCE",
+        "usr/share/licenses/zlib",
+        "usr/share/licenses/zlib/LICENSE"
+      ],
+      "limitations": [
+        "No SSH-client provisioning or private credential flow is claimed.",
+        "Lake dependency compilation and deployed execution are separate checks."
+      ]
+    }
+  ],
+  "initialRun": {
+    "url": "https://github.com/Millillion/lasm/actions/runs/35914849502",
+    "commit": "ba3b83e23fe4e24c64f00786e9ca7ad65e9f65d2",
+    "failures": [
+      "Git win32-x64",
+      "Git win32-arm64"
+    ],
+    "reason": "A cross-platform environment unit test exposed host-dependent path joining. The helper now uses the selected platform path conventions; all six rows pass after the repair."
+  },
+  "storage": "No Actions artifacts or caches were created.",
+  "coverageNotes": [
+    "Small regression controls include the five deployment-output preservation tests on all six native platforms.",
+    "Three archive symbolic-link tests have existing Windows skips. Junction-based output-preservation checks pass there.",
+    "SSH provisioning, optional credential/LFS flows and complete Lake/application acceptance are not claimed."
+  ]
+}

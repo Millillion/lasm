@@ -163,7 +163,8 @@ Rebuilding into an existing deployment now preserves added files and empty asset
 directories. Modified generated files, asset collisions, malformed receipts and
 symbolic links cause a descriptive refusal before replacement. Five filesystem
 controls verify preservation, restoration of missing generated files and removal
-of obsolete generated support. This repair is tested in the source tree; it is
+of obsolete generated support. They now pass in the source tree on all six
+native platforms as part of the managed Git matrix. This repair is
 not part of the installed `experimental.5` upstream campaign already in progress.
 
 The first real primary-CLI Node check passes ordinary console/filesystem/tasks,
