@@ -72,6 +72,15 @@ is 7.02 GiB, with all 7,267 original hashes, six symlinks and ten harness hashes
 intact and no resource events. The same base-page, one-build-worker and memory
 limits remain in force. See
 [the Deno preparation and driver-control evidence](evidence/server-project-deno-v151-system-directories-2026-09-23.json).
+The first saved Deno checkpoint has **all 61 prioritized tests passing**, with
+zero failures, resource aborts or harness failures and 3,835 registrations pending.
+This includes all 35 `async_` and all 20 `async_http` registrations, the opt-in
+channel/mutex/signal cases, filesystem/process/console tests, all earlier plugin
+failure cases, the server-project workload, compiler frontend and Lean checker.
+Its largest peak is 7.85 GiB in `pkg/frontend`, below the unchanged proactive
+limit, with no OOM, throttling, swap or monitor events and all source/harness
+hashes intact. The full Deno suite is still incomplete; see
+[the 61-test Deno checkpoint](evidence/deno-broad-v151-system-directories-checkpoint61-2026-09-23.json).
 
 The separate v151 repair makes POSIX home/temporary-directory queries preserve
 empty values, environment precedence, raw bytes and Lean's buffer-limit errors.
