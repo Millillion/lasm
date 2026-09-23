@@ -12,6 +12,8 @@ below retain their original, narrower scope.
 - [x] Build the matching full runtime and all 2,516 shipped Lean library modules.
 - [x] Verify the first ordinary compiled Lean main in all three stock engines.
 - [x] Inventory all 4,066 unchanged upstream test registrations and exclusions.
+- [x] Connect the primary application CLI to verified runtime bundles and managed
+  native tools; verify its ordinary Lean main and Lake HTTP project on Linux x64.
 - [ ] Finish and package the primary `lasm Main.lean` / `lasm build Main.lean`
   pipeline with automatic tools, Lake dependencies and reliable cache reuse.
 - [ ] Validate the HTTP and Express examples and callable JS/TypeScript bindings

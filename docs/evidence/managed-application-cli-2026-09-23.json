@@ -1,0 +1,329 @@
+{
+  "recordedAt": "2026-09-23T18:38:35.042806+00:00",
+  "scope": "Primary managed CLI, verified preprovisioned caches, Linux x64; clean npm installation and other native application platforms remain separate gates",
+  "fixture": "test/fixtures/application-main/Main.lean",
+  "mainChecks": [
+    {
+      "engine": "node",
+      "result": {
+        "scope": "Primary CLI with verified preprovisioned managed tools; cold npm installation and separate-machine deployment remain separate gates",
+        "target": "node",
+        "platform": "linux-x64",
+        "node": "v26.10.0",
+        "engineVersion": "v26.10.0",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "9e7f19002422c15bb66788c67bcc8d6747c81f466bdf3272af02ea3496c9bcff",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+              "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+            }
+          ],
+          "signature": "6fc9a818cbb3bf154442f48c41d38d78e10dbf6f6d4bdd9190d5c18745a598e4"
+        },
+        "wasmSha256": "2e32fb896a4b8189f55369897c343a6255cdd2c9e7405876fc59fe33f75dc568",
+        "buildSeconds": 151.844334931,
+        "cachedBuildSeconds": 28.251829530000016,
+        "controls": [
+          {
+            "args": [
+              "hello λ",
+              "",
+              "space argument"
+            ],
+            "native": {
+              "code": 7,
+              "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+              "stderr": ""
+            },
+            "target": {
+              "code": 7,
+              "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+              "stderr": ""
+            }
+          },
+          {
+            "args": [
+              "fail"
+            ],
+            "native": {
+              "code": 1,
+              "stdout": "",
+              "stderr": "uncaught exception: ordinary failure λ\n"
+            },
+            "target": {
+              "code": 1,
+              "stdout": "",
+              "stderr": "uncaught exception: ordinary failure λ\n"
+            }
+          }
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-node-r2-resources.json",
+        "recordedAt": "2026-09-23T18:24:47.699Z"
+      },
+      "resourceReport": ".work/product-acceptance/managed-application-node-r2-resources.json",
+      "peakMemoryBytes": 5890203648,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceLimited": false
+    },
+    {
+      "engine": "deno",
+      "result": {
+        "scope": "Primary CLI with verified preprovisioned managed tools; cold npm installation and separate-machine deployment remain separate gates",
+        "target": "deno",
+        "platform": "linux-x64",
+        "node": "v26.10.0",
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "0289bd7ce5f812d3b6b4666b5ff041136f953ca977d17b9d5e24502755585573",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+              "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+            }
+          ],
+          "signature": "6ed4a973bd6fbfe4f0dde1a5809616b0ffd62c635ee8fce79861faf7f1e87545",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+        },
+        "wasmSha256": "2e32fb896a4b8189f55369897c343a6255cdd2c9e7405876fc59fe33f75dc568",
+        "buildSeconds": 59.956936152000004,
+        "cachedBuildSeconds": 15.626273755999994,
+        "controls": [
+          {
+            "args": [
+              "hello λ",
+              "",
+              "space argument"
+            ],
+            "native": {
+              "code": 7,
+              "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+              "stderr": ""
+            },
+            "target": {
+              "code": 7,
+              "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+              "stderr": ""
+            }
+          },
+          {
+            "args": [
+              "fail"
+            ],
+            "native": {
+              "code": 1,
+              "stdout": "",
+              "stderr": "uncaught exception: ordinary failure λ\n"
+            },
+            "target": {
+              "code": 1,
+              "stdout": "",
+              "stderr": "uncaught exception: ordinary failure λ\n"
+            }
+          }
+        ],
+        "directFileCommand": {
+          "code": 7,
+          "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "Preparing Lean 4.34.0 for deno…\n"
+        },
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-deno-r1-resources.json",
+        "recordedAt": "2026-09-23T18:36:13.044Z"
+      },
+      "resourceReport": ".work/product-acceptance/managed-application-deno-r1-resources.json",
+      "peakMemoryBytes": 3398041600,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceLimited": false
+    },
+    {
+      "engine": "bun",
+      "result": {
+        "scope": "Primary CLI with verified preprovisioned managed tools; cold npm installation and separate-machine deployment remain separate gates",
+        "target": "bun",
+        "platform": "linux-x64",
+        "node": "v26.10.0",
+        "engineVersion": "1.4.2",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "0289bd7ce5f812d3b6b4666b5ff041136f953ca977d17b9d5e24502755585573",
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+              "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+            }
+          ],
+          "signature": "d971e79e6c028b430a3f7622eb42df251a7d0f98a47c7fc3555820eab1e27bbd",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+        },
+        "wasmSha256": "0374c833b8af9bc46c9b74d7fe17bac4f91621353e08f24787ef08fe2787688e",
+        "buildSeconds": 90.889992097,
+        "cachedBuildSeconds": 15.274823801999998,
+        "controls": [
+          {
+            "args": [
+              "hello λ",
+              "",
+              "space argument"
+            ],
+            "native": {
+              "code": 7,
+              "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+              "stderr": ""
+            },
+            "target": {
+              "code": 7,
+              "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+              "stderr": ""
+            }
+          },
+          {
+            "args": [
+              "fail"
+            ],
+            "native": {
+              "code": 1,
+              "stdout": "",
+              "stderr": "uncaught exception: ordinary failure λ\n"
+            },
+            "target": {
+              "code": 1,
+              "stdout": "",
+              "stderr": "uncaught exception: ordinary failure λ\n"
+            }
+          }
+        ],
+        "directFileCommand": {
+          "code": 7,
+          "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "Preparing Lean 4.34.0 for bun…\n"
+        },
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-bun-r1-resources.json",
+        "recordedAt": "2026-09-23T18:32:57.763Z"
+      },
+      "resourceReport": ".work/product-acceptance/managed-application-bun-r1-resources.json",
+      "peakMemoryBytes": 3726090240,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceLimited": false
+    }
+  ],
+  "http": {
+    "result": {
+      "scope": "Primary CLI with ordinary Lake dependency discovery and full HTTP differential checks",
+      "compiler": "/home/lastmjs/development/lasm/compiler",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "0289bd7ce5f812d3b6b4666b5ff041136f953ca977d17b9d5e24502755585573",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "+App.Model",
+            "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+            "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+          },
+          {
+            "module": "+App.Server",
+            "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+            "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+          },
+          {
+            "module": "Main.lean",
+            "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+            "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+          }
+        ],
+        "signature": "323dc8d427872d9628539178463fd0245252cc325200ed57af5163d9b76feac1",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      },
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-node-r2-resources.json",
+      "recordedAt": "2026-09-23T18:29:32.634Z"
+    },
+    "vitest": ".work/managed-http-node-r2/vitest.json",
+    "peakMemoryBytes": 3424296960,
+    "resourceLimited": false
+  },
+  "harnessCorrections": [
+    {
+      "output": ".work/managed-application-node-r1",
+      "cause": "Initial maintainer invocation put cache environment variables outside the resource guard allowlist; retry passes them explicitly inside the guarded command."
+    },
+    {
+      "output": ".work/managed-http-node-r1",
+      "cause": "Trailing-slash checkout path comparison incorrectly cleared the maintainer bundle setting; normalize the harness path."
+    }
+  ],
+  "remainingGates": [
+    "clean npm install and automatic cold tool provisioning",
+    "complete source-free separate-environment deployment",
+    "additional Lake dependency configurations and cache concurrency",
+    "latest-Lean callable libraries and Express example",
+    "all upstream application cases and standard API audit",
+    "native six-platform application and engine matrix",
+    "Windows ARM64 native Lean and SDK bundles"
+  ]
+}

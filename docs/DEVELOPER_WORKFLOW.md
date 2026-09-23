@@ -1,11 +1,14 @@
 # Node applications with normal Lake projects
 
-For a complete Lean application, start with an ordinary `main` in a standalone
-file or Lake project and run `npx lasm run Main.lean`. Build deployable output with
-`npx lasm build Main.lean dist`, then `node dist/main.mjs`. No `lasm.json` or Lean
-dependency on Lasm is needed. See [NODE_APPS.md](NODE_APPS.md).
+For the current Lean 4.34 application pipeline, start with an ordinary `main` in
+a standalone file or Lake project and run `lasm Main.lean`. Build deployable
+output with `lasm build Main.lean --target node`, then `node dist/main.mjs`.
+`deno` and `bun` are also deployment targets. No `lasm.json` or Lean dependency
+on Lasm is needed. See [current implementation status](APPLICATION_PIPELINE.md)
+for managed-tool, package, and platform acceptance; the package is not published.
 
-The rest of this guide describes callable libraries embedded in JavaScript.
+The rest of this guide describes the earlier Lean 4.32 callable-library path.
+It remains available while latest-Lean bindings are implemented.
 A Lasm application can start as a Node project or a Lean project. The common
 layout places a Lake project under `lean/`, alongside `package.json` and the
 JavaScript host. Lake owns Lean elaboration, dependency resolution, and compiler

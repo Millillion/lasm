@@ -10,7 +10,7 @@ Neither pipeline is yet a complete implementation of the current product plan.
 `src/managed-lean.mjs` finds the nearest ordinary `lean-toolchain`, chooses the
 matching versioned catalog entry, and supplies Lean/Lake in a private cache. The
 initial catalog selects Lean 4.34.0. Unsupported pins fail without modifying the
-project. This module is not yet wired into the primary application CLI.
+project. The primary application CLI now uses this module.
 
 Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
 downloads and extraction stream their data. Installation stages privately and
@@ -127,15 +127,56 @@ Linux x64 maintainer-build evidence; primary CLI packaging, callable libraries,
 full API coverage, long-duration cleanup and the six-platform application matrix
 remain unfinished.
 
-The command parser now covers the planned direct-file/run/build forms, options
+The command parser covers the planned direct-file/run/build forms, options
 before or after the filename, target selection, output directories, and the
-application-argument separator. Nineteen parser checks pass. It remains separate
-from the primary CLI until full-runtime application compilation is integrated.
+application-argument separator. Nineteen parser checks pass. The primary CLI now
+uses the parser and the managed full-runtime application builder. JSON binding
+configurations still select the preserved older callable-library implementation.
 
 The full-runtime output helper packages host adapters and native support and
 generates a relative `main.mjs` launcher. Three loader checks cover relocation,
 argument forwarding, working directory and engine mismatch handling. These are
-loader-level controls; actual deployed Wasm applications still need acceptance.
+loader-level controls; the separate acceptance records above use real Wasm.
+
+## Managed application integration
+
+`src/application-build.mjs` now uses native Lean/Lake from the managed cache,
+the repaired managed SDK, and a catalog-pinned application runtime bundle.
+The 363,644,361-byte bundle contains all compiled library archives, headers,
+runtime ABI exports, and a precompiled standard-symbol registry. Its manifest
+and every file are checked before use. Applications supply a separate lookup
+table generated from their actual object symbols and C declarations; initialized
+data remains distinct from function-table addresses.
+
+Lake's own `transImports`, `c`, and `lean` facets discover dependencies and
+generate application inputs. Standalone files use Lean's `--src-deps` parser.
+Build identities include the native compiler, SDK catalog and repairs, complete
+runtime manifest, application C and source hashes, target, and shipped host code.
+Successful deployments have content inventories checked on reuse. Cached builds
+do not execute the compiler SDK, so its full immutable cache is verified only
+when compilation needs it; native Lean/Lake still rechecks project inputs.
+
+The first real primary-CLI Node check passes ordinary console/filesystem/tasks,
+Unicode and empty arguments, large naturals, exception output, and exit codes
+against native Lean. Rebuilding unchanged source reuses the exact deployment.
+Only Node was on the build's PATH, with previously verified tools in the managed
+cache. The first SDK Wasm64 system-library build was included and peaked at
+5.49 GiB without OOM or resource aborts. This is a warm-tool-cache check, not a
+clean npm installation claim. The ordinary Lake HTTP project also passes all
+20 differential checks through the primary CLI, peaking at 3.19 GiB.
+
+Stock Deno 2.9.7 and Bun 1.4.2 now pass the same managed-build controls and
+the direct-file CLI with application arguments after `--`. The latest cached
+Bun build took 15.27 seconds, mostly native tool integrity checks; faster repeat
+startup remains work. The [managed CLI evidence](evidence/managed-application-cli-2026-09-23.json)
+keeps exact build inputs, native comparisons, cache timings and guarded resource
+reports. These passes used preprovisioned verified tool caches and a maintainer
+runtime-bundle path, so package installation remains a separate gate.
+
+Clean local-package installation, additional ordinary dependency layouts,
+concurrent cache users, full upstream/API coverage, and the six native platform
+matrix remain acceptance gates. The package assembler preserves the older
+callable-library target with its original Lean 4.32 requirements.
 
 ## Native CI
 

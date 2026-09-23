@@ -1,99 +1,80 @@
 # Lasm compiler
 
-Lasm compiles Lean programs to WebAssembly modules callable from Node.js, Deno, Bun,
-browsers, and Cloudflare Workers. It uses Lean's actual object and arbitrary-integer
-runtime, with typed JavaScript bindings. Node applications can use ordinary Lean
-console, filesystem, async tasks, and `Std.Http.Server` APIs.
+Lasm is building a managed compiler for ordinary Lean applications deployed in
+Node, Deno, and Bun. Native Lean/Lake compiles the application ahead of time;
+the deployed application contains WebAssembly, JavaScript loaders, and host
+support. Lean source uses ordinary APIs, including `IO.FS` and `Std.Http`.
 
-The experimental compiler supports normal Lake projects and a local installable
-package. Developers need Node 24+ and the complete official Lean 4.32.0 toolchain;
-the package includes its Wasm libraries, sysroot, and optimizer. Linux x64 is
-validated. macOS and Windows adapters are implemented, with native acceptance
-still pending; see the [platform matrix](docs/RELEASE.md). Running generated
-modules requires only the application host. Nothing has been published.
+The [current product plan](docs/PLAN.md) targets full Lean compatibility and
+Node/npm-only installation on Linux, macOS, and Windows, each on x64 and ARM64.
+**That acceptance goal is not complete.** Nothing has been published to npm.
+See [implementation status](docs/APPLICATION_PIPELINE.md),
+[remaining IO work](IO_LIMITATIONS.md), and [next steps](NEXT_STEPS.md).
 
-The initial design discussion is the
-[shared Claude conversation](https://claude.ai/share/1a8522ee-e3a9-4ce5-9447-8d8457b6f005).
-The full displayed conversation has been reviewed and its key claims tested.
+## Application workflow
 
-- [Run ordinary Lean mains and HTTP servers in Node](docs/NODE_APPS.md)
-- [Node, Deno, and Bun launchers and verified scope](docs/JS_ENGINES.md)
-- [Complete Lean HTTP server and Vitest tests](examples/lean-server/README.md)
-- [Accepted implementation plan](docs/PLAN.md)
-- [Developer workflow: Lake and Node projects](docs/DEVELOPER_WORKFLOW.md)
-- [Local release packaging and supported platforms](docs/RELEASE.md)
-- [Browser, IndexedDB, and Workers adapters](docs/HOSTS.md)
-- [Runtime implementation and boundaries](docs/RUNTIME.md)
-- [Lean filesystem/HTTP IO and async backends](docs/IO.md)
-- [Upstream Lean compatibility results and reproducible tests](docs/UPSTREAM_RESULTS.md)
-- [Express task board with Lean endpoints and Vitest tests](examples/express/README.md)
-- [Next steps](NEXT_STEPS.md)
-- [Feasibility results and corrections](docs/FEASIBILITY.md)
-- [Conversation digest and original goals](docs/THREAD_REVIEW.md)
-- [Reproduce the local experiments](experiments/feasibility/README.md)
+The primary CLI now connects managed native tools to the full application
+runtime. It selects Lean using the ordinary `lean-toolchain` file, defaulting to
+the release's pinned version when there is no project pin. The current managed
+application version is Lean 4.34.0; unsupported pins fail without being changed.
 
-To develop the compiler from this checkout on Linux x64 with Node 24+ and elan's
-Lean 4.32.0 installed:
+After installing a complete local compiler candidate:
 
 ```sh
-npm ci
-npm run setup
-npm test
-npm run build:example
-node --input-type=module -e "import createModule from './examples/basic/dist/index.mjs'; const m = await createModule(); console.log(m.square(2n ** 128n)); m.dispose();"
-```
-
-Run the new complete Lean application with:
-
-```sh
-node lasm-node.js examples/lean-server/Main.lean
-# After installing the compiler package in your own project:
-npx lasm run Main.lean
-npx lasm build Main.lean dist
+lasm Main.lean -- hello
+lasm build Main.lean --target node
 node dist/main.mjs
+
+lasm build Main.lean --target deno
+deno run -A dist/main.mjs
+
+lasm build Main.lean --target bun
+bun dist/main.mjs
 ```
 
-The first run builds; unchanged runs are cached. No Lasm imports, export manifest,
-or custom annotations are needed for a Lean executable. Run its native/Node
-HTTP tests with `npm run test:lean-server`.
+Standalone files and ordinary Lake projects use the same CLI. Lake owns module
+dependencies and compiler configuration. Application builds need no Lasm imports,
+annotations, or `lasm.json`. Deploy the complete `dist/` directory.
+Building a target does not require its execution engine to be installed.
 
-`setup` explicitly downloads and verifies the pinned reference toolchain and Lean
-source into `.cache`. There is no install hook. Building is local:
+The [ordinary Lean HTTP example](examples/lean-server-latest/README.md) exercises
+JSON CRUD, persistent files, concurrent requests, binary bodies, streaming,
+cancellation, and graceful shutdown. Its parallel Vitest suite compares deployed
+Wasm with native Lean. The primary managed CLI currently has separate Linux x64
+acceptance records; it must still pass clean package installation and the full
+native platform matrix. Native Windows ARM64 build tools remain unfinished.
 
-```sh
-node bin/lasm.mjs build examples/basic/lasm.json .work/my-module
-```
+## Maintainer development
 
-The output directory contains the Wasm, Node/browser/Worker ESM factories, runtime
-adapters, TypeScript declarations, import manifest, notices, and build report.
-Copy that directory into an application. Export signatures are declared
-in `lasm.json` and checked by Lean through generated wrappers. Supported boundary
-types are `Nat`/`Int` as `bigint`, `String`, `ByteArray` as `Uint8Array`, `UInt32`,
-`Bool`, and `Unit` as `undefined`.
+Work stays on `main`, with unsigned commits pushed to the authorized GitHub
+repository. npm publication requires separate authorization. Keep downloaded
+tools and generated artifacts under ignored `.cache/` and `.work/` directories.
+Follow [AGENTS.md](AGENTS.md): one guarded heavy workload at a time, with base
+pages and one worker for full Wasm links. Earlier overlapping workloads caused
+host OOM kills.
 
-Lake handles dependencies and compiler options; Lasm links the reachable runtime
-code and uses packaged standard-library archives when installed from a release.
-`npm run build:io` builds the actual Lean IO example with Asyncify; it
-reads/writes bytes and makes HTTP requests through explicitly supplied Node host
-capabilities. Optional JSPI uses the same interface. See [IO.md](docs/IO.md).
+The application bundle is built with
+`scripts/full-lean/build-application-runtime.mjs` and assembled with
+`scripts/full-lean/package-application-runtime.mjs`. Maintainer builds can point
+`LASM_APPLICATION_RUNTIME` to the verified bundle. Local release candidates are
+assembled by `scripts/package-application-release.mjs`; installing users receive
+the bundle inside the package. `LASM_TOOLCHAIN_CACHE` can relocate managed tools.
 
-The [Express example](examples/express/README.md) uses Lean for endpoint routing,
-validation, versioned CRUD, filtering, summaries, and HTTP template imports, with
-Node supplying filesystem and HTTP capabilities. Try it with
-`npm run build:express` followed by `npm run start:express`; run its real-server
-Vitest suite with `npm run test:express`.
+The repository's root `lean-toolchain` still pins the older compiler-development
+project. The current HTTP example has its own ordinary Lean 4.34.0 pin. Do not
+silently replace a project's toolchain to make a command succeed.
 
-Create and validate a local release with `npm run package:release` followed by
-`npm run test:release`. The installation suite exercises npm, pnpm, and Yarn with
-empty-cache offline installs, Lake dependencies, isolated compiler paths, and
-standalone execution. `npm run test:hosts` runs real headless Chrome and local
-Cloudflare workerd tests. See the linked docs for prerequisites and scope.
+## Preserved earlier work
 
-Standard Node console, filesystem, child processes, tasks and HTTP server support
-use Asyncify. TLS, DNS, UDP, parallel threads, and unrestricted
-`Std.Async` remain outside the supported runtime slice. See [IO limitations](IO_LIMITATIONS.md). Unsupported native symbols fail during
-linking. Browser support is tested in Chrome and cloud support in local workerd;
-no live cloud deployment has been performed. The original research probes remain
-available as `npm run probe` and `npm run probe:runtime`.
+The previous Lean 4.32.0 cooperative runtime, callable JavaScript/TypeScript
+bindings, Express example, browser/Workers adapters, and compiler-in-Wasm research
+remain available with their original scope. Their results do not establish
+compatibility of the current product. Latest-Lean callable bindings and Express
+acceptance remain open work.
 
-Development is local on `main`. Commits are unsigned, and no remote is configured.
+- [Callable libraries and Lake integration](docs/DEVELOPER_WORKFLOW.md)
+- [Express application with Lean endpoints](examples/express/README.md)
+- [Earlier release and installation evidence](docs/RELEASE.md)
+- [Unchanged latest upstream suite inventory](docs/UPSTREAM_APPLICATION_TESTS.md)
+- [Separate compiler-in-Wasm results](docs/FULL_SUITE_RESULTS.md)
+- [Initial discussion and tested design claims](docs/THREAD_REVIEW.md)
