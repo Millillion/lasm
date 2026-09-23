@@ -53,11 +53,14 @@ in a separate directory. Executable headers are checked for a matching native
 ELF, Mach-O or PE architecture before use. Six decoder regressions and three
 executable-header checks pass locally. The new SDK CI matrix is pending.
 
-This initial SDK module is pristine upstream Emscripten. Applying the recorded
-Lasm runtime repairs and coupling it to verified application-library bundles
-remains unfinished. Its C-to-Wasm smoke is deliberately separate from full Lean
-application acceptance. Native Windows ARM64 LLVM/Binaryen is another missing
-upstream artifact, not a fundamental limitation.
+The SDK module now applies the recorded Emscripten runtime repairs to a separate
+verified copy of the source driver. Whole-file before/after digests detect drift;
+no external `patch` executable is needed and the upstream download stays intact.
+Two repair/cache regressions pass. Real native CI of the repaired driver and
+coupling it to verified application-library bundles remains unfinished. The first
+SDK matrix uses the preceding pristine-driver revision; its C-to-Wasm smoke is
+separate from full Lean application acceptance. Native Windows ARM64 LLVM/Binaryen
+is another missing upstream artifact, not a fundamental limitation.
 
 ## CLI and deployment foundations
 

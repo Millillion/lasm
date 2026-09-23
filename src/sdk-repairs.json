@@ -1,0 +1,51 @@
+{
+  "version": "6.0.9",
+  "patchSha256": "a132e6482a95d97d23e2d4c90866a0a36f32990b651a8b80fcc8e4d5941051eb",
+  "files": [
+    {
+      "path": "tools/link.py",
+      "replacements": [
+        {
+          "before": "  set_max_memory()\n\n  # check if we can address the 2GB mark and higher.\n  if not settings.MEMORY64 and settings.MAXIMUM_MEMORY > 2 * 1024 * 1024 * 1024:\n    settings.CAN_ADDRESS_2GB = 1\n\n  if settings.MAX_WEBGL_VERSION >= 2:\n",
+          "after": "  set_max_memory()\n\n  # check if we can address the 2GB mark and higher.\n  # Lowered memory64 still indexes wasm32 memory from JavaScript. Its heap\n  # shifts must be unsigned, just as for ordinary wasm32 above the 2GB mark.\n  if settings.MEMORY64 != 1 and settings.MAXIMUM_MEMORY > 2 * 1024 * 1024 * 1024:\n    settings.CAN_ADDRESS_2GB = 1\n\n  if settings.MAX_WEBGL_VERSION >= 2:\n"
+        },
+        {
+          "before": "    # main module to avoid creating new invoke functions at runtime.\n    imports = set(imports)\n    imports = {i for i in imports if not i.startswith('invoke_')}\n    weak_imports = webassembly.get_weak_imports(dylib)\n    strong_imports = sorted(imports.difference(weak_imports))\n    logger.debug('Adding symbols requirements from `%s`: %s', dylib, imports)\n",
+          "after": "    # main module to avoid creating new invoke functions at runtime.\n    imports = set(imports)\n    imports = {i for i in imports if not i.startswith('invoke_')}\n    # Relocation bases belong to each side module and are provided by the\n    # dynamic loader, not exported by the main module's C/JavaScript libraries.\n    imports.difference_update({'__memory_base', '__table_base',\n                               '__memory_base32', '__table_base32'})\n    weak_imports = webassembly.get_weak_imports(dylib)\n    strong_imports = sorted(imports.difference(weak_imports))\n    logger.debug('Adding symbols requirements from `%s`: %s', dylib, imports)\n"
+        }
+      ],
+      "patchedSha256": "2f143e5ca6d8aa560f5b2ea5e1d31a1ea897d068ea7778e50aa07d84ff10e481",
+      "originalSha256": "c5332e4fbdfbc9c7223c57ae8b34bcc28921fef2daefd8470d0583e7bfdf0efc"
+    },
+    {
+      "path": "src/lib/libdylink.js",
+      "replacements": [
+        {
+          "before": "        if ('__start_em_asm' in moduleExports) {\n          var start = moduleExports['__start_em_asm'].value;\n          var stop = moduleExports['__stop_em_asm'].value;\n#if CAN_ADDRESS_2GB\n          start >>>= 0;\n          stop >>>= 0;\n#else\n",
+          "after": "        if ('__start_em_asm' in moduleExports) {\n          var start = moduleExports['__start_em_asm'].value;\n          var stop = moduleExports['__stop_em_asm'].value;\n#if MEMORY64\n          {{{ from64('start') }}}\n          {{{ from64('stop') }}}\n#elif CAN_ADDRESS_2GB\n          start >>>= 0;\n          stop >>>= 0;\n#else\n"
+        },
+        {
+          "before": "#if ASSERTIONS\n    assert(lib, `Tried to dlsym() from an unopened handle: ${handle}`);\n#endif\n    newSymIndex = Object.keys(lib.exports).indexOf(symbol);\n    if (newSymIndex == -1 || lib.exports[symbol].stub) {\n      dlSetError(`Tried to lookup unknown symbol \"${symbol}\" in dynamic lib: ${lib.name}`)\n      return 0;\n    }\n",
+          "after": "#if ASSERTIONS\n    assert(lib, `Tried to dlsym() from an unopened handle: ${handle}`);\n#endif\n#if WASM_BIGINT\n    // Most interpreter lookups miss or find a function already in the table.\n    // Preserve own/enumerable semantics without scanning the export dictionary.\n    if (!Object.prototype.propertyIsEnumerable.call(lib.exports, symbol) || lib.exports[symbol].stub) {\n#else\n    newSymIndex = Object.keys(lib.exports).indexOf(symbol);\n    if (newSymIndex == -1 || lib.exports[symbol].stub) {\n#endif\n      dlSetError(`Tried to lookup unknown symbol \"${symbol}\" in dynamic lib: ${lib.name}`)\n      return 0;\n    }\n"
+        },
+        {
+          "before": "        // function the second argument will not be needed.  If it's a JS\n        // function we rely on the `sig` attribute being set based on the\n        // `<func>__sig` specified in library JS file.\n        result = addFunction(result, result.sig);\n#if DYLINK_DEBUG\n        dbg('adding symbol to table:',  symbol);\n",
+          "after": "        // function the second argument will not be needed.  If it's a JS\n        // function we rely on the `sig` attribute being set based on the\n        // `<func>__sig` specified in library JS file.\n#if WASM_BIGINT\n        // Worker catch-up still needs the exact current enumeration index.\n        newSymIndex = Object.keys(lib.exports).indexOf(symbol);\n#endif\n        result = addFunction(result, result.sig);\n#if DYLINK_DEBUG\n        dbg('adding symbol to table:',  symbol);\n"
+        }
+      ],
+      "patchedSha256": "711eba55c77409aad5302a05ea48e3d1c15a04dbb0221f34cb80db0979b79d8c",
+      "originalSha256": "37342422027bba9f80c23a8a426217e7cffa3ae2a0a2a1fcdf5416c2ec4316e8"
+    },
+    {
+      "path": "src/lib/libpthread.js",
+      "replacements": [
+        {
+          "before": "    worker.onmessage = (e) => {\n#if ASSERTIONS\n      var cmd = e.data.cmd;\n      err(`received \"${cmd}\" command from terminated worker: ${worker.workerID}`);\n#endif\n    };\n",
+          "after": "    worker.onmessage = (e) => {\n#if ASSERTIONS\n      var cmd = e.data.cmd;\n      // Joined/detached pthreads may finish concurrently with process exit.\n      // Their normal completion packets can already be queued at terminate().\n      if (cmd === {{{ CMD_CLEANUP_THREAD }}} || cmd === {{{ CMD_MARK_AS_FINISHED }}}) return;\n      err(`received \"${cmd}\" command from terminated worker: ${worker.workerID}`);\n#endif\n    };\n"
+        }
+      ],
+      "patchedSha256": "99456db0bf77860dd8eb998a130fb68207a0b16ee0ca6b8d065ab55c7ae262a1",
+      "originalSha256": "9b762d32a9473f720fe75f64a5bd56108a91654b9833cc8842553c631288d6a9"
+    }
+  ]
+}

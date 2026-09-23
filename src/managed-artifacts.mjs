@@ -239,3 +239,37 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
   pending.set(key, operation);
   try { return await operation; } finally { pending.delete(key); }
 }
+
+/** Record immutable build-tool derivations separately from upstream downloads. */
+export async function deriveArtifact(provenance, produce, { cache = managedCacheDirectory() } = {}) {
+  const identity = digest(JSON.stringify(provenance)), directory = resolve(cache, 'derived', identity);
+  if (pending.has(directory)) return pending.get(directory);
+  const operation = (async () => {
+    try {
+      await lstat(directory);
+      return { directory, identity, receipt: await verify(directory, identity), cacheHit: true };
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      try { await lstat(directory); throw new Error(`Incomplete derived tool cache: ${directory}`); }
+      catch (missing) { if (missing.code !== 'ENOENT') throw missing; }
+    }
+    await mkdir(dirname(directory), { recursive: true });
+    const staging = await mkdtemp(join(dirname(directory), '.derive-'));
+    try {
+      const tree = join(staging, 'tree'); await mkdir(tree);
+      await produce(tree);
+      const files = await inventory(tree);
+      if (!Object.keys(files).length) throw new Error('Derived tool tree is empty');
+      const receipt = { schema: 1, identity, provenance, files };
+      await writeFile(join(tree, receiptName), JSON.stringify(receipt) + '\n', { flag: 'wx' });
+      try { await rename(tree, directory); }
+      catch (error) {
+        if (!['EEXIST', 'ENOTEMPTY', 'EPERM', 'EACCES'].includes(error.code)) throw error;
+        await verify(directory, identity);
+      }
+      return { directory, identity, receipt, cacheHit: false };
+    } finally { await rm(staging, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
+  })();
+  pending.set(directory, operation);
+  try { return await operation; } finally { pending.delete(directory); }
+}

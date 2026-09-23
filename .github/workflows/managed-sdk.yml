@@ -35,6 +35,8 @@ jobs:
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Native executable header checks
         run: node test/native-program.test.mjs
+      - name: SDK repair and cache regressions
+        run: node test/sdk-repairs.test.mjs
       - name: Check the native Node host
         run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
       # One small C-to-Wasm fixture, one compiler/Binaryen worker. No full Lean

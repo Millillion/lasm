@@ -1,10 +1,12 @@
-import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
 import { join, resolve, dirname, delimiter } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { randomUUID, createHash } from 'node:crypto';
 import { provisionArtifact, managedCacheDirectory } from './managed-artifacts.mjs';
 import { provisionPython } from './managed-python.mjs';
 import { executableName } from './platform.mjs';
 import { verifyNativeProgram } from './native-program.mjs';
+import { prepareSdkRepairs } from './sdk-repairs.mjs';
 
 export const sdkCatalog = JSON.parse(await readFile(new URL('./sdk-tools.json', import.meta.url), 'utf8'));
 
@@ -23,14 +25,18 @@ export async function provisionSdk(options = {}) {
     nativePrograms[name] = await verifyNativeProgram(join(prefix, 'bin', executableName(name, platform)), platform, arch);
   const version = (await readFile(join(prefix, 'emscripten/emscripten-version.txt'), 'utf8')).trim().replaceAll('"', '');
   if (version !== release.version) throw new Error(`Managed compiler SDK version mismatch: ${version}`);
-  const state = resolve(cache, 'sdk-state', installed.identity);
+  const repaired = options.repairs === false ? undefined : await prepareSdkRepairs(installed, { cache });
+  const driver = repaired?.directory ?? join(prefix, 'emscripten');
+  const state = resolve(cache, 'sdk-state', repaired?.identity ?? installed.identity);
   await mkdir(state, { recursive: true });
-  const config = join(state, 'config.py');
+  const nodeKey = createHash('sha256').update(process.execPath).digest('hex');
+  const config = join(state, `config-${nodeKey}.py`), pendingConfig = config + '.' + randomUUID();
   // JSON string literals are also valid Python literals for these paths.
-  await writeFile(config, [
+  await writeFile(pendingConfig, [
     ['LLVM_ROOT', join(prefix, 'bin')], ['BINARYEN_ROOT', prefix], ['NODE_JS', process.execPath],
     ['CACHE', join(state, 'cache')], ['PORTS', join(state, 'ports')],
   ].map(([key, value]) => `${key} = ${JSON.stringify(value)}`).join('\n') + '\n');
+  await rename(pendingConfig, config);
   const env = { ...process.env };
   for (const key of Object.keys(env)) if (/^(?:EM_|EMCC_|EMSDK|PYTHON|LLVM_|BINARYEN_)/.test(key)) delete env[key];
   Object.assign(env, { EM_CONFIG: config, EMSDK_PYTHON: python.executable, PYTHONDONTWRITEBYTECODE: '1',
@@ -40,9 +46,10 @@ export async function provisionSdk(options = {}) {
     if (!['emcc', 'em++', 'emar', 'emranlib'].includes(tool)) throw new Error('Unsupported managed compiler tool');
     // Emscripten imports sibling Python modules, so -s -E preserves its script
     // directory while ignoring user packages/configuration. -I would remove it.
-    return execFileSync(python.executable, ['-B', '-E', '-s', join(prefix, 'emscripten', tool + '.py'), ...args],
+    return execFileSync(python.executable, ['-B', '-E', '-s', join(driver, tool + '.py'), ...args],
       { env, windowsHide: true, ...settings });
   };
-  return { ...installed, prefix, python, state, env, execute, nativePrograms, version, platform: host,
-    runtimePatchesApplied: false };
+  return { ...installed, prefix, driver, driverIdentity: repaired?.identity ?? installed.identity,
+    python, state, env, execute, nativePrograms, version, platform: host,
+    runtimePatchesApplied: !!repaired };
 }

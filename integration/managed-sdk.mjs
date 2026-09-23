@@ -19,9 +19,10 @@ assert.equal(result.stderr.trim(), '');
 assert.ok((await readFile(join(base, 'hello.wasm'))).length > 8);
 const reused = await provisionSdk({ cache: join(base, 'cache') });
 assert.equal(reused.cacheHit, true);
-const report = { scope: 'Pristine managed SDK C-to-Wasm smoke; full Lean runtime patches and acceptance remain separate',
+const report = { scope: 'Managed SDK C-to-Wasm smoke; full Lean application acceptance remains separate',
   recordedAt: new Date().toISOString(), platform: tools.platform, node: process.version,
   sdk: tools.version, identity: tools.identity, archive: tools.receipt.artifact,
+  driverIdentity: tools.driverIdentity, runtimePatchesApplied: tools.runtimePatchesApplied,
   nativePrograms: tools.nativePrograms, python: tools.python.version, verifiedReuse: reused.cacheHit,
   output: result.stdout.trim(), exit: result.status };
 await writeFile(join(base, 'result.json'), JSON.stringify(report, null, 2) + '\n');
