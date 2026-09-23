@@ -1,0 +1,42 @@
+# Lean 4.34 application API inventory
+
+The [recorded audit](../evidence/application-api-inventory-2026-09-23.json) imports
+all **2,516 modules** in the application runtime's compiled-library manifest.
+Each matching native module source is checked against that manifest before the
+inventory runs. This covers Init, Std, Lean and Lake, including deprecated
+modules; their compiler warnings are preserved separately.
+
+The inventory contains **72,983 declarations** after excluding theorem and
+internal names. It separately records 91,323 theorems and 54,265 internal names.
+These counts describe the exported declaration surface, not passing behavior.
+
+| Origin | Declarations |
+| --- | ---: |
+| Init | 13,630 |
+| Std | 11,724 |
+| Lean | 42,195 |
+| Lake | 5,434 |
+
+There are 163 `IO.FS` declarations and 2,087 `Std.Http` declarations under these
+rules. Across the full inventory, 925 declarations carry extern metadata,
+including 875 distinct standard C symbols. The
+[extern inventory](lean-4.34-extern-declarations.json) preserves backend names,
+inline/opaque/standard forms, module origin, compiled IR availability and
+`implemented_by` targets. All behavioral-coverage fields start unverified.
+
+The complete 14 MiB declaration artifact stays in the ignored experiment
+directory recorded by the evidence, with its SHA256. Reproduce it with
+`scripts/audit-application-apis.mjs` inside the resource guard after preparing the
+matching application library bundle and managed native tools. The completed
+audit peaked at 386 MiB with no resource events.
+
+- [x] Inventory every compiled standard module and its exported declarations.
+- [x] Record extern metadata and exact native/runtime source identities.
+- [ ] Trace executable dependencies, private helpers and dynamic callbacks.
+- [ ] Audit each runtime implementation, including platform-specific branches.
+- [ ] Map unchanged upstream and supplementary differential tests to APIs.
+- [ ] Complete behavior coverage across three engines and six native platforms.
+
+The existing Emscripten implementations of `Std.Internal.UV.Loop.configure`
+and `alive` are explicit unsupported branches. Their linked symbols do not make
+those APIs implemented. The open item is recorded in [IO_LIMITATIONS.md](../../IO_LIMITATIONS.md).

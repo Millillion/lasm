@@ -10,6 +10,10 @@ separately from the earlier runtime evidence below.
   application path; earlier 4.32 results do not transfer automatically.
 - [ ] Complete the latest-release declaration/API audit and native differential
   coverage in all three stock engines and all six OS/architecture combinations.
+  The [Lean 4.34 surface inventory](docs/compatibility/API_SURFACE_4_34.md) now
+  covers all 2,516 compiled modules and 72,983 non-theorem, non-internal
+  declarations, including 925 extern declarations. Implementation and behavior
+  coverage remain unverified individually; these counts are not API passes.
 - [ ] Finish managed application packaging, native Windows ARM64 tools and
   deployment validation without source or build tools.
 - [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and

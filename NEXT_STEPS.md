@@ -12,6 +12,8 @@ below retain their original, narrower scope.
 - [x] Build the matching full runtime and all 2,516 shipped Lean library modules.
 - [x] Verify the first ordinary compiled Lean main in all three stock engines.
 - [x] Inventory all 4,066 unchanged upstream test registrations and exclusions.
+- [x] Inventory the declaration and extern surface of all 2,516 compiled latest
+  standard modules; implementation and behavioral coverage remain separate work.
 - [x] Connect the primary application CLI to verified runtime bundles and managed
   native tools; verify its ordinary Lean main and Lake HTTP project on Linux x64.
 - [x] Verify a cold npm candidate install with only Node/npm, automatic tool

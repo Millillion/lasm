@@ -1,0 +1,47 @@
+{
+  "scope": "Native metadata from every compiled standard module; all behavioral coverage remains unverified",
+  "lean": "4.34.0",
+  "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+  "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+  "libraryInventorySha256": "50a66b6e3571770498231c4ca2eb51b26e5ce2d0d5ac69bde51453d9b94922af",
+  "inventorySourceSha256": "332903d875f493c93054066d668133a601e66d4629330e01102e22f879548363",
+  "rawInventory": "/home/lastmjs/development/lasm/compiler/.work/application-api-inventory-r2/declarations.json",
+  "rawInventorySha256": "dc24a0b0f3dc0ab994f368d00c86ad50724e6cd415e6a64a37e29598c1712d6a",
+  "compilerOutputSha256": "240a2261fa0366f3793d204fa94cf8a68ac91e186c651c77cc31ed5b35dc2631",
+  "compiledModules": 2516,
+  "importedModules": 2516,
+  "declarations": 72983,
+  "groups": {
+    "Init": 13630,
+    "Std": 11724,
+    "Lean": 42195,
+    "Lake": 5434
+  },
+  "ioFsDeclarations": 163,
+  "httpDeclarations": 2087,
+  "externDeclarations": 925,
+  "standardCSymbols": 875,
+  "excludedTheorems": 91323,
+  "excludedInternalNames": 54265,
+  "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-api-inventory-r2-resources.json",
+  "recordedAt": "2026-09-23T19:52:06.299Z",
+  "resources": {
+    "peakMemoryBytes": 404230144,
+    "resourceLimited": false,
+    "memoryThrottled": false,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "scopeNotes": [
+    "Counts exclude theorem and internal names, which remain tracked separately.",
+    "Every recorded compiled standard module was imported and its native source hash matched the compiled-library manifest.",
+    "A linked extern or compiled IR body is not behavioral compatibility evidence.",
+    "The initial attempt produced the same native metadata but its JSON parser rejected an ordinary deprecated-module warning; compiler diagnostics are now preserved separately."
+  ]
+}
