@@ -70,7 +70,15 @@ the pinned release archive contains `6.0.9-git`, and the official installer writ
 `"6.0.9"`. Lasm now records and verifies both exact forms and performs that rewrite
 in the derived driver, leaving the download intact. All three runtime repair
 input hashes were independently checked against the downloaded official archive.
-The corrected native compilation run remains pending.
+The next native run compiled the C fixture on Linux/macOS, then caught Python
+bytecode written by recursive SDK entry points. Windows x64 instead exposed
+the native command-line length limit while building libc. Recursive SDK tools
+now use the private Python directly with bytecode disabled; long Windows Clang
+commands use ordinary LLVM response files. Cache verification remains strict.
+The corrected Linux x64 clean download, C-to-Wasm compile, execution and
+whole-cache reuse all pass, peaking at 2.63 GiB without resource events. See the
+[Linux SDK evidence](evidence/managed-sdk-linux-2026-09-23.json). The Windows
+response-file change and the remaining native hosts await the next CI run.
 
 ## CLI and deployment foundations
 

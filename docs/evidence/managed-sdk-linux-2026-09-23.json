@@ -1,0 +1,67 @@
+{
+  "scope": "Managed SDK C-to-Wasm smoke; full Lean application acceptance remains separate",
+  "recordedAt": "2026-09-23T17:19:30.212Z",
+  "platform": "linux-x64",
+  "node": "v26.10.0",
+  "sdk": "6.0.9",
+  "identity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+  "archive": {
+    "name": "emscripten-6.0.9-linux-x64",
+    "root": "install",
+    "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/f04ea239d533260dd1db760dd2d668d5f9a88d6b/wasm-binaries.tar.xz",
+    "sha256": "d5c6c2917fbc1cae1a7d1e581f1c0b2817369dd57f94c7a0d05921476f1a7287",
+    "bytes": 298541944,
+    "format": "tar.xz",
+    "maximumExtractedBytes": 5000000000
+  },
+  "driverIdentity": "41d607cf269ed1fb1f966c379110338eea8edfaa2519d417b47bfec1d8c4e35b",
+  "runtimePatchesApplied": true,
+  "nativePrograms": {
+    "clang": {
+      "platform": "linux",
+      "architectures": [
+        "x64"
+      ]
+    },
+    "wasm-ld": {
+      "platform": "linux",
+      "architectures": [
+        "x64"
+      ]
+    },
+    "wasm-opt": {
+      "platform": "linux",
+      "architectures": [
+        "x64"
+      ]
+    }
+  },
+  "python": "3.13.15",
+  "verifiedReuse": true,
+  "output": "managed SDK application",
+  "exit": 7,
+  "sourceRevision": "4a7df9c plus recursive private-Python driver fixes; Windows response-file fix added afterwards and unverified in this run",
+  "resources": {
+    "peakMemoryBytes": 2819530752,
+    "resourceLimited": false,
+    "memoryThrottled": false,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "limitations": [
+    "Linux x64 only",
+    "One C-to-Wasm fixture, not full Lean application acceptance",
+    "Windows command-length fix awaits native CI",
+    "Native Windows ARM64 SDK distribution remains missing"
+  ]
+}

@@ -57,8 +57,40 @@
           "after": "\"6.0.9\"\n"
         }
       ]
+    },
+    {
+      "path": "tools/utils.py",
+      "originalSha256": "0ab7e53b2f0e05b90cb3c4e01f282c93834d6439af518afbb79e31719100dc8c",
+      "patchedSha256": "01bfd7c3d8dcf19d86ece199860cc6c29036194a292935f5eab89021770c45b9",
+      "replacements": [
+        {
+          "before": "def run_process(cmd, check=True, input=None, *args, **kw):\n",
+          "after": "def python_compiler_command(cmd):\n  # Lasm's private compiler dependency must not write bytecode into its verified\n  # installation. Bypass the platform entrypoint wrappers, whose -E drops the\n  # PYTHONDONTWRITEBYTECODE environment variable, for internal compiler calls.\n  if not isinstance(cmd, (list, tuple)) or not cmd:\n    return cmd\n  program = os.path.abspath(cmd[0])\n  name, extension = os.path.splitext(os.path.basename(program))\n  if (os.path.normcase(os.path.dirname(program)) == os.path.normcase(__rootpath__)\n      and name in {'emcc', 'em++', 'emar', 'emranlib', 'embuilder'}\n      and extension in {'', '.exe', '.cmd', '.bat'}):\n    return [sys.executable, '-B', '-E', '-s', path_from_root(name + '.py'), *cmd[1:]]\n  return cmd\n\n\ndef run_process(cmd, check=True, input=None, *args, **kw):\n"
+        },
+        {
+          "before": "  ret = subprocess.run(cmd, check=check, input=input, *args, **kw)\n",
+          "after": "  cmd = python_compiler_command(cmd)\n  ret = subprocess.run(cmd, check=check, input=input, *args, **kw)\n"
+        }
+      ]
+    },
+    {
+      "path": "tools/shared.py",
+      "originalSha256": "ffa65e36574d213aa71ec5b540db47bdc588cf7483c717136e06d320acc04edd",
+      "patchedSha256": "72a72ef63776f895c6e51f1f67341eedcf884e9c5f2bb938d4e7fd6e023dfbc4",
+      "replacements": [
+        {
+          "before": "      proc = subprocess.Popen(commands[i], stdout=stdout, stderr=None, env=env, cwd=cwd)\n",
+          "after": "      proc = subprocess.Popen(utils.python_compiler_command(commands[i]), stdout=stdout, stderr=None, env=env, cwd=cwd)\n"
+        },
+        {
+          "before": "def exec_process(cmd):\n  print_compiler_stage(cmd)\n  utils.exec(cmd)\n",
+          "after": "def exec_process(cmd):\n  print_compiler_stage(cmd)\n  # Keep Clang argument batches below the Windows CreateProcess limit, including\n  # the expanded source paths from internal SDK response files.\n  if utils.WINDOWS and len(subprocess.list2cmdline(cmd).encode(\"utf-16-le\")) // 2 > 24000:\n    from . import response_file\n    cmd = [cmd[0], \"@\" + response_file.create_response_file(cmd[1:], TEMP_DIR)]\n  utils.exec(cmd)\n"
+        }
+      ]
     }
   ],
   "archiveVersion": "6.0.9-git",
-  "versionNormalization": "The official emsdk installer writes the stable release version resolved from this archive hash into emscripten-version.txt."
+  "versionNormalization": "The official emsdk installer writes the stable release version resolved from this archive hash into emscripten-version.txt.",
+  "internalCompilerLaunches": "Use private Python directly with -B -E -s for recursive SDK tools; avoid shell-wrapper bytecode writes and retain strict whole-cache verification.",
+  "windowsCommandLines": "Convert expanded native compiler commands above 24000 UTF-16 code units into the SDK's ordinary LLVM response files before CreateProcess."
 }
