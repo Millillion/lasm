@@ -50,6 +50,14 @@ Unmapped additional compiler flags fail explicitly. The generated per-pile
 `lean-toolchain` selects the same release as the managed native control while
 preserving upstream's original stage-directory pin.
 
+For the four compile-disabled inputs, a separate campaign can supply
+`probe-compile-disabled` after its exact filter. This leaves their original
+markers and driver intact, runs that driver first, then adds a native AOT control
+and an installed-Lasm AOT attempt with the original assertions. Native AOT
+failures are recorded in their own phase. These additional experiments do not
+relabel the original upstream-disabled registrations as upstream compilation
+passes.
+
 Each case has a 900-second deadline and CTest runs with one job. The resource
 report distinguishes memory/pressure aborts from behavior failures. Case reports
 record the native/build/runtime phase, package build inputs and Wasm hash.

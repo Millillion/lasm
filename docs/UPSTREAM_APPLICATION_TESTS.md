@@ -76,3 +76,15 @@ retains the earlier guarded resource stop and both harness defects. The complete
 broad run peaked at 2.32 GiB without resource events. This result covers native
 compilation and evaluation; it does not validate those same APIs when deployed
 in JavaScript engines or establish the remaining platform results.
+
+The first complete installed-application Node campaign finished all 101
+registrations: **96 passed, four retained upstream's compilation-disabled
+markers, and one failed**. `compile_bench/const_fold.lean` hit an intermittent
+Emscripten worker-mailbox exception (`wait.value.then is not a function`); its
+native output is preserved and the runtime defect remains open. All original
+files/links and harness hashes remained unchanged. The 4.10 GiB peak caused no
+OOM, throttling or proactive stop. The
+[per-case record](evidence/upstream-applications-node-r1-2026-09-23.json) is the
+authoritative count; earlier progress updates missed that failure. It also
+identifies the six compiled fixtures that deliberately launch native Lean child
+processes, keeping those compiler operations separate from deployed behavior.

@@ -11,9 +11,11 @@ import { sourceIdentity } from './source-identity.mjs';
 
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
-const [outputArg, category, target, engineArg, compilerArg, filter = '.*'] = process.argv.slice(2);
+const [outputArg, category, target, engineArg, compilerArg, filter = '.*', mode = 'upstream'] = process.argv.slice(2);
 if (!outputArg || !['compiled-application', 'compiled-test-driver', 'compiled-driver-and-native-compiler', 'native-build-time'].includes(category) || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
   throw new Error('Supply NEW_OUTPUT CATEGORY TARGET ENGINE INSTALLED_COMPILER [FILTER]');
+if (!['upstream', 'probe-compile-disabled'].includes(mode) || mode !== 'upstream' && category !== 'compiled-application')
+  throw new Error('The optional probe-compile-disabled mode applies only to compiled-application cases');
 const output = resolve(outputArg), compiler = resolve(compilerArg), engine = resolve(engineArg);
 if (existsSync(output)) throw new Error('Use a new campaign directory');
 const inventoryFile = join(root, 'docs/evidence/lean-4.34-upstream-application-inventory.json');
@@ -46,6 +48,8 @@ const tests = inventory.tests.filter(test => test.category === category && new R
     return { ...test, sha256: identity.sha256, sourceIdentity: identity };
   });
 if (!tests.length) throw new Error('No upstream tests matched');
+if (mode === 'probe-compile-disabled' && tests.some(test => test.upstreamCompileEnabled !== false))
+  throw new Error('The extra compilation probe must select only upstream compile-disabled cases');
 const generatedPins = [];
 const sharedDriver = ['compiled-test-driver', 'compiled-driver-and-native-compiler'].includes(category);
 if (category === 'compiled-application' || sharedDriver) for (const directory of new Set(tests.map(test => dirname(test.source)))) {
@@ -68,7 +72,8 @@ const nativeEnvironment = sharedDriver
 if (!sharedDriver)
   writeFileSync(nativeEnvironment, '#!/usr/bin/env bash\nsource "$TEST_DIR/util.sh"\ndriver="$1"; shift\nsource "$driver"\n');
 let compiledDriver;
-let compileDriver = join(root, 'scripts/application-tests/compile-case.sh');
+let compileDriver = join(root, 'scripts/application-tests',
+  mode === 'probe-compile-disabled' ? 'probe-compile-disabled.sh' : 'compile-case.sh');
 if (sharedDriver) {
   const pile = category === 'compiled-test-driver' ? 'docparse' : 'server_interactive';
   if (tests.some(test => test.driver !== `tests/${pile}/run_test.sh`)) throw new Error('Unmapped compiled test driver; select an explicitly supported original driver');
@@ -91,7 +96,7 @@ if (sharedDriver) {
 const timeoutSeconds = 900;
 const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sourceArchiveSha256: inventory.sourceArchiveSha256,
   sourceManifestSha256: await hashFile(sourcesFile), verifiedOriginalFilesAndLinks: verified,
-  output, source, execution, category, target, engine, compiler, nativeEnvironment, compileDriver, timeoutSeconds, environment, tests, generatedPins,
+  output, source, execution, category, mode, target, engine, compiler, nativeEnvironment, compileDriver, timeoutSeconds, environment, tests, generatedPins,
   nativeArtifactIdentity: lean.identity, compiledDriver, resourceReport: process.env.LASM_RESOURCE_REPORT,
   scope: category === 'native-build-time' ? 'Unchanged managed native compiler tests; no deployed runtime pass implied'
     : 'Unchanged native driver followed by installed-CLI AOT execution with original arguments and assertions',
@@ -113,6 +118,11 @@ if (category === 'compiled-driver-and-native-compiler') {
   manifest.scope = 'AOT Lean LSP client/driver using its unchanged managed native compiler/server child; server/compiler behavior is native build-time coverage';
   manifest.adaptations.push('The exact original lean --server invocation is forwarded to the verified native compiler and recorded for every deployed case; arbitrary compiler invocations are rejected.',
     'Only tests/server_interactive/run_test.sh is mapped in this campaign; the other five driver registrations still require their own parallel adapters.');
+}
+if (mode === 'probe-compile-disabled') {
+  manifest.scope = 'Additional native AOT and installed-Lasm AOT experiments for original upstream compile-disabled inputs; original markers/driver run unchanged first';
+  manifest.adaptations.push('After the unchanged upstream driver, an additional native AOT control runs the ordinary compile driver commands and original assertions, followed by installed-Lasm AOT.',
+    'No no_compile marker is removed or edited; the extra-native-aot phase distinguishes a native control failure from a deployed application failure.');
 }
 const manifestFile = join(output, 'manifest.json');
 writeFileSync(manifestFile, JSON.stringify(manifest, null, 2) + '\n');

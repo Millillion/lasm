@@ -1,0 +1,3034 @@
+{
+  "scope": "Unchanged native driver followed by installed-CLI AOT execution with original arguments and assertions",
+  "lean": "4.34.0",
+  "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+  "category": "compiled-application",
+  "target": "node",
+  "registered": 101,
+  "counts": {
+    "passed": 96,
+    "upstream-compile-disabled": 4,
+    "failed": 1
+  },
+  "originalSources": {
+    "before": {
+      "checked": 7669,
+      "modified": []
+    },
+    "after": {
+      "checked": 7669,
+      "modified": []
+    }
+  },
+  "harness": {
+    "before": {
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/run.mjs": "1979d680b20ab89cd58a671edb24fb540427a4881455d7f6824674cfaece3008",
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/case.mjs": "ba66207bebb0197863c9c5785648b575cd03d21f17713078113c53a1ebc0bd9a",
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh": "3020f0107f5fe50c8ea84bfd7d0ceac35d105b861ad273927ca4f4ea9eaf2453",
+      "/home/lastmjs/development/lasm/compiler/.work/upstream-application-all-node-r1/native-environment.sh": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6"
+    },
+    "changed": []
+  },
+  "startedAt": "2026-09-23T20:04:47.737Z",
+  "finishedAt": "2026-09-23T21:52:20.421Z",
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r2/lasm-compiler-0.1.0-experimental.5.tgz",
+    "sha256": "74016a9c13a5b14d1fef93e8e7ece301d932732b56068855400d02e4385e7644",
+    "compressedBytes": 124724784,
+    "installedBytes": 626285802,
+    "files": 2657,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-package-r2-resources.json",
+    "recordedAt": "2026-09-23T19:35:05.266Z"
+  },
+  "resources": {
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "peakMemoryBytes": 4403380224,
+    "minimumHostAvailable": 21969915904,
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "memoryEvents": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  },
+  "fullExecutionSha256": "982b2c5ff0d6614a1528f8544340cc6fe19c6c239aed6b98a4ace89879e73a78",
+  "harnessLog": ".work/upstream-application-all-node-r1/execution.log",
+  "remainingFailure": {
+    "name": "compile_bench/const_fold.lean",
+    "phase": "application-runtime",
+    "nativeOutput": "93011 93011\n",
+    "error": "TypeError: wait.value.then is not a function in __emscripten_thread_mailbox_await",
+    "status": "under investigation; nonfundamental runtime defect"
+  },
+  "fixturesThatExplicitlyInvokeNativeLean": [
+    "compile/incr_cli_snapshot.lean",
+    "compile/incr_header_mismatch.lean",
+    "compile_bench/incr_header_load.lean",
+    "compile_bench/incr_header_save.lean",
+    "compile_bench/server_startup.lean",
+    "compile_bench/watchdogRss.lean"
+  ],
+  "scopeNotes": [
+    "Original native compile/interpreter checks precede each deployed application.",
+    "The explicitly listed fixtures launch a managed native Lean child by design; their compiler behavior remains native evidence.",
+    "Four upstream compile-disabled registrations are preserved as untested deployed cases, not successes.",
+    "Earlier progress updates missed the const_fold failure; this final per-case record is authoritative."
+  ],
+  "cases": [
+    {
+      "name": "compile/534.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "720a6465ce5267560d754b2ebcfbbc237eb06c1a1aaf7d2e0dbd28522dad300e",
+      "sourceUnchanged": true,
+      "wasmSha256": "b3b90a996cf608d465c5960144a55ad1ad24b8d667cbfbec29f86dff7756638e",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "534",
+            "sourceSha256": "720a6465ce5267560d754b2ebcfbbc237eb06c1a1aaf7d2e0dbd28522dad300e",
+            "cSha256": "de49396f6a15549de72f9bbd67ba3a067e3f74edaf8a7db45e2780b7f2bbc137"
+          }
+        ],
+        "signature": "e32fd3e6a5cbbadd2278ae105d21c574c218ad3fd0fb25430857a0cf2046bdc4",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/StackOverflow.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "3cd8941d6ef61a1d34b2b381e6c114d68ea0f2b0a679c0a6509097867c8d7a9c",
+      "sourceUnchanged": true,
+      "wasmSha256": "54f7f90e65ff6da288a49d3e94d9981899925d5897e877f2218982850bb23dc4",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "StackOverflow",
+            "sourceSha256": "3cd8941d6ef61a1d34b2b381e6c114d68ea0f2b0a679c0a6509097867c8d7a9c",
+            "cSha256": "05d457d2657a832ddb529d4c7fd57cc48134a4ba4e04431e63e490457c211b4e"
+          }
+        ],
+        "signature": "f36eff69447b01f51405b684e8f1181c096dc4e724282ca1047389099fa0a913",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/StackOverflowTask.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "ca3928c152a07bdda9a0736d39de5fb38a1437af0c74e17f97fd6e47a8dd13b1",
+      "sourceUnchanged": true,
+      "wasmSha256": "73c7c75926d8d0dadbf701ce214cb9760b15146f3045b2b9984ff18b8266c4ff",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "StackOverflowTask",
+            "sourceSha256": "ca3928c152a07bdda9a0736d39de5fb38a1437af0c74e17f97fd6e47a8dd13b1",
+            "cSha256": "c70add0c8c48f468952173b743d5658dcbcb79c385bee1bde614c7fb44ba6260"
+          }
+        ],
+        "signature": "1ee6610e752c35bf428e6c617c7ed2ad881d24723e99952dce71de47c335022f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/append.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "84ac8901a802e437f1519c8373614a9fe5b207c843046083ece5a305be51469f",
+      "sourceUnchanged": true,
+      "wasmSha256": "6d40344a1520e54882d6d98e64a3eb6a8cfecbf7148158bea3305888ba179b44",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "append",
+            "sourceSha256": "84ac8901a802e437f1519c8373614a9fe5b207c843046083ece5a305be51469f",
+            "cSha256": "406e71814c3ce3dda73886bf0e5083b7a71fcffe3720c74aa660dfbf64253305"
+          }
+        ],
+        "signature": "b9ddba1703b082ca9dcd9e0aa7cc6425a9fb5fb82c1764e90b514695c3a2e0fb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/arity_bug1.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "77cc8b86e6a9a74f055beffffee8c044376a52a8cfde1c0039672540456ee812",
+      "sourceUnchanged": true,
+      "wasmSha256": "24686fe4d2fa58a37948bded082084ab12a33b3cb776e60e935e4a948f3f9e30",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "arity_bug1",
+            "sourceSha256": "77cc8b86e6a9a74f055beffffee8c044376a52a8cfde1c0039672540456ee812",
+            "cSha256": "369b61946f5bc8ab6129ec4c85ba2e5020ab490e47b78f2144f5323fe12dfc65"
+          }
+        ],
+        "signature": "f07ffbe7d2dfb7e7922ec8c8c64a57e2e8b9c468055e42a2f14564e89fd43150",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/array.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "8183c02be65366c15424f733033680bf263167dd1f32986181743650f1528726",
+      "sourceUnchanged": true,
+      "wasmSha256": "565d49ef6a8569b5dfcd66a4cb3fe07633a87c9578e2cd81962795af27c03347",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "array",
+            "sourceSha256": "8183c02be65366c15424f733033680bf263167dd1f32986181743650f1528726",
+            "cSha256": "e1ae6d2387c55bf23ddce32d00a87635121a9c78a25b52e97d7007711d6b1b76"
+          }
+        ],
+        "signature": "643c290dccf943856782e76b58dccf46b07512947fa1242b62660bbb488b00c2",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/arrayMapIdxInPlace.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "5fc644e8f1de97cb6020f8430c0821161413862c39f822bcb0b8ab386cb298ba",
+      "sourceUnchanged": true,
+      "wasmSha256": "003f5c35b63102e69d02dab5b4bdf574dcb33a6879235d430758c9e34bf15743",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "arrayMapIdxInPlace",
+            "sourceSha256": "5fc644e8f1de97cb6020f8430c0821161413862c39f822bcb0b8ab386cb298ba",
+            "cSha256": "f10e4495b1af106567b72179d0fac5e4f3db320776e726ba1bef6d95512be6b6"
+          }
+        ],
+        "signature": "08e0830fa6c1e7cbf2cd453463a66df0b6181587adad46df8fa8c245bdcb51a7",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/arrayMk.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "b00cba3126381c6351bd0a8d4a363fe7d7b78e33a62a8a6ecdbe4a2cec348fcb",
+      "sourceUnchanged": true,
+      "wasmSha256": "6f7b4605a6c31a31e65b08c59509842aa1721b5a8557d7b830e73cf8f686c849",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "arrayMk",
+            "sourceSha256": "b00cba3126381c6351bd0a8d4a363fe7d7b78e33a62a8a6ecdbe4a2cec348fcb",
+            "cSha256": "f8186124fa7bfb924a12168b059321a2ffb3f6d7e1012dbabbf2b8d4816122bb"
+          }
+        ],
+        "signature": "8c11c7eaf9a72ac5e3c0393ac6faebb2f31d3601e95723d4b5b2690ce805d51e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/array_test.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "f4a54c70cea13fe6b7c5ced7e0a80fcbce5ad3b0f601571e7c4a029786096360",
+      "sourceUnchanged": true,
+      "wasmSha256": "928815c6330e7fd82277ca2bfc3c84bc2db79010a2341e9d595acbca0d220062",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "array_test",
+            "sourceSha256": "f4a54c70cea13fe6b7c5ced7e0a80fcbce5ad3b0f601571e7c4a029786096360",
+            "cSha256": "6bfee201d762f700cf76ef35b7b38e19ac660b8c0391f65803bfd42a41398353"
+          }
+        ],
+        "signature": "42ce8550a0c81f6e40c03bca47b8b6c9d03a7913dd352809b372cd81cb00f225",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/array_test2.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "40dbcd1b8abed8315d130b258ef715e47f5a8d45581084bd6cb922e6eb56c8ad",
+      "sourceUnchanged": true,
+      "wasmSha256": "89b725a3d75a6b1960e760f02663aeff6b67898e1f9f432db57e7e7d22714557",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "array_test2",
+            "sourceSha256": "40dbcd1b8abed8315d130b258ef715e47f5a8d45581084bd6cb922e6eb56c8ad",
+            "cSha256": "6e0b0df3713c42cc83f00c0674d9044019eb8cce6236189c0d07fba343ba63cb"
+          }
+        ],
+        "signature": "194909fe2027ea131fdfacb67447614d0231e8c3109fcc51579b6f18e96b0c11",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/bigctor.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "5a49f006130293e4afd994199b5b3dbf5ccb0951ad32d87938ec384a1af67a3e",
+      "sourceUnchanged": true,
+      "wasmSha256": "045d2ff3643caa59e99233b9b8aa5e343436ea426153672619dcb5a9414748da",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "bigctor",
+            "sourceSha256": "5a49f006130293e4afd994199b5b3dbf5ccb0951ad32d87938ec384a1af67a3e",
+            "cSha256": "26fdb3ef9b83b00a3c06ffd8260789a738165f5a43739609c2a0d925f5162995"
+          }
+        ],
+        "signature": "3cb6b7b8692124e706d3a4af876a62c6ad45b7443887e0465ed3ad67710f246d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/bytearray_bug.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "a1c1618e9cd80412f703d6d0ff8bac56b63fe8182b70005fa8c152481aa621c6",
+      "sourceUnchanged": true,
+      "wasmSha256": "e4f52d348d6c4751d5ee0526abd626459f59fe0b2e3d56852cb074161027a302",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "bytearray_bug",
+            "sourceSha256": "a1c1618e9cd80412f703d6d0ff8bac56b63fe8182b70005fa8c152481aa621c6",
+            "cSha256": "a43226d10b80eec1e8b1915f83dba310775202a4a9554408cdb170ae72f41be7"
+          }
+        ],
+        "signature": "d5d67a88b20fb9335ee040155e8d6c04edc3dcbaf5e950907fa0309fb78fa822",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/char_escape.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "86eb076350ae7c690b9de4344f4fcb947d03a3e06abd0383c43b48d7f7a53bc7",
+      "sourceUnchanged": true,
+      "wasmSha256": "72e72b6c9838dc59c42e916d5b397cb85f7fd43c1a9068baf87d9d76a78e386a",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "char_escape",
+            "sourceSha256": "86eb076350ae7c690b9de4344f4fcb947d03a3e06abd0383c43b48d7f7a53bc7",
+            "cSha256": "8562a6e5d45ff693ad7bd856462e84717f295ffd18c9de65057a4e3a836e1973"
+          }
+        ],
+        "signature": "2a48ecf6d1f197ff7f0ae122e163749f4a0b8e5ba56306862c6aaffab9b0b188",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/closure_bug1.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "cb4fd2b7fc146f7e62943abf6845b9465dca41ff9abc5c18746a8209d38b5e7b",
+      "sourceUnchanged": true,
+      "wasmSha256": "d381df1f32e6ab915cca85035d1133e23af507524c90b74d1c72fd397ab31d8e",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "closure_bug1",
+            "sourceSha256": "cb4fd2b7fc146f7e62943abf6845b9465dca41ff9abc5c18746a8209d38b5e7b",
+            "cSha256": "f46189d51b9dfedf13c52631af90999df3c0c8c186dae49ca325c445cd221cd6"
+          }
+        ],
+        "signature": "bdd405258b73338b1b734aa37c00262da09db6af6ab59a0aa3ecd4acd79694b2",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/closure_bug2.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "187b66395a5a0748ca89a6a80e37946b99eb2537378eeb5dd1ff848702e7efb4",
+      "sourceUnchanged": true,
+      "wasmSha256": "8f84299614334d9d9401a3be06d2658927cc9c323800c65ed72210e15869599c",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "closure_bug2",
+            "sourceSha256": "187b66395a5a0748ca89a6a80e37946b99eb2537378eeb5dd1ff848702e7efb4",
+            "cSha256": "bd59df70c0e4d743b786a1fcf1bc43418bdf3f9a897fde341fca3939c3a8e312"
+          }
+        ],
+        "signature": "964eccd8cdcc6ae67b232baff5c38eeb765e78a7f48d5266a490dd1d14ba1d9d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/closure_bug3.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "f4d06bc8ee7dde48cd92e8a8c54ce0b35a49d1c6271163dd4fb8a577b1e24b94",
+      "sourceUnchanged": true,
+      "wasmSha256": "7d842f3178399478c07c90aaa2b922da123867cbfdac0cf7985ca9fe2c42c1d0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "closure_bug3",
+            "sourceSha256": "f4d06bc8ee7dde48cd92e8a8c54ce0b35a49d1c6271163dd4fb8a577b1e24b94",
+            "cSha256": "b9a8c2df4fd6e627d6ca085c137133591c77a413872d43dea9841a2475803d03"
+          }
+        ],
+        "signature": "9c146fe5debb5e308d141ce1f1456899734eb7876fa14160f4f8231be9b9b2a9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/closure_bug4.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "ec3f89b85967b77fe265ae2bd2c71222c6fbdd613309ab8b9f14b45582e1200d",
+      "sourceUnchanged": true,
+      "wasmSha256": "277af943f84ff9f642d345262a3d8fd3e30c463c9ea110a9835137b1b7a68900",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "closure_bug4",
+            "sourceSha256": "ec3f89b85967b77fe265ae2bd2c71222c6fbdd613309ab8b9f14b45582e1200d",
+            "cSha256": "10e93a03012aa01b160a063088165719b65b36edc9fc7594d37937cbe973d1af"
+          }
+        ],
+        "signature": "facd6c0bf646344384f9f6787b775e5b8c886d0046ac3075cb35d030f8e2d78a",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/closure_bug5.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "1b5458608e9ef2f814b8dae7ebfc0c01aa2583b43eead71fd579080b88cca3c1",
+      "sourceUnchanged": true,
+      "wasmSha256": "b4d9eb5887070143e083e8d9f1e8c917de75c9ac6351c59be2c20c10df2e5e7b",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "closure_bug5",
+            "sourceSha256": "1b5458608e9ef2f814b8dae7ebfc0c01aa2583b43eead71fd579080b88cca3c1",
+            "cSha256": "0037dc9210088d58421858b3e52b49e60bfbb3f5758ef954848b950fcd8a8e06"
+          }
+        ],
+        "signature": "f0ff9309536fb5941d6893296a056c9d92e9646b7efe2151c699632f8ae882cb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/closure_bug6.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "024ddc06586bd07ded5ce8654ea8c3f59a8d9803984865f169d3029608a45d75",
+      "sourceUnchanged": true,
+      "wasmSha256": "c48b37edb415cc8c197b6929493f0ba9e92f3f839752d4309139600cc556bf90",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "closure_bug6",
+            "sourceSha256": "024ddc06586bd07ded5ce8654ea8c3f59a8d9803984865f169d3029608a45d75",
+            "cSha256": "ba4ecb3ae66dd35f4bb93bceb2c9e2189cc49c9f736779807de1b117bdc7fafe"
+          }
+        ],
+        "signature": "e5097df2774f0b7742e97943ea5a4e6568cccdb4c0c52b5bc7131a4f2b5fb45d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/closure_bug7.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "678d7543d2f609bb6b1384b52597c443bc1c5f95a5de21eef9f3aa1c899650f3",
+      "sourceUnchanged": true,
+      "wasmSha256": "c2f4e2a703d06db15fc52d967b28b90099ac425af5e11ddca396641bb2b3de79",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "closure_bug7",
+            "sourceSha256": "678d7543d2f609bb6b1384b52597c443bc1c5f95a5de21eef9f3aa1c899650f3",
+            "cSha256": "d8f6266b84d545770f8ed1cac9630f5af1f5869e03490ef6a58cdb4d1348692f"
+          }
+        ],
+        "signature": "1adadcc3c5eb065a2a2f4c015b00e21951af6ee993cbb7e52461eb98250ca465",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/closure_bug8.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "6c278e83e260f998c0121cb0bac88b8e81cea092ff1969b8cd69f8f906eaf759",
+      "sourceUnchanged": true,
+      "wasmSha256": "cbcfe4ed174c917131a40e8a15eef457e78f3c135271d3e278cfea72892f54b1",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "closure_bug8",
+            "sourceSha256": "6c278e83e260f998c0121cb0bac88b8e81cea092ff1969b8cd69f8f906eaf759",
+            "cSha256": "b43a5e4436bdc6aa6367ec67f04a7f5dcd773db85e9d56838d4196ab35690cd6"
+          }
+        ],
+        "signature": "be0a8b4fc4aa5deb2ca72b1bca2dcdb8378862f003744499cef573db90f00924",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/compact_closure.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "f4652a259a32390fa80aeaef557c9f590425135581ae8e874608cce23b6306ed",
+      "sourceUnchanged": true,
+      "wasmSha256": "c1a97e0cf3597f843e057fc4d6bbcf0d5a28e88250bc026cbc1b8c9847a427de",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "compact_closure",
+            "sourceSha256": "f4652a259a32390fa80aeaef557c9f590425135581ae8e874608cce23b6306ed",
+            "cSha256": "2731a7e5b9619558f08587f5c320fa50aea0e91e7cd391295dc3e9f582e39070"
+          }
+        ],
+        "signature": "abd93e9051ff1f93479b31340df301d0d451a6d7e586eac5bfd5de409762f527",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/compact_closure_cross.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "f737687c4d5d3995367037c4ad3a22a9966a74277b04cc7cf07d1abe531ec08d",
+      "sourceUnchanged": true,
+      "wasmSha256": "3f01dca9e9a3f61d9b89c901a61d918a544dabb8415008a9240b788c3a6ddb80",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "compact_closure_cross",
+            "sourceSha256": "f737687c4d5d3995367037c4ad3a22a9966a74277b04cc7cf07d1abe531ec08d",
+            "cSha256": "fea23f146fcac9e053f86402d51632144d301219a70e8946d9cd497576841d57"
+          }
+        ],
+        "signature": "9923ee9bd76c7dc33774c5d94ba47da9dae3d56497a1d26dfb572ff31013d7a7",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/compactor_chain.lean",
+      "status": "upstream-compile-disabled",
+      "phase": "native-driver",
+      "sourceSha256": "a9bbe382ded2090b5ca1c3aa65375821fb6fbfa05053ef54756efe78acdb291a",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "compile/dep_regions.lean",
+      "status": "upstream-compile-disabled",
+      "phase": "native-driver",
+      "sourceSha256": "03a920cecc92dc46a430abcf5782847b65115bd10582407c08188e6ba516c6a8",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "compile/dep_regions_miss.lean",
+      "status": "upstream-compile-disabled",
+      "phase": "native-driver",
+      "sourceSha256": "9c1b6e6f449c8111b94d4cbcd862dd215c71bd9c6304705e864336283a3bdf19",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "compile/escape.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "358fe3f774f6e1922a5daa2469f0da3ec97c8a04d212f73269626f1f04c04be9",
+      "sourceUnchanged": true,
+      "wasmSha256": "98af9f03fc8ba405784954197ddfaa38f3052165a0f647e80e77b4fd550cff88",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "escape",
+            "sourceSha256": "358fe3f774f6e1922a5daa2469f0da3ec97c8a04d212f73269626f1f04c04be9",
+            "cSha256": "d39b66521b395eb65ba074332e3f1a55994e32358f3a0ac27ff0bb11b81de814"
+          }
+        ],
+        "signature": "c93983da5bb200304651c153a34dca028d497a786dafeb453d260c05f572a73d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/expr.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "26ad97293463731d5f7c8f5ab475f5ad8daff730108174c3a2edabdbe9306758",
+      "sourceUnchanged": true,
+      "wasmSha256": "6a9561832b6ef64af4240043525973626a42dcaa6ccf9c11439255d69afa9039",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "expr",
+            "sourceSha256": "26ad97293463731d5f7c8f5ab475f5ad8daff730108174c3a2edabdbe9306758",
+            "cSha256": "352cd3244e2c7514680bdba763ba180ffae583a89bb21797f1affa5f754b2b4b"
+          }
+        ],
+        "signature": "5aba095be6554dfd7b8aa52eaef64e1db4136c31eb533fe5cde00bdf6ebf37cc",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/extractClosedMutualBlock.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "e4f3c1f0a5baac982aa76fe05856786dfdc64e503097495fd01d5a0eeace52d0",
+      "sourceUnchanged": true,
+      "wasmSha256": "f229991269c92caebaf59acf24715ebecc8ecacab706638542da83d8d758e4f4",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "extractClosedMutualBlock",
+            "sourceSha256": "e4f3c1f0a5baac982aa76fe05856786dfdc64e503097495fd01d5a0eeace52d0",
+            "cSha256": "319f1460030b92c26a9c656aa0f2546da83c39800700a5dbdbf97415290cc4c6"
+          }
+        ],
+        "signature": "8591ccf092c336e54c55d317c84930f188ae025bba63507940b02468485e3e9c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/extract_uaf.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "17ee71f229eb7af6d3c8fc41ee4dc00f71bfa5327d680cba27342dad6c61ad84",
+      "sourceUnchanged": true,
+      "wasmSha256": "5d646bdd4205187259e9b81f1c57d7dd8841fa612772ff8b9ea521f48010a16f",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "extract_uaf",
+            "sourceSha256": "17ee71f229eb7af6d3c8fc41ee4dc00f71bfa5327d680cba27342dad6c61ad84",
+            "cSha256": "a24782227967a107df47e39869f6561da6218ada45d496420f2fa699fd9d04f5"
+          }
+        ],
+        "signature": "b2b457f3be3a0295249ca2d254194fe08f0edb60f0ec2cdb1aa73237b5132222",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/file_read_overflow.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "22d69ba7ca9ec055b29f212ddce606dae0b9ef218364c66d61b032a5863c17bb",
+      "sourceUnchanged": true,
+      "wasmSha256": "798abf989c3aa46c396f524c1ef877481e38978350d462686579a0327304c201",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "file_read_overflow",
+            "sourceSha256": "22d69ba7ca9ec055b29f212ddce606dae0b9ef218364c66d61b032a5863c17bb",
+            "cSha256": "c042de6e30d7863a5d5f93ce2909d0292ad2e8a8a51f6aa7bd78a9417216dd5a"
+          }
+        ],
+        "signature": "3801b54204e008afca9a5f6424261cb7eca79c4ff98bcf17c0912ead23788d7f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/float.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "bf026abcb3b21a3a88e5301454ef954d9869f4ac91ed3951a044a77b8fb64935",
+      "sourceUnchanged": true,
+      "wasmSha256": "fd9a73b70db8f49bd8558f9764c2ce4651f8eeaca26a66e184a3fef29f8d39e6",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "float",
+            "sourceSha256": "bf026abcb3b21a3a88e5301454ef954d9869f4ac91ed3951a044a77b8fb64935",
+            "cSha256": "82c27f5b70833c2cff3bfaeb7b659aa2bfbbcf35f69b231b364851fd0660df9a"
+          }
+        ],
+        "signature": "d85776aaefa65dc51775754bc88a782af9863c1da0f1c0e5cf943226229a6bd3",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/float_cases_bug.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "cece0d6547ca6167818b4339faab098781b86f702c64420e5528b8c6306686b8",
+      "sourceUnchanged": true,
+      "wasmSha256": "660e7156cbf8f270c79c9b2d8a9095f3f833db6e404db4e947483cff3804a877",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "float_cases_bug",
+            "sourceSha256": "cece0d6547ca6167818b4339faab098781b86f702c64420e5528b8c6306686b8",
+            "cSha256": "42901bda5d54c3633889f9d5e8c82f9acda3a4f36e9b04b4e3663badb169725f"
+          }
+        ],
+        "signature": "c003564ed075705c51353f5cdeea784150942c951d30630a74fb8623fc116f70",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/incr_cli_snapshot.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "45a78c666318546e0c48d32f102103e75dccd243b517cf7d778e3b72f618328c",
+      "sourceUnchanged": true,
+      "wasmSha256": "5fef1564813f7c69cd3a54a79372ffd1515b2f84848ec403296b0ba7a945674c",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "incr_cli_snapshot",
+            "sourceSha256": "45a78c666318546e0c48d32f102103e75dccd243b517cf7d778e3b72f618328c",
+            "cSha256": "89741c2eb0b2360e55fd0c501b1754f1c41ed684473f7289771ef4732ceb5f00"
+          }
+        ],
+        "signature": "9fce12076446695c0950515fba5378733ab820383a37a44068a71a602ad76795",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/incr_header_mismatch.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "429e8d3c1fd344e96ac273a06316ab115222da29216303737c7708238fb85d66",
+      "sourceUnchanged": true,
+      "wasmSha256": "789d7cad9aec42a8d362bdd40ffc7a09ad9e30ae64df687d041a5f8a3ee03b37",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "incr_header_mismatch",
+            "sourceSha256": "429e8d3c1fd344e96ac273a06316ab115222da29216303737c7708238fb85d66",
+            "cSha256": "c14fa5b58fddd843e3d580298a00bb01169b4d8fd7fc30e88a3013f1d17d8097"
+          }
+        ],
+        "signature": "8fc3821b607cc4b3074f07913312709ab6f934902bf90864816bff6cfb3934ad",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/init.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "f831ca6842c5d8d581a2dd2aee0cad753458a625912aaa48623b6fcac7e42dfa",
+      "sourceUnchanged": true,
+      "wasmSha256": "a5de235da809989b9c76e0d9e410438f10186997e6c5e0c81e81d3235c43d214",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "init",
+            "sourceSha256": "f831ca6842c5d8d581a2dd2aee0cad753458a625912aaa48623b6fcac7e42dfa",
+            "cSha256": "450e42246fbf901927915f2dc64c3e6d6a1418a8e2da18a2e518ec983084f0b1"
+          }
+        ],
+        "signature": "6698b302b4120a3efe1d54c261d2f6078d273d1910eff1880d2a8d8123643e6c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/initUnboxed.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "63ecedbac80e2974846cdab2a3f0452316c8ebca304efa7d58602b66c22dd4ec",
+      "sourceUnchanged": true,
+      "wasmSha256": "8bb577628a027e30147bbc176c24230f25266ccdb7cb1c1c49d951c7baa9366e",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "initUnboxed",
+            "sourceSha256": "63ecedbac80e2974846cdab2a3f0452316c8ebca304efa7d58602b66c22dd4ec",
+            "cSha256": "7ac4f6b9051a9a5dccbd7f366ad8a58c281efad81041628f925d6800be6d963c"
+          }
+        ],
+        "signature": "af4e675fa604e7f1639ec48e2d60910326d3df9177c0e07cdeeb857893172b36",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/large_closure_bug.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "a3d9bb5e50fc3ed89718361a67ba1e57b3a278123d673fb5aa0b4f19cfaf550f",
+      "sourceUnchanged": true,
+      "wasmSha256": "ff10eb04b0e3da9838f17c106ec371b8d8ad7e2dddbba385eebc57d5b57c19dc",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "large_closure_bug",
+            "sourceSha256": "a3d9bb5e50fc3ed89718361a67ba1e57b3a278123d673fb5aa0b4f19cfaf550f",
+            "cSha256": "1b71e8c363336040af25bdef9d1979a114fa5319dede402465ae422a0c3e9924"
+          }
+        ],
+        "signature": "fc2fa8b446c777f70c1fb388fbe932e40f2456fabbd463d6b3a85b3e99bfb451",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/lazylist.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "a8bb24b54ec9c63bffeba1c6c16a5f4c1af33c8cedf2c5f6fe79f72b72e93993",
+      "sourceUnchanged": true,
+      "wasmSha256": "d6b41362db1a4d8e1548faeab68130084e04c4458d1ddbb7cc8f6f0c50860233",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "lazylist",
+            "sourceSha256": "a8bb24b54ec9c63bffeba1c6c16a5f4c1af33c8cedf2c5f6fe79f72b72e93993",
+            "cSha256": "a5f1da73fea04e3308b52bf2a3382c19eb0854d626f8740a30a47ea948a8c115"
+          }
+        ],
+        "signature": "a46ae7a8aede31b4bf71390af372b3633fb257d338220537a66a4ba9020bce50",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/link_lake.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "a655eb44474da5bae6473ffc6507232f62f276573587a881d669f9966f8c18a7",
+      "sourceUnchanged": true,
+      "wasmSha256": "01685f507515305cc787f26f4064ebd3db441b3f8d662561e876d0028593aa49",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "link_lake",
+            "sourceSha256": "a655eb44474da5bae6473ffc6507232f62f276573587a881d669f9966f8c18a7",
+            "cSha256": "3239bdedea350e7016a8ad59c0f176d6b803ac9a4ecc1e47e234c4b563d344c2"
+          }
+        ],
+        "signature": "14be5a4c5b080689b2b7609e1599cffd03c9f369b67b1d9c0a0eb454999d6886",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/map_big.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "c43cd7bfa5ef89c5611e479b51cf8f7689c0ce4271bd646901596e9ef5202025",
+      "sourceUnchanged": true,
+      "wasmSha256": "213c14406232f1d3f09b970cb57bb131ddbbddab290cc4ff30a316a288f92e0a",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "map_big",
+            "sourceSha256": "c43cd7bfa5ef89c5611e479b51cf8f7689c0ce4271bd646901596e9ef5202025",
+            "cSha256": "7e66fe7097667974fe2733ca09cea893bb8d192918798abf748988352ad895b9"
+          }
+        ],
+        "signature": "bb031a6b2accb4bf0ddfd185ffd36a66559b179c3377bf3a608ce2d2d74229eb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/module.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "dc70849397aec46502cef75c1d2b046b9fb14f20f3849d60b1c8956a791edea2",
+      "sourceUnchanged": true,
+      "wasmSha256": "667dcabc88d777fe46ee929db560094b891e8146bee6b226504a355ad8f6dcdb",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "module",
+            "sourceSha256": "dc70849397aec46502cef75c1d2b046b9fb14f20f3849d60b1c8956a791edea2",
+            "cSha256": "279655451782ccb0b01750c0bf391b7c52fc77d73be3e77829ad208212486dc5"
+          }
+        ],
+        "signature": "b4b417d6f7bbd6b445e640c0bc383eeba5d5114d8c77e630206b5cbce0f6d20e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/nat_shiftr.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "c4716bba5e3cd8c96e1d66b69b5a9b2bba224af442cdcc8ce33697a4f5301a19",
+      "sourceUnchanged": true,
+      "wasmSha256": "754ba585fd105ab1bfd12ba6efdf7cd196d34df3bab2ceecd4a787a6530517eb",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "nat_shiftr",
+            "sourceSha256": "c4716bba5e3cd8c96e1d66b69b5a9b2bba224af442cdcc8ce33697a4f5301a19",
+            "cSha256": "2a34e3686c13f325ca55fdf716dcf6add11b82f4f3275b3436748c49a83bb0ed"
+          }
+        ],
+        "signature": "2143320433fa3248c5ff823ba2fb41857792743e42a883ca6af52251f9d815e9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/overflow1.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "6af9b2b276bd294f4b56b6c8139b793481e17190b0ab9f1d6b4c615926bc80c7",
+      "sourceUnchanged": true,
+      "wasmSha256": "e9766a9f761374ec6f9a7867c186b1d53499d562d71ffdbf85d3952162af574e",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "overflow1",
+            "sourceSha256": "6af9b2b276bd294f4b56b6c8139b793481e17190b0ab9f1d6b4c615926bc80c7",
+            "cSha256": "de66b9673ffa3cd846bd7f65ad5f6d8687f17af53d07ef631bce40c5a83142f7"
+          }
+        ],
+        "signature": "c97f8c7e0c7c32558840c29eba48823e8bc189e4d5f053559df1bb89b376062f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/overflow2.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "b6d4f3cc27e9204baf3a0f6c2379c0b77b8871b3fbf6614efaee35d059d454d2",
+      "sourceUnchanged": true,
+      "wasmSha256": "caae9d9056e67ced853db6de1f0de50448b62995dc277a354818d05d2f68b0ac",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "overflow2",
+            "sourceSha256": "b6d4f3cc27e9204baf3a0f6c2379c0b77b8871b3fbf6614efaee35d059d454d2",
+            "cSha256": "01a88458b23de44837773bd2cc84475fc2c097c7ba8bc18365d67021fa680d59"
+          }
+        ],
+        "signature": "ac75db55a29ee4d7d4ebc1abed2bff8aa03f78e913ac73acf4642e1a0a508a85",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/overflow3.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "7c48d5941faf69709b4f4cef4cbfc2f96afd33ed6048b2e7e5bdc7d084fd7ddd",
+      "sourceUnchanged": true,
+      "wasmSha256": "0b7a6ced7a569ff7410a640d088928f0f47254eb6680134b472e758268dbb8ee",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "overflow3",
+            "sourceSha256": "7c48d5941faf69709b4f4cef4cbfc2f96afd33ed6048b2e7e5bdc7d084fd7ddd",
+            "cSha256": "2b42b6378dd3fb102435b67a6598d0802d0a1c3f3a2a695d8b8b755df53d007c"
+          }
+        ],
+        "signature": "38436369408458c161096bcd4e3d1c1636022ad99429faaf7c1e603e64bf1eea",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/partial.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "b23f4b89757b55b2981e5d284d81b4f2e20ecc53370d5c2360c015c465d9e7f3",
+      "sourceUnchanged": true,
+      "wasmSha256": "47ac45f49d9d7bf5a240d434ac9784858822077d04ccd0777c987f5e45e1dcff",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "partial",
+            "sourceSha256": "b23f4b89757b55b2981e5d284d81b4f2e20ecc53370d5c2360c015c465d9e7f3",
+            "cSha256": "a7917f29a50531897d49614268187dbaf0218d3f25b1210d4a88983c82afad50"
+          }
+        ],
+        "signature": "4866876b0a5436581721a2cb0143f7c26134c64eb8fcc2bd2c646fbea38af9d8",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/phashmap.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "3f2b1cba03e633be1b85278d2c63614a2b17c375da48d407b823a408e47e2e6d",
+      "sourceUnchanged": true,
+      "wasmSha256": "4d398fe21b5f9a2c5ef7b63ec381c202cc724a6a4f0703812f00027adf9e53a1",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "phashmap",
+            "sourceSha256": "3f2b1cba03e633be1b85278d2c63614a2b17c375da48d407b823a408e47e2e6d",
+            "cSha256": "545a4c05dbd259df213ab8ca0b27984226907b6818382d35262bc7f20383098c"
+          }
+        ],
+        "signature": "e2533d08d86bbd43fe93539aea8f249c476f4383371ad70a2a85e7b69d1c7377",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/phashmap2.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "fa7987cf71683d581307cbed2db483a8c350ea060711268ea1f0ec958b85b02c",
+      "sourceUnchanged": true,
+      "wasmSha256": "e9d59e7733e53b5e0b7bb94c49218855bcbdf2677ade212e015bde08a723aaa0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "phashmap2",
+            "sourceSha256": "fa7987cf71683d581307cbed2db483a8c350ea060711268ea1f0ec958b85b02c",
+            "cSha256": "8d03e559a191f3963f2a90df07132ddd321451400c36741a8fa33994beb4ffb9"
+          }
+        ],
+        "signature": "ddf03640d4c87b635dafb13701e9ec0bdd4d1f91b5cbc962a6324b8aaefaceb4",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/phashmap3.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "52f5a792bcddf1594eabe460f09b727bfb4eb641a39404c03b736729875585f3",
+      "sourceUnchanged": true,
+      "wasmSha256": "dcaf918493299541f5e16be72fde8ac600a5e62d83224ea148e06041a0557c39",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "phashmap3",
+            "sourceSha256": "52f5a792bcddf1594eabe460f09b727bfb4eb641a39404c03b736729875585f3",
+            "cSha256": "b9c294473359629fd3d9eb2aedbe1ab3bcae047851b87f01dba76ee2bded336a"
+          }
+        ],
+        "signature": "8ec3a93500f980eeba3603e3a2576d84239f282a762ba3a8e865ccb24368ec83",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/phashmap_alter.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "cd49348c761d9343e977460bacb1a8424903c0f66c945e0d3a6d6826c668eb6a",
+      "sourceUnchanged": true,
+      "wasmSha256": "fdf31c74f02abc19c5339f55b9d722c4f5fd503110a7f3396af91bc143ebbc5e",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "phashmap_alter",
+            "sourceSha256": "cd49348c761d9343e977460bacb1a8424903c0f66c945e0d3a6d6826c668eb6a",
+            "cSha256": "d9c5a1ae375956b8fb4c98a95eb1a887987cdcd708a45d2acd08fe26279b662b"
+          }
+        ],
+        "signature": "0353aa24ab8630e05f4ecd525ffc488ab713b2e9d0042e15377eac520d665949",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/print_error.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "72ebc52dd228ca4e9acc82c270e9c7b7bccaf76d55af84c9dc6c9c7f5e9bafe6",
+      "sourceUnchanged": true,
+      "wasmSha256": "2d4c8048104c5f0f1c5009365cd91ae12995cecbc8a488ae7b720212bebf52c7",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "print_error",
+            "sourceSha256": "72ebc52dd228ca4e9acc82c270e9c7b7bccaf76d55af84c9dc6c9c7f5e9bafe6",
+            "cSha256": "98466a9817d9c60d9ada8d950318e2ba0459f2c62f709fa4aa33cafc29fc92b9"
+          }
+        ],
+        "signature": "06bf7b0a1cf04d9fec9e1a90939d8bd407c873fb0c339adce43a4aa220a6c1ed",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/qsortBadLt.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "1e80df88b90edfa227162e8c7e42260778e9388b1d291107005689ee176c8aaa",
+      "sourceUnchanged": true,
+      "wasmSha256": "13e05eb23768679e440bf305bf4470e0b13c67b2a157b933a8b91021580858f7",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "qsortBadLt",
+            "sourceSha256": "1e80df88b90edfa227162e8c7e42260778e9388b1d291107005689ee176c8aaa",
+            "cSha256": "e6e0699826a3f232642eb4677d10d39580dca7facbfc72a9502e4e033b59b565"
+          }
+        ],
+        "signature": "cf01b606c418ea869d98a3566424f450b6425ac47ab1aa87b7ee299b05163deb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/rbmap_library.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "1e123d2eac6d054ae215199c9ddc005a1d4d8a25dbbff8319ea5a63d4b55b722",
+      "sourceUnchanged": true,
+      "wasmSha256": "d90755442909b18498e31a7cfce53b441b591f6524c7ac4442906c205cc16997",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "rbmap_library",
+            "sourceSha256": "1e123d2eac6d054ae215199c9ddc005a1d4d8a25dbbff8319ea5a63d4b55b722",
+            "cSha256": "42a5ffac8ab72b7133edd8ffbf1ac1971537deae7ab4e540364d24d3c58aa16c"
+          }
+        ],
+        "signature": "e827c80f2f2f0db540225ebfa45241aeb333aa1d0a1f7e206319a26a47490be5",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/reduceArity_overapp.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "a3296fecbdec1dd8d41d8606bed4e6a70f2d62c7ef093b5d4706e05930ff0c8c",
+      "sourceUnchanged": true,
+      "wasmSha256": "6b9a962d710b182a2f8e5ca86435f1ae9aecf6b76bb4dd1327fb4ad27d8924d0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "reduceArity_overapp",
+            "sourceSha256": "a3296fecbdec1dd8d41d8606bed4e6a70f2d62c7ef093b5d4706e05930ff0c8c",
+            "cSha256": "6328f8b40c17717f4386490a0062b9386e245e46b6e021c6701d1953bf7d680f"
+          }
+        ],
+        "signature": "a98c05b4da730c98a69bdf29bf0f8bdb79be08aa84cd4bd652f7f6e3e4849e4b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/reusebug.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "102bc13bb452572a6a682622f0d583b6e6104bd59240a219bd2d260e5c219513",
+      "sourceUnchanged": true,
+      "wasmSha256": "90328cf76356ae2bc0083ae1a00287f45b9db9fdca1e5c2c776c73a121fad4e0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "reusebug",
+            "sourceSha256": "102bc13bb452572a6a682622f0d583b6e6104bd59240a219bd2d260e5c219513",
+            "cSha256": "fe18e9c15b59d6cf353bed0fed45e3ea6edec4d2854cbe33717d7e3f4de692c8"
+          }
+        ],
+        "signature": "b56987bad3382f806af65c1f1bdca6a3ba9eeac74b45785ba21bf0c5d08647f9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/str.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "604f05fa57dae90153eafae2790b98f08d639ab3b80ed7613f547eaff6c8d3ad",
+      "sourceUnchanged": true,
+      "wasmSha256": "d8c887f791963b78a42f94c71dd46ad3b244c6e98042cc83d5f1655835563396",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "str",
+            "sourceSha256": "604f05fa57dae90153eafae2790b98f08d639ab3b80ed7613f547eaff6c8d3ad",
+            "cSha256": "eedf4c7c333aa909bb77eaa0e9c9e8fbc1467d6df3aea5df5848fa9f052b0f46"
+          }
+        ],
+        "signature": "b3e8a9cdeabedad73c7339376701acddfa4fbf5a299398f4e7f20304dbc14583",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/strictAndOr.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "7c047fa47bf17d27a6bdedbe40cf87beadc6a49d59b8c7e5cf4dca122214fe6d",
+      "sourceUnchanged": true,
+      "wasmSha256": "b598c8ec9a41cbffe40975cfe4bd397de79f24a929743115cb68f6866614b777",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "strictAndOr",
+            "sourceSha256": "7c047fa47bf17d27a6bdedbe40cf87beadc6a49d59b8c7e5cf4dca122214fe6d",
+            "cSha256": "f37ed201a6c233f84a2268971885479fe1806d48303bca8fd557173fc06ca6c3"
+          }
+        ],
+        "signature": "defbc3e160487c25204eacf3a947b77cbd13ba02a82950d1e67915e891b74cab",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/t1.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "a33a85b86058dc24df9169b392fc5b73e6b210e81fdbdc0c58215e99433b3bd5",
+      "sourceUnchanged": true,
+      "wasmSha256": "686717805f502e340027719cb004094d37b2a9bf539dcb5b908ad30786343844",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "t1",
+            "sourceSha256": "a33a85b86058dc24df9169b392fc5b73e6b210e81fdbdc0c58215e99433b3bd5",
+            "cSha256": "11c4b32fddf274ee37ae37536092768948e378bdcf08503597e734542aef52d3"
+          }
+        ],
+        "signature": "f11605534cd2233d8321c23988c46261c601fdb8be69a4d5d9d02cab5b2dd1c5",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/t2.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "bb6319337c80eb71b06c07ecf21b1a751c580faea39d16bfcc929f35815d7299",
+      "sourceUnchanged": true,
+      "wasmSha256": "a33af4fffa5c34feece5bfec5745ee8e835b76b9e63397334ab58798293f365a",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "t2",
+            "sourceSha256": "bb6319337c80eb71b06c07ecf21b1a751c580faea39d16bfcc929f35815d7299",
+            "cSha256": "2a2042d95de2e9f7c120dfe6f3e4a770f47bf864c09ebfc62fc0a0a16b435b46"
+          }
+        ],
+        "signature": "972be1fe95eb546758872a8b89534c53a7635122c8aac84760218c7c1cda970f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/t4.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "e392e0e2cf04700afd39ced0b47c5bd0870f027cefeecbdf5ec96b7e012cf36f",
+      "sourceUnchanged": true,
+      "wasmSha256": "819aafd6233151f2deb136dcb2f2f2f2768b5618ab9182ec238ef9e22c756bd5",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "t4",
+            "sourceSha256": "e392e0e2cf04700afd39ced0b47c5bd0870f027cefeecbdf5ec96b7e012cf36f",
+            "cSha256": "48f1841215f93cffeb5878e47859dc6c893660dbe8f18e516a52534b73e0b0ed"
+          }
+        ],
+        "signature": "f8a500539ded8c2cd777fb9052ef1587044f29306fcf406bf41cb9c302053de5",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/thunk.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "f281b4b82f21e54c08a77712d6099ef6c0b957d42d8d205b2c88a158c893c639",
+      "sourceUnchanged": true,
+      "wasmSha256": "85715425deac5cd2fe41c93e80bad618a59d865d7cf7afcf166b79064593b7dd",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "thunk",
+            "sourceSha256": "f281b4b82f21e54c08a77712d6099ef6c0b957d42d8d205b2c88a158c893c639",
+            "cSha256": "b86ed4f8fa054dd08988805c98fd2999332ca81fffa09f64d5641b521fd56de2"
+          }
+        ],
+        "signature": "93c8bdc7a1130d1d339a1b48a3578c36798d2ac1b2dd2965cbe40b21e003203e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/trie.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "ce089a3a1aadc5983c271d98e39cb62fabb30ae0a3b28de024cb537277cd7bfd",
+      "sourceUnchanged": true,
+      "wasmSha256": "dfb9e2a230933a2e9253d6eb37e5d970fd8949bbec93fbea352f274c04121160",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "trie",
+            "sourceSha256": "ce089a3a1aadc5983c271d98e39cb62fabb30ae0a3b28de024cb537277cd7bfd",
+            "cSha256": "c2fcab25b6d6d9b91d317cbbf71e9a61d8fca4f173218a6f73b4b2ef1275d0c5"
+          }
+        ],
+        "signature": "cedc54b6880312eec986e2320b62eaac4be45037013630702e3c656e13f7918e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/trigraphs.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "6fd99e4f0d81084f2226c99aad625466e91b3600c0caf4abd2a180471b4135de",
+      "sourceUnchanged": true,
+      "wasmSha256": "6fc80efb7f8b5593056d40c730f3ba8c7be46feb46e12b51831747b0ad34202f",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "trigraphs",
+            "sourceSha256": "6fd99e4f0d81084f2226c99aad625466e91b3600c0caf4abd2a180471b4135de",
+            "cSha256": "66b6a3e34789d0a261a26c35a729d0e586c4d01b87296857c72cc62892b11562"
+          }
+        ],
+        "signature": "a7b16e170b2390b6c3e08beec0ef3338208db8811a53bc2c3abc2705216916da",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/tuple.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "fa24e3da090624f013f5ca8ffbc457af9b898ac77fc8117322a911f66bb58d3b",
+      "sourceUnchanged": true,
+      "wasmSha256": "c1345c68c921378dfa27cb0040b016730759f62359e15e59110b27289bc8d348",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "tuple",
+            "sourceSha256": "fa24e3da090624f013f5ca8ffbc457af9b898ac77fc8117322a911f66bb58d3b",
+            "cSha256": "b1492010135b3ab0ff5f6641d1d6743308bc34fff936afc224ada2599fd524cc"
+          }
+        ],
+        "signature": "2a8ebbcd8e1b7599bc8ab276f4a3af720a949aafc282272baa90e699e0523c20",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/typeFormerPolymorphism.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "e8e2c6690d047ab9e5f2ef85e440040a49d5b8091f3028709a1642e993307ac0",
+      "sourceUnchanged": true,
+      "wasmSha256": "b08dcac92e3c9555f52fca09cdee1fa2c490ab361add940c747a061d08d652c4",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "typeFormerPolymorphism",
+            "sourceSha256": "e8e2c6690d047ab9e5f2ef85e440040a49d5b8091f3028709a1642e993307ac0",
+            "cSha256": "fc375d161df3bffcb28d414c4d9da69424017b534f6726ee58f8edc1e6373b39"
+          }
+        ],
+        "signature": "927ca66bff2d000ce7de79abbd5375a2bc94e6ebdc25e5bd76d0e9152e8bac7c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/uint_fold.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "52658508ddc958d6bf78f560618b2d337da6ec0ffce4f11908e0237b16628827",
+      "sourceUnchanged": true,
+      "wasmSha256": "642918b39dcdf0a926ed78dbc9bef20e13d9f4eba160f24bb5a06f952e94418d",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "uint_fold",
+            "sourceSha256": "52658508ddc958d6bf78f560618b2d337da6ec0ffce4f11908e0237b16628827",
+            "cSha256": "0af249291b4de051a54ea215a1f7a2b3687296ed499ee4e20a1f9f18617bf5f9"
+          }
+        ],
+        "signature": "22d83bd065102cdbee39b48f3116688e2fd42e810defc04452c032b8b2818fa2",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/unreachable.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "283e9ccdaa74dab167d8d903a35f79dbb8149da069502394084c48dac2911810",
+      "sourceUnchanged": true,
+      "wasmSha256": "a918dfaa769678fb1432944782fe392c0134c9c7820c267927812724265b4a83",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "unreachable",
+            "sourceSha256": "283e9ccdaa74dab167d8d903a35f79dbb8149da069502394084c48dac2911810",
+            "cSha256": "45740e98c53f2487c4d33343c2147346090da43f9d5b445008b0503834be4049"
+          }
+        ],
+        "signature": "1fd086e573f1aa144c2ea29cd10491e59df1e815aab2b1348d2b91e14be1de1f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/uset.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "23a7eaf97fd714e1e36055d3133413eb7a0c2aa79aa8791e6e5fa1457f8bc43b",
+      "sourceUnchanged": true,
+      "wasmSha256": "e54920803d3f7edc30e101555d45466ae15dfb1843262c9baf1ad94b43755ff5",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "uset",
+            "sourceSha256": "23a7eaf97fd714e1e36055d3133413eb7a0c2aa79aa8791e6e5fa1457f8bc43b",
+            "cSha256": "243bf9d797adea4cdab6cee67266143864506604b161aff028d9df6b18898780"
+          }
+        ],
+        "signature": "ce9fa7b5667c4967280a9e989cfaa5971ea050e6adf578ee8f3b28dae9284094",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/utf8Path.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "eed4da6b302e07f6ef06596f76931bd2861100972348dec76f40468368bed1c5",
+      "sourceUnchanged": true,
+      "wasmSha256": "fcf116b145f43851c6e98f16b8f2bf3cf539cb0a4c615cc3bad8e7a064ade159",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "utf8Path",
+            "sourceSha256": "eed4da6b302e07f6ef06596f76931bd2861100972348dec76f40468368bed1c5",
+            "cSha256": "a81b8498ca7eb071779f34837af25a8e92b09aa61654a3972a2eb52b05841c22"
+          }
+        ],
+        "signature": "39ee646b0e3880aca43bf7e4fdb95fe3163fddb0cd483fef34cf1ba622beeb5a",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile/wait_dedicated.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "e4b0b1e53c3eb9eb21c705f4b2d81cd878d72fd31893a5acf82b71dc106b935e",
+      "sourceUnchanged": true,
+      "wasmSha256": "0f8d51344f41de21b56540f11a4df8facd1aeb7c3b8d1c473f7120b5cd198ee6",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "wait_dedicated",
+            "sourceSha256": "e4b0b1e53c3eb9eb21c705f4b2d81cd878d72fd31893a5acf82b71dc106b935e",
+            "cSha256": "7dba46b5e1228daa5453df42e810a6a39a460635d60b449887ed1ca2e665271e"
+          }
+        ],
+        "signature": "9633f017c2339d43bbc9650606ec638404be115aa07a455a9c0a9d3ccfda67e6",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/binarytrees.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "d1a18ef9921e82a2dc4773894d6253902184a8f6229719e01ee109829ed4bfe7",
+      "sourceUnchanged": true,
+      "wasmSha256": "f47b8fa8172db1a75fb3a9b100e35597987ea7fe3882db5d4f241bdcf16b8481",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "binarytrees",
+            "sourceSha256": "d1a18ef9921e82a2dc4773894d6253902184a8f6229719e01ee109829ed4bfe7",
+            "cSha256": "299374e08b3edbb79460aee4855857c1467a48d6e36bee6a5fb8a1402f8a97c6"
+          }
+        ],
+        "signature": "ea202fbc908c578ffcd2fd5e40989a0ffcc1738f832d6c046b44e3e6d748e3d3",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/binarytrees.st.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "e0e53844bd96d664e2e899c81522aa6dc9fed8878e0a9fecb60dc5be1c2bd637",
+      "sourceUnchanged": true,
+      "wasmSha256": "281be926d3ed5e26019830ae29b358cacd981daa7fbdfcd1d69c6f370ce33356",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "binarytrees.st",
+            "sourceSha256": "e0e53844bd96d664e2e899c81522aa6dc9fed8878e0a9fecb60dc5be1c2bd637",
+            "cSha256": "7c8f6654d0dd9edb08f24097ccd69a3198a15c14402c425a799ef6196e35ea83"
+          }
+        ],
+        "signature": "f94a7d45f8df48870412d61548b5cc29501a875784e56fe1682bf14fa727ba76",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/channel.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "984bedcc89cba1292394ce2bc7578461e3415ba89236566bb05fbec4556f4f71",
+      "sourceUnchanged": true,
+      "wasmSha256": "70f4080cf22aad1aca996f4b5d000c151bcc54c8bd54b5962cd2faa4fefdd40d",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "channel",
+            "sourceSha256": "984bedcc89cba1292394ce2bc7578461e3415ba89236566bb05fbec4556f4f71",
+            "cSha256": "7897789a173cd9d01c1d9d843e8d4bcfa92f7ba43721139c685887457b551f27"
+          }
+        ],
+        "signature": "140aaba7372c2769158225d5137079ccaebf8677785d4727d052865e619bd1fc",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/const_fold.lean",
+      "status": "failed",
+      "phase": "application-runtime",
+      "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+      "sourceUnchanged": true,
+      "wasmSha256": "5f73dcb19c1b88ecfd2c4f64a3de59ccc1ee757b36ec8815207b6ba3d4d5dc01",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "const_fold",
+            "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+            "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+          }
+        ],
+        "signature": "71f5fafe68c91ee1734fc07d017a5c2c58523f16a2fb5e2ab6e14265691572c8",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/deriv.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "ae625db30cc2db5ce73cad5bda23e9c9744e6a201933c4742d98fee0e350c319",
+      "sourceUnchanged": true,
+      "wasmSha256": "9e9c74c6c389b5e49b01dffda7c466bda2435b3f27026f5fccf8fba6d8daad60",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "deriv",
+            "sourceSha256": "ae625db30cc2db5ce73cad5bda23e9c9744e6a201933c4742d98fee0e350c319",
+            "cSha256": "c0b63b1d282c3ef57217e552b55d8276dd0a9b0bfd60da2e52480ddce93c8229"
+          }
+        ],
+        "signature": "9e0f894da22fc9b54a6dc38831371d79d5db1783ece3e4573f6ea24369e22e45",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/hashmap.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "858e641eac3ef076ca371505ab3d5739a7aa241a5031525b9164994f41319cee",
+      "sourceUnchanged": true,
+      "wasmSha256": "4d81f2b87a1ffa5a62db08a3df8c08c88049c2780c63a8fc142fac2c179ce9e0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "hashmap",
+            "sourceSha256": "858e641eac3ef076ca371505ab3d5739a7aa241a5031525b9164994f41319cee",
+            "cSha256": "8db94bdeed4453585ecc688f243802a8bd086846dd74d31fb69c0c3165762260"
+          }
+        ],
+        "signature": "b6f159a0d11c7d030ef354f3074e09c2ebc1389f54eb29df5bec23b642534fab",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/http_server.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "114b72eae0f26818278dfcd7a390980c3bf7651a9d49fa91f9fceac1090b389f",
+      "sourceUnchanged": true,
+      "wasmSha256": "96890c64d5c2abfe1e682c10b70caacdc46130cc459de2b1660a26ca5a4d3cf9",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "http_server",
+            "sourceSha256": "114b72eae0f26818278dfcd7a390980c3bf7651a9d49fa91f9fceac1090b389f",
+            "cSha256": "ffe5ac31d6b2faa19af6d3643e1a43b5f2d1c008c4d6672556047d21d449d727"
+          }
+        ],
+        "signature": "622f14dd9e315c70b23d1438166b715c0ec0f7a60120b6350af4e0f9727f838a",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/http_server_tcp.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "df4deefbc5477ac7279ff71631736a322080e8ef59698357b6198d1fb8bdcc2e",
+      "sourceUnchanged": true,
+      "wasmSha256": "58455b6893a72876264312fcfe7b6a2a21b2e64288b70e8f23005db5e64bb8b4",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "http_server_tcp",
+            "sourceSha256": "df4deefbc5477ac7279ff71631736a322080e8ef59698357b6198d1fb8bdcc2e",
+            "cSha256": "f80cfd259dd9064b8179054b2a1e824a1f6a33262768e0a81810b7c8c4576df3"
+          }
+        ],
+        "signature": "9e2085a31edf359d56ffa90d779aca6d466de13afbc0d5a5f9427aae0bbf9837",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/identifier_completion.lean",
+      "status": "upstream-compile-disabled",
+      "phase": "native-driver",
+      "sourceSha256": "a7c6d5894f1182a04d0368825c96ce3f83e8817097c9260c63723ad734385707",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "compile_bench/ilean_roundtrip.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "81741545fdf83992e138ae70246a09816dba2fc7fb29e6b160a581ecdbc8007d",
+      "sourceUnchanged": true,
+      "wasmSha256": "e6885e92a96269de6e81d3db275a7ad61f3fefe28719a29568ffb6a3d1acc198",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "ilean_roundtrip",
+            "sourceSha256": "81741545fdf83992e138ae70246a09816dba2fc7fb29e6b160a581ecdbc8007d",
+            "cSha256": "f751420cc0b1e0289b525fde038ba5130bc299690a94cf15f51be39b9f81342c"
+          }
+        ],
+        "signature": "bcf5016e385ec11809ba97f0509c77435819a4db2932dc9a2909661ca031cf31",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/incr_header_load.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "dcafb0b6a6bda9ed54f0ac59cfd55935a4e935f883fc5a46a3b88211fd18ee45",
+      "sourceUnchanged": true,
+      "wasmSha256": "ecce286e55edc06e255925976bc48d7fbe9f1b16ab7337cb2763cae3a889a918",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "incr_header_load",
+            "sourceSha256": "dcafb0b6a6bda9ed54f0ac59cfd55935a4e935f883fc5a46a3b88211fd18ee45",
+            "cSha256": "4003867a88df4622eb7383af33c266fe07b6ab9a4e35a0a7a96b69778d31287a"
+          }
+        ],
+        "signature": "b1a6ca49f68733b5bd1d6a0e7f1f01df3d163704f3553019dfe92b7801a1fee6",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/incr_header_save.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "8c4b9d6368acb859a17867bfc9b5c5c5d17d62090eb571c88e7763f3a6e28692",
+      "sourceUnchanged": true,
+      "wasmSha256": "ad80f82cae7e30d7298a55c50b3476121a4253cdb5d090be94940c1ac854c582",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "incr_header_save",
+            "sourceSha256": "8c4b9d6368acb859a17867bfc9b5c5c5d17d62090eb571c88e7763f3a6e28692",
+            "cSha256": "901d329469639f914e47eb4f2d23773d3fef80c39a60bf9bf6896f2cc8de312c"
+          }
+        ],
+        "signature": "70018063e40e566d5fea39352f13b37a2ad0def8cb115fd0006dd1ac6800e584",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/io_compute.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "25a397d6ba3bc422f79278ae07c92d2ad631d3f2808225ffd0be30ca421f163a",
+      "sourceUnchanged": true,
+      "wasmSha256": "69d8500bbb5f2b3bea075c2f6154d24802b99bfd0b6269aee4bf697ddb95a918",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "io_compute",
+            "sourceSha256": "25a397d6ba3bc422f79278ae07c92d2ad631d3f2808225ffd0be30ca421f163a",
+            "cSha256": "985b22e88d8c3ff918839765bf0508e001093838a0479b11f15d6be99e7fc70b"
+          }
+        ],
+        "signature": "bc9b2773c0d6c1b4c190034c761f640063930c5ca5518c7f16851b365c41f355",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/iterators.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "133ad6d9d1de5056ef4ae7eb21106277d2b825b9bc11f50222a1a7db38c1ea71",
+      "sourceUnchanged": true,
+      "wasmSha256": "e0cb1fc4700073ca0de0f3c90b7dbf921a3c5c715ede53a9f9b1f3ec2afdbbed",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "iterators",
+            "sourceSha256": "133ad6d9d1de5056ef4ae7eb21106277d2b825b9bc11f50222a1a7db38c1ea71",
+            "cSha256": "bee066cb568466b4111383a5c364e915700d0ef72b6b513eef9628a99a78b252"
+          }
+        ],
+        "signature": "75889a03508251062562d4b1c80ef68c9fa108fb2627733cf3d4c8d970b886d8",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/liasolver.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "0fcc697b8c3275c945ce04e7eb1c53858dd2bc3c6a7cc1c93b30eaa160b06480",
+      "sourceUnchanged": true,
+      "wasmSha256": "ac9e3dbcdaa6759610dcf1f9e01273578c1af8dbea5badeabcd25d87bc2e9ff6",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "liasolver",
+            "sourceSha256": "0fcc697b8c3275c945ce04e7eb1c53858dd2bc3c6a7cc1c93b30eaa160b06480",
+            "cSha256": "3b2c58f7ca8dab5d9b2087a66a5d01456a3de42f91034f25ba7a71ed58b5fa04"
+          }
+        ],
+        "signature": "d31440976fa1ce6b83f09c7e43b833d972dcdf21ef8276ba8f2e04b844b89ec0",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/nat_repr.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "a826adc11a024c522253bf82e905d0ef389a657f50031b1de5cf381bc6d99a83",
+      "sourceUnchanged": true,
+      "wasmSha256": "56b4720d93359aa4a8efc76b235828bfc9ed0007752d717f364821e28f53a346",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "nat_repr",
+            "sourceSha256": "a826adc11a024c522253bf82e905d0ef389a657f50031b1de5cf381bc6d99a83",
+            "cSha256": "d166720a74e22137d77542dee7977eeb216eaf936c9028afb9c08560b626940c"
+          }
+        ],
+        "signature": "5a2e5eb5037d6b8e483997a9607165617e38df323d3b914c31c4dc56dd1673fa",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/parser.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "d0b2f81f33efa19da2ef190897318ee174b4a63180f1ef93f1626c88d721b8e9",
+      "sourceUnchanged": true,
+      "wasmSha256": "caa8abefed85194efa5510340155518de2de82b03ab0a08f07cf61e4eca1d714",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "parser",
+            "sourceSha256": "d0b2f81f33efa19da2ef190897318ee174b4a63180f1ef93f1626c88d721b8e9",
+            "cSha256": "5c285e34752fb87bd9807e59cde70ac836bb25249afb94da7a61bec7727e875b"
+          }
+        ],
+        "signature": "500bb74146f767550cca5bb32df91cfaa6deaded1c50431c20a51e21cf2f319e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/phashmap.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "eea26c9fbacecdf774140d725c9f50a738b3a1822c77e2f6e591f610f11b8949",
+      "sourceUnchanged": true,
+      "wasmSha256": "fd4d4be03e2f6557b83d70fe1e87b6b612f72c7f161c18700654ffc7e3458631",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "phashmap",
+            "sourceSha256": "eea26c9fbacecdf774140d725c9f50a738b3a1822c77e2f6e591f610f11b8949",
+            "cSha256": "85e41466f5869313f50d289811d2b00a7c57566d38cde88c41cfc7505029f416"
+          }
+        ],
+        "signature": "3775caed4ba3f44fefb4539c4f2948d258473f69db6aaa4601256ffd475f762d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/qsort.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "31c4bcb0d73af1efbaca137e792eed05202bad52408f5d19fb8fb374eb6a4475",
+      "sourceUnchanged": true,
+      "wasmSha256": "313e7783d1183154225f5951631808c9aea89f83f992ad04cf5bd0ee56a184e9",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "qsort",
+            "sourceSha256": "31c4bcb0d73af1efbaca137e792eed05202bad52408f5d19fb8fb374eb6a4475",
+            "cSha256": "911d01becbc0013e55d05941fd6391928bbbb5c7439efc69f3f9652e27863e00"
+          }
+        ],
+        "signature": "5b4c1018e498e2b84be3c2e0847679d8743d5d960e52ab299c6a861297706559",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/rbmap.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "ff867cb17ca3a9a871e2439eade038799d66ebdaa9c24e9d0d9a5f73a938ab29",
+      "sourceUnchanged": true,
+      "wasmSha256": "6723e20ead87cf3ff797f06b2abdf91fe41ba271265c86d60156a0b44d5b3cd9",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "rbmap",
+            "sourceSha256": "ff867cb17ca3a9a871e2439eade038799d66ebdaa9c24e9d0d9a5f73a938ab29",
+            "cSha256": "f8a3d3cdcd1015079b5f32d57986ec2b68e66f0198fced07970a4461441e600e"
+          }
+        ],
+        "signature": "a62a73a6ae9939009faec0a115f1e84067b29f853a7995334acfe053efedc98b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/rbmap_checkpoint.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "43288ac1bbc94bf28424a5a00966eb6dc140eb495122473794d218feb6a04627",
+      "sourceUnchanged": true,
+      "wasmSha256": "50163d20e14c9102b357370b72c7e7440186a6360ee2a2725fb31d49947a285e",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "rbmap_checkpoint",
+            "sourceSha256": "43288ac1bbc94bf28424a5a00966eb6dc140eb495122473794d218feb6a04627",
+            "cSha256": "6de3afa71972271efbd61bbe057f37d3519fbf60add3b2c838d359d7df37cd5c"
+          }
+        ],
+        "signature": "64b3e828f96e67f6ae55878395cbcce5bcee92c41cc5bf92e0b3bc937ce4d08b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/rbmap_fbip.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "f57e98047ed64497d89c98cf2e9fcfd85c0c45b54c3d4c6c983fce60b38a63d8",
+      "sourceUnchanged": true,
+      "wasmSha256": "8e7fae6dca04a67be314b199ec07710e762fdeb97f70681b17438e688a1c0bd7",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "rbmap_fbip",
+            "sourceSha256": "f57e98047ed64497d89c98cf2e9fcfd85c0c45b54c3d4c6c983fce60b38a63d8",
+            "cSha256": "98e09a811727ec400b0099023c2c9fa0dcd448a3b14a2333f3cf59094e9d87b1"
+          }
+        ],
+        "signature": "c9d842ef0056389b0e9944ff268b94395a57082670d73de7b4df96ce8897d5de",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/rbmap_library.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "0b74d74682d0139c2743deebcf1a35c08eaaa28f1646572433b507a3de24b1bc",
+      "sourceUnchanged": true,
+      "wasmSha256": "6de47ac7ba8d53d7a41f7ac2949fc65c6967929e03fa898d99d8d8f9c7ac02de",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "rbmap_library",
+            "sourceSha256": "0b74d74682d0139c2743deebcf1a35c08eaaa28f1646572433b507a3de24b1bc",
+            "cSha256": "f607d49d5159eeaf88a5047ed5abe231141579a7dacdd6abe6aeb2a66e60cc8c"
+          }
+        ],
+        "signature": "2598e77c01eaf245e7c884a1ee78c14e9f18ec48ca769cc7bc99668c5652ba9d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/select.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "d46972b027a146a75a76b799af56e71db10886aa0501068cf5a19916dbfacb12",
+      "sourceUnchanged": true,
+      "wasmSha256": "8beb8eebc4d077ed6e05d8d57f076d7ae05cde7b1b68ad01c0fa3742bff68854",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "select",
+            "sourceSha256": "d46972b027a146a75a76b799af56e71db10886aa0501068cf5a19916dbfacb12",
+            "cSha256": "20844e660cb006f7284c08b192505e9d79acdadfc7d79421e266eaf87916d03e"
+          }
+        ],
+        "signature": "7bb921a514b8351a637ccd550c458aa3c49b47c9e5fb9a7dfe10bf8ece011310",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/server_startup.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "4e039c08da1f09b01ba7688251854bd64e5c3b39cdb4d89c03c4cd0c1075a70d",
+      "sourceUnchanged": true,
+      "wasmSha256": "0aba99d5fee80b49b005e46553caa21e328de049812570c6760e92fb8fef2824",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "server_startup",
+            "sourceSha256": "4e039c08da1f09b01ba7688251854bd64e5c3b39cdb4d89c03c4cd0c1075a70d",
+            "cSha256": "4d7c88558269fb81c76eb578be6b35654462e0873e9369f4f9442f355edaaf89"
+          }
+        ],
+        "signature": "5dada857fa7ca68d1c2cb9245f2ec755feafeb4cee7ea966a70c5feea9e177de",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/sigmaIterator.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "1ca2e86197d0aa30e3cb1c9db7cedcab5debb455c4f7a769268d724ad1cf7541",
+      "sourceUnchanged": true,
+      "wasmSha256": "89f02fb4ec3bbb50a310e31321270c584d6a8c030a1259ad183c965d59ba3d87",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "sigmaIterator",
+            "sourceSha256": "1ca2e86197d0aa30e3cb1c9db7cedcab5debb455c4f7a769268d724ad1cf7541",
+            "cSha256": "396319a6728c52599749264288f7cc5ed72ac1daeb29de55c145731e31b56abd"
+          }
+        ],
+        "signature": "1a575a8ee6ea8740073bd5ef128c77373215c533b204ca24334d39c7b83110f9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/treemap.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "053e0e49d5ca057b6681e94bb988e55fe2b1ae6bad12462f39b4e3e6aeb960b1",
+      "sourceUnchanged": true,
+      "wasmSha256": "c05a32b2283e4713468b9037180fbc8cd3f71f5a07d3891a6016e10a072ac2e4",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "treemap",
+            "sourceSha256": "053e0e49d5ca057b6681e94bb988e55fe2b1ae6bad12462f39b4e3e6aeb960b1",
+            "cSha256": "987da122af99a4f77a8b52ba4952b4f0b44ad28769a818940dfdc3aaf9ad756b"
+          }
+        ],
+        "signature": "b03bb667194c09bfbb3c7c70f60039b71fd456cc7235b02129f73746b05d3018",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/unionfind.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "ebcaba6b9a76478b377320eab1a54ce6004d1d18df71335161838d66e234ceeb",
+      "sourceUnchanged": true,
+      "wasmSha256": "96b639b0bfa320fcc0badb72dda0360acba51f883a012e9c580fa497928dac56",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "unionfind",
+            "sourceSha256": "ebcaba6b9a76478b377320eab1a54ce6004d1d18df71335161838d66e234ceeb",
+            "cSha256": "b53594098ae65334bdd60fb1a70cea9159ceabc6d2f3912f9f08dd831e12f97a"
+          }
+        ],
+        "signature": "c027768521165a87bdcddbe2207b245666464632853aa9d106e2cda8320e26d8",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/watchdogRss.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "df4d5f68f66f885231afef3574a7140f629ec0103477a2ef77cc5d8e6aee8bc0",
+      "sourceUnchanged": true,
+      "wasmSha256": "8d73e9b4050a4bc6dd001f0d7e6c4d1de69cd26fb4f3ca1f61deb2207f06951b",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "watchdogRss",
+            "sourceSha256": "df4d5f68f66f885231afef3574a7140f629ec0103477a2ef77cc5d8e6aee8bc0",
+            "cSha256": "b5895d97e861b61f0205f68db9cabc4f23fb71eb28d8284d1c3871ef196d03f5"
+          }
+        ],
+        "signature": "2928fe09aecb004e7ec54706967cdd75c8b945679d1fa9eee20680f5dd33abac",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    },
+    {
+      "name": "compile_bench/workspaceSymbolsNewRanges.lean",
+      "status": "passed",
+      "phase": "complete",
+      "sourceSha256": "82b4e6a78cd649cf37e82e9e8924b9edd52b642fc8e33e2c4b8d2f073d539663",
+      "sourceUnchanged": true,
+      "wasmSha256": "a3249413e9faf55bfbd52fdd3c4314febea7afe516e1cf3297bacd04ed4bd9c0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "d79712ae0a8f962ffa4612f18eaf2bc56d9c2eee59cebdf9d5052ad034887e03",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "workspaceSymbolsNewRanges",
+            "sourceSha256": "82b4e6a78cd649cf37e82e9e8924b9edd52b642fc8e33e2c4b8d2f073d539663",
+            "cSha256": "134921afbcd14698209c660eec949f801c72b623456ff7e648d4bc2db693312c"
+          }
+        ],
+        "signature": "c920dd51f898b5ee2f2ce3b7feea80d2eb0d563f0bd45f08247c010a562d8ebc",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+      }
+    }
+  ]
+}
