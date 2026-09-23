@@ -74,6 +74,27 @@ The corrected native compilation run remains pending.
 
 ## CLI and deployment foundations
 
+The maintainer application-runtime build compiles **2,516 Lean 4.34 modules**:
+649 Init, 489 Std, 1,218 Lean and 160 Lake modules, alongside the real threaded
+C++ runtime and existing host adapters. This builds application libraries, not
+a Wasm Lean compiler executable. The guarded build peaked at 2.17 GiB with no
+OOM or pressure stops.
+
+A compiled ordinary Lean main now matches native Lean on **stock Node 26.10.0,
+Deno 2.9.7 and Bun 1.4.2** on Linux x64. Checks cover console output, filesystem
+round trips and missing-file errors, tasks and sleep, Unicode/empty arguments,
+large natural numbers, ordinary exceptions and exit codes. Each complete output
+directory was relocated and run from a separate working directory with an empty
+PATH and no Lean toolchain environment. Host support and notices are bundled.
+Each probe peaked below 0.5 GiB. See the
+[application evidence](evidence/application-aot-three-engines-2026-09-23.json).
+
+Node/Deno use native Wasm64 addressing. Stock Bun uses Emscripten's lowered
+memory mode while retaining Lean's 64-bit layout; its current 4 GiB linear-memory
+ceiling and large-memory behavior remain open work. These small application
+passes do not establish full API compatibility, a finished managed CLI, or the
+other native platform results.
+
 The command parser now covers the planned direct-file/run/build forms, options
 before or after the filename, target selection, output directories, and the
 application-argument separator. Nineteen parser checks pass. It remains separate
@@ -120,7 +141,8 @@ commits and the acceptance Node version is fixed at 26.10.0.
 ## Outstanding product work
 
 - [ ] Wire managed compiler/linker/runtime artifacts into the primary CLI.
-- [ ] Build and validate matching full Lean 4.34 application libraries.
+- [x] Build matching Lean 4.34 application libraries and pass the first three-engine
+  differential main probe; full API validation remains required below.
 - [ ] Produce portable `dist/main.mjs` output and callable bindings for stock
   Node, Deno and Bun; preserve full threading/IO semantics.
 - [ ] Supply and validate the Windows ARM64 native compiler distribution.

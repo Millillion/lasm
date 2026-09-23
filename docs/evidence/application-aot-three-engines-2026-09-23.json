@@ -1,0 +1,221 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-09-23T17:11:33.498Z",
+  "scope": "Linux x64 maintainer build of ordinary Lean main, relocated deployment in stock Node/Deno/Bun; not complete API or managed CLI acceptance",
+  "lean": "4.34.0",
+  "builds": {
+    "modules": 2516,
+    "groups": {
+      "Init": 649,
+      "Std": 489,
+      "Lean": 1218,
+      "Lake": 160
+    },
+    "auditSha256": "50a66b6e3571770498231c4ca2eb51b26e5ce2d0d5ac69bde51453d9b94922af",
+    "inputsSha256": "0f9170a8d96c28bb92c3c199cc0920f1896019cab37462497ff2e9ad519233f2",
+    "sourceCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+    "patches": {
+      "wasm-build": "f2938efcd13f174949767906877446d57506d93efc3f3ee1c046ee2b9d186ca8",
+      "compact-alignment": "071e70af2a4b58e1744b178ba1ee094c0d2701bcefef4653995675656f4daedb",
+      "thread-runtime": "2e4a2efd1a209cabd2caa893e5dfa8e26174f82ed2a808145b9faafff667265a",
+      "sdk-mimalloc": "ecef94dbbc5481d72f363360e8d7686964bc683e4e16abb6cb7e851adcb81fba",
+      "c-inputs": "ff01c0e773a2ec96bc87e39acb8e8a6e205390cdeb955c6019325da3e1769035",
+      "region-allocation": "d8584427270436c68bdcbaaa75da56e74a572983a585022fb84923c979ae1787",
+      "host-platform": "de1d33de36b72d17ae2350bf912a636c0db511b426b6ca428b3fa2834d4ae61c"
+    },
+    "allocator": "mimalloc",
+    "threading": "pthreads",
+    "peakMemoryBytes": 2328977408,
+    "resourceReportSha256": "5e4112646867c334a7009f81e8d10c938c334acf78cdee3f57ec57fbedaa5a00",
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "targets": [
+    {
+      "target": "node",
+      "engine": "v26.10.0",
+      "stockEngine": true,
+      "memoryMode": 1,
+      "wasmSha256": "90bcfc6efb07e2f55455ec944134bb962458e09b731123f1a605a8ea2757d8e8",
+      "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+      "controls": [
+        {
+          "arguments": [
+            "hello λ",
+            "",
+            "space argument"
+          ],
+          "native": {
+            "code": 7,
+            "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          },
+          "target": {
+            "code": 7,
+            "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          }
+        },
+        {
+          "arguments": [
+            "fail"
+          ],
+          "native": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure λ\n"
+          },
+          "target": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure λ\n"
+          }
+        }
+      ],
+      "peakMemoryBytes": 449822720,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceReportSha256": "71991f9c21d96f57828b80853cfaee8319936494c2df57a68d0a05fe756e9868",
+      "resultSha256": "23558a7b938810a671ad3d9648e60a5b3b4076fc16106bbf4a32244fe2175a78"
+    },
+    {
+      "target": "deno",
+      "engine": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "stockEngine": true,
+      "memoryMode": 1,
+      "wasmSha256": "90bcfc6efb07e2f55455ec944134bb962458e09b731123f1a605a8ea2757d8e8",
+      "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+      "controls": [
+        {
+          "arguments": [
+            "hello λ",
+            "",
+            "space argument"
+          ],
+          "native": {
+            "code": 7,
+            "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          },
+          "target": {
+            "code": 7,
+            "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          }
+        },
+        {
+          "arguments": [
+            "fail"
+          ],
+          "native": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure λ\n"
+          },
+          "target": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure λ\n"
+          }
+        }
+      ],
+      "peakMemoryBytes": 440483840,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceReportSha256": "cbe98b9540762b442f88d8f6560935c42cda5ea644988f523787c24215fe5a99",
+      "resultSha256": "618a3ef8f8ea5a45354a35042febd3960d6e61b756fa28e84dc05d201992fcb1"
+    },
+    {
+      "target": "bun",
+      "engine": "1.4.2",
+      "stockEngine": true,
+      "memoryMode": 2,
+      "wasmSha256": "e3090780e8618249511cc1f1869bf318f0a01b40554ebf2367fac5290963cdaa",
+      "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+      "controls": [
+        {
+          "arguments": [
+            "hello λ",
+            "",
+            "space argument"
+          ],
+          "native": {
+            "code": 7,
+            "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          },
+          "target": {
+            "code": 7,
+            "stdout": "hello λ||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          }
+        },
+        {
+          "arguments": [
+            "fail"
+          ],
+          "native": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure λ\n"
+          },
+          "target": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure λ\n"
+          }
+        }
+      ],
+      "peakMemoryBytes": 441192448,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "resourceReportSha256": "95cddad0bfb872dc5f3d274757653fc225ddbea7a6ddf4b6517a22de017ec815",
+      "resultSha256": "03746f91ab721df8aac4d1e0149bfd54b85e103fdc8cbd8e5ba299ea85ad2b55"
+    }
+  ],
+  "deployment": {
+    "completeDirectoryMoved": true,
+    "separateWorkingDirectory": true,
+    "executionPathEmpty": true,
+    "sourceNotCopiedToDeployment": true,
+    "executionOnSameHost": true,
+    "toolEnvironmentRemoved": [
+      "LEAN_PATH",
+      "LEAN_SRC_PATH",
+      "LEAN_SYSROOT"
+    ],
+    "hostSupportAndNoticesBundled": true
+  },
+  "remaining": [
+    "Managed build tool/runtime bundles are not yet connected to the primary CLI.",
+    "Only this small differential application has been run with this new pipeline.",
+    "Native OS/architecture matrix for full applications remains pending.",
+    "Bun uses MEMORY64=2 lowering with a 4 GiB linear-memory ceiling; large-memory behavior is not validated.",
+    "Unchanged upstream suite and all-standard-API coverage remain separate acceptance work."
+  ]
+}
