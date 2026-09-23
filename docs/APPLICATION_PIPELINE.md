@@ -144,6 +144,10 @@ now pass on all six native platforms; see the
 [launcher evidence](evidence/application-launchers-2026-09-23.json).
 Real installed-candidate launcher acceptance is pending. The
 earlier 4.32 implementation and its regression fixtures remain explicitly legacy.
+Run commands now check that the selected engine starts before creating a build
+cache or downloading tools. Build-only commands still require only Node/npm.
+The added missing-engine check brings the local CLI/launcher controls to 23;
+the linked earlier native record retains its original 22-check scope.
 
 The full-runtime output helper packages host adapters and native support and
 generates a relative `main.mjs` launcher. Three loader checks cover relocation,

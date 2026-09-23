@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,4 +38,19 @@ test('the common CLI child runner preserves an application exit code and diagnos
   assert.equal(await runApplicationChild(process.execPath, ['--max-old-space-size=64', '-e', 'process.exit(7)'], 'missing'), 7);
   await assert.rejects(runApplicationChild('lasm-nonexistent-engine-482fecc4', [], 'Selected engine is missing'),
     { message: 'Selected engine is missing' });
+});
+
+test('a missing deployment engine fails before an ordinary Lean run downloads tools or creates a build cache', t => {
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-no-engine-'));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  writeFileSync(join(directory, 'Main.lean'), 'def main : IO Unit := IO.println "hello"\n');
+  for (const target of ['deno', 'bun']) {
+    const result = spawnSync(process.execPath,
+      ['--max-old-space-size=64', fileURLToPath(new URL('../bin/lasm.mjs', import.meta.url)), 'Main.lean', '--target', target],
+      { cwd: directory, env: { ...process.env, PATH: '', LASM_TOOLCHAIN_CACHE: join(directory, 'tools') },
+        encoding: 'utf8', timeout: 10_000 });
+    assert.ifError(result.error); assert.equal(result.status, 1);
+    assert.match(result.stderr, new RegExp(`selected ${target} engine is not installed`));
+    assert.deepEqual(readdirSync(directory), ['Main.lean']);
+  }
 });

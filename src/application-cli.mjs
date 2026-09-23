@@ -1,5 +1,5 @@
 import { parseLasmArguments, cliUsage } from './cli-arguments.mjs';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { constants } from 'node:os';
 import { join } from 'node:path';
 import { engineName } from './js-engine.mjs';
@@ -25,6 +25,16 @@ export function reportCliError(error) {
     : (error.stderr?.toString() || error.stdout?.toString() || error.message).slice(-12000));
 }
 
+function requireApplicationEngine(executable, target) {
+  if (target === 'node' && executable === process.execPath) return;
+  const result = spawnSync(executable, ['--version'], { encoding: 'utf8', windowsHide: true,
+    timeout: 10_000, maxBuffer: 1024 * 1024 });
+  if (result.error?.code === 'ENOENT')
+    throw new Error(`The selected ${target} engine is not installed or is not on PATH. Install it to run this target; building does not require it.`);
+  if (result.error || result.status !== 0)
+    throw new Error(`Could not start the selected ${target} engine: ${(result.error?.message || result.stderr || 'exit ' + result.status).trim().slice(-2000)}`);
+}
+
 /** Shared by the primary CLI and the compatibility launchers. Builds use Node. */
 export async function runApplicationCli(argv, { defaultTarget = 'node', targetExecutable } = {}) {
   const options = parseLasmArguments(argv, { defaultTarget });
@@ -37,14 +47,17 @@ export async function runApplicationCli(argv, { defaultTarget = 'node', targetEx
     console.log(`Built ${result.module}: ${result.wasmBytes} bytes, ${result.modules.length} modules → ${result.output}`);
     return 0;
   }
+  const executable = options.target === defaultTarget && targetExecutable
+    ? targetExecutable : options.target === 'node' ? process.execPath : options.target;
+  // A run needs its engine. Diagnose that before creating caches or downloading
+  // build tools; build-only commands do not inspect or require the target engine.
+  if (options.command === 'run') requireApplicationEngine(executable, options.target);
   const { buildApplication } = await import('./application-build.mjs');
   const result = await buildApplication(options.input, options);
   if (options.command === 'build') {
     console.error(`${result.cacheHit ? 'Reused' : 'Built'} Lean ${result.lean} for ${result.target}: ${result.output}`);
     return 0;
   }
-  const executable = options.target === defaultTarget && targetExecutable
-    ? targetExecutable : options.target === 'node' ? process.execPath : options.target;
   return runApplicationChild(executable,
     [...(options.target === 'deno' ? ['run', '-A'] : []), join(result.output, 'main.mjs'), ...options.args],
     `The selected ${options.target} engine is not installed or is not on PATH. Install it to run this target; building does not require it.`);
