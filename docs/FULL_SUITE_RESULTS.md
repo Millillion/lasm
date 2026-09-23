@@ -72,8 +72,8 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **3,057 registrations passing**, completing
-all 854 prioritized names and 2,203 further registrations. This includes
+passes. Its latest saved checkpoint has **3,304 registrations passing**, completing
+all 854 prioritized names and 2,450 further registrations. This includes
 all 56 Lake tests, all 69 compiler regressions, all 27 compiled benchmarks,
 all 657 prioritized elaborator regressions,
 all 78 prioritized interactive server tests, lint, seven documentation examples,
@@ -82,9 +82,9 @@ handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 839 registrations remain pending in that
+harness hash remains intact. The other 592 registrations remain pending in that
 snapshot; see
-[the 3,057-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint3057-2026-09-23.json).
+[the 3,304-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint3304-2026-09-23.json).
 All 197 documentation-parser registrations also pass in this checkpoint.
 Additional evaluator, coercion, compiler simplification, decidability, definition,
 pretty-printing, dependent-elimination, derivation, iteration, floating-point and
@@ -108,6 +108,11 @@ and network-interface registrations also pass, along with mutual recursion,
 verification-condition generation, partial fixpoints, pretty-printing and
 name-resolution regressions. These remain observations of this Linux x64 Node
 profile, not complete cross-engine or platform conformance.
+The unchanged standard-output/error and redirected-file-stream checks also pass,
+including restoration after an exception and file readback. Synchronization
+barriers, channels, notifications and recursive mutexes pass, alongside task
+state, iteration and IO checks. Date/time arithmetic, parsing, formats and
+timezone-file parsing also pass their original tests.
 All three earlier plugin failures now pass within this campaign. The server-project
 workload also passes under the same 8 GiB proactive budget; it is this checkpoint's
 largest peak at 7.56 GiB. Cancellation, completions, navigation, references, hover,
