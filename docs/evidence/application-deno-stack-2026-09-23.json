@@ -1,0 +1,293 @@
+{
+  "scope": "Unresolved stock Deno 2.9.7 execution-stack difference on Linux x64; not a fundamental limitation",
+  "source": {
+    "path": "tests/compile_bench/const_fold.lean",
+    "sha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+    "originalStackKiB": 4194304,
+    "argument": "15"
+  },
+  "application": {
+    "candidate": "0.1.0-experimental.7",
+    "directory": ".work/application-large-stack-deno-r1",
+    "nativeControls": "Interpreter and native executable assertions passed before the installed application build and target failure",
+    "expected": {
+      "code": 0,
+      "stdout": "93011 93011\n",
+      "stderr": ""
+    },
+    "actual": {
+      "code": 134,
+      "stdout": "",
+      "stderr": "\nStack overflow detected. Aborting.\n"
+    },
+    "build": {
+      "schema": 1,
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "emscripten": "6.0.9",
+      "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+      "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+      "buildDriverIdentity": "6de6663a9d4ccaaa8957eeeaf39f059fb18e09d183deb2bd1877ca7de5714bed",
+      "target": "deno",
+      "memoryMode": 1,
+      "modules": [
+        {
+          "module": "const_fold",
+          "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+          "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+        }
+      ],
+      "signature": "fb9643d4960ce5eecef2fa3b127e1be16d9e005859749447c89b0768947a4b2e",
+      "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+      "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+    },
+    "wasmSha256": "68e82dc2bb25375ce737c648fa74bc41fa7d3b8e8264ec52082c0da760203c1d",
+    "logSha256": "2ad32085d85539f5ffbe9a0ca7e9e11fc4d4e1219bf2a4b11e3e39f815445de8",
+    "resources": {
+      "startedAt": "2026-09-23T22:42:57.613Z",
+      "command": [
+        "/usr/bin/env",
+        "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+        "/bin/bash",
+        "-c",
+        "ulimit -c 0; ulimit -s unlimited; exec python3 scripts/full-lean/base-pages.py /home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node integration/application-large-stack.mjs .work/application-large-stack-deno-r1 deno .cache/js-runtimes/deno-2.9.7/deno .work/application-installed-r6/workspace/project/node_modules/@lasm/compiler"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "90e6d005-94e9-4b10-b456-1881a07b02ff",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25752924160
+      },
+      "minimumHostAvailable": 22264446976,
+      "peakMemoryBytes": 3963387904,
+      "peakTasks": 36,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-large-stack-deno-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-23T22:44:15.706Z",
+        "memoryBytes": 1590513664,
+        "peakMemoryBytes": 3963387904,
+        "swapBytes": 0,
+        "tasks": 13,
+        "memoryBreakdown": {
+          "anon": 750350336,
+          "file": 806100992,
+          "kernel": 26808320,
+          "shmem": 0,
+          "file_mapped": 921600,
+          "inactive_file": 786124800,
+          "slab": 12506464
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-23T22:44:15.814Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 831729664,
+        "peakMemoryBytes": 3963387904,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11661312,
+          "file": 806100992,
+          "kernel": 12734464,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 786124800,
+          "slab": 11779304
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-23T22:44:15.838Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "smallDifferential": {
+    "source": "integration/wasm-stack-budget.mjs",
+    "sha256": "5dc5c693ced47782876b8cf330df5e8b1b3209a114dfd1b2cda0a554b81d0c08",
+    "observations": [
+      {
+        "engine": "v26.10.0",
+        "smallControl": 100,
+        "setFlag": false,
+        "outcomes": {
+          "ordinary": 100000,
+          "promising": "RangeError: Maximum call stack size exceeded"
+        }
+      },
+      {
+        "engine": "v26.10.0",
+        "smallControl": 100,
+        "setFlag": true,
+        "outcomes": {
+          "ordinary": 100000,
+          "promising": 100000
+        }
+      },
+      {
+        "engine": "2.9.7",
+        "smallControl": 100,
+        "setFlag": false,
+        "outcomes": {
+          "ordinary": "RangeError: Maximum call stack size exceeded",
+          "promising": "RangeError: Maximum call stack size exceeded"
+        }
+      },
+      {
+        "engine": "2.9.7",
+        "smallControl": 100,
+        "setFlag": true,
+        "outcomes": {
+          "ordinary": "RangeError: Maximum call stack size exceeded",
+          "promising": "RangeError: Maximum call stack size exceeded"
+        }
+      }
+    ],
+    "resources": {
+      "startedAt": "2026-09-23T23:07:54.774Z",
+      "command": [
+        "/bin/bash",
+        "-c",
+        "ulimit -c 0; .cache/js-runtimes/node-26.10.0/bin/node integration/wasm-stack-budget.mjs && .cache/js-runtimes/deno-2.9.7/deno run -A integration/wasm-stack-budget.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "10c9da11-1d78-4f66-a6ca-f27d5312a5fb",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25753608192
+      },
+      "minimumHostAvailable": 25719029760,
+      "peakMemoryBytes": 32751616,
+      "peakTasks": 10,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-stack-api-r2-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-23T23:07:54.996Z",
+        "memoryBytes": 22274048,
+        "peakMemoryBytes": 28319744,
+        "swapBytes": 0,
+        "tasks": 10,
+        "memoryBreakdown": {
+          "anon": 19083264,
+          "file": 1298432,
+          "kernel": 1314816,
+          "shmem": 0,
+          "file_mapped": 151552,
+          "inactive_file": 1159168,
+          "slab": 213472
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-23T23:07:55.136Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 15040512,
+        "peakMemoryBytes": 32751616,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11649024,
+          "file": 1368064,
+          "kernel": 1105920,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 1171456,
+          "slab": 155248
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-23T23:07:55.163Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "primarySources": [
+    {
+      "url": "https://raw.githubusercontent.com/denoland/deno/v2.9.7/runtime/ops/worker_host.rs",
+      "finding": "resourceLimits.stackSizeMb sets the native OS thread reservation"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/denoland/deno/v2.9.7/ext/node/ops/v8.rs",
+      "finding": "op_v8_set_flags_from_string only recognizes expose_gc toggles; stack-size has no effect"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/v8/v8/15.0.245/src/flags/flag-definitions.h",
+      "finding": "The process-global V8 execution stack limit is independent of the worker OS reservation"
+    }
+  ],
+  "remaining": [
+    "Provide ordinary flag-free deployment behavior with adequate Wasm execution stacks.",
+    "Preserve narrowed Deno permissions, process identity/lifetime, child process behavior and unrelated worker safety.",
+    "Evaluate permitted compiler transformations, host adapters or managed helpers; rejected shortcuts do not prove a fundamental restriction."
+  ]
+}

@@ -107,3 +107,13 @@ were 1.05 GiB for the sparse controls, 0.85 GiB for SDK regressions, 3.40 GiB fo
 the installed repetitions and 3.55 GiB for the suite-driver rerun, without
 resource events. This is targeted Node/Linux x64 evidence; full repaired-package,
 other-engine and platform campaigns remain required.
+
+The unchanged `const_fold` deployment still fails in Deno 2.9.7 with a stack
+overflow after both native controls pass. A small independent Wasm recursion
+control distinguishes the worker's OS stack reservation from its engine stack
+limit: Node succeeds with the same 64 MiB worker option; Deno fails despite that
+reservation. Deno's runtime stack flag setter has no effect, and promise-wrapped
+Wasm calls also overflow at their default budget. The
+[Deno stack evidence](evidence/application-deno-stack-2026-09-23.json) preserves
+the failed application, the successful shallow controls and the guarded
+differential. This is unresolved implementation work, not a fundamental limit.
