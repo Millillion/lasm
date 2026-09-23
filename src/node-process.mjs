@@ -6,7 +6,7 @@ import { nativeFiles } from './native-files.mjs';
 import { spawnInheritedProcess } from './native-process.mjs';
 import { numbers } from './node-host.mjs';
 
-export function createNodeProcesses({ add, get, release, cwd, flushStdout = async () => {} }) {
+export function createNodeProcesses({ add, get, release, cwd, applicationCommand, flushStdout = async () => {} }) {
   function decode(bytes, state) {
     let offset = 0;
     const number = () => { const n = Number(bytes.readBigUInt64LE(offset)); offset += 8; return n; };
@@ -61,6 +61,30 @@ export function createNodeProcesses({ add, get, release, cwd, flushStdout = asyn
   }
   async function start(bytes, state) {
     const options = decode(bytes, state), native = nativeFiles();
+    // An AOT application's ordinary IO.appPath is its portable JS entry point.
+    // Relaunch that exact application with the executing engine, without PATH,
+    // a shell, a compiler, or an executable bit on a Windows .mjs file. Keep the
+    // normal child path below so pipes, cwd, raw environment, sessions and PID
+    // lifetime retain the same semantics as other process launches.
+    if (applicationCommand && options.command === applicationCommand.path) {
+      options.command = applicationCommand.executable;
+      options.args = [...applicationCommand.arguments, applicationCommand.path, ...options.args];
+      if (process.versions.deno) {
+        // Deno 2.9.7 prepends a Node shim to PATH when it cannot find node.
+        // Disable that startup mutation, then let the generated entry point
+        // restore these two private transport values before running Lean.
+        const flag = 'DENO_DISABLE_NODE_SHIM', transport = 'LASM_DENO_CHILD_ENV';
+        const saved = JSON.stringify([options.env[flag] ?? null, options.env[transport] ?? null]);
+        for (const [key, value] of [[flag, '1'], [transport, saved]]) {
+          options.env[key] = value;
+          if (options.envBytes) {
+            const encoded = Buffer.from(key).toString('base64');
+            options.envBytes = options.envBytes.filter(([name]) => name !== encoded);
+            options.envBytes.push([encoded, Buffer.from(value).toString('base64')]);
+          }
+        }
+      }
+    }
     // Native Lean flushes std::cout only when the child inherits stdin. A
     // failed implicit flush does not stop it from attempting the spawn.
     if (options.modes[0] === 1) await flushStdout().catch(() => {});

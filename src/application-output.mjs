@@ -22,9 +22,20 @@ export function copyApplicationHost(output) {
 
 export function applicationEntrypoint(target) {
   if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Invalid application deployment target');
-  return `#!/usr/bin/env node
+  const shebang = target === 'deno' ? '/usr/bin/env -S deno run -A' : '/usr/bin/env ' + target;
+  return `#!${shebang}
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+// A self-launch may temporarily disable Deno's automatic PATH shim. Restore
+// the caller's exact visible values before the program or its workers start.
+if (process.versions.deno && process.env.LASM_DENO_CHILD_ENV !== undefined) {
+  const saved = JSON.parse(process.env.LASM_DENO_CHILD_ENV);
+  if (!Array.isArray(saved) || saved.length !== 2 || saved.some(value => value !== null && typeof value !== 'string'))
+    throw new Error('Invalid private child environment transport');
+  for (const [index, key] of ['DENO_DISABLE_NODE_SHIM', 'LASM_DENO_CHILD_ENV'].entries()) {
+    if (saved[index] === null) delete process.env[key]; else process.env[key] = saved[index];
+  }
+}
 const expected = ${JSON.stringify(target)};
 const actual = process.versions.deno ? 'deno' : process.versions.bun ? 'bun' : 'node';
 if (actual !== expected) {
@@ -40,6 +51,6 @@ if (actual !== expected) {
 
 export function writeApplicationEntrypoint(output, target) {
   mkdirSync(output, { recursive: true });
-  writeFileSync(join(output, 'main.mjs'), applicationEntrypoint(target));
+  writeFileSync(join(output, 'main.mjs'), applicationEntrypoint(target), { mode: 0o755 });
   writeFileSync(join(output, 'package.json'), JSON.stringify({ private: true, type: 'module' }) + '\n');
 }

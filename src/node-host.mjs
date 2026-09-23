@@ -45,7 +45,8 @@ export function encodeError(err) {
 }
 
 /** Private Node implementation of Lean's runtime primitives, not a Lean API. */
-export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = {}, appPath = process.execPath, propagateCwd = false, processExit = false } = {}) {
+export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = {}, appPath = process.execPath,
+  applicationCommand, propagateCwd = false, processExit = false } = {}) {
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))
     throw new TypeError('Lean main arguments must be Unicode strings without NUL characters');
   const directory = createWorkingDirectory(cwd, propagateCwd);
@@ -132,6 +133,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   const network = createNodeNetwork({ add, get, release });
   const udp = createNodeUdp({ add, get });
   const processes = createNodeProcesses({ add, get, release, cwd: state => directory.spawn(state),
+    applicationCommand: applicationCommand && { ...applicationCommand, path: appPath },
     flushStdout: () => flushStandard(1) });
   const system = createNodeSystem();
   const signals = createNodeSignals({ add, get });

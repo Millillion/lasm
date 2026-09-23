@@ -211,6 +211,17 @@ respectively, with no resource events. See the
 This closes the Linux installed-package HTTP example check; the broader API,
 callable/Express, dependency and platform requirements remain open.
 
+The next candidate, `0.1.0-experimental.5`, repairs application self-launching:
+ordinary `IO.Process` calls using `IO.appPath` start the selected engine with
+the deployed entry point. The original cross-process closure-save/load test now
+passes through that installed package in all three engines. Host controls also
+verify Unicode/empty arguments, explicit cwd, pipes, PID/exit status and an empty
+PATH with environment inheritance disabled. Deno's automatic Node PATH shim is
+temporarily disabled during this child startup; original visible values are
+restored before the application starts. See the
+[repair evidence](evidence/application-self-launch-2026-09-23.json). This exact
+self-path mapping still needs broader alias/other-deployment/platform coverage.
+
 ## Native CI
 
 `managed-tools.yml` tests provisioning on the six required standard native runner

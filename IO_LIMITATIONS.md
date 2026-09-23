@@ -12,6 +12,10 @@ separately from the earlier runtime evidence below.
   coverage in all three stock engines and all six OS/architecture combinations.
 - [ ] Finish managed application packaging, native Windows ARM64 tools and
   deployment validation without source or build tools.
+- [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and
+  `Std.Internal.UV.Loop.alive`. The compiled library declarations are present,
+  but their Emscripten C implementations still reject the operation or abort;
+  shipping all library archives is not complete API support.
 
 ## Earlier runtime evidence and remaining compatibility work
 

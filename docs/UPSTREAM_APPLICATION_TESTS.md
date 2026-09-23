@@ -46,3 +46,22 @@ where appropriate; they are neither successes nor fundamental Lasm limitations.
 Resource aborts, cold-build deadlines, behavior failures, unsupported inputs and
 unexecuted cases must stay distinct in reports. No broad campaign should start
 until it uses the shipping application path and obeys the resource guard.
+
+The new [application harness](../scripts/application-tests/README.md) now drives
+the installed npm candidate. The first five Node cases exercised filesystem read
+bounds, Unicode paths, dedicated tasks, exception reporting and cross-process
+closure serialization. Four passed immediately; serialization exposed a real
+self-launch failure because `IO.appPath` names the portable JavaScript entry.
+The host now relaunches that exact application through the current engine,
+preserving ordinary child-process handling. The repaired installed candidate
+passes the original closure test in Node, Deno and stock Bun. Eight loader,
+three-engine child-process and shutdown controls also pass. The
+[self-launch evidence](evidence/application-self-launch-2026-09-23.json) records
+the original failure, both package identities, repaired runs and resource use.
+Every original test/helper file and symlink remains unchanged.
+
+The initial harness-only attempt encountered upstream's relative stage-directory
+toolchain pin. The parallel suite now supplies a nearer generated release pin,
+retaining the original pin and all 7,669 original entries. This is an explicit
+harness adaptation, not a changed test or expected result. Broader registrations,
+native compiler coverage and all-API differential coverage remain open.
