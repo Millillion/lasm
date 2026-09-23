@@ -11,7 +11,7 @@ jobs:
     if: github.event.repository.visibility == 'public'
     name: Files ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       max-parallel: 3
@@ -39,5 +39,23 @@ jobs:
         run: node --max-old-space-size=128 --test --test-isolation=none test/native-file-abi.test.mjs test/application-lock.test.mjs test/application-files.test.mjs
       - name: CLI and compatibility launcher controls without tool downloads
         run: node --max-old-space-size=128 --test --test-isolation=none test/cli-arguments.test.mjs test/application-launcher.test.mjs
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        id: deno
+        if: success() || failure()
+        with:
+          deno-version: 2.9.7
+          cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        id: bun
+        if: success() || failure()
+        with:
+          bun-version: 1.4.2
+          no-cache: true
+      - name: Stock Deno native file ABI
+        if: ${{ !cancelled() && steps.deno.outcome == 'success' }}
+        run: deno run -A integration/native-file-abi.mjs deno 2.9.7
+      - name: Stock Bun native file ABI
+        if: ${{ !cancelled() && steps.bun.outcome == 'success' }}
+        run: bun integration/native-file-abi.mjs bun 1.4.2
       # Lightweight filesystem checks only; child fixtures each use a 64 MiB
       # JS heap cap. No compiler builds, artifacts or Actions caches.
