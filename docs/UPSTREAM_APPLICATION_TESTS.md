@@ -126,3 +126,14 @@ It verifies all 7,669 recorded test/helper files and links before and after and
 confirms the extracted tree is unchanged. The guarded run peaked at 0.98 GiB
 without resource events. This is a native source-only check, not a deployed
 application result; see the [source-lint evidence](evidence/upstream-source-lint-2026-09-23.json).
+
+All **202 documentation-parser inputs pass in stock Node 26.10.0** through
+installed candidate `0.1.0-experimental.9` on Linux x64. The unchanged
+`tests/docparse/run_test.lean` is compiled once through the shipping application
+CLI. Each input runs first through the original native driver, then through that
+same driver with its exact `lean --run` invocation mapped to the deployed main.
+Original assertions and expected outputs remain in force. All 7,669 source entries
+and the active harness hashes are unchanged before and after execution. The test
+phase took 663.02 seconds; preparation and execution peaked at 3.40 GiB with no
+resource events. The [per-case evidence](evidence/upstream-docparse-node-2026-09-23.json)
+does not imply Deno, Bun or other-platform passes for this category.
