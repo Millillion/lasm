@@ -24,7 +24,9 @@ jobs:
         run: |
           test "$(gh api repos/leanprover/lean4/releases/latest --jq .tag_name)" = v4.34.0
           mkdir -p .cache/downloads
-          curl --fail --location --retry 3 --output .cache/downloads/lean4-v4.34.0.tar.gz https://github.com/leanprover/lean4/archive/refs/tags/v4.34.0.tar.gz
+          # The recorded archive uses the full-commit directory prefix, not the
+          # tag-based prefix. Preserve its original checksum and source manifest.
+          curl --fail --location --retry 3 --output .cache/downloads/lean4-v4.34.0.tar.gz https://github.com/leanprover/lean4/archive/293d5d0c0c3f3dded4688b3ccd6a33939ac5102b.tar.gz
           printf '%s  %s\n' 09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b .cache/downloads/lean4-v4.34.0.tar.gz | sha256sum -c -
       - name: Enable the per-user resource boundary on this disposable runner
         run: |
