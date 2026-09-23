@@ -1,0 +1,41 @@
+{
+  "recordedAt": "2026-09-23T19:03:11.160785+00:00",
+  "scope": "Native Windows ARM64 compiler bootstrap experiment; no distribution or application-platform pass yet",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35890685116",
+  "runner": "windows-11-arm",
+  "lean": "4.34.0",
+  "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+  "nativeClang": "22.1.7 aarch64-w64-windows-gnu",
+  "status": "failed",
+  "failure": "lld: error: unable to find library -lleanmanifest while linking stage0 lake.exe",
+  "peakCommittedBytes": 585883648,
+  "minimumHostAvailableBytes": 12261212160,
+  "resourceLimited": false,
+  "stageReached": "Generated native ARM64 standard-library objects and shared libraries; stage0 executable linking failed",
+  "repair": {
+    "description": "Enable Windows RC compilation and make lean, lake and leanchecker depend on leanmanifest in both stage source trees. Add a small native ARM64 manifest/link preflight before the large bootstrap.",
+    "patchControl": {
+      "scope": "Windows RC language and manifest archive build order only",
+      "files": [
+        {
+          "name": "src/CMakeLists.txt",
+          "originalSha256": "037075df7198856d4b14095ebcde87733922c045a23c26b897e52cb6c5bda3a7",
+          "patchedSha256": "bff40a49c76f6cf896d554afe15e1f87d5e382ef7c578ee04b76125059fd4135"
+        },
+        {
+          "name": "stage0/src/CMakeLists.txt",
+          "originalSha256": "51a789a8bb01612cdb998aaad6a3bc6df31b5628c247745f81d94345e3e182fd",
+          "patchedSha256": "7eb22bf00655cc64d4e4a75913891997353966ffd8e5dd364ca14c016e8d90b2"
+        }
+      ]
+    },
+    "nativeValidation": "pending new CI run",
+    "resourceCompilerPackage": "https://packages.msys2.org/packages/mingw-w64-clang-aarch64-llvm-tools"
+  },
+  "remaining": [
+    "complete bootstrap and verify PE ARM64 compiler and application headers",
+    "package native Lean/Lake with supporting binaries and notices",
+    "supply matching managed Windows ARM64 SDK",
+    "full application and engine platform acceptance"
+  ]
+}

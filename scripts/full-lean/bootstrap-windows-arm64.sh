@@ -9,17 +9,42 @@ set -euo pipefail
 export CMAKE_BUILD_PARALLEL_LEVEL=1 LEAN_NUM_THREADS=2
 export BINARYEN_CORES=1 EMCC_CORES=1
 export CC=clang CXX=clang++
+command -v llvm-windres
+command -v llvm-readobj
+node_binary="$(cygpath -u "$LASM_BOOTSTRAP_NODE")"
 base="$PWD/.work/windows-arm64-bootstrap"
 mkdir -p "$base"
 pacman -Q > "$base/msys2-package-versions.txt"
 clang --version
 cmake --version
-git init "$base/lean4"
+git init -b main "$base/lean4"
 git -C "$base/lean4" fetch --depth 1 https://github.com/leanprover/lean4.git 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b
 git -C "$base/lean4" checkout --detach 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b
 [[ "$(git -C "$base/lean4" rev-parse HEAD)" == 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b ]]
+"$node_binary" scripts/full-lean/patch-windows-manifest.mjs "$base/lean4"
+git -C "$base/lean4" diff -- src/CMakeLists.txt stage0/src/CMakeLists.txt > "$base/windows-manifest.patch"
+# Fail quickly on resource-compiler/COFF issues, before compiling thousands of
+# upstream C files. The manifest itself is the unchanged upstream Windows one.
+mkdir -p "$base/manifest-check"
+cp "$base/lean4/src/shell/manifest.rc" "$base/lean4/src/shell/app.manifest" "$base/manifest-check/"
+printf '#include <stdio.h>\nint main(void) { puts("native ARM64 manifest link"); return 0; }\n' > "$base/manifest-check/main.c"
+printf '\n' > "$base/manifest-check/empty.c"
+cat > "$base/manifest-check/CMakeLists.txt" <<'CMAKE'
+cmake_minimum_required(VERSION 3.21)
+project(ManifestControl C RC)
+add_library(leanmanifest STATIC empty.c manifest.rc)
+add_executable(manifest-check main.c)
+target_link_libraries(manifest-check PRIVATE -Wl,--whole-archive leanmanifest -Wl,--no-whole-archive)
+CMAKE
+cmake -S "$base/manifest-check" -B "$base/manifest-build" -G 'Unix Makefiles' \
+  -DCMAKE_C_COMPILER=clang -DCMAKE_RC_COMPILER=llvm-windres
+cmake --build "$base/manifest-build" --parallel 1
+llvm-readobj --file-headers "$base/manifest-build/manifest-check.exe" > "$base/manifest-pe.txt"
+grep -q IMAGE_FILE_MACHINE_ARM64 "$base/manifest-pe.txt"
+"$base/manifest-build/manifest-check.exe"
 cmake -S "$base/lean4" -B "$base/build" -G 'Unix Makefiles' \
-  -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+  -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_RC_COMPILER=llvm-windres \
+  -DSTAGE0_CMAKE_RC_COMPILER=llvm-windres \
   -DCMAKE_BUILD_TYPE=Release -DCHECK_OLEAN_VERSION=ON \
   -DUSE_LAKE=OFF -DLLVM=OFF -DLEAN_EXTRA_OPTS='-j2 -s8192' \
   -DSTAGE0_LEAN_EXTRA_OPTS='-j2 -s8192' \

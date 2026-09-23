@@ -39,6 +39,7 @@ jobs:
             make git tar diffutils binutils
             mingw-w64-clang-aarch64-cmake
             mingw-w64-clang-aarch64-clang
+            mingw-w64-clang-aarch64-llvm-tools
             mingw-w64-clang-aarch64-gmp
             mingw-w64-clang-aarch64-libuv
             mingw-w64-clang-aarch64-openssl
@@ -47,6 +48,7 @@ jobs:
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
           $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
+          $env:LASM_BOOTSTRAP_NODE = (Get-Command node).Source
           node scripts/full-lean/run-bounded.mjs --report .work/windows-arm64-bootstrap-resources.json -- $bash --login scripts/full-lean/bootstrap-windows-arm64.sh
       - name: Preserve bounded bootstrap results in logs
         if: always()
