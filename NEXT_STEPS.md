@@ -14,6 +14,9 @@ below retain their original, narrower scope.
 - [x] Inventory all 4,066 unchanged upstream test registrations and exclusions.
 - [x] Connect the primary application CLI to verified runtime bundles and managed
   native tools; verify its ordinary Lean main and Lake HTTP project on Linux x64.
+- [x] Verify a cold npm candidate install with only Node/npm, automatic tool
+  provisioning, and a separate deployment denied access to source/build tools
+  on Linux x64; the remaining native platforms are tracked below.
 - [ ] Finish and package the primary `lasm Main.lean` / `lasm build Main.lean`
   pipeline with automatic tools, Lake dependencies and reliable cache reuse.
 - [ ] Validate the HTTP and Express examples and callable JS/TypeScript bindings

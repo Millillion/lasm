@@ -1,0 +1,248 @@
+{
+  "recordedAt": "2026-09-23T19:12:50.839015+00:00",
+  "scope": "Cold local npm candidate installation and managed main compilation on Linux x64, then a separate copied Node deployment with source and tools denied. Not full API or other-platform acceptance.",
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r1/lasm-compiler-0.1.0-experimental.4.tgz",
+    "sha256": "0c40a44f62ecebf2d33322b4e5244a2f5f19e47d87e2e6fa6f6e08196526c9ee",
+    "compressedBytes": 124725186,
+    "installedBytes": 626280248,
+    "files": 2657,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-package-r1-resources.json",
+    "recordedAt": "2026-09-23T18:39:57.324Z"
+  },
+  "installation": {
+    "scope": "Cold npm installation and managed compilation in an isolated filesystem containing only Node/npm and standard OS shared libraries",
+    "node": "v26.10.0",
+    "platform": "linux-x64",
+    "package": "0.1.0-experimental.4",
+    "firstBuildSeconds": 497.651692715,
+    "cachedDirectRunSeconds": 18.619054634,
+    "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+    "build": {
+      "schema": 1,
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "emscripten": "6.0.9",
+      "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+      "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+      "buildDriverIdentity": "b6966242264a5e4a82956f97222ba7f36fdc1142e9d23b240b4727cf9148f1c4",
+      "target": "node",
+      "memoryMode": 1,
+      "modules": [
+        {
+          "module": "Main",
+          "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+          "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+        }
+      ],
+      "signature": "3df5bec12fcdb48c48baf39d455f7d5963be5f5a84997e025ea7a71fa967046f",
+      "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+      "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+    },
+    "checks": [
+      {
+        "args": [
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": ""
+        }
+      },
+      {
+        "args": [
+          "fail"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n"
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n"
+        }
+      }
+    ],
+    "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/project/node_modules/@lasm/compiler",
+    "output": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/dist",
+    "toolchains": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+    "recordedAt": "2026-09-23T19:03:06.351Z"
+  },
+  "installationResources": {
+    "peakMemoryBytes": 8520470528,
+    "resourceLimited": false,
+    "memoryThrottled": false,
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "status": "finished",
+    "result": {
+      "code": 1,
+      "signal": null
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "deployment": {
+    "scope": "Separate copied deployment and Node executable outside the checkout; Landlock denies source, build tools and original output contents. OS libraries and writable data/temp are allowed. Metadata-only stat and network access are not restricted.",
+    "installationFile": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/result.json",
+    "installationSha256": "8fd5981e803d5970dd7413ff1875ed90d1ccfcd59b182b6af34cfa7e43efe2e9",
+    "node": "v26.10.0",
+    "platform": "linux-x64",
+    "build": {
+      "schema": 1,
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "emscripten": "6.0.9",
+      "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+      "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+      "buildDriverIdentity": "b6966242264a5e4a82956f97222ba7f36fdc1142e9d23b240b4727cf9148f1c4",
+      "target": "node",
+      "memoryMode": 1,
+      "modules": [
+        {
+          "module": "Main",
+          "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+          "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+        }
+      ],
+      "signature": "3df5bec12fcdb48c48baf39d455f7d5963be5f5a84997e025ea7a71fa967046f",
+      "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+      "sdkDriverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d"
+    },
+    "wasmSha256": "0c8c641386ca9aab07b2b859641a126902ac586ee3f3c481d2a2830adb801042",
+    "deniedFiles": [
+      "/home/lastmjs/development/lasm/compiler/package.json",
+      "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/project/Main.lean",
+      "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+      "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+      "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/dist/program.wasm"
+    ],
+    "denialControl": {
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "checks": [
+      {
+        "args": [
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": ""
+        }
+      },
+      {
+        "args": [
+          "fail"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n"
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n"
+        }
+      }
+    ],
+    "rules": "/home/lastmjs/development/lasm/compiler/.work/application-deployment-r1/deployment-rules.json",
+    "isolated": "/tmp/lasm-deployment-SBFIV9",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-deployment-r1-resources.json",
+    "recordedAt": "2026-09-23T19:10:12.559Z"
+  },
+  "deploymentResources": {
+    "peakMemoryBytes": 1636507648,
+    "resourceLimited": false,
+    "memoryThrottled": false,
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "status": "finished",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    }
+  },
+  "harnessHistory": [
+    {
+      "output": ".work/application-installed-r1",
+      "classification": "harness-environment failure",
+      "reason": "Bubblewrap namespace setup was denied under the resource-guard service. No host policy or guard was changed; Landlock was used instead."
+    },
+    {
+      "output": ".work/application-installed-r2",
+      "classification": "harness allowlist failure",
+      "reason": "Node needed the ordinary OS OpenSSL configuration file, which was absent from the initial allowlist."
+    },
+    {
+      "output": ".work/application-installed-r3",
+      "classification": "installation passed; initial deployment harness failed",
+      "reason": "The npm installation, automatic tools, compiled controls and cached direct run passed. Deployment cwd was nested under a deliberately unreadable parent package.json, causing Node worker preload package-scope resolution to fail."
+    },
+    {
+      "output": ".work/application-deployment-r1",
+      "classification": "separate deployment passed",
+      "reason": "The same unmodified installed output and Node binary were copied outside the checkout; content denials and both native comparisons passed. No tools were downloaded again."
+    }
+  ],
+  "limitations": [
+    "Landlock allows stat metadata and does not restrict network access.",
+    "Native system libraries and device/proc information are allowed.",
+    "This is one ordinary main on Linux x64; all APIs and platforms remain open.",
+    "The cold install used registry access for the pinned npm dependency and official tool download URLs."
+  ]
+}

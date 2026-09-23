@@ -173,10 +173,31 @@ keeps exact build inputs, native comparisons, cache timings and guarded resource
 reports. These passes used preprovisioned verified tool caches and a maintainer
 runtime-bundle path, so package installation remains a separate gate.
 
-Clean local-package installation, additional ordinary dependency layouts,
-concurrent cache users, full upstream/API coverage, and the six native platform
-matrix remain acceptance gates. The package assembler preserves the older
-callable-library target with its original Lean 4.32 requirements.
+The local `0.1.0-experimental.4` npm candidate now passes a cold Linux x64
+installation with only Node/npm on PATH and kernel-enforced denial of checkout,
+global tool and previously cached tool contents. It automatically downloads and
+verifies Lean, private Python and the SDK, then compiles and runs the ordinary
+main. The cold build took 497.65 seconds; the unchanged direct run took 18.62
+seconds. Its compressed package is 124,725,186 bytes. No npm publication occurred.
+
+A separately copied deployment and Node executable also pass with source,
+compiler tools, checkout and original output contents denied, matching native
+output and exit status for normal execution and an exception. The first
+deployment harness incorrectly nested its working directory under a denied
+parent `package.json`; Node's worker preloader tried to read that package scope.
+Relocating the deployment outside the checkout fixes the harness without
+changing the package, application or expected results. Linux Landlock restricts
+contents and execution, but not metadata-only `stat` or network access. See the
+[installed-package evidence](evidence/installed-application-2026-09-23.json).
+
+The cold run peaked at 7.94 GiB, including tool-download filesystem cache; the
+separate deployment check peaked at 1.52 GiB. Both retained the proactive 8 GiB
+guard and 10 GiB hard cap, with no OOM, throttling or resource aborts. Further
+checks reuse the installed tools instead of repeating the cold downloads.
+Additional ordinary dependency layouts, concurrent cache users, full upstream/API
+coverage, and the six native platform matrix remain acceptance gates. The package
+assembler preserves the older callable-library target with its original Lean
+4.32 requirements.
 
 ## Native CI
 
@@ -213,7 +234,7 @@ commits and the acceptance Node version is fixed at 26.10.0.
 
 ## Outstanding product work
 
-- [ ] Wire managed compiler/linker/runtime artifacts into the primary CLI.
+- [x] Wire managed compiler/linker/runtime artifacts into the primary CLI.
 - [x] Build matching Lean 4.34 application libraries and pass the first three-engine
   differential main probe; full API validation remains required below.
 - [ ] Produce portable `dist/main.mjs` output and callable bindings for stock
