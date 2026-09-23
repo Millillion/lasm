@@ -1,0 +1,955 @@
+{
+  "recordedAt": "2026-09-23T12:19:52.289429+00:00",
+  "scope": "Deno v151 unchanged compiled server-driver build, parallel-suite preparation, and two unchanged original server controls. Separate from both the completed v147 Node suite and the pending full Deno campaign; no passes imported. Same base-page, one-build-worker, four-Lean-worker and 8 GiB proactive / 10 GiB hard resource profile.",
+  "preparation": [
+    {
+      "label": "driver-build",
+      "command": [
+        "node",
+        "scripts/full-lean/run-bounded.mjs",
+        "--report",
+        ".work/full-engine-probe/deno-v151-broad-driver-build.resources.json",
+        "--",
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "env",
+        "BINARYEN_CORES=1",
+        "EMCC_CORES=1",
+        "CMAKE_BUILD_PARALLEL_LEVEL=1",
+        "node",
+        "scripts/full-lean/build-server-driver.mjs",
+        ".work/full-toolchains/deno-v151-system-directories-native",
+        ".work/server-driver-deno-v151-system-directories",
+        "--standalone-link"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "suite-prepare",
+      "command": [
+        "node",
+        "scripts/full-lean/run-bounded.mjs",
+        "--report",
+        ".work/full-engine-probe/deno-v151-broad-suite-prepare.resources.json",
+        "--",
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "env",
+        "BINARYEN_CORES=1",
+        "EMCC_CORES=1",
+        "CMAKE_BUILD_PARALLEL_LEVEL=1",
+        "node",
+        "scripts/full-lean/prepare-suite.mjs",
+        "--prefix",
+        ".work/full-toolchains/deno-v151-system-directories-native",
+        "--backend",
+        "deno",
+        "--output",
+        ".work/full-suite-deno-v151-system-directories-driver",
+        "--compiled-server-driver",
+        ".work/server-driver-deno-v151-system-directories/driver.json",
+        "--include-excluded",
+        "--timeout",
+        "1800"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "driver-controls",
+      "command": [
+        "node",
+        "scripts/full-lean/run-campaign.mjs",
+        "--suite",
+        ".work/full-suite-deno-v151-system-directories-driver",
+        "--output",
+        ".work/server-project-deno-v151-system-directories-driver",
+        "--filter",
+        "^(server_interactive/cancellation_empty_by\\.lean|misc_dir/server_project)$",
+        "--base-pages",
+        "--build-jobs",
+        "1"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "resources": [
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/deno-v151-broad-driver-build.resources.json",
+      "sha256": "f527ef59148a616ed8c520ba6c21f8b99507d8fa53f530b4ef0dfac1878ac7ea",
+      "report": {
+        "startedAt": "2026-09-23T12:15:34.995Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "env",
+          "BINARYEN_CORES=1",
+          "EMCC_CORES=1",
+          "CMAKE_BUILD_PARALLEL_LEVEL=1",
+          "node",
+          "scripts/full-lean/build-server-driver.mjs",
+          ".work/full-toolchains/deno-v151-system-directories-native",
+          ".work/server-driver-deno-v151-system-directories",
+          "--standalone-link"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "9ac3b928-1d1e-4f3e-a79e-19a5e9ca75ef",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 28069756928
+        },
+        "minimumHostAvailable": 23811416064,
+        "peakMemoryBytes": 4306337792,
+        "peakTasks": 48,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/deno-v151-broad-driver-build.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-23T12:16:10.442Z",
+          "memoryBytes": 220139520,
+          "peakMemoryBytes": 4306337792,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 53915648,
+            "file": 159559680,
+            "kernel": 5906432,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 159559680,
+            "slab": 4767496
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-23T12:16:10.497Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 176304128,
+          "peakMemoryBytes": 4306337792,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10235904,
+            "file": 159559680,
+            "kernel": 5550080,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 159559680,
+            "slab": 4702968
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-23T12:16:10.532Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/deno-v151-broad-suite-prepare.resources.json",
+      "sha256": "ddd54dc4ed39d5cee4ce094bec638dd035dbba1d5ce3aaa1b8d5db4fb1737aa1",
+      "report": {
+        "startedAt": "2026-09-23T12:16:10.574Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "env",
+          "BINARYEN_CORES=1",
+          "EMCC_CORES=1",
+          "CMAKE_BUILD_PARALLEL_LEVEL=1",
+          "node",
+          "scripts/full-lean/prepare-suite.mjs",
+          "--prefix",
+          ".work/full-toolchains/deno-v151-system-directories-native",
+          "--backend",
+          "deno",
+          "--output",
+          ".work/full-suite-deno-v151-system-directories-driver",
+          "--compiled-server-driver",
+          ".work/server-driver-deno-v151-system-directories/driver.json",
+          "--include-excluded",
+          "--timeout",
+          "1800"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "120db803-e37c-44df-b6b9-021db7e98bab",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 27710889984
+        },
+        "minimumHostAvailable": 27276836864,
+        "peakMemoryBytes": 851132416,
+        "peakTasks": 13,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/deno-v151-broad-suite-prepare.resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-23T12:16:15.985Z",
+          "memoryBytes": 840654848,
+          "peakMemoryBytes": 851132416,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 93429760,
+            "file": 699162624,
+            "kernel": 47640576,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 699162624,
+            "slab": 44924760
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-23T12:16:16.052Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 758595584,
+          "peakMemoryBytes": 851132416,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10235904,
+            "file": 701698048,
+            "kernel": 45711360,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 701698048,
+            "slab": 44879392
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-23T12:16:16.078Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "driver": {
+    "version": 1,
+    "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+    "prefix": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v151-system-directories-native",
+    "engine": "deno",
+    "config": {
+      "leanCommit": "8c9756b28d64dab099da31a4c09229a9e6a2ef35",
+      "engine": "deno",
+      "executable": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "engineArgs": [
+        "run",
+        "-A",
+        "--v8-flags=--stack-size=61440"
+      ],
+      "build": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v151-system-directories-native",
+      "source": "/home/lastmjs/development/lasm/compiler/.work/lean-full/lean4-4.32.0/src",
+      "sdk": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v126-shell-arguments-r2-lowered/sdk",
+      "runtimeSupport": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v151-system-directories-native/runtime-support",
+      "standaloneLinkOptimization": {
+        "level": 1,
+        "providedArchives": [
+          {
+            "path": "lib/lean/libgmp.a",
+            "sha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+            "bytes": 846928
+          },
+          {
+            "path": "libuv/src/libuv/libuv.a",
+            "sha256": "570f72b7a490dd0b61651cc66b0d05732c0ded33f440783c24d3c3e9168ffdbe",
+            "bytes": 183206
+          }
+        ],
+        "compilerLibraryDirectories": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v151-system-directories-native/lib/lean",
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v151-system-directories-native/lib/lean"
+        ],
+        "scope": "Opt-in two-stage build for one generated Lean C input using verified runtime libraries. Original C compilation flags are retained; final standalone linking uses -O1. Other inputs keep their original build path."
+      },
+      "leanThreads": 4,
+      "lakeThreads": 1,
+      "bunSmol": false,
+      "sourceBuild": "/home/lastmjs/development/lasm/compiler/.work/lean-full/wasm64",
+      "systemAllocator": "mimalloc",
+      "leanAllocator": "mimalloc",
+      "memoryMode": 1,
+      "engineEnvironment": {},
+      "maximumMemoryBytes": 8589934592,
+      "pthreadPoolSize": 5,
+      "backend": "full-lean-wasm64-native",
+      "nativeLeanFallback": false,
+      "environmentAdjustments": {
+        "LEAN_SYSROOT": "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v151-system-directories-native",
+        "LASM_FULL_APP_PATH": "Selected facade entry point",
+        "LEAN_STACK_SIZE_KB": "65536 unless explicitly supplied",
+        "LEAN_NUM_THREADS": "4 unless explicitly supplied",
+        "leanShell": "Prepend ordinary -j/-s options from the environment because this entry point does not read application defaults; explicit user CLI options take precedence."
+      },
+      "externalTools": {
+        "lib": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v151-system-directories-native/lib",
+        "include": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v151-system-directories-native/include",
+        "share": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v151-system-directories-native/share",
+        "bin/leanmake": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v151-system-directories-native/bin/leanmake",
+        "bin/cadical": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/cadical",
+        "bin/leantar": "/home/lastmjs/.elan/toolchains/leanprover--lean4---v4.32.0/bin/leantar"
+      }
+    },
+    "applicationLinkMode": "standalone",
+    "linkAdjustment": "Compile the unchanged test driver as a standalone Wasm application to reduce the memory retained while compiler/server children run.",
+    "linkStrategy": "Ordinary Leanc invocation.",
+    "toolchainConfigSha256": "0c28363f89c8406a967c4da228335b39c7b0b5ed648b72a2b85367a90268ecfa",
+    "source": "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean",
+    "sourceSha256": "56410b1b00e9f04bb326741df718a7e3c6bf51de85481ce1cb2aff2304cd8fff",
+    "executable": "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver",
+    "scope": "Unchanged upstream server-test driver compiled ahead of time. Server and test sources still use the selected full compiler; this is an optional parallel harness.",
+    "startedAt": "2026-09-23T12:15:35.759Z",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/deno-v151-broad-driver-build.resources.json",
+    "commands": [
+      {
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v151-system-directories-native/bin/lean",
+          "-Dlinter.all=false",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.c",
+          "/home/lastmjs/development/lasm/compiler/.cache/lean4-4.32.0/tests/server_interactive/run_test.lean"
+        ],
+        "startedAt": "2026-09-23T12:15:35.760Z",
+        "finishedAt": "2026-09-23T12:15:43.478Z",
+        "code": 0,
+        "signal": null
+      },
+      {
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/full-toolchains/deno-v151-system-directories-native/bin/leanc",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver",
+          "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.c"
+        ],
+        "startedAt": "2026-09-23T12:15:43.479Z",
+        "finishedAt": "2026-09-23T12:16:09.968Z",
+        "code": 0,
+        "signal": null
+      }
+    ],
+    "artifacts": {
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver": "2ea0e3d434f6f1ef5dc7bea5490789039e1b5b5daf770e326fc18fc79ee85603",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.c": "fdb21d4c18d1e1edcc6f1283029f60bb96e3960a337ddde8e05d1726e4cc160e",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.cjs": "3eb1bca40f6889d39ad7d77c42a7221af706a7a98fe3776cf53bea507d1d6422",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.exports.json": "2d7201b079a96c62619890434567a1ae048b2e47e035a2ac46d75fc43fe59754",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.lasm-optimization.json": "d598a9769925aeb5ada2428d9ded6267be2584f7b29b40928607864514a74d85",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.rpaths.js": "4e3a19f5b8ad344bf45e723addf12849f371580df11fe448bb0fda722f93395a",
+      "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.wasm": "1a175f417e1e4f6400d2d9940c20637dd018ec398664df34ace1450f5c6c2ac9"
+    },
+    "finishedAt": "2026-09-23T12:16:10.443Z"
+  },
+  "driverManifestSha256": "3a70a9dfda0383fc9f43837c199e5d45e4dc1e24069b5590c08fa84b2b37c1e3",
+  "suite": "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v151-system-directories-driver",
+  "suiteManifestSha256": "42fe0250fbbf869c374430b6e09b480187ddba65f029467b45caaffb3df4f6b8",
+  "registered": 3896,
+  "counts": {
+    "passed": 2,
+    "failed": 0,
+    "resource-aborted": 0,
+    "harness-failed": 0,
+    "pending": 0
+  },
+  "tests": [
+    {
+      "test": {
+        "name": "server_interactive/cancellation_empty_by.lean",
+        "attempts": [
+          {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00001-3190728e",
+            "status": "passed",
+            "startedAt": "2026-09-23T12:16:16.813Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-23T12:16:40.527Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00001-3190728e/resources.json",
+            "peakMemoryBytes": 6525444096,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            }
+          }
+        ],
+        "status": "passed"
+      },
+      "execution": {
+        "startedAt": "2026-09-23T12:16:17.602Z",
+        "finishedAt": "2026-09-23T12:16:40.435Z",
+        "backend": "deno",
+        "registered": 3896,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v151-system-directories-driver/run",
+          "-j",
+          "1",
+          "--no-tests=error",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00001-3190728e/results/results.xml",
+          "-R",
+          "^server_interactive/cancellation_empty_by\\.lean$"
+        ],
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": [],
+            "symlinks": {
+              "checked": 6,
+              "modified": []
+            }
+          },
+          "after": {
+            "checked": 7267,
+            "modified": [],
+            "symlinks": {
+              "checked": 6,
+              "modified": []
+            }
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 10,
+            "modified": []
+          },
+          "after": {
+            "checked": 10,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00001-3190728e/resources.json",
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00001-3190728e/resources.json",
+        "sha256": "694cdbb0addbac4e23c4659538ca48b55dd397b7d7d48301e7a1f29025855064",
+        "report": {
+          "startedAt": "2026-09-23T12:16:16.850Z",
+          "command": [
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+            "env",
+            "BINARYEN_CORES=1",
+            "EMCC_CORES=1",
+            "CMAKE_BUILD_PARALLEL_LEVEL=1",
+            "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+            "--suite",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v151-system-directories-driver",
+            "--results",
+            "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00001-3190728e/results",
+            "--jobs",
+            "1",
+            "--filter",
+            "^server_interactive/cancellation_empty_by\\.lean$"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "1ab4b431-0ebf-473d-ac19-d4718d2b53cb",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 27414892544
+          },
+          "minimumHostAvailable": 21232709632,
+          "peakMemoryBytes": 6525444096,
+          "peakTasks": 89,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00001-3190728e/resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-23T12:16:40.489Z",
+            "memoryBytes": 11436032,
+            "peakMemoryBytes": 6525444096,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 9383936,
+              "file": 139264,
+              "kernel": 950272,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 139264,
+              "slab": 156456
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "highWaterProcesses": {
+            "at": "2026-09-23T12:16:38.687Z",
+            "processes": [
+              {
+                "pid": 3212685,
+                "name": "deno",
+                "residentBytes": 3578695680,
+                "threads": 26
+              },
+              {
+                "pid": 3212666,
+                "name": "deno",
+                "residentBytes": 1732825088,
+                "threads": 18
+              },
+              {
+                "pid": 3212651,
+                "name": "deno",
+                "residentBytes": 1215385600,
+                "threads": 13
+              },
+              {
+                "pid": 3212631,
+                "name": "MainThread",
+                "residentBytes": 114745344,
+                "threads": 11
+              },
+              {
+                "pid": 3212644,
+                "name": "ctest",
+                "residentBytes": 34471936,
+                "threads": 2
+              },
+              {
+                "pid": 3212646,
+                "name": "bash",
+                "residentBytes": 3837952,
+                "threads": 1
+              },
+              {
+                "pid": 3212650,
+                "name": "bash",
+                "residentBytes": 2555904,
+                "threads": 1
+              }
+            ]
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-23T12:16:40.493Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 12222464,
+            "peakMemoryBytes": 6525444096,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10231808,
+              "file": 139264,
+              "kernel": 983040,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 139264,
+              "slab": 160936
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-23T12:16:40.520Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      },
+      "junit": {
+        "name": "server_interactive/cancellation_empty_by.lean",
+        "classname": "server_interactive/cancellation_empty_by.lean",
+        "time": "22.062",
+        "status": "run"
+      }
+    },
+    {
+      "test": {
+        "name": "misc_dir/server_project",
+        "attempts": [
+          {
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00002-5e107548",
+            "status": "passed",
+            "startedAt": "2026-09-23T12:16:40.527Z",
+            "exit": {
+              "code": 0,
+              "signal": null
+            },
+            "finishedAt": "2026-09-23T12:19:02.827Z",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00002-5e107548/resources.json",
+            "peakMemoryBytes": 7535276032,
+            "originalSources": {
+              "before": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              },
+              "after": {
+                "checked": 7267,
+                "modified": [],
+                "symlinks": {
+                  "checked": 6,
+                  "modified": []
+                }
+              }
+            },
+            "harnessArtifacts": {
+              "before": {
+                "checked": 10,
+                "modified": []
+              },
+              "after": {
+                "checked": 10,
+                "modified": []
+              }
+            }
+          }
+        ],
+        "status": "passed"
+      },
+      "execution": {
+        "startedAt": "2026-09-23T12:16:41.319Z",
+        "finishedAt": "2026-09-23T12:19:02.729Z",
+        "backend": "deno",
+        "registered": 3896,
+        "command": [
+          "--test-dir",
+          "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v151-system-directories-driver/run",
+          "-j",
+          "1",
+          "--no-tests=error",
+          "--output-on-failure",
+          "--output-junit",
+          "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00002-5e107548/results/results.xml",
+          "-R",
+          "^misc_dir/server_project$"
+        ],
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "originalSources": {
+          "before": {
+            "checked": 7267,
+            "modified": [],
+            "symlinks": {
+              "checked": 6,
+              "modified": []
+            }
+          },
+          "after": {
+            "checked": 7267,
+            "modified": [],
+            "symlinks": {
+              "checked": 6,
+              "modified": []
+            }
+          }
+        },
+        "harnessArtifacts": {
+          "before": {
+            "checked": 10,
+            "modified": []
+          },
+          "after": {
+            "checked": 10,
+            "modified": []
+          }
+        },
+        "leftoverProcessCleanup": [],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00002-5e107548/resources.json",
+        "environment": "Explicit host context; Git signing disabled and test identity supplied; no compiler overrides."
+      },
+      "resource": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00002-5e107548/resources.json",
+        "sha256": "3134c969290398eb58bed0423d13730596497a049aa32ea414861bb5756feebe",
+        "report": {
+          "startedAt": "2026-09-23T12:16:40.567Z",
+          "command": [
+            "python3",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/base-pages.py",
+            "env",
+            "BINARYEN_CORES=1",
+            "EMCC_CORES=1",
+            "CMAKE_BUILD_PARALLEL_LEVEL=1",
+            "/home/lastmjs/.nvm/versions/node/v24.13.1/bin/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/run-suite.mjs",
+            "--suite",
+            "/home/lastmjs/development/lasm/compiler/.work/full-suite-deno-v151-system-directories-driver",
+            "--results",
+            "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00002-5e107548/results",
+            "--jobs",
+            "1",
+            "--filter",
+            "^misc_dir/server_project$"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "11a3cb7f-ae08-4633-a759-accd9aa73e01",
+          "limits": {
+            "memoryMax": 10737418240,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 8589934592,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 27383787520
+          },
+          "minimumHostAvailable": 20189810688,
+          "peakMemoryBytes": 7535276032,
+          "peakTasks": 101,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/server-project-deno-v151-system-directories-driver/00002-5e107548/resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-23T12:19:02.734Z",
+            "memoryBytes": 57368576,
+            "peakMemoryBytes": 7535276032,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 37130240,
+              "file": 17457152,
+              "kernel": 1306624,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 17321984,
+              "slab": 307360
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "highWaterProcesses": {
+            "at": "2026-09-23T12:17:21.013Z",
+            "processes": [
+              {
+                "pid": 3213093,
+                "name": "deno",
+                "residentBytes": 2007347200,
+                "threads": 24
+              },
+              {
+                "pid": 3213063,
+                "name": "deno",
+                "residentBytes": 1438814208,
+                "threads": 17
+              },
+              {
+                "pid": 3213031,
+                "name": "deno",
+                "residentBytes": 1229074432,
+                "threads": 16
+              },
+              {
+                "pid": 3213046,
+                "name": "deno",
+                "residentBytes": 1138069504,
+                "threads": 15
+              },
+              {
+                "pid": 3213112,
+                "name": "deno",
+                "residentBytes": 914542592,
+                "threads": 14
+              },
+              {
+                "pid": 3212771,
+                "name": "MainThread",
+                "residentBytes": 114761728,
+                "threads": 11
+              },
+              {
+                "pid": 3212784,
+                "name": "ctest",
+                "residentBytes": 34439168,
+                "threads": 2
+              },
+              {
+                "pid": 3212786,
+                "name": "bash",
+                "residentBytes": 3883008,
+                "threads": 1
+              },
+              {
+                "pid": 3213030,
+                "name": "bash",
+                "residentBytes": 2596864,
+                "threads": 1
+              }
+            ]
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-23T12:19:02.793Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 29847552,
+            "peakMemoryBytes": 7535276032,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10227712,
+              "file": 17457152,
+              "kernel": 1097728,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 17321984,
+              "slab": 243960
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-23T12:19:02.821Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      },
+      "junit": {
+        "name": "misc_dir/server_project",
+        "classname": "misc_dir/server_project",
+        "time": "140.654",
+        "status": "run"
+      }
+    }
+  ],
+  "maximumPeakBytes": 7535276032
+}

@@ -63,6 +63,16 @@ remain preserved separately. Both original server-driver controls also passed
 before this campaign, peaking at 7.59 GiB without resource events; see
 [the v147 server controls](evidence/server-project-v147-temporary-files-2026-09-22.json).
 
+A fresh full **Deno v151 campaign is running** with all 3,896 registrations
+selected. It imports no Node or targeted-control passes and prioritizes 61 IO,
+async, overflow, plugin and larger server/frontend/checker registrations.
+The unchanged server-driver build and suite preparation passed first, followed
+by both original cancellation and server-project controls. Their maximum peak
+is 7.02 GiB, with all 7,267 original hashes, six symlinks and ten harness hashes
+intact and no resource events. The same base-page, one-build-worker and memory
+limits remain in force. See
+[the Deno preparation and driver-control evidence](evidence/server-project-deno-v151-system-directories-2026-09-23.json).
+
 The separate v151 repair makes POSIX home/temporary-directory queries preserve
 empty values, environment precedence, raw bytes and Lean's buffer-limit errors.
 Temporary creation shares the same selection routine. Fifteen ordinary Lean API
