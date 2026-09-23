@@ -72,8 +72,8 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **1,109 registrations passing**, completing
-all 854 prioritized names and 255 further registrations. This includes
+passes. Its latest saved checkpoint has **1,302 registrations passing**, completing
+all 854 prioritized names and 448 further registrations. This includes
 all 56 Lake tests, all 69 compiler regressions, all 27 compiled benchmarks,
 all 657 prioritized elaborator regressions,
 all 78 prioritized interactive server tests, lint, seven documentation examples,
@@ -82,16 +82,20 @@ handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 2,787 registrations remain pending in that
+harness hash remains intact. The other 2,594 registrations remain pending in that
 snapshot; see
-[the 1,109-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint1109-2026-09-23.json).
+[the 1,302-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint1302-2026-09-23.json).
 All 197 documentation-parser registrations also pass in this checkpoint.
 All three earlier plugin failures now pass within this campaign. The server-project
 workload also passes under the same 8 GiB proactive budget; it is this checkpoint's
 largest peak at 7.56 GiB. Cancellation, completions, navigation, references, hover,
 incremental edits and server standard output pass their original assertions.
 There are no recorded OOM, hard-limit, throttling, swap or monitor events.
-The unchanged IO/async registrations now also pass cancellation and reasons, DNS,
+All 20 `async_http` registrations now pass, including framing, dispatch, encoding,
+expectation handling, request/response headers and request-line parsing. Of the
+35 `async_` registrations, 34 pass; the opt-in `async_select_channel` case remains
+scheduled later in the campaign. The unchanged IO/async registrations also pass
+cancellation and reasons, DNS,
 HTTP bodies, three HTTP fuzzing groups, hang regressions, keepalive, socket/timer
 selection, TCP errors and half-close, TCP server/client exchanges, UDP, file paths,
 file-handle locking, shared mutexes and temporary-file creation. These are observed
