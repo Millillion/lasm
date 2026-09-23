@@ -38,10 +38,12 @@ Node's streaming gzip decoder installs it without an existing Python or archive
 utility. The launcher checks version and native architecture, isolates it from
 global Python configuration, and disables bytecode writes to the verified cache.
 The small-archive regression passes. Real native Python installation, version,
-architecture and cache-reuse checks pass on all six runners. An overly narrow
-acceptance check looked only for top-level license files; Unix Python places its
-license under the standard-library directory. The revised check searches the
-verified inventory and records the actual notice paths; its rerun is pending.
+architecture, cache-reuse and notice checks pass on all six runners. An overly
+narrow acceptance check initially looked only for top-level license files; Unix
+Python places its license under the standard-library directory. The corrected
+run records the actual notice paths. See the
+[six-platform tool evidence](evidence/managed-native-tools-2026-09-23.json), which
+also verifies native Lean C compilation on the five available Lean platforms.
 This supplies one SDK dependency, not the complete managed linker distribution.
 
 `src/managed-sdk.mjs` provisions the pinned Emscripten 6.0.9 native tools for the

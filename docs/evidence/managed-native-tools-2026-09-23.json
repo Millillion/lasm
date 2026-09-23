@@ -1,0 +1,391 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-09-23T17:06:09.696Z",
+  "scope": "Managed native tool provisioning and C compilation only; not full Lean/Wasm application acceptance",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35890840372",
+  "node": "26.10.0",
+  "lean": "4.34.0",
+  "python": "3.13.15",
+  "summary": {
+    "nativePythonPassed": 6,
+    "nativeLeanCompilePassed": 5,
+    "leanWindowsArm64": "Missing native distribution; implementation gap"
+  },
+  "logSha256": "ccbbd0c5239d9da2baed0d5e8e78a168919df925718c7f90b274235d8fcba4dc",
+  "jobs": [
+    {
+      "name": "Native win32-arm64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35890840372/job/107282594296",
+      "conclusion": "failure",
+      "steps": [
+        {
+          "name": "Managed native compiler-support Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Lean and Lake with only managed tools",
+          "conclusion": "failure"
+        }
+      ]
+    },
+    {
+      "name": "Native linux-x64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35890840372/job/107282594689",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Managed native compiler-support Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Lean and Lake with only managed tools",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Native win32-x64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35890840372/job/107282594692",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Managed native compiler-support Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Lean and Lake with only managed tools",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Native linux-arm64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35890840372/job/107282594727",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Managed native compiler-support Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Lean and Lake with only managed tools",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Native darwin-arm64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35890840372/job/107282594869",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Managed native compiler-support Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Lean and Lake with only managed tools",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Native darwin-x64",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35890840372/job/107282594877",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Managed native compiler-support Python",
+          "conclusion": "success"
+        },
+        {
+          "name": "Native Lean and Lake with only managed tools",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "scope": "Managed native build Python only",
+      "recordedAt": "2026-09-23T16:49:10.007Z",
+      "node": "v26.10.0",
+      "platform": "win32-arm64",
+      "machine": "ARM64",
+      "version": "3.13.15",
+      "identity": "5054a12ecf4bdf8e63923396f60ce654c840186f0c46d0128514fa46c39a432f",
+      "archive": {
+        "name": "python-3.13.15-20260901-win32-arm64",
+        "root": "python",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-aarch64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "sha256": "8b31e1ddae9ebd339eae0549049546aa54484dbf92c81694b1e7510fee869413",
+        "bytes": 20657679,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 600000000
+      },
+      "verifiedReuse": true,
+      "entries": 3314,
+      "notices": [
+        "LICENSE.txt",
+        "tcl/tk8.6/demos/license.terms",
+        "tcl/tk8.6/license.terms"
+      ]
+    },
+    {
+      "scope": "Managed native build Python only",
+      "recordedAt": "2026-09-23T16:44:52.034Z",
+      "node": "v26.10.0",
+      "platform": "linux-x64",
+      "machine": "x86_64",
+      "version": "3.13.15",
+      "identity": "fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c",
+      "archive": {
+        "name": "python-3.13.15-20260901-linux-x64",
+        "root": "python",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+        "sha256": "8a689a077337bea6d1c4bc0b7df1d52fcaa28f5f67e50df8bf417c1e3f9d8874",
+        "bytes": 34810677,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 600000000
+      },
+      "verifiedReuse": true,
+      "entries": 4722,
+      "notices": [
+        "lib/python3.13/LICENSE.txt"
+      ]
+    },
+    {
+      "scope": "Native Lean/Lake provisioning, not compiled-Wasm application acceptance",
+      "recordedAt": "2026-09-23T16:45:44.319Z",
+      "platform": "linux-x64",
+      "node": "v26.10.0",
+      "lean": "Lean (version 4.34.0, x86_64-unknown-linux-gnu, commit 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b, Release)",
+      "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "identity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "firstCacheHit": false,
+      "verifiedReuse": true,
+      "firstMilliseconds": 42814,
+      "recordedCacheEntries": 18380,
+      "installedBytes": 3067799197,
+      "archive": {
+        "name": "lean-4.34.0-linux.tar.zst",
+        "root": "lean-4.34.0-linux",
+        "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-linux.tar.zst",
+        "sha256": "caaa98356098c85dc0fcbbd28e1ec66f39eb6551829972b752ff20e1286b646b",
+        "bytes": 580367391,
+        "format": "tar.zst",
+        "maximumExtractedBytes": 8589934592
+      },
+      "nativeMain": "passed",
+      "lakeMain": "passed",
+      "nativeCompileAndLink": "passed",
+      "notices": "preserved"
+    },
+    {
+      "scope": "Managed native build Python only",
+      "recordedAt": "2026-09-23T16:46:23.220Z",
+      "node": "v26.10.0",
+      "platform": "win32-x64",
+      "machine": "AMD64",
+      "version": "3.13.15",
+      "identity": "9e55a264389aaae206916ac0f109426a9cb716bb052e6c5587cde35bebe73382",
+      "archive": {
+        "name": "python-3.13.15-20260901-win32-x64",
+        "root": "python",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-x86_64-pc-windows-msvc-install_only_stripped.tar.gz",
+        "sha256": "63d263ab0162f34a241a56dc5b283c22d6e131f5516117e6a921350c69ba7d4f",
+        "bytes": 21936514,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 600000000
+      },
+      "verifiedReuse": true,
+      "entries": 3562,
+      "notices": [
+        "LICENSE.txt",
+        "tcl/tk8.6/demos/license.terms",
+        "tcl/tk8.6/license.terms"
+      ]
+    },
+    {
+      "scope": "Native Lean/Lake provisioning, not compiled-Wasm application acceptance",
+      "recordedAt": "2026-09-23T16:47:55.676Z",
+      "platform": "win32-x64",
+      "node": "v26.10.0",
+      "lean": "Lean (version 4.34.0, x86_64-w64-windows-gnu, commit 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b, Release)",
+      "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "identity": "c3927f8838754733f7dd3047a1f62becf629ce48522777e28b21069e20049636",
+      "firstCacheHit": false,
+      "verifiedReuse": true,
+      "firstMilliseconds": 79760,
+      "recordedCacheEntries": 18376,
+      "installedBytes": 3245697026,
+      "archive": {
+        "name": "lean-4.34.0-windows.tar.zst",
+        "root": "lean-4.34.0-windows",
+        "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-windows.tar.zst",
+        "sha256": "c07e88d1fe4839ec96a79f54637b2a3a983ea6c5b7e82ff35afa22a7700a86b7",
+        "bytes": 588837341,
+        "format": "tar.zst",
+        "maximumExtractedBytes": 8589934592
+      },
+      "nativeMain": "passed",
+      "lakeMain": "passed",
+      "nativeCompileAndLink": "passed",
+      "notices": "preserved"
+    },
+    {
+      "scope": "Managed native build Python only",
+      "recordedAt": "2026-09-23T16:44:52.994Z",
+      "node": "v26.10.0",
+      "platform": "linux-arm64",
+      "machine": "aarch64",
+      "version": "3.13.15",
+      "identity": "08ece863de605baac3acf1500078f3f289e728664f0d25c62d30bd123a916424",
+      "archive": {
+        "name": "python-3.13.15-20260901-linux-arm64",
+        "root": "python",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz",
+        "sha256": "01ce0ce9189feaead3298abf10d4efe998c55a489b3d5d38ca4f83dda7e7977e",
+        "bytes": 29222533,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 600000000
+      },
+      "verifiedReuse": true,
+      "entries": 4722,
+      "notices": [
+        "lib/python3.13/LICENSE.txt"
+      ]
+    },
+    {
+      "scope": "Native Lean/Lake provisioning, not compiled-Wasm application acceptance",
+      "recordedAt": "2026-09-23T16:45:32.371Z",
+      "platform": "linux-arm64",
+      "node": "v26.10.0",
+      "lean": "Lean (version 4.34.0, aarch64-unknown-linux-gnu, commit 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b, Release)",
+      "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "identity": "0d20aeca378cf75675cc8057649bc81f2a6794c14f0989c0876081a90d0669f7",
+      "firstCacheHit": false,
+      "verifiedReuse": true,
+      "firstMilliseconds": 31643,
+      "recordedCacheEntries": 18380,
+      "installedBytes": 3122375286,
+      "archive": {
+        "name": "lean-4.34.0-linux_aarch64.tar.zst",
+        "root": "lean-4.34.0-linux_aarch64",
+        "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-linux_aarch64.tar.zst",
+        "sha256": "40b04fdb7fb849d3c80e10c3bbeebc7b7354b6d3f07450b9168c2149b40d2a82",
+        "bytes": 581973544,
+        "format": "tar.zst",
+        "maximumExtractedBytes": 8589934592
+      },
+      "nativeMain": "passed",
+      "lakeMain": "passed",
+      "nativeCompileAndLink": "passed",
+      "notices": "preserved"
+    },
+    {
+      "scope": "Managed native build Python only",
+      "recordedAt": "2026-09-23T16:46:03.510Z",
+      "node": "v26.10.0",
+      "platform": "darwin-arm64",
+      "machine": "arm64",
+      "version": "3.13.15",
+      "identity": "ae9e3f66aeda497552d2e55793d2fd9642d4bafb6b4467cc9f8d3cc9925f53a3",
+      "archive": {
+        "name": "python-3.13.15-20260901-darwin-arm64",
+        "root": "python",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-aarch64-apple-darwin-install_only_stripped.tar.gz",
+        "sha256": "d3904bd6a072246e07aa0bdadee9a14e80521e42a943c0848059feb16a2816dc",
+        "bytes": 25147663,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 600000000
+      },
+      "verifiedReuse": true,
+      "entries": 1808,
+      "notices": [
+        "lib/python3.13/LICENSE.txt"
+      ]
+    },
+    {
+      "scope": "Native Lean/Lake provisioning, not compiled-Wasm application acceptance",
+      "recordedAt": "2026-09-23T16:47:42.841Z",
+      "platform": "darwin-arm64",
+      "node": "v26.10.0",
+      "lean": "Lean (version 4.34.0, arm64-apple-darwin24.6.0, commit 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b, Release)",
+      "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "identity": "cd68765ebf1afef6a7411697113af72924f8c9cda72bf1681afe8686a9585a46",
+      "firstCacheHit": false,
+      "verifiedReuse": true,
+      "firstMilliseconds": 69276,
+      "recordedCacheEntries": 18341,
+      "installedBytes": 2860122955,
+      "archive": {
+        "name": "lean-4.34.0-darwin_aarch64.tar.zst",
+        "root": "lean-4.34.0-darwin_aarch64",
+        "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-darwin_aarch64.tar.zst",
+        "sha256": "69f263fa6e21bbc2466bbfb1affcd92479ee2714c883a07de548e099a5922932",
+        "bytes": 561666156,
+        "format": "tar.zst",
+        "maximumExtractedBytes": 8589934592
+      },
+      "nativeMain": "passed",
+      "lakeMain": "passed",
+      "nativeCompileAndLink": "passed",
+      "notices": "preserved"
+    },
+    {
+      "scope": "Managed native build Python only",
+      "recordedAt": "2026-09-23T16:45:39.932Z",
+      "node": "v26.10.0",
+      "platform": "darwin-x64",
+      "machine": "x86_64",
+      "version": "3.13.15",
+      "identity": "e7d7675e501673e0a3a0584889c4c13126e93864a4441504ee336ff8c421c7df",
+      "archive": {
+        "name": "python-3.13.15-20260901-darwin-x64",
+        "root": "python",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-x86_64-apple-darwin-install_only_stripped.tar.gz",
+        "sha256": "f712a9143c8a5d248438ec7921a0b48d548bca4f1337d33c690d28c2d0504137",
+        "bytes": 24912286,
+        "format": "tar.gz",
+        "maximumExtractedBytes": 600000000
+      },
+      "verifiedReuse": true,
+      "entries": 1804,
+      "notices": [
+        "lib/python3.13/LICENSE.txt"
+      ]
+    },
+    {
+      "scope": "Native Lean/Lake provisioning, not compiled-Wasm application acceptance",
+      "recordedAt": "2026-09-23T16:50:33.209Z",
+      "platform": "darwin-x64",
+      "node": "v26.10.0",
+      "lean": "Lean (version 4.34.0, x86_64-apple-darwin24.6.0, commit 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b, Release)",
+      "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "identity": "7392d19a9fc9f4fb3e512f311f8c8b719ca24609be55cb7a4f65f5bb79a930f3",
+      "firstCacheHit": false,
+      "verifiedReuse": true,
+      "firstMilliseconds": 242525,
+      "recordedCacheEntries": 18341,
+      "installedBytes": 2872249109,
+      "archive": {
+        "name": "lean-4.34.0-darwin.tar.zst",
+        "root": "lean-4.34.0-darwin",
+        "url": "https://github.com/leanprover/lean4/releases/download/v4.34.0/lean-4.34.0-darwin.tar.zst",
+        "sha256": "e90afe84c0a2aa3583f3ecd08e51fb7eeebb84d36f99b7cac5d3c067fa8640b0",
+        "bytes": 564239871,
+        "format": "tar.zst",
+        "maximumExtractedBytes": 8589934592
+      },
+      "nativeMain": "passed",
+      "lakeMain": "passed",
+      "nativeCompileAndLink": "passed",
+      "notices": "preserved"
+    }
+  ],
+  "costControls": {
+    "publicStandardRunnersOnly": true,
+    "actionsCache": false,
+    "artifactUploads": false
+  }
+}

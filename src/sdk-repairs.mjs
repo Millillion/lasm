@@ -25,7 +25,7 @@ export async function prepareSdkRepairs(installed, options = {}) {
     manifestSha256: digest(JSON.stringify(sdkRepairs)) }, async output => {
     // Preserve the downloaded compiler and sysroot verbatim. Only the source
     // driver's derived copy gets the reviewed runtime repairs.
-    await cp(join(installed.directory, 'emscripten'), output, { recursive: true });
+    await cp(join(installed.directory, 'emscripten'), output, { recursive: true, verbatimSymlinks: true });
     const changes = [];
     for (const file of sdkRepairs.files) {
       const path = join(output, file.path);
