@@ -12,7 +12,7 @@ import { sourceIdentity } from './source-identity.mjs';
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const [outputArg, category, target, engineArg, compilerArg, filter = '.*'] = process.argv.slice(2);
-if (!outputArg || !['compiled-application', 'compiled-test-driver', 'native-build-time'].includes(category) || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
+if (!outputArg || !['compiled-application', 'compiled-test-driver', 'compiled-driver-and-native-compiler', 'native-build-time'].includes(category) || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
   throw new Error('Supply NEW_OUTPUT CATEGORY TARGET ENGINE INSTALLED_COMPILER [FILTER]');
 const output = resolve(outputArg), compiler = resolve(compilerArg), engine = resolve(engineArg);
 if (existsSync(output)) throw new Error('Use a new campaign directory');
@@ -47,7 +47,8 @@ const tests = inventory.tests.filter(test => test.category === category && new R
   });
 if (!tests.length) throw new Error('No upstream tests matched');
 const generatedPins = [];
-if (['compiled-application', 'compiled-test-driver'].includes(category)) for (const directory of new Set(tests.map(test => dirname(test.source)))) {
+const sharedDriver = ['compiled-test-driver', 'compiled-driver-and-native-compiler'].includes(category);
+if (category === 'compiled-application' || sharedDriver) for (const directory of new Set(tests.map(test => dirname(test.source)))) {
   const pin = join(source, directory, 'lean-toolchain');
   if (existsSync(pin)) throw new Error('Do not replace an upstream pin: ' + pin);
   // tests/lean-toolchain also points at upstream's build/release/stage1. Keep
@@ -59,17 +60,19 @@ const environment = { TEST_DIR: join(source, 'tests'), SRC_DIR: join(source, 'sr
   BUILD_DIR: lean.prefix, STAGE: '1', TEST_CTEST: '1',
   PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(':'),
   LASM_COMPILER: compiler, LASM_BUILD_NODE: process.execPath, LASM_APPLICATION_TARGET: target, LASM_APPLICATION_ENGINE: engine,
+  LASM_NATIVE_LEAN: lean.lean,
   LASM_TOOLCHAIN_CACHE: process.env.LASM_TOOLCHAIN_CACHE,
   LEAN_HEADER_SNAPSHOTS: '0', LEANC_OPTS: '', CXX: join(lean.prefix, 'bin/clang++') };
-const nativeEnvironment = category === 'compiled-test-driver'
+const nativeEnvironment = sharedDriver
   ? join(root, 'scripts/application-tests/docparse-case.sh') : join(output, 'native-environment.sh');
-if (category !== 'compiled-test-driver')
+if (!sharedDriver)
   writeFileSync(nativeEnvironment, '#!/usr/bin/env bash\nsource "$TEST_DIR/util.sh"\ndriver="$1"; shift\nsource "$driver"\n');
 let compiledDriver;
 let compileDriver = join(root, 'scripts/application-tests/compile-case.sh');
-if (category === 'compiled-test-driver') {
-  if (tests.some(test => test.driver !== 'tests/docparse/run_test.sh')) throw new Error('Unmapped compiled test driver');
-  const driverSource = join(source, 'tests/docparse/run_test.lean'), dist = join(output, 'driver-dist');
+if (sharedDriver) {
+  const pile = category === 'compiled-test-driver' ? 'docparse' : 'server_interactive';
+  if (tests.some(test => test.driver !== `tests/${pile}/run_test.sh`)) throw new Error('Unmapped compiled test driver; select an explicitly supported original driver');
+  const driverSource = join(source, `tests/${pile}/run_test.lean`), dist = join(output, 'driver-dist');
   const env = { ...process.env }; delete env.LASM_APPLICATION_RUNTIME;
   for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(key)) delete env[key];
   execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', driverSource,
@@ -80,7 +83,8 @@ if (category === 'compiled-test-driver') {
   environment.LASM_TEST_DRIVER_DIST = dist;
   const shimDirectory = join(output, 'parallel-bin'); mkdirSync(shimDirectory);
   compileDriver = join(shimDirectory, 'lean');
-  writeFileSync(compileDriver, readFileSync(join(root, 'scripts/application-tests/docparse-lean.sh')));
+  writeFileSync(compileDriver, readFileSync(join(root, 'scripts/application-tests',
+    pile === 'docparse' ? 'docparse-lean.sh' : 'server-driver-lean.sh')));
   chmodSync(compileDriver, 0o755);
   environment.LASM_TEST_DRIVER_SHIM = compileDriver;
 }
@@ -101,10 +105,15 @@ const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sou
     'Successful large binaries and per-case caches are removed after recording build identities and Wasm hashes; failed outputs remain.'],
   recordedAt: new Date().toISOString() };
 if (compiledDriver) manifest.adaptations.push(
-  'The unchanged docparse Lean driver is compiled once through the installed application CLI, then reused for all original inputs.',
+  'The unchanged Lean test driver is compiled once through the installed application CLI, then reused for all original inputs.',
   'Both phases source the unchanged upstream shell driver. The deployed phase substitutes only its exact lean -Dlinter.all=false --run run_test.lean INPUT invocation; unexpected arguments fail explicitly.',
   'Linter suppression applies to the native interpreter elaboration; deployed parser behavior and all original output assertions are retained.',
   'Each case refers to the shared immutable deployment with a generated symlink; removing a successful case reference never removes the shared artifact.');
+if (category === 'compiled-driver-and-native-compiler') {
+  manifest.scope = 'AOT Lean LSP client/driver using its unchanged managed native compiler/server child; server/compiler behavior is native build-time coverage';
+  manifest.adaptations.push('The exact original lean --server invocation is forwarded to the verified native compiler and recorded for every deployed case; arbitrary compiler invocations are rejected.',
+    'Only tests/server_interactive/run_test.sh is mapped in this campaign; the other five driver registrations still require their own parallel adapters.');
+}
 const manifestFile = join(output, 'manifest.json');
 writeFileSync(manifestFile, JSON.stringify(manifest, null, 2) + '\n');
 const quote = value => `[==[${value}]==]`;

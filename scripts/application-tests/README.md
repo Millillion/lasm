@@ -29,6 +29,14 @@ preparation under the base-page wrapper as well. Each input then runs through
 the original native shell driver and a second invocation of that same driver
 whose exact `lean --run` command executes the compiled application. The shared
 deployment and its build/hash evidence remain in the campaign directory.
+`compiled-driver-and-native-compiler` with filter `^server_interactive/` similarly
+compiles the original LSP client/driver once for its 150 inputs. Its exact
+`lean --server` child command still runs the managed native compiler; that
+invocation is recorded explicitly. This tests the deployed client's process,
+pipe, JSON and filesystem behavior while keeping native compiler behavior
+separate. The other five registrations in this category have no mapped adapter
+yet and fail preparation explicitly. No parser or LSP campaign result is
+implied by harness support alone.
 The target and engine arguments accept Node, Deno or Bun. The harness itself
 requires Linux, Bash, GNU tar, CTest, Perl and diff, as used by the upstream
 drivers. End-user tool provisioning is tested separately.
