@@ -2,6 +2,7 @@ import { mkdir, readdir, readFile, lstat, rename, rm, cp, copyFile } from 'node:
 import { join, dirname, relative } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { hashFile } from './managed-artifacts.mjs';
+import { withApplicationLock } from './application-lock.mjs';
 
 export const outputReceipt = '.lasm-application.json';
 
@@ -50,6 +51,10 @@ export async function reusableOutput(directory, signature) {
 /** Replace generated files while retaining user assets and refusing to erase edits. */
 export async function deliverOutput(cached, output, signature) {
   if (output === cached) return;
+  return withApplicationLock(output + '.lasm-output.lock', () => deliverLockedOutput(cached, output, signature));
+}
+
+async function deliverLockedOutput(cached, output, signature) {
   const destinationExists = await exists(output);
   let extraFiles = [], extraDirectories = [];
   if (destinationExists) {

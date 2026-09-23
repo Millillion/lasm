@@ -12,6 +12,7 @@ import { applicationSources, findApplicationProject } from './application-source
 import { readApplicationSymbols } from './application-symbols.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint } from './application-output.mjs';
 import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
+import { withApplicationLock } from './application-lock.mjs';
 import { executableName, responseFile, insideDirectory } from './platform.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
@@ -33,11 +34,16 @@ async function buildDriverIdentity() {
 }
 
 /** Managed native elaboration and AOT linking, with content-verified build reuse. */
-export async function buildApplication(file, { target = 'node', output, rebuild = false, verbose = false,
-  cache, runtimeDirectory, log = console.error } = {}) {
-  if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Invalid application target');
+export async function buildApplication(file, options = {}) {
   const source = resolve(file);
   if (!source.endsWith('.lean') || !(await lstat(source)).isFile()) throw new Error(`Expected an existing Lean source: ${source}`);
+  const directory = findApplicationProject(source) ?? dirname(source);
+  return withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), () => buildLockedApplication(source, options));
+}
+
+async function buildLockedApplication(source, { target = 'node', output, rebuild = false, verbose = false,
+  cache, runtimeDirectory, log = console.error } = {}) {
+  if (!['node', 'deno', 'bun'].includes(target)) throw new Error('Invalid application target');
   // Check the bundle before expensive tool provisioning; a missing package must
   // never make an otherwise pointless multi-gigabyte compiler download.
   const selection = await selectLeanVersion(source);

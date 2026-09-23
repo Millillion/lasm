@@ -40,7 +40,7 @@ test('rebuilds replace generated output, remove obsolete files, and preserve add
   assert.equal(Object.hasOwn(JSON.parse(await readFile(join(dist, outputReceipt))).files, 'assets/data.txt'), false);
   await deliverOutput(next, dist, 'next');
   assert.equal(await readFile(join(dist, 'assets/data.txt'), 'utf8'), 'user data');
-  assert.deepEqual((await readdir(base)).sort(), ['dist', 'next', 'old']);
+  assert.deepEqual((await readdir(base)).sort(), ['dist', 'dist.lasm-output.lock', 'next', 'old']);
 });
 
 test('modified generated files and malformed receipts cannot authorize deletion', async t => {

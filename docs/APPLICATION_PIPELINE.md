@@ -167,6 +167,15 @@ of obsolete generated support. They now pass in the source tree on all six
 native platforms as part of the managed Git matrix. This repair is
 not part of the installed `experimental.5` upstream campaign already in progress.
 
+Source generation and application caching are now serialized per project with
+OS file locks; output delivery has a separate destination lock for builds from
+different projects. Locks release when their owning process exits, including
+abrupt termination. Empty lock files remain to prevent separate lock identities
+for existing waiters. Three small controls cover concurrent updates, interrupted
+owners and exception cleanup. Native six-platform validation and full concurrent
+CLI builds are separate acceptance checks; the already running installed-package
+campaign still uses its original code.
+
 The first real primary-CLI Node check passes ordinary console/filesystem/tasks,
 Unicode and empty arguments, large naturals, exception output, and exit codes
 against native Lean. Rebuilding unchanged source reuses the exact deployment.
