@@ -23,6 +23,12 @@ node scripts/full-lean/run-bounded.mjs -- \
 `compiled-application` selects the registered application cases. The filter is
 optional; its default includes every case in that category. `native-build-time`
 selects managed native compiler checks, with no deployed-runtime pass implied.
+`compiled-test-driver` selects the 202 documentation-parser inputs. Preparation
+compiles their original `run_test.lean` once through the installed CLI; run this
+preparation under the base-page wrapper as well. Each input then runs through
+the original native shell driver and a second invocation of that same driver
+whose exact `lean --run` command executes the compiled application. The shared
+deployment and its build/hash evidence remain in the campaign directory.
 The target and engine arguments accept Node, Deno or Bun. The harness itself
 requires Linux, Bash, GNU tar, CTest, Perl and diff, as used by the upstream
 drivers. End-user tool provisioning is tested separately.

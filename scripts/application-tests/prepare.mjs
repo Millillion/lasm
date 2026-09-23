@@ -1,6 +1,6 @@
 // Prepare an explicit parallel CTest suite for the managed application product.
 // The pinned upstream source archive and all 7,669 test/helper entries are checked.
-import { mkdirSync, readFileSync, writeFileSync, existsSync, lstatSync, readlinkSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, existsSync, lstatSync, readlinkSync, chmodSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -11,7 +11,7 @@ import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const [outputArg, category, target, engineArg, compilerArg, filter = '.*'] = process.argv.slice(2);
-if (!outputArg || !['compiled-application', 'native-build-time'].includes(category) || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
+if (!outputArg || !['compiled-application', 'compiled-test-driver', 'native-build-time'].includes(category) || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
   throw new Error('Supply NEW_OUTPUT CATEGORY TARGET ENGINE INSTALLED_COMPILER [FILTER]');
 const output = resolve(outputArg), compiler = resolve(compilerArg), engine = resolve(engineArg);
 if (existsSync(output)) throw new Error('Use a new campaign directory');
@@ -41,7 +41,7 @@ if (lean.commit !== inventory.leanCommit) throw new Error('Native control versio
 const tests = inventory.tests.filter(test => test.category === category && new RegExp(filter).test(test.name));
 if (!tests.length) throw new Error('No upstream tests matched');
 const generatedPins = [];
-if (category === 'compiled-application') for (const directory of new Set(tests.map(test => dirname(test.source)))) {
+if (['compiled-application', 'compiled-test-driver'].includes(category)) for (const directory of new Set(tests.map(test => dirname(test.source)))) {
   const pin = join(source, directory, 'lean-toolchain');
   if (existsSync(pin)) throw new Error('Do not replace an upstream pin: ' + pin);
   // tests/lean-toolchain also points at upstream's build/release/stage1. Keep
@@ -55,15 +55,36 @@ const environment = { TEST_DIR: join(source, 'tests'), SRC_DIR: join(source, 'sr
   LASM_COMPILER: compiler, LASM_BUILD_NODE: process.execPath, LASM_APPLICATION_TARGET: target, LASM_APPLICATION_ENGINE: engine,
   LASM_TOOLCHAIN_CACHE: process.env.LASM_TOOLCHAIN_CACHE,
   LEAN_HEADER_SNAPSHOTS: '0', LEANC_OPTS: '', CXX: join(lean.prefix, 'bin/clang++') };
-const nativeEnvironment = join(output, 'native-environment.sh');
-writeFileSync(nativeEnvironment, '#!/usr/bin/env bash\nsource "$TEST_DIR/util.sh"\ndriver="$1"; shift\nsource "$driver"\n');
-const compileDriver = join(root, 'scripts/application-tests/compile-case.sh');
+const nativeEnvironment = category === 'compiled-test-driver'
+  ? join(root, 'scripts/application-tests/docparse-case.sh') : join(output, 'native-environment.sh');
+if (category !== 'compiled-test-driver')
+  writeFileSync(nativeEnvironment, '#!/usr/bin/env bash\nsource "$TEST_DIR/util.sh"\ndriver="$1"; shift\nsource "$driver"\n');
+let compiledDriver;
+let compileDriver = join(root, 'scripts/application-tests/compile-case.sh');
+if (category === 'compiled-test-driver') {
+  if (tests.some(test => test.driver !== 'tests/docparse/run_test.sh')) throw new Error('Unmapped compiled test driver');
+  const driverSource = join(source, 'tests/docparse/run_test.lean'), dist = join(output, 'driver-dist');
+  const env = { ...process.env }; delete env.LASM_APPLICATION_RUNTIME;
+  for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(key)) delete env[key];
+  execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', driverSource,
+    '--target', target, '--output', dist], { env, stdio: 'inherit', timeout: 1800_000 });
+  compiledDriver = { source: driverSource, sourceSha256: await hashFile(driverSource),
+    dist, build: JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8')),
+    wasmSha256: await hashFile(join(dist, 'program.wasm')) };
+  environment.LASM_TEST_DRIVER_DIST = dist;
+  const shimDirectory = join(output, 'parallel-bin'); mkdirSync(shimDirectory);
+  compileDriver = join(shimDirectory, 'lean');
+  writeFileSync(compileDriver, readFileSync(join(root, 'scripts/application-tests/docparse-lean.sh')));
+  chmodSync(compileDriver, 0o755);
+  environment.LASM_TEST_DRIVER_SHIM = compileDriver;
+}
 const timeoutSeconds = 900;
 const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sourceArchiveSha256: inventory.sourceArchiveSha256,
   sourceManifestSha256: await hashFile(sourcesFile), verifiedOriginalFilesAndLinks: verified,
   output, source, execution, category, target, engine, compiler, nativeEnvironment, compileDriver, timeoutSeconds, environment, tests, generatedPins,
-  nativeArtifactIdentity: lean.identity, resourceReport: process.env.LASM_RESOURCE_REPORT,
-  scope: category === 'compiled-application' ? 'Unchanged native driver followed by installed-CLI AOT execution with original arguments and assertions' : 'Unchanged managed native compiler tests; no deployed runtime pass implied',
+  nativeArtifactIdentity: lean.identity, compiledDriver, resourceReport: process.env.LASM_RESOURCE_REPORT,
+  scope: category === 'native-build-time' ? 'Unchanged managed native compiler tests; no deployed runtime pass implied'
+    : 'Unchanged native driver followed by installed-CLI AOT execution with original arguments and assertions',
   adaptations: ['Generated environment selects the matching managed native toolchain and isolated unchanged source copy.',
     'For applications, the unchanged native compile/interpreter driver runs first; a parallel driver substitutes the installed Lasm CLI and selected engine for deployed compilation/execution.',
     'Original source, init/before/after scripts, expected output, normalization and assertions are preserved.',
@@ -73,6 +94,11 @@ const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sou
     'One CTest job and 900-second case deadline; resource aborts are separate from test failures.',
     'Successful large binaries and per-case caches are removed after recording build identities and Wasm hashes; failed outputs remain.'],
   recordedAt: new Date().toISOString() };
+if (compiledDriver) manifest.adaptations.push(
+  'The unchanged docparse Lean driver is compiled once through the installed application CLI, then reused for all original inputs.',
+  'Both phases source the unchanged upstream shell driver. The deployed phase substitutes only its exact lean -Dlinter.all=false --run run_test.lean INPUT invocation; unexpected arguments fail explicitly.',
+  'Linter suppression applies to the native interpreter elaboration; deployed parser behavior and all original output assertions are retained.',
+  'Each case refers to the shared immutable deployment with a generated symlink; removing a successful case reference never removes the shared artifact.');
 const manifestFile = join(output, 'manifest.json');
 writeFileSync(manifestFile, JSON.stringify(manifest, null, 2) + '\n');
 const quote = value => `[==[${value}]==]`;
