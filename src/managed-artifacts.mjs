@@ -5,7 +5,7 @@ import { homedir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { Readable, Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
-import { createZstdDecompress } from 'node:zlib';
+import { createZstdDecompress, createGunzip } from 'node:zlib';
 import { x as extractTar } from 'tar';
 
 const digest = value => createHash('sha256').update(value).digest('hex');
@@ -36,7 +36,7 @@ export function validateArtifact(artifact) {
       || !/^[a-f0-9]{64}$/.test(artifact.sha256 ?? '')
       || !Number.isSafeInteger(artifact.bytes) || artifact.bytes <= 0
       || !Number.isSafeInteger(artifact.maximumExtractedBytes) || artifact.maximumExtractedBytes <= 0
-      || artifact.format !== 'tar.zst') throw new Error('Invalid managed artifact description');
+      || !['tar.zst', 'tar.gz'].includes(artifact.format)) throw new Error('Invalid managed artifact description');
   const url = new URL(artifact.url);
   if (url.protocol !== 'https:' || url.username || url.password) throw new Error('Managed artifacts require an HTTPS URL without credentials');
   return digest(JSON.stringify(artifact));
@@ -99,7 +99,8 @@ async function extract(artifact, archive, directory) {
       return true;
     },
   });
-  await pipeline(createReadStream(archive), createZstdDecompress(), unpack);
+  const decompressor = artifact.format === 'tar.gz' ? createGunzip() : createZstdDecompress();
+  await pipeline(createReadStream(archive), decompressor, unpack);
   if (error) throw error;
   for (const entry of links) {
     const parent = dirname(join(directory, entry.name));
@@ -185,7 +186,7 @@ export async function provisionArtifact(artifact, { cache = managedCacheDirector
     const staging = await mkdtemp(join(dirname(directory), '.install-'));
     let failure;
     try {
-      const archive = join(staging, 'archive.tar.zst'), tree = join(staging, 'tree');
+      const archive = join(staging, 'archive.' + artifact.format), tree = join(staging, 'tree');
       log(`Downloading verified ${artifact.name}…`);
       await download(artifact, archive, fetch_);
       await mkdir(tree);

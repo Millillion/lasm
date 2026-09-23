@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, readFile, writeFile, readdir, rm, symlink, chmod } from
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
-import { zstdCompressSync } from 'node:zlib';
+import { zstdCompressSync, gzipSync } from 'node:zlib';
 import { c as createTar, Header } from 'tar';
 import { provisionArtifact, managedCacheDirectory, validateArtifact } from '../src/managed-artifacts.mjs';
 import { selectLeanVersion, provisionLean } from '../src/managed-lean.mjs';
@@ -60,6 +60,17 @@ test('concurrent requests share an install; version identities never share direc
   assert.equal(a.directory, b.directory); assert.equal(f.requests(), 1);
   const c = await provisionArtifact({ ...f.artifact, name: 'tool-2.tar.zst' }, f.options);
   assert.notEqual(a.directory, c.directory);
+});
+
+test('gzip bootstrap archives need no external decompression executable', async t => {
+  const f = await fixture(t), bytes = gzipSync(await readFile(join(f.base, 'tool.tar')));
+  const artifact = { ...description(bytes), name: 'python.tar.gz', format: 'tar.gz' };
+  const options = { ...f.options, fetch: async () => new Response(bytes) };
+  const installed = await provisionArtifact(artifact, options);
+  assert.equal(await readFile(join(installed.directory, 'bin/lean'), 'utf8'), 'compiler fixture');
+  assert.equal((await provisionArtifact(artifact, options)).cacheHit, true);
+  await assert.rejects(provisionArtifact({ ...artifact, name: 'broken.tar.gz' },
+    { ...options, fetch: async () => new Response(bytes.subarray(0, -3)) }), /checksum or size/);
 });
 
 for (const mode of ['digest', 'truncated', 'oversized', 'http-error', 'interrupted']) {

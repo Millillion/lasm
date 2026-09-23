@@ -31,6 +31,15 @@ and Windows x64. **A native Windows ARM64 distribution remains missing.** The
 installer reports that gap and does not substitute an emulated x64 compiler.
 That missing artifact is an engineering gap, not a fundamental limitation.
 
+The compiler-support bootstrap also has a six-platform catalog for native Python
+3.13.15 from the pinned
+[20260901 standalone release](https://github.com/astral-sh/python-build-standalone/releases/tag/20260901).
+Node's streaming gzip decoder installs it without an existing Python or archive
+utility. The launcher checks version and native architecture, isolates it from
+global Python configuration, and disables bytecode writes to the verified cache.
+The small-archive regression passes; real six-platform installation is pending.
+This supplies one SDK dependency, not the complete managed linker distribution.
+
 ## CLI and deployment foundations
 
 The command parser now covers the planned direct-file/run/build forms, options

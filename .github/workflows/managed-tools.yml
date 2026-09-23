@@ -47,6 +47,8 @@ jobs:
         run: node test/managed-artifacts.test.mjs
       - name: CLI and deployment-loader regressions
         run: node --test test/cli-arguments.test.mjs test/application-output.test.mjs
+      - name: Managed native compiler-support Python
+        run: node integration/managed-python.mjs .work/managed-python-ci
       # Windows ARM64 intentionally remains a failing acceptance row until a
       # native Lean artifact is implemented. Do not skip or emulate that gap.
       - name: Native Lean and Lake with only managed tools
