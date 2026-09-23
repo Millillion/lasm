@@ -10,6 +10,19 @@
   retrying authenticated pushes; then push accumulated commits. Other push
   failures likewise must not block local progress. npm publication remains
   unauthorized.
+- Prioritize complete Lean language and standard-library/API compatibility on
+  the latest stable published Lean, Node, Deno, and Bun releases across the six
+  required OS/architecture combinations. Recheck official releases before new
+  acceptance campaigns and pin exact versions within each campaign. Keep Lean
+  selectable through `lean-toolchain`; preserve older evidence with its original
+  versions. Browser work is deferred.
+- GitHub Actions CI/CD is authorized autonomously within the user's existing
+  plan/public-repository allowances and with no additional costs. Configure and
+  run workflows, inspect failures, and manage this repo's artifacts/caches as
+  needed, especially for native macOS/Windows and ARM64 validation. Verify the
+  no-cost eligibility of runners/features and bound storage/retention to included
+  allowances. Do not enable paid larger runners, upgrades, services, or overages;
+  use no-cost alternatives and keep progressing. Follow `docs/PLAN.md` for scope.
 - Separate experimentally verified behavior from design proposals and open questions.
 - Keep downloaded toolchains, third-party source trees, caches, and generated
   experiment artifacts in ignored `.cache/` or `.work/` directories.

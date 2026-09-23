@@ -24,11 +24,15 @@ preserve existing browser work without making it a current implementation gate.
 ### Complete Lean compatibility
 
 The goal is the entire Lean language and all standard libraries and APIs in each
-of Node, Deno, and Bun, for every advertised supported Lean version and platform.
+of Node, Deno, and Bun. Begin explicit support and testing with the latest stable
+published Lean release and the latest stable published releases of all three
+engines, across the six required operating-system/architecture combinations.
 This includes all of `IO.FS`, `Std.Http`, async/concurrency, and the other shipped
 library APIs, not merely the subset exercised by existing examples or tests.
 Preserve native Lean behavior on the corresponding operating system, including
-errors, resource lifetime, and concurrency semantics.
+errors, resource lifetime, and concurrency semantics. Supporting additional Lean
+versions remains possible through version selection; it must not delay this
+initial latest-release acceptance goal.
 
 Continue fixing all nonfundamental gaps. Missing implementations, difficult
 engineering, unavailable test runners, engine bugs, packaging work, timeouts, or
@@ -81,11 +85,30 @@ not the primary getting-started workflow.
 
 ### Version policy
 
+- Target the latest published stable releases, excluding release candidates,
+  nightlies, canaries, and locally patched engines. For Node this means the latest
+  Current release, not an older LTS release merely because it is the default
+  download. Recheck official release sources when starting a new acceptance
+  campaign; record exact versions and keep them fixed throughout that campaign.
+- The initial latest-release baseline verified on 2026-09-23 is:
+
+  | Component | Required acceptance version | Official source |
+  | --- | --- | --- |
+  | Lean | 4.34.0 | [Release](https://github.com/leanprover/lean4/releases/tag/v4.34.0) |
+  | Node | 26.10.0 | [Current release](https://nodejs.org/en/blog/release/v26.10.0) |
+  | Deno | 2.9.7 | [Release](https://github.com/denoland/deno/releases/tag/v2.9.7) |
+  | Bun | 1.4.2 | [Release](https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2) |
+
+  These are acceptance targets, not claims of completed Lasm validation. Earlier
+  Lean 4.32.0 / Node 24.13.1 results keep their original scope. New upstream
+  releases require fresh compatibility work and evidence, not relabeled passes.
 - Select Lean through the standard `lean-toolchain` file, for example
-  `leanprover/lean4:v4.32.0`. Lasm supplies that exact supported toolchain and
-  matching target libraries. Without a pin, use the Lasm release's documented
-  supported default. Reject unsupported versions clearly; never silently change
-  the project's Lean version.
+  `leanprover/lean4:v4.34.0`. Preserve the ability to change Lean versions and
+  manage matching compiler/runtime/library artifacts per version; do not make
+  the architecture permanently depend on one hardcoded Lean release. Start with
+  explicit support for the latest stable release. Without a pin, use the Lasm
+  release's documented, validated default. Reject versions without a working
+  matching implementation clearly; never silently change a project's pin.
 - Do not add Node, Deno, or Bun version-selection syntax or a runtime
   version manager. `--target` selects the environment only. Use the installed
   selected engine; report a missing engine clearly.
@@ -149,6 +172,38 @@ When the working implementation task adopts this plan, finish its current test,
 checkpoint/pause broad compiler-in-Wasm campaigns, and prioritize this product
 pipeline. Preserve evidence and follow the existing resource guard and
 single-heavy-workload rules. Do not risk another OOM.
+
+### GitHub Actions CI/CD authority and cost limit
+
+GitHub Actions is essential to native macOS and Windows acceptance, and to the
+full Linux/macOS/Windows × x86-64/ARM64 matrix. Codex is authorized to create,
+modify, enable, dispatch, rerun, cancel, inspect, and repair workflows; configure
+relevant Actions settings; and manage this repository's CI artifacts and caches
+as needed without repeated permission, provided these actions incur no additional
+cost under the user's current plan and public open-source repository allowance.
+This includes selecting matrices, splitting workloads, adjusting timeouts, and
+building/testing release candidates. Resolve and test the latest stable Lean and
+engine versions in CI, while recording exact resolved versions for each run.
+
+Use standard GitHub-hosted runners covered by the public-repository allowance.
+The [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
+lists native standard runners for all six required combinations. Preserve
+resource safety on each runner; fit or split workloads within its actual memory,
+disk, and job limits rather than moving to paid larger runners.
+
+The no-extra-cost condition is mandatory. Do not enable paid/larger runners,
+upgrades, paid third-party services, or chargeable overages. Verify free/included
+eligibility before using a feature. Bound artifact size and retention and cache
+usage to the current included allowances, accounting for shared storage usage.
+Clean up this repository's disposable CI data as needed while preserving required
+evidence. If a feature cannot be confirmed free or included, use a verified
+no-cost alternative and continue unaffected work.
+
+As checked on 2026-09-23, standard hosted runner compute is free for public
+repositories, while larger runners are charged and excess artifact/cache storage
+can be billed. Recheck [GitHub's billing rules](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
+when making cost-sensitive changes; do not equate public-repository compute with
+unlimited free storage. CI/CD authority does not itself authorize npm publication.
 
 ### Git workflow and delivery
 
