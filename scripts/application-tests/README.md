@@ -56,7 +56,7 @@ a safe preflight-refusal check without allocating disk space. For broad campaign
 disable core dumps in the bounded command with `ulimit -c 0`; the original test
 assertions still run, while intentional native crashes cannot fill the disk.
 
-The native CI workflow partitions registrations across four standard runners,
+The native CI workflow partitions registrations across one, two or four standard runners,
 with at most two jobs running at once. Every runner still executes one CTest
 job. Tool/source preparation and execution are sequential, separately guarded
 phases, each preserving the same host headroom and proactive memory policy.
@@ -70,3 +70,17 @@ unchanged inventory and assigns every one of its 1,684 uncompleted cases to
 exactly one shard. `all` assigns the complete category. No test, timeout, driver,
 or expected output is changed by partitioning. Native compiler passes are not
 deployed application passes.
+
+The separately guarded second campaign completed all registrations: 3,495 passed
+with a 2.32 GiB peak and no OOM, throttling or proactive stop. Two source symlinks
+were rejected before execution because the per-case verifier compared their
+contents with an absent per-registration hash. Preparation now resolves expected
+content hashes through the immutable source manifest, retaining the original link
+checks and target checks. `remaining-r3-2026-09-23` selects those two cases; use
+two shards. The first campaign's resource-stop evidence remains intact.
+
+That campaign also exposed lost shard settings at the resource boundary, causing
+the complete category to be selected. Duplicate jobs were cancelled. Selection
+and shard numbers are now mandatory command arguments, checked again against
+the prepared manifest before execution. They do not depend on environment
+variables surviving the guard.

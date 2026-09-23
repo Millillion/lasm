@@ -4,9 +4,14 @@ on:
     inputs:
       selection:
         type: choice
-        options: [all, remaining-2026-09-23]
+        options: [all, remaining-2026-09-23, remaining-r3-2026-09-23]
         default: all
-        description: Entire category or every uncompleted case in the preserved first campaign
+        description: Entire category or every uncompleted case in a preserved campaign
+      shards:
+        type: choice
+        options: ['4', '2', '1']
+        default: '4'
+        description: Disjoint runners (choose at most the number of remaining cases)
 permissions:
   contents: read
 concurrency:
@@ -21,12 +26,12 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        shard: [0, 1, 2, 3]
+        shard: ${{ fromJSON(inputs.shards == '1' && '[0]' || inputs.shards == '2' && '[0,1]' || '[0,1,2,3]') }}
     name: Native shard ${{ matrix.shard }}
     env:
       LASM_NATIVE_SELECTION: ${{ inputs.selection }}
       LASM_NATIVE_SHARD: ${{ matrix.shard }}
-      LASM_NATIVE_SHARDS: 4
+      LASM_NATIVE_SHARDS: ${{ inputs.shards }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -50,9 +55,9 @@ jobs:
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Prepare the exact shard within the resource boundary
-        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-prepare-resources.json -- /bin/bash scripts/application-tests/native-ci.sh prepare
+        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-prepare-resources.json -- /bin/bash scripts/application-tests/native-ci.sh prepare "${LASM_NATIVE_SELECTION:?}" "${LASM_NATIVE_SHARD:?}" "${LASM_NATIVE_SHARDS:?}"
       - name: Execute one bounded native campaign
-        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-resources.json -- /bin/bash scripts/application-tests/native-ci.sh run
+        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-resources.json -- /bin/bash scripts/application-tests/native-ci.sh run "${LASM_NATIVE_SELECTION:?}" "${LASM_NATIVE_SHARD:?}" "${LASM_NATIVE_SHARDS:?}"
       - name: Preserve evidence in logs and a compact summary
         if: always()
         run: |

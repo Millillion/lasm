@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { provisionLean } from '../../src/managed-lean.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
+import { sourceIdentity } from './source-identity.mjs';
 
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
@@ -38,7 +39,12 @@ for (const [name, expected] of Object.entries(hashes)) {
 writeFileSync(join(source, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
 const lean = await provisionLean(source);
 if (lean.commit !== inventory.leanCommit) throw new Error('Native control version mismatch');
-const tests = inventory.tests.filter(test => test.category === category && new RegExp(filter).test(test.name));
+const tests = inventory.tests.filter(test => test.category === category && new RegExp(filter).test(test.name))
+  .map(test => {
+    const identity = sourceIdentity(hashes, test.source);
+    if (test.sha256 !== null && test.sha256 !== identity.sha256) throw new Error('Inventory hash mismatch: ' + test.name);
+    return { ...test, sha256: identity.sha256, sourceIdentity: identity };
+  });
 if (!tests.length) throw new Error('No upstream tests matched');
 const generatedPins = [];
 if (['compiled-application', 'compiled-test-driver'].includes(category)) for (const directory of new Set(tests.map(test => dirname(test.source)))) {
