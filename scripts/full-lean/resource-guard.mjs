@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 
 export const GiB = 1024 ** 3;
 export function hostMemory() {
@@ -16,6 +16,15 @@ export function currentCgroup() {
   return join('/sys/fs/cgroup', path);
 }
 export function hasResourceGuard() {
+  if (process.platform === 'win32') {
+    if (!process.env.LASM_RESOURCE_UNIT || !process.env.LASM_RESOURCE_PYTHON) return false;
+    // Query the actual named Job Object and this descendant's membership.
+    // An inherited environment marker alone does not establish a memory cap.
+    const checked = spawnSync(process.env.LASM_RESOURCE_PYTHON, ['-I', '-B',
+      fileURLToPath(new URL('./run-bounded-windows.py', import.meta.url)), '--check-current'],
+      { encoding: 'utf8', timeout: 10_000, windowsHide: true });
+    return !checked.error && checked.status === 0;
+  }
   if (process.platform !== 'linux' || !process.env.LASM_RESOURCE_UNIT) return false;
   try {
     const path = currentCgroup();
@@ -27,9 +36,10 @@ export function hasResourceGuard() {
 }
 export async function ensureResourceGuard() {
   if (hasResourceGuard()) return;
-  if (process.platform !== 'linux') throw new Error('This maintainer harness needs the Linux cgroup runner; a portable equivalent is not implemented');
+  if (!['linux', 'win32'].includes(process.platform)) throw new Error('This maintainer harness needs a Linux cgroup or Windows Job Object guard');
   const runner = fileURLToPath(new URL('./run-bounded.mjs', import.meta.url));
-  const child = spawn(process.execPath, [runner, '--', process.execPath, ...process.argv.slice(1)], { stdio: 'inherit' });
+  const report = process.platform === 'win32' ? ['--report', join(process.cwd(), '.work/resource-runs', `${Date.now()}-${process.pid}.json`)] : [];
+  const child = spawn(process.execPath, [runner, ...report, '--', process.execPath, ...process.argv.slice(1)], { stdio: 'inherit' });
   for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));
   const code = await new Promise((resolve, reject) => {
     child.once('error', reject);

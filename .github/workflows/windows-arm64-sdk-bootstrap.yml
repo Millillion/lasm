@@ -25,6 +25,10 @@ jobs:
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Verify the native host
         run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-arm64')"
+      - name: Verify nested guard detection before building
+        run: |
+          node --input-type=module -e "import {hasResourceGuard} from './scripts/full-lean/resource-guard.mjs'; if(hasResourceGuard()) throw Error('Unexpected guard outside workload')"
+          node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-sdk-guard-control.json -- node --input-type=module -e "import {ensureResourceGuard,hasResourceGuard} from './scripts/full-lean/resource-guard.mjs'; if(!hasResourceGuard()) throw Error('Missing descendant guard'); await ensureResourceGuard(); console.log('Nested Job Object guard verified')"
       - uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2.32.0
         id: msys2
         with:
@@ -50,5 +54,5 @@ jobs:
       - name: Preserve bounded results in logs
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/windows-arm64-sdk/result.json','.work/windows-arm64-sdk/distribution/result.json','.work/windows-arm64-sdk-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-sdk-guard-control.json','.work/windows-arm64-sdk/result.json','.work/windows-arm64-sdk/distribution/result.json','.work/windows-arm64-sdk-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
       # One free standard public-repository runner; no artifact or cache storage.

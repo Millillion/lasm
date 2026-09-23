@@ -14,6 +14,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+import uuid
 
 if sys.platform != "win32":
     raise SystemExit("This guard requires native Windows Python")
@@ -64,6 +65,9 @@ def function(name, arguments, result=W.BOOL):
 close = function("CloseHandle", [W.HANDLE])
 mutex_create = function("CreateMutexW", [C.c_void_p, W.BOOL, W.LPCWSTR], W.HANDLE)
 job_create = function("CreateJobObjectW", [C.c_void_p, W.LPCWSTR], W.HANDLE)
+job_open = function("OpenJobObjectW", [W.DWORD, W.BOOL, W.LPCWSTR], W.HANDLE)
+in_job = function("IsProcessInJob", [W.HANDLE, W.HANDLE, C.POINTER(W.BOOL)])
+current_process = function("GetCurrentProcess", [], W.HANDLE)
 job_set = function("SetInformationJobObject", [W.HANDLE, C.c_int, C.c_void_p, W.DWORD])
 job_query = function("QueryInformationJobObject", [W.HANDLE, C.c_int, C.c_void_p, W.DWORD, C.c_void_p])
 assign = function("AssignProcessToJobObject", [W.HANDLE, W.HANDLE])
@@ -89,6 +93,25 @@ def memory():
     check(memory_status(C.byref(value)))
     return {"total": value.total, "available": value.available}
 
+
+if sys.argv[1:] == ["--check-current"]:
+    name = os.environ.get("LASM_RESOURCE_UNIT", "")
+    if not name.startswith("Local\\LasmResource-"):
+        raise SystemExit("Missing Lasm Job Object identity")
+    handle = check(job_open(0x4, False, name))  # JOB_OBJECT_QUERY
+    try:
+        member, limits = W.BOOL(), EXTENDED_LIMIT()
+        check(in_job(current_process(), handle, C.byref(member)))
+        check(job_query(handle, 9, C.byref(limits), C.sizeof(limits), None))
+        required_flags = 0x200 | 0x8 | 0x2000
+        if (not member.value or limits.basic.flags & required_flags != required_flags
+                or not 0 < limits.jobMemory <= 10 * 1024**3
+                or limits.basic.flags & (0x800 | 0x1000)):
+            raise SystemExit("Current process is not inside the required capped Job Object")
+        print(json.dumps({"guarded": True, "jobCommittedBytes": limits.jobMemory}))
+    finally:
+        close(handle)
+    raise SystemExit(0)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--memory-mib", type=int, default=8192)
@@ -125,13 +148,17 @@ try:
     mutex = check(mutex_create(None, True, "Local\\LasmHeavy-" + hashlib.sha256(root.encode()).hexdigest()[:20]))
     if C.get_last_error() == 183:
         raise RuntimeError("Another heavy workload already owns this checkout")
-    job = check(job_create(None, None))
+    job_name = "Local\\LasmResource-" + str(uuid.uuid4())
+    job = check(job_create(None, job_name))
     limits = EXTENDED_LIMIT()
     # JOB_MEMORY, ACTIVE_PROCESS, KILL_ON_JOB_CLOSE; deliberately no BREAKAWAY.
     limits.basic.flags = 0x200 | 0x8 | 0x2000
     limits.basic.activeProcesses = 128
     limits.jobMemory = limit
     check(job_set(job, 9, C.byref(limits), C.sizeof(limits)))
+    os.environ.update(LASM_RESOURCE_UNIT=job_name, LASM_RESOURCE_REPORT=str(report),
+                      LASM_RESOURCE_PYTHON=sys.executable)
+    evidence["unit"] = job_name
     startup = STARTUP()
     startup.cb = C.sizeof(startup)
     invocation = C.create_unicode_buffer(subprocess.list2cmdline(command))
