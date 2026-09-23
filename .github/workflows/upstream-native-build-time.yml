@@ -1,0 +1,40 @@
+name: Unchanged upstream native build-time checks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: upstream-native-build-time-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  native:
+    if: github.event.repository.visibility == 'public'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Check the release and fetch the pinned unchanged sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(gh api repos/leanprover/lean4/releases/latest --jq .tag_name)" = v4.34.0
+          mkdir -p .cache/downloads
+          curl --fail --location --retry 3 --output .cache/downloads/lean4-v4.34.0.tar.gz https://github.com/leanprover/lean4/archive/refs/tags/v4.34.0.tar.gz
+          printf '%s  %s\n' 09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b .cache/downloads/lean4-v4.34.0.tar.gz | sha256sum -c -
+      - name: Enable the per-user resource boundary on this disposable runner
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Execute one bounded native campaign
+        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-resources.json -- /bin/bash scripts/application-tests/native-ci.sh
+      - name: Preserve evidence in logs and a compact summary
+        if: always()
+        run: node scripts/application-tests/report-ci.mjs .work/upstream-native-ci .work/upstream-native-ci-resources.json
+      # Native build-time evidence only. A standard public Linux runner, one
+      # process-tree resource boundary and one CTest job; no storage uploads.
