@@ -46,6 +46,19 @@
       ],
       "patchedSha256": "99456db0bf77860dd8eb998a130fb68207a0b16ee0ca6b8d065ab55c7ae262a1",
       "originalSha256": "9b762d32a9473f720fe75f64a5bd56108a91654b9833cc8842553c631288d6a9"
+    },
+    {
+      "path": "emscripten-version.txt",
+      "originalSha256": "6bf7f89a794c69175d3d2b6616049da0e4f9190af284aa480992e29332ec6c47",
+      "patchedSha256": "243d1b6b2a45198d87048f5e81fba5bc8cf540c3bb54fb1d9ebd1df190e21014",
+      "replacements": [
+        {
+          "before": "6.0.9-git\n",
+          "after": "\"6.0.9\"\n"
+        }
+      ]
     }
-  ]
+  ],
+  "archiveVersion": "6.0.9-git",
+  "versionNormalization": "The official emsdk installer writes the stable release version resolved from this archive hash into emscripten-version.txt."
 }

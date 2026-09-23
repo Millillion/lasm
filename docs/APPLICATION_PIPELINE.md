@@ -62,6 +62,14 @@ SDK matrix uses the preceding pristine-driver revision; its C-to-Wasm smoke is
 separate from full Lean application acceptance. Native Windows ARM64 LLVM/Binaryen
 is another missing upstream artifact, not a fundamental limitation.
 
+The first real SDK matrix passed extraction and native executable-header checks
+on those five hosts, then exposed emsdk's install-time version normalization:
+the pinned release archive contains `6.0.9-git`, and the official installer writes
+`"6.0.9"`. Lasm now records and verifies both exact forms and performs that rewrite
+in the derived driver, leaving the download intact. All three runtime repair
+input hashes were independently checked against the downloaded official archive.
+The corrected native compilation run remains pending.
+
 ## CLI and deployment foundations
 
 The command parser now covers the planned direct-file/run/build forms, options

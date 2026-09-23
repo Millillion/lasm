@@ -20,7 +20,7 @@ export function repairSdkFile(path, content, manifest = sdkRepairs) {
 
 export async function prepareSdkRepairs(installed, options = {}) {
   const version = (await readFile(join(installed.directory, 'emscripten/emscripten-version.txt'), 'utf8')).trim().replaceAll('"', '');
-  if (version !== sdkRepairs.version) throw new Error(`SDK repairs do not support ${version}`);
+  if (version !== sdkRepairs.archiveVersion) throw new Error(`SDK repairs do not support archive ${version}`);
   return deriveArtifact({ kind: 'emscripten-runtime-repairs', sourceIdentity: installed.identity,
     manifestSha256: digest(JSON.stringify(sdkRepairs)) }, async output => {
     // Preserve the downloaded compiler and sysroot verbatim. Only the source

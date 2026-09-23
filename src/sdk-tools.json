@@ -52,5 +52,6 @@
   },
   "unavailable": {
     "win32-arm64": "Upstream SDK manifest has no native Windows ARM64 LLVM/Binaryen bundle; a native build remains an engineering gap."
-  }
+  },
+  "archiveVersion": "6.0.9-git"
 }

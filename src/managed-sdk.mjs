@@ -24,7 +24,7 @@ export async function provisionSdk(options = {}) {
   for (const name of ['clang', 'wasm-ld', 'wasm-opt'])
     nativePrograms[name] = await verifyNativeProgram(join(prefix, 'bin', executableName(name, platform)), platform, arch);
   const version = (await readFile(join(prefix, 'emscripten/emscripten-version.txt'), 'utf8')).trim().replaceAll('"', '');
-  if (version !== release.version) throw new Error(`Managed compiler SDK version mismatch: ${version}`);
+  if (version !== release.archiveVersion) throw new Error(`Managed compiler SDK archive version mismatch: ${version}`);
   const repaired = options.repairs === false ? undefined : await prepareSdkRepairs(installed, { cache });
   const driver = repaired?.directory ?? join(prefix, 'emscripten');
   const state = resolve(cache, 'sdk-state', repaired?.identity ?? installed.identity);
@@ -50,6 +50,6 @@ export async function provisionSdk(options = {}) {
       { env, windowsHide: true, ...settings });
   };
   return { ...installed, prefix, driver, driverIdentity: repaired?.identity ?? installed.identity,
-    python, state, env, execute, nativePrograms, version, platform: host,
+    python, state, env, execute, nativePrograms, version: release.version, archiveVersion: version, platform: host,
     runtimePatchesApplied: !!repaired };
 }
