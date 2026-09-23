@@ -51,4 +51,5 @@ jobs:
         run: node integration/managed-lean.mjs .work/managed-lean-ci
       - name: Preserve the provisioning result in the job summary
         if: always()
-        run: node -e "const f=require('node:fs');const p='.work/managed-lean-ci/result.json';f.appendFileSync(process.env.GITHUB_STEP_SUMMARY, f.existsSync(p) ? 'Managed native tool provisioning only (not Wasm acceptance)\n\n'+f.readFileSync(p,'utf8') : 'Provisioning did not complete. See the failing step; this is not a platform compatibility pass.\n')"
+        run: |
+          node -e "const f=require('node:fs');const p='.work/managed-lean-ci/result.json';f.appendFileSync(process.env.GITHUB_STEP_SUMMARY, f.existsSync(p) ? 'Managed native tool provisioning only (not Wasm acceptance)\n\n'+f.readFileSync(p,'utf8') : 'Provisioning did not complete. See the failing step; this is not a platform compatibility pass.\n')"
