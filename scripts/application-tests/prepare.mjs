@@ -104,7 +104,8 @@ const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sou
     'For applications, the unchanged native compile/interpreter driver runs first; a parallel driver substitutes the installed Lasm CLI and selected engine for deployed compilation/execution.',
     'Original source, init/before/after scripts, expected output, normalization and assertions are preserved.',
     'Generated per-pile lean-toolchain files select the release in this parallel suite; upstream tests/lean-toolchain remains unchanged and refers to an unavailable stage1 build directory.',
-    'Upstream compile-disabled cases exit 77 and remain explicitly untested as deployed applications.',
+    mode === 'upstream' ? 'Upstream compile-disabled cases exit 77 and remain explicitly untested as deployed applications.'
+      : 'This separately named experiment retains the upstream compile-disabled markers and adds explicit native/deployed AOT controls after the unchanged original driver.',
     'Additional compiler flags without an implemented application mapping fail explicitly rather than being dropped.',
     'One CTest job and 900-second case deadline; resource aborts are separate from test failures.',
     'Successful large binaries and per-case caches are removed after recording build identities and Wasm hashes; failed outputs remain.'],

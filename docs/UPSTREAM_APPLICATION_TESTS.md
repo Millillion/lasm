@@ -37,6 +37,7 @@ where appropriate; they are neither successes nor fundamental Lasm limitations.
 
 - [x] Record unchanged default registrations, exclusions and source integrity.
 - [x] Run all native build-time registrations with the managed tools on Linux x64.
+- [x] Run the original source-lint registration against the complete pinned archive.
 - [ ] Run application cases and compiled drivers through the shipping AOT path.
 - [ ] Finish per-driver classification of mixed shell/Lake/package tests.
 - [ ] Execute separately identified upstream exclusions without changing tests.
@@ -117,3 +118,11 @@ Wasm calls also overflow at their default budget. The
 [Deno stack evidence](evidence/application-deno-stack-2026-09-23.json) preserves
 the failed application, the successful shallow controls and the guarded
 differential. This is unresolved implementation work, not a fundamental limit.
+
+The original `tests/lint.py` also passes with managed Python and Git on Linux
+x64. Its parallel harness recreates a Git index for all 13,319 files from the
+complete official archive, because the unchanged checker uses `git ls-files`.
+It verifies all 7,669 recorded test/helper files and links before and after and
+confirms the extracted tree is unchanged. The guarded run peaked at 0.98 GiB
+without resource events. This is a native source-only check, not a deployed
+application result; see the [source-lint evidence](evidence/upstream-source-lint-2026-09-23.json).

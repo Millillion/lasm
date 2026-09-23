@@ -1,0 +1,126 @@
+{
+  "scope": "Unchanged upstream source lint using managed native Python/Git; no deployed runtime pass implied",
+  "test": {
+    "name": "lint.py",
+    "category": "source-lint",
+    "source": "tests/lint.py",
+    "sha256": "db09dce8f8ef384eb7bfe0a00cc5e80bf6c82f7029e39a813258aa0b61b8c7e7",
+    "inventoryStatusAtDiscovery": "not-run-through-product-pipeline",
+    "status": "passed-native-source-lint"
+  },
+  "lean": "4.34.0",
+  "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+  "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+  "adaptation": "Recreate an index of every file from the complete official source archive because lint.py uses git ls-files. No source file, root toolchain pin, assertion or expected output is changed.",
+  "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+  "pythonIdentity": "fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c",
+  "trackedFiles": 13319,
+  "originalEntries": {
+    "before": 7669,
+    "after": 7669
+  },
+  "changed": "",
+  "untracked": "",
+  "execution": {
+    "code": 0,
+    "signal": null,
+    "stdout": "",
+    "stderr": ""
+  },
+  "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-source-lint-r1-resources.json",
+  "recordedAt": "2026-09-23T23:33:30.139Z",
+  "resources": {
+    "startedAt": "2026-09-23T23:33:12.442Z",
+    "command": [
+      "/usr/bin/env",
+      "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      "--max-old-space-size=256",
+      "integration/upstream-source-lint.mjs",
+      ".work/upstream-source-lint-r1"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "d94d5bfd-fac8-40e1-9335-fff8b1847d44",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 25823596544
+    },
+    "minimumHostAvailable": 25603325952,
+    "peakMemoryBytes": 1048285184,
+    "peakTasks": 13,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-source-lint-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-23T23:33:30.072Z",
+      "memoryBytes": 1034866688,
+      "peakMemoryBytes": 1048285184,
+      "swapBytes": 0,
+      "tasks": 11,
+      "memoryBreakdown": {
+        "anon": 85073920,
+        "file": 876457984,
+        "kernel": 72536064,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 876457984,
+        "slab": 70662504
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-23T23:33:30.208Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 960901120,
+      "peakMemoryBytes": 1048285184,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11653120,
+        "file": 876462080,
+        "kernel": 71528448,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 876462080,
+        "slab": 70582176
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-23T23:33:30.233Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  }
+}
