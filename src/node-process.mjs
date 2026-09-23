@@ -35,11 +35,29 @@ export function createNodeProcesses({ add, get, release, cwd, flushStdout = asyn
       else requestedCwd = value;
     }
     const env = Object.assign(Object.create(null), inherit ? process.env : {});
+    const rawEnvironment = process.platform === 'win32' ? undefined
+      : inherit ? nativeFiles().environmentEntries() : [];
     for (let i = 0; i < envc; i++) {
       const key = string(), present = number();
-      if (present) env[key] = string(); else delete env[key];
+      const value = present ? string() : undefined;
+      if (present) env[key] = value; else delete env[key];
+      // Native Lean ignores failed setenv/unsetenv for invalid keys. Compare
+      // valid keys as bytes so malformed inherited names are never decoded.
+      if (rawEnvironment && key && !key.includes('=')) {
+        const name = Buffer.from(key);
+        const index = rawEnvironment.findIndex(([entry]) => entry.equals(name));
+        if (present) {
+          const pair = [name, Buffer.from(value)];
+          if (index < 0) rawEnvironment.push(pair); else rawEnvironment[index] = pair;
+        } else {
+          for (let j = rawEnvironment.length - 1; j >= 0; j--)
+            if (rawEnvironment[j][0].equals(name)) rawEnvironment.splice(j, 1);
+        }
+      }
     }
-    return { modes, command, args, directory, directoryFd, inheritProcessCwd, requestedCwd, env, setsid };
+    // This private payload travels over an inherited pipe, never argv/logs.
+    const envBytes = rawEnvironment?.map(pair => pair.map(bytes => bytes.toString('base64')));
+    return { modes, command, args, directory, directoryFd, inheritProcessCwd, requestedCwd, env, envBytes, setsid };
   }
   async function start(bytes, state) {
     const options = decode(bytes, state), native = nativeFiles();

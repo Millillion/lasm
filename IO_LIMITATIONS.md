@@ -1,6 +1,6 @@
 # Current IO limitations in Lasm
 
-Snapshot: 2026-09-22 UTC, `0.1.0-experimental.3`, Lean `4.32.0`.
+Snapshot: 2026-09-23 UTC, `0.1.0-experimental.3`, Lean `4.32.0`.
 Every checkbox below is intentionally empty and describes remaining work, a
 known difference, or a validation gap. These are Lasm limitations, not Lean
 limitations. This list does not promise that every restriction will be removed.
@@ -51,7 +51,7 @@ and do not establish full-suite conformance. See
 ## Standard API coverage
 
 - [ ] Complete temporary-file/directory parity on Windows and validate native
-  macOS/ARM64, raw non-UTF8 environment values and near-limit relative paths.
+  macOS/ARM64, raw non-UTF8 temporary-path environment values and near-limit relative paths.
   On Linux x64, POSIX atomic creation now preserves symlink/dot traversal,
   relative spelling and the instance cwd, honors empty variables and the
   `TEMPDIR` fallback, and matches libuv errors. Ten ordinary Lean cases match
@@ -59,6 +59,17 @@ and do not establish full-suite conformance. See
   safe-error check for the native missing-directory crash. All six unchanged
   upstream IO controls pass. Windows retains the earlier adapter; see
   [the temporary-file evidence](docs/evidence/temporary-files-2026-09-22.json).
+- [ ] Validate malformed/duplicate environment names, concurrent third-party
+  native mutation, and native macOS/Windows/ARM64 environment behavior. Linux
+  x64 environment-value reads, enumeration, set/unset and child inheritance now
+  retain original POSIX bytes. Eight ordinary Lean cases match native in each
+  full and packaged engine, including six formerly differing malformed-UTF8
+  cases. Bun's separate JavaScript environment map is handled explicitly;
+  three host controls cover later JavaScript edits as well. All 37 packaged/host
+  checks and nine unchanged upstream IO/process/temporary-file registrations
+  pass, along with eight existing packaged process-override/NUL checks.
+  This does not close raw temporary-path or full-suite coverage; see
+  [the byte-environment evidence](docs/evidence/environment-bytes-2026-09-23.json).
 - [ ] Complete a declaration-by-declaration compatibility audit; the implemented
   primitives and tested higher-level APIs are not all of Lean IO. The pinned
   inventory now lists 193 `IO.FS` and 1,938 `Std.Http` declarations. All 20 direct

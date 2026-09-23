@@ -54,6 +54,24 @@ export function nativeFiles({ synchronous = false } = {}) {
     try { mkostemp = bind('mkostemp', 'int', ['void *', 'int']); } catch { /* use mkstemp */ }
   }
   const strlen = windows ? null : bind('strlen', 'size_t', ['void *']);
+  // A JavaScript string has already decoded malformed UTF-8. Keep environment
+  // bytes intact until Lean applies its own lossy decoder, or a child inherits
+  // them. Read the current environ pointer after every possible setenv.
+  const getenv = windows ? null : bind('getenv', 'void *', ['str']);
+  const setenv = windows ? null : bind('setenv', 'int', ['str', 'str', 'int']);
+  const unsetenv = windows ? null : bind('unsetenv', 'int', ['str']);
+  const environ = windows ? null : process.platform === 'darwin'
+    ? bind('_NSGetEnviron', 'void *', []) : libc.symbol('environ');
+  const environmentPointer = () => ffi.decode(typeof environ === 'function' ? environ() : environ, 'void *');
+  const copyCString = pointer => Buffer.from(new Uint8Array(ffi.view(pointer, Number(strlen(pointer)))));
+  function environmentValue(name, original) {
+    // Bun keeps process.env updates in an engine-owned map. Preserve original
+    // bytes while its JS value is unchanged, and honor subsequent JS edits.
+    if (!process.versions.bun) return original;
+    const value = process.env[name];
+    if (value === undefined) return undefined;
+    return original?.toString() === value ? original : Buffer.from(value);
+  }
   const scanDirectory = windows ? null : libc.func('int scandir(str path, _Out_ void **entries, void *filter, void *compare)');
   const accessAt = windows ? null : libc.func('int faccessat(int directory, str path, int mode, int flags)');
   const getdelim = windows ? null : libc.func('intptr_t getdelim(_Inout_ void **line, _Inout_ size_t *capacity, int delimiter, void *stream)');
@@ -113,6 +131,53 @@ export function nativeFiles({ synchronous = false } = {}) {
     };
   }
   const adapter = {
+    environmentValue(name) {
+      if (windows) {
+        const value = process.env[name];
+        return value === undefined ? undefined : Buffer.from(value);
+      }
+      const pointer = getenv(name);
+      return environmentValue(name, pointer ? copyCString(pointer) : undefined);
+    },
+    setEnvironment(name, value) {
+      if (setenv && setenv(name, value, 1) < 0) {
+        const errno = ffi.errno();
+        throw Object.assign(failure(errno), { errno: -errno, nativeMessage: false });
+      }
+      process.env[name] = value;
+    },
+    unsetEnvironment(name) {
+      if (unsetenv && unsetenv(name) < 0) {
+        const errno = ffi.errno();
+        throw Object.assign(failure(errno), { errno: -errno, nativeMessage: false });
+      }
+      delete process.env[name];
+    },
+    environmentEntries() {
+      if (windows) return Object.entries(process.env).map(([key, value]) => [Buffer.from(key), Buffer.from(value)]);
+      const pointer = environmentPointer(), entries = [];
+      for (let i = 0; pointer; i++) {
+        const item = ffi.decode(pointer, i * ffi.sizeof('void *'), 'void *');
+        if (!item) break;
+        const bytes = copyCString(item), separator = bytes.indexOf(61);
+        if (separator >= 0) entries.push([bytes.subarray(0, separator), bytes.subarray(separator + 1)]);
+      }
+      if (process.versions.bun) {
+        const names = new Set();
+        for (let i = entries.length - 1; i >= 0; i--) {
+          const [key, original] = entries[i], name = key.toString();
+          names.add(name);
+          // A malformed key is still a valid POSIX name. Do not merge it with
+          // a distinct key whose real bytes contain replacement characters.
+          if (!Buffer.from(name).equals(key)) continue;
+          const value = environmentValue(name, original);
+          if (value === undefined) entries.splice(i, 1); else entries[i] = [key, value];
+        }
+        for (const [name, value] of Object.entries(process.env))
+          if (!names.has(name) && value !== undefined) entries.push([Buffer.from(name), Buffer.from(value)]);
+      }
+      return entries;
+    },
     error: failure,
     errno: name => ffi.os.errno[name],
     fromNodeError,

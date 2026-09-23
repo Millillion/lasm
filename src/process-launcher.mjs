@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 // A private binary protocol keeps environments out of argv, avoids a JSON
-// dependency in the tiny native child, and preserves literal UTF-8 strings.
+// dependency in the tiny native child, and preserves literal environment bytes.
 export function encodeProcessConfiguration(options) {
   const chunks = [Buffer.from('LASMEX01')];
   const number = value => { const bytes = Buffer.alloc(4); bytes.writeUInt32LE(value); chunks.push(bytes); };
@@ -18,7 +18,9 @@ export function encodeProcessConfiguration(options) {
   string(options.directory); string(options.requestedCwd);
   number(options.args.length + 1);
   for (const value of [options.command, ...options.args]) string(value);
-  const environment = Object.entries(options.env);
+  const environment = options.envBytes
+    ? options.envBytes.map(pair => pair.map(value => Buffer.from(value, 'base64')))
+    : Object.entries(options.env);
   number(environment.length);
   for (const [key, value] of environment) { string(key); string(value); }
   return Buffer.concat(chunks);

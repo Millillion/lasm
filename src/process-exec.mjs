@@ -16,7 +16,7 @@ const chdir = libc.func('int chdir(str path)');
 const fchdir = libc.func('int fchdir(int fd)');
 const setsid = libc.func('int setsid()');
 const unsetenv = libc.func('int unsetenv(str key)');
-const setenv = libc.func('int setenv(str key, str value, int overwrite)');
+const setenv = libc.func('int setenv(const void *key, const void *value, int overwrite)');
 const execvp = libc.func('int execvp(str file, str *argv)');
 const exit = libc.func('void _exit(int status)');
 
@@ -55,7 +55,11 @@ try {
       throw new Error(`stdio flags restore failed: errno ${ffi.errno()}`);
   }
   for (const key of Object.keys(process.env)) unsetenv(key);
-  for (const [key, value] of Object.entries(options.env)) setenv(key, value, 1);
+  const environment = options.envBytes
+    ? options.envBytes.map(pair => pair.map(value => Buffer.from(value, 'base64')))
+    : Object.entries(options.env).map(pair => pair.map(value => Buffer.from(value)));
+  for (const [key, value] of environment)
+    setenv(Buffer.concat([key, Buffer.from([0])]), Buffer.concat([value, Buffer.from([0])]), 1);
   // An absolute cwd can recover from a removed/renamed parent directory.
   // Do not first try to enter the stale parent path in that case.
   const absolute = options.requestedCwd?.startsWith('/');

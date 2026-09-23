@@ -45,6 +45,16 @@ Use an explicit wrapper for other experimental commands:
 node scripts/full-lean/run-bounded.mjs -- COMMAND ARGUMENTS
 ```
 
+`probe-environment-bytes.py NEW_OUTPUT FROZEN_FACADE` is a supplementary Linux
+comparison of ordinary Lean environment reads, mutation and child inheritance
+against the pinned native toolchain. Run it through `run-bounded.mjs` and
+`base-pages.py`, with one engine per guard and a fresh output directory. It
+records only dedicated test variables, retains raw outputs and frozen hashes,
+and stops the workload on a timeout. Its eight cases do not add upstream CTest
+registrations. The corresponding packaged test is
+`test/node-environment-bytes.test.mjs`; native environment-name and concurrency
+coverage remains separate from the tested malformed-value cases.
+
 The Linux systemd/cgroup-v2 runner includes every descendant in one 10 GiB
 kernel memory cap, stops the workload proactively at 8 GiB, and stops on low
 host headroom or rising memory pressure. Smaller hosts/budgets receive a lower

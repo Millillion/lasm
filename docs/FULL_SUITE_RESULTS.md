@@ -3,6 +3,24 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The separate v149 host repair preserves POSIX environment bytes for `IO.getEnv`,
+UV environment queries and inherited child processes. The same eight ordinary
+Lean cases now match native output in full Node, Deno and local rebuilt Bun;
+the v147 baseline differed on six cases per engine. A retained intermediate
+attempt exposed Bun's separate JavaScript environment map. The final adapter
+synchronizes Lean updates with libc and honors subsequent JavaScript edits.
+All 37 packaged/host checks pass in released Node, Deno and stock Bun, including
+24 native-output comparisons. Nine unchanged upstream IO/process/temporary-file
+registrations pass with all 7,267 original hashes and six symlinks intact.
+Eight further packaged checks retain native environment overrides, NUL handling,
+PATH and executable-text behavior. The full comparisons peak at 2.01 GiB and
+the unchanged upstream controls at 3.77 GiB, with no resource/OOM/throttling/swap
+or monitoring event.
+These results remain separate from the frozen v147 broad campaign below.
+Raw temporary-path bytes, unusual environment names, concurrent native mutation
+and native cross-platform validation remain open. See
+[the environment-byte comparison and retained attempts](evidence/environment-bytes-2026-09-23.json).
+
 The v147 host repair preserves temporary-path spelling and symlink traversal,
 uses POSIX atomic creation with the upstream filename template, and matches
 Lean's environment precedence and libuv errors. The full Wasm compiler binary
@@ -17,8 +35,8 @@ validation and broader edge cases remain open. See
 
 The fresh v147 Node campaign selects all **3,896** registrations and prioritizes
 854 names not passed in the preserved v144/v145/v146 runs. It imports no earlier
-passes. Its latest saved checkpoint has **854 registrations passing**, completing
-all 854 prioritized names. This includes
+passes. Its latest saved checkpoint has **874 registrations passing**, completing
+all 854 prioritized names and 20 further registrations. This includes
 all 14 prioritized Lake tests, all 69 prioritized compiler regressions, all 16
 prioritized compiled benchmarks, all 657 prioritized elaborator regressions,
 all 78 prioritized interactive server tests, lint, seven documentation examples,
@@ -27,9 +45,9 @@ handling in the main and task threads, arrays, closures, compaction, incremental
 compiler snapshots, initialization, lazy lists and Lake linking. The unchanged
 file-read-overflow test returns Lean's expected `resourceExhausted` error without
 an OOM event. There are no failures or resource aborts, and every original and
-harness hash remains intact. The other 3,042 registrations remain pending in that
+harness hash remains intact. The other 3,022 registrations remain pending in that
 snapshot; see
-[the 854-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint854-2026-09-23.json).
+[the 874-test v147 checkpoint](evidence/node-broad-v147-temporary-files-checkpoint874-2026-09-23.json).
 All three earlier plugin failures now pass within this campaign. The server-project
 workload also passes under the same 8 GiB proactive budget; it is this checkpoint's
 largest peak at 7.56 GiB. Cancellation, completions, navigation, references, hover,
@@ -41,7 +59,7 @@ selection, TCP errors and half-close, TCP server/client exchanges, UDP, file pat
 file-handle locking, shared mutexes and temporary-file creation. These are observed
 Node results; the entire suite and other-engine validation remain open.
 Earlier checkpoints, including the
-[768-test snapshot](evidence/node-broad-v147-temporary-files-checkpoint768-2026-09-23.json),
+[854-test snapshot](evidence/node-broad-v147-temporary-files-checkpoint854-2026-09-23.json),
 remain preserved separately.
 Before starting it, both unchanged server-driver controls passed again:
 cancellation and `misc_dir/server_project`, peaking at 7.59 GiB with all 7,267

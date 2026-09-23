@@ -32,18 +32,18 @@ export function createNodeSystem() {
     case 129: return nativeFiles().groupInfo(n).then(group => group == null ? numbers(0) : Buffer.concat([
       numbers(1), string(group.name), numbers(group.gid, group.members.length), ...group.members.map(string)]));
     case 130: {
-      const entries = Object.entries(process.env);
+      const entries = nativeFiles().environmentEntries();
       return Buffer.concat([numbers(entries.length), ...entries.flatMap(([key, value]) => [string(key), string(value)])]);
     }
     case 132: {
       const split = bytes.indexOf(0), name = bytes.subarray(0, split).toString();
       if (!name || name.includes('=')) throw invalidArgument();
-      process.env[name] = bytes.subarray(split + 1).toString(); return empty;
+      nativeFiles().setEnvironment(name, bytes.subarray(split + 1).toString()); return empty;
     }
     case 133: {
       const name = bytes.toString();
       if (!name || name.includes('=')) throw invalidArgument();
-      delete process.env[name]; return empty;
+      nativeFiles().unsetEnvironment(name); return empty;
     }
     case 134: return Buffer.from(os.hostname());
     case 135: return numbers(os.getPriority(Number(BigInt.asIntN(32, argument))));

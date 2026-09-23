@@ -209,8 +209,8 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       // Lean returns none before consulting getenv when the name contains NUL.
       // Some engines truncate the key in process.env; others reject it.
       if (bytes.includes(0)) return empty;
-      const value = process.env[bytes.toString()];
-      return value === undefined ? empty : Buffer.from('\x01' + value);
+      const value = nativeFiles().environmentValue(bytes.toString());
+      return value === undefined ? empty : Buffer.concat([Buffer.from([1]), value]);
     }
     case 23: return directory.name(state).then(value => Buffer.from(value));
     case 24: return Buffer.from(appPath);
