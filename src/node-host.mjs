@@ -83,15 +83,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   async function createTemporary(isDirectory, state) {
     // uv_os_tmpdir checks presence, including empty values, in this order.
     // Avoid path.join: lexical normalization changes symlink/.. traversal.
-    let base;
-    for (const name of ['TMPDIR', 'TMP', 'TEMP', 'TEMPDIR']) {
-      base = nativeFiles().environmentValue(name);
-      if (base !== undefined) break;
-    }
-    base ??= Buffer.from('/tmp');
-    if (base.length >= (process.platform === 'darwin' ? 1024 : 4096))
-      throw Object.assign(error('ENOBUFS', ''), { errno: -nativeFiles().errno('ENOBUFS') });
-    if (base.length > 1 && base[base.length - 1] === 47) base = base.subarray(0, -1);
+    const base = nativeFiles().temporaryDirectory();
     if (!base.length) throw Object.assign(error('ENOENT', ''), { errno: -nativeFiles().errno('ENOENT') });
     const template = Buffer.concat([base, Buffer.from(base[base.length - 1] === 47 ? '' : '/'), Buffer.from('tmp.XXXXXXXX')]);
     const result = await nativeFiles().createTemporary(directory.path(template, state), isDirectory);

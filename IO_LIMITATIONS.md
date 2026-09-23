@@ -65,6 +65,15 @@ and do not establish full-suite conformance. See
   [the raw temporary-path evidence](docs/evidence/temporary-path-bytes-2026-09-23.json).
   Windows retains the earlier adapter; see
   [the temporary-file evidence](docs/evidence/temporary-files-2026-09-22.json).
+- [ ] Validate home/temporary-directory queries on native macOS/Windows/ARM64,
+  malformed passwd entries and account lookup errors. Linux x64 now preserves
+  empty environment values, fallback order, raw bytes and buffer-limit errors.
+  Fifteen API cases match native in each full engine; 45 compact packaged
+  comparisons also pass. Oversized `HOME` supplied before engine startup still
+  prevents Deno's npm configuration loading and crashes local Bun's parser.
+  The documented parallel API probe sets these boundary values from Lean after
+  startup. Those original engine failures remain open, not fundamental or passing;
+  see [the directory-query evidence](docs/evidence/system-directories-2026-09-23.json).
 - [ ] Validate malformed/duplicate environment names, concurrent third-party
   native mutation, and native macOS/Windows/ARM64 environment behavior. Bun
   JavaScript assignments equal to an original value's lossy decoding also need
@@ -354,6 +363,10 @@ and do not establish full-suite conformance. See
   exceeds the packaged runtime stack. Raising its heap limit did not fix the
   former. The separate full Node compiler now passes `elab/12676.lean` at a
   measured 2.24 GiB workload peak; that repair still needs packaged integration.
+  The directory-query probe also overflows the packaged Node stack while
+  formatting a 4,095-element byte list. Its original verbose program and failure
+  are preserved alongside a compact parallel API check that verifies every byte;
+  see [the probe explanations](test/fixtures/system-directories/README.md).
 - [ ] `USize` and `ISize` are 32-bit in Wasm32, unlike native 64-bit Lean builds.
   Width-sensitive application results therefore differ. The full lowered-memory64
   target preserves 64-bit widths but currently has a 4 GiB address-space ceiling;

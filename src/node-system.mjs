@@ -23,8 +23,8 @@ export function createNodeSystem() {
       return Buffer.concat([numbers(cpus.length), ...cpus.flatMap(cpu => [string(cpu.model),
         numbers(cpu.speed, cpu.times.user, cpu.times.nice, cpu.times.sys, cpu.times.idle, cpu.times.irq)])]);
     }
-    case 126: return Buffer.from(os.homedir());
-    case 127: return Buffer.from(os.tmpdir());
+    case 126: return nativeFiles().homeDirectory();
+    case 127: return nativeFiles().temporaryDirectory();
     case 128: {
       const user = os.userInfo();
       return Buffer.concat([string(user.username), numbers(user.uid, user.gid), optionalString(user.shell), optionalString(user.homedir)]);

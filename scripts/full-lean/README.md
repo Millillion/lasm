@@ -62,6 +62,15 @@ permissions and contents. Only random leaf names in those external observations
 are excluded from comparison. The shared fixture also drives
 `test/node-temporary-path-bytes.test.mjs`; original upstream tests are untouched.
 
+`probe-system-directories.py NEW_OUTPUT FROZEN_FACADE` compares fifteen Linux
+home/temporary-directory cases in the same guarded slot. `--startup` runs the
+preserved original conditions, including oversized `HOME` values that prevent
+Deno/Bun startup. The default parallel probe sets those three boundary values
+using ordinary Lean `osSetenv` after startup. Packaged tests use a compact
+every-byte check for the long ASCII result because the preserved verbose version
+exposes a separate packaged-stack failure. Neither failure is counted as a pass;
+see [the fixture explanations](../../test/fixtures/system-directories/README.md).
+
 The Linux systemd/cgroup-v2 runner includes every descendant in one 10 GiB
 kernel memory cap, stops the workload proactively at 8 GiB, and stops on low
 host headroom or rising memory pressure. Smaller hosts/budgets receive a lower

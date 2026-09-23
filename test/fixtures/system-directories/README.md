@@ -1,0 +1,9 @@
+The first baseline supplied all fifteen values before engine startup. Deno 2.9.7 refused the three oversized HOME values while loading ~/.npmrc, and locally rebuilt Bun 1.4.2 panicked while parsing its entry file. The original results and source remain intact.
+
+The parallel API comparison keeps the twelve ordinary startup cases. In the three 4095/4096-byte boundary cases only, it starts the engine with HOME and TMPDIR absent, then sets the exact requested ASCII values using ordinary Lean Std.Internal.UV.System.osSetenv before making the directory queries. The original startup-only program remains Startup.lean and the full probe accepts --startup to reproduce its original conditions. No upstream Lean test changes or timeout changes are involved.
+
+Passing this parallel comparison establishes API behavior after startup. It does not turn engine bootstrap failures into passes or classify them as fundamental. The separate Node startup comparisons already pass all fifteen cases with the v151 host adapter.
+
+The full compiler comparison prints every byte using Main.lean. Its 4095-byte success case exposed a packaged Node stack overflow in the long List Repr/pretty-print operation after the home-directory query returned. The first failing packaged build/output is retained separately. Packaged.lean is a parallel API probe: above 256 bytes it reports the byte length and checks every byte against the requested h/t value, instead of building the large nested pretty-print result. Small malformed-byte outputs and all error outputs remain exact. This keeps API checks independent of the unresolved packaged-stack regression; it does not count the verbose program as passing.
+
+Probe child processes now run inside their dedicated ignored output directory, keeping engine caches for relative HOME values out of the repository root. The initial root cache directories were preserved under .work/system-directory-startup-caches-root with byte-name relocation records.

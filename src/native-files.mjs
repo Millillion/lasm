@@ -1,6 +1,7 @@
 import { createRequire } from 'node:module';
 import { existsSync, constants } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { homedir, tmpdir, userInfo } from 'node:os';
 import { callNativeFile } from './native-file-worker-pool.mjs';
 
 // Only the Node host loads this private adapter. No Lean declaration or user
@@ -83,6 +84,15 @@ export function nativeFiles({ synchronous = false } = {}) {
     return Object.assign(new Error(strerror(errno)), { code: codes[errno] ?? 'EIO', errno, nativeMessage: true });
   }
   const fromNodeError = error => failure(ffi.os.errno[error.code] ?? ffi.os.errno.EIO);
+  function directoryBuffer(bytes) {
+    // Lean passes PATH_MAX bytes to libuv, including the terminating NUL.
+    // Check before removing a trailing separator, as libuv does.
+    if (bytes.length >= (process.platform === 'darwin' ? 1024 : 4096)) {
+      const errno = ffi.os.errno.ENOBUFS;
+      throw Object.assign(failure(errno), { errno: -errno, nativeMessage: false });
+    }
+    return bytes;
+  }
   // Capture errno in the callback, before another asynchronous result can
   // overwrite the calling thread's errno. Koffi propagates the worker's errno.
   const call = synchronous ? async (fn, ...args) => {
@@ -131,6 +141,22 @@ export function nativeFiles({ synchronous = false } = {}) {
     };
   }
   const adapter = {
+    homeDirectory() {
+      if (windows) return Buffer.from(homedir());
+      // An empty HOME is present. Only an absent value uses the passwd entry.
+      return directoryBuffer(adapter.environmentValue('HOME')
+        ?? Buffer.from(userInfo({ encoding: 'buffer' }).homedir));
+    },
+    temporaryDirectory() {
+      if (windows) return Buffer.from(tmpdir());
+      let bytes;
+      for (const name of ['TMPDIR', 'TMP', 'TEMP', 'TEMPDIR']) {
+        bytes = adapter.environmentValue(name);
+        if (bytes !== undefined) break;
+      }
+      bytes = directoryBuffer(bytes ?? Buffer.from(process.platform === 'android' ? '/data/local/tmp' : '/tmp'));
+      return bytes.length > 1 && bytes[bytes.length - 1] === 47 ? bytes.subarray(0, -1) : bytes;
+    },
     environmentValue(name) {
       if (windows) {
         const value = process.env[name];

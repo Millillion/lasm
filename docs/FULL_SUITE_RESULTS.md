@@ -3,6 +3,28 @@
 Pinned Lean: **4.32.0**, commit
 `8c9756b28d64dab099da31a4c09229a9e6a2ef35`.
 
+The separate v151 repair makes POSIX home/temporary-directory queries preserve
+empty values, environment precedence, raw bytes and Lean's buffer-limit errors.
+Temporary creation shares the same selection routine. Fifteen ordinary Lean API
+cases match native in each full engine: 45 matches. Eighteen raw temporary-path
+regressions and nine unchanged upstream IO registrations also pass; all 7,267
+original hashes and six symlinks remain intact. Full validation peaks at 3.77 GiB,
+with no resource/OOM/throttling/swap or monitor event.
+
+The initial probes retain two separate failures. Oversized `HOME` values supplied
+before startup prevent Deno from loading npm configuration and crash local Bun
+while parsing its entry file. The parallel API probe sets those three boundary
+values through ordinary Lean `osSetenv` after startup. Separately, the packaged
+Node runtime overflows its stack while formatting a 4,095-element byte list.
+The original verbose program and failing output remain preserved. A compact
+packaged probe checks every returned byte and its length: all 45 comparisons
+plus the parent test pass in released Node, Deno and stock Bun. The 56 existing
+packaged temporary-file/path and system checks also pass. These results do not
+turn the startup or stack failures into passes, and neither issue is classified
+as fundamental. See
+[the directory-query evidence and retained attempts](evidence/system-directories-2026-09-23.json)
+and [the parallel-probe explanations](../test/fixtures/system-directories/README.md).
+
 The separate v150 host repair retains raw POSIX temporary-directory bytes through
 creation, cwd anchoring and worker replies. Six ordinary Lean cases match native
 output and independently checked file locations in all three full engines;
