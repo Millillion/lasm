@@ -140,7 +140,9 @@ wrapper under Deno/Bun invokes Node for compilation and then the exact original
 engine executable for the application; Node must be on PATH. Node can also run
 any of the three wrapper files, with the selected deployment engine on PATH.
 Help and usage errors perform no tool downloads. The 22 parser/launcher controls
-pass locally; real installed-candidate launcher acceptance is pending. The
+now pass on all six native platforms; see the
+[launcher evidence](evidence/application-launchers-2026-09-23.json).
+Real installed-candidate launcher acceptance is pending. The
 earlier 4.32 implementation and its regression fixtures remain explicitly legacy.
 
 The full-runtime output helper packages host adapters and native support and
@@ -176,6 +178,14 @@ controls verify preservation, restoration of missing generated files and removal
 of obsolete generated support. They now pass in the source tree on all six
 native platforms as part of the managed Git matrix. This repair is
 not part of the installed `experimental.5` upstream campaign already in progress.
+
+Native file/descriptor checks exposed incorrect fixed-arity bindings for POSIX
+`open` and `fcntl` on macOS ARM64. The repaired variadic bindings pass file
+creation, permissions, reopen, append, exclusive-create and descriptor checks
+in stock Node 26.10.0, Deno 2.9.7 and Bun 1.4.2 on all six native platforms.
+The two POSIX-only pipe/socket checks explicitly do not apply to Windows.
+These [host-adapter results](evidence/native-file-abi-2026-09-23.json) do not
+establish full filesystem or compiled-application parity on those hosts.
 
 Source generation and application caching are now serialized per project with
 OS file locks; output delivery has a separate destination lock for builds from

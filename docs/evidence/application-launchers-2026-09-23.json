@@ -1,0 +1,50 @@
+{
+  "scope": "CLI parsing, help/usage without tool downloads, and child exit handling; installed application compilation remains separate",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35920590067",
+  "commit": "f85cce3",
+  "node": "26.10.0",
+  "testFiles": [
+    "test/application-launcher.test.mjs",
+    "test/cli-arguments.test.mjs"
+  ],
+  "platforms": [
+    {
+      "platform": "linux-arm64",
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "platform": "linux-x64",
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "platform": "darwin-arm64",
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "platform": "win32-arm64",
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "platform": "darwin-x64",
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "platform": "win32-x64",
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "localLog": ".work/product-acceptance/application-launcher-unit-r2.log",
+  "installedAcceptance": "pending"
+}

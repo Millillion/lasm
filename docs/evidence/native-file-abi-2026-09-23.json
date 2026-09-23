@@ -79,5 +79,160 @@
       }
     ],
     "skipScope": "The two POSIX-only pipe/socket controls do not apply on Windows; all file-creation, lock and output controls pass there."
+  },
+  "stockEngineMatrix": {
+    "url": "https://github.com/Millillion/lasm/actions/runs/35921645832",
+    "commit": "cf5d8e8",
+    "node": "26.10.0",
+    "conclusion": "success",
+    "results": [
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "bun",
+        "version": "1.4.2",
+        "platform": "darwin-arm64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "passed",
+          "socketFlags": "passed"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "deno",
+        "version": "2.9.7",
+        "platform": "darwin-arm64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "passed",
+          "socketFlags": "passed"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "bun",
+        "version": "1.4.2",
+        "platform": "darwin-x64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "passed",
+          "socketFlags": "passed"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "deno",
+        "version": "2.9.7",
+        "platform": "darwin-x64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "passed",
+          "socketFlags": "passed"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "bun",
+        "version": "1.4.2",
+        "platform": "linux-arm64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "passed",
+          "socketFlags": "passed"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "deno",
+        "version": "2.9.7",
+        "platform": "linux-arm64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "passed",
+          "socketFlags": "passed"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "bun",
+        "version": "1.4.2",
+        "platform": "linux-x64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "passed",
+          "socketFlags": "passed"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "deno",
+        "version": "2.9.7",
+        "platform": "linux-x64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "passed",
+          "socketFlags": "passed"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "bun",
+        "version": "1.4.2",
+        "platform": "win32-arm64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "POSIX-only",
+          "socketFlags": "POSIX-only"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "deno",
+        "version": "2.9.7",
+        "platform": "win32-arm64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "POSIX-only",
+          "socketFlags": "POSIX-only"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "bun",
+        "version": "1.4.2",
+        "platform": "win32-x64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "POSIX-only",
+          "socketFlags": "POSIX-only"
+        }
+      },
+      {
+        "scope": "Native file ABI controls; full Lean application validation remains separate",
+        "engine": "deno",
+        "version": "2.9.7",
+        "platform": "win32-x64",
+        "checks": {
+          "directFileIO": "passed",
+          "workerFileIO": "passed",
+          "descriptorInheritance": "POSIX-only",
+          "socketFlags": "POSIX-only"
+        }
+      }
+    ],
+    "nodeScope": "The same four shared ABI controls plus lock/output and launcher checks run through Node test on every platform. Windows explicitly omits the two POSIX-only checks.",
+    "cacheUploads": false,
+    "artifactUploads": false
   }
 }
