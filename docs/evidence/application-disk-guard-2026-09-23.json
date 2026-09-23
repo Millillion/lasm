@@ -1,0 +1,23 @@
+{
+  "scope": "Safe preflight resource-refusal control; no upstream test or intentional space allocation ran",
+  "result": ".work/upstream-application-disk-preflight-r2/execution.json",
+  "exitCode": 125,
+  "reserveBytes": 1099511627776,
+  "availableBytes": 15840337920,
+  "counts": {
+    "not-completed": 1
+  },
+  "resourceStop": {
+    "reason": "Insufficient disk headroom before execution",
+    "available": 15840337920
+  },
+  "sourceVerification": {
+    "checked": 7669,
+    "modified": []
+  },
+  "recordedAt": "2026-09-23T20:03:28.869Z",
+  "limitations": [
+    "This control verifies refusal before CTest launch. The periodic low-space termination path has not been induced.",
+    "Default disk reserve remains 4 GiB and cannot be lowered."
+  ]
+}

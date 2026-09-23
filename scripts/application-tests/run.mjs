@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, lstatSync, readlinkSync, existsSync, createWriteStream } from 'node:fs';
+import { readFileSync, writeFileSync, lstatSync, readlinkSync, existsSync, createWriteStream, statfsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -10,6 +10,12 @@ import { cleanupTestProcesses } from '../full-lean/cleanup-processes.mjs';
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const manifestFile = resolve(process.argv[2]);
+const options = process.argv.slice(3);
+if (options.length && (options.length !== 2 || options[0] !== '--minimum-free-disk-mib'))
+  throw new Error('Expected MANIFEST [--minimum-free-disk-mib N]');
+const minimumFreeDisk = Number(options[1] ?? 4096) * 1024 ** 2;
+if (!Number.isSafeInteger(minimumFreeDisk) || minimumFreeDisk < 4 * 1024 ** 3)
+  throw new Error('The disk reserve must be at least 4096 MiB');
 const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'));
 const resultFile = join(manifest.output, 'execution.json');
 if (existsSync(resultFile) || existsSync(join(manifest.output, 'execution-started.json')))
@@ -34,14 +40,26 @@ const harnessFiles = [fileURLToPath(import.meta.url), join(root, 'scripts/applic
   manifest.compileDriver, manifest.nativeEnvironment];
 const harnessBefore = Object.fromEntries(await Promise.all(harnessFiles.map(async file => [file, await hashFile(file)])));
 const runId = randomUUID(), startedAt = new Date().toISOString();
+const freeDisk = () => { const disk = statfsSync(manifest.output); return disk.bavail * disk.bsize; };
+const diskAtStart = freeDisk();
+if (diskAtStart < minimumFreeDisk) {
+  const report = { startedAt, finishedAt: new Date().toISOString(), registered: manifest.tests.length,
+    counts: { 'not-completed': manifest.tests.length },
+    resourceStop: { reason: 'Insufficient disk headroom before execution', available: diskAtStart },
+    diskAtStart, diskAtEnd: diskAtStart, minimumFreeDisk,
+    originalSources: { before }, harness: { before: harnessBefore },
+    resourceReport: process.env.LASM_RESOURCE_REPORT };
+  writeFileSync(resultFile, JSON.stringify(report, null, 2) + '\n');
+  console.error(report.resourceStop.reason); process.exit(125);
+}
 const args = ['--test-dir', manifest.execution, '-j', '1', '--no-tests=error', '--output-on-failure',
   '--output-junit', join(manifest.output, 'results.xml')];
-writeFileSync(join(manifest.output, 'execution-started.json'), JSON.stringify({ runId, startedAt, args, before, harnessBefore,
+writeFileSync(join(manifest.output, 'execution-started.json'), JSON.stringify({ runId, startedAt, args, before, harnessBefore, diskAtStart, minimumFreeDisk,
   resourceReport: process.env.LASM_RESOURCE_REPORT }, null, 2) + '\n');
 const child = spawn('ctest', args, { env: { ...process.env, LASM_UPSTREAM_RUN_ID: runId }, stdio: ['ignore', 'pipe', 'pipe'] });
 const log = createWriteStream(join(manifest.output, 'execution.log'));
 const completed = [], finished = new Set(), cleanup = [];
-let partial = '', previous = new Set();
+let partial = '', previous = new Set(), resourceStop, forceStop;
 child.stdout.on('data', bytes => {
   log.write(bytes); process.stdout.write(bytes);
   const lines = (partial + bytes.toString()).split('\n'); partial = lines.pop();
@@ -54,6 +72,16 @@ child.stdout.on('data', bytes => {
 });
 child.stderr.on('data', bytes => { log.write(bytes); process.stderr.write(bytes); });
 const timer = setInterval(() => {
+  const available = freeDisk();
+  if (available < minimumFreeDisk && !resourceStop) {
+    resourceStop = { reason: 'Disk headroom fell below the reserve', available, at: new Date().toISOString() };
+    child.kill('SIGTERM');
+    cleanup.push(...cleanupTestProcesses(runId));
+    forceStop = setTimeout(() => {
+      cleanup.push(...cleanupTestProcesses(runId, undefined, 'SIGKILL'));
+      child.kill('SIGKILL');
+    }, 2000);
+  }
   cleanup.push(...cleanupTestProcesses(runId, previous, 'SIGKILL'));
   cleanup.push(...cleanupTestProcesses(runId, finished));
   previous = new Set(finished);
@@ -66,6 +94,7 @@ try {
   execution = await new Promise((resolve, reject) => { child.once('error', reject); child.once('close', (code, signal) => resolve({ code, signal })); });
 } finally {
   clearInterval(timer);
+  clearTimeout(forceStop);
   for (const [signal, handler] of handlers) process.off(signal, handler);
   cleanup.push(...cleanupTestProcesses(runId));
   if (cleanup.length) {
@@ -87,7 +116,8 @@ const report = { startedAt, finishedAt: new Date().toISOString(), scope: manifes
   lean: manifest.lean, leanCommit: manifest.leanCommit, category: manifest.category, target: manifest.target,
   execution, counts, registered: manifest.tests.length, originalSources: { before, after },
   harness: { before: harnessBefore, changed: harnessChanged },
-  cases, cleanup, resourceReport: process.env.LASM_RESOURCE_REPORT };
+  cases, cleanup, resourceStop, diskAtStart, diskAtEnd: freeDisk(), minimumFreeDisk,
+  resourceReport: process.env.LASM_RESOURCE_REPORT };
 writeFileSync(resultFile, JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify({ counts, originalSources: report.originalSources, execution }, null, 2));
-process.exitCode = after.modified.length || harnessChanged.length ? 2 : execution.code ?? 1;
+process.exitCode = resourceStop ? 125 : after.modified.length || harnessChanged.length ? 2 : execution.code ?? 1;

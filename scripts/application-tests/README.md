@@ -42,4 +42,10 @@ record the native/build/runtime phase, package build inputs and Wasm hash.
 Successful large outputs and per-case compilation caches are removed to bound
 disk usage; failure artifacts and all diagnostics remain. Always prepare a new
 campaign directory after a repair. Source and harness hash checks accompany
-every completed execution.
+every completed execution. Campaigns require 4 GiB of disk headroom and stop with
+a separate resource status if free space falls below that reserve; they do not
+delete failure evidence to make room.
+`--minimum-free-disk-mib N` may raise (never lower) that reserve, including for
+a safe preflight-refusal check without allocating disk space. For broad campaigns
+disable core dumps in the bounded command with `ulimit -c 0`; the original test
+assertions still run, while intentional native crashes cannot fill the disk.
