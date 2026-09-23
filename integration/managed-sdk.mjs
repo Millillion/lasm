@@ -9,7 +9,12 @@ await mkdir(base, { recursive: true });
 const tools = await provisionSdk({ cache: join(base, 'cache') });
 const source = join(base, 'hello.c'), entrypoint = join(base, 'hello.cjs');
 await writeFile(source, '#include <stdio.h>\nint main(void) { puts("managed SDK application"); return 7; }\n');
-tools.execute('emcc', [source, '-O1', '-sENVIRONMENT=node', '-o', entrypoint], { stdio: 'inherit', timeout: 180_000 });
+// A new SDK state compiles libc with one worker. The standard macOS Intel
+// runner exceeded three minutes on that cold build; retain the exact fixture
+// and checks while allowing up to fifteen minutes for the compiler phase.
+const compileStarted = performance.now();
+tools.execute('emcc', [source, '-O1', '-sENVIRONMENT=node', '-o', entrypoint], { stdio: 'inherit', timeout: 900_000 });
+const compileSeconds = (performance.now() - compileStarted) / 1000;
 let result;
 try { execFileSync(process.execPath, [entrypoint], { env: { ...tools.env, PATH: '' }, encoding: 'utf8', timeout: 30_000 }); }
 catch (error) { result = error; }
@@ -24,6 +29,6 @@ const report = { scope: 'Managed SDK C-to-Wasm smoke; full Lean application acce
   sdk: tools.version, identity: tools.identity, archive: tools.receipt.artifact,
   driverIdentity: tools.driverIdentity, runtimePatchesApplied: tools.runtimePatchesApplied,
   nativePrograms: tools.nativePrograms, python: tools.python.version, verifiedReuse: reused.cacheHit,
-  output: result.stdout.trim(), exit: result.status };
+  output: result.stdout.trim(), exit: result.status, compileSeconds };
 await writeFile(join(base, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report, null, 2));

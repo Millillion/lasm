@@ -78,7 +78,12 @@ commands use ordinary LLVM response files. Cache verification remains strict.
 The corrected Linux x64 clean download, C-to-Wasm compile, execution and
 whole-cache reuse all pass, peaking at 2.63 GiB without resource events. See the
 [Linux SDK evidence](evidence/managed-sdk-linux-2026-09-23.json). The Windows
-response-file change and the remaining native hosts await the next CI run.
+response-file change now passes on Windows x64. The
+[corrected native SDK matrix](evidence/managed-sdk-native-ci-2026-09-23.json)
+also passes Linux x64/ARM64 and macOS ARM64. macOS x64 reached its first libc
+build but exceeded the smoke harness's three-minute compiler deadline. A
+separate run raises that cold-build deadline to fifteen minutes with the same
+fixture, assertions and one worker. Windows ARM64 still needs its native SDK.
 
 ## CLI and deployment foundations
 

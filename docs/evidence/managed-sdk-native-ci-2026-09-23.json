@@ -1,0 +1,213 @@
+{
+  "scope": "Native managed SDK provisioning and one C-to-Wasm fixture; not full Lean application acceptance",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35895970408",
+  "commit": "9d39e119b6aa0549690c2e696384f59510227558",
+  "overallConclusion": "failure",
+  "results": [
+    {
+      "platform": "linux-x64",
+      "conclusion": "success",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35895970408/job/107299862328",
+      "result": {
+        "scope": "Managed SDK C-to-Wasm smoke; full Lean application acceptance remains separate",
+        "recordedAt": "2026-09-23T17:31:07.346Z",
+        "platform": "linux-x64",
+        "node": "v26.10.0",
+        "sdk": "6.0.9",
+        "identity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "archive": {
+          "name": "emscripten-6.0.9-linux-x64",
+          "root": "install",
+          "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/f04ea239d533260dd1db760dd2d668d5f9a88d6b/wasm-binaries.tar.xz",
+          "sha256": "d5c6c2917fbc1cae1a7d1e581f1c0b2817369dd57f94c7a0d05921476f1a7287",
+          "bytes": 298541944,
+          "format": "tar.xz",
+          "maximumExtractedBytes": 5000000000
+        },
+        "driverIdentity": "f5b014c6acc7f8c762abe9be5ee01ce8ec74ce0c71d3b6cfa693503a45faa01d",
+        "runtimePatchesApplied": true,
+        "nativePrograms": {
+          "clang": {
+            "platform": "linux",
+            "architectures": [
+              "x64"
+            ]
+          },
+          "wasm-ld": {
+            "platform": "linux",
+            "architectures": [
+              "x64"
+            ]
+          },
+          "wasm-opt": {
+            "platform": "linux",
+            "architectures": [
+              "x64"
+            ]
+          }
+        },
+        "python": "3.13.15",
+        "verifiedReuse": true,
+        "output": "managed SDK application",
+        "exit": 7
+      }
+    },
+    {
+      "platform": "win32-x64",
+      "conclusion": "success",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35895970408/job/107299862521",
+      "result": {
+        "scope": "Managed SDK C-to-Wasm smoke; full Lean application acceptance remains separate",
+        "recordedAt": "2026-09-23T17:34:39.934Z",
+        "platform": "win32-x64",
+        "node": "v26.10.0",
+        "sdk": "6.0.9",
+        "identity": "ff23ed41c08b4ddf5d6797e24c45189c405be06d4632375629bcc00f191ea3e6",
+        "archive": {
+          "name": "emscripten-6.0.9-win32-x64",
+          "root": "install",
+          "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/win/f04ea239d533260dd1db760dd2d668d5f9a88d6b/wasm-binaries.zip",
+          "sha256": "f7512eab6e69ad9d7de5adbf39e68d7d6773b317b13e70ec5003ef1d10f92980",
+          "bytes": 654169912,
+          "format": "zip",
+          "maximumExtractedBytes": 5000000000
+        },
+        "driverIdentity": "acd5ce7524103482c6b56f36a85167f974d6964172baf090203aa1f07aaf598d",
+        "runtimePatchesApplied": true,
+        "nativePrograms": {
+          "clang": {
+            "platform": "win32",
+            "architectures": [
+              "x64"
+            ]
+          },
+          "wasm-ld": {
+            "platform": "win32",
+            "architectures": [
+              "x64"
+            ]
+          },
+          "wasm-opt": {
+            "platform": "win32",
+            "architectures": [
+              "x64"
+            ]
+          }
+        },
+        "python": "3.13.15",
+        "verifiedReuse": true,
+        "output": "managed SDK application",
+        "exit": 7
+      }
+    },
+    {
+      "platform": "darwin-arm64",
+      "conclusion": "success",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35895970408/job/107299862593",
+      "result": {
+        "scope": "Managed SDK C-to-Wasm smoke; full Lean application acceptance remains separate",
+        "recordedAt": "2026-09-23T17:34:30.521Z",
+        "platform": "darwin-arm64",
+        "node": "v26.10.0",
+        "sdk": "6.0.9",
+        "identity": "cc3f0e82b5e58eb0336049fd442445e776dff590bfd3961feedf2ce4a73a0135",
+        "archive": {
+          "name": "emscripten-6.0.9-darwin-arm64",
+          "root": "install",
+          "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/mac/f04ea239d533260dd1db760dd2d668d5f9a88d6b/wasm-binaries-arm64.tar.xz",
+          "sha256": "b60514308507f64f4138d3c55bdb6979f20222288700fde603dced23b65dd533",
+          "bytes": 275476160,
+          "format": "tar.xz",
+          "maximumExtractedBytes": 5000000000
+        },
+        "driverIdentity": "e1803b826b044a02669c40d29064679d6371d3e818cdb6799bc972cca1edec47",
+        "runtimePatchesApplied": true,
+        "nativePrograms": {
+          "clang": {
+            "platform": "darwin",
+            "architectures": [
+              "arm64"
+            ]
+          },
+          "wasm-ld": {
+            "platform": "darwin",
+            "architectures": [
+              "arm64"
+            ]
+          },
+          "wasm-opt": {
+            "platform": "darwin",
+            "architectures": [
+              "arm64"
+            ]
+          }
+        },
+        "python": "3.13.15",
+        "verifiedReuse": true,
+        "output": "managed SDK application",
+        "exit": 7
+      }
+    },
+    {
+      "platform": "linux-arm64",
+      "conclusion": "success",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35895970408/job/107299862609",
+      "result": {
+        "scope": "Managed SDK C-to-Wasm smoke; full Lean application acceptance remains separate",
+        "recordedAt": "2026-09-23T17:31:23.599Z",
+        "platform": "linux-arm64",
+        "node": "v26.10.0",
+        "sdk": "6.0.9",
+        "identity": "c42dc140877f01ac8f2a783c34f36e39eeb1caaaa95d6077050bda013f8bfa43",
+        "archive": {
+          "name": "emscripten-6.0.9-linux-arm64",
+          "root": "install",
+          "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/f04ea239d533260dd1db760dd2d668d5f9a88d6b/wasm-binaries-arm64.tar.xz",
+          "sha256": "04909913893cf83e5f40f27c2fca886b619b1d762f7ecc0945a1f2c9d453792c",
+          "bytes": 276512964,
+          "format": "tar.xz",
+          "maximumExtractedBytes": 5000000000
+        },
+        "driverIdentity": "e536c7788d5fa684bd49f166c1d314a22bc3da7141107160143ea3c442a8f866",
+        "runtimePatchesApplied": true,
+        "nativePrograms": {
+          "clang": {
+            "platform": "linux",
+            "architectures": [
+              "arm64"
+            ]
+          },
+          "wasm-ld": {
+            "platform": "linux",
+            "architectures": [
+              "arm64"
+            ]
+          },
+          "wasm-opt": {
+            "platform": "linux",
+            "architectures": [
+              "arm64"
+            ]
+          }
+        },
+        "python": "3.13.15",
+        "verifiedReuse": true,
+        "output": "managed SDK application",
+        "exit": 7
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "conclusion": "failure",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35895970408/job/107299862769",
+      "failure": "No packaged native LLVM/Binaryen SDK; implementation gap."
+    },
+    {
+      "platform": "darwin-x64",
+      "conclusion": "failure",
+      "url": "https://github.com/Millillion/lasm/actions/runs/35895970408/job/107299862901",
+      "failure": "Cold libc build exceeded the 180-second harness deadline; no behavior mismatch established."
+    }
+  ],
+  "costControls": "Public standard runners; no artifact uploads or Actions caches."
+}

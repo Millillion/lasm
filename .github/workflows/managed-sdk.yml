@@ -1,6 +1,12 @@
 name: Managed compiler SDK provisioning
 on:
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Native SDK hosts to check
+        type: choice
+        default: all
+        options: [all, darwin-x64]
 permissions:
   contents: read
 concurrency:
@@ -16,13 +22,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        include:
-          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
-          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
-          - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
-          - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
-          - { platform: win32-x64, runner: windows-2022, arch: x64 }
-          - { platform: win32-arm64, runner: windows-11-arm, arch: arm64 }
+        include: ${{ fromJSON(inputs.scope == 'darwin-x64' && '[{"platform":"darwin-x64","runner":"macos-15-intel","arch":"x64"}]' || '[{"platform":"linux-x64","runner":"ubuntu-24.04","arch":"x64"},{"platform":"linux-arm64","runner":"ubuntu-24.04-arm","arch":"arm64"},{"platform":"darwin-x64","runner":"macos-15-intel","arch":"x64"},{"platform":"darwin-arm64","runner":"macos-15","arch":"arm64"},{"platform":"win32-x64","runner":"windows-2022","arch":"x64"},{"platform":"win32-arm64","runner":"windows-11-arm","arch":"arm64"}]') }}
     env:
       LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
     steps:
