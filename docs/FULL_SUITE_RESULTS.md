@@ -89,6 +89,16 @@ limit, with no OOM, throttling, swap or monitor events and all source/harness
 hashes intact. The full Deno suite is still incomplete; see
 [the 61-test Deno checkpoint](evidence/deno-broad-v151-system-directories-checkpoint61-2026-09-23.json).
 
+The next saved Deno checkpoint has **100/100 first-attempt passes**, including
+39 of the 56 Lake registrations. Project initialization, linting, caching,
+drivers, module visibility/rebuilds, logging and dependency-order checks now
+pass alongside the prioritized group. The maintained auditor independently
+checks the same checkpoint and all 100 unskipped JUnit results. There are zero
+failures, resource aborts or harness failures, all source/harness checks remain
+intact, and the maximum peak remains 7.85 GiB. The other 3,796 registrations
+remain pending in this snapshot; see
+[the 100-test Deno checkpoint](evidence/deno-broad-v151-system-directories-checkpoint100-2026-09-23.json).
+
 The separate v151 repair makes POSIX home/temporary-directory queries preserve
 empty values, environment precedence, raw bytes and Lean's buffer-limit errors.
 Temporary creation shares the same selection routine. Fifteen ordinary Lean API
