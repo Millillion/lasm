@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, writeFile, lstat, rename, rm, cp, copyFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, lstat, rename, rm, copyFile } from 'node:fs/promises';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,6 +10,7 @@ import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject } from './application-sources.mjs';
 import { readApplicationSymbols } from './application-symbols.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint } from './application-output.mjs';
+import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
 import { executableName, responseFile, insideDirectory } from './platform.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
@@ -20,21 +21,6 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const helpers = ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
   'function-table-index.mjs', 'table-growth.mjs', 'preserve-web-worker.mjs'];
 const digest = value => createHash('sha256').update(value).digest('hex');
-const outputReceipt = '.lasm-application.json';
-
-async function fileInventory(directory, skip = new Set()) {
-  const files = {};
-  async function walk(base) {
-    for (const entry of (await readdir(base, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
-      const file = join(base, entry.name), name = relative(directory, file).replaceAll('\\', '/');
-      if (skip.has(name)) continue;
-      if (entry.isDirectory()) await walk(file);
-      else if (entry.isFile()) files[name] = await hashFile(file);
-      else throw new Error(`Unexpected link or special file in application build inputs: ${name}`);
-    }
-  }
-  await walk(directory); return files;
-}
 
 async function buildDriverIdentity() {
   const files = await fileInventory(join(root, 'src'));
@@ -43,37 +29,6 @@ async function buildDriverIdentity() {
   const native = join(root, 'src/native');
   if (!existsSync(native)) Object.assign(files, Object.fromEntries(Object.entries(await fileInventory(join(root, '.cache/native-host'))).map(([name, hash]) => ['native/' + name, hash])));
   return digest(JSON.stringify(files));
-}
-
-async function reusableOutput(directory, signature) {
-  try {
-    if (!(await lstat(directory)).isDirectory() || !(await lstat(join(directory, outputReceipt))).isFile()) return false;
-    const previous = JSON.parse(await readFile(join(directory, outputReceipt), 'utf8'));
-    return previous.schema === 1 && previous.signature === signature
-      && JSON.stringify(await fileInventory(directory, new Set([outputReceipt]))) === JSON.stringify(previous.files);
-  } catch (error) { if (error.code === 'ENOENT' || error instanceof SyntaxError) return false; throw error; }
-}
-
-async function deliverOutput(cached, output, signature) {
-  if (output === cached) return;
-  if (await reusableOutput(output, signature)) return;
-  await mkdir(dirname(output), { recursive: true });
-  if (existsSync(output)) {
-    if (!(await lstat(output)).isDirectory()) throw new Error('Application output must be an ordinary directory');
-    const entries = await readdir(output);
-    if (entries.length && !entries.includes(outputReceipt)) throw new Error(`Output directory is not a Lasm application build: ${output}. Choose --output with an empty directory.`);
-  }
-  const staging = output + '.lasm-' + randomUUID(), previous = output + '.previous-' + randomUUID();
-  await cp(cached, staging, { recursive: true });
-  let moved = false;
-  try {
-    if (existsSync(output)) { await rename(output, previous); moved = true; }
-    await rename(staging, output);
-  } catch (error) {
-    if (moved && !existsSync(output)) await rename(previous, output);
-    throw error;
-  } finally { await rm(staging, { recursive: true, force: true }); }
-  if (moved) await rm(previous, { recursive: true, force: true });
 }
 
 /** Managed native elaboration and AOT linking, with content-verified build reuse. */

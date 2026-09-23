@@ -156,6 +156,13 @@ Successful deployments have content inventories checked on reuse. Cached builds
 do not execute the compiler SDK, so its full immutable cache is verified only
 when compilation needs it; native Lean/Lake still rechecks project inputs.
 
+Rebuilding into an existing deployment now preserves added files and empty asset
+directories. Modified generated files, asset collisions, malformed receipts and
+symbolic links cause a descriptive refusal before replacement. Five filesystem
+controls verify preservation, restoration of missing generated files and removal
+of obsolete generated support. This repair is tested in the source tree; it is
+not part of the installed `experimental.5` upstream campaign already in progress.
+
 The first real primary-CLI Node check passes ordinary console/filesystem/tasks,
 Unicode and empty arguments, large naturals, exception output, and exit codes
 against native Lean. Rebuilding unchanged source reuses the exact deployment.
