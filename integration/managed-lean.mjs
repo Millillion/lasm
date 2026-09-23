@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { createReadStream } from 'node:fs';
 import { Readable } from 'node:stream';
 import { provisionLean } from '../src/managed-lean.mjs';
+import { executableName } from '../src/platform.mjs';
 
 const base = resolve(process.argv[2] ?? '.work/managed-lean-acceptance');
 await mkdir(base, { recursive: true });
@@ -31,6 +32,10 @@ const run = (program, args) => execFileSync(program, args, { cwd: project, env,
   encoding: 'utf8', timeout: 120_000, maxBuffer: 1024 * 1024, windowsHide: true }).trim();
 assert.equal(run(tools.lean, ['--run', main, 'one', 'two']), 'managed Lean: one,two');
 assert.equal(run(tools.lake, ['--no-cache', '--keep-toolchain', 'env', 'lean', '--run', main, 'lake']), 'managed Lean: lake');
+const generated = join(project, 'Main.c'), executable = join(project, executableName('native-main'));
+run(tools.lean, ['-R', project, '-Dcompiler.postponeCompile=false', '-c', generated, main]);
+run(join(tools.prefix, 'bin', executableName('leanc')), ['-O2', generated, '-o', executable]);
+assert.equal(run(executable, ['compiled', 'native']), 'managed Lean: compiled,native');
 const version = run(tools.lean, ['--version']);
 assert.match(version, /4\.34\.0/);
 assert.match(await readFile(join(tools.prefix, 'LICENSE'), 'utf8'), /Apache/);
@@ -40,6 +45,7 @@ const report = { scope: 'Native Lean/Lake provisioning, not compiled-Wasm applic
   firstCacheHit: tools.cacheHit, verifiedReuse: reused.cacheHit, firstMilliseconds,
   recordedCacheEntries: Object.keys(tools.receipt.files).length,
   installedBytes: Object.values(tools.receipt.files).reduce((n, item) => n + (item.bytes ?? 0), 0),
-  archive: tools.receipt.artifact, nativeMain: 'passed', lakeMain: 'passed', notices: 'preserved' };
+  archive: tools.receipt.artifact, nativeMain: 'passed', lakeMain: 'passed',
+  nativeCompileAndLink: 'passed', notices: 'preserved' };
 await writeFile(join(base, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report, null, 2));

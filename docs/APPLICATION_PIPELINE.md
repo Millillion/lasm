@@ -49,6 +49,13 @@ loader-level controls; actual deployed Wasm applications still need acceptance.
 types. Windows ARM64 remains a failing acceptance row until its distribution is
 implemented. CI provisioning results do not constitute Wasm application passes.
 
+The [first native matrix result](evidence/managed-lean-native-ci-2026-09-23.json)
+verifies automatic downloads, whole-cache integrity, ordinary Lean execution and
+Lake execution on **Linux x64/ARM64, macOS x64/ARM64 and Windows x64**, with Node
+26.10.0 and Lean 4.34.0. Windows ARM64 fails at the documented missing artifact.
+The next revision adds native C generation, compilation and linking with the
+same restricted PATH; those checks are not imported into the earlier result.
+
 The repository was verified public and runner eligibility was checked against
 [GitHub's standard-runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
 and [billing rules](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
