@@ -18,10 +18,10 @@ export function nativeFiles({ synchronous = false } = {}) {
   const bind = (name, result, args) => libc.func(name, result, args);
   const fdopen = bind(windows ? '_fdopen' : 'fdopen', 'void *', ['int', 'str']);
   const openFile = windows ? libc.func('int _wsopen_s(_Out_ int *fd, str16 path, int flags, int sharing, int mode)')
-    : libc.func('int open(str path, int flags, uint32_t mode)');
+    : libc.func('int open(str path, int flags, ...)');
   const dup = bind(windows ? '_dup' : 'dup', 'int', ['int']);
   const closeFd = bind(windows ? '_close' : 'close', 'int', ['int']);
-  const fcntl = windows ? null : bind('fcntl', 'int', ['int', 'int', 'int']);
+  const fcntl = windows ? null : libc.func('int fcntl(int fd, int command, ...)');
   const pipe = windows ? libc.func('int _pipe(_Out_ int *fds, uint size, int mode)')
     : libc.func('int pipe(_Out_ int *fds)');
   const fclose = bind('fclose', 'int', ['void *']);
@@ -216,13 +216,13 @@ export function nativeFiles({ synchronous = false } = {}) {
     },
     openDirectory(path) {
       if (process.platform !== 'linux') throw failure(ffi.os.errno.ENOSYS);
-      const fd = openFile(path, 0x200000 /* O_PATH */ | 0x10000 /* O_DIRECTORY */ | 0x80000 /* O_CLOEXEC */, 0);
+      const fd = openFile(path, 0x200000 /* O_PATH */ | 0x10000 /* O_DIRECTORY */ | 0x80000 /* O_CLOEXEC */);
       if (fd < 0) throw failure();
       return fd;
     },
     descriptorFlags(fd) {
       if (!fcntl) throw failure(ffi.os.errno.ENOSYS);
-      const flags = fcntl(fd, 3 /* F_GETFL */, 0);
+      const flags = fcntl(fd, 3 /* F_GETFL */);
       if (flags < 0) throw failure();
       return flags;
     },
@@ -242,7 +242,7 @@ export function nativeFiles({ synchronous = false } = {}) {
             : { value: -1, errno: ffi.os.errno.EINVAL };
           if (result.value < 0 && result.errno === ffi.os.errno.EINVAL) {
             result = await call(mkstemp, bytes);
-            if (result.value >= 0 && fcntl(result.value, 2, 1) < 0) {
+            if (result.value >= 0 && fcntl(result.value, 2, 'int', 1) < 0) {
               const error = failure(); closeFd(result.value); throw error;
             }
           }
@@ -340,7 +340,11 @@ export function nativeFiles({ synchronous = false } = {}) {
           c.O_RDWR, c.O_WRONLY|c.O_CREAT|c.O_APPEND, c.O_RDWR|c.O_CREAT|c.O_EXCL][mode];
         if (flags === undefined) throw failure(ffi.os.errno.EINVAL);
         // Node does not expose O_CLOEXEC on every supported OS.
-        fd = await checked(openFile, path, flags | (process.platform === 'darwin' ? 0x1000000 : 0x80000), permissions);
+        // open's mode is variadic: Darwin ARM64 passes it on the stack. Koffi
+        // variadic calls are synchronous; ordinary IO reaches this adapter in
+        // a dedicated native-file worker, including potentially blocking FIFOs.
+        fd = openFile(path, flags | (process.platform === 'darwin' ? 0x1000000 : 0x80000), 'uint32_t', permissions);
+        if (fd < 0) throw failure();
       }
       try { return adapter.openDescriptor(fd, ['r','w','w','r+','a','r+'][mode]); }
       catch (error) { closeFd(fd); throw error; }
@@ -348,7 +352,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     pipe() {
       const fds = [0, 0];
       if ((windows ? pipe(fds, 4096, 0x8000 | 0x0080) : pipe(fds)) < 0) throw failure();
-      if (!windows && fds.some(fd => fcntl(fd, 2, 1) < 0)) {
+      if (!windows && fds.some(fd => fcntl(fd, 2, 'int', 1) < 0)) {
         const error = failure(); for (const fd of fds) closeFd(fd); throw error;
       }
       return fds;
@@ -362,7 +366,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     duplicateDescriptor(fd, mode) {
       const owned = dup(fd);
       if (owned < 0) throw failure();
-      if (!windows && fcntl(owned, 2, 1) < 0) { const error = failure(); closeFd(owned); throw error; }
+      if (!windows && fcntl(owned, 2, 'int', 1) < 0) { const error = failure(); closeFd(owned); throw error; }
       return adapter.openDescriptor(owned, mode);
     },
     close(file, discardOutput = false) {

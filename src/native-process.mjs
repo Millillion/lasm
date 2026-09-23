@@ -25,7 +25,7 @@ export function spawnInheritedProcess(command, args, descriptors, configuration,
       duplicate: libc.func('int posix_spawn_file_actions_adddup2(void *actions, int fd, int target)'),
       nullFile: libc.func('int posix_spawn_file_actions_addopen(void *actions, int fd, str path, int flags, uint32_t mode)'),
       spawn: libc.func('int posix_spawn(_Out_ int *pid, str path, void *actions, void *attributes, str *args, str *env)'),
-      fcntl: libc.func('int fcntl(int fd, int command, int value)'),
+      fcntl: libc.func('int fcntl(int fd, int command, ...)'),
       socketpair: libc.func('int socketpair(int domain, int type, int protocol, _Out_ int *fds)'),
       shutdown: libc.func('int shutdown(int fd, int direction)'),
       read: libc.func('intptr_t read(int fd, void *bytes, size_t count)'),
@@ -55,7 +55,7 @@ export function spawnInheritedProcess(command, args, descriptors, configuration,
         // Duplicate above all destination slots first, including when a caller
         // has closed one of 0..4. File actions must never overwrite a source.
         const copy = api.fcntl(descriptor === 'inherit' ? index : descriptor,
-          1030 /* F_DUPFD_CLOEXEC */, stdio.length);
+          1030 /* F_DUPFD_CLOEXEC */, 'int', stdio.length);
         if (copy < 0) throw native.error(api.ffi.errno());
         owned.push(copy);
         checked(api.duplicate(actions, copy, index));

@@ -20,7 +20,7 @@ export function nativeTcp() {
   const listen = libc.func('int listen(int, int)');
   const connect = libc.func('int connect(int, void *, uint32_t)');
   const close = libc.func('int close(int)');
-  const fcntl = libc.func('int fcntl(int, int, int)');
+  const fcntl = libc.func('int fcntl(int fd, int command, ...)');
   const setOption = libc.func('int setsockopt(int, int, int, void *, uint32_t)');
   const getOption = libc.func('int getsockopt(int, int, int, void *, _Inout_ uint32_t *)');
   const getName = libc.func('int getsockname(int, void *, _Inout_ uint32_t *)');
@@ -133,8 +133,8 @@ export function nativeTcp() {
         },
       };
       try {
-        checked(fcntl(fd, 2, 1)); // F_SETFD, FD_CLOEXEC
-        checked(fcntl(fd, 4, checked(fcntl(fd, 3, 0)) | constants.O_NONBLOCK));
+        checked(fcntl(fd, 2, 'int', 1)); // F_SETFD, FD_CLOEXEC
+        checked(fcntl(fd, 4, 'int', checked(fcntl(fd, 3)) | constants.O_NONBLOCK));
         if (settings.noDelay) handle.noDelay();
         // libuv retains the enable flag before fd creation, but uses 60 seconds
         // at stream-open time rather than retaining the earlier delay.
