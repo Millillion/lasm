@@ -1,7 +1,7 @@
-// Runtime metadata is an explicit input here, not a self-contained deployment claim.
+// Preserve explicit-input evidence; optionally verify automatically bundled data.
 import assert from 'node:assert/strict';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
-import { join, resolve, relative } from 'node:path';
+import { join, resolve, relative, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { hashFile } from '../src/managed-artifacts.mjs';
@@ -12,8 +12,9 @@ import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.m
 
 await ensureResourceGuard();
 const [outputArg, target, engineArg, compilerArg, referenceArg, ...extra] = process.argv.slice(2);
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg && !extra.length,
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE');
+const bundled = extra.length === 1 && extra[0] === '--bundled-metadata';
+assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg && (!extra.length || bundled),
+  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE [--bundled-metadata]');
 assert.equal(process.platform, 'linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
@@ -27,15 +28,19 @@ assert.equal(registration?.driver, 'tests/pkg/user_attr_app/run_test.sh');
 const prefix = 'tests/pkg/user_attr_app/';
 const originals = Object.fromEntries(Object.entries(sources).filter(([path]) => path.startsWith(prefix))
   .map(([path, identity]) => [path.slice(prefix.length), identity]));
-const report = { scope: 'Original user-attribute application with explicit runtime module metadata inputs; installed AOT executes the imports',
+const report = { scope: bundled ? 'Original user-attribute application with automatically packaged module data; installed AOT executes the relocated imports without Lean path environment inputs'
+  : 'Original user-attribute application with explicit runtime module metadata inputs; installed AOT executes the imports',
+  bundledMetadata: bundled,
   name: registration.name, target, engine, compiler, reference, commands: [], passed: false,
   sourceArchiveSha256: inventory.sourceArchiveSha256, sourceManifestSha256: await hashFile(sourcesFile),
   harnessSha256: await hashFile(fileURLToPath(import.meta.url)), resourceReport: process.env.LASM_RESOURCE_REPORT,
   adaptations: [
     'The complete original native shell driver and compile-time attribute assertions run unchanged.',
     'A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.',
-    'The original main intentionally imports compiled Lean modules at runtime. Project metadata is copied as explicit input data. Standard-library metadata remains at the verified managed native prefix, selected by ordinary LEAN_SYSROOT and LEAN_PATH in both native and target controls.',
-    'Both executables run with empty PATH and hidden source copies. No native Lean/Lake process is needed during the deployed import; the retained metadata dependency prevents a self-contained deployment claim.',
+    bundled ? 'The original main intentionally imports compiled Lean modules at runtime. All module data must be supplied automatically by the installed Lasm build. Native controls explicitly select the same deployed data; deployed processes receive neither LEAN_SYSROOT nor LEAN_PATH.'
+      : 'The original main intentionally imports compiled Lean modules at runtime. Project metadata is copied as explicit input data. Standard-library metadata remains at the verified managed native prefix, selected by ordinary LEAN_SYSROOT and LEAN_PATH in both native and target controls.',
+    bundled ? 'Both executables run with empty PATH and hidden source copies. All module data paths used by the deployed import are inside the relocated dist; no native Lean/Lake process is needed at runtime.'
+      : 'Both executables run with empty PATH and hidden source copies. No native Lean/Lake process is needed during the deployed import; the retained metadata dependency prevents a self-contained deployment claim.',
     'A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.',
     'A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks.',
   ] };
@@ -73,6 +78,18 @@ async function metadata(directory, destination) {
   assert.ok(entries.some(row => row.path === 'UserAttr/Tst.olean'));
   assert.ok(entries.some(row => row.path === 'UserAttr/BlaAttr.olean'));
   return entries;
+}
+
+async function bundledMetadata(directory) {
+  const manifest = JSON.parse(readFileSync(join(directory, 'lean/metadata.json')));
+  assert.equal(manifest.schema, 1); assert.equal(manifest.lean, '4.34.0');
+  assert.ok(manifest.files.some(file => file.path === 'lib/lean/Init.olean'));
+  for (const suffix of ['/UserAttr/Tst.olean', '/UserAttr/BlaAttr.olean'])
+    assert.ok(manifest.files.some(file => file.path.endsWith(suffix)));
+  for (const file of manifest.files) assert.equal(await hashFile(join(directory, 'lean', file.path)), file.sha256);
+  const sysroot = join(directory, 'lean');
+  return { manifest, manifestSha256: await hashFile(join(sysroot, 'metadata.json')),
+    sysroot, projectPath: manifest.roots.map(name => join(sysroot, name)).join(delimiter) };
 }
 
 save();
@@ -131,30 +148,39 @@ try {
   const deployment = join(output, 'relocated deployment'); renameSync(dist, deployment);
   const attributeDeployment = join(output, 'relocated attribute deployment'); renameSync(attributeDist, attributeDeployment);
   const data = join(deployment, 'module data');
-  report.moduleData = await metadata(join(native, '.lake/build/lib/lean'), data);
-  report.standardModuleData = { directory: join(lean.prefix, 'lib/lean'), nativeArtifactIdentity: lean.identity,
-    scope: 'Explicit external read-only standard module data; automatic deployment packaging is not validated by this probe' };
+  if (bundled) {
+    report.bundled = await bundledMetadata(deployment);
+    report.attributeBundled = await bundledMetadata(attributeDeployment);
+  } else {
+    report.moduleData = await metadata(join(native, '.lake/build/lib/lean'), data);
+    report.standardModuleData = { directory: join(lean.prefix, 'lib/lean'), nativeArtifactIdentity: lean.identity,
+      scope: 'Explicit external read-only standard module data; automatic deployment packaging is not validated by this probe' };
+  }
   for (const directory of [native, original, project]) renameSync(directory, directory + '.hidden');
   const runtimeEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
-  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2',
-    LEAN_SYSROOT: lean.prefix, LEAN_PATH: data });
+  Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
+  if (!bundled) Object.assign(runtimeEnv, { LEAN_SYSROOT: lean.prefix, LEAN_PATH: data });
+  const nativeRuntimeEnv = bundled
+    ? { ...runtimeEnv, LEAN_SYSROOT: report.bundled.sysroot, LEAN_PATH: report.bundled.projectPath } : runtimeEnv;
+  const nativeAttributeEnv = bundled
+    ? { ...runtimeEnv, LEAN_SYSROOT: report.attributeBundled.sysroot, LEAN_PATH: report.attributeBundled.projectPath } : runtimeEnv;
   const nativeBinary = join(native + '.hidden', '.lake/build/bin/user_attr');
   const invocation = [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')];
   report.deployment = { directory: deployment, sourceHidden: true, path: '', buildProcessesUsedAtRuntime: false,
-    selfContained: false, wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
-  report.native = run('native compiled runtime import with explicit metadata', nativeBinary, [], deployment, runtimeEnv);
-  report.actual = run('deployed runtime import with explicit metadata', engine, invocation, deployment, runtimeEnv);
+    selfContained: bundled, suppliedLeanPaths: !bundled, wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
+  report.native = run('native compiled runtime import with selected metadata', nativeBinary, [], deployment, nativeRuntimeEnv);
+  report.actual = run(bundled ? 'deployed runtime import with automatic metadata' : 'deployed runtime import with explicit metadata', engine, invocation, deployment, runtimeEnv);
   assert.deepEqual(report.actual, report.native);
-  report.attributeDeployment = { directory: attributeDeployment, sourceHidden: true, path: '', selfContained: false,
+  report.attributeDeployment = { directory: attributeDeployment, sourceHidden: true, path: '', selfContained: bundled, suppliedLeanPaths: !bundled,
     wasmSha256: await hashFile(join(attributeDeployment, 'program.wasm')) };
   report.runtimeAttributes = {
-    native: run('native runtime-attribute assertions', nativeAttributeBinary, [], deployment, runtimeEnv),
+    native: run('native runtime-attribute assertions', nativeAttributeBinary, [], deployment, nativeAttributeEnv),
     actual: run('deployed runtime-attribute assertions', engine,
       [...(target === 'deno' ? ['run', '-A'] : []), join(attributeDeployment, 'main.mjs')], deployment, runtimeEnv),
   };
   assert.deepEqual(report.runtimeAttributes.actual, report.runtimeAttributes.native);
   const missing = join(output, 'missing standard data'); mkdirSync(missing);
-  const missingEnv = { ...runtimeEnv, LEAN_SYSROOT: missing };
+  const missingEnv = { ...runtimeEnv, LEAN_SYSROOT: missing, ...(bundled ? { LEAN_PATH: report.bundled.projectPath } : {}) };
   report.missingDataControl = {
     native: run('native missing-standard-metadata control', nativeBinary, [], deployment, missingEnv, false),
     actual: run('deployed missing-standard-metadata control', engine, invocation, deployment, missingEnv, false),
@@ -162,7 +188,10 @@ try {
   assert.equal(report.missingDataControl.native.signal, null);
   assert.notEqual(report.missingDataControl.native.code, 0, 'Missing standard module data must not silently succeed');
   assert.deepEqual(report.missingDataControl.actual, report.missingDataControl.native);
-  for (const row of report.moduleData) assert.equal(await hashFile(join(data, row.path)), row.sha256);
+  if (bundled) {
+    assert.deepEqual(await bundledMetadata(deployment), report.bundled);
+    assert.deepEqual(await bundledMetadata(attributeDeployment), report.attributeBundled);
+  } else for (const row of report.moduleData) assert.equal(await hashFile(join(data, row.path)), row.sha256);
   report.nativeSourceAfter = await verify(native + '.hidden', originals);
   report.applicationAfter = await verify(project + '.hidden', buildSources);
   report.originalApplicationAfter = await verify(original + '.hidden', originals);

@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Expanded signal CI](evidence/signal-policy-native-ci-2026-09-24.json) passes all 45 controls without skips on Linux x64 and ARM64 after the documented runner core-collector correction. Native module-data controls and the guarded full Bun application campaign are running; installed metadata acceptance remains pending.
+**Changed:** [Native module-data CI](evidence/application-module-data-resource-stop-2026-09-24.json) builds both native controls, then stops safely during copying because of file-cache charges. Provisioning and validation now use separate guarded phases with unchanged limits. Nine local unit controls pass; the installed-import harness is prepared.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

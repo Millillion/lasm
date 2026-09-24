@@ -92,3 +92,17 @@ test('explicit Lean paths, including empty overrides, are preserved', async t =>
   await writeFile(join(output, 'lean/metadata.json'), JSON.stringify({ schema: 1, roots: ['../../outside'] }));
   assert.throws(() => prepareApplicationMetadata(pathToFileURL(join(output, 'main.mjs')), {}), /Invalid deployed/);
 });
+
+test('an explicit sysroot also selects the standard data in the default search path', async t => {
+  const { directory, lean, generated } = await fixture(t);
+  const output = join(directory, 'output');
+  await copyApplicationMetadata(await applicationMetadata(generated, lean), output);
+  for (const value of ['', join(directory, 'caller standard data')]) {
+    const env = { LEAN_SYSROOT: value };
+    prepareApplicationMetadata(pathToFileURL(join(output, 'main.mjs')), env);
+    assert.equal(env.LEAN_SYSROOT, value);
+    assert.deepEqual(env.LEAN_PATH.split(delimiter), [
+      join(output, 'lean/packages/0'), join(output, 'lean/packages/1'), join(value, 'lib/lean'),
+    ]);
+  }
+});

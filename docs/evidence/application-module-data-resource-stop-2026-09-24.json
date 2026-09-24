@@ -1,0 +1,661 @@
+{
+  "scope": "Retained first native module-data CI campaign; both guarded cold provision-and-copy sequences stopped before completing the import controls",
+  "status": {
+    "conclusion": "failure",
+    "databaseId": 35998539823,
+    "headSha": "62ea8aea24796319e11e513b27b3dc450b69a00e",
+    "jobs": [
+      {
+        "completedAt": "2026-09-24T12:22:55Z",
+        "conclusion": "failure",
+        "databaseId": 107629233858,
+        "name": "Module data linux-arm64",
+        "startedAt": "2026-09-24T12:21:37Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Check native engine and enable process-tree guard",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Guarded module-data unit controls",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "failure",
+            "name": "Guarded native Lake and relocated import control",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Preserve results in logs",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 15,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 16,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Millillion/lasm/actions/runs/35998539823/job/107629233858"
+      },
+      {
+        "completedAt": "2026-09-24T12:22:37Z",
+        "conclusion": "failure",
+        "databaseId": 107629234100,
+        "name": "Module data linux-x64",
+        "startedAt": "2026-09-24T12:21:35Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Check native engine and enable process-tree guard",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Guarded module-data unit controls",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "failure",
+            "name": "Guarded native Lake and relocated import control",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Preserve results in logs",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 15,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 16,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 17,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Millillion/lasm/actions/runs/35998539823/job/107629234100"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/Millillion/lasm/actions/runs/35998539823"
+  },
+  "logFile": ".work/product-acceptance/module-data-ci-35998539823.log",
+  "logSha256": "fa11a7384545ea1ce2bcf4ed6143ecf94d324393f8c99d05983f48027ceba12d",
+  "platforms": [
+    {
+      "platform": "linux-x64",
+      "classification": "proactive resource abort, not an API test failure",
+      "reports": {
+        ".work/module-data-units-resources.json": {
+          "startedAt": "2026-09-24T12:21:45.808Z",
+          "command": [
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/application-metadata.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "25c00de4-6386-4f96-9e4a-68944b1f9402",
+          "limits": {
+            "memoryMax": 536870912,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 429496729,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 15477903360
+          },
+          "minimumHostAvailable": 15469780992,
+          "peakMemoryBytes": 43417600,
+          "peakTasks": 12,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-units-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:21:46.030Z",
+            "memoryBytes": 22589440,
+            "peakMemoryBytes": 38416384,
+            "swapBytes": 0,
+            "tasks": 12,
+            "memoryBreakdown": {
+              "anon": 19902464,
+              "file": 290816,
+              "kernel": 1826816,
+              "shmem": 0,
+              "file_mapped": 172032,
+              "inactive_file": 290816,
+              "slab": 303128
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:21:46.163Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 15917056,
+            "peakMemoryBytes": 43417600,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13692928,
+              "file": 307200,
+              "kernel": 1077248,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 307200,
+              "slab": 170960
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:21:46.183Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/module-data-native-resources.json": {
+          "startedAt": "2026-09-24T12:21:46.232Z",
+          "command": [
+            "node",
+            "integration/application-module-data.mjs",
+            ".work/module-data-native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "b5413498-632e-475c-8306-76b999767e65",
+          "limits": {
+            "memoryMax": 6871318528,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 5497054822,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 15461306368
+          },
+          "minimumHostAvailable": 14937464832,
+          "peakMemoryBytes": 5513940992,
+          "peakTasks": 23,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-native-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:22:34.485Z",
+            "memoryBytes": 5512105984,
+            "peakMemoryBytes": 5512105984,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 170639360,
+              "file": 5135101952,
+              "kernel": 204120064,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4901445632,
+              "slab": 200415216
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "highWaterProcesses": {
+            "at": "2026-09-24T12:22:27.275Z",
+            "processes": [
+              {
+                "pid": 2167,
+                "name": "node-MainThread",
+                "residentBytes": 230682624,
+                "threads": 11
+              }
+            ]
+          },
+          "stoppedBecause": "Workload reached its proactive memory budget",
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "killed",
+            "exitStatus": "TERM",
+            "capturedAt": "2026-09-24T12:22:34.544Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 5352611840,
+            "peakMemoryBytes": 5513940992,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13680640,
+              "file": 5137047552,
+              "kernel": 201281536,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4903391232,
+              "slab": 200354800
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:22:34.562Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": true,
+          "memoryThrottled": false
+        },
+        ".work/module-data-native/result.json": {
+          "scope": "Native Lake helper and relocated module-data import control; no installed Wasm acceptance implied",
+          "platform": "linux-x64",
+          "commands": [
+            {
+              "label": "native AOT control build",
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            }
+          ],
+          "passed": false,
+          "resourceReport": "/home/runner/work/lasm/lasm/.work/module-data-native-resources.json",
+          "toolchain": {
+            "version": "4.34.0",
+            "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+            "identity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1"
+          },
+          "generated": {
+            "modules": [
+              "+Imported",
+              "+Example.Data",
+              "/+Main"
+            ],
+            "metadataRoots": [
+              "/home/runner/work/lasm/lasm/.work/module-data-native/project/dependency/.lake/build/lib/lean",
+              "/home/runner/work/lasm/lasm/.work/module-data-native/project/.lake/build/lib/lean"
+            ]
+          },
+          "phase": "native AOT control build"
+        }
+      }
+    },
+    {
+      "platform": "linux-arm64",
+      "classification": "proactive resource abort, not an API test failure",
+      "reports": {
+        ".work/module-data-units-resources.json": {
+          "startedAt": "2026-09-24T12:21:46.803Z",
+          "command": [
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/application-metadata.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "5a72adfb-035c-4bd6-a5fc-9f88609a1796",
+          "limits": {
+            "memoryMax": 536870912,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 429496729,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16722010112,
+            "available": 15292579840
+          },
+          "minimumHostAvailable": 15277395968,
+          "peakMemoryBytes": 37306368,
+          "peakTasks": 17,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-units-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:21:47.023Z",
+            "memoryBytes": 33742848,
+            "peakMemoryBytes": 33820672,
+            "swapBytes": 0,
+            "tasks": 17,
+            "memoryBreakdown": {
+              "anon": 30621696,
+              "file": 274432,
+              "kernel": 2076672,
+              "shmem": 0,
+              "file_mapped": 172032,
+              "inactive_file": 274432,
+              "slab": 389008
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:21:47.186Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 13447168,
+            "peakMemoryBytes": 37306368,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11722752,
+              "file": 311296,
+              "kernel": 925696,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 311296,
+              "slab": 200720
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:21:47.206Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/module-data-native-resources.json": {
+          "startedAt": "2026-09-24T12:21:47.254Z",
+          "command": [
+            "node",
+            "integration/application-module-data.mjs",
+            ".work/module-data-native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "4ef81378-967b-4582-afb1-e44bccda1192",
+          "limits": {
+            "memoryMax": 6694109184,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 5355287347,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16722010112,
+            "available": 15284342784
+          },
+          "minimumHostAvailable": 14770855936,
+          "peakMemoryBytes": 5361127424,
+          "peakTasks": 23,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-native-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:22:52.375Z",
+            "memoryBytes": 5355360256,
+            "peakMemoryBytes": 5355360256,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 131489792,
+              "file": 5025898496,
+              "kernel": 197447680,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4770869248,
+              "slab": 195648688
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "highWaterProcesses": {
+            "at": "2026-09-24T12:22:26.329Z",
+            "processes": [
+              {
+                "pid": 2315,
+                "name": "node-MainThread",
+                "residentBytes": 231706624,
+                "threads": 11
+              }
+            ]
+          },
+          "stoppedBecause": "Workload reached its proactive memory budget",
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "killed",
+            "exitStatus": "TERM",
+            "capturedAt": "2026-09-24T12:22:52.432Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 5239664640,
+            "peakMemoryBytes": 5361127424,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11710464,
+              "file": 5031190528,
+              "kernel": 196526080,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4776161280,
+              "slab": 195759664
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:22:52.452Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": true,
+          "memoryThrottled": false
+        },
+        ".work/module-data-native/result.json": {
+          "scope": "Native Lake helper and relocated module-data import control; no installed Wasm acceptance implied",
+          "platform": "linux-arm64",
+          "commands": [
+            {
+              "label": "native AOT control build",
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            }
+          ],
+          "passed": false,
+          "resourceReport": "/home/runner/work/lasm/lasm/.work/module-data-native-resources.json",
+          "toolchain": {
+            "version": "4.34.0",
+            "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+            "identity": "0d20aeca378cf75675cc8057649bc81f2a6794c14f0989c0876081a90d0669f7"
+          },
+          "generated": {
+            "modules": [
+              "+Imported",
+              "+Example.Data",
+              "/+Main"
+            ],
+            "metadataRoots": [
+              "/home/runner/work/lasm/lasm/.work/module-data-native/project/dependency/.lake/build/lib/lean",
+              "/home/runner/work/lasm/lasm/.work/module-data-native/project/.lake/build/lib/lean"
+            ]
+          },
+          "phase": "native AOT control build"
+        }
+      }
+    }
+  ],
+  "finding": "Both private Lake helpers and native application builds succeeded. The guard stopped subsequent copying at about five GiB of cgroup memory, mostly inactive file cache; process high-water RSS was about 220 MiB. No kernel OOM, throttle or pressure event occurred.",
+  "followup": "Run cold provisioning and module-data copying/import validation as separate sequential guarded phases. Keep identical guard limits, fixture assertions and full metadata copies.",
+  "recordedAt": "2026-09-24T12:26:34.206521+00:00",
+  "followupUnitControls": {
+    "tests": 9,
+    "passed": 9,
+    "skipped": 0,
+    "log": "\u2714 runtime module data preserves search precedence and relocates without original files (33.821921ms)\n\u2714 metadata content changes invalidate the recipe and copies reject concurrent changes (19.092687ms)\n\u2714 linked module data is materialized, duplicate roots removed and cycles rejected (21.367375ms)\n\u2714 ordinary Init/Std-only applications do not acquire unused metaprogramming assets (4.59619ms)\n\u2714 explicit Lean paths, including empty overrides, are preserved (14.365702ms)\n\u2714 an explicit sysroot also selects the standard data in the default search path (12.567747ms)\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (48.942695ms)\n\u2714 wrong engines fail before executing the application payload (39.83184ms)\n\u2714 all full-runtime host support files exist and target validation is strict (3.494814ms)\n\u2139 tests 9\n\u2139 suites 0\n\u2139 pass 9\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 367.624211\n",
+    "scope": "Small file/loader controls only; new native CI phases and installed import harness remain unexecuted"
+  },
+  "followupSourceSha256": {
+    "src/application-metadata-runtime.mjs": "d56663c1ee0c51d408e2a72b4bae45d9e74529e7229ec57b612939e2afd11af7",
+    "test/application-metadata.test.mjs": "35025722242ff05b552a2a5538a4572762baecb852636b6145a97174e7762117",
+    "integration/application-module-data-provision.mjs": "4370902ec5f6ed3960c55689b1935750eca94a7e5dbc3c43768cd8bbf6978608",
+    "integration/application-upstream-runtime-imports.mjs": "6d85d2b0ceb89489bacd775790e18faf3669d72f3d521831b1dcba169cf80905",
+    ".github/workflows/application-module-data.yml": "c53721d755842659d495d22bb75c37fb2bc99d4c00098998ea4818b129399ed9"
+  }
+}

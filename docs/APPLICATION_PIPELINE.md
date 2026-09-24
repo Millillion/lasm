@@ -576,3 +576,14 @@ Lake/import controls and installed Wasm acceptance are still pending; this
 unit-tested implementation is not a completed deployment gate. Unbuilt dynamic
 modules and custom foreign consumers need separate coverage, and the full
 metadata payload's size is an outstanding deployment tradeoff.
+
+The [first native module-data campaign](evidence/application-module-data-resource-stop-2026-09-24.json)
+successfully evaluates the revised Lake helper and builds the native control
+on Linux x64 and ARM64, then stops proactively during metadata copying. About
+five GiB of cgroup usage is predominantly inactive file cache; neither run
+has an OOM or pressure event. These are resource aborts, not import failures.
+The workflow now separates cold provisioning and validation into sequential
+guarded phases with unchanged limits. Nine local unit controls pass, including
+an explicit sysroot with default project search paths. The installed import
+harness has a separate bundled-data mode that supplies no Lean path variables
+to deployed processes; that campaign remains pending.

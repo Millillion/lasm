@@ -38,9 +38,11 @@ jobs:
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Guarded module-data unit controls
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/module-data-units-resources.json -- node --max-old-space-size=128 --test --test-concurrency=1 test/application-metadata.test.mjs test/application-output.test.mjs
+      - name: Guarded cold native tool provisioning
+        run: node scripts/full-lean/run-bounded.mjs --report .work/module-data-provision-resources.json -- node integration/application-module-data-provision.mjs .work/module-data-provision
       - name: Guarded native Lake and relocated import control
         run: node scripts/full-lean/run-bounded.mjs --report .work/module-data-native-resources.json -- node integration/application-module-data.mjs .work/module-data-native
       - name: Preserve results in logs
         if: always()
         run: |
-          node -e "const fs=require('node:fs');for(const p of ['.work/module-data-units-resources.json','.work/module-data-native-resources.json','.work/module-data-native/result.json'])if(fs.existsSync(p))console.log(p+'\n'+fs.readFileSync(p,'utf8'))"
+          node -e "const fs=require('node:fs');for(const p of ['.work/module-data-units-resources.json','.work/module-data-provision-resources.json','.work/module-data-provision/result.json','.work/module-data-native-resources.json','.work/module-data-native/result.json'])if(fs.existsSync(p))console.log(p+'\n'+fs.readFileSync(p,'utf8'))"

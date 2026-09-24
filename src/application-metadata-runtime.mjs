@@ -12,5 +12,5 @@ export function prepareApplicationMetadata(entrypoint, env = process.env) {
     || metadata.roots.some(name => typeof name !== 'string' || !/^packages\/\d+$/.test(name)))
     throw new Error('Invalid deployed Lean module-data manifest');
   env.LEAN_SYSROOT ??= root;
-  env.LEAN_PATH ??= [...metadata.roots, 'lib/lean'].map(name => join(root, name)).join(delimiter);
+  env.LEAN_PATH ??= [...metadata.roots.map(name => join(root, name)), join(env.LEAN_SYSROOT, 'lib/lean')].join(delimiter);
 }
