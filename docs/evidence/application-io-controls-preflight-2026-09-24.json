@@ -1,0 +1,59 @@
+{
+  "scope": "Prepared supplementary filesystem probe and native oracle CI; execution pending",
+  "recordedAt": "2026-09-24T03:07:48.527Z",
+  "checks": {
+    "javascriptSyntax": "passed",
+    "workflowStructure": "passed",
+    "leanFixtureExecution": "pending",
+    "installedApplicationExecution": "pending"
+  },
+  "files": {
+    "integration/application-io-regressions.mjs": "f6d9889abda4f0ab77e8b5342fa789dce7db9bbdd5734f856991931359b465d6",
+    "integration/fixtures/FilesystemSurface.lean": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+    ".github/workflows/application-io-controls.yml": "309d376b2cbca6b8faeb342f65048f63381bb0df118e54a0d114b1a9645bf426"
+  },
+  "filesystemAssertionCallSites": 51,
+  "earlierFixtures": [
+    "standard-io",
+    "getline-state",
+    "truncate-errors",
+    "console-buffering"
+  ],
+  "nativeCi": {
+    "repo": "Millillion/lasm",
+    "visibility": "public",
+    "standardRunners": [
+      "ubuntu-24.04",
+      "ubuntu-24.04-arm",
+      "windows-2022"
+    ],
+    "artifactUploads": false,
+    "cacheUploads": false,
+    "scope": "Native controls only; macOS, Windows ARM64 and Wasm acceptance remain separate"
+  },
+  "releases": [
+    {
+      "component": "Lean",
+      "version": "4.34.0",
+      "url": "https://github.com/leanprover/lean4/releases/latest",
+      "resolved": "https://github.com/leanprover/lean4/releases/tag/v4.34.0"
+    },
+    {
+      "component": "Node",
+      "version": "26.10.0",
+      "url": "https://nodejs.org/en/download/current"
+    },
+    {
+      "component": "Deno",
+      "version": "2.9.7",
+      "url": "https://github.com/denoland/deno/releases/latest",
+      "resolved": "https://github.com/denoland/deno/releases/tag/v2.9.7"
+    },
+    {
+      "component": "Bun",
+      "version": "1.4.2",
+      "url": "https://github.com/oven-sh/bun/releases/latest",
+      "resolved": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2"
+    }
+  ]
+}

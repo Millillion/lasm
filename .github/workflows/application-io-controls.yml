@@ -1,0 +1,48 @@
+name: Native controls for application IO regressions
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: application-io-controls-${{ github.ref }}
+  cancel-in-progress: false
+
+# Native fixture oracles only; never count these as Wasm application passes.
+# Reuses the verified public standard-runner/guard profile. No stored caches
+# or artifact uploads. macOS and native Windows ARM64 acceptance remain open.
+jobs:
+  controls:
+    if: github.event.repository.visibility == 'public'
+    name: Native application IO ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64, memory: 6144 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64, memory: 6144 }
+          - { platform: win32-x64, runner: windows-2022, arch: x64, memory: 2048 }
+    env:
+      LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable Linux resource guard
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Native Lean 4.34 fixture oracles
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/application-io-controls-resources.json -- node integration/application-io-regressions.mjs .work/application-io-controls native
+      - name: Preserve bounded native receipts
+        if: always()
+        run: node -e "const f=require('node:fs');for(const p of ['.work/application-io-controls/result.json','.work/application-io-controls-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
