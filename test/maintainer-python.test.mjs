@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, existsSync, rmSync, symlinkSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname, delimiter } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { maintainerPython } from '../scripts/full-lean/maintainer-sdk.mjs';
@@ -39,16 +39,19 @@ test('SDK normalization retains bytecode protection through configure and make c
   const replacement = repair.replacements[0];
   const script = join(base, 'parent.py');
   const env = { ...process.env, EMSDK_PYTHON: './private launcher/maintainer-python', PYTHONDONTWRITEBYTECODE: '1' };
-  function nested(normalization) {
-    writeFileSync(script, 'import os, sys, subprocess\ndef normalize():\n' + normalization +
+  function nested(normalization, overrides = {}) {
+    writeFileSync(script, 'import os, sys, subprocess, shutil\ndef normalize():\n' + normalization +
       '\nnormalize()\nos.chdir(' + JSON.stringify(elsewhere) + ')\nsubprocess.run([' + JSON.stringify(child) + '], check=True)\n');
-    return execFileSync(launcher, ['-E', script], { cwd: base, env, encoding: 'utf8' });
+    return execFileSync(launcher, ['-E', script], { cwd: base, env: { ...env, ...overrides }, encoding: 'utf8' });
   }
   assert.equal(nested(replacement.before), 'False\n42\n');
   assert.ok(existsSync(join(base, '__pycache__')), 'Unpatched normalization loses the wrapper before spawning the child');
   rmSync(join(base, '__pycache__'), { recursive: true });
   assert.equal(nested(replacement.after), 'True\n42\n');
   assert.equal(existsSync(join(base, '__pycache__')), false);
+  assert.equal(nested(replacement.after, { EMSDK_PYTHON: 'maintainer-python',
+    PATH: dirname(launcher) + delimiter + process.env.PATH }), 'True\n42\n');
+  assert.equal(existsSync(join(base, '__pycache__')), false, 'A bare launcher name is resolved before the child changes cwd');
   // The behavior above uses the exact production replacement. Its complete
   // original and repaired files remain guarded by manifest source hashes.
   assert.ok(repair.originalSha256 !== repair.patchedSha256);

@@ -1,6 +1,6 @@
 {
   "version": "6.0.9",
-  "patchSha256": "f8b31335a97fc2dfd11cfc94ee1787d0b1aff6435ffd765a5613a9553f2e60dc",
+  "patchSha256": "30831eade8835dfa36b92f9354a1fcaaa4ec0315a06deb79d1c72508abef4664",
   "files": [
     {
       "path": "tools/link.py",
@@ -157,11 +157,11 @@
     {
       "path": "tools/config.py",
       "originalSha256": "c2614f51eb78480eb206651c15388d0977ec90576c0cef87fe0a753949d54954",
-      "patchedSha256": "592a97b529c6f30131348723ce89f1652dc6019ef1ee3bec522ba2b5257ac7af",
+      "patchedSha256": "8818ff8aaf1aa371d5b0c5422e47c7f08426e98d5d4513106e6c7fc2e97a5d5b",
       "replacements": [
         {
           "before": "  if os.environ.get('EMSDK_PYTHON'):\n    os.environ['EMSDK_PYTHON'] = sys.executable\n",
-          "after": "  if os.environ.get('EMSDK_PYTHON'):\n    # Keep a private launcher (including its Python isolation flags) when\n    # normalizing paths for configure/make and other recursive tool calls.\n    os.environ['EMSDK_PYTHON'] = os.path.abspath(os.environ['EMSDK_PYTHON'])\n"
+          "after": "  if os.environ.get('EMSDK_PYTHON'):\n    # Keep a private launcher (including its Python isolation flags) when\n    # normalizing paths for configure/make and other recursive tool calls.\n    launcher = os.environ['EMSDK_PYTHON']\n    os.environ['EMSDK_PYTHON'] = os.path.abspath(shutil.which(launcher) or launcher)\n"
         }
       ]
     }

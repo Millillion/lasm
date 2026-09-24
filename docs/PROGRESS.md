@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Deno listener controls](evidence/deno-native-listener-gap-2026-09-24.json) reproduce the SIGUSR1 interoperability gap for listeners registered before or after Lean; paired SIGUSR2 controls pass. This narrows an existing open issue without closing it. The repaired source CI build has passed dependency verification and reached runtime compilation.
+**Changed:** [SDK launcher lookup](evidence/application-runtime-source-python-path-2026-09-24.json) now retains isolation for PATH names as well as relative and spaced paths; five local controls and all nine exact SDK repairs pass. The preceding fix passed CI dependency verification and host preparation; complete runtime build and deployment receipts remain pending.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

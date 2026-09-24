@@ -1,0 +1,19 @@
+{
+  "scope": "SDK launcher PATH lookup regression controls; no new installed application or platform acceptance implied",
+  "controls": {
+    "tests": 5,
+    "pass": 5,
+    "fail": 0,
+    "skipped": 0,
+    "log": ".work/product-acceptance/runtime-source-sdk-units-r5.log"
+  },
+  "behavior": "Normalize configured Python launchers through PATH when necessary, then retain their absolute identity and isolation flags across changed working directories. Relative and spaced launcher paths remain covered.",
+  "sourceVerification": "All nine complete SDK input/output hashes and the complete patch checksum match untouched inputs.",
+  "sourceHashes": {
+    "src/sdk-repairs.json": "d8e69af2a1f23da69c03aeb77401b1e77c94dd6b3e05c513ab6ed9546daf5b41",
+    "scripts/full-lean/patches/emscripten-6.0.9-memory64.patch": "30831eade8835dfa36b92f9354a1fcaaa4ec0315a06deb79d1c72508abef4664",
+    "test/maintainer-python.test.mjs": "1784d7dcaf4f42fc27538639e01e608eba05a73334de9f827e286b9f17787be9"
+  },
+  "activeCiScope": "Run 36005801990 uses the preceding absolute/relative launcher repair. Its GMP verification and host-support phases passed; full runtime acceptance remains in progress. It does not validate this additional PATH-name case.",
+  "recordedAt": "2026-09-24T13:46:25.601294+00:00"
+}

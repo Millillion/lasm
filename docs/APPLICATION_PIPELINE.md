@@ -663,6 +663,14 @@ pass, and all nine exact SDK source repairs verify against untouched inputs.
 Integrity failures now report a bounded list of changed paths. The failed CI
 reports remain intact; another cold build must validate the fix in production.
 
+The fresh source run has passed GMP verification and host-support preparation
+with the nested-launcher repair and reached runtime compilation. A
+[further local control](evidence/application-runtime-source-python-path-2026-09-24.json)
+also preserves launchers supplied by name through PATH, alongside relative and
+spaced paths. All five controls and nine exact source repairs pass. This added
+PATH case is separate from the running CI commit; final build, packaging and
+relocated execution receipts remain pending.
+
 The [filesystem-device fixture](evidence/filesystem-devices-preflight-2026-09-24.json)
 adds ordinary Lean coverage for Linux character devices and procfs: bounded
 reads, kernel write failures, buffering/flush state, truncation, and readable

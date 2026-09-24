@@ -205,14 +205,15 @@
    uintptr_t offset = (uintptr_t)block;
 --- a/tools/config.py
 +++ b/tools/config.py
-@@ -61,7 +61,9 @@
+@@ -61,7 +61,10 @@
    # reinitialize EMSDK_PYTHON here so that sub-tool spawns will use the same
    # Python interpreter as the parent.
    if os.environ.get('EMSDK_PYTHON'):
 -    os.environ['EMSDK_PYTHON'] = sys.executable
 +    # Keep a private launcher (including its Python isolation flags) when
 +    # normalizing paths for configure/make and other recursive tool calls.
-+    os.environ['EMSDK_PYTHON'] = os.path.abspath(os.environ['EMSDK_PYTHON'])
++    launcher = os.environ['EMSDK_PYTHON']
++    os.environ['EMSDK_PYTHON'] = os.path.abspath(shutil.which(launcher) or launcher)
  
  
  def set_config_from_tool_location(config_key, tool_binary, f):
