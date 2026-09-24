@@ -229,9 +229,9 @@ source trees, empty PATH and unchanged datasets; per-file counts, failure counts
 and total output match native. All 7,669 reference entries remain unchanged.
 The [three-engine evidence](evidence/upstream-ofscientific-2026-09-24.json) records
 the 3.49 GiB maximum peak without resource events. The separate
-`integration/application-upstream-packages.mjs` harness also supports the reviewed
-floating-point project; its acceptance remains pending. Other mixed registrations
-and native platforms remain open.
+`integration/application-upstream-packages.mjs` harness drives the reviewed
+floating-point project too. Other mixed registrations and native platforms
+remain open.
 
 The unchanged `pkg/exe_private_lean_import` project also passes in all three
 engines through installed `.14`, matching its native executable's exact output.
@@ -244,3 +244,15 @@ preserve the initial preflight failure and all three passes, including unchanged
 original drivers and all 7,669 reference entries. Peak guarded memory was
 3.56 GiB without resource events. This is Linux x64 application evidence, not
 acceptance for other platforms or all mixed registrations.
+
+The complete `pkg/float` project now passes **1,751,726 original checks in each
+of stock Node, Deno and Bun** through installed `.14` on Linux x64. This covers
+875,863 vectors in all 48 vendored files, each checked by the original model and
+native backends. Native controls, per-file counts, totals and failure counts
+match; only elapsed-time text is excluded from comparison. The unchanged program
+explicitly executes `gzip`, so the isolated deployment PATH contains that one
+recorded dependency. All source copies are hidden and all 7,669 reference entries
+remain unchanged. The [floating-point receipts](evidence/upstream-float-2026-09-24.json)
+record a 4.97 GiB maximum peak without resource events. Original NaN-class and
+exception-flag policies remain unchanged; this is not proof of every possible
+floating-point input or other native platforms.

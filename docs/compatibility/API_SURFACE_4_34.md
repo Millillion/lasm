@@ -94,3 +94,11 @@ single patched object, with every other archive member and bundle file verified.
 Linux. Other native hosts remain unvalidated. LLVM target and Emscripten status
 describe the actual Wasm artifact; zero libuv/OpenSSL version observations remain
 an open semantics audit.
+
+The unchanged [upstream floating-point package](../evidence/upstream-float-2026-09-24.json)
+now passes all 1,751,726 checks per engine through installed `.14` on Linux x64:
+875,863 original vectors across 48 files, with both model and native backends.
+The original NaN-class comparison and ignored exception flags are preserved;
+timings are the only output excluded from differential comparison. This adds
+substantial arithmetic/conversion evidence without establishing complete
+floating-point, libm, other-API or native-platform parity.
