@@ -34,9 +34,13 @@ compiles the original LSP client/driver once for its 150 inputs. Its exact
 `lean --server` child command still runs the managed native compiler; that
 invocation is recorded explicitly. This tests the deployed client's process,
 pipe, JSON and filesystem behavior while keeping native compiler behavior
-separate. The other five registrations in this category have no mapped adapter
-yet and fail preparation explicitly. No parser or LSP campaign result is
-implied by harness support alone.
+separate. The four `^server/` clients compile separately through their mapped
+adapter. The `^misc_dir/server_project$` adapter compiles a byte-identical copy
+of the standard-library-only client in a separate release-pinned directory,
+preserving the original project's stage-directory pin. Its native Lake build
+and server commands remain explicit native coverage. Select these three LSP
+groups separately; unexpected child commands fail explicitly. No parser or LSP
+campaign result is implied by harness support alone.
 The target and engine arguments accept Node, Deno or Bun. The harness itself
 requires Linux, Bash, GNU tar, CTest, Perl and diff, as used by the upstream
 drivers. End-user tool provisioning is tested separately.

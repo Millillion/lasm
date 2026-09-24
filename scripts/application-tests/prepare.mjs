@@ -51,8 +51,12 @@ if (!tests.length) throw new Error('No upstream tests matched');
 if (mode === 'probe-compile-disabled' && tests.some(test => test.upstreamCompileEnabled !== false))
   throw new Error('The extra compilation probe must select only upstream compile-disabled cases');
 const generatedPins = [];
-const sharedDriver = ['compiled-test-driver', 'compiled-driver-and-native-compiler'].includes(category);
-if (category === 'compiled-application' || sharedDriver) for (const directory of new Set(tests.map(test => dirname(test.source)))) {
+const projectServer = category === 'compiled-driver-and-native-compiler' && tests.length === 1 &&
+  tests[0].name === 'misc_dir/server_project' && tests[0].driver === 'tests/misc_dir/server_project/run_test.sh';
+const standaloneServer = category === 'compiled-driver-and-native-compiler' && tests.every(test =>
+  test.driver === 'tests/server/run_test.sh' && /^server\/(diags|init_exit|init_exit_with_zed|init_exit_worker)\.lean$/.test(test.name));
+const sharedDriver = ['compiled-test-driver', 'compiled-driver-and-native-compiler'].includes(category) && !standaloneServer;
+if (!projectServer && (category === 'compiled-application' || sharedDriver || standaloneServer)) for (const directory of new Set(tests.map(test => dirname(test.source)))) {
   const pin = join(source, directory, 'lean-toolchain');
   if (existsSync(pin)) throw new Error('Do not replace an upstream pin: ' + pin);
   // tests/lean-toolchain also points at upstream's build/release/stage1. Keep
@@ -64,32 +68,59 @@ const environment = { TEST_DIR: join(source, 'tests'), SRC_DIR: join(source, 'sr
   BUILD_DIR: lean.prefix, STAGE: '1', TEST_CTEST: '1',
   PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(':'),
   LASM_COMPILER: compiler, LASM_BUILD_NODE: process.execPath, LASM_APPLICATION_TARGET: target, LASM_APPLICATION_ENGINE: engine,
-  LASM_NATIVE_LEAN: lean.lean,
+  LASM_NATIVE_LEAN: lean.lean, LASM_NATIVE_LAKE: lean.lake,
   LASM_TOOLCHAIN_CACHE: process.env.LASM_TOOLCHAIN_CACHE,
   LEAN_HEADER_SNAPSHOTS: '0', LEANC_OPTS: '', CXX: join(lean.prefix, 'bin/clang++') };
-const nativeEnvironment = sharedDriver
+const nativeEnvironment = projectServer ? join(root, 'scripts/application-tests/server-project-case.sh')
+  : standaloneServer ? join(root, 'scripts/application-tests/server-case.sh') : sharedDriver
   ? join(root, 'scripts/application-tests/docparse-case.sh') : join(output, 'native-environment.sh');
-if (!sharedDriver)
+if (!sharedDriver && !standaloneServer)
   writeFileSync(nativeEnvironment, '#!/usr/bin/env bash\nsource "$TEST_DIR/util.sh"\ndriver="$1"; shift\nsource "$driver"\n');
 let compiledDriver;
+const additionalHarnessFiles = [];
 let compileDriver = join(root, 'scripts/application-tests',
   mode === 'probe-compile-disabled' ? 'probe-compile-disabled.sh' : 'compile-case.sh');
 if (sharedDriver) {
-  const pile = category === 'compiled-test-driver' ? 'docparse' : 'server_interactive';
+  const pile = projectServer ? 'misc_dir/server_project' : category === 'compiled-test-driver' ? 'docparse' : 'server_interactive';
   if (tests.some(test => test.driver !== `tests/${pile}/run_test.sh`)) throw new Error('Unmapped compiled test driver; select an explicitly supported original driver');
   const driverSource = join(source, `tests/${pile}/run_test.lean`), dist = join(output, 'driver-dist');
+  let compiledSource = driverSource;
+  if (projectServer) {
+    // This original project pins its own unavailable stage1 compiler. Preserve
+    // that pin and compile a byte-identical copy of its stdlib-only client in a
+    // separate release-pinned directory. Both executions still use the original
+    // project cwd, input and shell driver; its server remains managed native.
+    const driverProject = join(output, 'driver-project'); mkdirSync(driverProject);
+    const pin = join(driverProject, 'lean-toolchain');
+    writeFileSync(pin, 'leanprover/lean4:v4.34.0\n'); generatedPins.push(pin);
+    compiledSource = join(driverProject, 'run_test.lean');
+    writeFileSync(compiledSource, readFileSync(driverSource));
+  }
   const env = { ...process.env }; delete env.LASM_APPLICATION_RUNTIME;
   for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(key)) delete env[key];
-  execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', driverSource,
+  execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), 'build', compiledSource,
     '--target', target, '--output', dist], { env, stdio: 'inherit', timeout: 1800_000 });
   compiledDriver = { source: driverSource, sourceSha256: await hashFile(driverSource),
+    ...(projectServer ? { compiledSource, compiledSourceSha256: await hashFile(compiledSource) } : {}),
     dist, build: JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8')),
     wasmSha256: await hashFile(join(dist, 'program.wasm')) };
   environment.LASM_TEST_DRIVER_DIST = dist;
   const shimDirectory = join(output, 'parallel-bin'); mkdirSync(shimDirectory);
   compileDriver = join(shimDirectory, 'lean');
   writeFileSync(compileDriver, readFileSync(join(root, 'scripts/application-tests',
-    pile === 'docparse' ? 'docparse-lean.sh' : 'server-driver-lean.sh')));
+    projectServer ? 'server-project-lean.sh' : pile === 'docparse' ? 'docparse-lean.sh' : 'server-driver-lean.sh')));
+  chmodSync(compileDriver, 0o755);
+  environment.LASM_TEST_DRIVER_SHIM = compileDriver;
+  if (projectServer) {
+    const lakeShim = join(shimDirectory, 'lake');
+    writeFileSync(lakeShim, readFileSync(join(root, 'scripts/application-tests/server-project-lake.sh')));
+    chmodSync(lakeShim, 0o755); additionalHarnessFiles.push(lakeShim, compiledSource);
+  }
+}
+if (standaloneServer) {
+  const shimDirectory = join(output, 'parallel-bin'); mkdirSync(shimDirectory);
+  compileDriver = join(shimDirectory, 'lean');
+  writeFileSync(compileDriver, readFileSync(join(root, 'scripts/application-tests/server-case-lean.sh')));
   chmodSync(compileDriver, 0o755);
   environment.LASM_TEST_DRIVER_SHIM = compileDriver;
 }
@@ -97,7 +128,7 @@ const timeoutSeconds = 900;
 const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sourceArchiveSha256: inventory.sourceArchiveSha256,
   sourceManifestSha256: await hashFile(sourcesFile), verifiedOriginalFilesAndLinks: verified,
   output, source, execution, category, mode, target, engine, compiler, nativeEnvironment, compileDriver, timeoutSeconds, environment, tests, generatedPins,
-  nativeArtifactIdentity: lean.identity, compiledDriver, resourceReport: process.env.LASM_RESOURCE_REPORT,
+  nativeArtifactIdentity: lean.identity, compiledDriver, additionalHarnessFiles, resourceReport: process.env.LASM_RESOURCE_REPORT,
   scope: category === 'native-build-time' ? 'Unchanged managed native compiler tests; no deployed runtime pass implied'
     : 'Unchanged native driver followed by installed-CLI AOT execution with original arguments and assertions',
   adaptations: ['Generated environment selects the matching managed native toolchain and isolated unchanged source copy.',
@@ -112,13 +143,17 @@ const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sou
   recordedAt: new Date().toISOString() };
 if (compiledDriver) manifest.adaptations.push(
   'The unchanged Lean test driver is compiled once through the installed application CLI, then reused for all original inputs.',
-  'Both phases source the unchanged upstream shell driver. The deployed phase substitutes only its exact lean -Dlinter.all=false --run run_test.lean INPUT invocation; unexpected arguments fail explicitly.',
+  'Both phases source the unchanged upstream shell driver. The deployed phase substitutes only its exact lean -Dlinter.all=false --run run_test.lean invocation and original input arguments; unexpected arguments fail explicitly.',
   'Linter suppression applies to the native interpreter elaboration; deployed parser behavior and all original output assertions are retained.',
   'Each case refers to the shared immutable deployment with a generated symlink; removing a successful case reference never removes the shared artifact.');
 if (category === 'compiled-driver-and-native-compiler') {
   manifest.scope = 'AOT Lean LSP client/driver using its unchanged managed native compiler/server child; server/compiler behavior is native build-time coverage';
-  manifest.adaptations.push('The exact original lean --server invocation is forwarded to the verified native compiler and recorded for every deployed case; arbitrary compiler invocations are rejected.',
-    'Only tests/server_interactive/run_test.sh is mapped in this campaign; the other five driver registrations still require their own parallel adapters.');
+  manifest.adaptations.push('The exact original compiler/server child invocation is forwarded to the verified native compiler and recorded for every deployed case; arbitrary compiler invocations are rejected.',
+    projectServer
+      ? 'The original server_project pin refers to an unavailable stage1 build. Its stdlib-only run_test.lean is copied byte-for-byte into a separate release-pinned compilation directory. Original project files, cwd, input, native Lake build/server commands and output assertions remain unchanged.'
+      : standaloneServer
+      ? 'Each of the four original tests/server Lean clients is compiled separately after its unchanged native driver passes; the same original shell driver then executes the deployed client through an exact-command shim.'
+      : 'This campaign maps tests/server_interactive/run_test.sh only; the four standalone server clients and the Lake project client use separately selected adapters.');
 }
 if (mode === 'probe-compile-disabled') {
   manifest.scope = 'Additional native AOT and installed-Lasm AOT experiments for original upstream compile-disabled inputs; original markers/driver run unchanged first';

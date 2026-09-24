@@ -37,7 +37,7 @@ async function verifySources() {
 const before = await verifySources();
 if (before.modified.length) throw new Error('Upstream originals changed before execution: ' + before.modified.join(', '));
 const harnessFiles = [fileURLToPath(import.meta.url), join(root, 'scripts/application-tests/case.mjs'),
-  manifest.compileDriver, manifest.nativeEnvironment];
+  manifest.compileDriver, manifest.nativeEnvironment, ...(manifest.additionalHarnessFiles ?? [])];
 const harnessBefore = Object.fromEntries(await Promise.all(harnessFiles.map(async file => [file, await hashFile(file)])));
 const runId = randomUUID(), startedAt = new Date().toISOString();
 const freeDisk = () => { const disk = statfsSync(manifest.output); return disk.bavail * disk.bsize; };

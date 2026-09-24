@@ -39,7 +39,7 @@ where appropriate; they are neither successes nor fundamental Lasm limitations.
 - [x] Run all native build-time registrations with the managed tools on Linux x64.
 - [x] Run the original source-lint registration against the complete pinned archive.
 - [ ] Run application cases and compiled drivers through the shipping AOT path.
-- [ ] Finish per-driver classification of mixed shell/Lake/package tests.
+- [x] Finish per-driver classification of mixed shell/Lake/package tests.
 - [ ] Execute separately identified upstream exclusions without changing tests.
 - [ ] Audit all shipped APIs and add native-versus-target coverage where missing.
 - [ ] Complete stock Node/Deno/Bun and native six-platform acceptance.
@@ -148,3 +148,16 @@ plugins and library test drivers remain native build-time coverage; executable
 test drivers and `lean --run` clients require deployed application checks too.
 Some original scripts intentionally edit fixtures, so their future harness must
 retain a pristine reference tree and run byte-identical independent copies.
+
+All **155 LSP client registrations pass in stock Node 26.10.0** with installed
+candidate `0.1.0-experimental.10` on Linux x64: four standalone clients, one
+project client and 150 interactive inputs. The original native driver runs first,
+followed by the same driver running the compiled Lean client. Exact native
+Lean/Lake server invocations are recorded separately. The project adapter retains
+its original stage-directory pin and compiles a byte-identical client copy in a
+separate release-pinned directory. This verifies deployed client behavior, not a
+Wasm-hosted Lean compiler. All 7,669 original entries and active harness hashes
+remain unchanged. The sequential preparation/execution run took 25 minutes
+49 seconds and peaked at 3.95 GiB with no resource events. See the
+[per-case evidence](evidence/upstream-lsp-node-2026-09-24.json); other engines
+and native platforms remain pending for this category.
