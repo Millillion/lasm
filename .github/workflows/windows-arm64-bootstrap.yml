@@ -27,6 +27,8 @@ jobs:
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Check the native host
         run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-arm64')"
+      - name: Verify completed-tree archives and storage accounting
+        run: node --max-old-space-size=128 --test --test-concurrency=1 test/tree-archive.test.mjs test/ci-cache-budget.test.mjs
       - name: Check descendant memory accounting below the cap
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-guard-control.json -- node test/fixtures/windows-guard.mjs
       - name: Verify the guard control
@@ -109,6 +111,22 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           SAVED_KEY: lasm-win-arm64-lean-ccache-v1-${{ steps.package.outputs.identity }}-${{ steps.package.outputs.sha256 }}
         run: node scripts/ci/compiler-cache-index.mjs prune .work/windows-arm64-bootstrap-cache/identity.json .work/windows-arm64-bootstrap-cache/pruning.json $env:SAVED_KEY
+      - name: Verify and archive the completed native installation
+        id: stage
+        if: steps.build.outcome == 'success'
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --timeout-seconds 1800 --report .work/windows-stage-pack-resources.json -- node --max-old-space-size=512 scripts/ci/windows-lean-stage.mjs
+      - name: Check included storage for the completed build
+        id: stage_budget
+        if: steps.stage.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/cache-budget.mjs .work/windows-arm64-lean-stage1.tgz .work/windows-stage-cache-budget.json
+      - name: Save the verified completed build for distribution work
+        if: steps.stage_budget.outputs.allowed == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/windows-arm64-lean-stage1.tgz
+          key: lasm-win-arm64-lean-stage1-v1-${{ steps.stage.outputs.identity }}-${{ steps.stage.outputs.sha256 }}
       - name: Preserve bounded bootstrap results in logs
         if: always()
         run: |
@@ -116,4 +134,4 @@ jobs:
       - name: Require a complete native Lean bootstrap
         if: always()
         run: node -e "const a=require('node:assert/strict');a.equal(require('./.work/windows-arm64-bootstrap-resources.json').status,'passed','A preserved checkpoint is not a completed Lean build')"
-      # Included, bounded compiler cache only; no artifact upload or publication.
+      # Included, bounded CI-generated caches only; no artifact upload or publication.

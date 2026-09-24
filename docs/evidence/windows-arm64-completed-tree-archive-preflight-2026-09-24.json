@@ -1,0 +1,34 @@
+{
+  "scope": "Local archive integrity and cache budget controls; real native Windows completed-tree archive has not run yet",
+  "checkedAt": "2026-09-24T14:02:07.858Z",
+  "sources": {
+    "scripts/ci/tree-archive.mjs": "46a858080fdd0e796706e5f0025bcd260c71ef01b4e80536f384d1cbb65f9512",
+    "scripts/ci/windows-lean-stage.mjs": "2aae3173dcf0d45d3755ac2cae10b4c42aa8858a7f35c5fedeaa0e61ddc8af07",
+    "test/tree-archive.test.mjs": "b508aeae56bd45f93c33a14693cb44be7f7e404e0a268dd9505fced0099f34b3",
+    ".github/workflows/windows-arm64-bootstrap.yml": "3e0ac558d46a5c26a7ea79e85f2b8a92419b7b190a0ac5058a36688310d2d9a6"
+  },
+  "tests": {
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "logFile": ".work/product-acceptance/completed-tree-archive-units-r4.log",
+    "sha256": "8e2999e4e8f5c92d62de27629f95a8a2699967f7274bb313d9e9c0f06c1c6c5e",
+    "log": "✔ accounts for archive framing and the larger of both repository metrics (2.147033ms)\n✔ refuses a payload or total that can cross the lower fixed ceiling (2.504596ms)\n✔ missing, invalid or unsafe API metrics cannot authorize an upload (1.063891ms)\n✔ completed CI trees restore exact files, empty directories and recipe checksums (65.433634ms)\n✔ valid tar framing cannot hide changed contents or a malformed manifest (19.42174ms)\n✔ the compressed byte ceiling stops output while it is being written (5.423355ms)\n✔ completed CI archives refuse links and preserve existing evidence (1.406503ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 307.903754\n"
+  },
+  "workflow": {
+    "runner": "windows-11-arm",
+    "maximumArchiveBytes": 2147483648,
+    "repositoryCacheCeilingBytes": 8589934592,
+    "serializedWriterGroup": "lasm-cache-writer",
+    "compilerCacheRecipeUnchanged": true,
+    "source": "CI-generated completed Lean bootstrap only",
+    "distribution": false
+  },
+  "billingSource": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+  "remaining": [
+    "Native archive execution and verified restore",
+    "Relocatable compiler, DLL dependencies and leantar",
+    "Cold Node/npm-only managed installation"
+  ]
+}
