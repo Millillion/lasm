@@ -42,12 +42,16 @@ function run(program, args) {
 try {
   run('cc', ['-std=c11', '-O2', '-Wall', '-Wextra', '-shared', '-fPIC', '-I' + join(sdk, 'include'), source,
     '-L' + join(sdk, 'lib'), '-lwasmtime', '-Wl,-rpath,' + join(sdk, 'lib'), '-o', helper]);
-  report.helperSha256 = await hashFile(helper); report.results = [];
+  report.helperSha256 = await hashFile(helper); report.results = []; report.failures = [];
   for (const [engine, args] of [
     [nodeArg ?? join(root, '.cache/js-runtimes/node-26.10.0/bin/node'), ['--max-old-space-size=128']],
     [denoArg ?? join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
     [bunArg ?? join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
-  ]) report.results.push(JSON.parse(run(engine, [...args, harness, helper]).stdout));
+  ]) {
+    try { report.results.push(JSON.parse(run(engine, [...args, harness, helper]).stdout)); }
+    catch (error) { report.failures.push({ engine, error: error.message }); save(); }
+  }
+  assert.equal(report.failures.length, 0, 'One or more stock engine probes failed; see result.json');
   assert.deepEqual(report.results.map(row => [row.engine, row.version]),
     [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
   report.passed = true;

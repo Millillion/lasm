@@ -1,0 +1,148 @@
+{
+  "scope": "Preserved first helper experiment failure: FFI declaration rejected before guest instantiation; not a Wasmtime or Lean compatibility conclusion",
+  "recordedAt": "2026-09-24T03:31:28.024711+00:00",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35951630293",
+  "commit": "1487c9a3091d854d33fa29b7978143835b114359",
+  "logSha256": "2d244dcf727b18cdcda701c404b2bb8bc0a603961ce189cbff0011fc14516ed7",
+  "preparation": {
+    "code": 0,
+    "signal": null,
+    "stdout": "{\"version\": \"49.0.0\", \"archiveSha256\": \"8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131\", \"files\": 115, \"selectedBytes\": 32341429}\n",
+    "stderr": ""
+  },
+  "commands": [
+    {
+      "program": "cc",
+      "args": [
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-shared",
+        "-fPIC",
+        "-I/home/runner/work/lasm/lasm/.cache/wasmtime-49.0.0/include",
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.c",
+        "-L/home/runner/work/lasm/lasm/.cache/wasmtime-49.0.0/lib",
+        "-lwasmtime",
+        "-Wl,-rpath,/home/runner/work/lasm/lasm/.cache/wasmtime-49.0.0/lib",
+        "-o",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "program": "node",
+      "args": [
+        "--max-old-space-size=128",
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "file:///home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs:15\nconst memory = library.func('int lasm_probe_memory(void *probe, _Out_ uint64_t fields[4])');\n                       ^\n\nError: Array types decay to pointers in prototypes (C standard), use pointers\n    at file:///home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs:15:24\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n    at async node:internal/modules/esm/loader:650:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5)\n\nNode.js v26.10.0\n"
+    }
+  ],
+  "helperSha256": "9a9b26b4e861d1bd16758698a20a08b5ca478694ca0935c9b58c0b3ae0ad9ce3",
+  "sourceSha256": "826fc377e32d22dc6620bdbe3fea549b8a71a2ff4c49997525cbffc3957f1c43",
+  "harnessSha256": "d095281357264374b8fe57f4379586e565da4c1bbf359b6d940ae994898e951b",
+  "resources": {
+    "startedAt": "2026-09-24T03:29:41.135Z",
+    "command": [
+      "node",
+      "--max-old-space-size=128",
+      "scripts/full-lean/probe-wasmtime-helper.mjs",
+      ".work/wasmtime-helper",
+      "node",
+      "deno",
+      "bun"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "09b2734d-2e61-40df-b44b-ef026d0cc835",
+    "limits": {
+      "memoryMax": 1073741824,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 858993459,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 16770744320,
+      "available": 15486570496
+    },
+    "minimumHostAvailable": 15472709632,
+    "peakMemoryBytes": 127266816,
+    "peakTasks": 13,
+    "report": "/home/runner/work/lasm/lasm/.work/wasmtime-helper-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-24T03:29:42.942Z",
+      "memoryBytes": 114941952,
+      "peakMemoryBytes": 114941952,
+      "swapBytes": 0,
+      "tasks": 13,
+      "memoryBreakdown": {
+        "anon": 44265472,
+        "file": 67014656,
+        "kernel": 3387392,
+        "shmem": 0,
+        "file_mapped": 14000128,
+        "inactive_file": 49741824,
+        "slab": 2006640
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "exit-code",
+      "exitCode": "exited",
+      "exitStatus": "1",
+      "capturedAt": "2026-09-24T03:29:43.113Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 91439104,
+      "peakMemoryBytes": 127266816,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13660160,
+        "file": 74555392,
+        "kernel": 2859008,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 49987584,
+        "slab": 1947880
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T03:29:43.136Z",
+    "result": {
+      "code": 1,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "repair": "Use an explicitly allocated 32-byte output buffer through a pointer, rather than unsupported array syntax in an FFI function prototype. Continue independent engine cases after a failure. Follow-up CI pending."
+}

@@ -12,7 +12,9 @@ const create = library.func('void *lasm_probe_new(char *error, size_t size)');
 const destroy = library.func('void lasm_probe_delete(void *probe)');
 const execute = library.func('int lasm_probe_run(void *probe, int64_t value, ProbeCallback *callback, _Out_ int64_t *result, char *error, size_t size)');
 const peek = library.func('uint64_t lasm_probe_peek(void *probe)');
-const memory = library.func('int lasm_probe_memory(void *probe, _Out_ uint64_t fields[4])');
+// Pass explicitly sized storage; a C pointer parameter does not carry an array
+// length, and Koffi correctly rejects array syntax in a function prototype.
+const memory = library.func('int lasm_probe_memory(void *probe, void *fields)');
 const grow = library.func('int lasm_probe_grow_one_page(void *probe, char *error, size_t size)');
 const error = Buffer.alloc(4096);
 const message = () => error.toString('utf8').split('\0')[0];
@@ -25,9 +27,9 @@ function run(probe, value) {
   return { value, result: Number(result[0]), callbacks: calls };
 }
 function describe(probe) {
-  const values = [0, 0, 0, 0];
+  const values = Buffer.alloc(4 * 8);
   assert.equal(memory(probe, values), 0);
-  return values.map(Number);
+  return Array.from({ length: 4 }, (_, index) => Number(values.readBigUInt64LE(index * 8)));
 }
 if (!isMainThread) {
   const result = run(workerData.probe, 41);
