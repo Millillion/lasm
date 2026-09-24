@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Full helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Real Lean module startup, 23 arithmetic comparisons, environment round trips and asynchronous Wasm mailbox tasks pass in every engine](evidence/wasmtime-real-lean-instantiation-2026-09-24.json). The successful guard peaked at 226 MiB. Earlier failures and one proactive resource abort remain recorded; no OOM occurred. Pushes await restored SSH credentials.
+**Changed:** [Real Lean allocator and guest copies pass above 4 GiB in every engine](evidence/wasmtime-real-lean-high-allocation-2026-09-24.json), including two allocation/free cycles and arithmetic after reclamation. Sparse windows keep physical memory low; the guard released at 223 MiB with no resource events. The original pthread benchmark remains open. Pushes await restored SSH credentials.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

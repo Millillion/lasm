@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { hashFile } from '../../../src/managed-artifacts.mjs';
 
-const [libraryPath, cache, expectedHash, oracle] = process.argv.slice(2);
+const [libraryPath, cache, expectedHash, oracle, profile = 'startup'] = process.argv.slice(2);
+assert.ok(['startup', 'high-allocation'].includes(profile));
 // Deserialization loads trusted native code, so verify again inside EACH engine.
 assert.equal(await hashFile(cache), expectedHash);
 const ffi = createRequire(import.meta.url)('koffi'), library = ffi.load(libraryPath);
@@ -16,6 +17,7 @@ const details = library.func('void lasm_lean_instance_details(void *probe, _Out_
 const rejection = library.func('int lasm_lean_instance_rejection_control(void *probe, char *error, size_t capacity)');
 const enqueue = library.func('int lasm_lean_instance_mailbox_enqueue(void *probe, uint64_t value, char *error, size_t capacity)');
 const checkEnvironment = library.func('int lasm_lean_instance_environment_check(void *probe, char *error, size_t capacity)');
+const window = library.func('void *lasm_lean_instance_memory_window(void *probe, uint64_t offset, size_t length)');
 const error = Buffer.alloc(8192), message = () => error.toString('utf8').split('\0')[0];
 let clockCalls = 0;
 assert.equal(Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 1, 0), 'not-equal',
@@ -43,7 +45,7 @@ const environmentBytes = Buffer.from(environment.join('\0') + '\0');
 const probe = create(cache, clock, mailbox, environmentBytes, environmentBytes.length,
   environment.length, process.argv[1], error, error.length);
 if (!probe) { ffi.unregister(clock); ffi.unregister(mailbox); assert.fail(message()); }
-const results = [], observed = Array(19).fill(0);
+const results = [], observed = Array(22).fill(0);
 function invoke(name, args = [], resultCount = 1) {
   const result = [0];
   assert.equal(call(probe, name, args, args.length, resultCount, result, error, error.length), 0, message());
@@ -95,13 +97,54 @@ try {
   assert.deepEqual(observed.slice(12, 14).map(Number), [4, 26]);
   assert.equal(mailboxChecks, 2); assert.equal(Number(observed[9]), 2);
   invoke('em_proxying_queue_destroy', [BigInt(observed[11])], 0);
+  let largeAllocation;
+  if (profile === 'high-allocation') {
+    const size = 4n * 1024n ** 3n + 65536n, pointers = [];
+    const scratch = invoke('malloc', [16n]);
+    assert.ok(scratch > 0n);
+    const view = address => {
+      const pointer = window(probe, address, 8);
+      assert.ok(pointer, 'Bounded window must be inside actual memory');
+      return new DataView(ffi.view(pointer, 8));
+    };
+    for (let repetition = 0; repetition < 2; repetition++) {
+      const allocation = invoke('malloc', [size]);
+      assert.ok(allocation > 0n, 'Actual guest allocator must allocate more than 4 GiB');
+      pointers.push(String(allocation));
+      details(probe, observed);
+      assert.ok(BigInt(observed[3]) >= allocation + size);
+      assert.ok(allocation < 4n * 1024n ** 3n);
+      const addresses = [allocation, 4n * 1024n ** 3n - 8n, 4n * 1024n ** 3n, allocation + size - 8n];
+      for (let i = 0; i < addresses.length; i++) {
+        const expected = 0xabcdef0123456700n + BigInt(i + repetition * 4);
+        view(scratch).setBigUint64(0, expected, true);
+        assert.equal(invoke('memcpy', [addresses[i], scratch, 8n]), addresses[i]);
+        assert.equal(view(addresses[i]).getBigUint64(0, true), expected);
+        view(scratch + 8n).setBigUint64(0, 0n, true);
+        invoke('memcpy', [scratch + 8n, addresses[i], 8n]);
+        assert.equal(view(scratch + 8n).getBigUint64(0, true), expected);
+      }
+      invoke('free', [allocation], 0);
+    }
+    invoke('free', [scratch], 0);
+    assert.equal(invoke('lean_nat_gcd', [49n, 37n]), 13n, 'Allocator still serves GCD after huge-block reclamation');
+    details(probe, observed);
+    assert.ok(Number(observed[19]) > 0 && Number(observed[20]) > 0);
+    assert.equal(window(probe, BigInt(observed[3]) - 4n, 8), null);
+    largeAllocation = { bytesPerAllocation: String(size), repetitions: 2, pointers,
+      boundaryWindowsPerRepetition: 4, windowBytes: 8, guestMemcpyRoundTrips: 8,
+      bothAllocationsFreed: true, postFreeArithmeticPassed: true,
+      growthRequests: Number(observed[19]), successfulGrowth: Number(observed[20]),
+      largestGrowthRequest: String(observed[21]),
+      pattern: 'Sparse malloc/free; four eight-byte windows touched per allocation, no full fill or dense-memory claim' };
+  }
   assert.equal(rejection(probe, error, error.length), 1);
   assert.match(message(), /UNIMPLEMENTED IMPORT env\.lasm_host_platform/);
   const control = message(); details(probe, observed); assert.equal(Number(observed[2]), 1);
   console.log(JSON.stringify({ scope: 'Real compiled Lean module instantiated; pure runtime exports with actual startup, clock and memory metadata, other function imports reject, no main/API acceptance',
     engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
     version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
-    imports: 139, exports: 27181, accessibleMemoryBytes: Number(observed[3]),
+    imports: 139, exports: 27181, accessibleMemoryBytes: Number(observed[3]), profile, largeAllocation,
     stack: { base: String(base), end: String(end), compiledBoundsCheckRetained: true },
     implementedImports: { emscripten_date_now: { source: 'Date.now()', calls: clockCalls },
       emscripten_get_heap_max: { source: 'Actual Wasmtime memory type maximum', calls: Number(observed[5]) },

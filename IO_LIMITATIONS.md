@@ -228,6 +228,13 @@ separately from the earlier runtime evidence below.
   Other imports still trap, six dynamic function globals remain unresolved,
   and workers, the original application main/4 GiB stack case, installed-package
   integration and other platforms remain unfinished. This is component evidence.
+  A [real-allocator follow-up](docs/evidence/wasmtime-real-lean-high-allocation-2026-09-24.json)
+  now allocates and frees 4 GiB plus 64 KiB twice per engine, growing actual
+  shared memory to 4,433,838,080 bytes. Eight guest `memcpy` round trips per
+  engine verify bounded windows below/across/above 4 GiB; subsequent arithmetic
+  still passes. Only sparse eight-byte regions are touched, with a 223 MiB
+  guarded peak and no resource events. This verifies allocator capacity and
+  reclamation, not a dense-memory workload or the original 4 GiB pthread test.
 
 ## Earlier runtime evidence and remaining compatibility work
 

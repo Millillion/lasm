@@ -12,9 +12,10 @@ import { nativeLeanEnvironment } from '../../src/application-sources.mjs';
 import { ensureResourceGuard } from './resource-guard.mjs';
 
 await ensureResourceGuard();
-const [outputArg, toolchainCacheArg, restoredCacheArg, ...extra] = process.argv.slice(2);
+const [outputArg, toolchainCacheArg, restoredCacheArg, profile = 'startup', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && toolchainCacheArg && !extra.length,
-  'Supply NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [VERIFIED_RESTORED_CACHE]');
+  'Supply NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [VERIFIED_RESTORED_CACHE] [startup|high-allocation]');
+assert.ok(['startup', 'high-allocation'].includes(profile));
 assert.equal(process.platform + '-' + process.arch, 'linux-x64');
 const root = fileURLToPath(new URL('../..', import.meta.url)), output = resolve(outputArg);
 const toolchainCache = resolve(toolchainCacheArg);
@@ -39,7 +40,7 @@ const inputs = ['scripts/full-lean/probes/wasmtime-instantiate-lean.c',
   'scripts/full-lean/probe-wasmtime-lean-instantiation.mjs', 'integration/fixtures/LeanPureExports.lean'];
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 const report = { scope: 'Instantiate the actual compiled const_fold module and compare pure runtime exports; actual startup/clock/memory metadata, other function imports reject, no application-main/API acceptance',
-  inputs: hashes, build: previous.build, trustedCache: cacheIdentity, archive, toolchainCache,
+  inputs: hashes, build: previous.build, trustedCache: cacheIdentity, archive, toolchainCache, profile,
   resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], results: [], failures: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(label, program, args, environment = process.env, timeout = 90_000) {
@@ -93,7 +94,7 @@ try {
     [join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ]) {
     try { report.results.push(JSON.parse(run('pure runtime exports', engine,
-      [...args, join(root, inputs[1]), helper, cache, cacheIdentity.sha256, oraclePath]))); }
+      [...args, join(root, inputs[1]), helper, cache, cacheIdentity.sha256, oraclePath, profile]))); }
     catch (error) { report.failures.push({ engine, message: error.message }); }
     save();
   }

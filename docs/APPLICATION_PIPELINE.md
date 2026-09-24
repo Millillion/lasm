@@ -779,3 +779,12 @@ installation; verified cache reuse fixes that setup error without raising limits
 No OOM event occurred. Full application main execution, the original large-stack
 case, worker routing, dynamic linking and installed-package integration remain
 open; unimplemented imports still trap rather than claiming unsupported behavior.
+
+The [real allocator also passes sparse high-address controls](evidence/wasmtime-real-lean-high-allocation-2026-09-24.json)
+in all three engines: allocate/free 4 GiB plus 64 KiB twice, copy through four
+eight-byte windows per allocation across the 4 GiB boundary, then run arithmetic
+again. Actual shared memory grows to 4,433,838,080 bytes using the generated
+loader's geometric-growth policy. The repeated startup/mailbox/native controls
+still pass; peak physical memory is 223 MiB under the unchanged 3 GiB guard.
+This closes a component allocation prerequisite. The original large-stack
+benchmark, worker lifecycle and shipping helper integration remain unpassed.

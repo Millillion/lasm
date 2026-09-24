@@ -28,6 +28,7 @@ typedef struct {
     uint64_t environment_sizes_calls, environment_get_calls;
     uint64_t random_calls, random_bytes;
     uint64_t program_name_calls;
+    uint64_t growth_requests, growth_successes, largest_growth_request;
     char *program_name;
     size_t environment_size, environment_count;
     uint8_t *environment;
@@ -75,6 +76,43 @@ static wasm_trap_t *heap_max_import(void *data, wasmtime_caller_t *caller,
         return wasmtime_trap_new("invalid memory maximum", 22);
     probe->heap_max_calls++;
     results[0] = (wasmtime_val_t){ .kind = WASMTIME_I64, .of.i64 = (int64_t)(maximum * page) };
+    return NULL;
+}
+static wasm_trap_t *heap_resize_import(void *data, wasmtime_caller_t *caller,
+    const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
+    (void)caller;
+    lean_probe_t *probe = data;
+    if (nargs != 1 || nresults != 1 || args[0].kind != WASMTIME_I64)
+        return wasmtime_trap_new("unexpected heap resize ABI", 26);
+    uint64_t requested = (uint64_t)args[0].of.i64;
+    uint64_t old = wasmtime_sharedmemory_data_size(probe->memory);
+    wasm_memorytype_t *type = wasmtime_sharedmemory_type(probe->memory);
+    uint64_t maximum = 0, page = wasmtime_memorytype_page_size(type);
+    bool present = wasmtime_memorytype_maximum(type, &maximum);
+    wasm_memorytype_delete(type);
+    if (!present || page != 65536 || maximum > UINT64_MAX / page)
+        return wasmtime_trap_new("invalid growth memory type", 26);
+    maximum *= page;
+    probe->growth_requests++;
+    if (requested > probe->largest_growth_request) probe->largest_growth_request = requested;
+    results[0] = (wasmtime_val_t){ .kind = WASMTIME_I32, .of.i32 = 0 };
+    if (requested <= old || requested > maximum) return NULL;
+    // Preserve this module's Emscripten growth policy, including geometric
+    // over-allocation, its 96 MiB cap and three progressively smaller attempts.
+    for (unsigned cut_down = 1; cut_down <= 4; cut_down *= 2) {
+        double candidate = (double)old * (1 + .2 / cut_down);
+        if (candidate > (double)requested + 100663296) candidate = (double)requested + 100663296;
+        if (candidate < (double)requested) candidate = (double)requested;
+        uint64_t desired = (uint64_t)candidate;
+        if ((double)desired < candidate) desired++;
+        desired = (desired + page - 1) / page * page;
+        if (desired > maximum) desired = maximum;
+        uint64_t current = wasmtime_sharedmemory_size(probe->memory), previous;
+        if (desired / page <= current) return NULL; // Caller retries concurrent growth.
+        wasmtime_error_t *error = wasmtime_sharedmemory_grow(probe->memory, desired / page - current, &previous);
+        if (error) { wasmtime_error_delete(error); continue; }
+        probe->growth_successes++; results[0].of.i32 = 1; return NULL;
+    }
     return NULL;
 }
 static bool memory_range(lean_probe_t *probe, uint64_t offset, uint64_t length) {
@@ -324,6 +362,14 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
         switch (wasm_externtype_kind(type)) {
         case WASM_EXTERN_FUNC: {
             if (module->size == 3 && !memcmp(module->data, "env", 3) &&
+                name->size == strlen("emscripten_resize_heap") &&
+                !memcmp(name->data, "emscripten_resize_heap", name->size)) {
+                imports[i].kind = WASMTIME_EXTERN_FUNC;
+                wasmtime_func_new(context, wasm_externtype_as_functype_const(type),
+                    heap_resize_import, probe, NULL, &imports[i].of.func);
+                break;
+            }
+            if (module->size == 3 && !memcmp(module->data, "env", 3) &&
                 name->size == strlen("_emscripten_get_progname") &&
                 !memcmp(name->data, "_emscripten_get_progname", name->size)) {
                 imports[i].kind = WASMTIME_EXTERN_FUNC;
@@ -504,6 +550,13 @@ void lasm_lean_instance_details(lean_probe_t *probe, uint64_t *details) {
     details[16] = probe->random_calls;
     details[17] = probe->random_bytes;
     details[18] = probe->program_name_calls;
+    details[19] = probe->growth_requests;
+    details[20] = probe->growth_successes;
+    details[21] = probe->largest_growth_request;
+}
+void *lasm_lean_instance_memory_window(lean_probe_t *probe, uint64_t offset, size_t length) {
+    if (length > 65536 || !memory_range(probe, offset, length)) return NULL;
+    return wasmtime_sharedmemory_data(probe->memory) + offset;
 }
 int lasm_lean_instance_environment_check(lean_probe_t *probe, char *error, size_t capacity) {
     size_t offset = 0;
