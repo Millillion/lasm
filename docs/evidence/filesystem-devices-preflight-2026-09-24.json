@@ -1,0 +1,18 @@
+{
+  "scope": "Prepared ordinary Lean device-IO differential fixture; execution pending",
+  "cases": [
+    "Bounded zero/short device reads and rewind behavior",
+    "Character-device metadata and terminal queries",
+    "Buffered and large /dev/full writes, repeated flushes and stream error state",
+    "High-level writes and truncation failures",
+    "Nonempty procfs content behind zero-size stat metadata"
+  ],
+  "sourceSha256": {
+    "integration/fixtures/FilesystemDevices.lean": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+    "integration/application-io-regressions.mjs": "771bec8bd978b8329ed866e208f2bfdd67853177527b0e2feabaa1cb80e0b90b",
+    ".github/workflows/application-io-controls.yml": "89e949b6332357c34da7c562aac2a1ee937b7cb49bbde678790f64e6114c085a"
+  },
+  "platformScope": "Linux devices/procfs only; other operating systems are explicit not-applicable rows in the broader harness. No upstream test is changed.",
+  "validation": "JavaScript and workflow syntax checked; native interpreted/native compiled and installed Wasm execution pending. Linux x64/ARM64 oracle workflow uses the existing descendant guard.",
+  "recordedAt": "2026-09-24T13:14:47.695179+00:00"
+}

@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Module-data controls](evidence/application-module-data-six-platforms-2026-09-24.json) pass 54 checks across all six native platforms. A [cold-build integrity rejection](evidence/application-runtime-source-python-2026-09-24.json) led to explicit Python bytecode protection; four local controls pass. Full source-build and installed Wasm validation remain pending.
+**Changed:** [Filesystem-device coverage](evidence/filesystem-devices-preflight-2026-09-24.json) is prepared for ordinary Lean reads, buffering, real kernel write errors and procfs metadata. The guarded Linux x64/ARM64 oracle workflow can select this fixture independently; native and installed Wasm execution remain pending. No upstream test was edited.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

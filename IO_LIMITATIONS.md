@@ -275,7 +275,11 @@ and do not establish full-suite conformance. See
   remain separate audit concerns; graph agreement does not close this checkbox.
 - [ ] Validate devices, pipes, FIFOs, large files, permission combinations, symlink
   races, and every open/seek/metadata edge case across OSs. Current tests focus on
-  regular files and common directory operations. `Handle.truncate` now preserves
+  regular files and common directory operations. A
+  [supplementary device fixture](docs/evidence/filesystem-devices-preflight-2026-09-24.json)
+  is prepared for Linux null/zero/full devices and procfs, with bounded transfers;
+  its native and installed application execution remains pending.
+  `Handle.truncate` now preserves
   the native call sequence even when querying the stream position fails; Linux
   regular-file and pipe comparisons match native Lean in all three packaged and
   full engines. See [the truncate evidence](docs/evidence/truncate-errors-2026-09-21.json).

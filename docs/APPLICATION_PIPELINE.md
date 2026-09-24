@@ -643,3 +643,11 @@ now passes `-B -s` explicitly, and GMP immediately rechecks both immutable tool
 trees. Four local controls pass. This is the likely cause of the CI mutation;
 the failed run did not record individual changed entries, and fresh CI remains
 necessary. All seven previous guards released without resource events.
+
+The [filesystem-device fixture](evidence/filesystem-devices-preflight-2026-09-24.json)
+adds ordinary Lean coverage for Linux character devices and procfs: bounded
+reads, kernel write failures, buffering/flush state, truncation, and readable
+content despite zero stat size. The differential harness now accepts native
+case selections, and CI can run just this new oracle on Linux x64/ARM64.
+These cases are prepared, not passing evidence; installed application runs
+remain queued behind the current guarded Bun campaign and disk reclamation.

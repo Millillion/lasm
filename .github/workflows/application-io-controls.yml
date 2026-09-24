@@ -1,6 +1,12 @@
 name: Native controls for application IO regressions
 on:
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Native IO fixture scope
+        type: choice
+        default: all
+        options: [all, filesystem-devices]
 permissions:
   contents: read
 concurrency:
@@ -20,10 +26,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        include:
-          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64, memory: 6144 }
-          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64, memory: 6144 }
-          - { platform: win32-x64, runner: windows-2022, arch: x64, memory: 2048 }
+        include: ${{ fromJSON(inputs.scope == 'filesystem-devices' && '[{"platform":"linux-x64","runner":"ubuntu-24.04","arch":"x64","memory":6144},{"platform":"linux-arm64","runner":"ubuntu-24.04-arm","arch":"arm64","memory":6144}]' || '[{"platform":"linux-x64","runner":"ubuntu-24.04","arch":"x64","memory":6144},{"platform":"linux-arm64","runner":"ubuntu-24.04-arm","arch":"arm64","memory":6144},{"platform":"win32-x64","runner":"windows-2022","arch":"x64","memory":2048}]') }}
     env:
       LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
     steps:
@@ -35,6 +38,8 @@ jobs:
           package-manager-cache: false
       - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Confirm latest stable acceptance pins
+        run: node scripts/ci/check-acceptance-versions.mjs .work/application-io-controls-versions.json
       - name: Enable Linux resource guard
         if: runner.os == 'Linux'
         run: |
@@ -42,7 +47,7 @@ jobs:
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Native Lean 4.34 fixture oracles
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/application-io-controls-resources.json -- node integration/application-io-regressions.mjs .work/application-io-controls native
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/application-io-controls-resources.json -- node integration/application-io-regressions.mjs .work/application-io-controls native ${{ inputs.scope == 'filesystem-devices' && 'filesystem-devices' || '' }}
       - name: Preserve bounded native receipts
         if: always()
         run: node -e "const f=require('node:fs');for(const p of ['.work/application-io-controls/result.json','.work/application-io-controls-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

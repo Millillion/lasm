@@ -12,16 +12,19 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('..', import.meta.url));
-const [outputArg, target, engineArg, compilerArg, ...selection] = process.argv.slice(2);
+const [outputArg, target, ...remaining] = process.argv.slice(2);
 const nativeOnly = target === 'native';
+const [engineArg, compilerArg] = nativeOnly ? [] : remaining;
+const selection = nativeOnly ? remaining : remaining.slice(2);
 if (!outputArg || (!nativeOnly && (!['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)))
-  throw new Error('Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER [CASE ...], or NEW_OUTPUT native');
-if (nativeOnly && (engineArg || compilerArg || selection.length)) throw new Error('Native controls take only NEW_OUTPUT native');
+  throw new Error('Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER [CASE ...], or NEW_OUTPUT native [CASE ...]');
 const cases = [
   { name: 'filesystem-surface', source: 'integration/fixtures/FilesystemSurface.lean',
     marker: 'filesystem surface checks passed\n', removesData: true },
   { name: 'filesystem-errors', source: 'integration/fixtures/FilesystemErrors.lean',
     marker: 'filesystem error observations completed\n', removesData: true },
+  { name: 'filesystem-devices', source: 'integration/fixtures/FilesystemDevices.lean',
+    marker: 'filesystem device observations completed\n', linux: true },
   { name: 'standard-io', source: 'test/fixtures/standard-io/Main.lean',
     marker: 'standard IO checks passed\n', removesData: true },
   { name: 'getline-state', source: 'test/fixtures/getline-state/Main.lean',
@@ -72,6 +75,9 @@ try {
     const sourceFile = join(root, fixture.source);
     const row = { ...fixture, sourceSha256: await hashFile(sourceFile), passed: false };
     report.cases.push(row); save();
+    if (fixture.linux && process.platform !== 'linux') {
+      row.status = 'not-applicable: fixture requires Linux character devices and procfs'; save(); continue;
+    }
     if (fixture.posix && process.platform === 'win32') {
       row.status = 'not-applicable: unchanged fixture requires /bin/sh or /bin/true'; save(); continue;
     }
