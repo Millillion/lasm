@@ -556,6 +556,14 @@ runner so the zero limit is effective, then restores the original pattern.
 Application expectations and deadlines are unchanged, and no desktop setting
 is modified. Follow-up execution remains pending.
 
+The [corrected native signal run](evidence/signal-policy-native-ci-2026-09-24.json)
+passes **all 45 controls without skips on Linux x64 and ARM64**. Child diagnostics
+confirm both zero core-file limits and the plain core pattern; both restoration
+steps succeed. Every process-tree guard releases without resource events. The
+earlier failed runs are retained. These source-helper controls expand Linux
+evidence but do not establish complete installed Lean ARM64 or other-platform
+signal acceptance.
+
 Automatic module-data packaging is now wired into the application builder,
 with [eight passing file/loader unit controls](evidence/application-module-data-units-2026-09-24.json).
 Generated Lean/Lake initializer dependencies select applications that need

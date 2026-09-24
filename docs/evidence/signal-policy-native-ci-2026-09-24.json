@@ -1,0 +1,824 @@
+{
+  "scope": "Expanded source-built native signal helper and application-startup controls; separate from installed compiled Lean platform acceptance",
+  "status": {
+    "conclusion": "success",
+    "databaseId": 35997808333,
+    "headSha": "7eadf165020366fe4006a3025301e4ffa9480f0f",
+    "jobs": [
+      {
+        "completedAt": "2026-09-24T12:15:31Z",
+        "conclusion": "success",
+        "databaseId": 107626837332,
+        "name": "Signal routing linux-arm64",
+        "startedAt": "2026-09-24T12:14:36Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Check native engines and retain exact paths",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Enable process-tree guard",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Disable core collection on this disposable CI runner",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build native control helper",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Guarded signal controls",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Preserve guard and helper receipts in logs",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Restore this runner's core collection policy",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 23,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 24,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 25,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 26,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 27,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Millillion/lasm/actions/runs/35997808333/job/107626837332"
+      },
+      {
+        "completedAt": "2026-09-24T12:15:23Z",
+        "conclusion": "success",
+        "databaseId": 107626837623,
+        "name": "Signal routing linux-x64",
+        "startedAt": "2026-09-24T12:14:32Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Check native engines and retain exact paths",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Enable process-tree guard",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Disable core collection on this disposable CI runner",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build native control helper",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Guarded signal controls",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Preserve guard and helper receipts in logs",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Restore this runner's core collection policy",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 23,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 24,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 25,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 26,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 27,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Millillion/lasm/actions/runs/35997808333/job/107626837623"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/Millillion/lasm/actions/runs/35997808333"
+  },
+  "logFile": ".work/product-acceptance/signal-policy-ci-35997808333.log",
+  "logSha256": "22b8136374e02aadb6be9f3c08ba756772724bd050ce1882fe1f7c2dc7156a8c",
+  "platforms": [
+    {
+      "platform": "linux-x64",
+      "tests": 45,
+      "passed": 45,
+      "failed": 0,
+      "skipped": 0,
+      "reports": {
+        ".work/signal-helper-build-resources.json": {
+          "startedAt": "2026-09-24T12:14:47.649Z",
+          "command": [
+            "node",
+            "scripts/build-signal-helper.mjs",
+            "--native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "8dd2f702-1c7b-4e33-997d-e692cd5b5041",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16765378560,
+            "available": 15337611264
+          },
+          "minimumHostAvailable": 15316561920,
+          "peakMemoryBytes": 50233344,
+          "peakTasks": 9,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:14:48.053Z",
+            "memoryBytes": 40787968,
+            "peakMemoryBytes": 50233344,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 12308480,
+              "file": 26451968,
+              "kernel": 1368064,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1482752,
+              "slab": 520296
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:14:48.061Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 42360832,
+            "peakMemoryBytes": 50233344,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13676544,
+              "file": 26451968,
+              "kernel": 1445888,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1482752,
+              "slab": 526664
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:14:48.077Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/signal-controls-resources.json": {
+          "startedAt": "2026-09-24T12:14:48.126Z",
+          "command": [
+            "/usr/bin/env",
+            "LASM_TEST_BUN=/home/runner/.bun/bin/bun",
+            "LASM_TEST_DENO=/opt/hostedtoolcache/deno/2.9.7/x64/deno",
+            "LASM_REQUIRE_SIGNAL_ENGINES=1",
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/node-signal.test.mjs",
+            "test/application-signals.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "25db17a5-41a8-4a61-bc14-e841065147a8",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16765378560,
+            "available": 15326785536
+          },
+          "minimumHostAvailable": 15299174400,
+          "peakMemoryBytes": 66465792,
+          "peakTasks": 31,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-controls-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:15:19.837Z",
+            "memoryBytes": 18919424,
+            "peakMemoryBytes": 66465792,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 12922880,
+              "file": 4222976,
+              "kernel": 1171456,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4222976,
+              "slab": 317368
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:15:19.838Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 19705856,
+            "peakMemoryBytes": 66465792,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13672448,
+              "file": 4222976,
+              "kernel": 1241088,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4222976,
+              "slab": 325472
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:15:19.855Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".cache/native-host/signals/manifest.json": {
+          "protocol": 1,
+          "source": "native/posix-signal.c",
+          "sourceSha256": "bedfba1f14c8d3f57d086bc1b691da39648ef1ccbb4c945dbb33c8216806e1d7",
+          "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+          "files": {
+            "linux-x64-gnu.so": {
+              "target": "native",
+              "sha256": "f17f8444a27c72db71c7f4b0e4e050796602a5515a47886654f1de7e400822af",
+              "bytes": 16464
+            }
+          },
+          "validation": "Native source control, separate from shipped cross-compiled helper acceptance."
+        }
+      },
+      "diagnostics": [
+        {
+          "engine": "node",
+          "signal": "SIGUSR1",
+          "readyState": {
+            "status": "State:\tS (sleeping)\nVmRSS:\t   63892 kB\nCoreDumping:\t0\nThreads:\t7\nSigQ:\t0/63791\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000100004402",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63791                63791                processes \nMax open files            65536                65536                files     \nMax locked memory         2095669248           2095669248           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63791                63791                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "ep_poll",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "node",
+          "signal": "SIGABRT",
+          "readyState": {
+            "status": "State:\tR (running)\nVmRSS:\t   63936 kB\nCoreDumping:\t0\nThreads:\t7\nSigQ:\t0/63791\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000100004402",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63791                63791                processes \nMax open files            65536                65536                files     \nMax locked memory         2095669248           2095669248           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63791                63791                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "0",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "deno",
+          "signal": "SIGUSR1",
+          "readyState": {
+            "status": "State:\tR (running)\nVmRSS:\t   67960 kB\nCoreDumping:\t0\nThreads:\t18\nSigQ:\t0/63791\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t0000000100004443",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63791                63791                processes \nMax open files            65536                65536                files     \nMax locked memory         2095669248           2095669248           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63791                63791                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "0",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "deno",
+          "signal": "SIGABRT",
+          "readyState": {
+            "status": "State:\tS (sleeping)\nVmRSS:\t   60736 kB\nCoreDumping:\t0\nThreads:\t9\nSigQ:\t0/63791\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t0000000100004443",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63791                63791                processes \nMax open files            65536                65536                files     \nMax locked memory         2095669248           2095669248           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63791                63791                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "ep_poll",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "bun",
+          "signal": "SIGUSR1",
+          "readyState": {
+            "status": "State:\tR (running)\nVmRSS:\t   41516 kB\nCoreDumping:\t0\nThreads:\t8\nSigQ:\t0/63791\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t00000001200004d8",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63791                63791                processes \nMax open files            65536                65536                files     \nMax locked memory         2095669248           2095669248           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63791                63791                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "0",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "bun",
+          "signal": "SIGABRT",
+          "readyState": {
+            "status": "State:\tR (running)\nVmRSS:\t   41028 kB\nCoreDumping:\t0\nThreads:\t7\nSigQ:\t0/63791\nSigPnd:\t0000000000000000\nSigBlk:\tfffffffffffbfeff\nSigIgn:\t0000000001001000\nSigCgt:\t00000001200004d8",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63791                63791                processes \nMax open files            65536                65536                files     \nMax locked memory         2095669248           2095669248           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63791                63791                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "0",
+            "corePattern": "core\n"
+          }
+        }
+      ]
+    },
+    {
+      "platform": "linux-arm64",
+      "tests": 45,
+      "passed": 45,
+      "failed": 0,
+      "skipped": 0,
+      "reports": {
+        ".work/signal-helper-build-resources.json": {
+          "startedAt": "2026-09-24T12:14:52.401Z",
+          "command": [
+            "node",
+            "scripts/build-signal-helper.mjs",
+            "--native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "7f2e2c61-7721-4d53-bce2-c672e66b1947",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16722010112,
+            "available": 15166816256
+          },
+          "minimumHostAvailable": 15166193664,
+          "peakMemoryBytes": 47468544,
+          "peakTasks": 10,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:14:54.610Z",
+            "memoryBytes": 41529344,
+            "peakMemoryBytes": 47468544,
+            "swapBytes": 0,
+            "tasks": 10,
+            "memoryBreakdown": {
+              "anon": 12804096,
+              "file": 26587136,
+              "kernel": 1630208,
+              "shmem": 0,
+              "file_mapped": 2560000,
+              "inactive_file": 1601536,
+              "slab": 607840
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:14:54.741Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 40574976,
+            "peakMemoryBytes": 47468544,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11714560,
+              "file": 26972160,
+              "kernel": 1294336,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1789952,
+              "slab": 519048
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:14:54.760Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/signal-controls-resources.json": {
+          "startedAt": "2026-09-24T12:14:54.807Z",
+          "command": [
+            "/usr/bin/env",
+            "LASM_TEST_BUN=/home/runner/.bun/bin/bun",
+            "LASM_TEST_DENO=/opt/hostedtoolcache/deno/2.9.7/arm64/deno",
+            "LASM_REQUIRE_SIGNAL_ENGINES=1",
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/node-signal.test.mjs",
+            "test/application-signals.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "441a28dd-dbee-40f5-a555-460bbc7084c3",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16722010112,
+            "available": 15199928320
+          },
+          "minimumHostAvailable": 15182815232,
+          "peakMemoryBytes": 58978304,
+          "peakTasks": 31,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-controls-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:15:26.330Z",
+            "memoryBytes": 44490752,
+            "peakMemoryBytes": 58978304,
+            "swapBytes": 0,
+            "tasks": 20,
+            "memoryBreakdown": {
+              "anon": 36966400,
+              "file": 4214784,
+              "kernel": 2621440,
+              "shmem": 0,
+              "file_mapped": 200704,
+              "inactive_file": 4214784,
+              "slab": 588400
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:15:26.419Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 17584128,
+            "peakMemoryBytes": 58978304,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11718656,
+              "file": 4214784,
+              "kernel": 1081344,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4214784,
+              "slab": 299392
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:15:26.437Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".cache/native-host/signals/manifest.json": {
+          "protocol": 1,
+          "source": "native/posix-signal.c",
+          "sourceSha256": "bedfba1f14c8d3f57d086bc1b691da39648ef1ccbb4c945dbb33c8216806e1d7",
+          "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+          "files": {
+            "linux-arm64-gnu.so": {
+              "target": "native",
+              "sha256": "fc496957bf35f505ca330994ca7e0d2cfd109e282a239ac7da334dbb3fb2b888",
+              "bytes": 70976
+            }
+          },
+          "validation": "Native source control, separate from shipped cross-compiled helper acceptance."
+        }
+      },
+      "diagnostics": [
+        {
+          "engine": "node",
+          "signal": "SIGUSR1",
+          "readyState": {
+            "status": "State:\tS (sleeping)\nVmRSS:\t   58480 kB\nCoreDumping:\t0\nThreads:\t7\nSigQ:\t0/63642\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000100004402",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63642                63642                processes \nMax open files            65536                65536                files     \nMax locked memory         2090250240           2090250240           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63642                63642                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "ep_poll",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "node",
+          "signal": "SIGABRT",
+          "readyState": {
+            "status": "State:\tR (running)\nVmRSS:\t   58572 kB\nCoreDumping:\t0\nThreads:\t7\nSigQ:\t0/63642\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000100004402",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63642                63642                processes \nMax open files            65536                65536                files     \nMax locked memory         2090250240           2090250240           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63642                63642                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "ep_poll",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "deno",
+          "signal": "SIGUSR1",
+          "readyState": {
+            "status": "State:\tR (running)\nVmRSS:\t   61712 kB\nCoreDumping:\t0\nThreads:\t18\nSigQ:\t0/63642\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t0000000100004443",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63642                63642                processes \nMax open files            65536                65536                files     \nMax locked memory         2090250240           2090250240           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63642                63642                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "0",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "deno",
+          "signal": "SIGABRT",
+          "readyState": {
+            "status": "State:\tR (running)\nVmRSS:\t   55076 kB\nCoreDumping:\t0\nThreads:\t9\nSigQ:\t0/63642\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t0000000100004443",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63642                63642                processes \nMax open files            65536                65536                files     \nMax locked memory         2090250240           2090250240           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63642                63642                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "0",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "bun",
+          "signal": "SIGUSR1",
+          "readyState": {
+            "status": "State:\tR (running)\nVmRSS:\t   42204 kB\nCoreDumping:\t0\nThreads:\t8\nSigQ:\t0/63642\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t00000001200004d8",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63642                63642                processes \nMax open files            65536                65536                files     \nMax locked memory         2090250240           2090250240           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63642                63642                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "0",
+            "corePattern": "core\n"
+          }
+        },
+        {
+          "engine": "bun",
+          "signal": "SIGABRT",
+          "readyState": {
+            "status": "State:\tR (running)\nVmRSS:\t   42632 kB\nCoreDumping:\t0\nThreads:\t8\nSigQ:\t0/63642\nSigPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t00000001200004d8",
+            "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            16777216             16777216             bytes     \nMax core file size        0                    0                    bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             63642                63642                processes \nMax open files            65536                65536                files     \nMax locked memory         2090250240           2090250240           bytes     \nMax address space         unlimited            unlimited            bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       63642                63642                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+            "wait": "0",
+            "corePattern": "core\n"
+          }
+        }
+      ]
+    }
+  ],
+  "versions": {
+    "node": "26.10.0",
+    "deno": "2.9.7",
+    "bun": "1.4.2"
+  },
+  "retainedFailures": [
+    "signal-policy-native-ci-failure-2026-09-24.json",
+    "signal-policy-core-collector-2026-09-24.json"
+  ],
+  "repair": "Both dedicated ephemeral CI runners temporarily set a plain core pattern while the service has zero core-file limits. The original collector policy is restored afterward; both restore steps succeeded. Application signal handlers, assertions and deadlines were unchanged after the earlier failed attempts. No local desktop settings were changed.",
+  "limits": [
+    "This tests natively compiled helper source on Linux x64/ARM64, not installed Lean applications on ARM64.",
+    "The 48 installed compiled comparisons remain Linux x64 evidence from application-signal-policy-2026-09-24.json.",
+    "Deno-native observer coexistence, caller embedding, inherited state altered before JS entry, cancellation races and other native platforms remain open."
+  ],
+  "recordedAt": "2026-09-24T12:20:54.348960+00:00"
+}

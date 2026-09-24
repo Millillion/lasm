@@ -58,6 +58,11 @@ separately from the earlier runtime evidence below.
   45 focused controls preserve observed ignored states and caller-owned handlers.
   Full cancellation/race coverage, inherited state altered before JavaScript
   entry, callable embedding and other native platforms remain open.
+  [Expanded native Linux CI](docs/evidence/signal-policy-native-ci-2026-09-24.json)
+  passes all 45 source-helper controls per architecture after disabling a
+  delaying core collector on the disposable test runners. Assertions and
+  deadlines are unchanged; both earlier failures and the diagnostic evidence
+  remain recorded. Installed Lean ARM64 acceptance is still distinct.
 - [ ] Complete panic diagnostics, symbolization and termination parity.
   Installed `.15` [restores real panic backtraces](docs/evidence/upstream-debug-2026-09-24.json)
   in Node and Deno on Linux x64, including exact output with `LEAN_BACKTRACE=0`.
