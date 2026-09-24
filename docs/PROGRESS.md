@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [All nineteen remaining Bun registrations](evidence/upstream-applications-bun-remaining-2026-09-24.json) pass unchanged. Combined coverage is 96 passes, four upstream compilation-disabled registrations and one unresolved large-stack failure. All source hashes match; the guard released without resource events. SSH authentication expired; local commits continue while pushes wait for restored credentials.
+**Changed:** [Memory64 atomic interoperability](evidence/wasmtime-atomic-interop-2026-09-24.json) passes sixteen groups and ten invalid-input controls per engine at a 62 MiB peak. An isolated optimized-C failure is preserved and repaired with explicit compare-exchange. This is a backend prerequisite, not Lean acceptance. Pushes still await restored SSH credentials.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

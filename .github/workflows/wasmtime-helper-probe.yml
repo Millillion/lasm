@@ -31,6 +31,8 @@ jobs:
           bun-version: 1.4.2
           no-cache: true
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Verify current stable acceptance pins
+        run: node --max-old-space-size=128 scripts/ci/check-acceptance-versions.mjs .work/wasmtime-probe-versions.json
       - name: Enable process-tree guard
         run: |
           sudo loginctl enable-linger "$(id -un)"
@@ -43,6 +45,13 @@ jobs:
           python3 scripts/full-lean/base-pages.py
           node --max-old-space-size=128 scripts/full-lean/probe-wasmtime-helper.mjs
           .work/wasmtime-helper node deno bun
+      - name: Check atomic host access and Wasm wait notification
+        run: >-
+          node scripts/full-lean/run-bounded.mjs --memory-mib 1024
+          --report .work/wasmtime-atomics-resources.json --
+          python3 scripts/full-lean/base-pages.py
+          node --max-old-space-size=128 scripts/full-lean/probe-wasmtime-atomics.mjs
+          .work/wasmtime-atomics node deno bun
       - name: Preserve bounded experiment receipts
         if: always()
-        run: node -e "const f=require('node:fs');for(const p of ['.work/wasmtime-helper/preparation.json','.work/wasmtime-helper/result.json','.work/wasmtime-helper-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+        run: node -e "const f=require('node:fs');for(const p of ['.work/wasmtime-helper/preparation.json','.work/wasmtime-helper/result.json','.work/wasmtime-helper-resources.json','.work/wasmtime-atomics/result.json','.work/wasmtime-atomics-resources.json','.work/wasmtime-probe-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

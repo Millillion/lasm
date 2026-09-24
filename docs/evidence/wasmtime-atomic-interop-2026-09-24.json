@@ -1,0 +1,705 @@
+{
+  "scope": "Sparse memory64 native atomic primitives, Wasm wait/notify and two-worker increments; no shipping backend or complete JS Atomics facade",
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "expected": "v4.34.0",
+      "tag": "v4.34.0",
+      "publishedAt": "2026-09-14T14:04:36Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "expected": "v2.9.7",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "expected": "bun-v1.4.2",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "expected": "v26.10.0",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false
+    },
+    "checkedAt": "2026-09-24T14:45:13.220Z"
+  },
+  "passed": true,
+  "inputs": {
+    "scripts/full-lean/probes/wasmtime-atomics.c": "3721145eaac1f1607e0c43c1aac417947ea5267fbd2e7d707391e73ee1c33e63",
+    "scripts/full-lean/probes/wasmtime-atomics.mjs": "260bca963af160f731edd89d194eea39b23cb13439bc55891466f8c9f15f5401",
+    "scripts/full-lean/probes/wasmtime-memory-view.c": "2040ebcf87d374f8199172226cd94d26814bf83f01d6c3b3375feb98ce757dc0",
+    "scripts/full-lean/probes/wasmtime-helper.c": "593fb94689013695235e6644c0c3d373fd3a4f057df9a3cb7e5b15dcb5a31951",
+    "scripts/full-lean/probe-wasmtime-atomics.mjs": "ea1271229753f377ac0e801e5aa8e2372e1eda371be18a8f982ac18238ff8522"
+  },
+  "inputsUnchanged": true,
+  "helperSha256": "41a5c41034b00c439624146eba9764d289d7fd4b38b1e4d01686164d0e15772f",
+  "helperInput": {
+    "version": "49.0.0",
+    "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+    "archiveBytes": 16115964,
+    "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz"
+  },
+  "nativeLibraryInput": {
+    "bytes": 31590960,
+    "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+  },
+  "results": [
+    {
+      "scope": "Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration",
+      "engine": "node",
+      "version": "26.10.0",
+      "accessibleGuestBytes": 4295098368,
+      "touchedCells": 12,
+      "checks": [
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 16,
+          "width": 1,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 32,
+          "width": 2,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 64,
+          "width": 4,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 128,
+          "width": 8,
+          "operations": 12
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 320,
+          "width": 4,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 320,
+          "width": 4,
+          "increments": 20000
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 384,
+          "width": 8,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 384,
+          "width": 8,
+          "increments": 20000
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967312,
+          "width": 1,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967328,
+          "width": 2,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967360,
+          "width": 4,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967424,
+          "width": 8,
+          "operations": 12
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 4294967616,
+          "width": 4,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 4294967616,
+          "width": 4,
+          "increments": 20000
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 4294967680,
+          "width": 8,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 4294967680,
+          "width": 8,
+          "increments": 20000
+        }
+      ],
+      "invalidNativeAddressesAndOperationsRejected": 5,
+      "invalidWasmInputsRejected": 5
+    },
+    {
+      "scope": "Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration",
+      "engine": "deno",
+      "version": "2.9.7",
+      "accessibleGuestBytes": 4295098368,
+      "touchedCells": 12,
+      "checks": [
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 16,
+          "width": 1,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 32,
+          "width": 2,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 64,
+          "width": 4,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 128,
+          "width": 8,
+          "operations": 12
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 320,
+          "width": 4,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 320,
+          "width": 4,
+          "increments": 20000
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 384,
+          "width": 8,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 384,
+          "width": 8,
+          "increments": 20000
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967312,
+          "width": 1,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967328,
+          "width": 2,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967360,
+          "width": 4,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967424,
+          "width": 8,
+          "operations": 12
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 4294967616,
+          "width": 4,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 4294967616,
+          "width": 4,
+          "increments": 20000
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 4294967680,
+          "width": 8,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 4294967680,
+          "width": 8,
+          "increments": 20000
+        }
+      ],
+      "invalidNativeAddressesAndOperationsRejected": 5,
+      "invalidWasmInputsRejected": 5
+    },
+    {
+      "scope": "Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration",
+      "engine": "bun",
+      "version": "1.4.2",
+      "accessibleGuestBytes": 4295098368,
+      "touchedCells": 12,
+      "checks": [
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 16,
+          "width": 1,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 32,
+          "width": 2,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 64,
+          "width": 4,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 128,
+          "width": 8,
+          "operations": 12
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 320,
+          "width": 4,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 320,
+          "width": 4,
+          "increments": 20000
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 384,
+          "width": 8,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 384,
+          "width": 8,
+          "increments": 20000
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967312,
+          "width": 1,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967328,
+          "width": 2,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967360,
+          "width": 4,
+          "operations": 12
+        },
+        {
+          "kind": "scalar-native-js-and-wasm",
+          "offset": 4294967424,
+          "width": 8,
+          "operations": 12
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 4294967616,
+          "width": 4,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 4294967616,
+          "width": 4,
+          "increments": 20000
+        },
+        {
+          "kind": "wait-notify",
+          "offset": 4294967680,
+          "width": 8,
+          "notEqual": 1,
+          "timeout": 2,
+          "awakened": 0
+        },
+        {
+          "kind": "two-worker-native-and-wasm-add",
+          "offset": 4294967680,
+          "width": 8,
+          "increments": 20000
+        }
+      ],
+      "invalidNativeAddressesAndOperationsRejected": 5,
+      "invalidWasmInputsRejected": 5
+    }
+  ],
+  "resources": {
+    "startedAt": "2026-09-24T14:58:34.158Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      "--max-old-space-size=128",
+      "scripts/full-lean/probe-wasmtime-atomics.mjs",
+      ".work/wasmtime-atomics-r2"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "1ed29798-2e33-4af2-8100-20bc00068557",
+    "limits": {
+      "memoryMax": 1073741824,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 858993459,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 23986671616
+    },
+    "minimumHostAvailable": 23938920448,
+    "peakMemoryBytes": 64974848,
+    "peakTasks": 24,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-atomics-r2-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T14:58:36.967Z",
+      "memoryBytes": 17690624,
+      "peakMemoryBytes": 64974848,
+      "swapBytes": 0,
+      "tasks": 11,
+      "memoryBreakdown": {
+        "anon": 14372864,
+        "file": 831488,
+        "kernel": 1474560,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 196608,
+        "slab": 340104
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T14:58:37.037Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 14544896,
+      "peakMemoryBytes": 64974848,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11653120,
+        "file": 831488,
+        "kernel": 1085440,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 196608,
+        "slab": 152272
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T14:58:37.064Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "resultFile": ".work/wasmtime-atomics-r2/result.json",
+  "resultSha256": "fcd5c341c5648038d5fe4dbe5df437cf660e34c59f57f7d84f20292222b52eac",
+  "priorFailure": {
+    "directory": ".work/wasmtime-atomics-r1",
+    "inputs": {
+      "scripts/full-lean/probes/wasmtime-atomics.c": "6c458ecd4250c533f66a558d8c18e475d24f651f5aadc81d1d0e567bb744eb91",
+      "scripts/full-lean/probes/wasmtime-atomics.mjs": "fba893fca5d8b57199c30cadfa0878db1aa846dc57bb10d4b90db82a6ed8f4f0",
+      "scripts/full-lean/probes/wasmtime-memory-view.c": "2040ebcf87d374f8199172226cd94d26814bf83f01d6c3b3375feb98ce757dc0",
+      "scripts/full-lean/probes/wasmtime-helper.c": "593fb94689013695235e6644c0c3d373fd3a4f057df9a3cb7e5b15dcb5a31951",
+      "scripts/full-lean/probe-wasmtime-atomics.mjs": "ea1271229753f377ac0e801e5aa8e2372e1eda371be18a8f982ac18238ff8522"
+    },
+    "failures": [
+      {
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "message": "node:internal/modules/run_main:111\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 18446744073709551613n\n- 4660n\n\n    at file:///home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-atomics.mjs:79:18\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n    at async node:internal/modules/esm/loader:650:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 18446744073709551613n,\n  expected: 4660n,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v26.10.0\n\n\n1 !== 0\n"
+      },
+      {
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "message": "\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Uncaught (in promise) AssertionError: Expected values to be strictly equal:\n+ actual - expected\n\n+ 18446744073709551613n\n- 4660n\n\n          assert.equal(atomic(probe, offset, width, 0), BigInt(Atomics.load(reference, 0)));\n\u001b[0m\u001b[31m                 ^\u001b[0m\n    at \u001b[0m\u001b[2m\u001b[38;5;245mfile:///home/lastmjs/development/lasm/compiler/\u001b[0m\u001b[0m\u001b[36mscripts/full-lean/probes/wasmtime-atomics.mjs\u001b[0m:\u001b[0m\u001b[33m79\u001b[0m:\u001b[0m\u001b[33m18\u001b[0m\n\n\n1 !== 0\n"
+      },
+      {
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "message": "74 |             : Atomics[name](reference, 0, js(value));\n75 |           const actual = atomic(probe, offset, width, op, value, comparison);\n76 |           // The primitive store reports stored bits; the future JS facade must\n77 |           // implement Atomics.store's distinct converted-input return value.\n78 |           if (name !== 'store') assert.equal(actual, BigInt(before));\n79 |           assert.equal(atomic(probe, offset, width, 0), BigInt(Atomics.load(reference, 0)));\n                      ^\nAssertionError: Expected values to be strictly equal:\n+ actual - expected\n\n+ 18446744073709551613n\n- 4660n\n\n generatedMessage: true,\n     actual: 18446744073709551613n,\n   expected: 4660n,\n   operator: \"strictEqual\",\n       diff: \"simple\",\n       code: \"ERR_ASSERTION\"\n\n      at /home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-atomics.mjs:79:18\n\nBun v1.4.2 (Linux x64)\n\n\n1 !== 0\n"
+      }
+    ],
+    "resultSha256": "383a6dc0d77ea819dd63050b72e8a9b72c26f0c8e7d6bad15441c97b1854b02a",
+    "resources": {
+      "startedAt": "2026-09-24T14:53:26.119Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=128",
+        "scripts/full-lean/probe-wasmtime-atomics.mjs",
+        ".work/wasmtime-atomics-r1"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "51c26019-fb03-4800-bb82-c23094922381",
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24221392896
+      },
+      "minimumHostAvailable": 24171286528,
+      "peakMemoryBytes": 40779776,
+      "peakTasks": 14,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-atomics-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T14:53:27.927Z",
+        "memoryBytes": 23220224,
+        "peakMemoryBytes": 40779776,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 14958592,
+          "file": 5287936,
+          "kernel": 1458176,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 3649536,
+          "slab": 345416
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T14:53:27.991Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 19353600,
+        "peakMemoryBytes": 40779776,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11657216,
+          "file": 5287936,
+          "kernel": 1134592,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 3649536,
+          "slab": 212080
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T14:53:28.018Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "nativeOnlyControl": {
+    "scope": "Same former integer atomic dispatch over one ordinary eight-byte native cell; no Wasmtime, Koffi or JavaScript involved",
+    "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "source": "#include <stdint.h>\n#include <stdatomic.h>\n#include <stdio.h>\ntypedef struct { _Atomic(uint64_t) cell; } probe_t;\nstatic int atomic_address(probe_t *p, uint64_t offset, uint32_t width, void **address) {\n if (offset || width != 8) return 2;\n *address=&p->cell; return 0;\n}\n__attribute__((noinline))\nint lasm_probe_atomic(probe_t *probe, uint64_t offset, uint32_t width, uint32_t operation,\n                      uint64_t value, uint64_t comparison, uint64_t *result) {\n    void *address;\n    if (operation > 8 || atomic_address(probe, offset, width, &address)) return 2;\n#define ACCESS(TYPE) do { \\\n    _Atomic(TYPE) *cell = address; \\\n    if (!atomic_is_lock_free(cell)) return 3; \\\n    TYPE before = 0; \\\n    switch (operation) { \\\n        case 0: before = atomic_load_explicit(cell, memory_order_seq_cst); break; \\\n        case 1: atomic_store_explicit(cell, (TYPE)value, memory_order_seq_cst); before = (TYPE)value; break; \\\n        case 2: before = atomic_fetch_add_explicit(cell, (TYPE)value, memory_order_seq_cst); break; \\\n        case 3: before = atomic_fetch_sub_explicit(cell, (TYPE)value, memory_order_seq_cst); break; \\\n        case 4: before = atomic_fetch_and_explicit(cell, (TYPE)value, memory_order_seq_cst); break; \\\n        case 5: before = atomic_fetch_or_explicit(cell, (TYPE)value, memory_order_seq_cst); break; \\\n        case 6: before = atomic_fetch_xor_explicit(cell, (TYPE)value, memory_order_seq_cst); break; \\\n        case 7: before = atomic_exchange_explicit(cell, (TYPE)value, memory_order_seq_cst); break; \\\n        case 8: before = (TYPE)comparison; \\\n            atomic_compare_exchange_strong_explicit(cell, &before, (TYPE)value, memory_order_seq_cst, memory_order_seq_cst); break; \\\n    } \\\n    *result = before; return 0; \\\n} while (0)\n    switch (width) { case 1: ACCESS(uint8_t); case 2: ACCESS(uint16_t);\n        case 4: ACCESS(uint32_t); case 8: ACCESS(uint64_t); }\n#undef ACCESS\n    return 2;\n}\n\n\nint main(void) {\n probe_t p={0}; uint64_t old=0, now=0;\n const uint32_t ops[3]={4,5,6};\n const uint64_t values[3]={0x1234,0x1234,0x1234};\n const uint64_t initial=UINT64_MAX-2;\n const uint64_t expected[3]={initial & values[0], initial | values[1], initial ^ values[2]};\n int failed=0;\n for (unsigned i=0;i<3;i++) {\n  atomic_store(&p.cell, initial);\n  lasm_probe_atomic(&p,0,8,ops[i],values[i],0,&old);\n  now=atomic_load(&p.cell);\n  printf(\"op=%u old=%llu stored=%llu expected=%llu\\n\",ops[i],(unsigned long long)old,(unsigned long long)now,(unsigned long long)expected[i]);\n  if(old!=initial || now!=expected[i]) failed=1;\n }\n return failed;\n}\n",
+    "sourceSha256": "2d52d64fdb7f4ac1beaff8e95f52ebf25fd491ccd68215495e21adb2e37682e0",
+    "commands": "#!/bin/bash\nset -eu\nfor level in 0 2; do\n cc -std=c11 -O\"$level\" -Wall -Wextra -Werror .work/atomic-bitwise-control-r1.c -o .work/atomic-bitwise-control-r1-O\"$level\"\n status=0\n .work/atomic-bitwise-control-r1-O\"$level\" || status=$?\n printf 'O%s exit=%s\\n' \"$level\" \"$status\"\ndone\n",
+    "log": "[lasm] One workload, 0.50 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/atomic-bitwise-control-r1-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: a377199825ac404cadf8d11e8332594c\nop=4 old=18446744073709551613 stored=4660 expected=4660\nop=5 old=18446744073709551613 stored=18446744073709551613 expected=18446744073709551613\nop=6 old=18446744073709551613 stored=18446744073709546953 expected=18446744073709546953\nO0 exit=0\nop=4 old=18446744073709551613 stored=18446744073709551613 expected=4660\nop=5 old=18446744073709551613 stored=18446744073709551613 expected=18446744073709551613\nop=6 old=18446744073709551613 stored=0 expected=18446744073709546953\nO2 exit=1\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 164ms\nCPU time consumed: 161ms\nMemory peak: 7.6M\nMemory swap peak: 0B\n[lasm] Peak 0.01 GiB; success\n",
+    "resources": {
+      "startedAt": "2026-09-24T14:57:30.947Z",
+      "command": [
+        "bash",
+        ".work/run-atomic-bitwise-control-r1.sh"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "4ccf47c2-7005-47fc-8f90-984e60db6a49",
+      "limits": {
+        "memoryMax": 536870912,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 429496729,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24075038720
+      },
+      "minimumHostAvailable": 24075038720,
+      "peakMemoryBytes": 14123008,
+      "peakTasks": 0,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/atomic-bitwise-control-r1-resources.json",
+      "status": "finished",
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T14:57:31.137Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 14123008,
+        "peakMemoryBytes": 14123008,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11644928,
+          "file": 212992,
+          "kernel": 1085440,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 36864,
+          "slab": 151264
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T14:57:31.162Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "observation": "At -O0 all native bitwise observations matched. At -O2 and preserved its input instead of applying the operand, and xor stored zero. An explicit sequentially consistent compare-exchange loop removes the failed code path; the actual helper remains compiled at -O2."
+  },
+  "limits": [
+    "Synthetic native helper prerequisite on Linux x64 only; no real Lean application instantiated or executed",
+    "External windows are ordinary ArrayBuffers; this is not a complete JavaScript Atomics facade",
+    "Only twelve cells in a reviewed sparse 4-GiB-plus-128-KiB mapping are touched; dense-memory capacity is not tested",
+    "Native six-platform packaging, all Emscripten imports, exception transport, worker lifecycle and actual large-stack acceptance remain open",
+    "Prepared CI changes are not dispatched while the latest local commits await restored GitHub SSH credentials"
+  ]
+}

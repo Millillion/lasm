@@ -183,6 +183,14 @@ separately from the earlier runtime evidence below.
   control without an OOM. Bounded windows offer an adapter path, but they are
   ordinary ArrayBuffers: JavaScript atomic synchronization, the full host adapter
   and real application acceptance remain unfinished.
+  The [atomic interoperability probe](docs/evidence/wasmtime-atomic-interop-2026-09-24.json)
+  now passes sixteen groups per engine: integer operations at four widths,
+  overflow, cross-worker waits/notifications and native/Wasm concurrent updates,
+  both below and above 4 GiB. Ten invalid-input controls also pass per engine.
+  Peak memory is 62 MiB. A native-only control isolates an optimized C bitwise
+  code-generation failure; explicit compare-exchange loops pass at the same
+  optimization level. This supplies internal synchronization primitives, not
+  a complete JavaScript Atomics facade or a working Lean backend.
 
 ## Earlier runtime evidence and remaining compatibility work
 
