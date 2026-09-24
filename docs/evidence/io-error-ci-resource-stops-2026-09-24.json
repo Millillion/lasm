@@ -1,0 +1,223 @@
+{
+  "scope": "Cold installation hit an undersized explicit CI memory profile before comparison; no behavior failure or compatibility pass",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35944252844",
+  "results": [
+    {
+      "platform": "linux-x64",
+      "resourceReport": {
+        "startedAt": "2026-09-24T01:44:48.175Z",
+        "command": [
+          "node",
+          "integration/io-error-decoder.mjs",
+          ".work/io-error-ci"
+        ],
+        "cwd": "/home/runner/work/lasm/lasm",
+        "unit": "lasm-heavy-0539ccf52500.service",
+        "id": "ae04bbac-040b-4b31-a8b1-aa1cd55b45e4",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 16766410752,
+          "available": 15367868416
+        },
+        "minimumHostAvailable": 15339536384,
+        "peakMemoryBytes": 1733750784,
+        "peakTasks": 11,
+        "report": "/home/runner/work/lasm/lasm/.work/io-error-ci-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "lastSample": {
+          "at": "2026-09-24T01:45:01.801Z",
+          "memoryBytes": 1728770048,
+          "peakMemoryBytes": 1728770048,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 130170880,
+            "file": 1544040448,
+            "kernel": 53579776,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1544040448,
+            "slab": 51079232
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-24T01:44:59.594Z",
+          "processes": [
+            {
+              "pid": 2282,
+              "name": "node-MainThread",
+              "residentBytes": 143659008,
+              "threads": 11
+            }
+          ]
+        },
+        "stoppedBecause": "Workload reached its proactive memory budget",
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "killed",
+          "exitStatus": "TERM",
+          "capturedAt": "2026-09-24T01:45:01.868Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "memoryBytes": 1612251136,
+          "peakMemoryBytes": 1733750784,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 13668352,
+            "file": 1546113024,
+            "kernel": 51978240,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1546113024,
+            "slab": 51056832
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T01:45:01.890Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": true,
+        "memoryThrottled": false
+      },
+      "logSha256": "51547ecf92135b0725e954c41160fda78885221edb83c201144c6184fb658d1a",
+      "localLog": ".work/product-acceptance/io-ci-linux-x64-35944252844.log"
+    },
+    {
+      "platform": "linux-arm64",
+      "resourceReport": {
+        "startedAt": "2026-09-24T01:44:50.351Z",
+        "command": [
+          "node",
+          "integration/io-error-decoder.mjs",
+          ".work/io-error-ci"
+        ],
+        "cwd": "/home/runner/work/lasm/lasm",
+        "unit": "lasm-heavy-0539ccf52500.service",
+        "id": "8f486b3b-4bb9-463d-afed-141da075920c",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 16722006016,
+          "available": 15238135808
+        },
+        "minimumHostAvailable": 15204343808,
+        "peakMemoryBytes": 1784897536,
+        "peakTasks": 11,
+        "report": "/home/runner/work/lasm/lasm/.work/io-error-ci-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "lastSample": {
+          "at": "2026-09-24T01:45:35.164Z",
+          "memoryBytes": 1762353152,
+          "peakMemoryBytes": 1762353152,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 113795072,
+            "file": 1586528256,
+            "kernel": 61509632,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1586475008,
+            "slab": 59183152
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-24T01:45:31.963Z",
+          "processes": [
+            {
+              "pid": 2264,
+              "name": "node-MainThread",
+              "residentBytes": 143564800,
+              "threads": 11
+            }
+          ]
+        },
+        "stoppedBecause": "Workload reached its proactive memory budget",
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "killed",
+          "exitStatus": "TERM",
+          "capturedAt": "2026-09-24T01:45:35.264Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "memoryBytes": 1669165056,
+          "peakMemoryBytes": 1784897536,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11710464,
+            "file": 1596592128,
+            "kernel": 60252160,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1596592128,
+            "slab": 59479616
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T01:45:35.281Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": true,
+        "memoryThrottled": false
+      },
+      "logSha256": "571989150b089170a2f3a2c2073ad310c4438a559161e34645284989d9dddc2d",
+      "localLog": ".work/product-acceptance/io-ci-linux-arm64-35944252844.log"
+    }
+  ],
+  "followUp": "Use a 6 GiB request on Linux only, still capped at half runner RAM and preserving 8 GiB host headroom, with proactive stop at 80 percent. Windows retains its 2 GiB profile. No local guard setting changes."
+}

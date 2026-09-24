@@ -324,6 +324,13 @@ failures remain recorded; complete API and native-platform coverage are open.
 Linux x64/ARM64 and Windows x64 runners. It uploads no caches or artifacts and
 does not replace full application acceptance. macOS needs a suitable process-tree
 guard for this harness, and Windows ARM64 still needs its native Lean artifact.
+The first Linux CI attempts hit their deliberately smaller 2 GiB cold-install
+profile while populating file cache, before the comparisons. Both guards stopped
+proactively without OOM or pressure events. These are
+[resource results](evidence/io-error-ci-resource-stops-2026-09-24.json), not API
+failures. The Linux request is now 6 GiB within the existing half-RAM cap,
+8 GiB host reserve and proactive-stop policy; Windows keeps 2 GiB. The local
+guard configuration is unchanged.
 
 `managed-tools.yml` tests provisioning on the six required standard native runner
 types. Windows ARM64 remains a failing acceptance row until its distribution is

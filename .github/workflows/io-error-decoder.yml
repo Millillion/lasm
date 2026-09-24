@@ -22,9 +22,12 @@ jobs:
       max-parallel: 2
       matrix:
         include:
-          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
-          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
-          - { platform: win32-x64, runner: windows-2022, arch: x64 }
+          # Cold extraction charges its page cache to the Linux cgroup. The
+          # original 2 GiB request stopped safely before compilation. Existing
+          # half-RAM/8 GiB headroom and 80% proactive-stop rules still apply.
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64, memory: 6144 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64, memory: 6144 }
+          - { platform: win32-x64, runner: windows-2022, arch: x64, memory: 2048 }
     env:
       LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
     steps:
@@ -43,7 +46,7 @@ jobs:
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Compare the native Lean library and host decoder
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/io-error-ci-resources.json -- node integration/io-error-decoder.mjs .work/io-error-ci
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/io-error-ci-resources.json -- node integration/io-error-decoder.mjs .work/io-error-ci
       - name: Verify actual worker errors and explicit Lean messages
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/io-error-controls-resources.json -- node --test --test-concurrency=1 test/lean-io-errors.test.mjs
       - name: Preserve bounded native comparison receipts
