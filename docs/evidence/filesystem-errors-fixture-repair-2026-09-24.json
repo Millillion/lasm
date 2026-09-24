@@ -1,0 +1,19 @@
+{
+  "scope": "Supplementary fixture compilation failure and repair, not a runtime compatibility failure or pass",
+  "recordedAt": "2026-09-24T04:10:06.988649+00:00",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35954149043",
+  "job": 107488768163,
+  "logSha256": "174c034afa6b9deb69535122b7eb080648f56c594220de46f6ff19ee53b3a861",
+  "diagnostic": [
+    "No Repr IO.Error instance",
+    "No Repr ByteArray instance"
+  ],
+  "repair": [
+    "Derive Repr for IO.Error, matching existing truncate-errors fixture",
+    "Observe ByteArray.data through existing Array UInt8 Repr instance"
+  ],
+  "fixtureSha256": "484d9860c5361ce70c97d0325517c6302939f93a76657c751fa315a08f21e88d",
+  "nativeRevalidation": "pending",
+  "deployedComparison": "pending",
+  "upstreamTestsModified": false
+}

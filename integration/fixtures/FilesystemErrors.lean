@@ -1,5 +1,7 @@
 import Init
 
+deriving instance Repr for IO.Error
+
 private def observe (name : String) (action : IO String) : IO Unit := do
   try
     IO.println s!"{name}: ok {repr (← action)}"
@@ -39,7 +41,7 @@ def main (args : List String) : IO Unit := do
     handle.truncate
     pure "truncated"
   observe "read on write-only handle" <| IO.FS.withFile (root / "write-only") .write fun handle => do
-    pure <| reprStr (← handle.read 1)
+    pure <| reprStr (← handle.read 1).data
   observe "metadata missing" do
     discard <| missing.metadata
     pure "metadata"
