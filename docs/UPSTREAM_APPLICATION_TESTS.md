@@ -171,3 +171,13 @@ remain unchanged. The sequential preparation/execution run took 25 minutes
 49 seconds and peaked at 3.95 GiB with no resource events. See the
 [per-case evidence](evidence/upstream-lsp-node-2026-09-24.json); other engines
 and native platforms remain pending for this category.
+
+The reviewed native-only mixed campaign now finishes **78 passed and one
+upstream-disabled** registration on Linux x64 with managed Lean 4.34.0. Each
+unchanged shell/Lake driver starts from its own verified source copy; intentional
+fixture mutations are recorded. All 7,669 original reference entries and active
+harness hashes remain unchanged. The preparation and execution run took
+11 minutes 10 seconds and peaked at 3.62 GiB without resource events. The
+[per-case evidence](evidence/upstream-mixed-native-2026-09-24.json) covers native
+build-time behavior only. The other 31 mixed registrations retain their ordinary
+application or foreign-runtime deployment obligations.
