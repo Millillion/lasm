@@ -677,6 +677,18 @@ spaced paths. All five controls and nine exact source repairs pass. This added
 PATH case is separate from the running CI commit; final build, packaging and
 relocated execution receipts remain pending.
 
+The [fourth cold source run](evidence/application-runtime-source-complete-2026-09-24.json)
+now completes all 2,516 modules across Init, Std, Lean and Lake, packages the
+363,645,375-byte runtime, and exactly matches native Lean's exit status, stdout
+and stderr from a relocated stock Node application. The application exercises
+ordinary file IO and a 131-bit natural number with its source hidden and PATH
+empty. All eleven sequential guards released; the largest peak was 3.80 GiB,
+with no OOM, memory-limit or pressure events. Five SDK/cache controls also pass.
+This validates the nested-Python repair and a cold source build on Linux x64.
+The candidate has its own identity; the shipping catalog remains unchanged.
+No package or cache was uploaded. Clean installed-package acceptance, deployment
+in a separate environment, and the other engines/platforms remain required.
+
 The [filesystem-device fixture](evidence/filesystem-devices-preflight-2026-09-24.json)
 adds ordinary Lean coverage for Linux character devices and procfs: bounded
 reads, kernel write failures, buffering/flush state, truncation, and readable

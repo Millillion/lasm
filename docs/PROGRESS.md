@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Native Windows ARM64 leantar](evidence/windows-arm64-leantar-trace-control-2026-09-24.json) builds and passes both unchanged upstream tests. Our supplementary trace assertion incorrectly expected uncompressed metadata bytes; it now compares against the official release and cross-reads both archives. That differential rerun is pending, and the failed control remains preserved.
+**Changed:** [Cold source CI](evidence/application-runtime-source-complete-2026-09-24.json) builds all 2,516 standard modules and matches native output from a relocated Node application. All eleven guards released without resource events. Installed-package and other-engine acceptance remain separate. SSH authentication expired; local commits continue while pushes wait for restored credentials.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

@@ -1,0 +1,532 @@
+{
+  "scope": "Cold source-built Lean 4.34.0 AOT runtime and relocated Node application differential; separate from npm installation and six-platform acceptance",
+  "run": {
+    "conclusion": "success",
+    "headSha": "edaefe8317914ba1372777bae541299408fb074c",
+    "jobs": [
+      {
+        "completedAt": "2026-09-24T14:36:53Z",
+        "conclusion": "success",
+        "databaseId": 107653521332,
+        "name": "runtime",
+        "startedAt": "2026-09-24T13:27:40Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Confirm latest stable acceptance pins",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Enable process-tree guard",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "SDK integrity and ABI-cache controls",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Cold managed Lean provisioning",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Cold managed SDK provisioning",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Download and verify pinned public sources",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build the pinned GMP dependency",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build host support from pinned inputs",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build runtime and Init Std application archives",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build Lean application archives",
+            "number": 14,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build Lake and verify all cached modules",
+            "number": 15,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Assemble the verified application runtime",
+            "number": 16,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Compare relocated compiled Node output with native Lean",
+            "number": 17,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Preserve bounded build results in logs",
+            "number": 18,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 35,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 36,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 37,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Millillion/lasm/actions/runs/36005801990/job/107653521332"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/Millillion/lasm/actions/runs/36005801990"
+  },
+  "log": {
+    "path": ".work/product-acceptance/runtime-source-ci-r4.log",
+    "sha256": "9d3ee0d78c7e5177c50c4486b1092c5c284d89551d4340b7fcf9b3aee160a415"
+  },
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "expected": "v4.34.0",
+      "tag": "v4.34.0",
+      "publishedAt": "2026-09-14T14:04:36Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "expected": "v2.9.7",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "expected": "bun-v1.4.2",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "expected": "v26.10.0",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false
+    },
+    "checkedAt": "2026-09-24T13:27:53.202Z"
+  },
+  "managedLean": {
+    "version": "4.34.0",
+    "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "identity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1"
+  },
+  "managedSdk": {
+    "identity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+    "driverIdentity": "7a0a587f237bbbc9cd9ca635a5ab220fee3d8cee3b889a82c0f2e50929bf75da",
+    "patchSha256": "f8b31335a97fc2dfd11cfc94ee1787d0b1aff6435ffd765a5613a9553f2e60dc"
+  },
+  "libraryBuild": {
+    "status": "complete",
+    "completed": 2516,
+    "groups": [
+      "Init",
+      "Std",
+      "Lean",
+      "Lake"
+    ]
+  },
+  "runtimeBundle": {
+    "scope": "Versioned application build inputs; managed CLI and installed-package validation remain pending",
+    "target": "/home/runner/work/lasm/lasm/.work/ci-application-bundle/lean-4.34.0-wasm64",
+    "manifestSha256": "4a9f48ee79445652ffb51ef7293dfef53d92b03d60ca22db72dc866f7f09097a",
+    "files": 18,
+    "installedBytes": 363645375,
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/bundle-resources.json"
+  },
+  "smoke": {
+    "phase": "smoke",
+    "scope": "Source-built AOT runtime control, not installed-package acceptance",
+    "passed": true,
+    "resourceReport": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/smoke-resources.json",
+    "startedAt": "2026-09-24T14:35:57.369Z",
+    "committedCatalog": {
+      "schema": 1,
+      "lean": {
+        "4.34.0": {
+          "name": "lean-4.34.0-wasm64",
+          "manifestSha256": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee"
+        }
+      }
+    },
+    "candidate": {
+      "identity": "4a9f48ee79445652ffb51ef7293dfef53d92b03d60ca22db72dc866f7f09097a",
+      "modules": 2516
+    },
+    "build": {
+      "signature": "2c1c89bdd5ad0bdf98566e940c5873040e44370e2d04ae31f0c41f80b5a7284a",
+      "cacheHit": false
+    },
+    "native": {
+      "code": 0,
+      "signal": null,
+      "stdout": "ordinary Lean IO\n1361129467683753853853498429727072845841\n",
+      "stderr": ""
+    },
+    "actual": {
+      "code": 0,
+      "signal": null,
+      "stdout": "ordinary Lean IO\n1361129467683753853853498429727072845841\n",
+      "stderr": ""
+    },
+    "runtimeBuild": {
+      "status": "complete",
+      "completed": 2516,
+      "groups": [
+        "Init",
+        "Std",
+        "Lean",
+        "Lake"
+      ]
+    },
+    "finishedAt": "2026-09-24T14:36:49.933Z"
+  },
+  "unitChecks": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "resourceReports": {
+    "ci-application-runtime--all-libraries-resources.json": {
+      "sha256": "def0cc3d7d1118ea6bb9f7d50bc44931388422c665f101c98c470a4d30a318ad",
+      "startedAt": "2026-09-24T14:30:59.830Z",
+      "finishedAt": "2026-09-24T14:34:23.285Z",
+      "peakMemoryBytes": 680923136,
+      "minimumHostAvailable": 15113801728,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--bundle-resources.json": {
+      "sha256": "6c4824c3f201238b53ce635cfefc0ab2c2f4f7f090c8c3c50cb28d618ac23611",
+      "startedAt": "2026-09-24T14:34:23.333Z",
+      "finishedAt": "2026-09-24T14:35:57.226Z",
+      "peakMemoryBytes": 2095751168,
+      "minimumHostAvailable": 13751160832,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--gmp-resources.json": {
+      "sha256": "faf5273565c283cfca875fed66f0d9cb3bafc47c45a0002b36208e37285c2b89",
+      "startedAt": "2026-09-24T13:29:38.949Z",
+      "finishedAt": "2026-09-24T13:36:26.505Z",
+      "peakMemoryBytes": 316993536,
+      "minimumHostAvailable": 15292411904,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--hosts-resources.json": {
+      "sha256": "1e1fa084eacb59d3105a95b630b6fcddcf01bcedcf0af0df68dc08e40fd4a503",
+      "startedAt": "2026-09-24T13:36:26.551Z",
+      "finishedAt": "2026-09-24T13:37:45.370Z",
+      "peakMemoryBytes": 378556416,
+      "minimumHostAvailable": 15398670336,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--init-std-resources.json": {
+      "sha256": "8406b3e3eb3fdc5b3da75e0db9175ef1f0b70eb5407a2244484e88b048395dfa",
+      "startedAt": "2026-09-24T13:37:45.418Z",
+      "finishedAt": "2026-09-24T14:00:03.331Z",
+      "peakMemoryBytes": 2333192192,
+      "minimumHostAvailable": 14222708736,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--lean-library-resources.json": {
+      "sha256": "20db4ef8b1f55083984d60745c73afa5202128d15c5e03b635e7583365df806f",
+      "startedAt": "2026-09-24T14:00:03.379Z",
+      "finishedAt": "2026-09-24T14:30:59.780Z",
+      "peakMemoryBytes": 1392709632,
+      "minimumHostAvailable": 15140339712,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--lean-resources.json": {
+      "sha256": "a71665f7536ab9225b5baa56a709c8b048ba6c0fc9dd96ad82e45e582a3ee46f",
+      "startedAt": "2026-09-24T13:27:54.083Z",
+      "finishedAt": "2026-09-24T13:28:27.616Z",
+      "peakMemoryBytes": 4078919680,
+      "minimumHostAvailable": 15093895168,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--sdk-resources.json": {
+      "sha256": "eae97cd78aae721518c8a5cf55c47fc8b69014d8d725298c02f441449e7c6c9a",
+      "startedAt": "2026-09-24T13:28:27.663Z",
+      "finishedAt": "2026-09-24T13:29:09.850Z",
+      "peakMemoryBytes": 2815811584,
+      "minimumHostAvailable": 14896951296,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--smoke-resources.json": {
+      "sha256": "e76d751e3524ff80f7c4d44bd8db5787ef4d589ade221fdb68a2f4e362e4fcc3",
+      "startedAt": "2026-09-24T14:35:57.280Z",
+      "finishedAt": "2026-09-24T14:36:50.017Z",
+      "peakMemoryBytes": 3401043968,
+      "minimumHostAvailable": 12360257536,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--sources-resources.json": {
+      "sha256": "7cc0c44c6c4b0548dd5ef80cda7e3635e31f338708917e00f95a3bc5b30bd6a8",
+      "startedAt": "2026-09-24T13:29:09.902Z",
+      "finishedAt": "2026-09-24T13:29:38.903Z",
+      "peakMemoryBytes": 754237440,
+      "minimumHostAvailable": 15216414720,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    },
+    "ci-application-runtime--units-resources.json": {
+      "sha256": "985979fe74ec51fb9eac076b6e6df92230f1443066aff9c6f840d34d9802ceda",
+      "startedAt": "2026-09-24T13:27:53.304Z",
+      "finishedAt": "2026-09-24T13:27:53.998Z",
+      "peakMemoryBytes": 42586112,
+      "minimumHostAvailable": 15281467392,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "pressureSomeAvg10": 0
+    }
+  },
+  "peakMemoryBytes": 4078919680,
+  "limits": [
+    "Linux x64 and stock Node 26.10.0 only; no Deno or Bun application in this source-built campaign",
+    "The candidate is selected in memory for this maintainer check; the shipping catalog remains unchanged",
+    "Relocation hides source and empties PATH and Lean paths but retains the managed build cache on the runner",
+    "No npm package, release, artifact or Actions cache uploaded",
+    "This was built from the recorded CI commit, not later local changes; prior failed runs remain preserved"
+  ]
+}
