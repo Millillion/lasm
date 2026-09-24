@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** The unchanged upstream [scientific-number Lake project](evidence/upstream-ofscientific-2026-09-24.json) passes all 10,047 vendored vectors in each stock engine through installed `.14` on Linux x64. Native outputs match and all 7,669 original source entries remain intact; peak memory was 3.49 GiB without resource events.
+**Changed:** The unchanged upstream [private-import Lake project](evidence/upstream-private-import-2026-09-24.json) passes in all three stock engines through installed `.14` on Linux x64. The parallel harness preserves the original stage pin and source bytes; peak memory was 3.56 GiB without resource events.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

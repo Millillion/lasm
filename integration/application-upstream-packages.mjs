@@ -43,7 +43,7 @@ const report = { scope: 'Reviewed unchanged upstream Lake applications, complete
   commands: [], passed: false,
   adaptations: [
     'Original tests, shell drivers, vectors and expected values are unchanged; native and application builds use independent verified copies.',
-    'Each copied package receives an ordinary Lean 4.34.0 toolchain pin; no original file is overwritten.',
+    'Packages without a pin receive an ordinary Lean 4.34.0 pin. Existing upstream stage pins remain unchanged in both original copies; a separate application copy preserves every other original byte and supplies the release pin.',
     'The application phase uses the installed Lasm CLI, moves dist and its unchanged data into a deployment, hides both source trees and removes build-tool environment variables.',
     'No input filters or extra program arguments are used. Each original self-check and complete vendored input count must pass.',
     'Float durations are retained in raw logs but omitted from differential comparison; every per-file count, failure count and total is compared.',
@@ -135,8 +135,24 @@ try {
   for (const directory of [native, project]) {
     cpSync(join(reference, prefix), directory, { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
     await verify(directory, packageSources);
-    assert.ok(!existsSync(join(directory, 'lean-toolchain')));
-    writeFileSync(join(directory, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+    if (!existsSync(join(directory, 'lean-toolchain')))
+      writeFileSync(join(directory, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+  }
+  let applicationProject = project;
+  const applicationSources = { ...packageSources };
+  if (packageSources['lean-toolchain']) {
+    applicationProject = join(output, 'release-pinned application source');
+    cpSync(project, applicationProject, { recursive: true, preserveTimestamps: true, verbatimSymlinks: true,
+      filter: path => path !== join(project, 'lean-toolchain') });
+    delete applicationSources['lean-toolchain'];
+    report.parallelApplicationCopy = {
+      directory: applicationProject, originalPin: readFileSync(join(project, 'lean-toolchain'), 'utf8'),
+      releasePin: 'leanprover/lean4:v4.34.0\n',
+      originalPinPreservedAt: [join(native, 'lean-toolchain'), join(project, 'lean-toolchain')],
+      before: await verify(applicationProject, applicationSources),
+    };
+    assert.ok(!existsSync(join(applicationProject, 'lean-toolchain')));
+    writeFileSync(join(applicationProject, 'lean-toolchain'), report.parallelApplicationCopy.releasePin);
   }
   assert.equal(await hashFile(join(native, 'run_test.sh')), registration.sha256);
   report.nativeDriver = run('original native shell driver', '/bin/bash',
@@ -146,14 +162,21 @@ try {
   report.nativeSourceAfter = await verify(native, packageSources);
   const dist = join(output, 'dist');
   run('installed application build', process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', join(project, 'Main.lean'), '--target', target, '--output', dist], project, env);
+    [join(compiler, 'bin/lasm.mjs'), 'build', join(applicationProject, 'Main.lean'), '--target', target, '--output', dist], applicationProject, env);
   report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
   report.applicationSourceAfter = await verify(project, packageSources);
+  if (report.parallelApplicationCopy) report.parallelApplicationCopy.after = await verify(applicationProject, applicationSources);
   const deployment = join(output, 'relocated deployment'); renameSync(dist, deployment);
   if (dataName) cpSync(join(reference, prefix, dataName), join(deployment, dataName), { recursive: true, preserveTimestamps: true });
   const dataSources = Object.fromEntries(Object.entries(packageSources).filter(([path]) => dataName && path.startsWith(dataName + '/')));
   report.deployedDataBefore = await verify(deployment, dataSources);
   renameSync(native, native + '.hidden'); renameSync(project, project + '.hidden');
+  if (applicationProject !== project) {
+    renameSync(applicationProject, applicationProject + '.hidden');
+    report.parallelApplicationCopy.hiddenDirectory = applicationProject + '.hidden';
+    report.parallelApplicationCopy.originalPinPreservedAt =
+      [join(native + '.hidden', 'lean-toolchain'), join(project + '.hidden', 'lean-toolchain')];
+  }
   const runtimeEnv = Object.fromEntries(Object.entries(process.env)
     .filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
   Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });

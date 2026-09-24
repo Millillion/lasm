@@ -221,6 +221,17 @@ and total output match native. All 7,669 reference entries remain unchanged.
 The [three-engine evidence](evidence/upstream-ofscientific-2026-09-24.json) records
 the 3.49 GiB maximum peak without resource events. The separate
 `integration/application-upstream-packages.mjs` harness also supports the reviewed
-floating-point and private-import projects; their acceptance remains separate
-until their recorded runs finish. Other mixed registrations and native platforms
-remain open.
+floating-point project; its acceptance remains pending. Other mixed registrations
+and native platforms remain open.
+
+The unchanged `pkg/exe_private_lean_import` project also passes in all three
+engines through installed `.14`, matching its native executable's exact output.
+The original stage-directory toolchain pin remains intact. An initial harness
+preflight rejected that pin before running the test; the repaired parallel harness
+uses an additional release-pinned application copy, verifies every other original
+byte, and hides all source copies before deployment. The
+[private-import receipts](evidence/upstream-private-import-2026-09-24.json)
+preserve the initial preflight failure and all three passes, including unchanged
+original drivers and all 7,669 reference entries. Peak guarded memory was
+3.56 GiB without resource events. This is Linux x64 application evidence, not
+acceptance for other platforms or all mixed registrations.

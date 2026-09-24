@@ -117,11 +117,14 @@ node scripts/full-lean/run-bounded.mjs -- \
 ```
 
 Select `float`, `ofScientific` or `exe_private_lean_import`, and use a fresh output
-directory for each engine/case. The reference is an extracted Lean 4.34 tree verified against all
-7,669 recorded source entries. This harness runs the original shell driver in
+directory for each engine/case. The reference is an extracted Lean 4.34 tree
+verified against all 7,669 recorded source entries. This harness runs the original shell driver in
 an independent package copy, then compares the native executable with a build
-through the installed Lasm CLI. Both source trees are hidden before the
-relocated deployment executes. The complete original vendored datasets are
+through the installed Lasm CLI. An existing upstream stage-directory toolchain
+pin remains unchanged in both original copies. For that case, a separate
+application copy retains every other original byte and receives an ordinary
+release pin, with both source inventories checked. All source copies are hidden
+before the relocated deployment executes. The complete original vendored datasets are
 copied as deployment assets; no input filters or changed assertions are used.
 Every per-file vector count, failure count and total must match. Float timings
 remain in raw logs but are excluded from the comparison. Its original program
