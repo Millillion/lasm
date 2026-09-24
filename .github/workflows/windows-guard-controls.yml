@@ -1,0 +1,39 @@
+name: Native Windows resource guard controls
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  control:
+    if: github.event.repository.visibility == 'public'
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - runner: windows-2025
+            architecture: x64
+          - runner: windows-11-arm
+            architecture: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    env:
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.architecture }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Check deadline and descendant cleanup without pressure
+        run: node integration/windows-guard-deadline.mjs
+      - name: Check ordinary below-cap completion still works
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/windows-guard-completion-resources.json -- node test/fixtures/windows-guard.mjs
+      - name: Verify normal completion and descendant accounting
+        run: node -e "const a=require('node:assert/strict'),r=require('./.work/windows-guard-completion-resources.json');a.equal(r.status,'passed');a.equal(r.exitCode,0);a.ok(r.peakCommittedBytes>=64*1024**2);a.ok(r.peakCommittedBytes<r.limits.stopCommittedBytes)"
+      - name: Preserve bounded receipts in logs
+        if: always()
+        run: node -e "const f=require('node:fs');if(f.existsSync('.work'))for(const n of f.readdirSync('.work').filter(n=>n.startsWith('windows-guard-')&&n.endsWith('.json')))console.log(n+'\n'+f.readFileSync('.work/'+n,'utf8'))"
+      # Standard public runners; no cache/artifact upload or large allocations.

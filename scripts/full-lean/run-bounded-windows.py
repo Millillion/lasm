@@ -115,12 +115,15 @@ if sys.argv[1:] == ["--check-current"]:
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--memory-mib", type=int, default=8192)
+parser.add_argument("--timeout-seconds", type=int)
 parser.add_argument("--report", required=True)
 parser.add_argument("command", nargs=argparse.REMAINDER)
 args = parser.parse_args()
 command = args.command[1:] if args.command[:1] == ["--"] else args.command
 if not command or not 128 <= args.memory_mib <= 10240:
     parser.error("Supply -- COMMAND and a cap of 128..10240 MiB")
+if args.timeout_seconds is not None and not 1 <= args.timeout_seconds <= 21600:
+    parser.error("The optional deadline must be 1..21600 seconds")
 report = Path(args.report).resolve()
 report.parent.mkdir(parents=True, exist_ok=True)
 with report.open("x", encoding="utf-8") as output:
@@ -131,7 +134,8 @@ limit = min(args.memory_mib * 1024**2, initial["total"] // 2, initial["available
 if limit < 128 * 1024**2:
     raise SystemExit("Insufficient free memory for the Windows CI guard")
 evidence = {"status": "starting", "command": command, "hostAtStart": initial,
-            "limits": {"jobCommittedBytes": limit, "stopCommittedBytes": int(limit * .8), "hostReserveBytes": reserve},
+            "limits": {"jobCommittedBytes": limit, "stopCommittedBytes": int(limit * .8),
+                       "hostReserveBytes": reserve, "timeoutSeconds": args.timeout_seconds},
             "peakCommittedBytes": 0, "minimumHostAvailable": initial["available"], "startedAt": time.time()}
 
 
@@ -171,6 +175,7 @@ try:
         terminate_process(child.process, 125)
         raise
     evidence.update(status="running", pid=child.pid)
+    deadline = time.monotonic() + args.timeout_seconds if args.timeout_seconds is not None else None
     while True:
         sample = EXTENDED_LIMIT()
         check(job_query(job, 9, C.byref(sample), C.sizeof(sample), None))
@@ -179,10 +184,11 @@ try:
         evidence["minimumHostAvailable"] = min(evidence["minimumHostAvailable"], host["available"])
         evidence["lastSampleAt"] = time.time()
         reason = ("proactive-memory-stop" if sample.peakJobMemory >= evidence["limits"]["stopCommittedBytes"]
-                  else "host-headroom-stop" if host["available"] < reserve else None)
+                  else "host-headroom-stop" if host["available"] < reserve
+                  else "time-limit" if deadline is not None and time.monotonic() >= deadline else None)
         if reason:
             evidence["stoppedBecause"] = reason
-            check(terminate(job, 125))
+            check(terminate(job, 124 if reason == "time-limit" else 125))
         save()
         state = wait(child.process, 200)
         if state == 0:
@@ -192,7 +198,9 @@ try:
     code = W.DWORD()
     check(exit_code(child.process, C.byref(code)))
     evidence["exitCode"] = code.value
-    evidence["status"] = "resource-abort" if evidence.get("stoppedBecause") else "passed" if code.value == 0 else "failed"
+    evidence["status"] = ("time-limit" if evidence.get("stoppedBecause") == "time-limit"
+                          else "resource-abort" if evidence.get("stoppedBecause")
+                          else "passed" if code.value == 0 else "failed")
 except BaseException as error:
     evidence.update(status="guard-error", error=str(error))
     raise
@@ -206,4 +214,5 @@ finally:
     evidence["finishedAt"] = time.time()
     save()
     print(json.dumps(evidence), flush=True)
-raise SystemExit(125 if evidence.get("stoppedBecause") else evidence["exitCode"])
+raise SystemExit(124 if evidence.get("stoppedBecause") == "time-limit"
+                 else 125 if evidence.get("stoppedBecause") else evidence["exitCode"])
