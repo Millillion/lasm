@@ -35,9 +35,14 @@ The [native Windows ARM64 bootstrap checkpoint](evidence/windows-arm64-bootstrap
 reached its 260-minute guard deadline while compiling stage1 Lean modules, with
 a 1.90 GiB committed-memory peak. Completed compiler-cache entries were verified
 and saved as a 228 MB archive within the included repository allowance. A rerun
-of the same recipe has been dispatched to reuse them. The build remains
-incomplete, and the final CI assertion correctly fails until the native Lean,
-Lake and compiled-main checks finish; a checkpoint is not a platform pass.
+of the same recipe reused 6,923 compiler results and completed 3,445 additional
+compilations without compiler errors. That [second checkpoint](evidence/windows-arm64-bootstrap-checkpoint-2-2026-09-24.json)
+reached the same deadline while linking the stage1 Lean shared library, with a
+1.90 GiB peak. Its verified cache archive is 360 MB; both retained checkpoints
+occupy 588 MB within the existing included-storage bound. A third attempt is
+running from that checkpoint. The build remains incomplete, and the final CI
+assertion correctly fails until the native Lean, Lake and compiled-main checks
+finish; a checkpoint is not a platform pass.
 
 The compiler-support bootstrap also has a six-platform catalog for native Python
 3.13.15 from the pinned

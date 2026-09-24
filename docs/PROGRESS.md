@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** Installed `.18` passes [all 155 Bun LSP-client registrations](evidence/upstream-lsp-bun-2026-09-24.json), completing this category across the three engines on Linux x64. Original drivers, 7,669 source entries and active harnesses remain unchanged. Peak memory was 4.16 GiB without resource events. Native server subprocesses remain compiler coverage; completed artifacts were losslessly archived.
+**Changed:** The [second Windows ARM64 bootstrap checkpoint](evidence/windows-arm64-bootstrap-checkpoint-2-2026-09-24.json) reused 6,923 compilations and completed 3,445 more without compiler errors. Its guard stopped at the deadline during stage1 linking, with a 1.90 GiB peak. A third attempt uses the verified checkpoint; both retained caches total 588 MB. This is build progress, not platform acceptance.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
