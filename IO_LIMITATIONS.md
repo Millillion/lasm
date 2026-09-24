@@ -235,6 +235,15 @@ separately from the earlier runtime evidence below.
   still passes. Only sparse eight-byte regions are touched, with a 223 MiB
   guarded peak and no resource events. This verifies allocator capacity and
   reclamation, not a dense-memory workload or the original 4 GiB pthread test.
+  The next [real-pthread probe](docs/evidence/wasmtime-real-lean-pthreads-2026-09-24.json)
+  now creates, executes, exits, joins and cleans up three guest pthreads per
+  engine using the module's actual pthread APIs. Separate JavaScript worker
+  instances share compiled code and memory, with independent Wasmtime stores
+  and real TLS. Stack requests are 2 MiB, 4 GiB and 4 GiB; the large allocation
+  is reused after joining, and subsequent arithmetic passes. Peak memory is
+  254 MiB, without resource events. These are sequential pure-entry threads;
+  deep execution, concurrent Lean scheduling, nested spawning, worker mailbox
+  routing and the unchanged benchmark main still require implementation/tests.
 
 ## Earlier runtime evidence and remaining compatibility work
 

@@ -10,7 +10,7 @@ assert.equal(await hashFile(cache), expectedHash);
 const ffi = createRequire(import.meta.url)('koffi'), library = ffi.load(libraryPath);
 const clockType = ffi.proto('double lasm_probe_date_now(void)');
 const mailboxType = ffi.proto('void lasm_probe_schedule_mailbox(void)');
-const create = library.func('void *lasm_lean_instance_new(str trusted_cache, lasm_probe_date_now *date_now, lasm_probe_schedule_mailbox *schedule_mailbox, const uint8_t *environment, size_t environment_size, size_t environment_count, str program_name, char *error, size_t capacity)');
+const create = library.func('void *lasm_lean_instance_new(str trusted_cache, lasm_probe_date_now *date_now, lasm_probe_schedule_mailbox *schedule_mailbox, const uint8_t *environment, size_t environment_size, size_t environment_count, str program_name, void *parent, void *spawn, void *thread_event, char *error, size_t capacity)');
 const destroy = library.func('void lasm_lean_instance_delete(void *probe)');
 const call = library.func('int lasm_lean_instance_call(void *probe, str name, const uint64_t *args, size_t nargs, uint32_t result_count, _Out_ uint64_t *result, char *error, size_t capacity)');
 const details = library.func('void lasm_lean_instance_details(void *probe, _Out_ uint64_t *details)');
@@ -43,9 +43,9 @@ process.env.LASM_WASMTIME_ENV_CONTROL = 'λ-雪 😀 =value';
 const environment = Object.entries(process.env).map(([key, value]) => `${key}=${value}`);
 const environmentBytes = Buffer.from(environment.join('\0') + '\0');
 const probe = create(cache, clock, mailbox, environmentBytes, environmentBytes.length,
-  environment.length, process.argv[1], error, error.length);
+  environment.length, process.argv[1], null, null, null, error, error.length);
 if (!probe) { ffi.unregister(clock); ffi.unregister(mailbox); assert.fail(message()); }
-const results = [], observed = Array(22).fill(0);
+const results = [], observed = Array(26).fill(0);
 function invoke(name, args = [], resultCount = 1) {
   const result = [0];
   assert.equal(call(probe, name, args, args.length, resultCount, result, error, error.length), 0, message());

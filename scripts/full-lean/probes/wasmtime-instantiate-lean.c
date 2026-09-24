@@ -12,6 +12,8 @@
 
 typedef double (*date_callback_t)(void);
 typedef void (*mailbox_callback_t)(void);
+typedef int32_t (*spawn_callback_t)(uint64_t, uint64_t, uint64_t);
+typedef int32_t (*thread_event_callback_t)(uint32_t, uint64_t);
 typedef struct {
     wasm_engine_t *engine;
     wasmtime_module_t *module;
@@ -29,11 +31,15 @@ typedef struct {
     uint64_t random_calls, random_bytes;
     uint64_t program_name_calls;
     uint64_t growth_requests, growth_successes, largest_growth_request;
+    uint64_t pthread_creations, pthread_cleanups, pthread_exits, blocking_checks;
+    bool is_worker;
     char *program_name;
     size_t environment_size, environment_count;
     uint8_t *environment;
     date_callback_t date_now;
     mailbox_callback_t schedule_mailbox;
+    spawn_callback_t spawn;
+    thread_event_callback_t thread_event;
 } lean_probe_t;
 typedef struct { lean_probe_t *owner; char name[256]; } rejected_import_t;
 
@@ -281,6 +287,57 @@ static wasm_trap_t *mailbox_notify_import(void *data, wasmtime_caller_t *caller,
     probe->schedule_mailbox();
     return NULL;
 }
+static wasm_trap_t *pthread_create_import(void *data, wasmtime_caller_t *caller,
+    const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
+    (void)caller;
+    lean_probe_t *probe = data;
+    if (nargs != 4 || nresults != 1) return wasmtime_trap_new("unexpected pthread create ABI", 29);
+    for (size_t i = 0; i < nargs; i++)
+        if (args[i].kind != WASMTIME_I64) return wasmtime_trap_new("unexpected pthread pointer ABI", 30);
+    if (!probe->spawn || probe->is_worker)
+        return wasmtime_trap_new("UNIMPLEMENTED nested pthread creation", 37);
+    int32_t status = probe->spawn((uint64_t)args[0].of.i64, (uint64_t)args[2].of.i64, (uint64_t)args[3].of.i64);
+    if (!status) probe->pthread_creations++;
+    results[0] = (wasmtime_val_t){ .kind = WASMTIME_I32, .of.i32 = status };
+    return NULL;
+}
+static wasm_trap_t *pthread_exit_import(void *data, wasmtime_caller_t *caller,
+    const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
+    (void)caller; (void)results;
+    lean_probe_t *probe = data;
+    if (nargs != 1 || nresults || args[0].kind != WASMTIME_I64)
+        return wasmtime_trap_new("unexpected pthread exit ABI", 27);
+    if (!probe->is_worker || !probe->thread_event ||
+        !probe->thread_event(0, (uint64_t)args[0].of.i64))
+        return wasmtime_trap_new("pthread exit notification rejected", 34);
+    probe->pthread_exits++;
+    return NULL;
+}
+static wasm_trap_t *pthread_cleanup_import(void *data, wasmtime_caller_t *caller,
+    const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
+    (void)results;
+    lean_probe_t *probe = data;
+    if (nargs != 1 || nresults || args[0].kind != WASMTIME_I64)
+        return wasmtime_trap_new("unexpected pthread cleanup ABI", 30);
+    if (probe->is_worker || !probe->thread_event ||
+        !probe->thread_event(1, (uint64_t)args[0].of.i64))
+        return wasmtime_trap_new("pthread cleanup notification rejected", 37);
+    wasm_trap_t *trap = invoke_from_import(probe, wasmtime_caller_context(caller),
+        "_emscripten_thread_free_data", args, 1, NULL, 0);
+    if (!trap) probe->pthread_cleanups++;
+    return trap;
+}
+static wasm_trap_t *blocking_allowed_import(void *data, wasmtime_caller_t *caller,
+    const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
+    (void)caller; (void)args; (void)results;
+    lean_probe_t *probe = data;
+    // Every creating JS isolate verifies actual blocking permission before
+    // constructing this helper. The Wasm thread must also be initialized.
+    if (nargs || nresults || !probe->main_pthread)
+        return wasmtime_trap_new("blocking requires an initialized thread", 39);
+    probe->blocking_checks++;
+    return NULL;
+}
 void lasm_lean_instance_delete(lean_probe_t *probe) {
     if (!probe) return;
     if (probe->store) wasmtime_store_delete(probe->store);
@@ -296,6 +353,7 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
     mailbox_callback_t schedule_mailbox,
     const uint8_t *environment, size_t environment_size, size_t environment_count,
     const char *program_name,
+    lean_probe_t *parent, spawn_callback_t spawn, thread_event_callback_t thread_event,
     char *error, size_t capacity) {
     const struct rlimit no_core = {0, 0};
     if (!date_now || !schedule_mailbox || setrlimit(RLIMIT_CORE, &no_core) != 0 || prctl(PR_GET_THP_DISABLE, 0, 0, 0, 0) != 1) {
@@ -325,6 +383,15 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
     probe->environment_size = environment_size; probe->environment_count = environment_count;
     probe->date_now = date_now;
     probe->schedule_mailbox = schedule_mailbox;
+    probe->spawn = spawn; probe->thread_event = thread_event;
+    probe->is_worker = parent != NULL;
+    if (parent) {
+        // Clone reference-counted immutable/shared values only. Each JS isolate
+        // owns its new Store and Instance; no Store crosses a thread boundary.
+        probe->engine = wasmtime_engine_clone(parent->engine);
+        probe->module = wasmtime_module_clone(parent->module);
+        probe->memory = wasmtime_sharedmemory_clone(parent->memory);
+    } else {
     wasm_config_t *config = wasm_config_new();
     wasmtime_config_wasm_memory64_set(config, true);
     wasmtime_config_wasm_threads_set(config, true);
@@ -342,6 +409,7 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
     // this unsafe native-code deserializer. Never accept external cache bytes.
     if (failure(wasmtime_module_deserialize_file(probe->engine, trusted_cache, &probe->module),
         NULL, error, capacity)) goto failed;
+    }
     probe->store = wasmtime_store_new(probe->engine, NULL, NULL);
     if (!probe->store) { snprintf(error, capacity, "store allocation failed"); goto failed; }
     wasmtime_context_t *context = wasmtime_store_context(probe->store);
@@ -361,6 +429,23 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
         const wasm_name_t *name = wasm_importtype_name(types.data[i]);
         switch (wasm_externtype_kind(type)) {
         case WASM_EXTERN_FUNC: {
+            if (module->size == 3 && !memcmp(module->data, "env", 3)) {
+                wasmtime_func_callback_t callback = NULL;
+                if (name->size == strlen("__pthread_create_js") && !memcmp(name->data, "__pthread_create_js", name->size))
+                    callback = pthread_create_import;
+                if (name->size == strlen("_emscripten_thread_exit_joinable") && !memcmp(name->data, "_emscripten_thread_exit_joinable", name->size))
+                    callback = pthread_exit_import;
+                if (name->size == strlen("_emscripten_thread_cleanup") && !memcmp(name->data, "_emscripten_thread_cleanup", name->size))
+                    callback = pthread_cleanup_import;
+                if (name->size == strlen("emscripten_check_blocking_allowed") && !memcmp(name->data, "emscripten_check_blocking_allowed", name->size))
+                    callback = blocking_allowed_import;
+                if (callback) {
+                    imports[i].kind = WASMTIME_EXTERN_FUNC;
+                    wasmtime_func_new(context, wasm_externtype_as_functype_const(type),
+                        callback, probe, NULL, &imports[i].of.func);
+                    break;
+                }
+            }
             if (module->size == 3 && !memcmp(module->data, "env", 3) &&
                 name->size == strlen("emscripten_resize_heap") &&
                 !memcmp(name->data, "emscripten_resize_heap", name->size)) {
@@ -468,11 +553,12 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
         }
         case WASM_EXTERN_MEMORY: {
             const wasm_memorytype_t *memory = wasm_externtype_as_memorytype_const(type);
-            if (probe->memory || !wasmtime_memorytype_isshared(memory) || !wasmtime_memorytype_is64(memory)
+            if (!wasmtime_memorytype_isshared(memory) || !wasmtime_memorytype_is64(memory)
                 || wasmtime_memorytype_minimum(memory) != 2048) {
                 snprintf(error, capacity, "unexpected memory import"); status = 1; break;
             }
-            status = failure(wasmtime_sharedmemory_new(probe->engine, memory, &probe->memory), NULL, error, capacity);
+            if (!probe->memory)
+                status = failure(wasmtime_sharedmemory_new(probe->engine, memory, &probe->memory), NULL, error, capacity);
             if (status) break;
             imports[i].kind = WASMTIME_EXTERN_SHAREDMEMORY;
             imports[i].of.sharedmemory = wasmtime_sharedmemory_clone(probe->memory);
@@ -510,15 +596,18 @@ int lasm_lean_instance_call(lean_probe_t *probe, const char *name, const uint64_
     wasm_functype_t *type = wasmtime_func_type(context, &item.of.func);
     const wasm_valtype_vec_t *parameters = wasm_functype_params(type), *returns = wasm_functype_results(type);
     if (parameters->size != nargs || returns->size != result_count ||
-        (result_count && wasm_valtype_kind(returns->data[0]) != WASM_I64)) {
-        snprintf(error, capacity, "unexpected pure-export signature"); status = 2;
+        (result_count && wasm_valtype_kind(returns->data[0]) != WASM_I64 &&
+            wasm_valtype_kind(returns->data[0]) != WASM_I32)) {
+        snprintf(error, capacity, "unexpected integer-export signature"); status = 2;
     }
     wasmtime_val_t inputs[8], returned;
     for (size_t i = 0; !status && i < nargs; i++) {
-        if (wasm_valtype_kind(parameters->data[i]) != WASM_I64) {
-            snprintf(error, capacity, "expected i64 parameter"); status = 2; break;
+        wasm_valkind_t kind = wasm_valtype_kind(parameters->data[i]);
+        if (kind != WASM_I64 && (kind != WASM_I32 || args[i] > UINT32_MAX)) {
+            snprintf(error, capacity, "expected matching integer parameter"); status = 2; break;
         }
-        inputs[i] = (wasmtime_val_t){ .kind = WASMTIME_I64, .of.i64 = (int64_t)args[i] };
+        if (kind == WASM_I64) inputs[i] = (wasmtime_val_t){ .kind = WASMTIME_I64, .of.i64 = (int64_t)args[i] };
+        else inputs[i] = (wasmtime_val_t){ .kind = WASMTIME_I32, .of.i32 = (int32_t)(uint32_t)args[i] };
     }
     wasm_functype_delete(type);
     if (!status) {
@@ -526,7 +615,10 @@ int lasm_lean_instance_call(lean_probe_t *probe, const char *name, const uint64_
         wasmtime_error_t *called = wasmtime_func_call(context, &item.of.func, inputs, nargs,
             result_count ? &returned : NULL, result_count, &trap);
         status = failure(called, trap, error, capacity);
-        if (!status && result_count) { *result = (uint64_t)returned.of.i64; wasmtime_val_unroot(&returned); }
+        if (!status && result_count) {
+            *result = returned.kind == WASMTIME_I64 ? (uint64_t)returned.of.i64 : (uint32_t)returned.of.i32;
+            wasmtime_val_unroot(&returned);
+        }
     }
 done:
     wasmtime_extern_delete(&item); return status;
@@ -553,10 +645,79 @@ void lasm_lean_instance_details(lean_probe_t *probe, uint64_t *details) {
     details[19] = probe->growth_requests;
     details[20] = probe->growth_successes;
     details[21] = probe->largest_growth_request;
+    details[22] = probe->pthread_creations;
+    details[23] = probe->pthread_cleanups;
+    details[24] = probe->pthread_exits;
+    details[25] = probe->blocking_checks;
 }
 void *lasm_lean_instance_memory_window(lean_probe_t *probe, uint64_t offset, size_t length) {
     if (length > 65536 || !memory_range(probe, offset, length)) return NULL;
     return wasmtime_sharedmemory_data(probe->memory) + offset;
+}
+int lasm_lean_instance_mailbox_register(lean_probe_t *probe, uint64_t pthread, char *error, size_t capacity) {
+    wasmtime_val_t arg = { .kind = WASMTIME_I64, .of.i64 = (int64_t)pthread };
+    return failure(NULL, mailbox_await_import(probe, NULL, &arg, 1, NULL, 0), error, capacity);
+}
+int lasm_lean_instance_function_pointer(lean_probe_t *probe, const char *name, uint64_t requested,
+    uint64_t *pointer, char *error, size_t capacity) {
+    wasmtime_context_t *context = wasmtime_store_context(probe->store);
+    wasmtime_extern_t table, function;
+    const char *table_name = "__indirect_function_table";
+    if (!wasmtime_instance_export_get(context, &probe->instance, table_name, strlen(table_name), &table)) {
+        snprintf(error, capacity, "missing function table"); return 1;
+    }
+    if (!wasmtime_instance_export_get(context, &probe->instance, name, strlen(name), &function)) {
+        wasmtime_extern_delete(&table); snprintf(error, capacity, "missing function pointer export"); return 1;
+    }
+    int status = 0;
+    if (table.kind != WASMTIME_EXTERN_TABLE || function.kind != WASMTIME_EXTERN_FUNC) {
+        snprintf(error, capacity, "invalid function pointer exports"); status = 1; goto done;
+    }
+    uint64_t size = wasmtime_table_size(context, &table.of.table);
+    if (requested == UINT64_MAX) requested = size;
+    // Only add a small diagnostic export entry. Never replace the module's
+    // compiled entries or pretend to implement general dynamic linking.
+    if (requested < size || requested - size > 16) {
+        snprintf(error, capacity, "function pointer must append a bounded table entry"); status = 1; goto done;
+    }
+    wasmtime_val_t empty = { .kind = WASMTIME_FUNCREF };
+    wasmtime_funcref_set_null(&empty.of.funcref);
+    uint64_t previous;
+    status = failure(wasmtime_table_grow(context, &table.of.table, requested - size + 1,
+        &empty, &previous), NULL, error, capacity);
+    if (status) goto done;
+    wasmtime_val_t value = { .kind = WASMTIME_FUNCREF, .of.funcref = function.of.func };
+    status = failure(wasmtime_table_set(context, &table.of.table, requested, &value), NULL, error, capacity);
+    if (!status) *pointer = requested;
+done:
+    wasmtime_extern_delete(&table); wasmtime_extern_delete(&function); return status;
+}
+int lasm_lean_instance_call_pointer(lean_probe_t *probe, uint64_t pointer, uint64_t argument,
+    uint64_t *result, char *error, size_t capacity) {
+    wasmtime_context_t *context = wasmtime_store_context(probe->store);
+    const char *name = "__indirect_function_table";
+    wasmtime_extern_t table;
+    if (!wasmtime_instance_export_get(context, &probe->instance, name, strlen(name), &table)) {
+        snprintf(error, capacity, "missing function table"); return 1;
+    }
+    wasmtime_val_t function;
+    bool found = table.kind == WASMTIME_EXTERN_TABLE && wasmtime_table_get(context, &table.of.table, pointer, &function);
+    wasmtime_extern_delete(&table);
+    if (!found) { snprintf(error, capacity, "missing function pointer"); return 1; }
+    if (function.kind != WASMTIME_FUNCREF || wasmtime_funcref_is_null(&function.of.funcref)) {
+        wasmtime_val_unroot(&function); snprintf(error, capacity, "null function pointer"); return 1;
+    }
+    wasmtime_val_t arg = { .kind = WASMTIME_I64, .of.i64 = (int64_t)argument }, returned;
+    wasm_trap_t *trap = NULL;
+    wasmtime_error_t *called = wasmtime_func_call(context, &function.of.funcref, &arg, 1, &returned, 1, &trap);
+    int status = failure(called, trap, error, capacity);
+    wasmtime_val_unroot(&function);
+    if (!status) {
+        if (returned.kind != WASMTIME_I64) { snprintf(error, capacity, "unexpected thread entry result"); status = 1; }
+        else *result = (uint64_t)returned.of.i64;
+        wasmtime_val_unroot(&returned);
+    }
+    return status;
 }
 int lasm_lean_instance_environment_check(lean_probe_t *probe, char *error, size_t capacity) {
     size_t offset = 0;

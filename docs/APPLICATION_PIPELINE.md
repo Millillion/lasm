@@ -788,3 +788,14 @@ loader's geometric-growth policy. The repeated startup/mailbox/native controls
 still pass; peak physical memory is 223 MiB under the unchanged 3 GiB guard.
 This closes a component allocation prerequisite. The original large-stack
 benchmark, worker lifecycle and shipping helper integration remain unpassed.
+
+[Real guest pthread lifecycle now passes](evidence/wasmtime-real-lean-pthreads-2026-09-24.json)
+in Node, Deno and Bun. The guest allocates each thread through `pthread_create`,
+a separate JS worker initializes its own Wasmtime store and real TLS, executes
+a guest function-table entry, and exits through the module's actual thread
+runtime. `pthread_join` receives the result and frees the thread data. The
+2 MiB/4 GiB/4 GiB sequence verifies reuse after cleanup and arithmetic afterward.
+All earlier startup and allocation controls pass again. The guard releases at
+254 MiB with no resource events. This establishes a sequential worker path;
+concurrent/nested scheduling, complete host imports, the original benchmark main,
+and the shipping backend remain open.
