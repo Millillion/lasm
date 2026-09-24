@@ -86,7 +86,8 @@ separate run raised that cold-build deadline to fifteen minutes with the same
 fixture, assertions and one worker, and passed (135.44 seconds in its compiler
 phase). Managed SDK installation, C-to-Wasm execution and verified immutable
 cache reuse now pass natively on all five hosts with upstream SDK bundles.
-Windows ARM64 still needs its native SDK.
+Windows ARM64's separately built SDK now passes local archive provisioning and
+C++ application checks below; a hosted managed distribution is still required.
 
 ## CLI and deployment foundations
 
@@ -341,6 +342,16 @@ This establishes that the native compiler tools can be built and run. Relocatabl
 DLL packaging, Emscripten sysroot integration, managed downloads and full Lean
 application validation are still required. The workflow uploaded no artifacts
 or Actions caches.
+
+The [next native SDK run](evidence/windows-arm64-sdk-package-2026-09-24.json)
+also passes relocatable DLL packaging, managed archive extraction, Emscripten
+sysroot integration and verified cache reuse. Its 174.8 MB local archive includes
+native ARM64 compiler tools and their non-system DLL dependencies. After hiding
+the original build directories, both Wasm32 and Wasm64 C++ applications using
+threads and exceptions compile and run in stock Node with empty PATH. The
+guarded build and package phase took 113.18 minutes, peaking at 0.91 GiB. The
+archive stayed on the ephemeral CI runner; no hosted SDK download, full Lean
+application pass or complete Node/npm-only installation is claimed.
 
 The repository was verified public and runner eligibility was checked against
 [GitHub's standard-runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)

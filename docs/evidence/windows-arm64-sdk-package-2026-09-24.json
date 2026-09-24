@@ -1,0 +1,2886 @@
+{
+  "scope": "Native Windows ARM64 SDK packaging and managed local-archive provisioning; complete Lean application acceptance and hosted distribution are still pending",
+  "run": {
+    "url": "https://github.com/Millillion/lasm/actions/runs/35931918782",
+    "commit": "9d3801b",
+    "conclusion": "success",
+    "runner": "windows-11-arm",
+    "completedAt": "2026-09-24T01:05:19Z"
+  },
+  "log": {
+    "localPath": ".work/product-acceptance/windows-sdk-package-35931918782.log",
+    "sha256": "0523d69fee72be798eefd663045dcf21b833c38d2356d6938b113608a2c054f9"
+  },
+  "bootstrap": {
+    "scope": "Native Windows ARM64 LLVM/Binaryen source bootstrap; not a packaged SDK or Lean application pass",
+    "node": "v26.10.0",
+    "platform": "win32-arm64",
+    "llvmCommit": "b158b0ae6c559f87be325b8f427c5588e6a48823",
+    "binaryenCommit": "d03c25ea43d8f147fc222f9b88ff3bf641abe8da",
+    "versions": {
+      "clang": "clang version 24.0.0git\nTarget: unknown\nThread model: posix\nInstalledDir: C:/a/lasm/lasm/.work/windows-arm64-sdk/llvm-build/bin",
+      "wasm-ld": "LLD 24.0.0 (C:/a/lasm/lasm/.work/windows-arm64-sdk/llvm-project/llvm b158b0ae6c559f87be325b8f427c5588e6a48823)",
+      "wasm-opt": "wasm-opt version 132"
+    },
+    "headers": {
+      "clang": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "wasm-ld": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "wasm-opt": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    "hashes": {
+      "clang": "a2df6c043a1e087bd5977d57b13d95d42b7d4525e41b8704f99e93ad94cad873",
+      "wasm-ld": "b88d085d02a7295044e2d600d0e04d9aa4824628ae820842daef9384fa4fbe0b",
+      "wasm-opt": "21dc38f5ca9d6e39658a8f81748ea8ae28e2520f525ef415b2211588aba5701d"
+    },
+    "checks": [
+      {
+        "target": "wasm32",
+        "compileLinkOptimizeExecute": "passed",
+        "wasmSha256": "3a729a8f3e2f1a29dee215583ae9edea59069c81670245a1a08d52cd5afc949e",
+        "optimizedSha256": "01332fcc4e6b9da5dc20f3ce2b377a8e91843d1f501105a60071723a8c3a3271"
+      },
+      {
+        "target": "wasm64",
+        "compileLinkOptimizeExecute": "passed",
+        "wasmSha256": "153f42f92cec8384b412868ec6257f843c104fc240d87d7085a5e44efbfa89bc",
+        "optimizedSha256": "67c5b456368e4a53202f8721274f16a7bb980de3537ccecaee915bdebe56cc16"
+      }
+    ],
+    "emscriptenReleasesCommit": "f04ea239d533260dd1db760dd2d668d5f9a88d6b",
+    "limitations": [
+      "Emscripten driver/sysroot integration, relocatable native dependency packaging and application builds remain required.",
+      "MSYS2 x64 shell utilities were used during this maintainer bootstrap; resulting compiler tools are checked for ARM64 PE headers."
+    ],
+    "recordedAt": "2026-09-24T00:54:02.417Z"
+  },
+  "distribution": {
+    "scope": "Local relocatable Windows ARM64 SDK archive, managed extraction and C++ application checks; not a hosted download or Lean application pass",
+    "artifact": {
+      "name": "emscripten-6.0.9-win32-arm64-local",
+      "root": "install",
+      "url": "https://lasm-sdk-fixture.invalid/emscripten-6.0.9-win32-arm64.tar.gz",
+      "sha256": "c68eaec7b1a16069f4ad31e6adaab7da0ecb025e1a083007e311512f9cf0979a",
+      "bytes": 174792458,
+      "format": "tar.gz",
+      "maximumExtractedBytes": 5000000000
+    },
+    "nativePrograms": {
+      "clang": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "wasm-ld": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      },
+      "wasm-opt": {
+        "platform": "win32",
+        "architectures": [
+          "arm64"
+        ]
+      }
+    },
+    "driverIdentity": "d8729c6365c125f08c3d2f5863d8c723a585d61d4fdb05e9f8d2957e55753b20",
+    "programs": [
+      {
+        "file": "clang.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\clang.exe",
+        "sha256": "a2df6c043a1e087bd5977d57b13d95d42b7d4525e41b8704f99e93ad94cad873",
+        "bytes": 87654400
+      },
+      {
+        "file": "clang++.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\clang++.exe",
+        "sha256": "a2df6c043a1e087bd5977d57b13d95d42b7d4525e41b8704f99e93ad94cad873",
+        "bytes": 87654400
+      },
+      {
+        "file": "clang-scan-deps.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\clang-scan-deps.exe",
+        "sha256": "73958b0eaffb9cffec52ed2b1a8d2187c2513116c91504b8b431bf959c0adf6e",
+        "bytes": 41230848
+      },
+      {
+        "file": "lld.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\lld.exe",
+        "sha256": "b88d085d02a7295044e2d600d0e04d9aa4824628ae820842daef9384fa4fbe0b",
+        "bytes": 52347392
+      },
+      {
+        "file": "wasm-ld.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\wasm-ld.exe",
+        "sha256": "b88d085d02a7295044e2d600d0e04d9aa4824628ae820842daef9384fa4fbe0b",
+        "bytes": 52347392
+      },
+      {
+        "file": "llvm-ar.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-ar.exe",
+        "sha256": "2b17d79f1cce39fffdc04371a097ab51ff43cb9126edc3613679e8264e09b09a",
+        "bytes": 5499392
+      },
+      {
+        "file": "llvm-ranlib.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-ranlib.exe",
+        "sha256": "2b17d79f1cce39fffdc04371a097ab51ff43cb9126edc3613679e8264e09b09a",
+        "bytes": 5499392
+      },
+      {
+        "file": "llvm-nm.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-nm.exe",
+        "sha256": "c0f94777b8c01f48aadbf8ef4c8219888faf2776a7bb63c28fb28b7f7b91a849",
+        "bytes": 6582272
+      },
+      {
+        "file": "llvm-objcopy.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-objcopy.exe",
+        "sha256": "a69da3bc8fd0bd9d509603fea2619539dd9af7137a3276ccbf608933e2982323",
+        "bytes": 5740032
+      },
+      {
+        "file": "llvm-dwarfdump.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-dwarfdump.exe",
+        "sha256": "9455756d8e4814bd829f741705b1b482c0213b918c1e28775970c20bacc0d3c0",
+        "bytes": 6645760
+      },
+      {
+        "file": "llvm-dwp.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-dwp.exe",
+        "sha256": "06a7a5b45e46e37071c7cca148d74dccefa7dc1bf7190cc1282f8f5658dd2b3b",
+        "bytes": 2286592
+      },
+      {
+        "file": "llvm-profdata.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-profdata.exe",
+        "sha256": "0b4daecd78c5e4f2cb7bc6b1303665c75d2789c13a680117c515cd1063221583",
+        "bytes": 7114240
+      },
+      {
+        "file": "llvm-cov.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-cov.exe",
+        "sha256": "6d321bf456d228adb99ff922cda2b268ae75d72c880b568eb68c006e0d0fe6be",
+        "bytes": 6067712
+      },
+      {
+        "file": "llvm-readobj.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-readobj.exe",
+        "sha256": "3b1e134debfe2cb5915d9a9d2bb120abf5fc82434da672ad0cbaf9a91184e59e",
+        "bytes": 8261120
+      },
+      {
+        "file": "llvm-size.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-size.exe",
+        "sha256": "e47734dad0fb4ec9b1582c973077530ad76ac0d4c5ed45ad82ffd8e230900bca",
+        "bytes": 4918784
+      },
+      {
+        "file": "llvm-strip.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\llvm-build\\bin\\llvm-strip.exe",
+        "sha256": "a69da3bc8fd0bd9d509603fea2619539dd9af7137a3276ccbf608933e2982323",
+        "bytes": 5740032
+      },
+      {
+        "file": "wasm-as.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\binaryen-build\\bin\\wasm-as.exe",
+        "sha256": "d8b1096d6581df7077d588f11d5f443eb352c47d5abab79afe2160124c4baa9d",
+        "bytes": 13592064
+      },
+      {
+        "file": "wasm-ctor-eval.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\binaryen-build\\bin\\wasm-ctor-eval.exe",
+        "sha256": "551b1312ba3e4489231962124d7637ea2e11e99e5b186a2668efea8034c77c95",
+        "bytes": 13921792
+      },
+      {
+        "file": "wasm-dis.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\binaryen-build\\bin\\wasm-dis.exe",
+        "sha256": "fec9b04e1b7c91e129db328e50fc3f50b95b724373dcca1e6d4a2b909b2c271b",
+        "bytes": 13580800
+      },
+      {
+        "file": "wasm-emscripten-finalize.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\binaryen-build\\bin\\wasm-emscripten-finalize.exe",
+        "sha256": "5a66f8c376b6e1aaa0d4b6b46b42302c893948ff1c5aff9960babad489580d2f",
+        "bytes": 13605888
+      },
+      {
+        "file": "wasm-metadce.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\binaryen-build\\bin\\wasm-metadce.exe",
+        "sha256": "a270c1dbc8794d547b13a4ea62b15d5861a85a75ecaab34aaa27d94bd57c890a",
+        "bytes": 13738496
+      },
+      {
+        "file": "wasm-opt.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\binaryen-build\\bin\\wasm-opt.exe",
+        "sha256": "21dc38f5ca9d6e39658a8f81748ea8ae28e2520f525ef415b2211588aba5701d",
+        "bytes": 15047680
+      },
+      {
+        "file": "wasm-split.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\binaryen-build\\bin\\wasm-split.exe",
+        "sha256": "712cc09e61000fac98a3ed7117d9bc8170f9192657a124091502bbc8c774ac4e",
+        "bytes": 13931520
+      },
+      {
+        "file": "wasm2js.exe",
+        "source": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk\\binaryen-build\\bin\\wasm2js.exe",
+        "sha256": "056120955937cadafbb20163aaaa7bd607c015a1cbc76466dd78d12ba8bfc208",
+        "bytes": 14131200
+      },
+      {
+        "file": "libc++.dll",
+        "source": "C:\\a\\_temp\\msys64\\clangarm64\\bin\\libc++.dll",
+        "sha256": "92e003c17be34ed7ce27571050de7d681d7217e1f9f856322d3726d58eace3aa",
+        "bytes": 1631232
+      },
+      {
+        "file": "zlib1.dll",
+        "source": "C:\\a\\_temp\\msys64\\clangarm64\\bin\\zlib1.dll",
+        "sha256": "fed18d2fda0a1b0252787fd59e7c01ed900f5c90eeb131f30a9992abb328c7ca",
+        "bytes": 115200
+      },
+      {
+        "file": "libzstd.dll",
+        "source": "C:\\a\\_temp\\msys64\\clangarm64\\bin\\libzstd.dll",
+        "sha256": "87e871f3f06ee054cdac83f99a7ea260f306472c923a1615ef88000905bfb9f2",
+        "bytes": 815104
+      }
+    ],
+    "imports": [
+      {
+        "from": "clang.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "VERSION.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "clang.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "VERSION.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "clang++.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "VERSION.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "clang-scan-deps.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "lld.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-ld.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ar.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-ranlib.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-nm.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-objcopy.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-dwarfdump.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-dwp.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "WINHTTP.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "CRYPT32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-profdata.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "WINHTTP.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "CRYPT32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-cov.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-readobj.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-size.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "zlib1.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "libzstd.dll",
+        "bundled": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "SHELL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "ole32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "ADVAPI32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "llvm-strip.exe",
+        "dll": "ntdll.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-as.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-ctor-eval.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-dis.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-emscripten-finalize.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-metadce.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-opt.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm-split.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "libc++.dll",
+        "bundled": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "wasm2js.exe",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-multibyte-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-math-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libc++.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "zlib1.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "zlib1.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "zlib1.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "zlib1.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "zlib1.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "zlib1.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "zlib1.dll",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "zlib1.dll",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "zlib1.dll",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "KERNEL32.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-time-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-private-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-string-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      },
+      {
+        "from": "libzstd.dll",
+        "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+        "bundled": false,
+        "windowsSystem": true
+      }
+    ],
+    "checks": [
+      {
+        "width": 32,
+        "cppThreadExceptionApplication": "passed",
+        "wasmSha256": "19f5a87a2f6e6f942f21ade9937e672ea1f11a3ad05dca803704527d675d0cb3"
+      },
+      {
+        "width": 64,
+        "cppThreadExceptionApplication": "passed",
+        "wasmSha256": "43223e9dcf4e7a8bb5090eb7452f3cd93944e0457983fc10d704cae23c8b50e2"
+      }
+    ],
+    "verifiedReuse": true,
+    "limitations": [
+      "Archive remains on the CI runner; no artifact or release is uploaded.",
+      "Full Lean application and Node/npm-only installation acceptance remain pending."
+    ],
+    "recordedAt": "2026-09-24T01:04:56.235Z",
+    "resourceReport": "C:\\a\\lasm\\lasm\\.work\\windows-arm64-sdk-resources.json"
+  },
+  "resources": {
+    "status": "passed",
+    "command": [
+      "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+      "--login",
+      "scripts/full-lean/bootstrap-windows-arm64-sdk.sh"
+    ],
+    "hostAtStart": {
+      "total": 17169428480,
+      "available": 12788133888
+    },
+    "limits": {
+      "jobCommittedBytes": 8584714240,
+      "stopCommittedBytes": 6867771392,
+      "hostReserveBytes": 2147483648
+    },
+    "peakCommittedBytes": 974438400,
+    "minimumHostAvailable": 11174813696,
+    "startedAt": 1790205105.4982514,
+    "unit": "Local\\LasmResource-718c67cd-39c5-421a-937c-e57c58d79ac7",
+    "pid": 6452,
+    "lastSampleAt": 1790211896.1243877,
+    "exitCode": 0,
+    "finishedAt": 1790211896.2968402
+  },
+  "guardControl": {
+    "status": "passed",
+    "command": [
+      "node",
+      "--input-type=module",
+      "-e",
+      "import {ensureResourceGuard,hasResourceGuard} from './scripts/full-lean/resource-guard.mjs'; if(!hasResourceGuard()) throw Error('Missing descendant guard'); await ensureResourceGuard(); console.log('Nested Job Object guard verified')"
+    ],
+    "hostAtStart": {
+      "total": 17169428480,
+      "available": 13528756224
+    },
+    "limits": {
+      "jobCommittedBytes": 536870912,
+      "stopCommittedBytes": 429496729,
+      "hostReserveBytes": 2147483648
+    },
+    "peakCommittedBytes": 42057728,
+    "minimumHostAvailable": 13501853696,
+    "startedAt": 1790204898.2497094,
+    "unit": "Local\\LasmResource-c12b691c-6e2d-4e1d-a54a-5c18dcf16e6d",
+    "pid": 8632,
+    "lastSampleAt": 1790204898.6678286,
+    "exitCode": 0,
+    "finishedAt": 1790204898.7943764
+  },
+  "acceptanceConditions": [
+    "Managed provisionSdk verifies and extracts the local checksum-addressed archive using private Python.",
+    "Source/build tool roots are renamed before Emscripten C++ pthread and exception checks.",
+    "Produced Wasm32/Wasm64 applications run with empty PATH in stock Node 26.10.0.",
+    "The second managed provisioning call verifies complete immutable cache reuse."
+  ],
+  "storage": "No Actions artifacts or caches uploaded by this workflow. The archive remained on the ephemeral runner; the fixture URL is not a hosted distribution.",
+  "remaining": [
+    "Complete native Lean bootstrap and leantar packaging.",
+    "Distribute and automatically install the native SDK with Node/npm-only prerequisites.",
+    "Validate complete Lean applications on native Windows ARM64."
+  ]
+}
