@@ -47,6 +47,10 @@ separately from the earlier runtime evidence below.
   registered `Deno.addSignalListener` observers remain unresolved. The latter
   uses a different observer path from the supported Node-compatible process
   listeners. None of these gaps is demonstrated fundamental.
+  [Native Linux x64/ARM64 source-helper CI](docs/evidence/signal-native-ci-2026-09-24.json)
+  now passes nine checks per platform with zero skips. Separate Linux x64 host
+  probes cover all 22 signal names in each engine. Full installed Lean signal
+  and default-action comparisons remain distinct unfinished requirements.
 - [ ] Complete panic diagnostics, symbolization and termination parity.
   Installed `.15` [restores real panic backtraces](docs/evidence/upstream-debug-2026-09-24.json)
   in Node and Deno on Linux x64, including exact output with `LEAN_BACKTRACE=0`.

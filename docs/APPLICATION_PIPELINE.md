@@ -517,3 +517,10 @@ stdout, stderr and termination in Node, Deno and Bun on Linux x64 with sources
 hidden and PATH empty. Nine focused controls pass; the largest application
 campaign peaks at 3.45 GiB without resource events. Other native platforms,
 the complete signal API and Deno-native observer coexistence remain pending.
+
+The [native signal CI follow-up](evidence/signal-native-ci-2026-09-24.json)
+executes all nine checks with zero skips on both Linux x64 and ARM64, using
+native GCC helpers and all three stock engines. Maximum guarded memory is
+59.9 MiB without resource events. Separate Linux x64 host-adapter probes also
+pass all 22 signal names per engine. These are source-helper controls, not
+complete installed Lean ARM64 or default-signal-behavior acceptance.

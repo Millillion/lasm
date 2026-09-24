@@ -1,0 +1,1422 @@
+{
+  "scope": "Native Linux x64/ARM64 source-helper signal controls; installed full Lean ARM64 acceptance remains separate",
+  "run": 35993077848,
+  "url": "https://github.com/Millillion/lasm/actions/runs/35993077848",
+  "sourceCommit": "7b7247ec64253037a58e96fcec62fac53fe1987d",
+  "workflow": ".github/workflows/signal-controls.yml",
+  "jobs": [
+    {
+      "job": {
+        "completedAt": "2026-09-24T11:27:25Z",
+        "conclusion": "success",
+        "databaseId": 107611531863,
+        "name": "Signal routing linux-x64",
+        "startedAt": "2026-09-24T11:27:05Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Check native engines and retain exact paths",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Enable process-tree guard",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build native control helper",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Guarded signal controls",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Preserve guard and helper receipts in logs",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 19,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 20,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 21,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 22,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 23,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Millillion/lasm/actions/runs/35993077848/job/107611531863"
+      },
+      "tests": 9,
+      "passed": 9,
+      "skipped": 0,
+      "log": "##[group]Run ulimit -c 0\n\u001b[36;1mulimit -c 0\u001b[0m\n\u001b[36;1mnode scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-controls-resources.json -- /usr/bin/env LASM_TEST_BUN=\"$LASM_TEST_BUN\" LASM_TEST_DENO=\"$LASM_TEST_DENO\" LASM_REQUIRE_SIGNAL_ENGINES=1 node --max-old-space-size=128 --test --test-concurrency=1 test/node-signal.test.mjs test/application-output.test.mjs\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/x64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n##[endgroup]\n[lasm] One workload, 1.00 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/signal-controls-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service; invocation ID: 5c9ebaca40c24db59459ffcf3201dff2\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (33.500837ms)\n\u2714 wrong engines fail before executing the application payload (27.04943ms)\n\u2714 all full-runtime host support files exist and target validation is strict (2.088623ms)\n\u2714 node signals preserve waiter lifecycle after 0 ms (74.409137ms)\n\u2714 node signals preserve waiter lifecycle after 1000 ms (1064.414108ms)\n\u2714 deno signals preserve waiter lifecycle after 0 ms (142.357675ms)\n\u2714 deno signals preserve waiter lifecycle after 1000 ms (1077.808163ms)\n\u2714 bun signals preserve waiter lifecycle after 0 ms (39.57335ms)\n\u2714 bun signals preserve waiter lifecycle after 1000 ms (1040.120515ms)\n\u2139 tests 9\n\u2139 suites 0\n\u2139 pass 9\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 3613.831327\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 3.692s\nCPU time consumed: 808ms\nMemory peak: 59.8M\nMemory swap peak: 0B\n[lasm] Peak 0.06 GiB; success",
+      "receipts": {
+        ".work/signal-helper-build-resources.json": {
+          "startedAt": "2026-09-24T11:27:17.894Z",
+          "command": [
+            "node",
+            "scripts/build-signal-helper.mjs",
+            "--native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "6c6207fc-9949-491a-96be-6cec414095a3",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 15429816320
+          },
+          "minimumHostAvailable": 15424540672,
+          "peakMemoryBytes": 50184192,
+          "peakTasks": 9,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T11:27:19.502Z",
+            "memoryBytes": 30248960,
+            "peakMemoryBytes": 50184192,
+            "swapBytes": 0,
+            "tasks": 6,
+            "memoryBreakdown": {
+              "anon": 2396160,
+              "file": 26550272,
+              "kernel": 925696,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1581056,
+              "slab": 507656
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T11:27:19.532Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 41951232,
+            "peakMemoryBytes": 50184192,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13656064,
+              "file": 26550272,
+              "kernel": 1421312,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1581056,
+              "slab": 503768
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T11:27:19.552Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/signal-controls-resources.json": {
+          "startedAt": "2026-09-24T11:27:19.604Z",
+          "command": [
+            "/usr/bin/env",
+            "LASM_TEST_BUN=/home/runner/.bun/bin/bun",
+            "LASM_TEST_DENO=/opt/hostedtoolcache/deno/2.9.7/x64/deno",
+            "LASM_REQUIRE_SIGNAL_ENGINES=1",
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/node-signal.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "61915452-a482-48a3-ad5e-18081f9a178c",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 15427391488
+          },
+          "minimumHostAvailable": 15399301120,
+          "peakMemoryBytes": 62808064,
+          "peakTasks": 30,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-controls-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T11:27:23.217Z",
+            "memoryBytes": 46526464,
+            "peakMemoryBytes": 62808064,
+            "swapBytes": 0,
+            "tasks": 23,
+            "memoryBreakdown": {
+              "anon": 38432768,
+              "file": 4153344,
+              "kernel": 2904064,
+              "shmem": 0,
+              "file_mapped": 200704,
+              "inactive_file": 4153344,
+              "slab": 625208
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T11:27:23.309Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 19554304,
+            "peakMemoryBytes": 62808064,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13676544,
+              "file": 4153344,
+              "kernel": 1224704,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4153344,
+              "slab": 314656
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T11:27:23.330Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".cache/native-host/signals/manifest.json": {
+          "protocol": 1,
+          "source": "native/posix-signal.c",
+          "sourceSha256": "117a1d8c0c3a4cc2f958e67a089518ff3da58817eac9c09b1a4e8602af412126",
+          "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+          "files": {
+            "linux-x64-gnu.so": {
+              "target": "native",
+              "sha256": "98ca9e4e4fca0fe3a02b5c9711c3fc87a6b32c45703f1fb57f385786611c08e4",
+              "bytes": 16368
+            }
+          },
+          "validation": "Native source control, separate from shipped cross-compiled helper acceptance."
+        }
+      }
+    },
+    {
+      "job": {
+        "completedAt": "2026-09-24T11:27:29Z",
+        "conclusion": "success",
+        "databaseId": 107611532190,
+        "name": "Signal routing linux-arm64",
+        "startedAt": "2026-09-24T11:27:07Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Check native engines and retain exact paths",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Enable process-tree guard",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build native control helper",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Guarded signal controls",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Preserve guard and helper receipts in logs",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 19,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 20,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 21,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 22,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 23,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Millillion/lasm/actions/runs/35993077848/job/107611532190"
+      },
+      "tests": 9,
+      "passed": 9,
+      "skipped": 0,
+      "log": "##[group]Run ulimit -c 0\n\u001b[36;1mulimit -c 0\u001b[0m\n\u001b[36;1mnode scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-controls-resources.json -- /usr/bin/env LASM_TEST_BUN=\"$LASM_TEST_BUN\" LASM_TEST_DENO=\"$LASM_TEST_DENO\" LASM_REQUIRE_SIGNAL_ENGINES=1 node --max-old-space-size=128 --test --test-concurrency=1 test/node-signal.test.mjs test/application-output.test.mjs\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/arm64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n##[endgroup]\n[lasm] One workload, 1.00 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/signal-controls-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service; invocation ID: b7bc3d4ee28746d38525ba620760b2a5\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (27.513312ms)\n\u2714 wrong engines fail before executing the application payload (23.865204ms)\n\u2714 all full-runtime host support files exist and target validation is strict (1.990008ms)\n\u2714 node signals preserve waiter lifecycle after 0 ms (57.692704ms)\n\u2714 node signals preserve waiter lifecycle after 1000 ms (1052.778642ms)\n\u2714 deno signals preserve waiter lifecycle after 0 ms (132.563278ms)\n\u2714 deno signals preserve waiter lifecycle after 1000 ms (1066.972247ms)\n\u2714 bun signals preserve waiter lifecycle after 0 ms (35.3962ms)\n\u2714 bun signals preserve waiter lifecycle after 1000 ms (1036.276596ms)\n\u2139 tests 9\n\u2139 suites 0\n\u2139 pass 9\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 3523.426506\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 3.583s\nCPU time consumed: 679ms\nMemory peak: 51.6M\nMemory swap peak: 0B\n[lasm] Peak 0.05 GiB; success",
+      "receipts": {
+        ".work/signal-helper-build-resources.json": {
+          "startedAt": "2026-09-24T11:27:21.512Z",
+          "command": [
+            "node",
+            "scripts/build-signal-helper.mjs",
+            "--native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "1fccf15a-fed1-4110-80b4-b86114892f2f",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 16722046976,
+            "available": 15252512768
+          },
+          "minimumHostAvailable": 15244779520,
+          "peakMemoryBytes": 47124480,
+          "peakTasks": 9,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T11:27:21.730Z",
+            "memoryBytes": 45813760,
+            "peakMemoryBytes": 45944832,
+            "swapBytes": 0,
+            "tasks": 9,
+            "memoryBreakdown": {
+              "anon": 21618688,
+              "file": 22331392,
+              "kernel": 1568768,
+              "shmem": 0,
+              "file_mapped": 18313216,
+              "inactive_file": 1458176,
+              "slab": 540536
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T11:27:21.845Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 40579072,
+            "peakMemoryBytes": 47124480,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11718656,
+              "file": 26972160,
+              "kernel": 1298432,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1789952,
+              "slab": 518792
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T11:27:21.863Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/signal-controls-resources.json": {
+          "startedAt": "2026-09-24T11:27:21.906Z",
+          "command": [
+            "/usr/bin/env",
+            "LASM_TEST_BUN=/home/runner/.bun/bin/bun",
+            "LASM_TEST_DENO=/opt/hostedtoolcache/deno/2.9.7/arm64/deno",
+            "LASM_REQUIRE_SIGNAL_ENGINES=1",
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/node-signal.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "41ffb260-04d0-4fa3-a9d2-e8a2816e7eca",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 16722046976,
+            "available": 15249522688
+          },
+          "minimumHostAvailable": 15208841216,
+          "peakMemoryBytes": 54108160,
+          "peakTasks": 22,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-controls-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T11:27:25.320Z",
+            "memoryBytes": 42508288,
+            "peakMemoryBytes": 54108160,
+            "swapBytes": 0,
+            "tasks": 20,
+            "memoryBreakdown": {
+              "anon": 35446784,
+              "file": 4153344,
+              "kernel": 2584576,
+              "shmem": 0,
+              "file_mapped": 200704,
+              "inactive_file": 4153344,
+              "slab": 584832
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T11:27:25.505Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 17629184,
+            "peakMemoryBytes": 54108160,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11722752,
+              "file": 4153344,
+              "kernel": 1093632,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4153344,
+              "slab": 305776
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T11:27:25.522Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".cache/native-host/signals/manifest.json": {
+          "protocol": 1,
+          "source": "native/posix-signal.c",
+          "sourceSha256": "117a1d8c0c3a4cc2f958e67a089518ff3da58817eac9c09b1a4e8602af412126",
+          "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+          "files": {
+            "linux-arm64-gnu.so": {
+              "target": "native",
+              "sha256": "a20b35838a5d91c04f414bc850178b05ee04d073b0f67c7490579276a83cda3c",
+              "bytes": 70880
+            }
+          },
+          "validation": "Native source control, separate from shipped cross-compiled helper acceptance."
+        }
+      }
+    }
+  ],
+  "logSha256": "fc3a530ffe17fee1b54c62774e686c06f97af5dc74562d217c550d6c35dd85d8",
+  "hostSurface": {
+    "scope": "66 source-host controls on Linux x64; not compiled Lean or default-action acceptance",
+    "result": {
+      "scope": "Supplementary host-adapter probes; not compiled Lean or upstream passes",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/signal-surface-host-r1-resources.json",
+      "cases": [
+        {
+          "target": "node",
+          "name": "SIGHUP",
+          "number": 1,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGINT",
+          "number": 2,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGQUIT",
+          "number": 3,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGTRAP",
+          "number": 5,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGABRT",
+          "number": 6,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGUSR1",
+          "number": 10,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGUSR2",
+          "number": 12,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGALRM",
+          "number": 14,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGTERM",
+          "number": 15,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGCHLD",
+          "number": 17,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGCONT",
+          "number": 18,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGTSTP",
+          "number": 20,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGTTIN",
+          "number": 21,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGTTOU",
+          "number": 22,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGURG",
+          "number": 23,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGXCPU",
+          "number": 24,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGXFSZ",
+          "number": 25,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGVTALRM",
+          "number": 26,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGPROF",
+          "number": 27,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGWINCH",
+          "number": 28,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGIO",
+          "number": 29,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "node",
+          "name": "SIGSYS",
+          "number": 31,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGHUP",
+          "number": 1,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGINT",
+          "number": 2,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGQUIT",
+          "number": 3,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGTRAP",
+          "number": 5,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGABRT",
+          "number": 6,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGUSR1",
+          "number": 10,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGUSR2",
+          "number": 12,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGALRM",
+          "number": 14,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGTERM",
+          "number": 15,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGCHLD",
+          "number": 17,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGCONT",
+          "number": 18,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGTSTP",
+          "number": 20,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGTTIN",
+          "number": 21,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGTTOU",
+          "number": 22,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGURG",
+          "number": 23,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGXCPU",
+          "number": 24,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGXFSZ",
+          "number": 25,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGVTALRM",
+          "number": 26,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGPROF",
+          "number": 27,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGWINCH",
+          "number": 28,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGIO",
+          "number": 29,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "deno",
+          "name": "SIGSYS",
+          "number": 31,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGHUP",
+          "number": 1,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGINT",
+          "number": 2,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGQUIT",
+          "number": 3,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGTRAP",
+          "number": 5,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGABRT",
+          "number": 6,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGUSR1",
+          "number": 10,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGUSR2",
+          "number": 12,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGALRM",
+          "number": 14,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGTERM",
+          "number": 15,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGCHLD",
+          "number": 17,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGCONT",
+          "number": 18,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGTSTP",
+          "number": 20,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGTTIN",
+          "number": 21,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGTTOU",
+          "number": 22,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGURG",
+          "number": 23,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGXCPU",
+          "number": 24,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGXFSZ",
+          "number": 25,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGVTALRM",
+          "number": 26,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGPROF",
+          "number": 27,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGWINCH",
+          "number": 28,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGIO",
+          "number": 29,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        },
+        {
+          "target": "bun",
+          "name": "SIGSYS",
+          "number": 31,
+          "code": 0,
+          "signal": null,
+          "stdout": "ok\n",
+          "stderr": "",
+          "passed": true
+        }
+      ],
+      "finishedAt": "2026-09-24T11:26:51.841Z"
+    },
+    "resources": {
+      "startedAt": "2026-09-24T11:26:47.704Z",
+      "command": [
+        "/bin/bash",
+        "-c",
+        "ulimit -c 0; exec .cache/js-runtimes/node-26.10.0/bin/node .work/run-signal-surface-host-r1.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "ae0c72a5-0733-4905-aeda-87d88859d0a5",
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24734081024
+      },
+      "minimumHostAvailable": 24588447744,
+      "peakMemoryBytes": 34897920,
+      "peakTasks": 18,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/signal-surface-host-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T11:26:51.711Z",
+        "memoryBytes": 24682496,
+        "peakMemoryBytes": 34897920,
+        "swapBytes": 0,
+        "tasks": 18,
+        "memoryBreakdown": {
+          "anon": 21442560,
+          "file": 393216,
+          "kernel": 1892352,
+          "shmem": 0,
+          "file_mapped": 114688,
+          "inactive_file": 192512,
+          "slab": 372272
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "cgroupRemovedAfterExit": {
+        "at": "2026-09-24T11:26:51.911Z",
+        "code": "ENOENT",
+        "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service/memory.current'",
+        "capturedAt": "2026-09-24T11:26:51.902Z"
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T11:26:51.902Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 14348288,
+        "peakMemoryBytes": 34897920,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11653120,
+          "file": 397312,
+          "kernel": 1085440,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 196608,
+          "slab": 175728
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T11:26:51.926Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "harnessSha256": "9f45de87ec30e1a4b8dab7e36cc7d7a980a373d104648a0dc2ede838c23dac1e",
+    "fixtureSha256": "477856932c9a5dc2aa2183af01049b339b60567de32a03b96d61c554b66457bb"
+  },
+  "limits": [
+    "Native helpers are compiled by each runner; this does not validate distributed cross-compiled binaries.",
+    "CI covers delivery, cancellation, shared subscriptions and cleanup for SIGUSR1/SIGUSR2, plus application entrypoint controls.",
+    "The additional 22-signal host probes do not establish compiled Lean behavior or default signal actions.",
+    "macOS, Windows and musl signal acceptance remain pending. No incompatibility is demonstrated fundamental."
+  ],
+  "recordedAt": "2026-09-24T11:32:58.460713+00:00"
+}
