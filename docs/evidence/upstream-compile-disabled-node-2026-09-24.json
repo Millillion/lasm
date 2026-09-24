@@ -1,0 +1,515 @@
+{
+  "scope": "Four explicitly parallel AOT checks for unchanged upstream compilation-disabled inputs on Linux x64; does not relabel their default-suite skip status",
+  "releases": {
+    "lean": {
+      "tag_name": "v4.34.0",
+      "published_at": "2026-09-14T14:04:36Z",
+      "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest"
+    },
+    "deno": {
+      "tag_name": "v2.9.7",
+      "published_at": "2026-09-17T09:04:55Z",
+      "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest"
+    },
+    "bun": {
+      "tag_name": "bun-v1.4.2",
+      "published_at": "2026-09-05T05:55:48Z",
+      "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest"
+    },
+    "node": {
+      "version": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "v8": "14.6.202.34",
+      "npm": "11.19.1",
+      "source": "https://nodejs.org/dist/index.json"
+    },
+    "checkedAt": "2026-09-24T10:22:04.246069+00:00"
+  },
+  "manifest": {
+    "schema": 1,
+    "lean": "4.34.0",
+    "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+    "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+    "verifiedOriginalFilesAndLinks": 7669,
+    "output": "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/source",
+    "execution": "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/run",
+    "category": "compiled-application",
+    "mode": "probe-compile-disabled",
+    "target": "node",
+    "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+    "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler",
+    "nativeEnvironment": "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/native-environment.sh",
+    "compileDriver": "/home/lastmjs/development/lasm/compiler/scripts/application-tests/probe-compile-disabled.sh",
+    "timeoutSeconds": 900,
+    "environment": {
+      "TEST_DIR": "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/source/tests",
+      "SRC_DIR": "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/source/src",
+      "SCRIPT_DIR": "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/source/script",
+      "BUILD_DIR": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "STAGE": "1",
+      "TEST_CTEST": "1",
+      "PATH": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin:/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin:/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin:/usr/bin:/bin",
+      "LASM_COMPILER": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler",
+      "LASM_BUILD_NODE": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "LASM_APPLICATION_TARGET": "node",
+      "LASM_APPLICATION_ENGINE": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "LASM_NATIVE_LEAN": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+      "LASM_NATIVE_LAKE": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lake",
+      "LASM_TOOLCHAIN_CACHE": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+      "LEAN_HEADER_SNAPSHOTS": "0",
+      "LEANC_OPTS": "",
+      "CXX": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/clang++"
+    },
+    "tests": [
+      {
+        "name": "compile/compactor_chain.lean",
+        "category": "compiled-application",
+        "status": "not-run-through-product-pipeline",
+        "source": "tests/compile/compactor_chain.lean",
+        "sha256": "a9bbe382ded2090b5ca1c3aa65375821fb6fbfa05053ef54756efe78acdb291a",
+        "sidecars": [
+          "tests/compile/compactor_chain.lean.no_compile"
+        ],
+        "driver": "tests/compile/run_test.sh",
+        "upstreamCompileEnabled": false,
+        "upstreamInterpretEnabled": true,
+        "sourceIdentity": {
+          "sha256": "a9bbe382ded2090b5ca1c3aa65375821fb6fbfa05053ef54756efe78acdb291a",
+          "target": "tests/compile/compactor_chain.lean",
+          "links": []
+        }
+      },
+      {
+        "name": "compile/dep_regions.lean",
+        "category": "compiled-application",
+        "status": "not-run-through-product-pipeline",
+        "source": "tests/compile/dep_regions.lean",
+        "sha256": "03a920cecc92dc46a430abcf5782847b65115bd10582407c08188e6ba516c6a8",
+        "sidecars": [
+          "tests/compile/dep_regions.lean.no_compile"
+        ],
+        "driver": "tests/compile/run_test.sh",
+        "upstreamCompileEnabled": false,
+        "upstreamInterpretEnabled": true,
+        "sourceIdentity": {
+          "sha256": "03a920cecc92dc46a430abcf5782847b65115bd10582407c08188e6ba516c6a8",
+          "target": "tests/compile/dep_regions.lean",
+          "links": []
+        }
+      },
+      {
+        "name": "compile/dep_regions_miss.lean",
+        "category": "compiled-application",
+        "status": "not-run-through-product-pipeline",
+        "source": "tests/compile/dep_regions_miss.lean",
+        "sha256": "9c1b6e6f449c8111b94d4cbcd862dd215c71bd9c6304705e864336283a3bdf19",
+        "sidecars": [
+          "tests/compile/dep_regions_miss.lean.no_compile"
+        ],
+        "driver": "tests/compile/run_test.sh",
+        "upstreamCompileEnabled": false,
+        "upstreamInterpretEnabled": true,
+        "sourceIdentity": {
+          "sha256": "9c1b6e6f449c8111b94d4cbcd862dd215c71bd9c6304705e864336283a3bdf19",
+          "target": "tests/compile/dep_regions_miss.lean",
+          "links": []
+        }
+      },
+      {
+        "name": "compile_bench/identifier_completion.lean",
+        "category": "compiled-application",
+        "status": "not-run-through-product-pipeline",
+        "source": "tests/compile_bench/identifier_completion.lean",
+        "sha256": "a7c6d5894f1182a04d0368825c96ce3f83e8817097c9260c63723ad734385707",
+        "sidecars": [
+          "tests/compile_bench/identifier_completion.lean.dir/didOpen.log",
+          "tests/compile_bench/identifier_completion.lean.dir/file.lean",
+          "tests/compile_bench/identifier_completion.lean.dir/initialization.log",
+          "tests/compile_bench/identifier_completion.lean.do_interpret",
+          "tests/compile_bench/identifier_completion.lean.no_compile",
+          "tests/compile_bench/identifier_completion.lean.out.expected"
+        ],
+        "driver": "tests/compile_bench/run_test.sh",
+        "upstreamCompileEnabled": false,
+        "upstreamInterpretEnabled": true,
+        "sourceIdentity": {
+          "sha256": "a7c6d5894f1182a04d0368825c96ce3f83e8817097c9260c63723ad734385707",
+          "target": "tests/compile_bench/identifier_completion.lean",
+          "links": []
+        }
+      }
+    ],
+    "generatedPins": [
+      "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/source/tests/compile/lean-toolchain",
+      "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/source/tests/compile_bench/lean-toolchain"
+    ],
+    "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+    "additionalHarnessFiles": [],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-compile-disabled-node-r1-resources.json",
+    "scope": "Additional native AOT and installed-Lasm AOT experiments for original upstream compile-disabled inputs; original markers/driver run unchanged first",
+    "adaptations": [
+      "Generated environment selects the matching managed native toolchain and isolated unchanged source copy.",
+      "For applications, the unchanged native compile/interpreter driver runs first; a parallel driver substitutes the installed Lasm CLI and selected engine for deployed compilation/execution.",
+      "Original source, init/before/after scripts, expected output, normalization and assertions are preserved.",
+      "Generated per-pile lean-toolchain files select the release in this parallel suite; upstream tests/lean-toolchain remains unchanged and refers to an unavailable stage1 build directory.",
+      "This separately named experiment retains the upstream compile-disabled markers and adds explicit native/deployed AOT controls after the unchanged original driver.",
+      "Additional compiler flags without an implemented application mapping fail explicitly rather than being dropped.",
+      "One CTest job and 900-second case deadline; resource aborts are separate from test failures.",
+      "Successful large binaries and per-case caches are removed after recording build identities and Wasm hashes; failed outputs remain.",
+      "After the unchanged upstream driver, an additional native AOT control runs the ordinary compile driver commands and original assertions, followed by installed-Lasm AOT.",
+      "No no_compile marker is removed or edited; the extra-native-aot phase distinguishes a native control failure from a deployed application failure."
+    ],
+    "recordedAt": "2026-09-24T10:22:48.862Z"
+  },
+  "execution": {
+    "startedAt": "2026-09-24T10:22:50.015Z",
+    "finishedAt": "2026-09-24T10:27:36.915Z",
+    "scope": "Additional native AOT and installed-Lasm AOT experiments for original upstream compile-disabled inputs; original markers/driver run unchanged first",
+    "lean": "4.34.0",
+    "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "category": "compiled-application",
+    "target": "node",
+    "execution": {
+      "code": 0,
+      "signal": null
+    },
+    "counts": {
+      "passed": 4
+    },
+    "registered": 4,
+    "originalSources": {
+      "before": {
+        "checked": 7669,
+        "modified": []
+      },
+      "after": {
+        "checked": 7669,
+        "modified": []
+      }
+    },
+    "harness": {
+      "before": {
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/run.mjs": "ddd191826eff2938eb644b798c69c7a32e59bcabca69feae1af3ca2ce6fbcedf",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/case.mjs": "7e526222e060e3e40f02955187ab5dba76904f8291e0188ce8e203938209a8d3",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/probe-compile-disabled.sh": "dc8aa74261a97336ef5320122217af59a7ceb5cccb2f0d7f12a3471bfa7b7209",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/native-environment.sh": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6"
+      },
+      "changed": []
+    },
+    "cases": [
+      {
+        "name": "compile/compactor_chain.lean",
+        "category": "compiled-application",
+        "command": [
+          "/bin/bash",
+          "/home/lastmjs/development/lasm/compiler/scripts/application-tests/probe-compile-disabled.sh",
+          "compactor_chain.lean",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/cases/compile__compactor_chain.lean"
+        ],
+        "startedAt": "2026-09-24T10:22:50.123Z",
+        "finishedAt": "2026-09-24T10:23:54.187Z",
+        "exitCode": 0,
+        "signal": null,
+        "status": "passed",
+        "sourceSha256": "a9bbe382ded2090b5ca1c3aa65375821fb6fbfa05053ef54756efe78acdb291a",
+        "sourceUnchanged": true,
+        "phase": "complete",
+        "nativeCompilerInvocations": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean -Dlinter.all=false --run compactor_chain.lean ",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean --c=compactor_chain.lean.c -Dcompiler.postponeCompile=false compactor_chain.lean"
+        ],
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "compactor_chain",
+              "sourceSha256": "a9bbe382ded2090b5ca1c3aa65375821fb6fbfa05053ef54756efe78acdb291a",
+              "cSha256": "0cf1ba5e47d877e2bebec53a7b6340cc6a9e1ee2221a733947431be13dcbf39f"
+            }
+          ],
+          "signature": "e5f85df2a487224d2681e0a5d65bc0435776b4684d3f881fceb06205324add7c",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "wasmSha256": "4ef86a4914393664959a7d601fc4ffe82d24319478e22355a744694c550e2ada"
+      },
+      {
+        "name": "compile/dep_regions.lean",
+        "category": "compiled-application",
+        "command": [
+          "/bin/bash",
+          "/home/lastmjs/development/lasm/compiler/scripts/application-tests/probe-compile-disabled.sh",
+          "dep_regions.lean",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/cases/compile__dep_regions.lean"
+        ],
+        "startedAt": "2026-09-24T10:23:54.793Z",
+        "finishedAt": "2026-09-24T10:24:58.647Z",
+        "exitCode": 0,
+        "signal": null,
+        "status": "passed",
+        "sourceSha256": "03a920cecc92dc46a430abcf5782847b65115bd10582407c08188e6ba516c6a8",
+        "sourceUnchanged": true,
+        "phase": "complete",
+        "nativeCompilerInvocations": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean -Dlinter.all=false --run dep_regions.lean ",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean --c=dep_regions.lean.c -Dcompiler.postponeCompile=false dep_regions.lean"
+        ],
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "dep_regions",
+              "sourceSha256": "03a920cecc92dc46a430abcf5782847b65115bd10582407c08188e6ba516c6a8",
+              "cSha256": "d8b582c178082244aa407f8a9c170cc99d7b9c7f922c63a243f54fc7c6b91b63"
+            }
+          ],
+          "signature": "9c9f264ab7583c4288c35b42501bf8c357de7eb2bf0cbc2e96f2f06e4064b118",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "wasmSha256": "5722a2141105c57f341f29f43864c113a310477845a44a2effec77d5ef2ac1aa"
+      },
+      {
+        "name": "compile/dep_regions_miss.lean",
+        "category": "compiled-application",
+        "command": [
+          "/bin/bash",
+          "/home/lastmjs/development/lasm/compiler/scripts/application-tests/probe-compile-disabled.sh",
+          "dep_regions_miss.lean",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/cases/compile__dep_regions_miss.lean"
+        ],
+        "startedAt": "2026-09-24T10:24:59.233Z",
+        "finishedAt": "2026-09-24T10:26:03.607Z",
+        "exitCode": 0,
+        "signal": null,
+        "status": "passed",
+        "sourceSha256": "9c1b6e6f449c8111b94d4cbcd862dd215c71bd9c6304705e864336283a3bdf19",
+        "sourceUnchanged": true,
+        "phase": "complete",
+        "nativeCompilerInvocations": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean -Dlinter.all=false --run dep_regions_miss.lean ",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean --c=dep_regions_miss.lean.c -Dcompiler.postponeCompile=false dep_regions_miss.lean"
+        ],
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "dep_regions_miss",
+              "sourceSha256": "9c1b6e6f449c8111b94d4cbcd862dd215c71bd9c6304705e864336283a3bdf19",
+              "cSha256": "d4d3d11cbf615489a7984029c3badb652eff4711187ff5f69cf1362e75f83ba9"
+            }
+          ],
+          "signature": "8c64142d361d24d5d8dd0530aac873b8ab95824b38f563650e289d0988e0629c",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "wasmSha256": "ea6ab22e8e1465b707814d5272d5fe758e48513048a29ace68f17ef26d1fdafd"
+      },
+      {
+        "name": "compile_bench/identifier_completion.lean",
+        "category": "compiled-application",
+        "command": [
+          "/bin/bash",
+          "/home/lastmjs/development/lasm/compiler/scripts/application-tests/probe-compile-disabled.sh",
+          "identifier_completion.lean",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-compile-disabled-node-r1/cases/compile_bench__identifier_completion.lean"
+        ],
+        "startedAt": "2026-09-24T10:26:04.191Z",
+        "finishedAt": "2026-09-24T10:27:35.249Z",
+        "exitCode": 0,
+        "signal": null,
+        "status": "passed",
+        "sourceSha256": "a7c6d5894f1182a04d0368825c96ce3f83e8817097c9260c63723ad734385707",
+        "sourceUnchanged": true,
+        "phase": "complete",
+        "nativeCompilerInvocations": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean -Dlinter.all=false --run identifier_completion.lean ",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean --server ",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean --c=identifier_completion.lean.c -Dcompiler.postponeCompile=false identifier_completion.lean ",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean --server ",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean --server"
+        ],
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "identifier_completion",
+              "sourceSha256": "a7c6d5894f1182a04d0368825c96ce3f83e8817097c9260c63723ad734385707",
+              "cSha256": "54e6cc3188f313ccfb97a761d85540ab33b3ac43a26fbce893bf537f7926508e"
+            }
+          ],
+          "signature": "f428766da6f4e16bbfdf29d185cb35194bc56c43ef618efbdd9069e1dbc11596",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "wasmSha256": "144fe4da565b614a82cf7dff9e83000726d648942e615c59383820a9d30971a3"
+      }
+    ],
+    "cleanup": [],
+    "diskAtStart": 5808689152,
+    "diskAtEnd": 5809373184,
+    "minimumFreeDisk": 4294967296,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-compile-disabled-node-r1-resources.json"
+  },
+  "resources": {
+    "startedAt": "2026-09-24T10:22:31.677Z",
+    "command": [
+      "/bin/bash",
+      ".work/run-compile-disabled-r1.sh",
+      "node",
+      ".work/upstream-compile-disabled-node-r1"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "532274f6-87ca-4619-84ba-6b9e13d0fe71",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24772231168
+    },
+    "minimumHostAvailable": 21131018240,
+    "peakMemoryBytes": 3754577920,
+    "peakTasks": 60,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-compile-disabled-node-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T10:27:36.870Z",
+      "memoryBytes": 215920640,
+      "peakMemoryBytes": 3754577920,
+      "swapBytes": 0,
+      "tasks": 11,
+      "memoryBreakdown": {
+        "anon": 53018624,
+        "file": 140926976,
+        "kernel": 21389312,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 131072000,
+        "slab": 20092928
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T10:27:36.974Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 173158400,
+      "peakMemoryBytes": 3754577920,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10244096,
+        "file": 140943360,
+        "kernel": 20865024,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 131088384,
+        "slab": 20025592
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T10:27:36.999Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r16/lasm-compiler-0.1.0-experimental.19.tgz",
+    "sha256": "7e477c20c3f0bd1ea201e83bf3ef92424eaf38472cf4eda890734301440e76b5",
+    "compressedBytes": 125374902,
+    "installedBytes": 629879442,
+    "files": 2673,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-lake-plugin-r1-resources.json",
+    "recordedAt": "2026-09-24T09:43:07.383Z"
+  },
+  "limits": [
+    "Only Node 26.10.0 on Linux x64 is covered. Deno, Bun and other native platforms remain pending.",
+    "Original drivers and markers run unchanged before extra native compiled and installed AOT checks. Timing observations use the original normalization and assertions.",
+    "Identifier completion launches native Lean --server in interpreted, native AOT and deployed phases. These subprocess operations are native compiler evidence, not Wasm compiler execution."
+  ],
+  "recordedAt": "2026-09-24T10:32:03.632430+00:00"
+}

@@ -33,6 +33,8 @@ const result = { name: test.name, category: test.category, command, startedAt, f
     : execution.status === 78 ? 'harness-compiler-options-gap' : execution.status === 0 ? 'passed' : 'failed',
   sourceSha256: before, sourceUnchanged: await hashFile(source) === before };
 if (existsSync(join(evidence, 'phase.txt'))) result.phase = readFileSync(join(evidence, 'phase.txt'), 'utf8').trim();
+const nativeCalls = join(evidence, 'native-compiler-invocations.txt');
+if (existsSync(nativeCalls)) result.nativeCompilerInvocations = readFileSync(nativeCalls, 'utf8').trim().split('\n').filter(Boolean);
 const dist = join(evidence, 'dist');
 if (existsSync(join(dist, 'build-info.json'))) {
   result.build = JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8'));

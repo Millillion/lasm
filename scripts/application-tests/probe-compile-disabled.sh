@@ -5,6 +5,21 @@ set -eo pipefail
 file="$1"
 evidence="$2"
 source "$TEST_DIR/util.sh"
+# Some excluded inputs launch a real compiler/server. Record every native Lean
+# invocation in all control phases; the shim execs the exact managed binary and
+# preserves arguments, streams, exit status and PID. This is harness evidence.
+mkdir "$evidence/native-compiler-bin"
+cat > "$evidence/native-compiler-bin/lean" <<'SHIM'
+#!/usr/bin/env bash
+set -eo pipefail
+{
+  printf '%q ' "$LASM_NATIVE_LEAN" "$@"
+  printf '\n'
+} >> "$LASM_APPLICATION_CASE/native-compiler-invocations.txt"
+exec "$LASM_NATIVE_LEAN" "$@"
+SHIM
+chmod +x "$evidence/native-compiler-bin/lean"
+export PATH="$evidence/native-compiler-bin:$PATH"
 printf 'native-driver\n' > "$evidence/phase.txt"
 source ./run_test.sh "$file"
 cp "$file.out.produced" "$evidence/native.out"

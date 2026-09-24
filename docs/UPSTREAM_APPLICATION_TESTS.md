@@ -60,6 +60,16 @@ budget alone fails. Bundled startup integration remains pending. Peak memory
 is 3.59 GiB without resource events. These are extra controls for upstream
 exclusions, not additional default-suite passes or proof against all races.
 
+The [four compilation-disabled Node controls](evidence/upstream-compile-disabled-node-2026-09-24.json)
+now pass through installed `.19`: `compactor_chain`, `dep_regions`,
+`dep_regions_miss` and `identifier_completion`. Original drivers and markers
+run first, followed by explicitly separate native AOT and deployed AOT checks
+with the original assertions. All 7,669 originals and harness hashes remain
+unchanged. Native Lean subprocess arguments are recorded, including the three
+language-server launches in the completion benchmark. The 3.50 GiB peak caused
+no resource events. Deno/Bun and other native platforms remain pending; these
+extra runs do not alter upstream's default compilation-disabled status.
+
 The new [application harness](../scripts/application-tests/README.md) now drives
 the installed npm candidate. The first five Node cases exercised filesystem read
 bounds, Unicode paths, dedicated tasks, exception reporting and cross-process

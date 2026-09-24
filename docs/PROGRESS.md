@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Unchanged excluded-concurrency controls](evidence/upstream-excluded-concurrency-2026-09-24.json) match native behavior in three repetitions each on Node and Deno. Bun exposes a real stack gap; a separate Linux diagnostic passes with larger worker stacks and engine budget. Bundled integration remains pending. Peak memory was 3.59 GiB without resource events.
+**Changed:** [Four upstream compilation-disabled inputs](evidence/upstream-compile-disabled-node-2026-09-24.json) pass separate native and installed Node AOT controls with original assertions. Exact native compiler subprocess calls are recorded. Peak memory was 3.50 GiB without resource events. Other engines remain pending; Bun stack support is still being repaired.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
