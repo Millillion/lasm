@@ -1,0 +1,45 @@
+{
+  "scope": "Native Windows ARM64 leantar builds and passes both unchanged upstream tests; supplemental trace byte-roundtrip assertion was incorrect and is replaced by official-release differential coverage, still pending",
+  "run": {
+    "id": 36011821984,
+    "url": "https://github.com/Millillion/lasm/actions/runs/36011821984",
+    "headSha": "88f8b62c59d58379489a75ee3ed809b156a1a309"
+  },
+  "upstreamTests": {
+    "passed": 2,
+    "failed": 0,
+    "sourceModified": false
+  },
+  "failure": "Our supplementary assertion expected .trace bytes to be unchanged. Upstream packs its dependency/output hashes and intentionally removes low-level logs and input metadata. The extracted trace is 247 bytes versus 2365 input bytes.",
+  "repair": "Compare exact extracted bytes to the checksum-pinned official x64 release (explicit emulation); cross-read both archives with both binaries. Keep byte-identical comparisons to all three original .olean fixtures and preserve trace schema, dependency hash and outputs.",
+  "source": "https://github.com/digama0/leangz/blob/46485d0eca748ed2d2678e70d59949bbc602f32c/src/ltar.rs",
+  "log": ".work/product-acceptance/windows-arm64-leantar-ci-r2.log",
+  "logSha256": "696cec627ec4c820299f1b42fd23692eb7d32c18bc8bcaae3eeaefd9afb8f6fc",
+  "resources": {
+    "status": "failed",
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "scripts/ci/windows-leantar.ps1"
+    ],
+    "hostAtStart": {
+      "total": 17169387520,
+      "available": 13422907392
+    },
+    "limits": {
+      "jobCommittedBytes": 4294967296,
+      "stopCommittedBytes": 3435973836,
+      "hostReserveBytes": 2147483648,
+      "timeoutSeconds": 2100
+    },
+    "peakCommittedBytes": 757661696,
+    "minimumHostAvailable": 12360265728,
+    "startedAt": 1790259597.4306056,
+    "unit": "Local\\LasmResource-dfc09020-c81c-46ae-876c-e0cca71bc01a",
+    "pid": 10632,
+    "lastSampleAt": 1790259717.6470826,
+    "exitCode": 1,
+    "finishedAt": 1790259717.8225334
+  }
+}
