@@ -1,0 +1,220 @@
+{
+  "scope": "Incomplete installed Bun application-suite run, with a real const_fold failure and a separate disk-reserve stop",
+  "campaign": ".work/upstream-applications-bun-r1",
+  "versions": {
+    "lean": {
+      "tag_name": "v4.34.0",
+      "published_at": "2026-09-14T14:04:36Z",
+      "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest"
+    },
+    "deno": {
+      "tag_name": "v2.9.7",
+      "published_at": "2026-09-17T09:04:55Z",
+      "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest"
+    },
+    "bun": {
+      "tag_name": "bun-v1.4.2",
+      "published_at": "2026-09-05T05:55:48Z",
+      "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest"
+    },
+    "node": {
+      "version": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "v8": "14.6.202.34",
+      "npm": "11.19.1",
+      "source": "https://nodejs.org/dist/index.json"
+    },
+    "checkedAt": "2026-09-24T11:59:29.550265+00:00"
+  },
+  "registered": 101,
+  "counts": {
+    "passed": 77,
+    "upstream-compile-disabled": 4,
+    "failed": 1,
+    "not-completed": 19
+  },
+  "resourceStop": {
+    "reason": "Disk headroom fell below the reserve",
+    "available": 4258590720,
+    "at": "2026-09-24T14:08:30.121Z"
+  },
+  "originalSources": {
+    "before": {
+      "checked": 7669,
+      "modified": []
+    },
+    "after": {
+      "checked": 7669,
+      "modified": []
+    }
+  },
+  "harnessChanged": [],
+  "failures": [
+    {
+      "name": "compile_bench/const_fold.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "const_fold.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-bun-r1/cases/compile_bench__const_fold.lean"
+      ],
+      "startedAt": "2026-09-24T13:54:44.705Z",
+      "finishedAt": "2026-09-24T13:56:16.949Z",
+      "exitCode": 1,
+      "signal": null,
+      "status": "failed",
+      "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+      "sourceUnchanged": true,
+      "phase": "application-runtime",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+        "buildDriverIdentity": "4c278e4bec0e1405aff1d992e8924b208f82a1b423bc89938cb69aef8309e25e",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "const_fold",
+            "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+            "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+          }
+        ],
+        "signature": "d268823a99e3bbbae85a5c013eb24333f1d19d547f0f6112c2d324048af33ebd",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "065978d1eb603f012cbada31b02b161877aa0ede71dc91bc2028f35c33c65a34"
+    }
+  ],
+  "unfinished": [
+    "compile_bench/incr_header_save.lean",
+    "compile_bench/io_compute.lean",
+    "compile_bench/iterators.lean",
+    "compile_bench/liasolver.lean",
+    "compile_bench/nat_repr.lean",
+    "compile_bench/parser.lean",
+    "compile_bench/phashmap.lean",
+    "compile_bench/qsort.lean",
+    "compile_bench/rbmap.lean",
+    "compile_bench/rbmap_checkpoint.lean",
+    "compile_bench/rbmap_fbip.lean",
+    "compile_bench/rbmap_library.lean",
+    "compile_bench/select.lean",
+    "compile_bench/server_startup.lean",
+    "compile_bench/sigmaIterator.lean",
+    "compile_bench/treemap.lean",
+    "compile_bench/unionfind.lean",
+    "compile_bench/watchdogRss.lean",
+    "compile_bench/workspaceSymbolsNewRanges.lean"
+  ],
+  "resources": {
+    "startedAt": "2026-09-24T11:59:47.981Z",
+    "command": [
+      "/bin/bash",
+      ".work/run-full-application-suite-r2.sh",
+      "bun",
+      ".work/upstream-applications-bun-r1"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "337f4556-6873-41fb-ba45-712dc2f9c65f",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24833765376
+    },
+    "minimumHostAvailable": 20215619584,
+    "peakMemoryBytes": 4985671680,
+    "peakTasks": 107,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-applications-bun-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T14:08:32.894Z",
+      "memoryBytes": 1803866112,
+      "peakMemoryBytes": 4985671680,
+      "swapBytes": 0,
+      "tasks": 1,
+      "memoryBreakdown": {
+        "anon": 44048384,
+        "file": 1698394112,
+        "kernel": 60760064,
+        "shmem": 0,
+        "file_mapped": 28672,
+        "inactive_file": 1009586176,
+        "slab": 60285760
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "exit-code",
+      "exitCode": "exited",
+      "exitStatus": "125",
+      "capturedAt": "2026-09-24T14:08:32.952Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 1772613632,
+      "peakMemoryBytes": 4985671680,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11657216,
+        "file": 1698394112,
+        "kernel": 61181952,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1009602560,
+        "slab": 60236120
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T14:08:32.978Z",
+    "result": {
+      "code": 125,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "resultSha256": "672037a2ce7d03bb3f575697aedf74bba8eb4e10297b2761167257e8c3a69552",
+  "followup": "Lossless verified archival of historical generated Wasm; preserve this stopped campaign, then execute unfinished tests separately. Diagnose const_fold using a separate copy."
+}

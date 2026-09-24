@@ -1,0 +1,32 @@
+name: Native Windows ARM64 leantar
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-arm64-leantar
+  cancel-in-progress: false
+jobs:
+  native:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: windows-11-arm
+    timeout-minutes: 45
+    env:
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: arm64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Require native ARM64 Node
+        run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-arm64')"
+      - name: Build and test pinned leantar with native ARM64 compilers
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --timeout-seconds 2100 --report .work/windows-leantar-resources.json -- pwsh -NoProfile -File scripts/ci/windows-leantar.ps1
+      - name: Preserve resource and native test results in logs
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const p of ['.work/windows-leantar-resources.json','.work/windows-arm64-leantar/result.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+      # Free standard public runner; no artifact or cache uploads.
