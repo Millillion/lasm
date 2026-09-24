@@ -277,8 +277,11 @@ and do not establish full-suite conformance. See
   races, and every open/seek/metadata edge case across OSs. Current tests focus on
   regular files and common directory operations. A
   [supplementary device fixture](docs/evidence/filesystem-devices-preflight-2026-09-24.json)
-  is prepared for Linux null/zero/full devices and procfs, with bounded transfers;
-  its native and installed application execution remains pending.
+  now has [matching native interpreted/compiled results on Linux x64 and
+  ARM64](docs/evidence/filesystem-devices-native-ci-2026-09-24.json), with bounded
+  transfers through null/zero/full devices and procfs. Buffered writes, repeated
+  flushes, errno values and zero-size procfs reads agree across both architectures.
+  Installed Wasm comparisons remain pending.
   `Handle.truncate` now preserves
   the native call sequence even when querying the stream position fails; Linux
   regular-file and pipe comparisons match native Lean in all three packaged and

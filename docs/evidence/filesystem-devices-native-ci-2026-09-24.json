@@ -1,0 +1,442 @@
+{
+  "scope": "Native Linux filesystem-device oracles only; installed Wasm validation remains separate",
+  "run": {
+    "databaseId": 36004390048,
+    "headSha": "4589c0f1f45825e32645e505cdeab6e28e717369",
+    "conclusion": "success",
+    "url": "https://github.com/Millillion/lasm/actions/runs/36004390048"
+  },
+  "logFile": ".work/product-acceptance/filesystem-devices-ci-36004390048.log",
+  "logSha256": "bcc41c1dd6572a142aef5712076a91d172a6bd44ad93d66be3da2400f887c007",
+  "platforms": [
+    {
+      "platform": "linux-x64",
+      "reports": {
+        ".work/application-io-controls/result.json": {
+          "scope": "Native interpreted/compiled fixture controls only; no Wasm application executed",
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "host": "linux-x64",
+          "target": "native",
+          "resourceReport": "/home/runner/work/lasm/lasm/.work/application-io-controls-resources.json",
+          "cases": [
+            {
+              "name": "filesystem-devices",
+              "source": "integration/fixtures/FilesystemDevices.lean",
+              "marker": "filesystem device observations completed\n",
+              "linux": true,
+              "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+              "passed": true,
+              "interpreted": {
+                "code": 0,
+                "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+                "stderr": ""
+              },
+              "nativeCompiled": {
+                "code": 0,
+                "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+                "stderr": ""
+              },
+              "sourceUnchanged": true,
+              "status": "native controls passed"
+            }
+          ],
+          "commands": [
+            {
+              "label": "filesystem-devices/native-interpreted",
+              "program": "/home/runner/.cache/lasm/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+              "args": [
+                "-Dlinter.all=false",
+                "--run",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/Main.lean",
+                "data"
+              ],
+              "cwd": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/native-interpreted",
+              "code": 0,
+              "signal": null,
+              "seconds": 0.3180113580000034,
+              "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+              "stderr": ""
+            },
+            {
+              "label": "filesystem-devices/generate native C",
+              "program": "/home/runner/.cache/lasm/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+              "args": [
+                "-j1",
+                "-Dlinter.all=false",
+                "-Dcompiler.postponeCompile=false",
+                "-c",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/Main.lean.c",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/Main.lean"
+              ],
+              "cwd": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source",
+              "code": 0,
+              "signal": null,
+              "seconds": 0.36074590499999615,
+              "stdout": "",
+              "stderr": ""
+            },
+            {
+              "label": "filesystem-devices/compile native",
+              "program": "/home/runner/.cache/lasm/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+              "args": [
+                "-O2",
+                "-DNDEBUG",
+                "-o",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/native",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/Main.lean.c"
+              ],
+              "cwd": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source",
+              "code": 0,
+              "signal": null,
+              "seconds": 0.5541226079999979,
+              "stdout": "",
+              "stderr": ""
+            },
+            {
+              "label": "filesystem-devices/native-compiled",
+              "program": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/native",
+              "args": [
+                "data"
+              ],
+              "cwd": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/native-compiled",
+              "code": 0,
+              "signal": null,
+              "seconds": 0.008115359999996144,
+              "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+              "stderr": ""
+            }
+          ],
+          "passed": true,
+          "finishedAt": "2026-09-24T13:16:21.379Z"
+        },
+        ".work/application-io-controls-resources.json": {
+          "startedAt": "2026-09-24T13:15:33.200Z",
+          "command": [
+            "node",
+            "integration/application-io-regressions.mjs",
+            ".work/application-io-controls",
+            "native",
+            "filesystem-devices"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "90072340-5834-41c0-bb76-deda127f8c15",
+          "limits": {
+            "memoryMax": 6442450944,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 5153960755,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 15355215872
+          },
+          "minimumHostAvailable": 15159926784,
+          "peakMemoryBytes": 4079554560,
+          "peakTasks": 19,
+          "report": "/home/runner/work/lasm/lasm/.work/application-io-controls-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T13:16:21.347Z",
+            "memoryBytes": 3487137792,
+            "peakMemoryBytes": 4079554560,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 229740544,
+              "file": 3126112256,
+              "kernel": 129155072,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 3121557504,
+              "slab": 123778024
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "highWaterProcesses": {
+            "at": "2026-09-24T13:16:11.939Z",
+            "processes": [
+              {
+                "pid": 2115,
+                "name": "node-MainThread",
+                "residentBytes": 263626752,
+                "threads": 11
+              }
+            ]
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T13:16:21.440Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 3264856064,
+            "peakMemoryBytes": 4079554560,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13684736,
+              "file": 3126112256,
+              "kernel": 124461056,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 3121557504,
+              "slab": 123532112
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T13:16:21.460Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "platform": "linux-arm64",
+      "reports": {
+        ".work/application-io-controls/result.json": {
+          "scope": "Native interpreted/compiled fixture controls only; no Wasm application executed",
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeArtifactIdentity": "0d20aeca378cf75675cc8057649bc81f2a6794c14f0989c0876081a90d0669f7",
+          "host": "linux-arm64",
+          "target": "native",
+          "resourceReport": "/home/runner/work/lasm/lasm/.work/application-io-controls-resources.json",
+          "cases": [
+            {
+              "name": "filesystem-devices",
+              "source": "integration/fixtures/FilesystemDevices.lean",
+              "marker": "filesystem device observations completed\n",
+              "linux": true,
+              "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+              "passed": true,
+              "interpreted": {
+                "code": 0,
+                "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+                "stderr": ""
+              },
+              "nativeCompiled": {
+                "code": 0,
+                "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+                "stderr": ""
+              },
+              "sourceUnchanged": true,
+              "status": "native controls passed"
+            }
+          ],
+          "commands": [
+            {
+              "label": "filesystem-devices/native-interpreted",
+              "program": "/home/runner/.cache/lasm/artifacts/0d20aeca378cf75675cc8057649bc81f2a6794c14f0989c0876081a90d0669f7/bin/lean",
+              "args": [
+                "-Dlinter.all=false",
+                "--run",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/Main.lean",
+                "data"
+              ],
+              "cwd": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/native-interpreted",
+              "code": 0,
+              "signal": null,
+              "seconds": 0.32564966000001005,
+              "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+              "stderr": ""
+            },
+            {
+              "label": "filesystem-devices/generate native C",
+              "program": "/home/runner/.cache/lasm/artifacts/0d20aeca378cf75675cc8057649bc81f2a6794c14f0989c0876081a90d0669f7/bin/lean",
+              "args": [
+                "-j1",
+                "-Dlinter.all=false",
+                "-Dcompiler.postponeCompile=false",
+                "-c",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/Main.lean.c",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/Main.lean"
+              ],
+              "cwd": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source",
+              "code": 0,
+              "signal": null,
+              "seconds": 0.379234169000003,
+              "stdout": "",
+              "stderr": ""
+            },
+            {
+              "label": "filesystem-devices/compile native",
+              "program": "/home/runner/.cache/lasm/artifacts/0d20aeca378cf75675cc8057649bc81f2a6794c14f0989c0876081a90d0669f7/bin/leanc",
+              "args": [
+                "-O2",
+                "-DNDEBUG",
+                "-o",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/native",
+                "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/Main.lean.c"
+              ],
+              "cwd": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source",
+              "code": 0,
+              "signal": null,
+              "seconds": 0.5747716490000021,
+              "stdout": "",
+              "stderr": ""
+            },
+            {
+              "label": "filesystem-devices/native-compiled",
+              "program": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/source/native",
+              "args": [
+                "data"
+              ],
+              "cwd": "/home/runner/work/lasm/lasm/.work/application-io-controls/filesystem-devices/native-compiled",
+              "code": 0,
+              "signal": null,
+              "seconds": 0.006595767000006162,
+              "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+              "stderr": ""
+            }
+          ],
+          "passed": true,
+          "finishedAt": "2026-09-24T13:16:46.592Z"
+        },
+        ".work/application-io-controls-resources.json": {
+          "startedAt": "2026-09-24T13:15:34.762Z",
+          "command": [
+            "node",
+            "integration/application-io-regressions.mjs",
+            ".work/application-io-controls",
+            "native",
+            "filesystem-devices"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "470a52a2-8e9d-43d5-ace4-48ea28cc774a",
+          "limits": {
+            "memoryMax": 6442450944,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 5153960755,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16722006016,
+            "available": 15220129792
+          },
+          "minimumHostAvailable": 15069732864,
+          "peakMemoryBytes": 4130160640,
+          "peakTasks": 19,
+          "report": "/home/runner/work/lasm/lasm/.work/application-io-controls-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T13:16:46.605Z",
+            "memoryBytes": 3399864320,
+            "peakMemoryBytes": 4130160640,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 89616384,
+              "file": 3181285376,
+              "kernel": 128540672,
+              "shmem": 0,
+              "file_mapped": 57344,
+              "inactive_file": 3176218624,
+              "slab": 125125936
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "highWaterProcesses": {
+            "at": "2026-09-24T13:16:36.370Z",
+            "processes": [
+              {
+                "pid": 2299,
+                "name": "node-MainThread",
+                "residentBytes": 237105152,
+                "threads": 11
+              }
+            ]
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T13:16:46.647Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 3319316480,
+            "peakMemoryBytes": 4130160640,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11714560,
+              "file": 3181285376,
+              "kernel": 125849600,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 3176218624,
+              "slab": 125068912
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T13:16:46.663Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    }
+  ],
+  "observations": [
+    "Bounded zero-byte, short and rewind reads agree between interpreted and compiled native Lean",
+    "Buffered /dev/full write initially succeeds; flush reports resourceExhausted errno 28, and repeated flush succeeds",
+    "Large and high-level binary /dev/full writes report errno 28; truncate reports invalidArgument errno 22",
+    "Procfs content remains readable despite zero-size file metadata"
+  ],
+  "limitations": [
+    "These are Linux native Lean oracles, not installed Lasm Wasm passes",
+    "Other device types, non-Linux semantics, races, pipes and large-file coverage remain incomplete"
+  ],
+  "recordedAt": "2026-09-24T13:24:41.189810+00:00"
+}

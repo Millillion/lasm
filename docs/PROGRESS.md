@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Filesystem-device coverage](evidence/filesystem-devices-preflight-2026-09-24.json) is prepared for ordinary Lean reads, buffering, real kernel write errors and procfs metadata. The guarded Linux x64/ARM64 oracle workflow can select this fixture independently; native and installed Wasm execution remain pending. No upstream test was edited.
+**Changed:** [Filesystem-device oracles](evidence/filesystem-devices-native-ci-2026-09-24.json) pass on native Linux x64/ARM64, including real kernel errors, buffered flush behavior and zero-size procfs reads. Interpreted and compiled Lean agree; installed Wasm comparisons remain pending. Both guards released without resource events.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

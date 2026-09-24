@@ -649,5 +649,10 @@ adds ordinary Lean coverage for Linux character devices and procfs: bounded
 reads, kernel write failures, buffering/flush state, truncation, and readable
 content despite zero stat size. The differential harness now accepts native
 case selections, and CI can run just this new oracle on Linux x64/ARM64.
-These cases are prepared, not passing evidence; installed application runs
-remain queued behind the current guarded Bun campaign and disk reclamation.
+The [native oracle campaign](evidence/filesystem-devices-native-ci-2026-09-24.json)
+passes on Linux x64 and ARM64, comparing interpreted and compiled Lean with
+identical observations across architectures. In particular, a small buffered
+`/dev/full` write succeeds before flush reports errno 28; repeating the flush
+succeeds, while a large write reports errno 28. All guards release without
+resource events. Installed Wasm comparisons remain queued behind the current
+guarded Bun campaign and disk reclamation; this does not close device coverage.
