@@ -11,7 +11,7 @@
 #include <errno.h>
 
 typedef double (*date_callback_t)(void);
-typedef void (*mailbox_callback_t)(void);
+typedef int32_t (*mailbox_callback_t)(uint64_t, uint64_t);
 typedef int32_t (*spawn_callback_t)(uint64_t, uint64_t, uint64_t);
 typedef int32_t (*thread_event_callback_t)(uint32_t, uint64_t);
 typedef struct {
@@ -278,13 +278,14 @@ static wasm_trap_t *mailbox_notify_import(void *data, wasmtime_caller_t *caller,
     lean_probe_t *probe = data;
     if (nargs != 2 || nresults || args[0].kind != WASMTIME_I64 || args[1].kind != WASMTIME_I64)
         return wasmtime_trap_new("unexpected notification ABI", 27);
-    // Worker routing remains unimplemented and must fail explicitly. This
-    // diagnostic implements the original targetThread == currThreadId branch.
-    if (!probe->main_pthread || (uint64_t)args[0].of.i64 != probe->main_pthread ||
+    // The sender must be the current guest thread. The JS adapter owns actual
+    // message routing; reject notifications it cannot accept.
+    if (!probe->main_pthread || !args[0].of.i64 ||
         (uint64_t)args[1].of.i64 != probe->main_pthread)
-        return wasmtime_trap_new("UNIMPLEMENTED worker mailbox routing", 36);
+        return wasmtime_trap_new("invalid mailbox notification sender", 35);
+    if (!probe->schedule_mailbox((uint64_t)args[0].of.i64, (uint64_t)args[1].of.i64))
+        return wasmtime_trap_new("mailbox notification was rejected", 33);
     probe->mailbox_notifications++;
-    probe->schedule_mailbox();
     return NULL;
 }
 static wasm_trap_t *pthread_create_import(void *data, wasmtime_caller_t *caller,
@@ -754,7 +755,8 @@ static wasm_trap_t *proxy_task(void *data, wasmtime_caller_t *caller,
     probe->delivered_sum += (uint64_t)args[0].of.i64;
     return NULL;
 }
-int lasm_lean_instance_mailbox_enqueue(lean_probe_t *probe, uint64_t value, char *error, size_t capacity) {
+int lasm_lean_instance_mailbox_prepare(lean_probe_t *probe, uint64_t desired_function,
+    uint64_t *function, char *error, size_t capacity) {
     wasmtime_context_t *context = wasmtime_store_context(probe->store);
     if (!probe->main_pthread) { snprintf(error, capacity, "mailbox is not registered"); return 2; }
     if (!probe->proxy_queue) {
@@ -778,15 +780,31 @@ int lasm_lean_instance_mailbox_enqueue(lean_probe_t *probe, uint64_t value, char
         wasmtime_val_t callback = { .kind = WASMTIME_FUNCREF };
         wasmtime_func_new(context, type, proxy_task, probe, NULL, &callback.of.funcref);
         wasm_functype_delete(type);
+        uint64_t next = wasmtime_table_size(context, &table.of.table);
+        if (desired_function != UINT64_MAX && desired_function != next) {
+            wasmtime_extern_delete(&table); wasmtime_val_unroot(&callback);
+            snprintf(error, capacity, "mailbox callback table index mismatch"); return 1;
+        }
         int failed = failure(wasmtime_table_grow(context, &table.of.table, 1, &callback,
             &probe->proxy_function), NULL, error, capacity);
         wasmtime_extern_delete(&table); wasmtime_val_unroot(&callback);
         if (failed) return failed;
     }
+    if (desired_function != UINT64_MAX && desired_function != probe->proxy_function) {
+        snprintf(error, capacity, "mailbox callback does not match the peer"); return 1;
+    }
+    *function = probe->proxy_function;
+    return 0;
+}
+int lasm_lean_instance_mailbox_send(lean_probe_t *probe, uint64_t target, uint64_t value,
+    char *error, size_t capacity) {
+    uint64_t function;
+    if (lasm_lean_instance_mailbox_prepare(probe, UINT64_MAX, &function, error, capacity)) return 1;
+    wasmtime_context_t *context = wasmtime_store_context(probe->store);
     wasmtime_val_t args[4] = {
         { .kind = WASMTIME_I64, .of.i64 = (int64_t)probe->proxy_queue },
-        { .kind = WASMTIME_I64, .of.i64 = (int64_t)probe->main_pthread },
-        { .kind = WASMTIME_I64, .of.i64 = (int64_t)probe->proxy_function },
+        { .kind = WASMTIME_I64, .of.i64 = (int64_t)target },
+        { .kind = WASMTIME_I64, .of.i64 = (int64_t)function },
         { .kind = WASMTIME_I64, .of.i64 = (int64_t)value } }, result;
     wasm_trap_t *trap = invoke_from_import(probe, context, "emscripten_proxy_async", args, 4, &result, 1);
     if (failure(NULL, trap, error, capacity)) return 1;
@@ -794,6 +812,9 @@ int lasm_lean_instance_mailbox_enqueue(lean_probe_t *probe, uint64_t value, char
     wasmtime_val_unroot(&result);
     if (!accepted) { snprintf(error, capacity, "proxy task was not accepted"); return 1; }
     return 0;
+}
+int lasm_lean_instance_mailbox_enqueue(lean_probe_t *probe, uint64_t value, char *error, size_t capacity) {
+    return lasm_lean_instance_mailbox_send(probe, probe->main_pthread, value, error, capacity);
 }
 int lasm_lean_instance_rejection_control(lean_probe_t *probe, char *error, size_t capacity) {
     if (!probe->control.store_id) { snprintf(error, capacity, "missing control import"); return 2; }

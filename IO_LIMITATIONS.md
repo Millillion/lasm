@@ -251,6 +251,14 @@ separately from the earlier runtime evidence below.
   clean up, while earlier controls remain passing. Peak memory is 295 MiB
   without resource events. This does not yet validate the full Lean scheduler,
   nested spawning, cross-worker mailboxes or the original benchmark main.
+  [Cross-worker mailboxes now pass](docs/evidence/wasmtime-real-lean-mailboxes-2026-09-24.json)
+  six real proxy tasks per engine across main-to-worker, worker-to-main and
+  worker-to-worker routes. Counts and values match exactly; all three proxy
+  queues are destroyed and all seven test threads per engine exit, join and
+  clean up. Earlier controls pass again, with a 293 MiB peak and no resource
+  events. Receiving event loops are available during this test; blocked-runtime
+  integration, nested/detached workers, cancellation, full main execution and
+  installed-package acceptance remain open.
 
 ## Earlier runtime evidence and remaining compatibility work
 

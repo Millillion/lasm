@@ -9,7 +9,7 @@ assert.ok(['startup', 'high-allocation'].includes(profile));
 assert.equal(await hashFile(cache), expectedHash);
 const ffi = createRequire(import.meta.url)('koffi'), library = ffi.load(libraryPath);
 const clockType = ffi.proto('double lasm_probe_date_now(void)');
-const mailboxType = ffi.proto('void lasm_probe_schedule_mailbox(void)');
+const mailboxType = ffi.proto('int32_t lasm_probe_schedule_mailbox(uint64_t target, uint64_t sender)');
 const create = library.func('void *lasm_lean_instance_new(str trusted_cache, lasm_probe_date_now *date_now, lasm_probe_schedule_mailbox *schedule_mailbox, const uint8_t *environment, size_t environment_size, size_t environment_count, str program_name, void *parent, void *spawn, void *thread_event, char *error, size_t capacity)');
 const destroy = library.func('void lasm_lean_instance_delete(void *probe)');
 const call = library.func('int lasm_lean_instance_call(void *probe, str name, const uint64_t *args, size_t nargs, uint32_t result_count, _Out_ uint64_t *result, char *error, size_t capacity)');
@@ -25,7 +25,8 @@ assert.equal(Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 1, 0), 'n
 const clock = ffi.register(() => { clockCalls++; return Date.now(); }, ffi.pointer(clockType));
 const timers = new Set();
 let closed = false, mailboxError, mailboxChecks = 0;
-const mailbox = ffi.register(() => {
+const mailbox = ffi.register((target, sender) => {
+  if (BigInt(target) !== BigInt(sender)) return 0;
   const timer = setTimeout(() => {
     timers.delete(timer);
     if (closed) return;
@@ -38,6 +39,7 @@ const mailbox = ffi.register(() => {
     } catch (error) { mailboxError = error; }
   });
   timers.add(timer);
+  return 1;
 }, ffi.pointer(mailboxType));
 process.env.LASM_WASMTIME_ENV_CONTROL = 'λ-雪 😀 =value';
 const environment = Object.entries(process.env).map(([key, value]) => `${key}=${value}`);

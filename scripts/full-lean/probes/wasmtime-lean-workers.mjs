@@ -11,7 +11,7 @@ if (isMainThread) assert.equal(await hashFile(cache), expectedHash);
 assert.equal(Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 1, 0), 'not-equal');
 const ffi = createRequire(import.meta.url)('koffi'), library = ffi.load(libraryPath);
 const clockType = ffi.proto('double lasm_worker_clock(void)');
-const mailboxType = ffi.proto('void lasm_worker_mailbox(void)');
+const mailboxType = ffi.proto('int32_t lasm_worker_mailbox(uint64_t target, uint64_t sender)');
 const spawnType = ffi.proto('int32_t lasm_worker_spawn(uint64_t pthread, uint64_t start, uint64_t argument)');
 const eventType = ffi.proto('int32_t lasm_worker_event(uint32_t event, uint64_t pthread)');
 const create = library.func('void *lasm_lean_instance_new(str trusted_cache, void *clock, void *mailbox, const uint8_t *environment, size_t environment_size, size_t environment_count, str program_name, void *parent, void *spawn, void *thread_event, char *error, size_t capacity)');
@@ -22,9 +22,12 @@ const window = library.func('void *lasm_lean_instance_memory_window(void *probe,
 const registerMailbox = library.func('int lasm_lean_instance_mailbox_register(void *probe, uint64_t pthread, char *error, size_t capacity)');
 const functionPointer = library.func('int lasm_lean_instance_function_pointer(void *probe, str name, uint64_t requested, _Out_ uint64_t *pointer, char *error, size_t capacity)');
 const callPointer = library.func('int lasm_lean_instance_call_pointer(void *probe, uint64_t pointer, uint64_t argument, _Out_ uint64_t *result, char *error, size_t capacity)');
+const prepareMailbox = library.func('int lasm_lean_instance_mailbox_prepare(void *probe, uint64_t desired_function, _Out_ uint64_t *function, char *error, size_t capacity)');
+const sendMailbox = library.func('int lasm_lean_instance_mailbox_send(void *probe, uint64_t target, uint64_t value, char *error, size_t capacity)');
 const error = Buffer.alloc(8192), message = () => error.toString('utf8').split('\0')[0];
 const workers = new Map(), timers = new Set(), registered = [];
-let probe, closed = false, callbackError, exitNotification = false, activeGroup;
+let probe, closed = false, callbackError, exitNotification = false, activeGroup, ownPthread;
+const mailboxRoutes = [];
 function callback(fn, type) { const value = ffi.register(fn, ffi.pointer(type)); registered.push(value); return value; }
 function invoke(name, args = [], resultCount = 1) {
   const result = [0];
@@ -38,15 +41,32 @@ function view(offset, size = 8) {
 }
 function snapshot() { const values = Array(26).fill(0); details(probe, values); return values.map(BigInt); }
 const clock = callback(() => Date.now(), clockType);
-const mailbox = callback(() => {
+function scheduleMailbox() {
   const timer = setTimeout(() => {
     timers.delete(timer);
     if (closed) return;
-    try { if (invoke('pthread_self') !== 0n) invoke('_emscripten_check_mailbox', [], 0); }
+    try {
+      if (invoke('pthread_self') !== 0n) invoke('_emscripten_check_mailbox', [], 0);
+      if (!isMainThread && workerData.mailbox) {
+        const state = snapshot();
+        parentPort.postMessage({ kind: 'mailbox-state', count: String(state[12]), sum: String(state[13]) });
+      }
+    }
     catch (error) { callbackError = error; }
   });
   timers.add(timer);
-}, mailboxType);
+}
+function routeMailbox(target, sender) {
+  target = BigInt(target); sender = BigInt(sender);
+  mailboxRoutes.push({ sender: String(sender), target: String(target) });
+  if (target === sender || target === ownPthread) { scheduleMailbox(); return 1; }
+  if (!isMainThread) { parentPort.postMessage({ kind: 'mailbox-notify', target, sender }); return 1; }
+  const record = workers.get(String(target));
+  if (!record || record.exited || record.cleaned) return 0;
+  record.worker.postMessage({ kind: 'mailbox-check' });
+  return 1;
+}
+const mailbox = callback(routeMailbox, mailboxType);
 const events = callback((kind, pthread) => {
   pthread = BigInt(pthread);
   if (!isMainThread && kind === 0 && pthread === workerData.pthread && !exitNotification) {
@@ -65,13 +85,23 @@ const spawn = isMainThread ? callback((pthread, start, argument) => {
     assert.ok(!previous || previous.cleaned, 'Live thread address cannot be reused');
     const worker = new Worker(fileURLToPath(import.meta.url), { workerData: {
       arguments: [libraryPath, cache, expectedHash], parent: ffi.address(probe), pthread, start, argument,
-      concurrent: activeGroup ? { barrier: activeGroup.barrier, mutex: activeGroup.mutex,
+      concurrent: activeGroup?.kind === 'concurrent' ? { barrier: activeGroup.barrier, mutex: activeGroup.mutex,
         counter: activeGroup.counter, index: activeGroup.next++ } : undefined,
+      mailbox: activeGroup?.kind === 'mailbox' ? { callbackIndex: activeGroup.callbackIndex } : undefined,
     } });
     const record = { worker, completed: false, exited: false, cleaned: false };
     record.result = new Promise((resolve, reject) => {
-      worker.once('message', value => { record.completed = true; resolve(value); });
-      worker.once('error', reject);
+      worker.on('message', value => {
+        try {
+          if (value.kind === 'mailbox-ready') record.mailboxReady = true;
+          else if (value.kind === 'mailbox-state') record.mailboxState = value;
+          else if (value.kind === 'mailbox-notify') {
+            assert.equal(BigInt(value.sender), pthread);
+            assert.equal(routeMailbox(value.target, value.sender), 1, 'Parent must route to a live guest thread');
+          } else { assert.ok(!record.completed); record.completed = true; resolve(value); }
+        } catch (error) { callbackError = error; reject(error); }
+      });
+      worker.once('error', error => { record.error = error; reject(error); });
       worker.once('exit', code => { if (!record.completed) reject(new Error(`Worker exited before response: ${code}`)); });
     });
     record.exit = new Promise((resolve, reject) => {
@@ -104,6 +134,7 @@ try {
     const tls = invoke('_emscripten_tls_init');
     assert.ok(tls > 0n); assert.equal(invoke('pthread_self'), pthread);
     assert.equal(registerMailbox(probe, pthread, error, error.length), 0, message());
+    ownPthread = pthread;
     assert.equal(invoke('_emscripten_dlsync_self'), 1n);
     const pointer = [0];
     assert.equal(functionPointer(probe, 'lean_nat_log2', start, pointer, error, error.length), 0, message());
@@ -112,6 +143,30 @@ try {
     assert.equal(callPointer(probe, start, argument, result, error, error.length), 0, message());
     const returned = BigInt(result[0]);
     assert.equal(returned, 13n, 'Guest log2(100) returns encoded Nat 6');
+    let crossMailbox;
+    if (workerData.mailbox) {
+      const callbackIndex = [0];
+      assert.equal(prepareMailbox(probe, workerData.mailbox.callbackIndex, callbackIndex, error, error.length), 0, message());
+      assert.equal(BigInt(callbackIndex[0]), workerData.mailbox.callbackIndex);
+      await new Promise((resolve, reject) => {
+        const listener = value => {
+          try {
+            if (value.kind === 'mailbox-check') scheduleMailbox();
+            else if (value.kind === 'mailbox-send')
+              assert.equal(sendMailbox(probe, value.target, value.value, error, error.length), 0, message());
+            else if (value.kind === 'mailbox-finish') { parentPort.off('message', listener); resolve(); }
+            else throw new Error('Unknown mailbox worker command');
+          } catch (error) { parentPort.off('message', listener); reject(error); }
+        };
+        parentPort.on('message', listener);
+        parentPort.postMessage({ kind: 'mailbox-ready' });
+      });
+      const state = snapshot();
+      assert.equal(timers.size, 0);
+      crossMailbox = { delivered: String(state[12]), sum: String(state[13]),
+        notificationsSent: String(state[9]), routes: mailboxRoutes };
+      invoke('em_proxying_queue_destroy', [state[11]], 0);
+    }
     let concurrent;
     if (workerData.concurrent) {
       const { mutex, counter, index } = workerData.concurrent;
@@ -153,11 +208,12 @@ try {
     const state = snapshot(); assert.equal(state[2], 0n); assert.equal(state[24], 1n);
     output = { pthread: String(pthread), stack: { top: String(top), bottom: String(bottom), size: String(size) },
       tls: String(tls), result: String(returned), realWasmExit: true, rejectedImports: 0,
-      sharedBytes: String(state[3]), independentStore: true, concurrent };
+      sharedBytes: String(state[3]), independentStore: true, concurrent, crossMailbox };
   } else {
     invoke('emscripten_stack_init', [], 0);
     invoke('__set_stack_limits', [invoke('emscripten_stack_get_base'), invoke('emscripten_stack_get_end')], 0);
     invoke('__wasm_call_ctors', [], 0);
+    ownPthread = invoke('pthread_self');
     const pointer = [0];
     assert.equal(functionPointer(probe, 'lean_nat_log2', 0xffffffffffffffffn, pointer, error, error.length), 0, message());
     const threadEntry = BigInt(pointer[0]), attr = invoke('malloc', [256n]), slots = invoke('malloc', [16n]);
@@ -189,7 +245,7 @@ try {
     assert.ok(mutex > 0n && counter > 0n);
     assert.equal(invoke('pthread_mutex_init', [mutex, 0n]), 0n);
     view(counter).setBigUint64(0, 0n, true);
-    activeGroup = { barrier: new SharedArrayBuffer(5 * 4), mutex, counter, next: 0 };
+    activeGroup = { kind: 'concurrent', barrier: new SharedArrayBuffer(5 * 4), mutex, counter, next: 0 };
     const pair = [];
     for (const size of [2n * 1024n ** 2n, 4n * 1024n ** 3n]) {
       assert.equal(invoke('pthread_attr_init', [attr]), 0n);
@@ -223,16 +279,71 @@ try {
     assert.equal(view(counter).getBigUint64(0, true), 1000n);
     assert.equal(invoke('pthread_mutex_destroy', [mutex]), 0n);
     invoke('free', [mutex], 0); invoke('free', [counter], 0);
+    const mailboxIndex = [0];
+    assert.equal(prepareMailbox(probe, 0xffffffffffffffffn, mailboxIndex, error, error.length), 0, message());
+    activeGroup = { kind: 'mailbox', callbackIndex: BigInt(mailboxIndex[0]) };
+    const mailboxPair = [];
+    for (const size of [2n * 1024n ** 2n, 4n * 1024n ** 3n]) {
+      assert.equal(invoke('pthread_attr_init', [attr]), 0n);
+      assert.equal(invoke('pthread_attr_setstacksize', [attr, size]), 0n);
+      assert.equal(invoke('pthread_create', [slots, attr, threadEntry, 201n]), 0n);
+      if (callbackError) throw callbackError;
+      const pthread = view(slots).getBigUint64(0, true);
+      mailboxPair.push({ pthread, size, record: workers.get(String(pthread)) });
+      assert.equal(invoke('pthread_attr_destroy', [attr]), 0n);
+    }
+    const waitForMailbox = async (condition, label) => {
+      const deadline = performance.now() + 10_000;
+      while (!condition() && performance.now() < deadline) {
+        if (callbackError) throw callbackError;
+        for (const { record } of mailboxPair) if (record.error) throw record.error;
+        await new Promise(resolve => setTimeout(resolve, 1));
+      }
+      assert.ok(condition(), label);
+    };
+    await waitForMailbox(() => mailboxPair.every(({ record }) => record.mailboxReady), 'Worker mailboxes must be ready');
+    const [first, second] = mailboxPair;
+    for (const value of [3n, 5n])
+      assert.equal(sendMailbox(probe, first.pthread, value, error, error.length), 0, message());
+    for (const value of [7n, 11n])
+      assert.equal(sendMailbox(probe, second.pthread, value, error, error.length), 0, message());
+    await waitForMailbox(() => mailboxPair.every(({ record }) => record.mailboxState?.count === '2'), 'Main-to-worker tasks must arrive');
+    assert.equal(first.record.mailboxState.sum, '8'); assert.equal(second.record.mailboxState.sum, '18');
+    first.record.worker.postMessage({ kind: 'mailbox-send', target: ownPthread, value: 13n });
+    await waitForMailbox(() => snapshot()[12] === 1n, 'Worker-to-main task must arrive');
+    assert.equal(snapshot()[13], 13n);
+    second.record.worker.postMessage({ kind: 'mailbox-send', target: first.pthread, value: 17n });
+    await waitForMailbox(() => first.record.mailboxState?.count === '3', 'Worker-to-worker task must arrive');
+    assert.equal(first.record.mailboxState.sum, '25');
+    const mailboxResults = [];
+    for (const { pthread, size, record } of mailboxPair) {
+      record.worker.postMessage({ kind: 'mailbox-finish' });
+      let deadline;
+      try {
+        const [result] = await Promise.race([
+          Promise.all([record.result, record.exit]),
+          new Promise((_, reject) => { deadline = setTimeout(() => reject(new Error('mailbox worker shutdown deadline')), 15_000); }),
+        ]);
+        assert.equal(result.stack.size, String(size));
+        assert.equal(invoke('pthread_join', [pthread, slots + 8n]), 0n);
+        assert.equal(view(slots + 8n).getBigUint64(0, true), 13n);
+        assert.ok(record.cleaned);
+        mailboxResults.push({ ...result, joinedResult: '13', cleanupVerified: true });
+      } finally { clearTimeout(deadline); }
+    }
+    assert.equal(timers.size, 0);
+    invoke('em_proxying_queue_destroy', [snapshot()[11]], 0);
     invoke('free', [attr], 0); invoke('free', [slots], 0);
     assert.equal(invoke('lean_nat_gcd', [49n, 37n]), 13n);
     const state = snapshot();
-    assert.equal(state[2], 0n); assert.equal(state[22], 5n); assert.equal(state[23], 5n);
-    assert.equal(state[25], 5n);
+    assert.equal(state[2], 0n); assert.equal(state[22], 7n); assert.equal(state[23], 7n);
+    assert.equal(state[25], 7n);
     output = { scope: 'Real guest pthread creation, separate JS worker Stores, TLS, guest entry execution, exit and join; no full Lean main or general scheduler acceptance',
       engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
       version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
       results, concurrentResults, concurrentProtectedUpdates: 1000,
-      sharedBytes: String(state[3]), created: 5, joined: 5, cleaned: 5,
+      mailboxResults, mailboxRoutes, mainMailbox: { delivered: String(state[12]), sum: String(state[13]) },
+      sharedBytes: String(state[3]), created: 7, joined: 7, cleaned: 7,
       postJoinArithmeticPassed: true, rejectedImports: 0 };
   }
 } finally {

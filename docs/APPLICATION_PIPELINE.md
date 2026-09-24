@@ -807,3 +807,12 @@ GCD checks per engine. All five sequential/concurrent threads per engine exit,
 join and clean up. Repeated startup and allocation controls pass; peak memory is
 295 MiB with no resource events. Complete Lean task scheduling, nested spawning,
 cross-worker mailbox routing and full application execution remain separate work.
+
+[Cross-worker mailbox routing now passes](evidence/wasmtime-real-lean-mailboxes-2026-09-24.json)
+through actual guest proxy queues: six tasks per engine travel from main to two
+workers, back to main, and between workers through the main relay. Exact task
+counts and values verify receiver execution; all queues and seven test threads
+per engine are reclaimed. Earlier controls pass again, and the guard releases
+at 293 MiB without resource events. This exercises available receiving event
+loops. Blocked-runtime integration, nested/detached lifecycle, cancellation,
+full application main and shipping integration still remain.

@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Full helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Concurrent real guest threads pass in all engines](evidence/wasmtime-real-lean-concurrency-2026-09-24.json): 2 MiB/4 GiB stacks, mutex contention, 1,000 protected updates and 1,000 GCD checks. Every thread is joined and reclaimed; earlier controls still pass. Peak memory is 295 MiB without resource events. Full scheduler/benchmark acceptance remains open. Pushes await restored SSH credentials.
+**Changed:** [Real guest mailboxes deliver across main and worker threads in every engine](evidence/wasmtime-real-lean-mailboxes-2026-09-24.json), with exact counts/values and complete test queue/thread cleanup. Earlier controls still pass; peak memory is 293 MiB without resource events. Full scheduler/benchmark acceptance remains open. Windows ARM64 CI completed; detailed audit follows. Pushes await restored SSH credentials.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
