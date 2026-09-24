@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Memory64 atomic interoperability](evidence/wasmtime-atomic-interop-2026-09-24.json) passes sixteen groups and ten invalid-input controls per engine at a 62 MiB peak. An isolated optimized-C failure is preserved and repaired with explicit compare-exchange. This is a backend prerequisite, not Lean acceptance. Pushes still await restored SSH credentials.
+**Changed:** [Installed Node runtime imports](evidence/application-module-data-node-original-2026-09-24.json) pass with automatically bundled metadata and correct missing-data errors. The run peaked at 7.50 GiB without memory-limit or OOM events. Verified archival and three duplicate-reclamation controls preserve headroom; attributes and other engines remain pending. Pushes await restored SSH credentials.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

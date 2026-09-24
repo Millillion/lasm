@@ -97,7 +97,12 @@ separately from the earlier runtime evidence below.
   and [real Linux x64/ARM64 import passes](docs/evidence/application-module-data-native-ci-2026-09-24.json).
   Relocated project, dependency and standard module data works with sources
   hidden; missing standard data produces a real import failure. Installed Wasm
-  validation, complete dynamic-module handling and other platforms stay open.
+  validation now includes the [original user-attribute application and its
+  missing-data control on Node](docs/evidence/application-module-data-node-original-2026-09-24.json),
+  using installed `.23` with automatic data copying and no Lean path inputs.
+  The 12,600 metadata files are verified and archived after execution. The
+  separate runtime-attribute assertions, Deno/Bun checks, complete dynamic-module
+  handling and other platforms stay open.
 - [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and
   `Std.Internal.UV.Loop.alive`. The compiled library declarations are present,
   but their Emscripten C implementations still reject the operation or abort;

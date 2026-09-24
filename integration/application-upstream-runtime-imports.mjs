@@ -4,11 +4,13 @@ import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, w
 import { join, resolve, relative, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { hashFile } from '../src/managed-artifacts.mjs';
 import { provisionLean } from '../src/managed-lean.mjs';
 import { applicationSources, nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.mjs';
+import { reclaimBuildMetadata } from '../scripts/application-tests/reclaim-metadata.mjs';
 
 await ensureResourceGuard();
 const [outputArg, target, engineArg, compilerArg, referenceArg, ...extra] = process.argv.slice(2);
@@ -40,6 +42,7 @@ const report = { scope: bundled ? 'Original user-attribute application with auto
   name: registration.name, target, engine, compiler, reference, commands: [], passed: false,
   sourceArchiveSha256: inventory.sourceArchiveSha256, sourceManifestSha256: await hashFile(sourcesFile),
   harnessSha256: await hashFile(fileURLToPath(import.meta.url)), resourceReport: process.env.LASM_RESOURCE_REPORT,
+  reclamationHelperSha256: await hashFile(join(root, 'scripts/application-tests/reclaim-metadata.mjs')),
   adaptations: [
     'The complete original native shell driver and compile-time attribute assertions run unchanged.',
     'A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.',
@@ -50,6 +53,7 @@ const report = { scope: bundled ? 'Original user-attribute application with auto
     'A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.',
     'A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks.',
     'The optional case selection separates complete original/missing-data and supplementary-attribute controls into independent guarded runs. Aggregate acceptance still requires both selections; it does not omit any assertion.',
+    'After each completed build, every generated cache/deployment metadata member is hashed and compared. Only the redundant generated cache copy is removed before execution; sources and deployed data are retained. This lowers memory/disk use without changing any test input or assertion.',
   ] };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 async function verify(directory, expected) {
@@ -130,6 +134,8 @@ try {
     run('installed application build', process.execPath,
       [join(compiler, 'bin/lasm.mjs'), 'build', join(project, 'Main.lean'), '--target', target, '--output', dist], project, env);
     report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
+    if (bundled) report.reclaimedOriginalCache = await reclaimBuildMetadata(project,
+      createHash('sha256').update(join(project, 'Main.lean')).digest('hex').slice(0, 16), report.build.signature, dist);
   }
   const fixture = join(root, 'integration/fixtures/RuntimeAttributeImport.lean');
   const fixtureName = 'RuntimeAttributeImport.lean', fixtureSource = join(project, fixtureName);
@@ -152,6 +158,8 @@ try {
     run('build installed runtime-attribute control', process.execPath,
       [join(compiler, 'bin/lasm.mjs'), 'build', fixtureSource, '--target', target, '--output', attributeDist], project, env);
     report.attributeBuild = JSON.parse(readFileSync(join(attributeDist, 'build-info.json')));
+    if (bundled) report.reclaimedAttributeCache = await reclaimBuildMetadata(project,
+      createHash('sha256').update(fixtureSource).digest('hex').slice(0, 16), report.attributeBuild.signature, attributeDist);
   }
   report.nativeSourceAfter = await verify(native, originals);
   report.applicationAfter = await verify(project, buildSources);
@@ -217,6 +225,8 @@ try {
   report.referenceAfter = await verify(reference, sources);
   if (attributeCase) assert.equal(await hashFile(fixture), report.supplementaryFixture.sha256, 'Runtime fixture changed during execution');
   assert.equal(await hashFile(fileURLToPath(import.meta.url)), report.harnessSha256, 'Harness changed during execution');
+  assert.equal(await hashFile(join(root, 'scripts/application-tests/reclaim-metadata.mjs')),
+    report.reclamationHelperSha256, 'Reclamation helper changed during execution');
   report.passed = true; report.phase = 'complete';
 } catch (error) {
   report.error = { message: error.message, stack: error.stack }; throw error;

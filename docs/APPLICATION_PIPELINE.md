@@ -613,6 +613,16 @@ Both selections in every engine are still required. This allows verified
 archival of completed generated data between checks without raising resource
 limits. Syntax checks pass; these selections have not yet executed.
 
+The [original selection now passes on Node](evidence/application-module-data-node-original-2026-09-24.json)
+through installed `.23`, including exact native output and the missing-standard-
+data failure. The relocated deployment contains 12,600 automatically supplied
+module-data files and receives no Lean path environment inputs. The run peaked
+at 7.50 GiB without memory-limit or OOM events. Afterward, every deployed module-data byte
+was archived and verified; an identical generated build-cache copy was removed.
+Three integrity controls cover a new parallel-harness step that verifies and
+removes only that redundant cache copy before future execution. The effect on
+execution peak, the separate attribute assertions and Deno/Bun remain pending.
+
 The [cold runtime-source workflow](../.github/workflows/application-runtime-source.yml)
 now prepares the application libraries from committed patches and pinned public
 Lean, GMP, SDK and host-helper inputs on a standard Linux x64 runner. Native
