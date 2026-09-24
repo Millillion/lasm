@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
+import { legacyExceptionBytes } from './legacy-exception-bytes.mjs';
 
 const ffi = createRequire(import.meta.url)('koffi');
 const libraryPath = isMainThread ? process.argv[2] : workerData.libraryPath;
@@ -21,6 +23,7 @@ const grow = library.func('int lasm_probe_grow_one_page(void *probe, char *error
 const wait = library.func('int lasm_probe_wait(void *probe, _Out_ int64_t *result, char *error, size_t size)');
 const notify = library.func('int lasm_probe_notify(void *probe, _Out_ int64_t *result, char *error, size_t size)');
 const legacy = library.func('int lasm_probe_legacy_exception(void *probe, const uint8_t *bytes, size_t length, char *error, size_t size)');
+const standalone = library.func('int lasm_probe_standalone(void *probe, const uint8_t *bytes, size_t length, _Out_ int64_t *result, char *error, size_t size)');
 const error = Buffer.alloc(4096);
 const message = () => error.toString('utf8').split('\0')[0];
 function run(probe, value) {
@@ -91,14 +94,7 @@ if (!isMainThread) {
     // A 52-byte legacy try/catch control, independently instantiated by the
     // stock JS engine before assessing the helper. Avoid a WAT parser's syntax
     // rejection being mistaken for rejection of valid compiled bytecode.
-    const legacyBytes = Uint8Array.of(
-      0, 97, 115, 109, 1, 0, 0, 0,
-      1, 9, 2, 0x60, 0, 1, 0x7e, 0x60, 1, 0x7e, 0,
-      3, 2, 1, 0,
-      13, 3, 1, 0, 1,
-      7, 7, 1, 3, 114, 117, 110, 0, 0,
-      10, 13, 1, 11, 0, 0x06, 0x7e, 0x42, 7, 0x08, 0, 0x07, 0, 0x0b, 0x0b,
-    );
+    const legacyBytes = legacyExceptionBytes;
     assert.ok(WebAssembly.validate(legacyBytes), 'Independent stock-engine legacy-bytecode validation');
     const legacyNative = (await WebAssembly.instantiate(legacyBytes)).instance.exports.run();
     assert.equal(legacyNative, 7n);
@@ -106,10 +102,16 @@ if (!isMainThread) {
     const legacyStatus = legacy(probe, legacyBytes, legacyBytes.length, error, error.length);
     assert.notEqual(legacyStatus, 2);
     const legacyException = { stockEngineResult: Number(legacyNative), accepted: legacyStatus === 0, diagnostic: message() };
+    const converted = readFileSync(process.argv[4]), convertedResult = [0];
+    assert.ok(converted.length <= 65536);
+    error.fill(0);
+    assert.equal(standalone(probe, converted, converted.length, convertedResult, error, error.length), 0, message());
+    assert.equal(Number(convertedResult[0]), Number(legacyNative));
+    const convertedException = { helperResult: Number(convertedResult[0]), stockEngineValid: WebAssembly.validate(converted) };
     console.log(JSON.stringify({ engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
       version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
       before, after, first, second, third, concurrentWait: { notified, attempts, waitResult: waiting.result },
-      legacyException, profile: sparseHigh ? 'sparse-high' : 'small', dataAddress: sparseHigh ? 4294967296 : 0,
+      legacyException, convertedException, profile: sparseHigh ? 'sparse-high' : 'small', dataAddress: sparseHigh ? 4294967296 : 0,
       accessibleGuestBytes: after[3], memoryAccessPattern: 'One 8-byte data cell plus a 4-byte wait cell at offset 8; no bulk fill',
       scope: 'Private helper executes synthetic memory64/atomic/exception/host-callback module across JS isolates; no Lean or dense-memory acceptance claim' }));
   } finally {

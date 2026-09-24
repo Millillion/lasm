@@ -174,6 +174,42 @@ int lasm_probe_legacy_exception(probe_t *probe, const uint8_t *bytes, size_t len
     return status;
 }
 
+int lasm_probe_standalone(probe_t *probe, const uint8_t *bytes, size_t length,
+                          int64_t *result, char *error, size_t size) {
+    if (length > 65536) { snprintf(error, size, "standalone control exceeds tiny probe bound"); return 2; }
+    wasmtime_module_t *module = NULL;
+    if (error_text(wasmtime_module_new(probe->engine, bytes, length, &module), NULL, error, size)) return 1;
+    wasmtime_store_t *store = wasmtime_store_new(probe->engine, NULL, NULL);
+    wasmtime_context_t *context = wasmtime_store_context(store);
+    wasmtime_instance_t instance;
+    wasm_trap_t *trap = NULL;
+    wasmtime_error_t *instance_error = wasmtime_instance_new(context, module, NULL, 0, &instance, &trap);
+    int status = error_text(instance_error, trap, error, size);
+    if (!status) {
+        wasmtime_extern_t item;
+        if (!wasmtime_instance_export_get(context, &instance, "run", 3, &item)) {
+            snprintf(error, size, "missing converted control export"); status = 1;
+        } else {
+            if (item.kind != WASMTIME_EXTERN_FUNC) { snprintf(error, size, "incorrect control export type"); status = 1; }
+            else {
+                wasmtime_val_t output;
+                trap = NULL;
+                wasmtime_error_t *call_error = wasmtime_func_call(context, &item.of.func, NULL, 0, &output, 1, &trap);
+                status = error_text(call_error, trap, error, size);
+                if (!status) {
+                    if (output.kind != WASMTIME_I64) { snprintf(error, size, "incorrect converted result type"); status = 1; }
+                    else *result = output.of.i64;
+                    wasmtime_val_unroot(&output);
+                }
+            }
+            wasmtime_extern_delete(&item);
+        }
+    }
+    wasmtime_store_delete(store);
+    wasmtime_module_delete(module);
+    return status;
+}
+
 uint64_t lasm_probe_peek(probe_t *probe) {
     return atomic_load((_Atomic uint64_t *)(wasmtime_sharedmemory_data(probe->memory) + PROBE_OFFSET));
 }

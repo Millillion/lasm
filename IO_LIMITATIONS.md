@@ -63,9 +63,12 @@ separately from the earlier runtime evidence below.
   maximum. A [follow-up](docs/evidence/wasmtime-helper-concurrency-2026-09-24.json)
   also passes concurrent Wasm wait/notify across isolates in all three engines.
   Identical legacy exception bytecode executes in the stock engines but is
-  rejected by the helper; conversion remains required. This is feasibility
-  evidence only: actual high-address accesses, full Lean integration and the
-  other native platforms remain unvalidated.
+  rejected by the helper; conversion remains required. The
+  [sparse-address follow-up](docs/evidence/wasmtime-helper-sparse-2026-09-24.json)
+  passes accesses at address 4 GiB, shared worker access, and concurrent waits
+  in all three engines, peaking at 139 MiB under the 1 GiB guard. This remains
+  feasibility evidence: full Lean integration, dense-memory capacity and the
+  other native platforms are unvalidated.
 
 ## Earlier runtime evidence and remaining compatibility work
 

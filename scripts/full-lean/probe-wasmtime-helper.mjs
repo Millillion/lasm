@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from './resource-guard.mjs';
+import { legacyExceptionBytes } from './probes/legacy-exception-bytes.mjs';
 
 await ensureResourceGuard();
 const [outputArg, nodeArg, denoArg, bunArg, ...extra] = process.argv.slice(2);
@@ -32,7 +33,8 @@ const report = { scope: 'Bounded private-helper feasibility probe only; no shipp
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(program, args) {
   const execution = spawnSync(program, args, { cwd: root, encoding: 'utf8', timeout: 60_000,
-    killSignal: 'SIGKILL', maxBuffer: 256 * 1024, env: { ...process.env, RAYON_NUM_THREADS: '1' } });
+    killSignal: 'SIGKILL', maxBuffer: 256 * 1024,
+    env: { ...process.env, RAYON_NUM_THREADS: '1', BINARYEN_CORES: '1', EMCC_CORES: '1' } });
   const record = { program, args, code: execution.status, signal: execution.signal,
     error: execution.error?.message, stdout: execution.stdout, stderr: execution.stderr };
   report.commands.push(record); save();
@@ -40,6 +42,15 @@ function run(program, args) {
   return record;
 }
 try {
+  const legacyFile = join(output, 'legacy.wasm'), convertedFile = join(output, 'converted.wasm');
+  writeFileSync(legacyFile, legacyExceptionBytes);
+  const optimizer = join(root, 'node_modules/binaryen/bin/wasm-opt');
+  const version = run(nodeArg ?? process.execPath, ['--max-old-space-size=128', optimizer, '--version']).stdout.trim();
+  run(nodeArg ?? process.execPath, ['--max-old-space-size=128', optimizer, legacyFile,
+    '--all-features', '--emit-exnref', '-o', convertedFile]);
+  report.conversion = { tool: version, toolSha256: await hashFile(optimizer),
+    originalSha256: await hashFile(legacyFile), convertedSha256: await hashFile(convertedFile),
+    controlSourceSha256: await hashFile(join(root, 'scripts/full-lean/probes/legacy-exception-bytes.mjs')) };
   report.helpers = {}; report.results = []; report.failures = [];
   for (const [profile, flags] of [['small', []], ['sparse-high', ['-DLASM_PROBE_SPARSE_HIGH_MEMORY=1']]]) {
     const helper = join(output, profile + '.so');
@@ -51,7 +62,7 @@ try {
     [denoArg ?? join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
     [bunArg ?? join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ]) {
-    try { report.results.push(JSON.parse(run(engine, [...args, harness, helper, profile]).stdout)); }
+    try { report.results.push(JSON.parse(run(engine, [...args, harness, helper, profile, convertedFile]).stdout)); }
     catch (error) { report.failures.push({ profile, engine, error: error.message }); save(); }
   }
   }
