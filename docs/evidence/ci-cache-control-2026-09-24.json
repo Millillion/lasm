@@ -1,0 +1,35 @@
+{
+  "scope": "Tiny native Windows ARM64 save/restore control within included repository cache allowance; not a compiler checkpoint",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35936795693",
+  "commit": "f6e5082",
+  "runner": "windows-11-arm",
+  "node": "26.10.0",
+  "conclusion": "success",
+  "result": {
+    "scope": "Native Windows ARM64 included-cache save/restore control only",
+    "status": "passed",
+    "sha256": "c32fdddecfe9df3c7b93535a7780c3770d88562c7889506fe5ff9de22b0d759a",
+    "bytes": 119,
+    "recordedAt": "2026-09-24T00:06:14.677Z"
+  },
+  "payloadArchiveBytes": 296,
+  "budget": {
+    "beforeBytes": 0,
+    "uploadUpperBound": 16777338,
+    "repositoryCeilingBytes": 8589934592,
+    "includedAllowanceBytes": 10737418240
+  },
+  "cacheKey": "lasm-cache-control-35936795693-1",
+  "deletedCacheId": 8047919500,
+  "afterDeletion": {
+    "active_caches_size_in_bytes": 0,
+    "active_caches_count": 0
+  },
+  "localLog": ".work/product-acceptance/ci-cache-control-35936795693.log",
+  "logSha256": "b69dda658789183383d707251c614fc58959ee93305d4fb6119a2f05a0990af2",
+  "billingSource": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+  "open": [
+    "Full compiler checkpoint resume and verification",
+    "Native Windows ARM64 end-user distribution"
+  ]
+}
