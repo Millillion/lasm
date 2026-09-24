@@ -60,6 +60,15 @@ budget alone fails. Bundled startup integration remains pending. Peak memory
 is 3.59 GiB without resource events. These are extra controls for upstream
 exclusions, not additional default-suite passes or proof against all races.
 
+Installed `.20` now [bundles the Linux Bun startup repair](evidence/bun-stack-startup-installed-2026-09-24.json)
+and passes the same three concurrency repetitions with sources hidden and an
+empty PATH. No caller flag or engine patch is required. Fourteen startup and
+deployment controls also pass, covering raw environment bytes, descriptors,
+same-PID signals and preservation of preload effects. Peak installed-build/run
+memory is 3.45 GiB without resource events. Other platforms and transparent
+deep-stack embedding remain open; the Linux ARM64 helper is cross-compiled,
+and its native source-control workflow is prepared separately.
+
 The [four compilation-disabled Node controls](evidence/upstream-compile-disabled-node-2026-09-24.json)
 now pass through installed `.19`: `compactor_chain`, `dep_regions`,
 `dep_regions_miss` and `identifier_completion`. Original drivers and markers

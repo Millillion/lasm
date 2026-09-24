@@ -70,8 +70,11 @@ separately from the earlier runtime evidence below.
   The [latest excluded-concurrency controls](docs/evidence/upstream-excluded-concurrency-2026-09-24.json)
   pass in installed `.19` on Node and Deno, but Bun overflows its execution
   stack. A Linux diagnostic using the unchanged application passes with both
-  larger OS-worker stacks and a larger engine budget; packaging that support
-  and verifying other native platforms remain open.
+  larger OS-worker stacks and a larger engine budget. Installed `.20`
+  [bundles that support](docs/evidence/bun-stack-startup-installed-2026-09-24.json)
+  and passes all three unchanged repetitions on stock Bun/Linux x64, plus
+  fourteen startup/deployment controls. Other native platforms, imported or
+  preloaded entry points and Bun-configured launches remain open.
   The latest installed Node candidate now preserves the original upstream
   4 GiB thread-stack setting for `const_fold`; allocation, reclamation and
   unchanged SDK regression checks pass. See the

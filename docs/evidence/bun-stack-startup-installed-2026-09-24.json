@@ -1,0 +1,975 @@
+{
+  "scope": "Bundled automatic Linux Bun stack startup plus installed unchanged concurrency acceptance on Linux x64; native other-platform and embedding gates remain open",
+  "releases": {
+    "lean": {
+      "tag_name": "v4.34.0",
+      "published_at": "2026-09-14T14:04:36Z",
+      "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest"
+    },
+    "deno": {
+      "tag_name": "v2.9.7",
+      "published_at": "2026-09-17T09:04:55Z",
+      "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest"
+    },
+    "bun": {
+      "tag_name": "bun-v1.4.2",
+      "published_at": "2026-09-05T05:55:48Z",
+      "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest"
+    },
+    "node": {
+      "version": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "v8": "14.6.202.34",
+      "npm": "11.19.1",
+      "source": "https://nodejs.org/dist/index.json"
+    },
+    "checkedAt": "2026-09-24T10:38:35.344978+00:00"
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r17/lasm-compiler-0.1.0-experimental.20.tgz",
+    "sha256": "f99886a8ff788150a9372fa4dabb235878aa4f2dc5ccebe1158c116274a1de3f",
+    "compressedBytes": 125424129,
+    "installedBytes": 630119644,
+    "files": 2682,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-bun-stack-r1-resources.json",
+    "recordedAt": "2026-09-24T10:36:55.546Z"
+  },
+  "packageResources": {
+    "startedAt": "2026-09-24T10:36:19.840Z",
+    "command": [
+      "/bin/bash",
+      ".work/package-install-bun-stack-r1.sh"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "8d304ef0-3733-4095-8000-d800201d9f9a",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24716423168
+    },
+    "minimumHostAvailable": 23481589760,
+    "peakMemoryBytes": 2239090688,
+    "peakTasks": 23,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-bun-stack-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T10:37:14.311Z",
+      "memoryBytes": 1422393344,
+      "peakMemoryBytes": 2239090688,
+      "swapBytes": 0,
+      "tasks": 3,
+      "memoryBreakdown": {
+        "anon": 208289792,
+        "file": 1171931136,
+        "kernel": 37355520,
+        "shmem": 0,
+        "file_mapped": 28672,
+        "inactive_file": 1171476480,
+        "slab": 32052992
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T10:37:14.368Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 1216491520,
+      "peakMemoryBytes": 2239090688,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10248192,
+        "file": 1171931136,
+        "kernel": 32776192,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1171476480,
+        "slab": 31925816
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T10:37:14.399Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "installedResult": {
+    "scope": "Separate native and installed AOT runtime controls for two upstream-excluded inputs; not default-suite passes",
+    "target": "bun",
+    "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+    "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler",
+    "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+    "excluded": [
+      {
+        "source": "tests/elab/async_select_channel.lean",
+        "reason": "upstream CMake flaky/nondeterministic exclusion"
+      },
+      {
+        "source": "tests/elab/sync_mutex.lean",
+        "reason": "upstream CMake flaky/nondeterministic exclusion"
+      }
+    ],
+    "commands": [
+      {
+        "label": "engine version",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "--version"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2",
+        "seconds": 0.005032984999999826,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "1.4.2\n",
+        "stderr": ""
+      },
+      {
+        "label": "original native driver/async_select_channel",
+        "program": "/bin/bash",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native-environment.sh",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source/tests/elab/run_test.sh",
+          "async_select_channel.lean"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/elab",
+        "seconds": 0.9025057270000015,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false async_select_channel.lean\n"
+      },
+      {
+        "label": "original native driver/sync_mutex",
+        "program": "/bin/bash",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native-environment.sh",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source/tests/elab/run_test.sh",
+          "sync_mutex.lean"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/elab",
+        "seconds": 0.4334320340000013,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false sync_mutex.lean\n"
+      },
+      {
+        "label": "compile native runtime controls",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+        "args": [
+          "-O2",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native oracle/lean/async_select_channel.c",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native oracle/lean/sync_mutex.c",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native oracle/lean/Main.c",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native concurrency control"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/elab",
+        "seconds": 1.292544997000001,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "installed application build",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+          "build",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/elab/Main.lean",
+          "--target",
+          "bun",
+          "--output",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/dist"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/elab",
+        "seconds": 108.502739071,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "Preparing Lean 4.34.0 for bun\u2026\nBuilding Main.lean for bun\u2026\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for bun: /home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/dist\n"
+      },
+      {
+        "label": "native repetition 1",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native concurrency control",
+        "args": [],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment",
+        "seconds": 0.22454405700000643,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+        "stderr": ""
+      },
+      {
+        "label": "deployed repetition 1",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment/main.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment",
+        "seconds": 3.508976316,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+        "stderr": ""
+      },
+      {
+        "label": "native repetition 2",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native concurrency control",
+        "args": [],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment",
+        "seconds": 0.21749303399998463,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+        "stderr": ""
+      },
+      {
+        "label": "deployed repetition 2",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment/main.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment",
+        "seconds": 3.8144568849999922,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+        "stderr": ""
+      },
+      {
+        "label": "native repetition 3",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native concurrency control",
+        "args": [],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment",
+        "seconds": 0.2095003499999875,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+        "stderr": ""
+      },
+      {
+        "label": "deployed repetition 3",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment/main.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment",
+        "seconds": 3.772836536000017,
+        "timeout": false,
+        "code": 0,
+        "signal": null,
+        "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+        "stderr": ""
+      }
+    ],
+    "repetitions": [
+      {
+        "repetition": 1,
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+          "stderr": ""
+        }
+      },
+      {
+        "repetition": 2,
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+          "stderr": ""
+        }
+      },
+      {
+        "repetition": 3,
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+          "stderr": ""
+        }
+      }
+    ],
+    "passed": true,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-bun-r2-resources.json",
+    "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+    "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+    "harnessSha256": "55586f6d88c309ad077e5914eaf82d882ff410cc502415b2bf5ddd44ac9a4a28",
+    "fixture": {
+      "path": "integration/fixtures/ExcludedConcurrency.lean",
+      "sha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1"
+    },
+    "adaptations": [
+      "Run the original elaboration driver and its assertions on byte-identical copies of both excluded files. Keep the upstream exclusions unchanged.",
+      "A separate ordinary Lean main imports their unchanged public definitions and reruns all eight channel-capacity assertions plus mutex, try-lock and condition-variable checks at application runtime.",
+      "Compare three independent native-compiled and deployed executions. No random seed, original function, timeout inside the test, assertion or expected output is changed.",
+      "The deployed process has empty PATH and hidden source copies. These repetitions do not prove the upstream nondeterministic cases are permanently free of races."
+    ],
+    "referenceBefore": {
+      "checked": 7669,
+      "modified": []
+    },
+    "lean": "4.34.0",
+    "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+    "phase": "complete",
+    "engineVersion": "1.4.2",
+    "packageVersion": "0.1.0-experimental.20",
+    "nativeDriverWrapperSha256": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6",
+    "nativeInputs": [
+      {
+        "module": "async_select_channel",
+        "sourceSha256": "1754df3e6cc34d31f371fc3e8cab3001201f733e62c0e65d4300321dba2645cc",
+        "cSha256": "9e00ad8143bfdf50a5c3752e2d9a0208297ef75c0b12e1866b9ff07166286e9b"
+      },
+      {
+        "module": "sync_mutex",
+        "sourceSha256": "1a0a03d96894348ba1906835678377c61011dfc356d6b4a9b2c05168bb427daa",
+        "cSha256": "2570a5ab041ea3fb7b146314c63dfd544e56eb62451f457ad00cebe572c09373"
+      },
+      {
+        "module": "Main",
+        "sourceSha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1",
+        "cSha256": "7191a0223cc43582612fad333134c4b25f3114e561f435541ff29a41c5d2ef1f"
+      }
+    ],
+    "build": {
+      "schema": 1,
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "emscripten": "6.0.9",
+      "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+      "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+      "buildDriverIdentity": "2ea658e4982493abd5c16c47d967ed0f6ca112359e42a2788664ef0b7849c48a",
+      "target": "bun",
+      "memoryMode": 2,
+      "modules": [
+        {
+          "module": "async_select_channel",
+          "sourceSha256": "1754df3e6cc34d31f371fc3e8cab3001201f733e62c0e65d4300321dba2645cc",
+          "cSha256": "9e00ad8143bfdf50a5c3752e2d9a0208297ef75c0b12e1866b9ff07166286e9b"
+        },
+        {
+          "module": "sync_mutex",
+          "sourceSha256": "1a0a03d96894348ba1906835678377c61011dfc356d6b4a9b2c05168bb427daa",
+          "cSha256": "2570a5ab041ea3fb7b146314c63dfd544e56eb62451f457ad00cebe572c09373"
+        },
+        {
+          "module": "Main",
+          "sourceSha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1",
+          "cSha256": "7191a0223cc43582612fad333134c4b25f3114e561f435541ff29a41c5d2ef1f"
+        }
+      ],
+      "signature": "316cee0518b1af7893973fc757dc1380a45246ebf75d88907604533fcbdbd33d",
+      "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+      "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+    },
+    "deployment": {
+      "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment",
+      "sourceHidden": true,
+      "path": "",
+      "wasmSha256": "0460bc5efe21da9e24b7cf18e59d4acf25fcfd6ada91dd336a36822a7192f61e"
+    },
+    "sourceAfter": {
+      "checked": 2,
+      "modified": []
+    },
+    "referenceAfter": {
+      "checked": 7669,
+      "modified": []
+    },
+    "finishedAt": "2026-09-24T10:42:35.244Z"
+  },
+  "installedResources": {
+    "startedAt": "2026-09-24T10:40:14.102Z",
+    "command": [
+      "/bin/bash",
+      ".work/run-upstream-concurrency-r2.sh",
+      "bun",
+      ".work/upstream-concurrency-bun-r2"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "2b883fab-c724-45b9-bbd8-10fc664f2ab0",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24818548736
+    },
+    "minimumHostAvailable": 20911886336,
+    "peakMemoryBytes": 3703693312,
+    "peakTasks": 66,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-bun-r2-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T10:42:35.289Z",
+      "memoryBytes": 456011776,
+      "peakMemoryBytes": 3703693312,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 7905280,
+        "file": 433848320,
+        "kernel": 13037568,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 429015040,
+        "slab": 12277496
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T10:42:35.303Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 458481664,
+      "peakMemoryBytes": 3703693312,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10248192,
+        "file": 433848320,
+        "kernel": 13099008,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 429015040,
+        "slab": 12277864
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T10:42:35.339Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "archive": {
+    "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-bun-r2-archive-resources.json",
+    "files": [
+      {
+        "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment/program.wasm",
+        "originalBytes": 166058025,
+        "originalSha256": "0460bc5efe21da9e24b7cf18e59d4acf25fcfd6ada91dd336a36822a7192f61e",
+        "mode": 509,
+        "mtimeNs": 1790246540941348341,
+        "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/relocated deployment/program.wasm.gz",
+        "archiveBytes": 38422825,
+        "archiveSha256": "7cca680357b107bbfbcf66d894fb365aab795e49d0a145a8d5b6234cb006ae08",
+        "verifiedDecompression": true,
+        "provenance": {
+          "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2",
+          "receiptSha256": "fac2e4fbec1123a2b4d4bb70aea6c00257ec8ad8597fdd0e935c1bbe614070eb"
+        },
+        "phase": "archived"
+      },
+      {
+        "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/elab.hidden/.lake/lasm/applications/16a687bc0c238fc3/316cee0518b1af7893973fc757dc1380a45246ebf75d88907604533fcbdbd33d/dist/program.wasm",
+        "originalBytes": 166058025,
+        "originalSha256": "0460bc5efe21da9e24b7cf18e59d4acf25fcfd6ada91dd336a36822a7192f61e",
+        "mode": 509,
+        "mtimeNs": 1790246530868273212,
+        "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/elab.hidden/.lake/lasm/applications/16a687bc0c238fc3/316cee0518b1af7893973fc757dc1380a45246ebf75d88907604533fcbdbd33d/dist/program.wasm.gz",
+        "archiveBytes": 38422825,
+        "archiveSha256": "7cca680357b107bbfbcf66d894fb365aab795e49d0a145a8d5b6234cb006ae08",
+        "verifiedDecompression": true,
+        "provenance": {
+          "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2",
+          "receiptSha256": "fac2e4fbec1123a2b4d4bb70aea6c00257ec8ad8597fdd0e935c1bbe614070eb"
+        },
+        "phase": "archived"
+      },
+      {
+        "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native concurrency control",
+        "originalBytes": 4764520,
+        "originalSha256": "472f293e1487fdb0c234b5d301fe030e498a77336faa165df36b2ebf2b3d507b",
+        "mode": 509,
+        "mtimeNs": 1790246432444539324,
+        "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2/native concurrency control.gz",
+        "archiveBytes": 1420771,
+        "archiveSha256": "0b63172156ac3d5939bd33f37174ec865c635206a33b000bdbffb91dce57c25c",
+        "verifiedDecompression": true,
+        "provenance": {
+          "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r2",
+          "receiptSha256": "fac2e4fbec1123a2b4d4bb70aea6c00257ec8ad8597fdd0e935c1bbe614070eb"
+        },
+        "phase": "archived"
+      }
+    ],
+    "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+    "savedBytes": 258614149,
+    "finishedAt": "2026-09-24T10:43:42.118992+00:00"
+  },
+  "archiveResources": {
+    "startedAt": "2026-09-24T10:43:35.378Z",
+    "command": [
+      "python3",
+      "-I",
+      "-B",
+      ".work/archive-passed-concurrency-r1.py",
+      ".work/upstream-concurrency-bun-r2"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "82c6ebfc-34fb-4fd2-b47e-a2ced41f133c",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24711417856
+    },
+    "minimumHostAvailable": 24674443264,
+    "peakMemoryBytes": 89604096,
+    "peakTasks": 1,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-bun-r2-archive-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T10:43:41.994Z",
+      "memoryBytes": 47419392,
+      "peakMemoryBytes": 89604096,
+      "swapBytes": 0,
+      "tasks": 1,
+      "memoryBreakdown": {
+        "anon": 7426048,
+        "file": 38490112,
+        "kernel": 1286144,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 38490112,
+        "slab": 1186312
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T10:43:42.169Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 54861824,
+      "peakMemoryBytes": 89604096,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11661312,
+        "file": 39911424,
+        "kernel": 2256896,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 39911424,
+        "slab": 1338040
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T10:43:42.195Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "startupControls": {
+    "tests": 14,
+    "failed": 0,
+    "skipped": 0,
+    "log": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-startup-final-controls-r1-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: f0d03e5518724581ab9b251992ea0a38\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (48.52129ms)\n\u2714 wrong engines fail before executing the application payload (41.66486ms)\n\u2714 all full-runtime host support files exist and target validation is strict (2.408217ms)\n\u2714 Bun automatic stack setup fixes deep Wasm calls with no caller flags (161.011149ms)\n\u2714 Bun restart preserves PID, environment, arguments, cwd and stdio (78.374252ms)\n\u2714 Bun restarted process receives signals at its original PID (58.887593ms)\n\u2714 Bun initialization never repeats explicit preload or embedding effects (103.32482ms)\n\u2714 Bun initialization preserves configured preload effects (29.013843ms)\n\u2714 Bun startup retains caller-owned descriptor 3 (67.8195ms)\n\u2714 Bun startup retains native environment bytes and removes private transport (104.241624ms)\n\u2714 Deno automatic stack setup fixes deep Wasm calls with no caller flags (308.871636ms)\n\u2714 Deno restart preserves PID, restricted permissions, environment, arguments and stdio (236.731116ms)\n\u2714 Deno restarted process receives signals at its original PID (177.58924ms)\n\u2714 Deno initialization never repeats preload or embedding side effects (148.639496ms)\n\u2139 tests 14\n\u2139 suites 0\n\u2139 pass 14\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 1778.732435\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 1.904s\nCPU time consumed: 2.101s\nMemory peak: 59.8M\nMemory swap peak: 0B\n[lasm] Peak 0.06 GiB; success\n",
+    "resource": {
+      "startedAt": "2026-09-24T10:43:33.372Z",
+      "command": [
+        "/usr/bin/env",
+        "LASM_REQUIRE_BUN_TESTS=1",
+        "LASM_REQUIRE_DENO_TESTS=1",
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=128",
+        "--test",
+        "--test-concurrency=1",
+        "test/bun-stack.test.mjs",
+        "test/deno-stack.test.mjs",
+        "test/application-output.test.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "66b3c8b1-ea77-4254-a1af-8be988ac4179",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24744992768
+      },
+      "minimumHostAvailable": 24652931072,
+      "peakMemoryBytes": 62730240,
+      "peakTasks": 21,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-startup-final-controls-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T10:43:35.182Z",
+        "memoryBytes": 41484288,
+        "peakMemoryBytes": 62730240,
+        "swapBytes": 0,
+        "tasks": 21,
+        "memoryBreakdown": {
+          "anon": 34496512,
+          "file": 2416640,
+          "kernel": 3125248,
+          "shmem": 0,
+          "file_mapped": 315392,
+          "inactive_file": 2416640,
+          "slab": 561800
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T10:43:35.301Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 16351232,
+        "peakMemoryBytes": 62730240,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11661312,
+          "file": 2404352,
+          "kernel": 1163264,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2404352,
+          "slab": 212464
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T10:43:35.325Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "implementationSha256": {
+    "src/bun-stack.mjs": "085c48a6e1a98059c770d641f841741905730dc34a227c4ee500d322654b8af3",
+    "src/posix-arguments.mjs": "1a2e421576f318a31b5f85d5cb6805240faa3dfcb013d65b7998deff31f96e34",
+    "src/deno-stack.mjs": "9245fea3039dfdd814ad79cc5e377293cd0e0f737a4d83e25008a4ab021cbf64",
+    "src/application-output.mjs": "bb404ee2c12b868a3f7226fd47d54d90889e5aa6bd730e2b046452cd89e85cfb",
+    "src/native-bundle.mjs": "675b8ad56356682680a210b230269dd4fb6a9064318ac1de8d8ce29fbe380a9b",
+    "native/bun-stack-reservation.c": "a83688fbe5fa7dae28e39b155b4bd5006a5760f138296b233e5e0554c2973494",
+    "scripts/build-bun-stack.mjs": "cbfa2d25e19f2eb0790d1f278189df507f836262e69aaf8f3b0bf0bc35726423",
+    "test/bun-stack.test.mjs": "4d225e3df25eaf5328620ad1d748be227ab367c24b46d8baf47152aaca0bd0b1",
+    "test/fixtures/bun-stack.mjs": "83cb0810d263428eb95e00f39cec3dc43dcd4609fd3a6695fc30d3f9e75bf474"
+  },
+  "helperManifest": {
+    "protocol": 1,
+    "source": "native/bun-stack-reservation.c",
+    "sourceSha256": "a83688fbe5fa7dae28e39b155b4bd5006a5760f138296b233e5e0554c2973494",
+    "compiler": "Zig 0.16.0",
+    "files": {
+      "linux-x64-gnu.so": {
+        "target": "x86_64-linux-gnu.2.17",
+        "sha256": "5e28c4a9475fc33b370891d093f633bd5083e9b8c295e67a533907961021b2d0",
+        "bytes": 8784
+      },
+      "linux-x64-musl.so": {
+        "target": "x86_64-linux-musl",
+        "sha256": "68e2e9a1f4294ba505c128e4f11b80475aa286579f39b0ae1cd3460ace17e867",
+        "bytes": 8288
+      },
+      "linux-arm64-gnu.so": {
+        "target": "aarch64-linux-gnu.2.17",
+        "sha256": "2ddb8e7b4842ef324a384974e41946c409d3496c428f4a446017f0842d813ef5",
+        "bytes": 9240
+      },
+      "linux-arm64-musl.so": {
+        "target": "aarch64-linux-musl",
+        "sha256": "898388d7c46b70aea8ea9dee9028b717527cb40676b9dba813cf63c87aff3d70",
+        "bytes": 8752
+      }
+    },
+    "validation": "Cross-compilation is not native execution validation."
+  },
+  "earlierFailureEvidence": "upstream-excluded-concurrency-2026-09-24.json",
+  "earlierStartupFailure": {
+    "log": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-stack-build-tests-r1-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 83b495568e364ffcb3b790a972b6e24c\nBuilt linux-x64-gnu.so: 8784 bytes\nBuilt linux-x64-musl.so: 8288 bytes\nBuilt linux-arm64-gnu.so: 9240 bytes\nBuilt linux-arm64-musl.so: 8752 bytes\n\u2716 Bun automatic stack setup fixes deep Wasm calls with no caller flags (30081.507122ms)\n\u2716 Bun restart preserves PID, environment, arguments, cwd and stdio (30057.038311ms)\n\u2716 Bun restarted process receives signals at its original PID (25024.071414ms)\n\u2714 Bun initialization never repeats explicit preload or embedding effects (82.79369ms)\n\u2714 Bun initialization preserves configured preload effects (30.73227ms)\n\u2716 Bun startup retains caller-owned descriptor 3 (30050.978741ms)\n\u2714 Deno automatic stack setup fixes deep Wasm calls with no caller flags (362.291616ms)\n\u2714 Deno restart preserves PID, restricted permissions, environment, arguments and stdio (233.949221ms)\n\u2714 Deno restarted process receives signals at its original PID (176.849751ms)\n\u2714 Deno initialization never repeats preload or embedding side effects (151.494592ms)\n\u2139 tests 10\n\u2139 suites 0\n\u2139 pass 6\n\u2139 fail 4\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 116369.640733\n\n\u2716 failing tests:\n\ntest at test/bun-stack.test.mjs:25:1\n\u2716 Bun automatic stack setup fixes deep Wasm calls with no caller flags (30081.507122ms)\n  AssertionError [ERR_ASSERTION]: ifError got unwanted exception: spawnSync /home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun ETIMEDOUT\n      at execute (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:22:10)\n      at Object.spawnSync (node:internal/child_process:1175:20)\n      at spawnSync (node:child_process:929:24)\n      at execute (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:19:17)\n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:26:56)\n      at Test.runInAsyncScope (node:async_hooks:226:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.start (node:internal/test_runner/test:1262:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: Error: spawnSync /home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun ETIMEDOUT\n        at Object.spawnSync (node:internal/child_process:1175:20)\n        at spawnSync (node:child_process:929:24)\n        at execute (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:19:17)\n        at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:26:56)\n        at Test.runInAsyncScope (node:async_hooks:226:14)\n        at Test.run (node:internal/test_runner/test:1402:25)\n        at Test.start (node:internal/test_runner/test:1262:17)\n        at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17),\n    expected: null,\n    operator: 'ifError',\n    diff: 'simple'\n  }\n\ntest at test/bun-stack.test.mjs:33:1\n\u2716 Bun restart preserves PID, environment, arguments, cwd and stdio (30057.038311ms)\n  AssertionError [ERR_ASSERTION]: ifError got unwanted exception: spawnSync /home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun ETIMEDOUT\n      at execute (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:22:10)\n      at Object.spawnSync (node:internal/child_process:1175:20)\n      at spawnSync (node:child_process:929:24)\n      at execute (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:19:17)\n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:34:54)\n      at Test.runInAsyncScope (node:async_hooks:226:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: Error: spawnSync /home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun ETIMEDOUT\n        at Object.spawnSync (node:internal/child_process:1175:20)\n        at spawnSync (node:child_process:929:24)\n        at execute (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:19:17)\n        at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:34:54)\n        at Test.runInAsyncScope (node:async_hooks:226:14)\n        at Test.run (node:internal/test_runner/test:1402:25)\n        at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n        at Test.postRun (node:internal/test_runner/test:1542:19)\n        at Test.run (node:internal/test_runner/test:1467:12)\n        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3),\n    expected: null,\n    operator: 'ifError',\n    diff: 'simple'\n  }\n\ntest at test/bun-stack.test.mjs:45:1\n\u2716 Bun restarted process receives signals at its original PID (25024.071414ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n      code: null,\n  +   signal: 'SIGKILL'\n  -   signal: 'SIGTERM'\n    }\n  \n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:59:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { code: null, signal: 'SIGKILL' },\n    expected: { code: null, signal: 'SIGTERM' },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n\ntest at test/bun-stack.test.mjs:94:1\n\u2716 Bun startup retains caller-owned descriptor 3 (30050.978741ms)\n  AssertionError [ERR_ASSERTION]: ifError got unwanted exception: spawnSync /home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun ETIMEDOUT\n      at execute (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:22:10)\n      at Object.spawnSync (node:internal/child_process:1175:20)\n      at spawnSync (node:child_process:929:24)\n      at execute (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:19:17)\n      at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:101:24)\n      at Test.runInAsyncScope (node:async_hooks:226:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n    generatedMessage: false,\n    code: 'ERR_ASSERTION',\n    actual: Error: spawnSync /home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun ETIMEDOUT\n        at Object.spawnSync (node:internal/child_process:1175:20)\n        at spawnSync (node:child_process:929:24)\n        at execute (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:19:17)\n        at TestContext.<anonymous> (file:///home/lastmjs/development/lasm/compiler/test/bun-stack.test.mjs:101:24)\n        at Test.runInAsyncScope (node:async_hooks:226:14)\n        at Test.run (node:internal/test_runner/test:1402:25)\n        at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n        at Test.postRun (node:internal/test_runner/test:1542:19)\n        at Test.run (node:internal/test_runner/test:1467:12)\n        at process.processTicksAndRejections (node:internal/process/task_queues:104:5),\n    expected: null,\n    operator: 'ifError',\n    diff: 'simple'\n  }\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 2min 2.687s\nCPU time consumed: 2min 12.751s\nMemory peak: 332.1M\nMemory swap peak: 0B\n[lasm] Peak 0.32 GiB; exit-code\n",
+    "resources": {
+      "startedAt": "2026-09-24T10:28:23.660Z",
+      "command": [
+        "/bin/bash",
+        "-c",
+        "set -euo pipefail; ulimit -c 0; .cache/js-runtimes/node-26.10.0/bin/node scripts/build-bun-stack.mjs; LASM_REQUIRE_BUN_TESTS=1 LASM_REQUIRE_DENO_TESTS=1 .cache/js-runtimes/node-26.10.0/bin/node --test --test-concurrency=1 test/bun-stack.test.mjs test/deno-stack.test.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "f8842d3a-b8df-4af8-87eb-fb9e5933a85e",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24734609408
+      },
+      "minimumHostAvailable": 24282427392,
+      "peakMemoryBytes": 348307456,
+      "peakTasks": 21,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-stack-build-tests-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T10:30:26.215Z",
+        "memoryBytes": 221757440,
+        "peakMemoryBytes": 348307456,
+        "swapBytes": 0,
+        "tasks": 21,
+        "memoryBreakdown": {
+          "anon": 38203392,
+          "file": 177348608,
+          "kernel": 4685824,
+          "shmem": 0,
+          "file_mapped": 352256,
+          "inactive_file": 74342400,
+          "slab": 1920808
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T10:30:26.369Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 191610880,
+        "peakMemoryBytes": 348307456,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10240000,
+          "file": 177356800,
+          "kernel": 2355200,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 74350592,
+          "slab": 1549336
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T10:30:26.393Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "cause": "Bun keeps process.env writes separate from libc environ. The first execv adapter restarted without its transport. The corrected adapter updates and restores the five private native fields, retaining all other original bytes."
+  },
+  "limits": [
+    "Only stock Bun 1.4.2 on Linux x64 has installed application acceptance here. Other native platforms remain unverified.",
+    "Linux ARM64/glibc and both musl helpers are cross-compiled, not natively validated by this local probe.",
+    "Imported entries, CLI or environment preloads and bunfig configuration retain caller engine configuration to avoid replaying user effects; transparent deep-stack embedding remains unfinished.",
+    "Bun memory64 and its lowered-backend capacity ceiling remain separate unresolved implementation work.",
+    "Three concurrency repetitions do not prove absence of nondeterministic races. Original upstream exclusions remain unchanged."
+  ],
+  "ci": {
+    "workflow": ".github/workflows/bun-stack-controls.yml",
+    "status": "prepared, not yet dispatched at this snapshot",
+    "platforms": [
+      "linux-x64",
+      "linux-arm64"
+    ],
+    "scope": "Native source-control helper; no assertion of shipped cross-compiled binary validation",
+    "costCheck": {
+      "repository": "Millillion/lasm",
+      "visibility": "public",
+      "runners": [
+        "ubuntu-24.04",
+        "ubuntu-24.04-arm"
+      ],
+      "actionsCaches": false,
+      "artifactUploads": false,
+      "sources": [
+        "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+        "https://docs.github.com/en/actions/reference/runners/github-hosted-runners"
+      ]
+    }
+  },
+  "recordedAt": "2026-09-24T10:44:30.238577+00:00"
+}

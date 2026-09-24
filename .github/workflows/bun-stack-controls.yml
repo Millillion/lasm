@@ -1,0 +1,60 @@
+name: Native Bun application startup controls
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: bun-stack-controls-${{ github.ref }}
+  cancel-in-progress: false
+
+# Source controls on free standard public runners, with no Actions caches or
+# uploaded artifacts. Native compilation here is not shipped-binary acceptance.
+jobs:
+  startup:
+    if: github.event.repository.visibility == 'public'
+    name: Bun startup ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+    env:
+      LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.2
+          no-cache: true
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Check native engines and retain exact Bun path
+        run: |
+          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
+          bun -e "if(Bun.version!=='1.4.2'||process.platform+'-'+process.arch!==process.env.LASM_EXPECT_PLATFORM)throw Error('Incorrect engine'); console.log(process.versions)"
+          printf 'LASM_TEST_BUN=%s\n' "$(command -v bun)" >> "$GITHUB_ENV"
+      - name: Enable process-tree guard
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Build native control helper
+        run: |
+          ulimit -c 0
+          node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/bun-stack-build-resources.json -- node scripts/build-bun-stack.mjs --native
+      - name: Guarded startup controls
+        run: |
+          ulimit -c 0
+          node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/bun-stack-controls-resources.json -- /usr/bin/env LASM_TEST_BUN="$LASM_TEST_BUN" LASM_REQUIRE_BUN_TESTS=1 node --max-old-space-size=128 --test --test-concurrency=1 test/bun-stack.test.mjs test/application-output.test.mjs
+      - name: Preserve guard and helper receipts in logs
+        if: always()
+        run: |
+          node -e "const f=require('node:fs');for(const p of ['.work/bun-stack-build-resources.json','.work/bun-stack-controls-resources.json','.cache/native-host/bun-stack/manifest.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

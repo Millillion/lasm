@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Four upstream compilation-disabled inputs](evidence/upstream-compile-disabled-node-2026-09-24.json) pass separate native and installed Node AOT controls with original assertions. Exact native compiler subprocess calls are recorded. Peak memory was 3.50 GiB without resource events. Other engines remain pending; Bun stack support is still being repaired.
+**Changed:** Installed `.20` [repairs Linux Bun stack startup](evidence/bun-stack-startup-installed-2026-09-24.json). The unchanged concurrency application passes three relocated repetitions; fourteen startup/deployment controls preserve environment bytes, descriptors and signals. Peak memory was 3.45 GiB without resource events. Native Linux ARM64 source controls are prepared; broader platform and embedding support remain open.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

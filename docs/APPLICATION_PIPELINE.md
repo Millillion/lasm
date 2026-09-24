@@ -477,3 +477,20 @@ now executes **all seven controls with zero skips on Linux and macOS, each on
 x64 and ARM64**. This confirms the adapter's native argument-vector handling
 and observed startup behavior on those four platforms. It remains source-level
 startup evidence, separate from full deployed Lean application acceptance.
+
+The [bundled Bun startup adapter](evidence/bun-stack-startup-installed-2026-09-24.json)
+now configures both Linux worker reservations and Bun's separate JSC execution
+budget before a directly launched application starts. A verified private shared
+library ships in the output; same-PID exec preserves argument bytes, stdio,
+inherited descriptors and both the native and JavaScript environments. Opening
+the helper through an inherited descriptor supports deployment paths containing
+spaces. Bun itself is the unchanged released binary.
+
+Installed `.20` passes all three repetitions of the previously failing ordinary
+Lean channel/mutex application on Linux x64, after relocation with sources hidden
+and PATH empty. Fourteen startup/deployment controls pass with zero skips; the
+maximum installed-build/run peak is 3.45 GiB without resource events. The earlier
+application failure and initial startup-loop defect remain recorded. Native
+ARM64/musl acceptance, macOS/Windows implementation and deep-stack embedding or
+preload/configuration support remain open. The prepared Linux x64/ARM64 CI
+workflow tests a natively compiled helper, separately from shipped-binary checks.

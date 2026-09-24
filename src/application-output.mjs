@@ -5,7 +5,7 @@ import { copyNativeBundle } from './native-bundle.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 export const applicationHostFiles = [
-  'node-host.mjs', 'lean-io-errors.mjs', 'deno-stack.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs',
+  'node-host.mjs', 'lean-io-errors.mjs', 'deno-stack.mjs', 'bun-stack.mjs', 'posix-arguments.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs',
   'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs', 'node-udp.mjs',
   'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-files.mjs',
   'native-clock.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs',
@@ -43,6 +43,7 @@ if (actual !== expected) {
   process.exitCode = 1;
 } else {
   if (actual === 'deno') (await import('./host/deno-stack.mjs')).prepareDenoStack(import.meta.url);
+  if (actual === 'bun') (await import('./host/bun-stack.mjs')).prepareBunStack(import.meta.url);
   process.env.LASM_FULL_HOST_MODULE = new URL('./host/node-host.mjs', import.meta.url).href;
   process.env.LASM_FULL_APP_PATH = fileURLToPath(import.meta.url);
   createRequire(import.meta.url)('./program.cjs');

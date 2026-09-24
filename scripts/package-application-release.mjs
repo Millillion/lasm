@@ -40,7 +40,7 @@ cpSync(join(root, 'examples/lean-server-latest'), join(staging, 'examples/lean-s
 });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 writeFileSync(join(staging, 'package.json'), JSON.stringify({
-  name: sourcePackage.name, version: '0.1.0-experimental.19', private: true, license: 'UNLICENSED',
+  name: sourcePackage.name, version: '0.1.0-experimental.20', private: true, license: 'UNLICENSED',
   type: 'module', description: 'Experimental managed Lean application compiler for Node, Deno, and Bun',
   bin: sourcePackage.bin, engines: sourcePackage.engines, os: ['linux', 'darwin', 'win32'], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'lean', 'scripts', 'targets', 'tools', 'docs', 'examples',
@@ -54,7 +54,7 @@ const packed = JSON.parse(execFileSync('npm', ['pack', '--json', '--ignore-scrip
   '--cache', join(root, '.cache/npm')], { cwd: staging, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 }))[0];
 const files = new Set(packed.files.map(file => file.path));
 for (const file of ['bin/lasm.mjs', 'scripts/full-lean/host-library.js', 'src/native/node_modules/koffi/index.cjs',
-  'src/native/process/manifest.json', 'src/native-abort.cjs', `targets/${runtime.manifest.name}/target.json`])
+  'src/native/process/manifest.json', 'src/native/bun-stack/manifest.json', 'src/native-abort.cjs', `targets/${runtime.manifest.name}/target.json`])
   if (!files.has(file)) throw new Error(`npm pack omitted required application support: ${file}`);
 const report = { scope: 'Local candidate assembly; installation and runtime checks are separate',
   tarball: join(output, packed.filename), sha256: await hashFile(join(output, packed.filename)),
