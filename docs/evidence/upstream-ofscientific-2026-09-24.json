@@ -1,0 +1,1590 @@
+{
+  "scope": "Unchanged Lean 4.34 pkg/ofScientific in installed stock Node/Deno/Bun on Linux x64 only",
+  "recordedAt": "2026-09-24T05:33:10.815927+00:00",
+  "versions": {
+    "lean": "4.34.0",
+    "node": "26.10.0",
+    "deno": "2.9.7",
+    "bun": "1.4.2",
+    "officialLatestRecheckedOn": "2026-09-24T05:22Z"
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r11/lasm-compiler-0.1.0-experimental.14.tgz",
+    "sha256": "fc656ee164ce5831e4e6a91266d3757db9ab92ed5dcf7b54a4a4168c7fffa571",
+    "compressedBytes": 125161765,
+    "installedBytes": 628948726,
+    "files": 2672,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "fb5d096b306d52e88b59366dacfd7136285eeef56d8e3f92798846ce2a17d9bb"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-platform-package-r1-resources.json",
+    "recordedAt": "2026-09-24T04:27:44.601Z"
+  },
+  "harnessFiles": {
+    "integration/application-upstream-packages.mjs": "1f4e23cb0b7cd39a3e0128d5af0bb01bae5d7eb630540f7ff291c2f33c49cbd4",
+    ".work/run-upstream-numeric-r1.sh": "93a2ba832e04a6a92d783808843c910cba4d7a4de87a22410b5d5af4da0eef24",
+    ".work/archive-passed-package-r1.py": "ff29325a6c74b3f06b248ca8f716943c31eb0ade8501768721dd5873589e88d8"
+  },
+  "results": [
+    {
+      "target": "node",
+      "resultFile": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/result.json",
+      "resultSha256": "d1e6fd78b970e41c5a2a398b8d9d81e61a21dce9c2c0f68162245a763e2e98d8",
+      "result": {
+        "scope": "Reviewed unchanged upstream Lake applications, complete vendored datasets and original native shell controls",
+        "name": "pkg/ofScientific",
+        "target": "node",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-node-ofScientific-r1-resources.json",
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 0.007393134999998437,
+            "stdout": "v26.10.0\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native shell driver",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+              "ordinary",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/native source/run_test.sh"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/native source",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 2.887349777000001,
+            "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+            "stderr": "info: ParseNumberCheck: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/6] Built ParseNumberCheck.Decimal (352ms)\n\u2714 [3/6] Built ParseNumberCheck.Decimal:c.o (232ms)\n\u2714 [4/6] Built Main (505ms)\n\u2714 [5/6] Built Main:c.o (607ms)\n\u2714 [6/6] Built \u00abparse-number-check\u00bb:exe (187ms)\n"
+          },
+          {
+            "label": "native compiled application",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/native source/.lake/build/bin/parse-number-check",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/native source",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 1.0108867320000026,
+            "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+            "stderr": ""
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/application source/Main.lean",
+              "--target",
+              "node",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/application source",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 66.744745547,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for node\u2026\ninfo: ParseNumberCheck: no previous manifest, creating one from scratch\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/dist\n"
+          },
+          {
+            "label": "relocated compiled application",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/relocated deployment",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 5.436887241000004,
+            "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "adaptations": [
+          "Original tests, shell drivers, vectors and expected values are unchanged; native and application builds use independent verified copies.",
+          "Each copied package receives an ordinary Lean 4.34.0 toolchain pin; no original file is overwritten.",
+          "The application phase uses the installed Lasm CLI, moves dist and its unchanged data into a deployment, hides both source trees and removes build-tool environment variables.",
+          "No input filters or extra program arguments are used. Each original self-check and complete vendored input count must pass.",
+          "Float durations are retained in raw logs but omitted from differential comparison; every per-file count, failure count and total is compared.",
+          "Float explicitly invokes the ordinary external gzip executable. Its isolated PATH contains only that recorded dependency; ofScientific has an empty PATH.",
+          "The harness allows 30 minutes per build/execution under the existing process-tree resource guard. A timeout is not an API or fundamental limitation."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "v26.10.0",
+        "packageVersion": "0.1.0-experimental.14",
+        "expected": {
+          "vectors": [
+            {
+              "path": "test-data/basic.txt",
+              "count": 28,
+              "sha256": "89c421a1e6467f7f6a29b4c7d8e6b023d960e81b1a3609f8060977230d71f5f5"
+            },
+            {
+              "path": "test-data/doubleround.txt",
+              "count": 19,
+              "sha256": "cf805315dc5cf32d2c667f64ea3430a9f59307fefb1db82372c0caca66e13f23"
+            },
+            {
+              "path": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "sha256": "310f55da113a49104e00124abfce228404ee88625bbbbb07a1705604721cf6f4"
+            }
+          ],
+          "rows": [
+            {
+              "label": "test-data/basic.txt",
+              "count": 28,
+              "failures": 0
+            },
+            {
+              "label": "test-data/doubleround.txt",
+              "count": 19,
+              "failures": 0
+            },
+            {
+              "label": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "failures": 0
+            }
+          ],
+          "total": "total: 10047 vectors, 0 failures across 3 file(s)"
+        },
+        "nativeDriver": {
+          "code": 0,
+          "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+          "stderr": "info: ParseNumberCheck: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/6] Built ParseNumberCheck.Decimal (352ms)\n\u2714 [3/6] Built ParseNumberCheck.Decimal:c.o (232ms)\n\u2714 [4/6] Built Main (505ms)\n\u2714 [5/6] Built Main:c.o (607ms)\n\u2714 [6/6] Built \u00abparse-number-check\u00bb:exe (187ms)\n"
+        },
+        "nativeCompiled": {
+          "code": 0,
+          "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+          "stderr": ""
+        },
+        "nativeObservations": {
+          "code": 0,
+          "rows": [
+            {
+              "label": "test-data/basic.txt",
+              "count": 28,
+              "failures": 0
+            },
+            {
+              "label": "test-data/doubleround.txt",
+              "count": 19,
+              "failures": 0
+            },
+            {
+              "label": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "failures": 0
+            }
+          ],
+          "total": "total: 10047 vectors, 0 failures across 3 file(s)",
+          "stderr": ""
+        },
+        "nativeSourceAfter": {
+          "checked": 9,
+          "modified": []
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "fb5d096b306d52e88b59366dacfd7136285eeef56d8e3f92798846ce2a17d9bb",
+          "buildDriverIdentity": "49a8613ba5ab03b4ba7ff4b7eec88faf7728804a3007fa9f5e9f05d0b66fa191",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+ParseNumberCheck.Decimal",
+              "sourceSha256": "66c92bfb2e971567374183b1a30b771a522cb8dad60efee66798494c157b8df9",
+              "cSha256": "e842feab66a00610fb06e2e82d62769fb0625903179c84c2040f5152390ae7ba"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "7b6e893ffecbb2631951c6656fafab42cce64e03291ddf4ea86f681ab4069d1f",
+              "cSha256": "cbdfd00d47b3e15d240f6d137856c8ec9da59609b11030df68bf826f112339a0"
+            }
+          ],
+          "signature": "8dd571c83aef1aab007aa36109e279d3c357df21c1a5413cf3d87a1c86cfa750",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "applicationSourceAfter": {
+          "checked": 9,
+          "modified": []
+        },
+        "deployedDataBefore": {
+          "checked": 4,
+          "modified": []
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/relocated deployment",
+          "sourceHidden": true,
+          "buildEnvironmentRemoved": true,
+          "path": "",
+          "sourceFiles": [],
+          "wasmSha256": "711a056485829cd8399126b2e31f24b9e2de209cf9169c2c79d40abac9938fab"
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+          "stderr": ""
+        },
+        "actualObservations": {
+          "code": 0,
+          "rows": [
+            {
+              "label": "test-data/basic.txt",
+              "count": 28,
+              "failures": 0
+            },
+            {
+              "label": "test-data/doubleround.txt",
+              "count": 19,
+              "failures": 0
+            },
+            {
+              "label": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "failures": 0
+            }
+          ],
+          "total": "total: 10047 vectors, 0 failures across 3 file(s)",
+          "stderr": ""
+        },
+        "deployedDataAfter": {
+          "checked": 4,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T05:24:23.083Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T05:22:50.557Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "/bin/bash",
+          ".work/run-upstream-numeric-r1.sh",
+          "node",
+          "ofScientific"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "61516857-f1b8-4148-87d2-432d048bdef0",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25646538752
+        },
+        "minimumHostAvailable": 21867028480,
+        "peakMemoryBytes": 3750035456,
+        "peakTasks": 39,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-node-ofScientific-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:24:23.066Z",
+          "memoryBytes": 709472256,
+          "peakMemoryBytes": 3750035456,
+          "swapBytes": 0,
+          "tasks": 12,
+          "memoryBreakdown": {
+            "anon": 126283776,
+            "file": 568250368,
+            "kernel": 14200832,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 565657600,
+            "slab": 11903736
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T05:24:23.155Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 593403904,
+          "peakMemoryBytes": 3750035456,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 568250368,
+            "kernel": 12697600,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 565657600,
+            "slab": 11774536
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:24:23.180Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-node-ofScientific-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/relocated deployment/program.wasm",
+            "originalBytes": 160455348,
+            "originalSha256": "711a056485829cd8399126b2e31f24b9e2de209cf9169c2c79d40abac9938fab",
+            "mode": 509,
+            "mtimeNs": 1790227456132397000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37264869,
+            "archiveSha256": "d968faaa3a2bb340d2cf422859dc093f0b6403542a5d681086147692f456c68c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1",
+              "receiptSha256": "d1e6fd78b970e41c5a2a398b8d9d81e61a21dce9c2c0f68162245a763e2e98d8"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/application source.hidden/.lake/lasm/applications/f26e9e5a39ed7a56/8dd571c83aef1aab007aa36109e279d3c357df21c1a5413cf3d87a1c86cfa750/dist/program.wasm",
+            "originalBytes": 160455348,
+            "originalSha256": "711a056485829cd8399126b2e31f24b9e2de209cf9169c2c79d40abac9938fab",
+            "mode": 509,
+            "mtimeNs": 1790227445198297900,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/application source.hidden/.lake/lasm/applications/f26e9e5a39ed7a56/8dd571c83aef1aab007aa36109e279d3c357df21c1a5413cf3d87a1c86cfa750/dist/program.wasm.gz",
+            "archiveBytes": 37264869,
+            "archiveSha256": "d968faaa3a2bb340d2cf422859dc093f0b6403542a5d681086147692f456c68c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1",
+              "receiptSha256": "d1e6fd78b970e41c5a2a398b8d9d81e61a21dce9c2c0f68162245a763e2e98d8"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check",
+            "originalBytes": 2464296,
+            "originalSha256": "d3e73d272ea42c0ad90fe3cb5698f95c35d93af94793668c77758c93556c3f4b",
+            "mode": 509,
+            "mtimeNs": 1790227387447774000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check.gz",
+            "archiveBytes": 909412,
+            "archiveSha256": "ab3ff03769bfa964a5e63188c9893fc9efe5f5db902d1eeccf012bd15436ae20",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1",
+              "receiptSha256": "d1e6fd78b970e41c5a2a398b8d9d81e61a21dce9c2c0f68162245a763e2e98d8"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 247935842,
+        "finishedAt": "2026-09-24T05:26:14.827684+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T05:26:08.547Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-package-r1.py",
+          ".work/upstream-numeric-node-ofScientific-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "c751c1ab-2612-41a2-900e-f95e6db64d95",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25545842688
+        },
+        "minimumHostAvailable": 25499295744,
+        "peakMemoryBytes": 91705344,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-node-ofScientific-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:26:14.759Z",
+          "memoryBytes": 87212032,
+          "peakMemoryBytes": 87474176,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 10108928,
+            "file": 74547200,
+            "kernel": 2359296,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 74543104,
+            "slab": 2253040
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T05:26:14.877Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 91705344,
+          "peakMemoryBytes": 91705344,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11649024,
+            "file": 75460608,
+            "kernel": 3325952,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 75460608,
+            "slab": 2380176
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:26:14.900Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "target": "deno",
+      "resultFile": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/result.json",
+      "resultSha256": "effeb4e9dd550cd947c5ffa0c888f4001ac00ce462784a289df44a38a440902f",
+      "result": {
+        "scope": "Reviewed unchanged upstream Lake applications, complete vendored datasets and original native shell controls",
+        "name": "pkg/ofScientific",
+        "target": "deno",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-deno-ofScientific-r1-resources.json",
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 0.007492718999999852,
+            "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native shell driver",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+              "ordinary",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/native source/run_test.sh"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/native source",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 2.9046402799999997,
+            "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+            "stderr": "info: ParseNumberCheck: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/6] Built ParseNumberCheck.Decimal (345ms)\n\u2714 [3/6] Built ParseNumberCheck.Decimal:c.o (231ms)\n\u2714 [4/6] Built Main (504ms)\n\u2714 [5/6] Built Main:c.o (599ms)\n\u2714 [6/6] Built \u00abparse-number-check\u00bb:exe (195ms)\n"
+          },
+          {
+            "label": "native compiled application",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/native source/.lake/build/bin/parse-number-check",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/native source",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 0.9111702939999996,
+            "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+            "stderr": ""
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/application source/Main.lean",
+              "--target",
+              "deno",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/application source",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 65.789028364,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for deno\u2026\ninfo: ParseNumberCheck: no previous manifest, creating one from scratch\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nBuilt Lean 4.34.0 for deno: /home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/dist\n"
+          },
+          {
+            "label": "relocated compiled application",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/relocated deployment",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 7.102704941999996,
+            "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "adaptations": [
+          "Original tests, shell drivers, vectors and expected values are unchanged; native and application builds use independent verified copies.",
+          "Each copied package receives an ordinary Lean 4.34.0 toolchain pin; no original file is overwritten.",
+          "The application phase uses the installed Lasm CLI, moves dist and its unchanged data into a deployment, hides both source trees and removes build-tool environment variables.",
+          "No input filters or extra program arguments are used. Each original self-check and complete vendored input count must pass.",
+          "Float durations are retained in raw logs but omitted from differential comparison; every per-file count, failure count and total is compared.",
+          "Float explicitly invokes the ordinary external gzip executable. Its isolated PATH contains only that recorded dependency; ofScientific has an empty PATH.",
+          "The harness allows 30 minutes per build/execution under the existing process-tree resource guard. A timeout is not an API or fundamental limitation."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "packageVersion": "0.1.0-experimental.14",
+        "expected": {
+          "vectors": [
+            {
+              "path": "test-data/basic.txt",
+              "count": 28,
+              "sha256": "89c421a1e6467f7f6a29b4c7d8e6b023d960e81b1a3609f8060977230d71f5f5"
+            },
+            {
+              "path": "test-data/doubleround.txt",
+              "count": 19,
+              "sha256": "cf805315dc5cf32d2c667f64ea3430a9f59307fefb1db82372c0caca66e13f23"
+            },
+            {
+              "path": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "sha256": "310f55da113a49104e00124abfce228404ee88625bbbbb07a1705604721cf6f4"
+            }
+          ],
+          "rows": [
+            {
+              "label": "test-data/basic.txt",
+              "count": 28,
+              "failures": 0
+            },
+            {
+              "label": "test-data/doubleround.txt",
+              "count": 19,
+              "failures": 0
+            },
+            {
+              "label": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "failures": 0
+            }
+          ],
+          "total": "total: 10047 vectors, 0 failures across 3 file(s)"
+        },
+        "nativeDriver": {
+          "code": 0,
+          "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+          "stderr": "info: ParseNumberCheck: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/6] Built ParseNumberCheck.Decimal (345ms)\n\u2714 [3/6] Built ParseNumberCheck.Decimal:c.o (231ms)\n\u2714 [4/6] Built Main (504ms)\n\u2714 [5/6] Built Main:c.o (599ms)\n\u2714 [6/6] Built \u00abparse-number-check\u00bb:exe (195ms)\n"
+        },
+        "nativeCompiled": {
+          "code": 0,
+          "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+          "stderr": ""
+        },
+        "nativeObservations": {
+          "code": 0,
+          "rows": [
+            {
+              "label": "test-data/basic.txt",
+              "count": 28,
+              "failures": 0
+            },
+            {
+              "label": "test-data/doubleround.txt",
+              "count": 19,
+              "failures": 0
+            },
+            {
+              "label": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "failures": 0
+            }
+          ],
+          "total": "total: 10047 vectors, 0 failures across 3 file(s)",
+          "stderr": ""
+        },
+        "nativeSourceAfter": {
+          "checked": 9,
+          "modified": []
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "fb5d096b306d52e88b59366dacfd7136285eeef56d8e3f92798846ce2a17d9bb",
+          "buildDriverIdentity": "49a8613ba5ab03b4ba7ff4b7eec88faf7728804a3007fa9f5e9f05d0b66fa191",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+ParseNumberCheck.Decimal",
+              "sourceSha256": "66c92bfb2e971567374183b1a30b771a522cb8dad60efee66798494c157b8df9",
+              "cSha256": "e842feab66a00610fb06e2e82d62769fb0625903179c84c2040f5152390ae7ba"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "7b6e893ffecbb2631951c6656fafab42cce64e03291ddf4ea86f681ab4069d1f",
+              "cSha256": "cbdfd00d47b3e15d240f6d137856c8ec9da59609b11030df68bf826f112339a0"
+            }
+          ],
+          "signature": "607efdbed13518c0a1badcca6134e53b4daa17361825700451b1b06895f28473",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "applicationSourceAfter": {
+          "checked": 9,
+          "modified": []
+        },
+        "deployedDataBefore": {
+          "checked": 4,
+          "modified": []
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/relocated deployment",
+          "sourceHidden": true,
+          "buildEnvironmentRemoved": true,
+          "path": "",
+          "sourceFiles": [],
+          "wasmSha256": "711a056485829cd8399126b2e31f24b9e2de209cf9169c2c79d40abac9938fab"
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+          "stderr": ""
+        },
+        "actualObservations": {
+          "code": 0,
+          "rows": [
+            {
+              "label": "test-data/basic.txt",
+              "count": 28,
+              "failures": 0
+            },
+            {
+              "label": "test-data/doubleround.txt",
+              "count": 19,
+              "failures": 0
+            },
+            {
+              "label": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "failures": 0
+            }
+          ],
+          "total": "total: 10047 vectors, 0 failures across 3 file(s)",
+          "stderr": ""
+        },
+        "deployedDataAfter": {
+          "checked": 4,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T05:29:53.036Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T05:28:20.843Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "/bin/bash",
+          ".work/run-upstream-numeric-r1.sh",
+          "deno",
+          "ofScientific"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "30bd5b21-7ef4-43ee-bf06-647a68b05db6",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25563865088
+        },
+        "minimumHostAvailable": 22081740800,
+        "peakMemoryBytes": 3551371264,
+        "peakTasks": 39,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-deno-ofScientific-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:29:52.962Z",
+          "memoryBytes": 507957248,
+          "peakMemoryBytes": 3551371264,
+          "swapBytes": 0,
+          "tasks": 12,
+          "memoryBreakdown": {
+            "anon": 123678720,
+            "file": 369205248,
+            "kernel": 14163968,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 366260224,
+            "slab": 11898968
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T05:29:53.112Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 395046912,
+          "peakMemoryBytes": 3551371264,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11649024,
+            "file": 369205248,
+            "kernel": 12713984,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 366260224,
+            "slab": 11765544
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:29:53.136Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-deno-ofScientific-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/relocated deployment/program.wasm",
+            "originalBytes": 160455348,
+            "originalSha256": "711a056485829cd8399126b2e31f24b9e2de209cf9169c2c79d40abac9938fab",
+            "mode": 509,
+            "mtimeNs": 1790227784199377200,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37264869,
+            "archiveSha256": "d968faaa3a2bb340d2cf422859dc093f0b6403542a5d681086147692f456c68c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1",
+              "receiptSha256": "effeb4e9dd550cd947c5ffa0c888f4001ac00ce462784a289df44a38a440902f"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/application source.hidden/.lake/lasm/applications/2181153c98148702/607efdbed13518c0a1badcca6134e53b4daa17361825700451b1b06895f28473/dist/program.wasm",
+            "originalBytes": 160455348,
+            "originalSha256": "711a056485829cd8399126b2e31f24b9e2de209cf9169c2c79d40abac9938fab",
+            "mode": 509,
+            "mtimeNs": 1790227773420279300,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/application source.hidden/.lake/lasm/applications/2181153c98148702/607efdbed13518c0a1badcca6134e53b4daa17361825700451b1b06895f28473/dist/program.wasm.gz",
+            "archiveBytes": 37264869,
+            "archiveSha256": "d968faaa3a2bb340d2cf422859dc093f0b6403542a5d681086147692f456c68c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1",
+              "receiptSha256": "effeb4e9dd550cd947c5ffa0c888f4001ac00ce462784a289df44a38a440902f"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check",
+            "originalBytes": 2464296,
+            "originalSha256": "d3e73d272ea42c0ad90fe3cb5698f95c35d93af94793668c77758c93556c3f4b",
+            "mode": 509,
+            "mtimeNs": 1790227716529762000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check.gz",
+            "archiveBytes": 909412,
+            "archiveSha256": "ab3ff03769bfa964a5e63188c9893fc9efe5f5db902d1eeccf012bd15436ae20",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1",
+              "receiptSha256": "effeb4e9dd550cd947c5ffa0c888f4001ac00ce462784a289df44a38a440902f"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 247935842,
+        "finishedAt": "2026-09-24T05:29:59.464098+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T05:29:53.190Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-package-r1.py",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "724fb922-fd33-41da-8eec-aba122f27c6c",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24989593600
+        },
+        "minimumHostAvailable": 24983891968,
+        "peakMemoryBytes": 91340800,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-deno-ofScientific-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:29:59.404Z",
+          "memoryBytes": 87003136,
+          "peakMemoryBytes": 87212032,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 10100736,
+            "file": 74534912,
+            "kernel": 2367488,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 74534912,
+            "slab": 2252072
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T05:29:59.514Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 91340800,
+          "peakMemoryBytes": 91340800,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11640832,
+            "file": 75448320,
+            "kernel": 3309568,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 75448320,
+            "slab": 2380616
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:29:59.538Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "target": "bun",
+      "resultFile": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/result.json",
+      "resultSha256": "476b6f1e4a7b89f85cee0fa5a1eba4c4a7b8cad3c6ceeca434dc581f05117806",
+      "result": {
+        "scope": "Reviewed unchanged upstream Lake applications, complete vendored datasets and original native shell controls",
+        "name": "pkg/ofScientific",
+        "target": "bun",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-bun-ofScientific-r1-resources.json",
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 0.005138355999999476,
+            "stdout": "1.4.2\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native shell driver",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+              "ordinary",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/native source/run_test.sh"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/native source",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 2.8823397440000007,
+            "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+            "stderr": "info: ParseNumberCheck: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/6] Built ParseNumberCheck.Decimal (361ms)\n\u2714 [3/6] Built ParseNumberCheck.Decimal:c.o (229ms)\n\u2714 [4/6] Built Main (505ms)\n\u2714 [5/6] Built Main:c.o (608ms)\n\u2714 [6/6] Built \u00abparse-number-check\u00bb:exe (187ms)\n"
+          },
+          {
+            "label": "native compiled application",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/native source/.lake/build/bin/parse-number-check",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/native source",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 0.9318776380000018,
+            "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+            "stderr": ""
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/application source/Main.lean",
+              "--target",
+              "bun",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/application source",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 93.776363504,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for bun\u2026\ninfo: ParseNumberCheck: no previous manifest, creating one from scratch\nBuilding Main.lean for bun\u2026\nBuilt Lean 4.34.0 for bun: /home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/dist\n"
+          },
+          {
+            "label": "relocated compiled application",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/relocated deployment",
+            "code": 0,
+            "signal": null,
+            "timeout": false,
+            "seconds": 5.104177809999994,
+            "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "adaptations": [
+          "Original tests, shell drivers, vectors and expected values are unchanged; native and application builds use independent verified copies.",
+          "Each copied package receives an ordinary Lean 4.34.0 toolchain pin; no original file is overwritten.",
+          "The application phase uses the installed Lasm CLI, moves dist and its unchanged data into a deployment, hides both source trees and removes build-tool environment variables.",
+          "No input filters or extra program arguments are used. Each original self-check and complete vendored input count must pass.",
+          "Float durations are retained in raw logs but omitted from differential comparison; every per-file count, failure count and total is compared.",
+          "Float explicitly invokes the ordinary external gzip executable. Its isolated PATH contains only that recorded dependency; ofScientific has an empty PATH.",
+          "The harness allows 30 minutes per build/execution under the existing process-tree resource guard. A timeout is not an API or fundamental limitation."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "1.4.2",
+        "packageVersion": "0.1.0-experimental.14",
+        "expected": {
+          "vectors": [
+            {
+              "path": "test-data/basic.txt",
+              "count": 28,
+              "sha256": "89c421a1e6467f7f6a29b4c7d8e6b023d960e81b1a3609f8060977230d71f5f5"
+            },
+            {
+              "path": "test-data/doubleround.txt",
+              "count": 19,
+              "sha256": "cf805315dc5cf32d2c667f64ea3430a9f59307fefb1db82372c0caca66e13f23"
+            },
+            {
+              "path": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "sha256": "310f55da113a49104e00124abfce228404ee88625bbbbb07a1705604721cf6f4"
+            }
+          ],
+          "rows": [
+            {
+              "label": "test-data/basic.txt",
+              "count": 28,
+              "failures": 0
+            },
+            {
+              "label": "test-data/doubleround.txt",
+              "count": 19,
+              "failures": 0
+            },
+            {
+              "label": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "failures": 0
+            }
+          ],
+          "total": "total: 10047 vectors, 0 failures across 3 file(s)"
+        },
+        "nativeDriver": {
+          "code": 0,
+          "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+          "stderr": "info: ParseNumberCheck: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/6] Built ParseNumberCheck.Decimal (361ms)\n\u2714 [3/6] Built ParseNumberCheck.Decimal:c.o (229ms)\n\u2714 [4/6] Built Main (505ms)\n\u2714 [5/6] Built Main:c.o (608ms)\n\u2714 [6/6] Built \u00abparse-number-check\u00bb:exe (187ms)\n"
+        },
+        "nativeCompiled": {
+          "code": 0,
+          "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+          "stderr": ""
+        },
+        "nativeObservations": {
+          "code": 0,
+          "rows": [
+            {
+              "label": "test-data/basic.txt",
+              "count": 28,
+              "failures": 0
+            },
+            {
+              "label": "test-data/doubleround.txt",
+              "count": 19,
+              "failures": 0
+            },
+            {
+              "label": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "failures": 0
+            }
+          ],
+          "total": "total: 10047 vectors, 0 failures across 3 file(s)",
+          "stderr": ""
+        },
+        "nativeSourceAfter": {
+          "checked": 9,
+          "modified": []
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "fb5d096b306d52e88b59366dacfd7136285eeef56d8e3f92798846ce2a17d9bb",
+          "buildDriverIdentity": "49a8613ba5ab03b4ba7ff4b7eec88faf7728804a3007fa9f5e9f05d0b66fa191",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "+ParseNumberCheck.Decimal",
+              "sourceSha256": "66c92bfb2e971567374183b1a30b771a522cb8dad60efee66798494c157b8df9",
+              "cSha256": "e842feab66a00610fb06e2e82d62769fb0625903179c84c2040f5152390ae7ba"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "7b6e893ffecbb2631951c6656fafab42cce64e03291ddf4ea86f681ab4069d1f",
+              "cSha256": "cbdfd00d47b3e15d240f6d137856c8ec9da59609b11030df68bf826f112339a0"
+            }
+          ],
+          "signature": "9cf16e389165180333aba694a6a24231cc50270b676df8b8017be9c3d710d7ad",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "applicationSourceAfter": {
+          "checked": 9,
+          "modified": []
+        },
+        "deployedDataBefore": {
+          "checked": 4,
+          "modified": []
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/relocated deployment",
+          "sourceHidden": true,
+          "buildEnvironmentRemoved": true,
+          "path": "",
+          "sourceFiles": [],
+          "wasmSha256": "9067d9c7fbf33c24fc18ecd60ae69dcdb5614ff9dc355b80864476b026bfab73"
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "test-data/basic.txt: 28 vectors, 0 failures\ntest-data/doubleround.txt: 19 vectors, 0 failures\ntest-data/random-from-dataset.txt: 10000 vectors, 0 failures\ntotal: 10047 vectors, 0 failures across 3 file(s)\n",
+          "stderr": ""
+        },
+        "actualObservations": {
+          "code": 0,
+          "rows": [
+            {
+              "label": "test-data/basic.txt",
+              "count": 28,
+              "failures": 0
+            },
+            {
+              "label": "test-data/doubleround.txt",
+              "count": 19,
+              "failures": 0
+            },
+            {
+              "label": "test-data/random-from-dataset.txt",
+              "count": 10000,
+              "failures": 0
+            }
+          ],
+          "total": "total: 10047 vectors, 0 failures across 3 file(s)",
+          "stderr": ""
+        },
+        "deployedDataAfter": {
+          "checked": 4,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T05:31:57.809Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T05:29:59.587Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "/bin/bash",
+          ".work/run-upstream-numeric-r1.sh",
+          "bun",
+          "ofScientific"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "10ec834e-f6fc-4ea7-9a28-d1f4e926fe5c",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25299341312
+        },
+        "minimumHostAvailable": 21969731584,
+        "peakMemoryBytes": 3727847424,
+        "peakTasks": 52,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-bun-ofScientific-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:31:57.742Z",
+          "memoryBytes": 527831040,
+          "peakMemoryBytes": 3727847424,
+          "swapBytes": 0,
+          "tasks": 12,
+          "memoryBreakdown": {
+            "anon": 127516672,
+            "file": 384339968,
+            "kernel": 14716928,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 381755392,
+            "slab": 12352720
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T05:31:57.892Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 410157056,
+          "peakMemoryBytes": 3727847424,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11522048,
+            "file": 384339968,
+            "kernel": 13156352,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 381755392,
+            "slab": 12214768
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:31:57.918Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-bun-ofScientific-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/relocated deployment/program.wasm",
+            "originalBytes": 166060255,
+            "originalSha256": "9067d9c7fbf33c24fc18ecd60ae69dcdb5614ff9dc355b80864476b026bfab73",
+            "mode": 509,
+            "mtimeNs": 1790227911002530600,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 38412246,
+            "archiveSha256": "8a74c7b9cb2ee151514a151a972efc8844ade279f7d767dc17640d0413bf2908",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1",
+              "receiptSha256": "476b6f1e4a7b89f85cee0fa5a1eba4c4a7b8cad3c6ceeca434dc581f05117806"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/application source.hidden/.lake/lasm/applications/74c33f4ff11fa15a/9cf16e389165180333aba694a6a24231cc50270b676df8b8017be9c3d710d7ad/dist/program.wasm",
+            "originalBytes": 166060255,
+            "originalSha256": "9067d9c7fbf33c24fc18ecd60ae69dcdb5614ff9dc355b80864476b026bfab73",
+            "mode": 509,
+            "mtimeNs": 1790227901085440300,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/application source.hidden/.lake/lasm/applications/74c33f4ff11fa15a/9cf16e389165180333aba694a6a24231cc50270b676df8b8017be9c3d710d7ad/dist/program.wasm.gz",
+            "archiveBytes": 38412246,
+            "archiveSha256": "8a74c7b9cb2ee151514a151a972efc8844ade279f7d767dc17640d0413bf2908",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1",
+              "receiptSha256": "476b6f1e4a7b89f85cee0fa5a1eba4c4a7b8cad3c6ceeca434dc581f05117806"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check",
+            "originalBytes": 2464296,
+            "originalSha256": "d3e73d272ea42c0ad90fe3cb5698f95c35d93af94793668c77758c93556c3f4b",
+            "mode": 509,
+            "mtimeNs": 1790227815365660700,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check.gz",
+            "archiveBytes": 909412,
+            "archiveSha256": "ab3ff03769bfa964a5e63188c9893fc9efe5f5db902d1eeccf012bd15436ae20",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1",
+              "receiptSha256": "476b6f1e4a7b89f85cee0fa5a1eba4c4a7b8cad3c6ceeca434dc581f05117806"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 256850902,
+        "finishedAt": "2026-09-24T05:32:04.437453+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T05:31:57.970Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-package-r1.py",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "6e814552-6a86-4602-ac0c-ebfe726ea2da",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25136263168
+        },
+        "minimumHostAvailable": 25136263168,
+        "peakMemoryBytes": 93720576,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-numeric-bun-ofScientific-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:32:04.381Z",
+          "memoryBytes": 89391104,
+          "peakMemoryBytes": 89518080,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 10108928,
+            "file": 76845056,
+            "kernel": 2433024,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 76812288,
+            "slab": 2320872
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T05:32:04.486Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 93720576,
+          "peakMemoryBytes": 93720576,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 77758464,
+            "kernel": 3375104,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 77725696,
+            "slab": 2452256
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:32:04.510Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "vectorsPerEngine": 10047,
+    "completeVendoredFiles": 3,
+    "peakMemoryBytes": 3750035456
+  },
+  "remaining": [
+    "Other reviewed Lake projects and mixed registrations",
+    "Other native OS/architecture combinations",
+    "Complete API audit and capacity/embedding repairs"
+  ],
+  "interpretation": "Each original native shell driver and an independent native compiled run pass before installed application compilation. All original per-vector assertions are retained. No source or expected output was changed. No numeric input filters were used."
+}

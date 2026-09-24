@@ -104,3 +104,31 @@ the complete category to be selected. Duplicate jobs were cancelled. Selection
 and shard numbers are now mandatory command arguments, checked again against
 the prepared manifest before execution. They do not depend on environment
 variables surviving the guard.
+
+The numeric and private-import Lake projects have a separate application harness:
+
+```sh
+node scripts/full-lean/run-bounded.mjs -- \
+  python3 scripts/full-lean/base-pages.py \
+  node integration/application-upstream-packages.mjs \
+  .work/numeric-node-ofScientific node /absolute/path/to/node \
+  /absolute/path/to/installed/compiler /absolute/path/to/pristine/reference \
+  ofScientific
+```
+
+Select `float`, `ofScientific` or `exe_private_lean_import`, and use a fresh output
+directory for each engine/case. The reference is an extracted Lean 4.34 tree verified against all
+7,669 recorded source entries. This harness runs the original shell driver in
+an independent package copy, then compares the native executable with a build
+through the installed Lasm CLI. Both source trees are hidden before the
+relocated deployment executes. The complete original vendored datasets are
+copied as deployment assets; no input filters or changed assertions are used.
+Every per-file vector count, failure count and total must match. Float timings
+remain in raw logs but are excluded from the comparison. Its original program
+explicitly invokes `gzip`; the runtime PATH contains only that recorded external
+dependency. The other projects run with an empty PATH. The private-import case
+retains the original environment-initialization assertion and additionally
+compares the entire native and deployed output. The parallel
+harness allows thirty minutes per phase within the same memory guard and
+records timeouts separately from behavior failures. Harness availability alone
+is not acceptance evidence.

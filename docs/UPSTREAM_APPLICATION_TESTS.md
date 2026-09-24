@@ -211,3 +211,16 @@ those historical snapshots; executable compiler artifacts, original upstream
 tests and their result receipts were not changed. Two archive-selection
 preflights exited before making changes and are retained separately. Neither
 archival nor the safe disk stop counts as an application test failure.
+
+The mixed registration `pkg/ofScientific` now passes all **10,047 original
+vendored vectors in each of stock Node, Deno and Bun**, using installed `.14`
+on Linux x64. Its original native shell driver and independent native executable
+both pass before each application build. Relocated deployments run with hidden
+source trees, empty PATH and unchanged datasets; per-file counts, failure counts
+and total output match native. All 7,669 reference entries remain unchanged.
+The [three-engine evidence](evidence/upstream-ofscientific-2026-09-24.json) records
+the 3.49 GiB maximum peak without resource events. The separate
+`integration/application-upstream-packages.mjs` harness also supports the reviewed
+floating-point and private-import projects; their acceptance remains separate
+until their recorded runs finish. Other mixed registrations and native platforms
+remain open.
