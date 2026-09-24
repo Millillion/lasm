@@ -48,6 +48,18 @@ Resource aborts, cold-build deadlines, behavior failures, unsupported inputs and
 unexecuted cases must stay distinct in reports. No broad campaign should start
 until it uses the shipping application path and obeys the resource guard.
 
+The separate [excluded-concurrency controls](evidence/upstream-excluded-concurrency-2026-09-24.json)
+run the unchanged `async_select_channel` and `sync_mutex` elaboration drivers,
+then import their original definitions into a supplementary ordinary main.
+Installed `.19` matches native compiled behavior in three repetitions each in
+Node and Deno on Linux x64, covering eight channel-capacity assertions plus
+mutex, try-lock and condition-variable checks. Bun fails its first deployed
+repetition with stack overflow. A preserved Linux diagnostic passes after
+raising both its OS worker reservation and engine execution budget; the engine
+budget alone fails. Bundled startup integration remains pending. Peak memory
+is 3.59 GiB without resource events. These are extra controls for upstream
+exclusions, not additional default-suite passes or proof against all races.
+
 The new [application harness](../scripts/application-tests/README.md) now drives
 the installed npm candidate. The first five Node cases exercised filesystem read
 bounds, Unicode paths, dedicated tasks, exception reporting and cross-process

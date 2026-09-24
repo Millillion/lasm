@@ -1,0 +1,1641 @@
+{
+  "scope": "Separate unchanged upstream-exclusion controls and supplementary deployed concurrency assertions on Linux x64; not default-suite passes",
+  "releases": {
+    "lean": {
+      "tag_name": "v4.34.0",
+      "published_at": "2026-09-14T14:04:36Z",
+      "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest"
+    },
+    "deno": {
+      "tag_name": "v2.9.7",
+      "published_at": "2026-09-17T09:04:55Z",
+      "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest"
+    },
+    "bun": {
+      "tag_name": "bun-v1.4.2",
+      "published_at": "2026-09-05T05:55:48Z",
+      "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest"
+    },
+    "node": {
+      "version": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "v8": "14.6.202.34",
+      "npm": "11.19.1",
+      "source": "https://nodejs.org/dist/index.json"
+    },
+    "checkedAt": "2026-09-24T10:06:19.280520+00:00"
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r16/lasm-compiler-0.1.0-experimental.19.tgz",
+    "sha256": "7e477c20c3f0bd1ea201e83bf3ef92424eaf38472cf4eda890734301440e76b5",
+    "compressedBytes": 125374902,
+    "installedBytes": 629879442,
+    "files": 2673,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-lake-plugin-r1-resources.json",
+    "recordedAt": "2026-09-24T09:43:07.383Z"
+  },
+  "cases": [
+    {
+      "directory": ".work/upstream-concurrency-node-r1",
+      "resultSha256": "845a1e11e14a631e699b4491017f0eed9dc3563045895f5fddbc6a82e31d3c39",
+      "result": {
+        "scope": "Separate native and installed AOT runtime controls for two upstream-excluded inputs; not default-suite passes",
+        "target": "node",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "excluded": [
+          {
+            "source": "tests/elab/async_select_channel.lean",
+            "reason": "upstream CMake flaky/nondeterministic exclusion"
+          },
+          {
+            "source": "tests/elab/sync_mutex.lean",
+            "reason": "upstream CMake flaky/nondeterministic exclusion"
+          }
+        ],
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1",
+            "seconds": 0.0070377810000009046,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "v26.10.0\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native driver/async_select_channel",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native-environment.sh",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source/tests/elab/run_test.sh",
+              "async_select_channel.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/elab",
+            "seconds": 0.9946429750000007,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false async_select_channel.lean\n"
+          },
+          {
+            "label": "original native driver/sync_mutex",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native-environment.sh",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source/tests/elab/run_test.sh",
+              "sync_mutex.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/elab",
+            "seconds": 0.4811395360000006,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false sync_mutex.lean\n"
+          },
+          {
+            "label": "compile native runtime controls",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native oracle/lean/async_select_channel.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native oracle/lean/sync_mutex.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native oracle/lean/Main.c",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native concurrency control"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/elab",
+            "seconds": 1.1899948249999979,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/elab/Main.lean",
+              "--target",
+              "node",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/elab",
+            "seconds": 64.565753704,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/dist\n"
+          },
+          {
+            "label": "native repetition 1",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native concurrency control",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment",
+            "seconds": 0.21639289299999656,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed repetition 1",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment",
+            "seconds": 4.0701164750000025,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "native repetition 2",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native concurrency control",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment",
+            "seconds": 0.23617786599999818,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed repetition 2",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment",
+            "seconds": 3.967617440999995,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "native repetition 3",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native concurrency control",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment",
+            "seconds": 0.2487640720000054,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed repetition 3",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment",
+            "seconds": 4.57605034500001,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          }
+        ],
+        "repetitions": [
+          {
+            "repetition": 1,
+            "native": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            }
+          },
+          {
+            "repetition": 2,
+            "native": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            }
+          },
+          {
+            "repetition": 3,
+            "native": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "passed": true,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-node-r1-resources.json",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "harnessSha256": "55586f6d88c309ad077e5914eaf82d882ff410cc502415b2bf5ddd44ac9a4a28",
+        "fixture": {
+          "path": "integration/fixtures/ExcludedConcurrency.lean",
+          "sha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1"
+        },
+        "adaptations": [
+          "Run the original elaboration driver and its assertions on byte-identical copies of both excluded files. Keep the upstream exclusions unchanged.",
+          "A separate ordinary Lean main imports their unchanged public definitions and reruns all eight channel-capacity assertions plus mutex, try-lock and condition-variable checks at application runtime.",
+          "Compare three independent native-compiled and deployed executions. No random seed, original function, timeout inside the test, assertion or expected output is changed.",
+          "The deployed process has empty PATH and hidden source copies. These repetitions do not prove the upstream nondeterministic cases are permanently free of races."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "v26.10.0",
+        "packageVersion": "0.1.0-experimental.19",
+        "nativeDriverWrapperSha256": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6",
+        "nativeInputs": [
+          {
+            "module": "async_select_channel",
+            "sourceSha256": "1754df3e6cc34d31f371fc3e8cab3001201f733e62c0e65d4300321dba2645cc",
+            "cSha256": "9e00ad8143bfdf50a5c3752e2d9a0208297ef75c0b12e1866b9ff07166286e9b"
+          },
+          {
+            "module": "sync_mutex",
+            "sourceSha256": "1a0a03d96894348ba1906835678377c61011dfc356d6b4a9b2c05168bb427daa",
+            "cSha256": "2570a5ab041ea3fb7b146314c63dfd544e56eb62451f457ad00cebe572c09373"
+          },
+          {
+            "module": "Main",
+            "sourceSha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1",
+            "cSha256": "7191a0223cc43582612fad333134c4b25f3114e561f435541ff29a41c5d2ef1f"
+          }
+        ],
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "async_select_channel",
+              "sourceSha256": "1754df3e6cc34d31f371fc3e8cab3001201f733e62c0e65d4300321dba2645cc",
+              "cSha256": "9e00ad8143bfdf50a5c3752e2d9a0208297ef75c0b12e1866b9ff07166286e9b"
+            },
+            {
+              "module": "sync_mutex",
+              "sourceSha256": "1a0a03d96894348ba1906835678377c61011dfc356d6b4a9b2c05168bb427daa",
+              "cSha256": "2570a5ab041ea3fb7b146314c63dfd544e56eb62451f457ad00cebe572c09373"
+            },
+            {
+              "module": "Main",
+              "sourceSha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1",
+              "cSha256": "7191a0223cc43582612fad333134c4b25f3114e561f435541ff29a41c5d2ef1f"
+            }
+          ],
+          "signature": "f874af5868fca701514f478e84ca9843d65a4563a4fcf071b6f344ce65517ddb",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "wasmSha256": "91dff76ac63a371749c1fe2814dd7b297f3d1066110bccb59e9c7ab12bb92b18"
+        },
+        "sourceAfter": {
+          "checked": 2,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T10:08:43.464Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T10:07:05.340Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-upstream-concurrency-r1.sh",
+          "node",
+          ".work/upstream-concurrency-node-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "3ca2d78c-fc68-445b-ad47-cd17d883864d",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24693661696
+        },
+        "minimumHostAvailable": 21161267200,
+        "peakMemoryBytes": 3852537856,
+        "peakTasks": 36,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-node-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T10:08:43.462Z",
+          "memoryBytes": 819240960,
+          "peakMemoryBytes": 3852537856,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 122499072,
+            "file": 681340928,
+            "kernel": 13967360,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 667385856,
+            "slab": 11773272
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:08:43.524Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 705241088,
+          "peakMemoryBytes": 3852537856,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10240000,
+            "file": 681340928,
+            "kernel": 12492800,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 667385856,
+            "slab": 11667296
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:08:43.550Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-node-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment/program.wasm",
+            "originalBytes": 160453140,
+            "originalSha256": "91dff76ac63a371749c1fe2814dd7b297f3d1066110bccb59e9c7ab12bb92b18",
+            "mode": 509,
+            "mtimeNs": 1790244508520633276,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37267480,
+            "archiveSha256": "b3d3d77af5bca97d43d000572b7cfdfc4caa865933967ee479446046191ac9bd",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1",
+              "receiptSha256": "845a1e11e14a631e699b4491017f0eed9dc3563045895f5fddbc6a82e31d3c39"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/elab.hidden/.lake/lasm/applications/2bc0f42d930a447a/f874af5868fca701514f478e84ca9843d65a4563a4fcf071b6f344ce65517ddb/dist/program.wasm",
+            "originalBytes": 160453140,
+            "originalSha256": "91dff76ac63a371749c1fe2814dd7b297f3d1066110bccb59e9c7ab12bb92b18",
+            "mode": 509,
+            "mtimeNs": 1790244497848566169,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/elab.hidden/.lake/lasm/applications/2bc0f42d930a447a/f874af5868fca701514f478e84ca9843d65a4563a4fcf071b6f344ce65517ddb/dist/program.wasm.gz",
+            "archiveBytes": 37267480,
+            "archiveSha256": "b3d3d77af5bca97d43d000572b7cfdfc4caa865933967ee479446046191ac9bd",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1",
+              "receiptSha256": "845a1e11e14a631e699b4491017f0eed9dc3563045895f5fddbc6a82e31d3c39"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native concurrency control",
+            "originalBytes": 4764520,
+            "originalSha256": "472f293e1487fdb0c234b5d301fe030e498a77336faa165df36b2ebf2b3d507b",
+            "mode": 509,
+            "mtimeNs": 1790244443964231852,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1/native concurrency control.gz",
+            "archiveBytes": 1420771,
+            "archiveSha256": "0b63172156ac3d5939bd33f37174ec865c635206a33b000bdbffb91dce57c25c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-node-r1",
+              "receiptSha256": "845a1e11e14a631e699b4491017f0eed9dc3563045895f5fddbc6a82e31d3c39"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 249715069,
+        "finishedAt": "2026-09-24T10:10:07.674194+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T10:10:00.903Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-concurrency-r1.py",
+          ".work/upstream-concurrency-node-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "81233b4b-98fc-4d42-9182-faf34ecfd54b",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24716922880
+        },
+        "minimumHostAvailable": 24652320768,
+        "peakMemoryBytes": 87273472,
+        "peakTasks": 6,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-node-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T10:10:07.715Z",
+          "memoryBytes": 45764608,
+          "peakMemoryBytes": 87273472,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 4476928,
+            "file": 38694912,
+            "kernel": 1826816,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 38694912,
+            "slab": 1266168
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:10:07.742Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 53538816,
+          "peakMemoryBytes": 87273472,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 38694912,
+            "kernel": 2224128,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 38694912,
+            "slab": 1290752
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:10:07.769Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "directory": ".work/upstream-concurrency-deno-r1",
+      "resultSha256": "0dfad2942690d8772610e8cf38189f0b18b135775745ac9eecce12d59c32b3ed",
+      "result": {
+        "scope": "Separate native and installed AOT runtime controls for two upstream-excluded inputs; not default-suite passes",
+        "target": "deno",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "excluded": [
+          {
+            "source": "tests/elab/async_select_channel.lean",
+            "reason": "upstream CMake flaky/nondeterministic exclusion"
+          },
+          {
+            "source": "tests/elab/sync_mutex.lean",
+            "reason": "upstream CMake flaky/nondeterministic exclusion"
+          }
+        ],
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1",
+            "seconds": 0.00916605200000049,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native driver/async_select_channel",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native-environment.sh",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source/tests/elab/run_test.sh",
+              "async_select_channel.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/elab",
+            "seconds": 1.168423354999999,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false async_select_channel.lean\n"
+          },
+          {
+            "label": "original native driver/sync_mutex",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native-environment.sh",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source/tests/elab/run_test.sh",
+              "sync_mutex.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/elab",
+            "seconds": 0.5118070969999989,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false sync_mutex.lean\n"
+          },
+          {
+            "label": "compile native runtime controls",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native oracle/lean/async_select_channel.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native oracle/lean/sync_mutex.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native oracle/lean/Main.c",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native concurrency control"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/elab",
+            "seconds": 1.1139686389999988,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/elab/Main.lean",
+              "--target",
+              "deno",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/elab",
+            "seconds": 64.918771404,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for deno\u2026\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for deno: /home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/dist\n"
+          },
+          {
+            "label": "native repetition 1",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native concurrency control",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment",
+            "seconds": 0.21023653100000228,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed repetition 1",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment",
+            "seconds": 4.5040446490000035,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "native repetition 2",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native concurrency control",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment",
+            "seconds": 0.2152453300000052,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed repetition 2",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment",
+            "seconds": 4.194940371999997,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "native repetition 3",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native concurrency control",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment",
+            "seconds": 0.23438514700000815,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed repetition 3",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment",
+            "seconds": 4.273041402000002,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          }
+        ],
+        "repetitions": [
+          {
+            "repetition": 1,
+            "native": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            }
+          },
+          {
+            "repetition": 2,
+            "native": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            }
+          },
+          {
+            "repetition": 3,
+            "native": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            },
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "passed": true,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-deno-r1-resources.json",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "harnessSha256": "55586f6d88c309ad077e5914eaf82d882ff410cc502415b2bf5ddd44ac9a4a28",
+        "fixture": {
+          "path": "integration/fixtures/ExcludedConcurrency.lean",
+          "sha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1"
+        },
+        "adaptations": [
+          "Run the original elaboration driver and its assertions on byte-identical copies of both excluded files. Keep the upstream exclusions unchanged.",
+          "A separate ordinary Lean main imports their unchanged public definitions and reruns all eight channel-capacity assertions plus mutex, try-lock and condition-variable checks at application runtime.",
+          "Compare three independent native-compiled and deployed executions. No random seed, original function, timeout inside the test, assertion or expected output is changed.",
+          "The deployed process has empty PATH and hidden source copies. These repetitions do not prove the upstream nondeterministic cases are permanently free of races."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "packageVersion": "0.1.0-experimental.19",
+        "nativeDriverWrapperSha256": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6",
+        "nativeInputs": [
+          {
+            "module": "async_select_channel",
+            "sourceSha256": "1754df3e6cc34d31f371fc3e8cab3001201f733e62c0e65d4300321dba2645cc",
+            "cSha256": "9e00ad8143bfdf50a5c3752e2d9a0208297ef75c0b12e1866b9ff07166286e9b"
+          },
+          {
+            "module": "sync_mutex",
+            "sourceSha256": "1a0a03d96894348ba1906835678377c61011dfc356d6b4a9b2c05168bb427daa",
+            "cSha256": "2570a5ab041ea3fb7b146314c63dfd544e56eb62451f457ad00cebe572c09373"
+          },
+          {
+            "module": "Main",
+            "sourceSha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1",
+            "cSha256": "7191a0223cc43582612fad333134c4b25f3114e561f435541ff29a41c5d2ef1f"
+          }
+        ],
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "async_select_channel",
+              "sourceSha256": "1754df3e6cc34d31f371fc3e8cab3001201f733e62c0e65d4300321dba2645cc",
+              "cSha256": "9e00ad8143bfdf50a5c3752e2d9a0208297ef75c0b12e1866b9ff07166286e9b"
+            },
+            {
+              "module": "sync_mutex",
+              "sourceSha256": "1a0a03d96894348ba1906835678377c61011dfc356d6b4a9b2c05168bb427daa",
+              "cSha256": "2570a5ab041ea3fb7b146314c63dfd544e56eb62451f457ad00cebe572c09373"
+            },
+            {
+              "module": "Main",
+              "sourceSha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1",
+              "cSha256": "7191a0223cc43582612fad333134c4b25f3114e561f435541ff29a41c5d2ef1f"
+            }
+          ],
+          "signature": "cbf283e086fef8421ff67b08cd9023a7d3a1715e4c85fb8e093e53d47a849227",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "wasmSha256": "91dff76ac63a371749c1fe2814dd7b297f3d1066110bccb59e9c7ab12bb92b18"
+        },
+        "sourceAfter": {
+          "checked": 2,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T10:11:46.288Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T10:10:07.834Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-upstream-concurrency-r1.sh",
+          "deno",
+          ".work/upstream-concurrency-deno-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "91bc607f-95fc-4947-91fa-ef5f32304f68",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24675422208
+        },
+        "minimumHostAvailable": 21056761856,
+        "peakMemoryBytes": 3546230784,
+        "peakTasks": 45,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-deno-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T10:11:46.348Z",
+          "memoryBytes": 398540800,
+          "peakMemoryBytes": 3546230784,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 9457664,
+            "file": 375545856,
+            "kernel": 12611584,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 369807360,
+            "slab": 11775240
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:11:46.356Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 400637952,
+          "peakMemoryBytes": 3546230784,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 375545856,
+            "kernel": 12709888,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 369807360,
+            "slab": 11777520
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:11:46.380Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-deno-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment/program.wasm",
+            "originalBytes": 160453140,
+            "originalSha256": "91dff76ac63a371749c1fe2814dd7b297f3d1066110bccb59e9c7ab12bb92b18",
+            "mode": 509,
+            "mtimeNs": 1790244690832830771,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37267480,
+            "archiveSha256": "b3d3d77af5bca97d43d000572b7cfdfc4caa865933967ee479446046191ac9bd",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1",
+              "receiptSha256": "0dfad2942690d8772610e8cf38189f0b18b135775745ac9eecce12d59c32b3ed"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/elab.hidden/.lake/lasm/applications/33b3f48c52046432/cbf283e086fef8421ff67b08cd9023a7d3a1715e4c85fb8e093e53d47a849227/dist/program.wasm",
+            "originalBytes": 160453140,
+            "originalSha256": "91dff76ac63a371749c1fe2814dd7b297f3d1066110bccb59e9c7ab12bb92b18",
+            "mode": 509,
+            "mtimeNs": 1790244680562760515,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/elab.hidden/.lake/lasm/applications/33b3f48c52046432/cbf283e086fef8421ff67b08cd9023a7d3a1715e4c85fb8e093e53d47a849227/dist/program.wasm.gz",
+            "archiveBytes": 37267480,
+            "archiveSha256": "b3d3d77af5bca97d43d000572b7cfdfc4caa865933967ee479446046191ac9bd",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1",
+              "receiptSha256": "0dfad2942690d8772610e8cf38189f0b18b135775745ac9eecce12d59c32b3ed"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native concurrency control",
+            "originalBytes": 4764520,
+            "originalSha256": "472f293e1487fdb0c234b5d301fe030e498a77336faa165df36b2ebf2b3d507b",
+            "mode": 509,
+            "mtimeNs": 1790244625931389080,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1/native concurrency control.gz",
+            "archiveBytes": 1420771,
+            "archiveSha256": "0b63172156ac3d5939bd33f37174ec865c635206a33b000bdbffb91dce57c25c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-deno-r1",
+              "receiptSha256": "0dfad2942690d8772610e8cf38189f0b18b135775745ac9eecce12d59c32b3ed"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 249715069,
+        "finishedAt": "2026-09-24T10:11:52.839372+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T10:11:46.434Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-concurrency-r1.py",
+          ".work/upstream-concurrency-deno-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "6e4b46e4-dad2-45ad-8d36-e051cf84f8f6",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23579582464
+        },
+        "minimumHostAvailable": 23579582464,
+        "peakMemoryBytes": 87154688,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-deno-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T10:11:52.844Z",
+          "memoryBytes": 39862272,
+          "peakMemoryBytes": 87154688,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 38694912,
+            "kernel": 1167360,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 38694912,
+            "slab": 1158608
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:11:52.893Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 53768192,
+          "peakMemoryBytes": 87154688,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 38694912,
+            "kernel": 2232320,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 38694912,
+            "slab": 1291656
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:11:52.918Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "directory": ".work/upstream-concurrency-bun-r1",
+      "resultSha256": "1b1cdd6a250342188105f00eb44956cda50620b9ba93bee883f1370b634e0fdd",
+      "result": {
+        "scope": "Separate native and installed AOT runtime controls for two upstream-excluded inputs; not default-suite passes",
+        "target": "bun",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "excluded": [
+          {
+            "source": "tests/elab/async_select_channel.lean",
+            "reason": "upstream CMake flaky/nondeterministic exclusion"
+          },
+          {
+            "source": "tests/elab/sync_mutex.lean",
+            "reason": "upstream CMake flaky/nondeterministic exclusion"
+          }
+        ],
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1",
+            "seconds": 0.004745738999999958,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "1.4.2\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native driver/async_select_channel",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/native-environment.sh",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source/tests/elab/run_test.sh",
+              "async_select_channel.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/elab",
+            "seconds": 0.9182914419999997,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false async_select_channel.lean\n"
+          },
+          {
+            "label": "original native driver/sync_mutex",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/native-environment.sh",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source/tests/elab/run_test.sh",
+              "sync_mutex.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/elab",
+            "seconds": 0.47338133700000073,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "++ lean --root=.. -DprintMessageEndPos=true -Dlinter.all=false -DElab.inServer=true -Dcompiler.postponeCompile=false sync_mutex.lean\n"
+          },
+          {
+            "label": "compile native runtime controls",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/native oracle/lean/async_select_channel.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/native oracle/lean/sync_mutex.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/native oracle/lean/Main.c",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/native concurrency control"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/elab",
+            "seconds": 1.1508427300000004,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/elab/Main.lean",
+              "--target",
+              "bun",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/elab",
+            "seconds": 96.39794179800002,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for bun\u2026\nBuilding Main.lean for bun\u2026\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for bun: /home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/dist\n"
+          },
+          {
+            "label": "native repetition 1",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/native concurrency control",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/relocated deployment",
+            "seconds": 0.21285222399998746,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed repetition 1",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/relocated deployment",
+            "seconds": 2.116074851000012,
+            "timeout": false,
+            "code": 134,
+            "signal": null,
+            "stdout": "",
+            "stderr": "\nStack overflow detected. Aborting.\n"
+          }
+        ],
+        "repetitions": [],
+        "passed": false,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-bun-r1-resources.json",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "harnessSha256": "55586f6d88c309ad077e5914eaf82d882ff410cc502415b2bf5ddd44ac9a4a28",
+        "fixture": {
+          "path": "integration/fixtures/ExcludedConcurrency.lean",
+          "sha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1"
+        },
+        "adaptations": [
+          "Run the original elaboration driver and its assertions on byte-identical copies of both excluded files. Keep the upstream exclusions unchanged.",
+          "A separate ordinary Lean main imports their unchanged public definitions and reruns all eight channel-capacity assertions plus mutex, try-lock and condition-variable checks at application runtime.",
+          "Compare three independent native-compiled and deployed executions. No random seed, original function, timeout inside the test, assertion or expected output is changed.",
+          "The deployed process has empty PATH and hidden source copies. These repetitions do not prove the upstream nondeterministic cases are permanently free of races."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "deployed repetition 1",
+        "engineVersion": "1.4.2",
+        "packageVersion": "0.1.0-experimental.19",
+        "nativeDriverWrapperSha256": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6",
+        "nativeInputs": [
+          {
+            "module": "async_select_channel",
+            "sourceSha256": "1754df3e6cc34d31f371fc3e8cab3001201f733e62c0e65d4300321dba2645cc",
+            "cSha256": "9e00ad8143bfdf50a5c3752e2d9a0208297ef75c0b12e1866b9ff07166286e9b"
+          },
+          {
+            "module": "sync_mutex",
+            "sourceSha256": "1a0a03d96894348ba1906835678377c61011dfc356d6b4a9b2c05168bb427daa",
+            "cSha256": "2570a5ab041ea3fb7b146314c63dfd544e56eb62451f457ad00cebe572c09373"
+          },
+          {
+            "module": "Main",
+            "sourceSha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1",
+            "cSha256": "7191a0223cc43582612fad333134c4b25f3114e561f435541ff29a41c5d2ef1f"
+          }
+        ],
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "async_select_channel",
+              "sourceSha256": "1754df3e6cc34d31f371fc3e8cab3001201f733e62c0e65d4300321dba2645cc",
+              "cSha256": "9e00ad8143bfdf50a5c3752e2d9a0208297ef75c0b12e1866b9ff07166286e9b"
+            },
+            {
+              "module": "sync_mutex",
+              "sourceSha256": "1a0a03d96894348ba1906835678377c61011dfc356d6b4a9b2c05168bb427daa",
+              "cSha256": "2570a5ab041ea3fb7b146314c63dfd544e56eb62451f457ad00cebe572c09373"
+            },
+            {
+              "module": "Main",
+              "sourceSha256": "c1d7edc5c75962a8dd7922a2f5f95cc7388d1b2b8ccad57519238c97b6dba9e1",
+              "cSha256": "7191a0223cc43582612fad333134c4b25f3114e561f435541ff29a41c5d2ef1f"
+            }
+          ],
+          "signature": "689dd5782319d8cb555bde2fd0c6232e5a62b594f952e4fe2cd2629e55b9da54",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-concurrency-bun-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "wasmSha256": "0460bc5efe21da9e24b7cf18e59d4acf25fcfd6ada91dd336a36822a7192f61e"
+        },
+        "error": {
+          "message": "deployed repetition 1: \nStack overflow detected. Aborting.\n\n\n134 !== 0\n",
+          "stack": "AssertionError [ERR_ASSERTION]: deployed repetition 1: \nStack overflow detected. Aborting.\n\n\n134 !== 0\n\n    at run (file:///home/lastmjs/development/lasm/compiler/integration/application-upstream-concurrency.mjs:52:77)\n    at file:///home/lastmjs/development/lasm/compiler/integration/application-upstream-concurrency.mjs:99:15\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+        },
+        "finishedAt": "2026-09-24T10:13:50.406Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T10:11:52.974Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-upstream-concurrency-r1.sh",
+          "bun",
+          ".work/upstream-concurrency-bun-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "2d3feff6-b18e-4c3c-9e97-fd7b407e27b0",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23947124736
+        },
+        "minimumHostAvailable": 21162790912,
+        "peakMemoryBytes": 3709460480,
+        "peakTasks": 52,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-concurrency-bun-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T10:13:50.322Z",
+          "memoryBytes": 1825382400,
+          "peakMemoryBytes": 3709460480,
+          "swapBytes": 0,
+          "tasks": 52,
+          "memoryBreakdown": {
+            "anon": 1417408512,
+            "file": 387166208,
+            "kernel": 19865600,
+            "shmem": 0,
+            "file_mapped": 835584,
+            "inactive_file": 382377984,
+            "slab": 12844352
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-24T10:13:50.465Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 413278208,
+          "peakMemoryBytes": 3709460480,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 387231744,
+            "kernel": 13152256,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 382377984,
+            "slab": 12186768
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:13:50.489Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": null,
+      "archiveResources": null
+    }
+  ],
+  "limits": [
+    "Only three repetitions per engine were run; passing does not establish absence of nondeterministic races.",
+    "The two original upstream CMake exclusions remain unchanged. These results are additional controls, not newly registered default-suite cases.",
+    "Native macOS, Windows and ARM64 application behavior and the remaining API surface are unverified by this probe.",
+    "Bun installed .19 fails its first deployed repetition with stack overflow. A separate Linux diagnostic passes with both larger OS-worker reservation and engine execution budget; this is not packaged acceptance."
+  ],
+  "recordedAt": "2026-09-24T10:20:51.600251+00:00",
+  "deployedPassedRepetitions": 6,
+  "failedEngine": "bun",
+  "diagnostic": {
+    "scope": "Stack-reservation diagnosis using unchanged failed concurrency deployment; not installed acceptance",
+    "sourceSha256": "d9f56a1d6d6a447baa4e218ffb19a7802227fcdd1614f7a47d67cf3eaa3ba599",
+    "helperSha256": "4cb6d9c4373e31c8211b6e9a0aa3b08563f6f50ffe41ebcf214ebaa6b29bde32",
+    "programSha256": "89b8280a53894368e1fcaf0a720443e955ddb74ee9f764571076080eb0b7f232",
+    "results": [
+      {
+        "name": "jsc-only-3mb",
+        "overrides": {
+          "BUN_JSC_maxPerThreadStackUsage": "3145728"
+        },
+        "code": 134,
+        "signal": null,
+        "stdout": "",
+        "stderr": "\nStack overflow detected. Aborting.\n",
+        "seconds": 2.01303284,
+        "matched": false
+      },
+      {
+        "name": "both-64mb",
+        "overrides": {
+          "LD_PRELOAD": "/home/lastmjs/development/lasm/compiler/.work/bun-concurrency-stack-r1/stack-reservation.so",
+          "BUN_JSC_maxPerThreadStackUsage": "62914560"
+        },
+        "code": 0,
+        "signal": null,
+        "stdout": "Channel capacity none: both sums match\nChannel capacity (some 0): both sums match\nChannel capacity (some 1): both sums match\nChannel capacity (some 128): both sums match\nMutex, try-lock and condition-variable checks passed\n",
+        "stderr": "",
+        "seconds": 3.793932258,
+        "matched": true
+      }
+    ],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-concurrency-stack-r1-resources.json"
+  },
+  "diagnosticResources": {
+    "startedAt": "2026-09-24T10:19:24.797Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      ".work/probe-concurrency-bun-stack-r1.mjs"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "fc8a1a69-4f4c-4a03-9664-4c216ed9a137",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24878252032
+    },
+    "minimumHostAvailable": 22449119232,
+    "peakMemoryBytes": 2041413632,
+    "peakTasks": 63,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-concurrency-stack-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T10:19:30.819Z",
+      "memoryBytes": 92897280,
+      "peakMemoryBytes": 2041413632,
+      "swapBytes": 0,
+      "tasks": 13,
+      "memoryBreakdown": {
+        "anon": 62238720,
+        "file": 21049344,
+        "kernel": 7122944,
+        "shmem": 0,
+        "file_mapped": 126976,
+        "inactive_file": 1253376,
+        "slab": 365912
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T10:19:30.906Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 33120256,
+      "peakMemoryBytes": 2041413632,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10248192,
+        "file": 21049344,
+        "kernel": 1015808,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1253376,
+        "slab": 169848
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T10:19:30.951Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  }
+}

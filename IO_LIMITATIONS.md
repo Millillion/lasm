@@ -67,6 +67,11 @@ separately from the earlier runtime evidence below.
   but their Emscripten C implementations still reject the operation or abort;
   shipping all library archives is not complete API support.
 - [ ] Complete large-stack/high-address parity in every engine and platform.
+  The [latest excluded-concurrency controls](docs/evidence/upstream-excluded-concurrency-2026-09-24.json)
+  pass in installed `.19` on Node and Deno, but Bun overflows its execution
+  stack. A Linux diagnostic using the unchanged application passes with both
+  larger OS-worker stacks and a larger engine budget; packaging that support
+  and verifying other native platforms remain open.
   The latest installed Node candidate now preserves the original upstream
   4 GiB thread-stack setting for `const_fold`; allocation, reclamation and
   unchanged SDK regression checks pass. See the
