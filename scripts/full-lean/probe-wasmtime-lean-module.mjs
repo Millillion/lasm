@@ -23,6 +23,7 @@ const report = { scope: 'Format validation and exception conversion of a real ge
   input, inputBytes: statSync(input).size, inputSha256: await hashFile(input),
   build: JSON.parse(readFileSync(join(deployment, 'build-info.json'), 'utf8')),
   sourceSha256: await hashFile(source), optimizer, optimizerSha256: await hashFile(optimizer),
+  conversion: { standardizedExceptions: true, compactImports: false },
   resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(program, args, timeout = 60_000) {
@@ -57,7 +58,9 @@ try {
   assert.match(report.original.diagnostic, /legacy_exceptions/);
   report.optimizerVersion = run(optimizer, ['--version']).stdout.trim();
   const converted = join(output, 'converted.wasm');
-  run(optimizer, [input, '--all-features', '--emit-exnref', '-o', converted], 1800_000);
+  // Wasmtime 49's validator accepts Binaryen's compact imports, but its actual
+  // compilation parser rejects them. Emit the ordinary import-section encoding.
+  run(optimizer, [input, '--all-features', '--disable-compact-imports', '--emit-exnref', '-o', converted], 1800_000);
   report.converted = { file: converted, bytes: statSync(converted).size,
     sha256: await hashFile(converted), ...assess(converted) };
   save(); assert.equal(report.converted.accepted, true, report.converted.diagnostic);

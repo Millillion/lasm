@@ -1,0 +1,668 @@
+{
+  "scope": "Lossless archival and deduplication of completed generated evidence, no new compatibility passes",
+  "recordedAt": "2026-09-24T06:05:20.948462+00:00",
+  "stages": [
+    {
+      "result": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-aot-archives-r1-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/aot-application-node-4.34-r1/deployed/program.wasm",
+            "originalBytes": 1835883,
+            "originalSha256": "90bcfc6efb07e2f55455ec944134bb962458e09b731123f1a605a8ea2757d8e8",
+            "mode": 509,
+            "mtimeNs": 1790183318685591885,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/aot-application-node-4.34-r1/deployed/program.wasm.gz",
+            "archiveBytes": 408224,
+            "archiveSha256": "8bf73de39410879b3c7c4293ee067e6b441cbe88caf08e4ed04ae66bf36b3acf",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/application-aot-three-engines-2026-09-23.json",
+              "receiptSha256": "e216dc2008ec71a94043f47fd12d81f59978bf17f3fb2aacc75ab075d58ad069"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/aot-application-deno-4.34-r1/deployed/program.wasm",
+            "originalBytes": 1835883,
+            "originalSha256": "90bcfc6efb07e2f55455ec944134bb962458e09b731123f1a605a8ea2757d8e8",
+            "mode": 509,
+            "mtimeNs": 1790183353323095587,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/aot-application-deno-4.34-r1/deployed/program.wasm.gz",
+            "archiveBytes": 408224,
+            "archiveSha256": "8bf73de39410879b3c7c4293ee067e6b441cbe88caf08e4ed04ae66bf36b3acf",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/application-aot-three-engines-2026-09-23.json",
+              "receiptSha256": "e216dc2008ec71a94043f47fd12d81f59978bf17f3fb2aacc75ab075d58ad069"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/aot-application-bun-4.34-r1/deployed/program.wasm",
+            "originalBytes": 1907135,
+            "originalSha256": "e3090780e8618249511cc1f1869bf318f0a01b40554ebf2367fac5290963cdaa",
+            "mode": 509,
+            "mtimeNs": 1790183386551574991,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/aot-application-bun-4.34-r1/deployed/program.wasm.gz",
+            "archiveBytes": 412563,
+            "archiveSha256": "3644a9118c0eeb7d2396d0051080917dda2eecfd8d2be0a687a10effd384e75f",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/application-aot-three-engines-2026-09-23.json",
+              "receiptSha256": "e216dc2008ec71a94043f47fd12d81f59978bf17f3fb2aacc75ab075d58ad069"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/aot-http-node-4.34-r5/application/deployed/program.wasm",
+            "originalBytes": 160833648,
+            "originalSha256": "bef1ad3b025ca1bcd3b9716940181ab2d5133a9c159da0618850ee3b1ca1ab46",
+            "mode": 509,
+            "mtimeNs": 1790186458146009528,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/aot-http-node-4.34-r5/application/deployed/program.wasm.gz",
+            "archiveBytes": 37315581,
+            "archiveSha256": "f77fe888d1405e6bd84156715566d541fa806a1c4c3baeff040fa98e54d5fc93",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/application-http-three-engines-2026-09-23.json",
+              "receiptSha256": "d4f54b31c5bb6f85a82384674fca12782ecfd25e7647f15ab7a43b200b93c6a7"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/aot-http-deno-4.34-r3/application/deployed/program.wasm",
+            "originalBytes": 160833648,
+            "originalSha256": "bef1ad3b025ca1bcd3b9716940181ab2d5133a9c159da0618850ee3b1ca1ab46",
+            "mode": 509,
+            "mtimeNs": 1790186210781430634,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/aot-http-deno-4.34-r3/application/deployed/program.wasm.gz",
+            "archiveBytes": 37315581,
+            "archiveSha256": "f77fe888d1405e6bd84156715566d541fa806a1c4c3baeff040fa98e54d5fc93",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/application-http-three-engines-2026-09-23.json",
+              "receiptSha256": "d4f54b31c5bb6f85a82384674fca12782ecfd25e7647f15ab7a43b200b93c6a7"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/aot-http-bun-4.34-r3/application/deployed/program.wasm",
+            "originalBytes": 166450735,
+            "originalSha256": "537bd4ad05c367413cf05781418fc53ff4a718580baf821ba4dd4cac539cc1f3",
+            "mode": 509,
+            "mtimeNs": 1790186576964845304,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/aot-http-bun-4.34-r3/application/deployed/program.wasm.gz",
+            "archiveBytes": 38469591,
+            "archiveSha256": "08a5dd4d9a3d40a95ff544618de0550ea52ae44b5316c8fb35179b96add405c6",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/application-http-three-engines-2026-09-23.json",
+              "receiptSha256": "d4f54b31c5bb6f85a82384674fca12782ecfd25e7647f15ab7a43b200b93c6a7"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 379367168,
+        "finishedAt": "2026-09-24T05:48:11.208547+00:00"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T05:48:02.184Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-completed-aot-r1.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "de0251ca-9ec4-4d90-81cf-7dc90ab4ea44",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25530716160
+        },
+        "minimumHostAvailable": 25280356352,
+        "peakMemoryBytes": 218243072,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-aot-archives-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:48:11.199Z",
+          "memoryBytes": 22503424,
+          "peakMemoryBytes": 218243072,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 11169792,
+            "file": 10108928,
+            "kernel": 520192,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 10108928,
+            "slab": 415616
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T05:48:11.267Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 13963264,
+          "peakMemoryBytes": 218243072,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 237568,
+            "kernel": 1081344,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 237568,
+            "slab": 151480
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:48:11.293Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "resultSha256": "f1ee6c5e51794872226467ec12771ccfa3eb11bd13f1982d968ab84777bb8cf3",
+      "script": ".work/archive-completed-aot-r1.py",
+      "scriptSha256": "0e562ca0cfd3b40151cbb92628cf2003fe76a789a538624eff78cdc81d2da51f"
+    },
+    {
+      "result": {
+        "scope": "Deduplication of byte-identical completed gzip archives only; all original archive paths and decoded bytes remain recoverable",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-archive-deduplication-r1-resources.json",
+        "sourceEvidence": [
+          {
+            "file": "docs/evidence/application-io-surface-2026-09-24.json",
+            "sha256": "c6f6c653f75d2f6f5c76dbb001aea7410e7d30bcd5d3355b3b482a50fd930fa5"
+          },
+          {
+            "file": "docs/evidence/upstream-ofscientific-2026-09-24.json",
+            "sha256": "9b240e6377ab3fec2f35e78bf8cc328469265142fe4c4ef1bc66837e4b40c809"
+          },
+          {
+            "file": "docs/evidence/upstream-private-import-2026-09-24.json",
+            "sha256": "4068b9126986c730d00113b2ca0e5278280589781d4430bcf8b51f63bdf49cf6"
+          }
+        ],
+        "files": [
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-surface-r1/filesystem-surface/source.hidden/.lake/lasm/applications/50045e5d678a8872/85212f9e4b7ba6c8c3c9a42a190a27b559e229dddfac38ae58299d975255fce9/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-surface-r1/filesystem-surface/relocated deployment/program.wasm.gz",
+            "sha256": "ce4ce54206453cf4fc6758459c59961688a6812cc45ae509cc9a1779cead2a37",
+            "bytes": 37257253,
+            "releasedAllocatedBytes": 37261312
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-surface-r1/filesystem-surface/relocated deployment/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-surface-r1/filesystem-surface/relocated deployment/program.wasm.gz",
+            "sha256": "ce4ce54206453cf4fc6758459c59961688a6812cc45ae509cc9a1779cead2a37",
+            "bytes": 37257253,
+            "releasedAllocatedBytes": 37261312
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-surface-r1/filesystem-surface/source.hidden/.lake/lasm/applications/aa368fae74a32670/b9aa851f7241c419cf4fa73348cc17c86766abfd7d2215c4b2863dde15a270b8/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-surface-r1/filesystem-surface/relocated deployment/program.wasm.gz",
+            "sha256": "ce4ce54206453cf4fc6758459c59961688a6812cc45ae509cc9a1779cead2a37",
+            "bytes": 37257253,
+            "releasedAllocatedBytes": 37261312
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-surface-r1/filesystem-surface/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-surface-r1/filesystem-surface/source.hidden/native.gz",
+            "sha256": "b060c8fd45e6a0230ca3daeb69a889549a7ed3c3a2a17c52d9e8921006471264",
+            "bytes": 1355315,
+            "releasedAllocatedBytes": 1355776
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-surface-r1/filesystem-surface/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-surface-r1/filesystem-surface/source.hidden/native.gz",
+            "sha256": "b060c8fd45e6a0230ca3daeb69a889549a7ed3c3a2a17c52d9e8921006471264",
+            "bytes": 1355315,
+            "releasedAllocatedBytes": 1355776
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-surface-r1/filesystem-surface/source.hidden/.lake/lasm/applications/acfc5b478eab0c5d/edc1d5f5f62fb918320fa9f56049254d8312865e6face42fd24037ff97cf1443/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-surface-r1/filesystem-surface/relocated deployment/program.wasm.gz",
+            "sha256": "f0e05b6b59908a66b3cfd6da28fee4802ea92be5caa1f298012b83fabf9d7a15",
+            "bytes": 38406915,
+            "releasedAllocatedBytes": 38408192
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-errors-r1/filesystem-errors/source.hidden/.lake/lasm/applications/74738c82afe04867/5503600a56c7d42fb9eea90760aa8c67175faa566a4faca190dd07041822cb40/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-errors-r1/filesystem-errors/relocated deployment/program.wasm.gz",
+            "sha256": "f53fbbd51a9b815772dac01b8f525296a0cc2baeed5dca8a55959b994308d8a0",
+            "bytes": 37255045,
+            "releasedAllocatedBytes": 37257216
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-errors-r1/filesystem-errors/relocated deployment/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-errors-r1/filesystem-errors/relocated deployment/program.wasm.gz",
+            "sha256": "f53fbbd51a9b815772dac01b8f525296a0cc2baeed5dca8a55959b994308d8a0",
+            "bytes": 37255045,
+            "releasedAllocatedBytes": 37257216
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-errors-r1/filesystem-errors/source.hidden/.lake/lasm/applications/b0e624daa06dd4f5/5d2b9333b26efa1b61497dc53a2d15f00001a5214a173d0ed16e997d074aa646/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-errors-r1/filesystem-errors/relocated deployment/program.wasm.gz",
+            "sha256": "f53fbbd51a9b815772dac01b8f525296a0cc2baeed5dca8a55959b994308d8a0",
+            "bytes": 37255045,
+            "releasedAllocatedBytes": 37257216
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-errors-r1/filesystem-errors/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-errors-r1/filesystem-errors/source.hidden/native.gz",
+            "sha256": "ac8d03fbd6b74c3e785ab301812494650f13b71541f844e0f6f11753b3470b34",
+            "bytes": 1357554,
+            "releasedAllocatedBytes": 1359872
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-errors-r1/filesystem-errors/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-errors-r1/filesystem-errors/source.hidden/native.gz",
+            "sha256": "ac8d03fbd6b74c3e785ab301812494650f13b71541f844e0f6f11753b3470b34",
+            "bytes": 1357554,
+            "releasedAllocatedBytes": 1359872
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-errors-r1/filesystem-errors/source.hidden/.lake/lasm/applications/0c9ee99ffc0bedc1/9bf7ea2c346a38d5733c6cdffaee9871614cce4dd34c51fb602caa1f43b71637/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-errors-r1/filesystem-errors/relocated deployment/program.wasm.gz",
+            "sha256": "d08e0d83541760eef0823fddb6d3d50a7e7644e8a96329f2e59e307d29d10089",
+            "bytes": 38404704,
+            "releasedAllocatedBytes": 38412288
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-standard-io-r1/standard-io/source.hidden/.lake/lasm/applications/667c14296e7c74b4/c734521f1dddf8184e630f9abc47c618583ed16194a00ecafff93ab74c08070d/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-standard-io-r1/standard-io/relocated deployment/program.wasm.gz",
+            "sha256": "237036ef5a7044e6c5dd432635012943fc7f4e90583d2fbe7a1f2b70af94e8c9",
+            "bytes": 37264495,
+            "releasedAllocatedBytes": 37269504
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-standard-io-r1/standard-io/relocated deployment/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-standard-io-r1/standard-io/relocated deployment/program.wasm.gz",
+            "sha256": "237036ef5a7044e6c5dd432635012943fc7f4e90583d2fbe7a1f2b70af94e8c9",
+            "bytes": 37264495,
+            "releasedAllocatedBytes": 37269504
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-standard-io-r1/standard-io/source.hidden/.lake/lasm/applications/e9444487e567d7a2/a60468775e794ff4777cc8b2c47bdb6d6d448d5f3612ad7677fabe2ccbdd8e90/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-standard-io-r1/standard-io/relocated deployment/program.wasm.gz",
+            "sha256": "237036ef5a7044e6c5dd432635012943fc7f4e90583d2fbe7a1f2b70af94e8c9",
+            "bytes": 37264495,
+            "releasedAllocatedBytes": 37269504
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-standard-io-r1/standard-io/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-standard-io-r1/standard-io/source.hidden/native.gz",
+            "sha256": "73cb97d062e9890931b115c4b375359c0b7a728860fee95ec952caea3d0832b8",
+            "bytes": 1022067,
+            "releasedAllocatedBytes": 1024000
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-standard-io-r1/standard-io/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-standard-io-r1/standard-io/source.hidden/native.gz",
+            "sha256": "73cb97d062e9890931b115c4b375359c0b7a728860fee95ec952caea3d0832b8",
+            "bytes": 1022067,
+            "releasedAllocatedBytes": 1024000
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-standard-io-r1/standard-io/source.hidden/.lake/lasm/applications/801419d6ed392df5/9241c606e7dc0d2fdea927bd57c089b41cfef679244eceb3248fb0e007d4767b/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-standard-io-r1/standard-io/relocated deployment/program.wasm.gz",
+            "sha256": "514b92110ee19bdeb505d6ff49d86ce79e461207c00ed9e3dde8d09c3cf1dc75",
+            "bytes": 38414813,
+            "releasedAllocatedBytes": 38420480
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-getline-state-r1/getline-state/source.hidden/.lake/lasm/applications/3a3904f1f087f164/6fd71b98150bbfcae2f12983a9820b5492c1bf76e7883aed0b4a34066f316e0d/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-getline-state-r1/getline-state/relocated deployment/program.wasm.gz",
+            "sha256": "86c3fc4afd467e1ac6fd10de29504d3478c52b11103bb3239c63c79eb5c18acc",
+            "bytes": 37243322,
+            "releasedAllocatedBytes": 37244928
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-getline-state-r1/getline-state/relocated deployment/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-getline-state-r1/getline-state/relocated deployment/program.wasm.gz",
+            "sha256": "86c3fc4afd467e1ac6fd10de29504d3478c52b11103bb3239c63c79eb5c18acc",
+            "bytes": 37243322,
+            "releasedAllocatedBytes": 37244928
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-getline-state-r1/getline-state/source.hidden/.lake/lasm/applications/1c5ed2ac8068801d/adeea5c7788cc56d0b4397c26d7c28e5e5d911979318be63cf8b7fadd95d4894/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-getline-state-r1/getline-state/relocated deployment/program.wasm.gz",
+            "sha256": "86c3fc4afd467e1ac6fd10de29504d3478c52b11103bb3239c63c79eb5c18acc",
+            "bytes": 37243322,
+            "releasedAllocatedBytes": 37244928
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-getline-state-r1/getline-state/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-getline-state-r1/getline-state/source.hidden/native.gz",
+            "sha256": "cf6c22eea5abfce18b201c72755dd5bcf657875a4e49dcd29b522142eda02086",
+            "bytes": 1340230,
+            "releasedAllocatedBytes": 1343488
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-getline-state-r1/getline-state/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-getline-state-r1/getline-state/source.hidden/native.gz",
+            "sha256": "cf6c22eea5abfce18b201c72755dd5bcf657875a4e49dcd29b522142eda02086",
+            "bytes": 1340230,
+            "releasedAllocatedBytes": 1343488
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-getline-state-r1/getline-state/source.hidden/.lake/lasm/applications/6ca97919b5994fe7/002cfb6053eeb86e31971dcdda7ff2aa419828623deedd7b695092405db0fb2d/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-getline-state-r1/getline-state/relocated deployment/program.wasm.gz",
+            "sha256": "5ee287402bdf972b37c0c15fedacd07272ae024556049dae70a23548562450f6",
+            "bytes": 38397347,
+            "releasedAllocatedBytes": 38400000
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-truncate-errors-r1/truncate-errors/source.hidden/.lake/lasm/applications/307ff1f3661735b1/c91bf0fe3f9ed7326ad723abea46a9b7f99c35d2c5eebd70efb9d93f4d1873a5/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-truncate-errors-r1/truncate-errors/relocated deployment/program.wasm.gz",
+            "sha256": "0a6f07c57ac62fcb8e572dc12a9435af5bef86798f029801d8a9c50cc896a1cb",
+            "bytes": 37245146,
+            "releasedAllocatedBytes": 37249024
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-truncate-errors-r1/truncate-errors/relocated deployment/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-truncate-errors-r1/truncate-errors/relocated deployment/program.wasm.gz",
+            "sha256": "0a6f07c57ac62fcb8e572dc12a9435af5bef86798f029801d8a9c50cc896a1cb",
+            "bytes": 37245146,
+            "releasedAllocatedBytes": 37249024
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-truncate-errors-r1/truncate-errors/source.hidden/.lake/lasm/applications/56d0a5bc9948401f/3cb58600b885c1eb60c707f35595337c25658144a2ec9d533ff2d010b3001c45/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-truncate-errors-r1/truncate-errors/relocated deployment/program.wasm.gz",
+            "sha256": "0a6f07c57ac62fcb8e572dc12a9435af5bef86798f029801d8a9c50cc896a1cb",
+            "bytes": 37245146,
+            "releasedAllocatedBytes": 37249024
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-truncate-errors-r1/truncate-errors/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-truncate-errors-r1/truncate-errors/source.hidden/native.gz",
+            "sha256": "cb250e90f7bb7a2c38c3e7552c8c786d95119161b91ff3ab78d06e557040f618",
+            "bytes": 1345699,
+            "releasedAllocatedBytes": 1347584
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-truncate-errors-r1/truncate-errors/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-truncate-errors-r1/truncate-errors/source.hidden/native.gz",
+            "sha256": "cb250e90f7bb7a2c38c3e7552c8c786d95119161b91ff3ab78d06e557040f618",
+            "bytes": 1345699,
+            "releasedAllocatedBytes": 1347584
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-truncate-errors-r1/truncate-errors/source.hidden/.lake/lasm/applications/9f42772b53d01c4c/173dc07f46ea09b56206f404fec05eff09efe5a39cd339b94f4634071edc0f23/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-truncate-errors-r1/truncate-errors/relocated deployment/program.wasm.gz",
+            "sha256": "788b833e7843dfd3ade77c9427efbf059b228ab4dc93162aed4aa601ff9fadf6",
+            "bytes": 38395608,
+            "releasedAllocatedBytes": 38395904
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-console-buffering-r1/console-buffering/source.hidden/.lake/lasm/applications/e7fc98e651151431/b11d77d1e8c4515ddfeafbf5cdd727ff936a8d12d2d56784697206982cf6a53f/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-console-buffering-r1/console-buffering/relocated deployment/program.wasm.gz",
+            "sha256": "a2a1c65190a80f94e9d7638c6a90346b0f4dfb2b30d30e4c15747e5e95d7613a",
+            "bytes": 37251998,
+            "releasedAllocatedBytes": 37253120
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-console-buffering-r1/console-buffering/relocated deployment/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-console-buffering-r1/console-buffering/relocated deployment/program.wasm.gz",
+            "sha256": "a2a1c65190a80f94e9d7638c6a90346b0f4dfb2b30d30e4c15747e5e95d7613a",
+            "bytes": 37251998,
+            "releasedAllocatedBytes": 37253120
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-console-buffering-r1/console-buffering/source.hidden/.lake/lasm/applications/e5af2b35515dee66/fc6b0f5fca6f6c93861092927a51025fd011117efc9a85a6b32c2c0ccf2310f7/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-console-buffering-r1/console-buffering/relocated deployment/program.wasm.gz",
+            "sha256": "a2a1c65190a80f94e9d7638c6a90346b0f4dfb2b30d30e4c15747e5e95d7613a",
+            "bytes": 37251998,
+            "releasedAllocatedBytes": 37253120
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-console-buffering-r1/console-buffering/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-console-buffering-r1/console-buffering/source.hidden/native.gz",
+            "sha256": "7f781db6d85eddbcb0cc6f0b6c7b8f73625f343151da556db8960298ad553e55",
+            "bytes": 1316520,
+            "releasedAllocatedBytes": 1318912
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-console-buffering-r1/console-buffering/source.hidden/native.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-console-buffering-r1/console-buffering/source.hidden/native.gz",
+            "sha256": "7f781db6d85eddbcb0cc6f0b6c7b8f73625f343151da556db8960298ad553e55",
+            "bytes": 1316520,
+            "releasedAllocatedBytes": 1318912
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-console-buffering-r1/console-buffering/source.hidden/.lake/lasm/applications/6b3e977f3e1a4e95/2ec057d4b899541af5a98294cb2fcd1ef13f26317ec608195dc4902f2e1edd4e/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-console-buffering-r1/console-buffering/relocated deployment/program.wasm.gz",
+            "sha256": "c0b634c87567918e153a1a1b5cce384d5ad29b5fe104842c3f9e3c2c44da09b6",
+            "bytes": 38402700,
+            "releasedAllocatedBytes": 38404096
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/application source.hidden/.lake/lasm/applications/f26e9e5a39ed7a56/8dd571c83aef1aab007aa36109e279d3c357df21c1a5413cf3d87a1c86cfa750/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/relocated deployment/program.wasm.gz",
+            "sha256": "d968faaa3a2bb340d2cf422859dc093f0b6403542a5d681086147692f456c68c",
+            "bytes": 37264869,
+            "releasedAllocatedBytes": 37265408
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/relocated deployment/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/relocated deployment/program.wasm.gz",
+            "sha256": "d968faaa3a2bb340d2cf422859dc093f0b6403542a5d681086147692f456c68c",
+            "bytes": 37264869,
+            "releasedAllocatedBytes": 37265408
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/application source.hidden/.lake/lasm/applications/2181153c98148702/607efdbed13518c0a1badcca6134e53b4daa17361825700451b1b06895f28473/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/relocated deployment/program.wasm.gz",
+            "sha256": "d968faaa3a2bb340d2cf422859dc093f0b6403542a5d681086147692f456c68c",
+            "bytes": 37264869,
+            "releasedAllocatedBytes": 37265408
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check.gz",
+            "sha256": "ab3ff03769bfa964a5e63188c9893fc9efe5f5db902d1eeccf012bd15436ae20",
+            "bytes": 909412,
+            "releasedAllocatedBytes": 913408
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-ofScientific-r1/native source.hidden/.lake/build/bin/parse-number-check.gz",
+            "sha256": "ab3ff03769bfa964a5e63188c9893fc9efe5f5db902d1eeccf012bd15436ae20",
+            "bytes": 909412,
+            "releasedAllocatedBytes": 913408
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/application source.hidden/.lake/lasm/applications/74c33f4ff11fa15a/9cf16e389165180333aba694a6a24231cc50270b676df8b8017be9c3d710d7ad/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-ofScientific-r1/relocated deployment/program.wasm.gz",
+            "sha256": "8a74c7b9cb2ee151514a151a972efc8844ade279f7d767dc17640d0413bf2908",
+            "bytes": 38412246,
+            "releasedAllocatedBytes": 38412288
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-exe_private_lean_import-r2/release-pinned application source.hidden/.lake/lasm/applications/02ce313bb36e28aa/6ad5e4f2b264afd5988cb8c95e91ffd2e1f4189859138352b999fa1428dfe91f/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-exe_private_lean_import-r2/relocated deployment/program.wasm.gz",
+            "sha256": "2269d33941f3fbaba07d0f64eb497bc99128545ca023e4c7fdef1c7806ba3b95",
+            "bytes": 37234610,
+            "releasedAllocatedBytes": 37236736
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-exe_private_lean_import-r2/relocated deployment/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-exe_private_lean_import-r2/relocated deployment/program.wasm.gz",
+            "sha256": "2269d33941f3fbaba07d0f64eb497bc99128545ca023e4c7fdef1c7806ba3b95",
+            "bytes": 37234610,
+            "releasedAllocatedBytes": 37236736
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-exe_private_lean_import-r2/release-pinned application source.hidden/.lake/lasm/applications/9e69bc27ab19e306/e55010b7a0f8b97d814795588bfe8f7ea7bf2d96ec01bb0046a02caa871f474b/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-exe_private_lean_import-r2/relocated deployment/program.wasm.gz",
+            "sha256": "2269d33941f3fbaba07d0f64eb497bc99128545ca023e4c7fdef1c7806ba3b95",
+            "bytes": 37234610,
+            "releasedAllocatedBytes": 37236736
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-exe_private_lean_import-r2/native source.hidden/.lake/build/bin/main.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-exe_private_lean_import-r2/native source.hidden/.lake/build/bin/main.gz",
+            "sha256": "f0d3f2e36280982ebfac89843db7bd5b9528d45db0f514aa75e95d24c1790820",
+            "bytes": 39270760,
+            "releasedAllocatedBytes": 39272448
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-exe_private_lean_import-r2/native source.hidden/.lake/build/bin/main.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-exe_private_lean_import-r2/native source.hidden/.lake/build/bin/main.gz",
+            "sha256": "f0d3f2e36280982ebfac89843db7bd5b9528d45db0f514aa75e95d24c1790820",
+            "bytes": 39270760,
+            "releasedAllocatedBytes": 39276544
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-exe_private_lean_import-r2/release-pinned application source.hidden/.lake/lasm/applications/1d67b0f371ba1f93/d06c495a8f3ba901003721fdf8783ec0075697a0a0c56f8f52bfc5bab37f0abe/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-exe_private_lean_import-r2/relocated deployment/program.wasm.gz",
+            "sha256": "9f612cc88e3c42c5fb0d7196ca90fd305d93b0c5176be5c6e7baa741d7e17564",
+            "bytes": 38385357,
+            "releasedAllocatedBytes": 38387712
+          }
+        ],
+        "restore": "Archives share immutable storage. Use gzip -dc ARCHIVE > ORIGINAL; verify the original hash and restore mode/mtime from the source evidence. Never rewrite an archive in place.",
+        "savedAllocatedBytes": 1297227776,
+        "finishedAt": "2026-09-24T06:01:37.191988+00:00"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T06:01:18.397Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/dedupe-completed-archives-r1.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "6e72fdd4-65eb-492d-899a-7d5646056ee0",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25403609088
+        },
+        "minimumHostAvailable": 25330356224,
+        "peakMemoryBytes": 48087040,
+        "peakTasks": 6,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-archive-deduplication-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T06:01:37.229Z",
+          "memoryBytes": 11083776,
+          "peakMemoryBytes": 48087040,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 7827456,
+            "file": 1327104,
+            "kernel": 888832,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1327104,
+            "slab": 171008
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T06:01:37.243Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 15200256,
+          "peakMemoryBytes": 48087040,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11649024,
+            "file": 1327104,
+            "kernel": 1118208,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1327104,
+            "slab": 180504
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T06:01:37.268Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "resultSha256": "d19fb6b7a4f2d1de9f0b63d238129d5e4e72315ffe20a907a088de70c8977e40",
+      "script": ".work/dedupe-completed-archives-r1.py",
+      "scriptSha256": "a8b5d313f847c5524ed943847c645b27d2a526afed407a1863327d1e34aa2b2c"
+    }
+  ]
+}

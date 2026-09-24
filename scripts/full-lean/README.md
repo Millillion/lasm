@@ -1162,3 +1162,28 @@ including `instances`; the earlier capacity failure remains preserved. Stock Bun
 ASAN coverage of the new WebKit build, the full Lean suite, package integration,
 and other operating systems/architectures remain separate gates. See
 [the full capacity evidence](../../docs/evidence/bun-memory64-capacity-2026-09-22.json).
+
+### Private helper integration prerequisites
+
+`probe-wasmtime-lean-module.mjs` converts a real immutable Lean deployment to
+standard exceptions and ordinary import encoding. The latter matters: Wasmtime
+49's validator accepted compact imports, while its compilation parser rejected
+them. `probe-wasmtime-lean-compilation.mjs COMPLETED_FORMAT_PROBE NEW_OUTPUT`
+then compiles that verified module with one Cranelift worker, serializes at most
+640 MiB and reloads only its own freshly generated trusted cache. Use the normal
+process-tree guard, base-pages wrapper and an external 30-minute deadline. The
+probe requires five GiB free before starting and never instantiates Lean or
+supplies fake imports. Its Linux C probe disables core dumps. See the
+[compilation evidence](../../docs/evidence/wasmtime-real-lean-compilation-2026-09-24.json)
+for all earlier failures and the successful 5.16 GiB peak.
+
+`probe-wasmtime-memory-view.mjs NEW_OUTPUT window` checks a separate host-memory
+bridge prerequisite, using a one-GiB guard and base-pages wrapper. The native
+mapping is sparse; only one eight-byte cell at address 4 GiB is touched. Parent
+and worker access are ordered by messages. Each engine views eight bytes of the
+same native memory without copying, and native/Wasm operations observe the
+changes. Invalid ranges are rejected. The `whole` profile retains the original
+full-view experiment, which aborted Bun's process without a memory-resource
+event. These external views are ordinary ArrayBuffers, not SharedArrayBuffers;
+this does not implement JavaScript atomic synchronization or Emscripten's complete
+memory interface. See the [view evidence](../../docs/evidence/wasmtime-memory-views-2026-09-24.json).

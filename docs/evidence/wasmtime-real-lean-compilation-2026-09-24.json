@@ -1,0 +1,3412 @@
+{
+  "scope": "Private Wasmtime 49 compiler prerequisite with a real Lean 4.34 AOT module on Linux x64; no Lean instantiation or execution",
+  "recordedAt": "2026-09-24T06:03:05.994175+00:00",
+  "precedingEvidence": "docs/evidence/wasmtime-real-lean-format-2026-09-24.json",
+  "compilationAttempts": [
+    {
+      "attempt": 1,
+      "result": {
+        "scope": "Single-worker compilation, serialization and trusted-cache reload of a real Lean module; no application instantiated or executed",
+        "input": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r1/converted.wasm",
+        "inputSha256": "c497b2e54d85cafc583ff1295e80efebc798d5d9c0a79461cccf23895fa7282b",
+        "inputBytes": 160483617,
+        "precedingFormatProbe": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r1/result.json",
+        "precedingResultSha256": "cba100a227bd35c65edfd67c16ff6271854f67c253cbf86d39b90e0ca95b6bd4",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "c1e6d5c818e905b19033d4de2d810cd36eb750f6c54df97e6bbae56fcead403e",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "const_fold",
+              "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+              "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+            }
+          ],
+          "signature": "540f068c463b058f625049dbf7af467c6f715efa7020654fd3e1464e5a8b84d8",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "sourceSha256": "7bbc3c03f27b3b9c5507e46548abbe0349fa32fe40cf181d4c450f4ee31e49b9",
+        "harnessSha256": "a471718bb864da10b72eb54f1fad03f533000b8f0c8466b77fd79ea62ad7d7b6",
+        "configuration": {
+          "compiler": "Cranelift",
+          "optimization": "none",
+          "parallelCompilation": false,
+          "memory64": true,
+          "threads": true,
+          "sharedMemory": true,
+          "exceptions": true,
+          "maximumWasmStack": 67108864,
+          "memoryReservation": 8589934592,
+          "instantiation": false,
+          "linearMemoryAllocated": false
+        },
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r1-resources.json",
+        "commands": [
+          {
+            "program": "python3",
+            "args": [
+              "-I",
+              "-B",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/prepare-wasmtime-probe.py"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "{\"version\": \"49.0.0\", \"archiveSha256\": \"8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131\", \"files\": 115, \"selectedBytes\": 32341429}\n",
+            "stderr": ""
+          },
+          {
+            "program": "cc",
+            "args": [
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-shared",
+              "-fPIC",
+              "-I/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/include",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-compile-lean.c",
+              "-L/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+              "-lwasmtime",
+              "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r1/compiler.so"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          }
+        ],
+        "passed": false,
+        "helperInput": {
+          "version": "49.0.0",
+          "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+          "archiveBytes": 16115964,
+          "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz",
+          "selectedFiles": {
+            "lib/libwasmtime.so": {
+              "bytes": 31590960,
+              "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+            },
+            "include/wasmtime.h": {
+              "bytes": 10101,
+              "sha256": "a7497ea0048c0cb8a598c35ca05d1611a31725a88809ed9d51a8b1aebfc6b0c7"
+            },
+            "include/wasm.hh": {
+              "bytes": 19096,
+              "sha256": "ff657786aa259af466fd3ea8cb23646e8ada2b5741362c632d9cdad4be6e9c67"
+            },
+            "include/wasm.h": {
+              "bytes": 23796,
+              "sha256": "c8c2ab4be578bf618512e0720f939d1c8b9b0121f007091dd3746e60290977d9"
+            },
+            "include/wasmtime/error.hh": {
+              "bytes": 3674,
+              "sha256": "689e0143742323bc707243b7cfc404ce966964dc32f76d884580224ea52472f5"
+            },
+            "include/wasmtime/linker.hh": {
+              "bytes": 7459,
+              "sha256": "82f5c95ae9b370ddd8d70190cedce68055cb95c190d02b8e925de7b34640e8bc"
+            },
+            "include/wasmtime/tag.hh": {
+              "bytes": 1724,
+              "sha256": "5c7b05e7d25028c4b9b8a2d3a948acad8c6ff273bf97cecc81df02296f44eb58"
+            },
+            "include/wasmtime/eqref.hh": {
+              "bytes": 927,
+              "sha256": "f2c7adc27741bf18545c0bf72a49c8e22538ba3b97380ac621c01455c2c36851"
+            },
+            "include/wasmtime/wat.hh": {
+              "bytes": 1265,
+              "sha256": "0b190e5defe09c91c448c0a6853afc237148a29c34c7972333166388e4a00abe"
+            },
+            "include/wasmtime/trap.hh": {
+              "bytes": 5505,
+              "sha256": "0ff60c6d5b707966e9388e7dc9e313f0363b7003d615ca5f4cbc03247b77ca9f"
+            },
+            "include/wasmtime/arrayref.hh": {
+              "bytes": 1691,
+              "sha256": "a0059e769dd5bfcc75e743fd6b66d1069e98534ef6f937989cf33657871751bd"
+            },
+            "include/wasmtime/sharedmemory.h": {
+              "bytes": 3027,
+              "sha256": "521d632a5f5ee3e28125b22fdf4f517edb2965a49ebd838278d620368377a1fe"
+            },
+            "include/wasmtime/profiling.h": {
+              "bytes": 4400,
+              "sha256": "92ac5516a561bd062aaf302051373512970a0ea9641836a47993d32b1ab8b205"
+            },
+            "include/wasmtime/_structref_class.hh": {
+              "bytes": 1938,
+              "sha256": "8d0473ee26eb96035000146ba17079feec1a70e2968e64faa472d6610dac6fdf"
+            },
+            "include/wasmtime/conf.h": {
+              "bytes": 1272,
+              "sha256": "025c75489f406c4f3097c57944c01e5fa13840c23c28fe124c748e942f5cdaaa"
+            },
+            "include/wasmtime/instance.hh": {
+              "bytes": 4085,
+              "sha256": "3c84c9ae9be96947637fba645769d0de51fea1d21c2a7915fbe36ed205091f83"
+            },
+            "include/wasmtime/helpers.hh": {
+              "bytes": 11810,
+              "sha256": "da70524f69df90a18c80387ea084c57a8219a5286f8005c770002aa34f768f6d"
+            },
+            "include/wasmtime/externref.h": {
+              "bytes": 4643,
+              "sha256": "37f55067f7227ba6dabc3d933812e0f757e711b6b927a89b47460956bf17d8a5"
+            },
+            "include/wasmtime/error.h": {
+              "bytes": 2420,
+              "sha256": "6905acdfe81f5a7d31c49ac1af8221b3d98b61d5341b91a4a8232f2466dce8f0"
+            },
+            "include/wasmtime/table.h": {
+              "bytes": 3924,
+              "sha256": "1d4313d41a85989ae00c8c744c2e2415ac0694ea3bc3fb15d51cddf5fd74d1ba"
+            },
+            "include/wasmtime/_store_class.hh": {
+              "bytes": 10374,
+              "sha256": "c5563b6d8d70c60ba81356cb9f46a68553ec0017b93943c78486f8aa11761b5e"
+            },
+            "include/wasmtime/extern.h": {
+              "bytes": 6263,
+              "sha256": "7486bc71ec8172152cc6d3d0e827946b4d0778f0b1495a1e377130c031d02031"
+            },
+            "include/wasmtime/async.h": {
+              "bytes": 13952,
+              "sha256": "eea9b04b8c59244fc555a713eeefc88d442baade7506f5355b909fac4c5d3a41"
+            },
+            "include/wasmtime/linker.h": {
+              "bytes": 12848,
+              "sha256": "3ccb42d67c0724b7ce20302c45313f0a056b47a3d0754ce83e0c408f8994576d"
+            },
+            "include/wasmtime/config.h": {
+              "bytes": 32567,
+              "sha256": "3840f8ab5abf1a77d93b728cbe99e04d49ad2e91ed88d2b27387a07753ac540c"
+            },
+            "include/wasmtime/_anyref_class.hh": {
+              "bytes": 2442,
+              "sha256": "8d7ee57b683c3fa4b9278ef56b9727fd33c584a402eea642642ed222954610d5"
+            },
+            "include/wasmtime/component.hh": {
+              "bytes": 401,
+              "sha256": "e77c24d71108d85cdb96fd5716fcc74ff22d2feafdb87dfac2602559eb833fd9"
+            },
+            "include/wasmtime/component.h": {
+              "bytes": 324,
+              "sha256": "7230a0a2ef79976c079225a193006289d5538b2d6cb7e6180649c4526b9dd898"
+            },
+            "include/wasmtime/_exnref_class.hh": {
+              "bytes": 1894,
+              "sha256": "94510c65aa8510b68f1449256d88e2e7ce71ed4944fe336ab5b82bee4ffbf167"
+            },
+            "include/wasmtime/engine.hh": {
+              "bytes": 1399,
+              "sha256": "51c8731580795fbbb214e9fa8a33f73f65d7b465b774b9667096a440f487c7b4"
+            },
+            "include/wasmtime/anyref.h": {
+              "bytes": 7419,
+              "sha256": "90cca7935d268d9ae17032a143bc7fa5d5287edf8254a8c49ac69ca0277c900e"
+            },
+            "include/wasmtime/memory.hh": {
+              "bytes": 4012,
+              "sha256": "15d70af6435ff1cdd61c09689e9507dcac32212f24f87a2e41a65158c1fb4d97"
+            },
+            "include/wasmtime/structref.h": {
+              "bytes": 4451,
+              "sha256": "6db53ade4d6ff78404c55d4e096acef881f435a6d5f76cca7dddb5859f8b1a12"
+            },
+            "include/wasmtime/exnref.hh": {
+              "bytes": 982,
+              "sha256": "48afdcb5b04cf01c9299df1ba9c994790db7a353b04658daaf0ba0e844429021"
+            },
+            "include/wasmtime/val.hh": {
+              "bytes": 3136,
+              "sha256": "23d0a1a258bcff223146e4007e68eabd40be41a04010e66df0596e6a51c047e1"
+            },
+            "include/wasmtime/_arrayref_class.hh": {
+              "bytes": 2189,
+              "sha256": "0069d2ccba2e007e868d7822d47aa6c541aa455b9073d592a9b0d785154fd2df"
+            },
+            "include/wasmtime/component/linker.hh": {
+              "bytes": 9391,
+              "sha256": "30f210fab1447396165845b29987b9d060cabfc91a65780e6915a72e38611337"
+            },
+            "include/wasmtime/component/instance.hh": {
+              "bytes": 2354,
+              "sha256": "a38a2fe8dfdc1cdc9cb89572f5c6924f8919a6ccc479afe52be2da6f66ff9ab1"
+            },
+            "include/wasmtime/component/linker.h": {
+              "bytes": 11133,
+              "sha256": "caa8228d65eec38ae44f7605d20a930daff8cbcafb038465d1fc8e99459f22d9"
+            },
+            "include/wasmtime/component/component.hh": {
+              "bytes": 5797,
+              "sha256": "044c6b8c9fc6d5eafe90f256cbe465077c66c3469e4916f7163d7427864d796a"
+            },
+            "include/wasmtime/component/component.h": {
+              "bytes": 5710,
+              "sha256": "c70c86787fe9a684ef5cd09858d7084944690f4c8779df40422be4bd02bcf30f"
+            },
+            "include/wasmtime/component/val.hh": {
+              "bytes": 31889,
+              "sha256": "a501863591fa10dc41d7779542bde7733d19ed117b10669ae5c0202d5893f1b4"
+            },
+            "include/wasmtime/component/types.h": {
+              "bytes": 419,
+              "sha256": "178795777a58f5ec7138a5932498904ed37fd37a1935b58f739fbd9e48a16614"
+            },
+            "include/wasmtime/component/types/instance.hh": {
+              "bytes": 2660,
+              "sha256": "df1aacf584b0b06c089ba78fc926fca79d91911e51e8a75f9902e5b83d22426b"
+            },
+            "include/wasmtime/component/types/resource.h": {
+              "bytes": 2363,
+              "sha256": "29e8ea2ef512969f9bf82700d932d89cd78437c31c2a9c4b9919f2b0581fcdd9"
+            },
+            "include/wasmtime/component/types/component.hh": {
+              "bytes": 11690,
+              "sha256": "52cf1e12e93838772da08f7bd09eba90ad3c5290fae10bb41a9ae82ac66ef856"
+            },
+            "include/wasmtime/component/types/component.h": {
+              "bytes": 9070,
+              "sha256": "9ff90206171ebdc06182c628382790f72d8e11d0d6e2acdc9074c4ec63d5be64"
+            },
+            "include/wasmtime/component/types/val.hh": {
+              "bytes": 20028,
+              "sha256": "f4869c2174bb6c63e4a4ee9ef9713c87dc27920a5fb38266b69aa6682c75b211"
+            },
+            "include/wasmtime/component/types/instance.h": {
+              "bytes": 2080,
+              "sha256": "525d7f53408a04f33f26389bd7a29e52a88fd9a0484a8697d66a2d6282fbb272"
+            },
+            "include/wasmtime/component/types/func.hh": {
+              "bytes": 1758,
+              "sha256": "001f88580a09bbdb866ba583086576f6b4a6f4a738006a7cfb5aa4feef2ad2e7"
+            },
+            "include/wasmtime/component/types/module.h": {
+              "bytes": 1918,
+              "sha256": "04afb394852aa2d22e2dcf0ece8ee4e4a6ae436c7f979ca361d939baf3023592"
+            },
+            "include/wasmtime/component/types/module.hh": {
+              "bytes": 1716,
+              "sha256": "a7d16678120376e97222c691dff5a92a7acee22a04c9d26a90ac74efb2f65f85"
+            },
+            "include/wasmtime/component/types/func.h": {
+              "bytes": 2021,
+              "sha256": "89d65916a8e599cf2abe3fe5734648b2a84ac0701be196d07533a2cef1e1a280"
+            },
+            "include/wasmtime/component/types/val.h": {
+              "bytes": 22894,
+              "sha256": "08d3b8fc7b78a4ccb9cc809d3200911a745d7593d9323a2db7d994f742b9c726"
+            },
+            "include/wasmtime/component/instance.h": {
+              "bytes": 2428,
+              "sha256": "5f2928c0fa8a5b016560d2582b489ddeca28a1200227a7cd351ab4b16d2c8c3f"
+            },
+            "include/wasmtime/component/func.hh": {
+              "bytes": 1991,
+              "sha256": "72aa729643bbf44562121875de26769b4fbbf9a37978dec1935ce81e763b64e1"
+            },
+            "include/wasmtime/component/types.hh": {
+              "bytes": 381,
+              "sha256": "a7b184e68345d1785e9daddd43b9891337d855825034399f0b248116fb18d7a9"
+            },
+            "include/wasmtime/component/func.h": {
+              "bytes": 3866,
+              "sha256": "7a277a0277cc5910f2650b84861d78c36ffc9d2729cfb06833aff9794f663663"
+            },
+            "include/wasmtime/component/val.h": {
+              "bytes": 20576,
+              "sha256": "db3a426f729b16706a3e7b48560a5288b7323efd3faea5b49ea49e31ad44ccd9"
+            },
+            "include/wasmtime/trap.h": {
+              "bytes": 8935,
+              "sha256": "66865a8eaa35eb7d95cdf7c359a8b16a049d16a61e77c619b955d29d61dd3662"
+            },
+            "include/wasmtime/engine.h": {
+              "bytes": 1241,
+              "sha256": "c1a02904ef0d4c660d2baa70477994bbc4cfe291aeebe7143bc1c8b316f77788"
+            },
+            "include/wasmtime/_func_class.hh": {
+              "bytes": 13795,
+              "sha256": "5c80bf9d72abd749cc9d63e386628c8bad2580d690d2c4c7dc12f6a13a0a2d44"
+            },
+            "include/wasmtime/extern_declare.hh": {
+              "bytes": 517,
+              "sha256": "c54d82840a4554f5ea0fc6fe94520fd2b24fb017c73405028e10b8916c61fd62"
+            },
+            "include/wasmtime/types.h": {
+              "bytes": 221,
+              "sha256": "47facddf2717b2ff9b13bc9bdae50cf0cd421c3299622248820f3c4f154fb464"
+            },
+            "include/wasmtime/config.hh": {
+              "bytes": 28665,
+              "sha256": "452ea4a26062cb65cfefcdcee70bbc1fba06cef4fbe0411265d74bba9989df43"
+            },
+            "include/wasmtime/types/tag.hh": {
+              "bytes": 2610,
+              "sha256": "0afd806de505b73b1d562f64dbd995c79d53c8d601c1f6dbd71799a056aa8d20"
+            },
+            "include/wasmtime/types/arrayref.hh": {
+              "bytes": 950,
+              "sha256": "372e35a259ff7a5f5e7465bb8165e6eee044c454ef3dec1d53ec9242f27a8b39"
+            },
+            "include/wasmtime/types/_structref_class.hh": {
+              "bytes": 5428,
+              "sha256": "f158b4b3e8c1b74256a95c1f56e40abf7f9cceeeaa29cec558e246f01bf116f3"
+            },
+            "include/wasmtime/types/memory.hh": {
+              "bytes": 6764,
+              "sha256": "bb22cd0b8b05fa0d088abe445de6a6280640ea6320914389364756af56eb819b"
+            },
+            "include/wasmtime/types/structref.h": {
+              "bytes": 3784,
+              "sha256": "16c0dd4a06bce1efbddefb720dd09dc9ebf166ebaf5a654130f5b7be6ab71b19"
+            },
+            "include/wasmtime/types/exnref.hh": {
+              "bytes": 1625,
+              "sha256": "ad6b76ceaef18ff81e6d5986174c22177927c2bc1db1e8c33889b3c564a31803"
+            },
+            "include/wasmtime/types/val.hh": {
+              "bytes": 13554,
+              "sha256": "29d3ec7490f785394db21f5476069151199aea96c94d7ff3c347379fe3cfd074"
+            },
+            "include/wasmtime/types/export.hh": {
+              "bytes": 2467,
+              "sha256": "cd0621e8659a45a4f3ca3ae5094ab80a86badfc0786aa27c968616a5a2bc4bf0"
+            },
+            "include/wasmtime/types/import.hh": {
+              "bytes": 2727,
+              "sha256": "b94bc37d543ff7d32098128b2acdca89c0cb76e9b1665733e6f004759770e702"
+            },
+            "include/wasmtime/types/table.hh": {
+              "bytes": 3303,
+              "sha256": "00559bb04924a26ddbf0120c73671a0366b2e359312b354742792bfaea33d4a8"
+            },
+            "include/wasmtime/types/structref.hh": {
+              "bytes": 452,
+              "sha256": "2dba4391088a03810e6d248b8b7e50a471003ff729377793c293a22aa524538b"
+            },
+            "include/wasmtime/types/func.hh": {
+              "bytes": 3363,
+              "sha256": "d8c640f7d586d9ad6186b4fae31587c66a075f08fbc89eafd47680567f65f48d"
+            },
+            "include/wasmtime/types/_val_class.hh": {
+              "bytes": 6454,
+              "sha256": "4fcbcd5ac4d435159c90100e781bc77ed6172d95bc55f0f3f57a3fc15d4b9bc4"
+            },
+            "include/wasmtime/types/arrayref.h": {
+              "bytes": 1504,
+              "sha256": "8b978b9ca57092c9b14c846efcb0f80515a1792e87af2e74169d3f2a7a7c8fe3"
+            },
+            "include/wasmtime/types/val.h": {
+              "bytes": 6133,
+              "sha256": "fbc78a085d0ac76a85f63f66986a2b77d0813146a7b715cf269c56115f84b3d3"
+            },
+            "include/wasmtime/types/extern.hh": {
+              "bytes": 2067,
+              "sha256": "fb3ec6f92fedf173c5f1cdf6fc7ea2cd7c9fe1697f02dc69cdf889b7470178a2"
+            },
+            "include/wasmtime/types/global.hh": {
+              "bytes": 2586,
+              "sha256": "d6189adc25faad4d4237c231808629628ed091c13b8a24846eab3e354e18a206"
+            },
+            "include/wasmtime/types/exnref.h": {
+              "bytes": 1214,
+              "sha256": "ff720e11ebec7936f9a439c66fd0de336176d4cecee01198dca936e2ca13383d"
+            },
+            "include/wasmtime/table.hh": {
+              "bytes": 3583,
+              "sha256": "718cf580417e3885dd6450c5734bb71ca3b736e52f5c6134ed04d242ef12427d"
+            },
+            "include/wasmtime/structref.hh": {
+              "bytes": 1715,
+              "sha256": "f56fe6b322ca4b66f36212f3ba7c413f6ef171b1344b5e34ae6807bc89c157c4"
+            },
+            "include/wasmtime/_eqref_class.hh": {
+              "bytes": 2730,
+              "sha256": "de249e5f5b53eec9544d4222e01e17cb45fec28eb60aa6db0b1cc348aa2a5703"
+            },
+            "include/wasmtime/store.hh": {
+              "bytes": 930,
+              "sha256": "f68ddbba240cab6631510d92cfa9d91eb3464b23a35668edf48dbe531c1d12fb"
+            },
+            "include/wasmtime/tag.h": {
+              "bytes": 2268,
+              "sha256": "0e6261f2f061b2c900b129b12de12e72e2bc37c32380ee95ef6f15e14baa395f"
+            },
+            "include/wasmtime/instance.h": {
+              "bytes": 6362,
+              "sha256": "4abeaef7a3942aa986d29e58b1ad169307d4ffd10e11a796e0f903933bec67b7"
+            },
+            "include/wasmtime/func.hh": {
+              "bytes": 9697,
+              "sha256": "68328055a4b42cbcdc7135a171209e39a41d1b7738b99d8201b4a4dbfa44580d"
+            },
+            "include/wasmtime/module.h": {
+              "bytes": 5768,
+              "sha256": "8c0b889e5235a1017a4844d03628a7dd67090a5088ae289f87f699f6bd6be88e"
+            },
+            "include/wasmtime/externref.hh": {
+              "bytes": 1325,
+              "sha256": "03a2f196f91f680347fd12eddda6aeed5063aa2bf69561fe5570b7446d5b69eb"
+            },
+            "include/wasmtime/module.hh": {
+              "bytes": 5580,
+              "sha256": "106774b8810482e4b70223eeb3768db626fe3580b9e41fcca969ead3d500a25f"
+            },
+            "include/wasmtime/types.hh": {
+              "bytes": 433,
+              "sha256": "568988261b07753fbae59c2649d168119ebb087ffcac79e7e2d393c4cdcf61c5"
+            },
+            "include/wasmtime/eqref.h": {
+              "bytes": 5263,
+              "sha256": "de21b013eac94b2d43eba4bbac34d565c649e2573814868dbbe50e64622ca7be"
+            },
+            "include/wasmtime/func.h": {
+              "bytes": 12787,
+              "sha256": "9a4fee4a295a2b19a141cf84be4ceb9355bfc25394ae761d7f780ac49f2d65ad"
+            },
+            "include/wasmtime/memory.h": {
+              "bytes": 5999,
+              "sha256": "95c0c3b189ea7b0e8c5b523a18de0a19a1bef7db8c5702275a3a2d9e6cea9642"
+            },
+            "include/wasmtime/_val_class.hh": {
+              "bytes": 6987,
+              "sha256": "9dcae719115fc13181fbfca22ddbb19910fc2ebf56f0b2a174971012e307b036"
+            },
+            "include/wasmtime/arrayref.h": {
+              "bytes": 4703,
+              "sha256": "a93ec80b4849edbd6c7bb2c8268b9f41ed4d97b5e0ad537e7521b4551d005521"
+            },
+            "include/wasmtime/val.h": {
+              "bytes": 14826,
+              "sha256": "33ea4fc9b9288f536dc12b15130b25b88b59144c85d1e34c30a8ff8514170148"
+            },
+            "include/wasmtime/_externref_class.hh": {
+              "bytes": 1949,
+              "sha256": "0f39147fd6bff3d781235ca4d2731e67597edb77e924c223208abfb04e54bdfc"
+            },
+            "include/wasmtime/extern.hh": {
+              "bytes": 1901,
+              "sha256": "2608bb08136598b81c0847515aa3dbe665e8ef77802a04c0683a628bf4d39fd9"
+            },
+            "include/wasmtime/wat.h": {
+              "bytes": 1153,
+              "sha256": "7533f9c25ee267c88ea64e21a7550bf28585183184a29c575ceb419eb711fe9f"
+            },
+            "include/wasmtime/span.hh": {
+              "bytes": 2716,
+              "sha256": "da563fddd6e110c419c8ba579de15496a03d1e1e44fde29a7d1744348996ca51"
+            },
+            "include/wasmtime/wasi.hh": {
+              "bytes": 3701,
+              "sha256": "f9318dccdccafe821b1e8ae4173a2444ac88cd87412252eeea06aa1658fd0149"
+            },
+            "include/wasmtime/store.h": {
+              "bytes": 10060,
+              "sha256": "ff307ac99c7e9fa58bd40b518b9e737663c5741abd4e756bbe8452f340f30386"
+            },
+            "include/wasmtime/global.h": {
+              "bytes": 2521,
+              "sha256": "5e51effa5185ec774e47bb53323fbf5f0d0b621158f0a578b5528711d2f18129"
+            },
+            "include/wasmtime/global.hh": {
+              "bytes": 2469,
+              "sha256": "a74e041c6e9c4a48af597896a77b7748a289656f7fad4fe7c2eb226f12fa4666"
+            },
+            "include/wasmtime/exnref.h": {
+              "bytes": 6109,
+              "sha256": "0f03df665b9a8b7ca9405ad638d4068c0ce7d5024165132acea94430bbc626d0"
+            },
+            "include/wasmtime/anyref.hh": {
+              "bytes": 1393,
+              "sha256": "7f7c57d3dc5381ab01d280633827b784e1cb545199bef98943bf056b9379f11b"
+            },
+            "include/wasi.h": {
+              "bytes": 8513,
+              "sha256": "37d15447efe4c47b445996c4bd9d879dfe02402bd96e36a9de5ca195670ce5ea"
+            },
+            "include/wasmtime.hh": {
+              "bytes": 1876,
+              "sha256": "402b06783af1f689b1646d3d2b69c5e4ab8a7ae71f3f87dab09e62a7a51f0db1"
+            },
+            "include/doc-wasm.h": {
+              "bytes": 83333,
+              "sha256": "33c6bca76dbc9ebcfd785798d8d7837ad4f34ca0df9beb1108408edf63a8d195"
+            },
+            "README.md": {
+              "bytes": 7674,
+              "sha256": "61b003ff4ddfbe6123ae3a1123e39e379f1559edc44634e6c14ba3f2671f9fd8"
+            },
+            "LICENSE": {
+              "bytes": 12243,
+              "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+            }
+          }
+        },
+        "helperSha256": "0b01fcc0cde82dc1e4d4393d2d38fec79cdd9b5b89e34e845d69fc818fc41f79",
+        "phase": "compiling"
+      },
+      "resultSha256": "82f276ff8ac4c42f803684a76a51005d535bc3ff4eec320208141000e234b346",
+      "resources": {
+        "startedAt": "2026-09-24T05:48:52.115Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "1800s",
+          ".cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=256",
+          "scripts/full-lean/probe-wasmtime-lean-compilation.mjs",
+          ".work/wasmtime-lean-module-r1",
+          ".work/wasmtime-lean-compilation-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "ec71f102-41f6-4fe5-b3d6-a1f5dc6624e8",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25594900480
+        },
+        "minimumHostAvailable": 25510006784,
+        "peakMemoryBytes": 275746816,
+        "peakTasks": 13,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:48:54.323Z",
+          "memoryBytes": 79159296,
+          "peakMemoryBytes": 275746816,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 78733312,
+            "kernel": 188416,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 78532608,
+            "slab": 58912
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "signal",
+          "exitCode": "killed",
+          "exitStatus": "ABRT",
+          "capturedAt": "2026-09-24T05:48:54.372Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 92528640,
+          "peakMemoryBytes": 275746816,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11649024,
+            "file": 78733312,
+            "kernel": 1097728,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 78532608,
+            "slab": 149072
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:48:54.397Z",
+        "result": {
+          "code": 255,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "log": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r1-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 70b8449792d447ab9d89e59ec165fba6\n[lasm] Build process uses base pages; memory and pressure guards remain active\n\nthread '<unnamed>' (3718186) panicked at crates/c-api/src/engine.rs:37:38:\ncalled `Result::unwrap()` on an `Err` value: max_wasm_stack size cannot exceed the async_stack_size\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n/usr/bin/timeout: the monitored command dumped core\nFinished with result: signal\nMain processes terminated with: code=killed/status=ABRT\nService runtime: 2.237s\nCPU time consumed: 2.226s\nMemory peak: 262.9M\nMemory swap peak: 0B\n[lasm] Peak 0.26 GiB; signal\n",
+      "exactInputSnapshots": {
+        ".work/wasmtime-lean-compilation-r1/source.c": "7bbc3c03f27b3b9c5507e46548abbe0349fa32fe40cf181d4c450f4ee31e49b9",
+        ".work/wasmtime-lean-compilation-r1/harness.mjs": "a471718bb864da10b72eb54f1fad03f533000b8f0c8466b77fd79ea62ad7d7b6"
+      }
+    },
+    {
+      "attempt": 2,
+      "result": {
+        "scope": "Single-worker compilation, serialization and trusted-cache reload of a real Lean module; no application instantiated or executed",
+        "input": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r1/converted.wasm",
+        "inputSha256": "c497b2e54d85cafc583ff1295e80efebc798d5d9c0a79461cccf23895fa7282b",
+        "inputBytes": 160483617,
+        "precedingFormatProbe": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r1/result.json",
+        "precedingResultSha256": "cba100a227bd35c65edfd67c16ff6271854f67c253cbf86d39b90e0ca95b6bd4",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "c1e6d5c818e905b19033d4de2d810cd36eb750f6c54df97e6bbae56fcead403e",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "const_fold",
+              "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+              "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+            }
+          ],
+          "signature": "540f068c463b058f625049dbf7af467c6f715efa7020654fd3e1464e5a8b84d8",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "sourceSha256": "1ef81f3a4b8adeb8744178ea8e4a1b39a9b24cb6f38804b76765579e10e38027",
+        "harnessSha256": "5aaffc1316e57185478826850ed0e64e3ce9870356a540d83b79a131549adbcf",
+        "configuration": {
+          "compiler": "Cranelift",
+          "optimization": "none",
+          "parallelCompilation": false,
+          "memory64": true,
+          "threads": true,
+          "sharedMemory": true,
+          "exceptions": true,
+          "maximumWasmStack": 67108864,
+          "asyncStackSize": 83886080,
+          "coreDumpsDisabled": true,
+          "memoryReservation": 8589934592,
+          "instantiation": false,
+          "linearMemoryAllocated": false
+        },
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r2-resources.json",
+        "commands": [
+          {
+            "program": "python3",
+            "args": [
+              "-I",
+              "-B",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/prepare-wasmtime-probe.py"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "{\"version\": \"49.0.0\", \"archiveSha256\": \"8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131\", \"files\": 115, \"selectedBytes\": 32341429}\n",
+            "stderr": ""
+          },
+          {
+            "program": "cc",
+            "args": [
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-shared",
+              "-fPIC",
+              "-I/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/include",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-compile-lean.c",
+              "-L/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+              "-lwasmtime",
+              "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r2/compiler.so"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          }
+        ],
+        "passed": false,
+        "helperInput": {
+          "version": "49.0.0",
+          "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+          "archiveBytes": 16115964,
+          "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz",
+          "selectedFiles": {
+            "lib/libwasmtime.so": {
+              "bytes": 31590960,
+              "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+            },
+            "include/wasmtime.h": {
+              "bytes": 10101,
+              "sha256": "a7497ea0048c0cb8a598c35ca05d1611a31725a88809ed9d51a8b1aebfc6b0c7"
+            },
+            "include/wasm.hh": {
+              "bytes": 19096,
+              "sha256": "ff657786aa259af466fd3ea8cb23646e8ada2b5741362c632d9cdad4be6e9c67"
+            },
+            "include/wasm.h": {
+              "bytes": 23796,
+              "sha256": "c8c2ab4be578bf618512e0720f939d1c8b9b0121f007091dd3746e60290977d9"
+            },
+            "include/wasmtime/error.hh": {
+              "bytes": 3674,
+              "sha256": "689e0143742323bc707243b7cfc404ce966964dc32f76d884580224ea52472f5"
+            },
+            "include/wasmtime/linker.hh": {
+              "bytes": 7459,
+              "sha256": "82f5c95ae9b370ddd8d70190cedce68055cb95c190d02b8e925de7b34640e8bc"
+            },
+            "include/wasmtime/tag.hh": {
+              "bytes": 1724,
+              "sha256": "5c7b05e7d25028c4b9b8a2d3a948acad8c6ff273bf97cecc81df02296f44eb58"
+            },
+            "include/wasmtime/eqref.hh": {
+              "bytes": 927,
+              "sha256": "f2c7adc27741bf18545c0bf72a49c8e22538ba3b97380ac621c01455c2c36851"
+            },
+            "include/wasmtime/wat.hh": {
+              "bytes": 1265,
+              "sha256": "0b190e5defe09c91c448c0a6853afc237148a29c34c7972333166388e4a00abe"
+            },
+            "include/wasmtime/trap.hh": {
+              "bytes": 5505,
+              "sha256": "0ff60c6d5b707966e9388e7dc9e313f0363b7003d615ca5f4cbc03247b77ca9f"
+            },
+            "include/wasmtime/arrayref.hh": {
+              "bytes": 1691,
+              "sha256": "a0059e769dd5bfcc75e743fd6b66d1069e98534ef6f937989cf33657871751bd"
+            },
+            "include/wasmtime/sharedmemory.h": {
+              "bytes": 3027,
+              "sha256": "521d632a5f5ee3e28125b22fdf4f517edb2965a49ebd838278d620368377a1fe"
+            },
+            "include/wasmtime/profiling.h": {
+              "bytes": 4400,
+              "sha256": "92ac5516a561bd062aaf302051373512970a0ea9641836a47993d32b1ab8b205"
+            },
+            "include/wasmtime/_structref_class.hh": {
+              "bytes": 1938,
+              "sha256": "8d0473ee26eb96035000146ba17079feec1a70e2968e64faa472d6610dac6fdf"
+            },
+            "include/wasmtime/conf.h": {
+              "bytes": 1272,
+              "sha256": "025c75489f406c4f3097c57944c01e5fa13840c23c28fe124c748e942f5cdaaa"
+            },
+            "include/wasmtime/instance.hh": {
+              "bytes": 4085,
+              "sha256": "3c84c9ae9be96947637fba645769d0de51fea1d21c2a7915fbe36ed205091f83"
+            },
+            "include/wasmtime/helpers.hh": {
+              "bytes": 11810,
+              "sha256": "da70524f69df90a18c80387ea084c57a8219a5286f8005c770002aa34f768f6d"
+            },
+            "include/wasmtime/externref.h": {
+              "bytes": 4643,
+              "sha256": "37f55067f7227ba6dabc3d933812e0f757e711b6b927a89b47460956bf17d8a5"
+            },
+            "include/wasmtime/error.h": {
+              "bytes": 2420,
+              "sha256": "6905acdfe81f5a7d31c49ac1af8221b3d98b61d5341b91a4a8232f2466dce8f0"
+            },
+            "include/wasmtime/table.h": {
+              "bytes": 3924,
+              "sha256": "1d4313d41a85989ae00c8c744c2e2415ac0694ea3bc3fb15d51cddf5fd74d1ba"
+            },
+            "include/wasmtime/_store_class.hh": {
+              "bytes": 10374,
+              "sha256": "c5563b6d8d70c60ba81356cb9f46a68553ec0017b93943c78486f8aa11761b5e"
+            },
+            "include/wasmtime/extern.h": {
+              "bytes": 6263,
+              "sha256": "7486bc71ec8172152cc6d3d0e827946b4d0778f0b1495a1e377130c031d02031"
+            },
+            "include/wasmtime/async.h": {
+              "bytes": 13952,
+              "sha256": "eea9b04b8c59244fc555a713eeefc88d442baade7506f5355b909fac4c5d3a41"
+            },
+            "include/wasmtime/linker.h": {
+              "bytes": 12848,
+              "sha256": "3ccb42d67c0724b7ce20302c45313f0a056b47a3d0754ce83e0c408f8994576d"
+            },
+            "include/wasmtime/config.h": {
+              "bytes": 32567,
+              "sha256": "3840f8ab5abf1a77d93b728cbe99e04d49ad2e91ed88d2b27387a07753ac540c"
+            },
+            "include/wasmtime/_anyref_class.hh": {
+              "bytes": 2442,
+              "sha256": "8d7ee57b683c3fa4b9278ef56b9727fd33c584a402eea642642ed222954610d5"
+            },
+            "include/wasmtime/component.hh": {
+              "bytes": 401,
+              "sha256": "e77c24d71108d85cdb96fd5716fcc74ff22d2feafdb87dfac2602559eb833fd9"
+            },
+            "include/wasmtime/component.h": {
+              "bytes": 324,
+              "sha256": "7230a0a2ef79976c079225a193006289d5538b2d6cb7e6180649c4526b9dd898"
+            },
+            "include/wasmtime/_exnref_class.hh": {
+              "bytes": 1894,
+              "sha256": "94510c65aa8510b68f1449256d88e2e7ce71ed4944fe336ab5b82bee4ffbf167"
+            },
+            "include/wasmtime/engine.hh": {
+              "bytes": 1399,
+              "sha256": "51c8731580795fbbb214e9fa8a33f73f65d7b465b774b9667096a440f487c7b4"
+            },
+            "include/wasmtime/anyref.h": {
+              "bytes": 7419,
+              "sha256": "90cca7935d268d9ae17032a143bc7fa5d5287edf8254a8c49ac69ca0277c900e"
+            },
+            "include/wasmtime/memory.hh": {
+              "bytes": 4012,
+              "sha256": "15d70af6435ff1cdd61c09689e9507dcac32212f24f87a2e41a65158c1fb4d97"
+            },
+            "include/wasmtime/structref.h": {
+              "bytes": 4451,
+              "sha256": "6db53ade4d6ff78404c55d4e096acef881f435a6d5f76cca7dddb5859f8b1a12"
+            },
+            "include/wasmtime/exnref.hh": {
+              "bytes": 982,
+              "sha256": "48afdcb5b04cf01c9299df1ba9c994790db7a353b04658daaf0ba0e844429021"
+            },
+            "include/wasmtime/val.hh": {
+              "bytes": 3136,
+              "sha256": "23d0a1a258bcff223146e4007e68eabd40be41a04010e66df0596e6a51c047e1"
+            },
+            "include/wasmtime/_arrayref_class.hh": {
+              "bytes": 2189,
+              "sha256": "0069d2ccba2e007e868d7822d47aa6c541aa455b9073d592a9b0d785154fd2df"
+            },
+            "include/wasmtime/component/linker.hh": {
+              "bytes": 9391,
+              "sha256": "30f210fab1447396165845b29987b9d060cabfc91a65780e6915a72e38611337"
+            },
+            "include/wasmtime/component/instance.hh": {
+              "bytes": 2354,
+              "sha256": "a38a2fe8dfdc1cdc9cb89572f5c6924f8919a6ccc479afe52be2da6f66ff9ab1"
+            },
+            "include/wasmtime/component/linker.h": {
+              "bytes": 11133,
+              "sha256": "caa8228d65eec38ae44f7605d20a930daff8cbcafb038465d1fc8e99459f22d9"
+            },
+            "include/wasmtime/component/component.hh": {
+              "bytes": 5797,
+              "sha256": "044c6b8c9fc6d5eafe90f256cbe465077c66c3469e4916f7163d7427864d796a"
+            },
+            "include/wasmtime/component/component.h": {
+              "bytes": 5710,
+              "sha256": "c70c86787fe9a684ef5cd09858d7084944690f4c8779df40422be4bd02bcf30f"
+            },
+            "include/wasmtime/component/val.hh": {
+              "bytes": 31889,
+              "sha256": "a501863591fa10dc41d7779542bde7733d19ed117b10669ae5c0202d5893f1b4"
+            },
+            "include/wasmtime/component/types.h": {
+              "bytes": 419,
+              "sha256": "178795777a58f5ec7138a5932498904ed37fd37a1935b58f739fbd9e48a16614"
+            },
+            "include/wasmtime/component/types/instance.hh": {
+              "bytes": 2660,
+              "sha256": "df1aacf584b0b06c089ba78fc926fca79d91911e51e8a75f9902e5b83d22426b"
+            },
+            "include/wasmtime/component/types/resource.h": {
+              "bytes": 2363,
+              "sha256": "29e8ea2ef512969f9bf82700d932d89cd78437c31c2a9c4b9919f2b0581fcdd9"
+            },
+            "include/wasmtime/component/types/component.hh": {
+              "bytes": 11690,
+              "sha256": "52cf1e12e93838772da08f7bd09eba90ad3c5290fae10bb41a9ae82ac66ef856"
+            },
+            "include/wasmtime/component/types/component.h": {
+              "bytes": 9070,
+              "sha256": "9ff90206171ebdc06182c628382790f72d8e11d0d6e2acdc9074c4ec63d5be64"
+            },
+            "include/wasmtime/component/types/val.hh": {
+              "bytes": 20028,
+              "sha256": "f4869c2174bb6c63e4a4ee9ef9713c87dc27920a5fb38266b69aa6682c75b211"
+            },
+            "include/wasmtime/component/types/instance.h": {
+              "bytes": 2080,
+              "sha256": "525d7f53408a04f33f26389bd7a29e52a88fd9a0484a8697d66a2d6282fbb272"
+            },
+            "include/wasmtime/component/types/func.hh": {
+              "bytes": 1758,
+              "sha256": "001f88580a09bbdb866ba583086576f6b4a6f4a738006a7cfb5aa4feef2ad2e7"
+            },
+            "include/wasmtime/component/types/module.h": {
+              "bytes": 1918,
+              "sha256": "04afb394852aa2d22e2dcf0ece8ee4e4a6ae436c7f979ca361d939baf3023592"
+            },
+            "include/wasmtime/component/types/module.hh": {
+              "bytes": 1716,
+              "sha256": "a7d16678120376e97222c691dff5a92a7acee22a04c9d26a90ac74efb2f65f85"
+            },
+            "include/wasmtime/component/types/func.h": {
+              "bytes": 2021,
+              "sha256": "89d65916a8e599cf2abe3fe5734648b2a84ac0701be196d07533a2cef1e1a280"
+            },
+            "include/wasmtime/component/types/val.h": {
+              "bytes": 22894,
+              "sha256": "08d3b8fc7b78a4ccb9cc809d3200911a745d7593d9323a2db7d994f742b9c726"
+            },
+            "include/wasmtime/component/instance.h": {
+              "bytes": 2428,
+              "sha256": "5f2928c0fa8a5b016560d2582b489ddeca28a1200227a7cd351ab4b16d2c8c3f"
+            },
+            "include/wasmtime/component/func.hh": {
+              "bytes": 1991,
+              "sha256": "72aa729643bbf44562121875de26769b4fbbf9a37978dec1935ce81e763b64e1"
+            },
+            "include/wasmtime/component/types.hh": {
+              "bytes": 381,
+              "sha256": "a7b184e68345d1785e9daddd43b9891337d855825034399f0b248116fb18d7a9"
+            },
+            "include/wasmtime/component/func.h": {
+              "bytes": 3866,
+              "sha256": "7a277a0277cc5910f2650b84861d78c36ffc9d2729cfb06833aff9794f663663"
+            },
+            "include/wasmtime/component/val.h": {
+              "bytes": 20576,
+              "sha256": "db3a426f729b16706a3e7b48560a5288b7323efd3faea5b49ea49e31ad44ccd9"
+            },
+            "include/wasmtime/trap.h": {
+              "bytes": 8935,
+              "sha256": "66865a8eaa35eb7d95cdf7c359a8b16a049d16a61e77c619b955d29d61dd3662"
+            },
+            "include/wasmtime/engine.h": {
+              "bytes": 1241,
+              "sha256": "c1a02904ef0d4c660d2baa70477994bbc4cfe291aeebe7143bc1c8b316f77788"
+            },
+            "include/wasmtime/_func_class.hh": {
+              "bytes": 13795,
+              "sha256": "5c80bf9d72abd749cc9d63e386628c8bad2580d690d2c4c7dc12f6a13a0a2d44"
+            },
+            "include/wasmtime/extern_declare.hh": {
+              "bytes": 517,
+              "sha256": "c54d82840a4554f5ea0fc6fe94520fd2b24fb017c73405028e10b8916c61fd62"
+            },
+            "include/wasmtime/types.h": {
+              "bytes": 221,
+              "sha256": "47facddf2717b2ff9b13bc9bdae50cf0cd421c3299622248820f3c4f154fb464"
+            },
+            "include/wasmtime/config.hh": {
+              "bytes": 28665,
+              "sha256": "452ea4a26062cb65cfefcdcee70bbc1fba06cef4fbe0411265d74bba9989df43"
+            },
+            "include/wasmtime/types/tag.hh": {
+              "bytes": 2610,
+              "sha256": "0afd806de505b73b1d562f64dbd995c79d53c8d601c1f6dbd71799a056aa8d20"
+            },
+            "include/wasmtime/types/arrayref.hh": {
+              "bytes": 950,
+              "sha256": "372e35a259ff7a5f5e7465bb8165e6eee044c454ef3dec1d53ec9242f27a8b39"
+            },
+            "include/wasmtime/types/_structref_class.hh": {
+              "bytes": 5428,
+              "sha256": "f158b4b3e8c1b74256a95c1f56e40abf7f9cceeeaa29cec558e246f01bf116f3"
+            },
+            "include/wasmtime/types/memory.hh": {
+              "bytes": 6764,
+              "sha256": "bb22cd0b8b05fa0d088abe445de6a6280640ea6320914389364756af56eb819b"
+            },
+            "include/wasmtime/types/structref.h": {
+              "bytes": 3784,
+              "sha256": "16c0dd4a06bce1efbddefb720dd09dc9ebf166ebaf5a654130f5b7be6ab71b19"
+            },
+            "include/wasmtime/types/exnref.hh": {
+              "bytes": 1625,
+              "sha256": "ad6b76ceaef18ff81e6d5986174c22177927c2bc1db1e8c33889b3c564a31803"
+            },
+            "include/wasmtime/types/val.hh": {
+              "bytes": 13554,
+              "sha256": "29d3ec7490f785394db21f5476069151199aea96c94d7ff3c347379fe3cfd074"
+            },
+            "include/wasmtime/types/export.hh": {
+              "bytes": 2467,
+              "sha256": "cd0621e8659a45a4f3ca3ae5094ab80a86badfc0786aa27c968616a5a2bc4bf0"
+            },
+            "include/wasmtime/types/import.hh": {
+              "bytes": 2727,
+              "sha256": "b94bc37d543ff7d32098128b2acdca89c0cb76e9b1665733e6f004759770e702"
+            },
+            "include/wasmtime/types/table.hh": {
+              "bytes": 3303,
+              "sha256": "00559bb04924a26ddbf0120c73671a0366b2e359312b354742792bfaea33d4a8"
+            },
+            "include/wasmtime/types/structref.hh": {
+              "bytes": 452,
+              "sha256": "2dba4391088a03810e6d248b8b7e50a471003ff729377793c293a22aa524538b"
+            },
+            "include/wasmtime/types/func.hh": {
+              "bytes": 3363,
+              "sha256": "d8c640f7d586d9ad6186b4fae31587c66a075f08fbc89eafd47680567f65f48d"
+            },
+            "include/wasmtime/types/_val_class.hh": {
+              "bytes": 6454,
+              "sha256": "4fcbcd5ac4d435159c90100e781bc77ed6172d95bc55f0f3f57a3fc15d4b9bc4"
+            },
+            "include/wasmtime/types/arrayref.h": {
+              "bytes": 1504,
+              "sha256": "8b978b9ca57092c9b14c846efcb0f80515a1792e87af2e74169d3f2a7a7c8fe3"
+            },
+            "include/wasmtime/types/val.h": {
+              "bytes": 6133,
+              "sha256": "fbc78a085d0ac76a85f63f66986a2b77d0813146a7b715cf269c56115f84b3d3"
+            },
+            "include/wasmtime/types/extern.hh": {
+              "bytes": 2067,
+              "sha256": "fb3ec6f92fedf173c5f1cdf6fc7ea2cd7c9fe1697f02dc69cdf889b7470178a2"
+            },
+            "include/wasmtime/types/global.hh": {
+              "bytes": 2586,
+              "sha256": "d6189adc25faad4d4237c231808629628ed091c13b8a24846eab3e354e18a206"
+            },
+            "include/wasmtime/types/exnref.h": {
+              "bytes": 1214,
+              "sha256": "ff720e11ebec7936f9a439c66fd0de336176d4cecee01198dca936e2ca13383d"
+            },
+            "include/wasmtime/table.hh": {
+              "bytes": 3583,
+              "sha256": "718cf580417e3885dd6450c5734bb71ca3b736e52f5c6134ed04d242ef12427d"
+            },
+            "include/wasmtime/structref.hh": {
+              "bytes": 1715,
+              "sha256": "f56fe6b322ca4b66f36212f3ba7c413f6ef171b1344b5e34ae6807bc89c157c4"
+            },
+            "include/wasmtime/_eqref_class.hh": {
+              "bytes": 2730,
+              "sha256": "de249e5f5b53eec9544d4222e01e17cb45fec28eb60aa6db0b1cc348aa2a5703"
+            },
+            "include/wasmtime/store.hh": {
+              "bytes": 930,
+              "sha256": "f68ddbba240cab6631510d92cfa9d91eb3464b23a35668edf48dbe531c1d12fb"
+            },
+            "include/wasmtime/tag.h": {
+              "bytes": 2268,
+              "sha256": "0e6261f2f061b2c900b129b12de12e72e2bc37c32380ee95ef6f15e14baa395f"
+            },
+            "include/wasmtime/instance.h": {
+              "bytes": 6362,
+              "sha256": "4abeaef7a3942aa986d29e58b1ad169307d4ffd10e11a796e0f903933bec67b7"
+            },
+            "include/wasmtime/func.hh": {
+              "bytes": 9697,
+              "sha256": "68328055a4b42cbcdc7135a171209e39a41d1b7738b99d8201b4a4dbfa44580d"
+            },
+            "include/wasmtime/module.h": {
+              "bytes": 5768,
+              "sha256": "8c0b889e5235a1017a4844d03628a7dd67090a5088ae289f87f699f6bd6be88e"
+            },
+            "include/wasmtime/externref.hh": {
+              "bytes": 1325,
+              "sha256": "03a2f196f91f680347fd12eddda6aeed5063aa2bf69561fe5570b7446d5b69eb"
+            },
+            "include/wasmtime/module.hh": {
+              "bytes": 5580,
+              "sha256": "106774b8810482e4b70223eeb3768db626fe3580b9e41fcca969ead3d500a25f"
+            },
+            "include/wasmtime/types.hh": {
+              "bytes": 433,
+              "sha256": "568988261b07753fbae59c2649d168119ebb087ffcac79e7e2d393c4cdcf61c5"
+            },
+            "include/wasmtime/eqref.h": {
+              "bytes": 5263,
+              "sha256": "de21b013eac94b2d43eba4bbac34d565c649e2573814868dbbe50e64622ca7be"
+            },
+            "include/wasmtime/func.h": {
+              "bytes": 12787,
+              "sha256": "9a4fee4a295a2b19a141cf84be4ceb9355bfc25394ae761d7f780ac49f2d65ad"
+            },
+            "include/wasmtime/memory.h": {
+              "bytes": 5999,
+              "sha256": "95c0c3b189ea7b0e8c5b523a18de0a19a1bef7db8c5702275a3a2d9e6cea9642"
+            },
+            "include/wasmtime/_val_class.hh": {
+              "bytes": 6987,
+              "sha256": "9dcae719115fc13181fbfca22ddbb19910fc2ebf56f0b2a174971012e307b036"
+            },
+            "include/wasmtime/arrayref.h": {
+              "bytes": 4703,
+              "sha256": "a93ec80b4849edbd6c7bb2c8268b9f41ed4d97b5e0ad537e7521b4551d005521"
+            },
+            "include/wasmtime/val.h": {
+              "bytes": 14826,
+              "sha256": "33ea4fc9b9288f536dc12b15130b25b88b59144c85d1e34c30a8ff8514170148"
+            },
+            "include/wasmtime/_externref_class.hh": {
+              "bytes": 1949,
+              "sha256": "0f39147fd6bff3d781235ca4d2731e67597edb77e924c223208abfb04e54bdfc"
+            },
+            "include/wasmtime/extern.hh": {
+              "bytes": 1901,
+              "sha256": "2608bb08136598b81c0847515aa3dbe665e8ef77802a04c0683a628bf4d39fd9"
+            },
+            "include/wasmtime/wat.h": {
+              "bytes": 1153,
+              "sha256": "7533f9c25ee267c88ea64e21a7550bf28585183184a29c575ceb419eb711fe9f"
+            },
+            "include/wasmtime/span.hh": {
+              "bytes": 2716,
+              "sha256": "da563fddd6e110c419c8ba579de15496a03d1e1e44fde29a7d1744348996ca51"
+            },
+            "include/wasmtime/wasi.hh": {
+              "bytes": 3701,
+              "sha256": "f9318dccdccafe821b1e8ae4173a2444ac88cd87412252eeea06aa1658fd0149"
+            },
+            "include/wasmtime/store.h": {
+              "bytes": 10060,
+              "sha256": "ff307ac99c7e9fa58bd40b518b9e737663c5741abd4e756bbe8452f340f30386"
+            },
+            "include/wasmtime/global.h": {
+              "bytes": 2521,
+              "sha256": "5e51effa5185ec774e47bb53323fbf5f0d0b621158f0a578b5528711d2f18129"
+            },
+            "include/wasmtime/global.hh": {
+              "bytes": 2469,
+              "sha256": "a74e041c6e9c4a48af597896a77b7748a289656f7fad4fe7c2eb226f12fa4666"
+            },
+            "include/wasmtime/exnref.h": {
+              "bytes": 6109,
+              "sha256": "0f03df665b9a8b7ca9405ad638d4068c0ce7d5024165132acea94430bbc626d0"
+            },
+            "include/wasmtime/anyref.hh": {
+              "bytes": 1393,
+              "sha256": "7f7c57d3dc5381ab01d280633827b784e1cb545199bef98943bf056b9379f11b"
+            },
+            "include/wasi.h": {
+              "bytes": 8513,
+              "sha256": "37d15447efe4c47b445996c4bd9d879dfe02402bd96e36a9de5ca195670ce5ea"
+            },
+            "include/wasmtime.hh": {
+              "bytes": 1876,
+              "sha256": "402b06783af1f689b1646d3d2b69c5e4ab8a7ae71f3f87dab09e62a7a51f0db1"
+            },
+            "include/doc-wasm.h": {
+              "bytes": 83333,
+              "sha256": "33c6bca76dbc9ebcfd785798d8d7837ad4f34ca0df9beb1108408edf63a8d195"
+            },
+            "README.md": {
+              "bytes": 7674,
+              "sha256": "61b003ff4ddfbe6123ae3a1123e39e379f1559edc44634e6c14ba3f2671f9fd8"
+            },
+            "LICENSE": {
+              "bytes": 12243,
+              "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+            }
+          }
+        },
+        "helperSha256": "fa153f42fadac326e53ff01ea91f689a26d9b39b5a8d67c8343303a1f4cb3937",
+        "phase": "compiling",
+        "compilation": {
+          "status": 1,
+          "seconds": 0.0033579839999999875,
+          "diagnostic": "failed to parse WebAssembly module\n\nCaused by:\n    invalid leading byte 0x7E with compact imports proposal disabled (at offset 0x50f0)\n",
+          "imports": 0,
+          "exports": 0,
+          "serializedBytes": 0,
+          "restoredImports": 0,
+          "restoredExports": 0
+        },
+        "error": {
+          "message": "failed to parse WebAssembly module\n\nCaused by:\n    invalid leading byte 0x7E with compact imports proposal disabled (at offset 0x50f0)\n\n\n1 !== 0\n",
+          "stack": "AssertionError [ERR_ASSERTION]: failed to parse WebAssembly module\n\nCaused by:\n    invalid leading byte 0x7E with compact imports proposal disabled (at offset 0x50f0)\n\n\n1 !== 0\n\n    at file:///home/lastmjs/development/lasm/compiler/scripts/full-lean/probe-wasmtime-lean-compilation.mjs:70:18\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+        },
+        "inputUnchanged": true,
+        "harnessUnchanged": true,
+        "finishedAt": "2026-09-24T05:50:22.949Z"
+      },
+      "resultSha256": "89888643fc79de7bf1c6e6b96022bcfca3de81cc67a45a83cf72d623dfaaa46c",
+      "resources": {
+        "startedAt": "2026-09-24T05:50:20.472Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "1800s",
+          ".cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=256",
+          "scripts/full-lean/probe-wasmtime-lean-compilation.mjs",
+          ".work/wasmtime-lean-module-r1",
+          ".work/wasmtime-lean-compilation-r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "049c8a27-2f0d-425d-9fb8-c0f2d3ed0819",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25557172224
+        },
+        "minimumHostAvailable": 25346224128,
+        "peakMemoryBytes": 217075712,
+        "peakTasks": 13,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r2-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:50:22.879Z",
+          "memoryBytes": 216637440,
+          "peakMemoryBytes": 217075712,
+          "swapBytes": 0,
+          "tasks": 12,
+          "memoryBreakdown": {
+            "anon": 213630976,
+            "file": 462848,
+            "kernel": 1851392,
+            "shmem": 0,
+            "file_mapped": 98304,
+            "inactive_file": 462848,
+            "slab": 269896
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-24T05:50:23.013Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 14454784,
+          "peakMemoryBytes": 217075712,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 462848,
+            "kernel": 1110016,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 462848,
+            "slab": 165344
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:50:23.037Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "log": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r2-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: f7db706c870845459376f2954c5cd078\n[lasm] Build process uses base pages; memory and pressure guards remain active\nnode:internal/modules/run_main:111\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: failed to parse WebAssembly module\n\nCaused by:\n    invalid leading byte 0x7E with compact imports proposal disabled (at offset 0x50f0)\n\n\n1 !== 0\n\n    at file:///home/lastmjs/development/lasm/compiler/scripts/full-lean/probe-wasmtime-lean-compilation.mjs:70:18\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 1,\n  expected: 0,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v26.10.0\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 2.519s\nCPU time consumed: 2.698s\nMemory peak: 207.0M\nMemory swap peak: 0B\n[lasm] Peak 0.20 GiB; exit-code\n",
+      "exactInputSnapshots": {
+        ".work/wasmtime-lean-compilation-r2/source.c": "1ef81f3a4b8adeb8744178ea8e4a1b39a9b24cb6f38804b76765579e10e38027",
+        ".work/wasmtime-lean-compilation-r2/harness.mjs": "5aaffc1316e57185478826850ed0e64e3ce9870356a540d83b79a131549adbcf"
+      }
+    },
+    {
+      "attempt": 3,
+      "result": {
+        "scope": "Single-worker compilation, serialization and trusted-cache reload of a real Lean module; no application instantiated or executed",
+        "input": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r2/converted.wasm",
+        "inputSha256": "17217b0dd3df7cef7d0f24492b4795c197e5188427ef571923780fbee255db9b",
+        "inputBytes": 160484134,
+        "precedingFormatProbe": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r2/result.json",
+        "precedingResultSha256": "b9a9b598a68b93d988d1c38fa063a29ce114ed4d126bac234890716eb32bbff6",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "c1e6d5c818e905b19033d4de2d810cd36eb750f6c54df97e6bbae56fcead403e",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "const_fold",
+              "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+              "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+            }
+          ],
+          "signature": "540f068c463b058f625049dbf7af467c6f715efa7020654fd3e1464e5a8b84d8",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "sourceSha256": "1ef81f3a4b8adeb8744178ea8e4a1b39a9b24cb6f38804b76765579e10e38027",
+        "harnessSha256": "5aaffc1316e57185478826850ed0e64e3ce9870356a540d83b79a131549adbcf",
+        "configuration": {
+          "compiler": "Cranelift",
+          "optimization": "none",
+          "parallelCompilation": false,
+          "memory64": true,
+          "threads": true,
+          "sharedMemory": true,
+          "exceptions": true,
+          "maximumWasmStack": 67108864,
+          "asyncStackSize": 83886080,
+          "coreDumpsDisabled": true,
+          "memoryReservation": 8589934592,
+          "instantiation": false,
+          "linearMemoryAllocated": false
+        },
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r3-resources.json",
+        "commands": [
+          {
+            "program": "python3",
+            "args": [
+              "-I",
+              "-B",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/prepare-wasmtime-probe.py"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "{\"version\": \"49.0.0\", \"archiveSha256\": \"8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131\", \"files\": 115, \"selectedBytes\": 32341429}\n",
+            "stderr": ""
+          },
+          {
+            "program": "cc",
+            "args": [
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-shared",
+              "-fPIC",
+              "-I/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/include",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-compile-lean.c",
+              "-L/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+              "-lwasmtime",
+              "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r3/compiler.so"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          }
+        ],
+        "passed": false,
+        "helperInput": {
+          "version": "49.0.0",
+          "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+          "archiveBytes": 16115964,
+          "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz",
+          "selectedFiles": {
+            "lib/libwasmtime.so": {
+              "bytes": 31590960,
+              "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+            },
+            "include/wasmtime.h": {
+              "bytes": 10101,
+              "sha256": "a7497ea0048c0cb8a598c35ca05d1611a31725a88809ed9d51a8b1aebfc6b0c7"
+            },
+            "include/wasm.hh": {
+              "bytes": 19096,
+              "sha256": "ff657786aa259af466fd3ea8cb23646e8ada2b5741362c632d9cdad4be6e9c67"
+            },
+            "include/wasm.h": {
+              "bytes": 23796,
+              "sha256": "c8c2ab4be578bf618512e0720f939d1c8b9b0121f007091dd3746e60290977d9"
+            },
+            "include/wasmtime/error.hh": {
+              "bytes": 3674,
+              "sha256": "689e0143742323bc707243b7cfc404ce966964dc32f76d884580224ea52472f5"
+            },
+            "include/wasmtime/linker.hh": {
+              "bytes": 7459,
+              "sha256": "82f5c95ae9b370ddd8d70190cedce68055cb95c190d02b8e925de7b34640e8bc"
+            },
+            "include/wasmtime/tag.hh": {
+              "bytes": 1724,
+              "sha256": "5c7b05e7d25028c4b9b8a2d3a948acad8c6ff273bf97cecc81df02296f44eb58"
+            },
+            "include/wasmtime/eqref.hh": {
+              "bytes": 927,
+              "sha256": "f2c7adc27741bf18545c0bf72a49c8e22538ba3b97380ac621c01455c2c36851"
+            },
+            "include/wasmtime/wat.hh": {
+              "bytes": 1265,
+              "sha256": "0b190e5defe09c91c448c0a6853afc237148a29c34c7972333166388e4a00abe"
+            },
+            "include/wasmtime/trap.hh": {
+              "bytes": 5505,
+              "sha256": "0ff60c6d5b707966e9388e7dc9e313f0363b7003d615ca5f4cbc03247b77ca9f"
+            },
+            "include/wasmtime/arrayref.hh": {
+              "bytes": 1691,
+              "sha256": "a0059e769dd5bfcc75e743fd6b66d1069e98534ef6f937989cf33657871751bd"
+            },
+            "include/wasmtime/sharedmemory.h": {
+              "bytes": 3027,
+              "sha256": "521d632a5f5ee3e28125b22fdf4f517edb2965a49ebd838278d620368377a1fe"
+            },
+            "include/wasmtime/profiling.h": {
+              "bytes": 4400,
+              "sha256": "92ac5516a561bd062aaf302051373512970a0ea9641836a47993d32b1ab8b205"
+            },
+            "include/wasmtime/_structref_class.hh": {
+              "bytes": 1938,
+              "sha256": "8d0473ee26eb96035000146ba17079feec1a70e2968e64faa472d6610dac6fdf"
+            },
+            "include/wasmtime/conf.h": {
+              "bytes": 1272,
+              "sha256": "025c75489f406c4f3097c57944c01e5fa13840c23c28fe124c748e942f5cdaaa"
+            },
+            "include/wasmtime/instance.hh": {
+              "bytes": 4085,
+              "sha256": "3c84c9ae9be96947637fba645769d0de51fea1d21c2a7915fbe36ed205091f83"
+            },
+            "include/wasmtime/helpers.hh": {
+              "bytes": 11810,
+              "sha256": "da70524f69df90a18c80387ea084c57a8219a5286f8005c770002aa34f768f6d"
+            },
+            "include/wasmtime/externref.h": {
+              "bytes": 4643,
+              "sha256": "37f55067f7227ba6dabc3d933812e0f757e711b6b927a89b47460956bf17d8a5"
+            },
+            "include/wasmtime/error.h": {
+              "bytes": 2420,
+              "sha256": "6905acdfe81f5a7d31c49ac1af8221b3d98b61d5341b91a4a8232f2466dce8f0"
+            },
+            "include/wasmtime/table.h": {
+              "bytes": 3924,
+              "sha256": "1d4313d41a85989ae00c8c744c2e2415ac0694ea3bc3fb15d51cddf5fd74d1ba"
+            },
+            "include/wasmtime/_store_class.hh": {
+              "bytes": 10374,
+              "sha256": "c5563b6d8d70c60ba81356cb9f46a68553ec0017b93943c78486f8aa11761b5e"
+            },
+            "include/wasmtime/extern.h": {
+              "bytes": 6263,
+              "sha256": "7486bc71ec8172152cc6d3d0e827946b4d0778f0b1495a1e377130c031d02031"
+            },
+            "include/wasmtime/async.h": {
+              "bytes": 13952,
+              "sha256": "eea9b04b8c59244fc555a713eeefc88d442baade7506f5355b909fac4c5d3a41"
+            },
+            "include/wasmtime/linker.h": {
+              "bytes": 12848,
+              "sha256": "3ccb42d67c0724b7ce20302c45313f0a056b47a3d0754ce83e0c408f8994576d"
+            },
+            "include/wasmtime/config.h": {
+              "bytes": 32567,
+              "sha256": "3840f8ab5abf1a77d93b728cbe99e04d49ad2e91ed88d2b27387a07753ac540c"
+            },
+            "include/wasmtime/_anyref_class.hh": {
+              "bytes": 2442,
+              "sha256": "8d7ee57b683c3fa4b9278ef56b9727fd33c584a402eea642642ed222954610d5"
+            },
+            "include/wasmtime/component.hh": {
+              "bytes": 401,
+              "sha256": "e77c24d71108d85cdb96fd5716fcc74ff22d2feafdb87dfac2602559eb833fd9"
+            },
+            "include/wasmtime/component.h": {
+              "bytes": 324,
+              "sha256": "7230a0a2ef79976c079225a193006289d5538b2d6cb7e6180649c4526b9dd898"
+            },
+            "include/wasmtime/_exnref_class.hh": {
+              "bytes": 1894,
+              "sha256": "94510c65aa8510b68f1449256d88e2e7ce71ed4944fe336ab5b82bee4ffbf167"
+            },
+            "include/wasmtime/engine.hh": {
+              "bytes": 1399,
+              "sha256": "51c8731580795fbbb214e9fa8a33f73f65d7b465b774b9667096a440f487c7b4"
+            },
+            "include/wasmtime/anyref.h": {
+              "bytes": 7419,
+              "sha256": "90cca7935d268d9ae17032a143bc7fa5d5287edf8254a8c49ac69ca0277c900e"
+            },
+            "include/wasmtime/memory.hh": {
+              "bytes": 4012,
+              "sha256": "15d70af6435ff1cdd61c09689e9507dcac32212f24f87a2e41a65158c1fb4d97"
+            },
+            "include/wasmtime/structref.h": {
+              "bytes": 4451,
+              "sha256": "6db53ade4d6ff78404c55d4e096acef881f435a6d5f76cca7dddb5859f8b1a12"
+            },
+            "include/wasmtime/exnref.hh": {
+              "bytes": 982,
+              "sha256": "48afdcb5b04cf01c9299df1ba9c994790db7a353b04658daaf0ba0e844429021"
+            },
+            "include/wasmtime/val.hh": {
+              "bytes": 3136,
+              "sha256": "23d0a1a258bcff223146e4007e68eabd40be41a04010e66df0596e6a51c047e1"
+            },
+            "include/wasmtime/_arrayref_class.hh": {
+              "bytes": 2189,
+              "sha256": "0069d2ccba2e007e868d7822d47aa6c541aa455b9073d592a9b0d785154fd2df"
+            },
+            "include/wasmtime/component/linker.hh": {
+              "bytes": 9391,
+              "sha256": "30f210fab1447396165845b29987b9d060cabfc91a65780e6915a72e38611337"
+            },
+            "include/wasmtime/component/instance.hh": {
+              "bytes": 2354,
+              "sha256": "a38a2fe8dfdc1cdc9cb89572f5c6924f8919a6ccc479afe52be2da6f66ff9ab1"
+            },
+            "include/wasmtime/component/linker.h": {
+              "bytes": 11133,
+              "sha256": "caa8228d65eec38ae44f7605d20a930daff8cbcafb038465d1fc8e99459f22d9"
+            },
+            "include/wasmtime/component/component.hh": {
+              "bytes": 5797,
+              "sha256": "044c6b8c9fc6d5eafe90f256cbe465077c66c3469e4916f7163d7427864d796a"
+            },
+            "include/wasmtime/component/component.h": {
+              "bytes": 5710,
+              "sha256": "c70c86787fe9a684ef5cd09858d7084944690f4c8779df40422be4bd02bcf30f"
+            },
+            "include/wasmtime/component/val.hh": {
+              "bytes": 31889,
+              "sha256": "a501863591fa10dc41d7779542bde7733d19ed117b10669ae5c0202d5893f1b4"
+            },
+            "include/wasmtime/component/types.h": {
+              "bytes": 419,
+              "sha256": "178795777a58f5ec7138a5932498904ed37fd37a1935b58f739fbd9e48a16614"
+            },
+            "include/wasmtime/component/types/instance.hh": {
+              "bytes": 2660,
+              "sha256": "df1aacf584b0b06c089ba78fc926fca79d91911e51e8a75f9902e5b83d22426b"
+            },
+            "include/wasmtime/component/types/resource.h": {
+              "bytes": 2363,
+              "sha256": "29e8ea2ef512969f9bf82700d932d89cd78437c31c2a9c4b9919f2b0581fcdd9"
+            },
+            "include/wasmtime/component/types/component.hh": {
+              "bytes": 11690,
+              "sha256": "52cf1e12e93838772da08f7bd09eba90ad3c5290fae10bb41a9ae82ac66ef856"
+            },
+            "include/wasmtime/component/types/component.h": {
+              "bytes": 9070,
+              "sha256": "9ff90206171ebdc06182c628382790f72d8e11d0d6e2acdc9074c4ec63d5be64"
+            },
+            "include/wasmtime/component/types/val.hh": {
+              "bytes": 20028,
+              "sha256": "f4869c2174bb6c63e4a4ee9ef9713c87dc27920a5fb38266b69aa6682c75b211"
+            },
+            "include/wasmtime/component/types/instance.h": {
+              "bytes": 2080,
+              "sha256": "525d7f53408a04f33f26389bd7a29e52a88fd9a0484a8697d66a2d6282fbb272"
+            },
+            "include/wasmtime/component/types/func.hh": {
+              "bytes": 1758,
+              "sha256": "001f88580a09bbdb866ba583086576f6b4a6f4a738006a7cfb5aa4feef2ad2e7"
+            },
+            "include/wasmtime/component/types/module.h": {
+              "bytes": 1918,
+              "sha256": "04afb394852aa2d22e2dcf0ece8ee4e4a6ae436c7f979ca361d939baf3023592"
+            },
+            "include/wasmtime/component/types/module.hh": {
+              "bytes": 1716,
+              "sha256": "a7d16678120376e97222c691dff5a92a7acee22a04c9d26a90ac74efb2f65f85"
+            },
+            "include/wasmtime/component/types/func.h": {
+              "bytes": 2021,
+              "sha256": "89d65916a8e599cf2abe3fe5734648b2a84ac0701be196d07533a2cef1e1a280"
+            },
+            "include/wasmtime/component/types/val.h": {
+              "bytes": 22894,
+              "sha256": "08d3b8fc7b78a4ccb9cc809d3200911a745d7593d9323a2db7d994f742b9c726"
+            },
+            "include/wasmtime/component/instance.h": {
+              "bytes": 2428,
+              "sha256": "5f2928c0fa8a5b016560d2582b489ddeca28a1200227a7cd351ab4b16d2c8c3f"
+            },
+            "include/wasmtime/component/func.hh": {
+              "bytes": 1991,
+              "sha256": "72aa729643bbf44562121875de26769b4fbbf9a37978dec1935ce81e763b64e1"
+            },
+            "include/wasmtime/component/types.hh": {
+              "bytes": 381,
+              "sha256": "a7b184e68345d1785e9daddd43b9891337d855825034399f0b248116fb18d7a9"
+            },
+            "include/wasmtime/component/func.h": {
+              "bytes": 3866,
+              "sha256": "7a277a0277cc5910f2650b84861d78c36ffc9d2729cfb06833aff9794f663663"
+            },
+            "include/wasmtime/component/val.h": {
+              "bytes": 20576,
+              "sha256": "db3a426f729b16706a3e7b48560a5288b7323efd3faea5b49ea49e31ad44ccd9"
+            },
+            "include/wasmtime/trap.h": {
+              "bytes": 8935,
+              "sha256": "66865a8eaa35eb7d95cdf7c359a8b16a049d16a61e77c619b955d29d61dd3662"
+            },
+            "include/wasmtime/engine.h": {
+              "bytes": 1241,
+              "sha256": "c1a02904ef0d4c660d2baa70477994bbc4cfe291aeebe7143bc1c8b316f77788"
+            },
+            "include/wasmtime/_func_class.hh": {
+              "bytes": 13795,
+              "sha256": "5c80bf9d72abd749cc9d63e386628c8bad2580d690d2c4c7dc12f6a13a0a2d44"
+            },
+            "include/wasmtime/extern_declare.hh": {
+              "bytes": 517,
+              "sha256": "c54d82840a4554f5ea0fc6fe94520fd2b24fb017c73405028e10b8916c61fd62"
+            },
+            "include/wasmtime/types.h": {
+              "bytes": 221,
+              "sha256": "47facddf2717b2ff9b13bc9bdae50cf0cd421c3299622248820f3c4f154fb464"
+            },
+            "include/wasmtime/config.hh": {
+              "bytes": 28665,
+              "sha256": "452ea4a26062cb65cfefcdcee70bbc1fba06cef4fbe0411265d74bba9989df43"
+            },
+            "include/wasmtime/types/tag.hh": {
+              "bytes": 2610,
+              "sha256": "0afd806de505b73b1d562f64dbd995c79d53c8d601c1f6dbd71799a056aa8d20"
+            },
+            "include/wasmtime/types/arrayref.hh": {
+              "bytes": 950,
+              "sha256": "372e35a259ff7a5f5e7465bb8165e6eee044c454ef3dec1d53ec9242f27a8b39"
+            },
+            "include/wasmtime/types/_structref_class.hh": {
+              "bytes": 5428,
+              "sha256": "f158b4b3e8c1b74256a95c1f56e40abf7f9cceeeaa29cec558e246f01bf116f3"
+            },
+            "include/wasmtime/types/memory.hh": {
+              "bytes": 6764,
+              "sha256": "bb22cd0b8b05fa0d088abe445de6a6280640ea6320914389364756af56eb819b"
+            },
+            "include/wasmtime/types/structref.h": {
+              "bytes": 3784,
+              "sha256": "16c0dd4a06bce1efbddefb720dd09dc9ebf166ebaf5a654130f5b7be6ab71b19"
+            },
+            "include/wasmtime/types/exnref.hh": {
+              "bytes": 1625,
+              "sha256": "ad6b76ceaef18ff81e6d5986174c22177927c2bc1db1e8c33889b3c564a31803"
+            },
+            "include/wasmtime/types/val.hh": {
+              "bytes": 13554,
+              "sha256": "29d3ec7490f785394db21f5476069151199aea96c94d7ff3c347379fe3cfd074"
+            },
+            "include/wasmtime/types/export.hh": {
+              "bytes": 2467,
+              "sha256": "cd0621e8659a45a4f3ca3ae5094ab80a86badfc0786aa27c968616a5a2bc4bf0"
+            },
+            "include/wasmtime/types/import.hh": {
+              "bytes": 2727,
+              "sha256": "b94bc37d543ff7d32098128b2acdca89c0cb76e9b1665733e6f004759770e702"
+            },
+            "include/wasmtime/types/table.hh": {
+              "bytes": 3303,
+              "sha256": "00559bb04924a26ddbf0120c73671a0366b2e359312b354742792bfaea33d4a8"
+            },
+            "include/wasmtime/types/structref.hh": {
+              "bytes": 452,
+              "sha256": "2dba4391088a03810e6d248b8b7e50a471003ff729377793c293a22aa524538b"
+            },
+            "include/wasmtime/types/func.hh": {
+              "bytes": 3363,
+              "sha256": "d8c640f7d586d9ad6186b4fae31587c66a075f08fbc89eafd47680567f65f48d"
+            },
+            "include/wasmtime/types/_val_class.hh": {
+              "bytes": 6454,
+              "sha256": "4fcbcd5ac4d435159c90100e781bc77ed6172d95bc55f0f3f57a3fc15d4b9bc4"
+            },
+            "include/wasmtime/types/arrayref.h": {
+              "bytes": 1504,
+              "sha256": "8b978b9ca57092c9b14c846efcb0f80515a1792e87af2e74169d3f2a7a7c8fe3"
+            },
+            "include/wasmtime/types/val.h": {
+              "bytes": 6133,
+              "sha256": "fbc78a085d0ac76a85f63f66986a2b77d0813146a7b715cf269c56115f84b3d3"
+            },
+            "include/wasmtime/types/extern.hh": {
+              "bytes": 2067,
+              "sha256": "fb3ec6f92fedf173c5f1cdf6fc7ea2cd7c9fe1697f02dc69cdf889b7470178a2"
+            },
+            "include/wasmtime/types/global.hh": {
+              "bytes": 2586,
+              "sha256": "d6189adc25faad4d4237c231808629628ed091c13b8a24846eab3e354e18a206"
+            },
+            "include/wasmtime/types/exnref.h": {
+              "bytes": 1214,
+              "sha256": "ff720e11ebec7936f9a439c66fd0de336176d4cecee01198dca936e2ca13383d"
+            },
+            "include/wasmtime/table.hh": {
+              "bytes": 3583,
+              "sha256": "718cf580417e3885dd6450c5734bb71ca3b736e52f5c6134ed04d242ef12427d"
+            },
+            "include/wasmtime/structref.hh": {
+              "bytes": 1715,
+              "sha256": "f56fe6b322ca4b66f36212f3ba7c413f6ef171b1344b5e34ae6807bc89c157c4"
+            },
+            "include/wasmtime/_eqref_class.hh": {
+              "bytes": 2730,
+              "sha256": "de249e5f5b53eec9544d4222e01e17cb45fec28eb60aa6db0b1cc348aa2a5703"
+            },
+            "include/wasmtime/store.hh": {
+              "bytes": 930,
+              "sha256": "f68ddbba240cab6631510d92cfa9d91eb3464b23a35668edf48dbe531c1d12fb"
+            },
+            "include/wasmtime/tag.h": {
+              "bytes": 2268,
+              "sha256": "0e6261f2f061b2c900b129b12de12e72e2bc37c32380ee95ef6f15e14baa395f"
+            },
+            "include/wasmtime/instance.h": {
+              "bytes": 6362,
+              "sha256": "4abeaef7a3942aa986d29e58b1ad169307d4ffd10e11a796e0f903933bec67b7"
+            },
+            "include/wasmtime/func.hh": {
+              "bytes": 9697,
+              "sha256": "68328055a4b42cbcdc7135a171209e39a41d1b7738b99d8201b4a4dbfa44580d"
+            },
+            "include/wasmtime/module.h": {
+              "bytes": 5768,
+              "sha256": "8c0b889e5235a1017a4844d03628a7dd67090a5088ae289f87f699f6bd6be88e"
+            },
+            "include/wasmtime/externref.hh": {
+              "bytes": 1325,
+              "sha256": "03a2f196f91f680347fd12eddda6aeed5063aa2bf69561fe5570b7446d5b69eb"
+            },
+            "include/wasmtime/module.hh": {
+              "bytes": 5580,
+              "sha256": "106774b8810482e4b70223eeb3768db626fe3580b9e41fcca969ead3d500a25f"
+            },
+            "include/wasmtime/types.hh": {
+              "bytes": 433,
+              "sha256": "568988261b07753fbae59c2649d168119ebb087ffcac79e7e2d393c4cdcf61c5"
+            },
+            "include/wasmtime/eqref.h": {
+              "bytes": 5263,
+              "sha256": "de21b013eac94b2d43eba4bbac34d565c649e2573814868dbbe50e64622ca7be"
+            },
+            "include/wasmtime/func.h": {
+              "bytes": 12787,
+              "sha256": "9a4fee4a295a2b19a141cf84be4ceb9355bfc25394ae761d7f780ac49f2d65ad"
+            },
+            "include/wasmtime/memory.h": {
+              "bytes": 5999,
+              "sha256": "95c0c3b189ea7b0e8c5b523a18de0a19a1bef7db8c5702275a3a2d9e6cea9642"
+            },
+            "include/wasmtime/_val_class.hh": {
+              "bytes": 6987,
+              "sha256": "9dcae719115fc13181fbfca22ddbb19910fc2ebf56f0b2a174971012e307b036"
+            },
+            "include/wasmtime/arrayref.h": {
+              "bytes": 4703,
+              "sha256": "a93ec80b4849edbd6c7bb2c8268b9f41ed4d97b5e0ad537e7521b4551d005521"
+            },
+            "include/wasmtime/val.h": {
+              "bytes": 14826,
+              "sha256": "33ea4fc9b9288f536dc12b15130b25b88b59144c85d1e34c30a8ff8514170148"
+            },
+            "include/wasmtime/_externref_class.hh": {
+              "bytes": 1949,
+              "sha256": "0f39147fd6bff3d781235ca4d2731e67597edb77e924c223208abfb04e54bdfc"
+            },
+            "include/wasmtime/extern.hh": {
+              "bytes": 1901,
+              "sha256": "2608bb08136598b81c0847515aa3dbe665e8ef77802a04c0683a628bf4d39fd9"
+            },
+            "include/wasmtime/wat.h": {
+              "bytes": 1153,
+              "sha256": "7533f9c25ee267c88ea64e21a7550bf28585183184a29c575ceb419eb711fe9f"
+            },
+            "include/wasmtime/span.hh": {
+              "bytes": 2716,
+              "sha256": "da563fddd6e110c419c8ba579de15496a03d1e1e44fde29a7d1744348996ca51"
+            },
+            "include/wasmtime/wasi.hh": {
+              "bytes": 3701,
+              "sha256": "f9318dccdccafe821b1e8ae4173a2444ac88cd87412252eeea06aa1658fd0149"
+            },
+            "include/wasmtime/store.h": {
+              "bytes": 10060,
+              "sha256": "ff307ac99c7e9fa58bd40b518b9e737663c5741abd4e756bbe8452f340f30386"
+            },
+            "include/wasmtime/global.h": {
+              "bytes": 2521,
+              "sha256": "5e51effa5185ec774e47bb53323fbf5f0d0b621158f0a578b5528711d2f18129"
+            },
+            "include/wasmtime/global.hh": {
+              "bytes": 2469,
+              "sha256": "a74e041c6e9c4a48af597896a77b7748a289656f7fad4fe7c2eb226f12fa4666"
+            },
+            "include/wasmtime/exnref.h": {
+              "bytes": 6109,
+              "sha256": "0f03df665b9a8b7ca9405ad638d4068c0ce7d5024165132acea94430bbc626d0"
+            },
+            "include/wasmtime/anyref.hh": {
+              "bytes": 1393,
+              "sha256": "7f7c57d3dc5381ab01d280633827b784e1cb545199bef98943bf056b9379f11b"
+            },
+            "include/wasi.h": {
+              "bytes": 8513,
+              "sha256": "37d15447efe4c47b445996c4bd9d879dfe02402bd96e36a9de5ca195670ce5ea"
+            },
+            "include/wasmtime.hh": {
+              "bytes": 1876,
+              "sha256": "402b06783af1f689b1646d3d2b69c5e4ab8a7ae71f3f87dab09e62a7a51f0db1"
+            },
+            "include/doc-wasm.h": {
+              "bytes": 83333,
+              "sha256": "33c6bca76dbc9ebcfd785798d8d7837ad4f34ca0df9beb1108408edf63a8d195"
+            },
+            "README.md": {
+              "bytes": 7674,
+              "sha256": "61b003ff4ddfbe6123ae3a1123e39e379f1559edc44634e6c14ba3f2671f9fd8"
+            },
+            "LICENSE": {
+              "bytes": 12243,
+              "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+            }
+          }
+        },
+        "helperSha256": "fa153f42fadac326e53ff01ea91f689a26d9b39b5a8d67c8343303a1f4cb3937",
+        "phase": "compiling",
+        "compilation": {
+          "status": 2,
+          "seconds": 163.755477197,
+          "diagnostic": "serialized module exceeds reviewed 512 MiB disk bound",
+          "imports": 139,
+          "exports": 27181,
+          "serializedBytes": 610719320,
+          "restoredImports": 0,
+          "restoredExports": 0
+        },
+        "error": {
+          "message": "serialized module exceeds reviewed 512 MiB disk bound\n\n2 !== 0\n",
+          "stack": "AssertionError [ERR_ASSERTION]: serialized module exceeds reviewed 512 MiB disk bound\n\n2 !== 0\n\n    at file:///home/lastmjs/development/lasm/compiler/scripts/full-lean/probe-wasmtime-lean-compilation.mjs:70:18\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+        },
+        "inputUnchanged": true,
+        "harnessUnchanged": true,
+        "finishedAt": "2026-09-24T05:55:37.774Z"
+      },
+      "resultSha256": "abedaa77744de5a96af5d752234651fe6405ce5d305124215cbde57e90416f96",
+      "resources": {
+        "startedAt": "2026-09-24T05:52:51.483Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "1800s",
+          ".cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=256",
+          "scripts/full-lean/probe-wasmtime-lean-compilation.mjs",
+          ".work/wasmtime-lean-module-r2",
+          ".work/wasmtime-lean-compilation-r3"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "63a403e1-ba24-49c1-989f-1c3ec3a693e7",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25446653952
+        },
+        "minimumHostAvailable": 19753672704,
+        "peakMemoryBytes": 5544267776,
+        "peakTasks": 13,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r3-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:55:38.100Z",
+          "memoryBytes": 166838272,
+          "peakMemoryBytes": 5544267776,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 4489216,
+            "file": 160641024,
+            "kernel": 716800,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 160534528,
+            "slab": 128504
+          },
+          "pressureSomeAvg10": 0.18,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "exit-code",
+          "exitCode": "exited",
+          "exitStatus": "1",
+          "capturedAt": "2026-09-24T05:55:38.126Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 174358528,
+          "peakMemoryBytes": 5544267776,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11649024,
+            "file": 160641024,
+            "kernel": 1114112,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 160534528,
+            "slab": 159112
+          },
+          "pressureSomeAvg10": 0.18,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:55:38.151Z",
+        "result": {
+          "code": 1,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "log": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r3-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 94665ecc0a0d44f9b6a4a41f53e9e4eb\n[lasm] Build process uses base pages; memory and pressure guards remain active\nnode:internal/modules/run_main:111\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: serialized module exceeds reviewed 512 MiB disk bound\n\n2 !== 0\n\n    at file:///home/lastmjs/development/lasm/compiler/scripts/full-lean/probe-wasmtime-lean-compilation.mjs:70:18\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 2,\n  expected: 0,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v26.10.0\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 2min 46.629s\nCPU time consumed: 2min 46.764s\nMemory peak: 5.1G\nMemory swap peak: 0B\n[lasm] Peak 5.16 GiB; exit-code\n",
+      "exactInputSnapshots": {
+        ".work/wasmtime-lean-compilation-r3/source.c": "1ef81f3a4b8adeb8744178ea8e4a1b39a9b24cb6f38804b76765579e10e38027",
+        ".work/wasmtime-lean-compilation-r3/harness.mjs": "5aaffc1316e57185478826850ed0e64e3ce9870356a540d83b79a131549adbcf"
+      }
+    },
+    {
+      "attempt": 4,
+      "result": {
+        "scope": "Single-worker compilation, serialization and trusted-cache reload of a real Lean module; no application instantiated or executed",
+        "input": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r2/converted.wasm",
+        "inputSha256": "17217b0dd3df7cef7d0f24492b4795c197e5188427ef571923780fbee255db9b",
+        "inputBytes": 160484134,
+        "precedingFormatProbe": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r2/result.json",
+        "precedingResultSha256": "b9a9b598a68b93d988d1c38fa063a29ce114ed4d126bac234890716eb32bbff6",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+          "buildDriverIdentity": "c1e6d5c818e905b19033d4de2d810cd36eb750f6c54df97e6bbae56fcead403e",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "const_fold",
+              "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+              "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+            }
+          ],
+          "signature": "540f068c463b058f625049dbf7af467c6f715efa7020654fd3e1464e5a8b84d8",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "sourceSha256": "68b6d38974caa464e1f315f8d78b30e5b1801e270e2b2d95f6f910015eed1cf6",
+        "harnessSha256": "6627ef72e79183f379637bc10adb15544f4ecc840331251606a8c0d9368aa8d4",
+        "configuration": {
+          "compiler": "Cranelift",
+          "optimization": "none",
+          "parallelCompilation": false,
+          "inputBoundBytes": 536870912,
+          "serializedBoundBytes": 671088640,
+          "memory64": true,
+          "threads": true,
+          "sharedMemory": true,
+          "exceptions": true,
+          "maximumWasmStack": 67108864,
+          "asyncStackSize": 83886080,
+          "coreDumpsDisabled": true,
+          "memoryReservation": 8589934592,
+          "instantiation": false,
+          "linearMemoryAllocated": false
+        },
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r4-resources.json",
+        "commands": [
+          {
+            "program": "python3",
+            "args": [
+              "-I",
+              "-B",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/prepare-wasmtime-probe.py"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "{\"version\": \"49.0.0\", \"archiveSha256\": \"8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131\", \"files\": 115, \"selectedBytes\": 32341429}\n",
+            "stderr": ""
+          },
+          {
+            "program": "cc",
+            "args": [
+              "-std=c11",
+              "-O2",
+              "-Wall",
+              "-Wextra",
+              "-Werror",
+              "-shared",
+              "-fPIC",
+              "-I/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/include",
+              "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-compile-lean.c",
+              "-L/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+              "-lwasmtime",
+              "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r4/compiler.so"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "helperInput": {
+          "version": "49.0.0",
+          "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+          "archiveBytes": 16115964,
+          "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz",
+          "selectedFiles": {
+            "lib/libwasmtime.so": {
+              "bytes": 31590960,
+              "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+            },
+            "include/wasmtime.h": {
+              "bytes": 10101,
+              "sha256": "a7497ea0048c0cb8a598c35ca05d1611a31725a88809ed9d51a8b1aebfc6b0c7"
+            },
+            "include/wasm.hh": {
+              "bytes": 19096,
+              "sha256": "ff657786aa259af466fd3ea8cb23646e8ada2b5741362c632d9cdad4be6e9c67"
+            },
+            "include/wasm.h": {
+              "bytes": 23796,
+              "sha256": "c8c2ab4be578bf618512e0720f939d1c8b9b0121f007091dd3746e60290977d9"
+            },
+            "include/wasmtime/error.hh": {
+              "bytes": 3674,
+              "sha256": "689e0143742323bc707243b7cfc404ce966964dc32f76d884580224ea52472f5"
+            },
+            "include/wasmtime/linker.hh": {
+              "bytes": 7459,
+              "sha256": "82f5c95ae9b370ddd8d70190cedce68055cb95c190d02b8e925de7b34640e8bc"
+            },
+            "include/wasmtime/tag.hh": {
+              "bytes": 1724,
+              "sha256": "5c7b05e7d25028c4b9b8a2d3a948acad8c6ff273bf97cecc81df02296f44eb58"
+            },
+            "include/wasmtime/eqref.hh": {
+              "bytes": 927,
+              "sha256": "f2c7adc27741bf18545c0bf72a49c8e22538ba3b97380ac621c01455c2c36851"
+            },
+            "include/wasmtime/wat.hh": {
+              "bytes": 1265,
+              "sha256": "0b190e5defe09c91c448c0a6853afc237148a29c34c7972333166388e4a00abe"
+            },
+            "include/wasmtime/trap.hh": {
+              "bytes": 5505,
+              "sha256": "0ff60c6d5b707966e9388e7dc9e313f0363b7003d615ca5f4cbc03247b77ca9f"
+            },
+            "include/wasmtime/arrayref.hh": {
+              "bytes": 1691,
+              "sha256": "a0059e769dd5bfcc75e743fd6b66d1069e98534ef6f937989cf33657871751bd"
+            },
+            "include/wasmtime/sharedmemory.h": {
+              "bytes": 3027,
+              "sha256": "521d632a5f5ee3e28125b22fdf4f517edb2965a49ebd838278d620368377a1fe"
+            },
+            "include/wasmtime/profiling.h": {
+              "bytes": 4400,
+              "sha256": "92ac5516a561bd062aaf302051373512970a0ea9641836a47993d32b1ab8b205"
+            },
+            "include/wasmtime/_structref_class.hh": {
+              "bytes": 1938,
+              "sha256": "8d0473ee26eb96035000146ba17079feec1a70e2968e64faa472d6610dac6fdf"
+            },
+            "include/wasmtime/conf.h": {
+              "bytes": 1272,
+              "sha256": "025c75489f406c4f3097c57944c01e5fa13840c23c28fe124c748e942f5cdaaa"
+            },
+            "include/wasmtime/instance.hh": {
+              "bytes": 4085,
+              "sha256": "3c84c9ae9be96947637fba645769d0de51fea1d21c2a7915fbe36ed205091f83"
+            },
+            "include/wasmtime/helpers.hh": {
+              "bytes": 11810,
+              "sha256": "da70524f69df90a18c80387ea084c57a8219a5286f8005c770002aa34f768f6d"
+            },
+            "include/wasmtime/externref.h": {
+              "bytes": 4643,
+              "sha256": "37f55067f7227ba6dabc3d933812e0f757e711b6b927a89b47460956bf17d8a5"
+            },
+            "include/wasmtime/error.h": {
+              "bytes": 2420,
+              "sha256": "6905acdfe81f5a7d31c49ac1af8221b3d98b61d5341b91a4a8232f2466dce8f0"
+            },
+            "include/wasmtime/table.h": {
+              "bytes": 3924,
+              "sha256": "1d4313d41a85989ae00c8c744c2e2415ac0694ea3bc3fb15d51cddf5fd74d1ba"
+            },
+            "include/wasmtime/_store_class.hh": {
+              "bytes": 10374,
+              "sha256": "c5563b6d8d70c60ba81356cb9f46a68553ec0017b93943c78486f8aa11761b5e"
+            },
+            "include/wasmtime/extern.h": {
+              "bytes": 6263,
+              "sha256": "7486bc71ec8172152cc6d3d0e827946b4d0778f0b1495a1e377130c031d02031"
+            },
+            "include/wasmtime/async.h": {
+              "bytes": 13952,
+              "sha256": "eea9b04b8c59244fc555a713eeefc88d442baade7506f5355b909fac4c5d3a41"
+            },
+            "include/wasmtime/linker.h": {
+              "bytes": 12848,
+              "sha256": "3ccb42d67c0724b7ce20302c45313f0a056b47a3d0754ce83e0c408f8994576d"
+            },
+            "include/wasmtime/config.h": {
+              "bytes": 32567,
+              "sha256": "3840f8ab5abf1a77d93b728cbe99e04d49ad2e91ed88d2b27387a07753ac540c"
+            },
+            "include/wasmtime/_anyref_class.hh": {
+              "bytes": 2442,
+              "sha256": "8d7ee57b683c3fa4b9278ef56b9727fd33c584a402eea642642ed222954610d5"
+            },
+            "include/wasmtime/component.hh": {
+              "bytes": 401,
+              "sha256": "e77c24d71108d85cdb96fd5716fcc74ff22d2feafdb87dfac2602559eb833fd9"
+            },
+            "include/wasmtime/component.h": {
+              "bytes": 324,
+              "sha256": "7230a0a2ef79976c079225a193006289d5538b2d6cb7e6180649c4526b9dd898"
+            },
+            "include/wasmtime/_exnref_class.hh": {
+              "bytes": 1894,
+              "sha256": "94510c65aa8510b68f1449256d88e2e7ce71ed4944fe336ab5b82bee4ffbf167"
+            },
+            "include/wasmtime/engine.hh": {
+              "bytes": 1399,
+              "sha256": "51c8731580795fbbb214e9fa8a33f73f65d7b465b774b9667096a440f487c7b4"
+            },
+            "include/wasmtime/anyref.h": {
+              "bytes": 7419,
+              "sha256": "90cca7935d268d9ae17032a143bc7fa5d5287edf8254a8c49ac69ca0277c900e"
+            },
+            "include/wasmtime/memory.hh": {
+              "bytes": 4012,
+              "sha256": "15d70af6435ff1cdd61c09689e9507dcac32212f24f87a2e41a65158c1fb4d97"
+            },
+            "include/wasmtime/structref.h": {
+              "bytes": 4451,
+              "sha256": "6db53ade4d6ff78404c55d4e096acef881f435a6d5f76cca7dddb5859f8b1a12"
+            },
+            "include/wasmtime/exnref.hh": {
+              "bytes": 982,
+              "sha256": "48afdcb5b04cf01c9299df1ba9c994790db7a353b04658daaf0ba0e844429021"
+            },
+            "include/wasmtime/val.hh": {
+              "bytes": 3136,
+              "sha256": "23d0a1a258bcff223146e4007e68eabd40be41a04010e66df0596e6a51c047e1"
+            },
+            "include/wasmtime/_arrayref_class.hh": {
+              "bytes": 2189,
+              "sha256": "0069d2ccba2e007e868d7822d47aa6c541aa455b9073d592a9b0d785154fd2df"
+            },
+            "include/wasmtime/component/linker.hh": {
+              "bytes": 9391,
+              "sha256": "30f210fab1447396165845b29987b9d060cabfc91a65780e6915a72e38611337"
+            },
+            "include/wasmtime/component/instance.hh": {
+              "bytes": 2354,
+              "sha256": "a38a2fe8dfdc1cdc9cb89572f5c6924f8919a6ccc479afe52be2da6f66ff9ab1"
+            },
+            "include/wasmtime/component/linker.h": {
+              "bytes": 11133,
+              "sha256": "caa8228d65eec38ae44f7605d20a930daff8cbcafb038465d1fc8e99459f22d9"
+            },
+            "include/wasmtime/component/component.hh": {
+              "bytes": 5797,
+              "sha256": "044c6b8c9fc6d5eafe90f256cbe465077c66c3469e4916f7163d7427864d796a"
+            },
+            "include/wasmtime/component/component.h": {
+              "bytes": 5710,
+              "sha256": "c70c86787fe9a684ef5cd09858d7084944690f4c8779df40422be4bd02bcf30f"
+            },
+            "include/wasmtime/component/val.hh": {
+              "bytes": 31889,
+              "sha256": "a501863591fa10dc41d7779542bde7733d19ed117b10669ae5c0202d5893f1b4"
+            },
+            "include/wasmtime/component/types.h": {
+              "bytes": 419,
+              "sha256": "178795777a58f5ec7138a5932498904ed37fd37a1935b58f739fbd9e48a16614"
+            },
+            "include/wasmtime/component/types/instance.hh": {
+              "bytes": 2660,
+              "sha256": "df1aacf584b0b06c089ba78fc926fca79d91911e51e8a75f9902e5b83d22426b"
+            },
+            "include/wasmtime/component/types/resource.h": {
+              "bytes": 2363,
+              "sha256": "29e8ea2ef512969f9bf82700d932d89cd78437c31c2a9c4b9919f2b0581fcdd9"
+            },
+            "include/wasmtime/component/types/component.hh": {
+              "bytes": 11690,
+              "sha256": "52cf1e12e93838772da08f7bd09eba90ad3c5290fae10bb41a9ae82ac66ef856"
+            },
+            "include/wasmtime/component/types/component.h": {
+              "bytes": 9070,
+              "sha256": "9ff90206171ebdc06182c628382790f72d8e11d0d6e2acdc9074c4ec63d5be64"
+            },
+            "include/wasmtime/component/types/val.hh": {
+              "bytes": 20028,
+              "sha256": "f4869c2174bb6c63e4a4ee9ef9713c87dc27920a5fb38266b69aa6682c75b211"
+            },
+            "include/wasmtime/component/types/instance.h": {
+              "bytes": 2080,
+              "sha256": "525d7f53408a04f33f26389bd7a29e52a88fd9a0484a8697d66a2d6282fbb272"
+            },
+            "include/wasmtime/component/types/func.hh": {
+              "bytes": 1758,
+              "sha256": "001f88580a09bbdb866ba583086576f6b4a6f4a738006a7cfb5aa4feef2ad2e7"
+            },
+            "include/wasmtime/component/types/module.h": {
+              "bytes": 1918,
+              "sha256": "04afb394852aa2d22e2dcf0ece8ee4e4a6ae436c7f979ca361d939baf3023592"
+            },
+            "include/wasmtime/component/types/module.hh": {
+              "bytes": 1716,
+              "sha256": "a7d16678120376e97222c691dff5a92a7acee22a04c9d26a90ac74efb2f65f85"
+            },
+            "include/wasmtime/component/types/func.h": {
+              "bytes": 2021,
+              "sha256": "89d65916a8e599cf2abe3fe5734648b2a84ac0701be196d07533a2cef1e1a280"
+            },
+            "include/wasmtime/component/types/val.h": {
+              "bytes": 22894,
+              "sha256": "08d3b8fc7b78a4ccb9cc809d3200911a745d7593d9323a2db7d994f742b9c726"
+            },
+            "include/wasmtime/component/instance.h": {
+              "bytes": 2428,
+              "sha256": "5f2928c0fa8a5b016560d2582b489ddeca28a1200227a7cd351ab4b16d2c8c3f"
+            },
+            "include/wasmtime/component/func.hh": {
+              "bytes": 1991,
+              "sha256": "72aa729643bbf44562121875de26769b4fbbf9a37978dec1935ce81e763b64e1"
+            },
+            "include/wasmtime/component/types.hh": {
+              "bytes": 381,
+              "sha256": "a7b184e68345d1785e9daddd43b9891337d855825034399f0b248116fb18d7a9"
+            },
+            "include/wasmtime/component/func.h": {
+              "bytes": 3866,
+              "sha256": "7a277a0277cc5910f2650b84861d78c36ffc9d2729cfb06833aff9794f663663"
+            },
+            "include/wasmtime/component/val.h": {
+              "bytes": 20576,
+              "sha256": "db3a426f729b16706a3e7b48560a5288b7323efd3faea5b49ea49e31ad44ccd9"
+            },
+            "include/wasmtime/trap.h": {
+              "bytes": 8935,
+              "sha256": "66865a8eaa35eb7d95cdf7c359a8b16a049d16a61e77c619b955d29d61dd3662"
+            },
+            "include/wasmtime/engine.h": {
+              "bytes": 1241,
+              "sha256": "c1a02904ef0d4c660d2baa70477994bbc4cfe291aeebe7143bc1c8b316f77788"
+            },
+            "include/wasmtime/_func_class.hh": {
+              "bytes": 13795,
+              "sha256": "5c80bf9d72abd749cc9d63e386628c8bad2580d690d2c4c7dc12f6a13a0a2d44"
+            },
+            "include/wasmtime/extern_declare.hh": {
+              "bytes": 517,
+              "sha256": "c54d82840a4554f5ea0fc6fe94520fd2b24fb017c73405028e10b8916c61fd62"
+            },
+            "include/wasmtime/types.h": {
+              "bytes": 221,
+              "sha256": "47facddf2717b2ff9b13bc9bdae50cf0cd421c3299622248820f3c4f154fb464"
+            },
+            "include/wasmtime/config.hh": {
+              "bytes": 28665,
+              "sha256": "452ea4a26062cb65cfefcdcee70bbc1fba06cef4fbe0411265d74bba9989df43"
+            },
+            "include/wasmtime/types/tag.hh": {
+              "bytes": 2610,
+              "sha256": "0afd806de505b73b1d562f64dbd995c79d53c8d601c1f6dbd71799a056aa8d20"
+            },
+            "include/wasmtime/types/arrayref.hh": {
+              "bytes": 950,
+              "sha256": "372e35a259ff7a5f5e7465bb8165e6eee044c454ef3dec1d53ec9242f27a8b39"
+            },
+            "include/wasmtime/types/_structref_class.hh": {
+              "bytes": 5428,
+              "sha256": "f158b4b3e8c1b74256a95c1f56e40abf7f9cceeeaa29cec558e246f01bf116f3"
+            },
+            "include/wasmtime/types/memory.hh": {
+              "bytes": 6764,
+              "sha256": "bb22cd0b8b05fa0d088abe445de6a6280640ea6320914389364756af56eb819b"
+            },
+            "include/wasmtime/types/structref.h": {
+              "bytes": 3784,
+              "sha256": "16c0dd4a06bce1efbddefb720dd09dc9ebf166ebaf5a654130f5b7be6ab71b19"
+            },
+            "include/wasmtime/types/exnref.hh": {
+              "bytes": 1625,
+              "sha256": "ad6b76ceaef18ff81e6d5986174c22177927c2bc1db1e8c33889b3c564a31803"
+            },
+            "include/wasmtime/types/val.hh": {
+              "bytes": 13554,
+              "sha256": "29d3ec7490f785394db21f5476069151199aea96c94d7ff3c347379fe3cfd074"
+            },
+            "include/wasmtime/types/export.hh": {
+              "bytes": 2467,
+              "sha256": "cd0621e8659a45a4f3ca3ae5094ab80a86badfc0786aa27c968616a5a2bc4bf0"
+            },
+            "include/wasmtime/types/import.hh": {
+              "bytes": 2727,
+              "sha256": "b94bc37d543ff7d32098128b2acdca89c0cb76e9b1665733e6f004759770e702"
+            },
+            "include/wasmtime/types/table.hh": {
+              "bytes": 3303,
+              "sha256": "00559bb04924a26ddbf0120c73671a0366b2e359312b354742792bfaea33d4a8"
+            },
+            "include/wasmtime/types/structref.hh": {
+              "bytes": 452,
+              "sha256": "2dba4391088a03810e6d248b8b7e50a471003ff729377793c293a22aa524538b"
+            },
+            "include/wasmtime/types/func.hh": {
+              "bytes": 3363,
+              "sha256": "d8c640f7d586d9ad6186b4fae31587c66a075f08fbc89eafd47680567f65f48d"
+            },
+            "include/wasmtime/types/_val_class.hh": {
+              "bytes": 6454,
+              "sha256": "4fcbcd5ac4d435159c90100e781bc77ed6172d95bc55f0f3f57a3fc15d4b9bc4"
+            },
+            "include/wasmtime/types/arrayref.h": {
+              "bytes": 1504,
+              "sha256": "8b978b9ca57092c9b14c846efcb0f80515a1792e87af2e74169d3f2a7a7c8fe3"
+            },
+            "include/wasmtime/types/val.h": {
+              "bytes": 6133,
+              "sha256": "fbc78a085d0ac76a85f63f66986a2b77d0813146a7b715cf269c56115f84b3d3"
+            },
+            "include/wasmtime/types/extern.hh": {
+              "bytes": 2067,
+              "sha256": "fb3ec6f92fedf173c5f1cdf6fc7ea2cd7c9fe1697f02dc69cdf889b7470178a2"
+            },
+            "include/wasmtime/types/global.hh": {
+              "bytes": 2586,
+              "sha256": "d6189adc25faad4d4237c231808629628ed091c13b8a24846eab3e354e18a206"
+            },
+            "include/wasmtime/types/exnref.h": {
+              "bytes": 1214,
+              "sha256": "ff720e11ebec7936f9a439c66fd0de336176d4cecee01198dca936e2ca13383d"
+            },
+            "include/wasmtime/table.hh": {
+              "bytes": 3583,
+              "sha256": "718cf580417e3885dd6450c5734bb71ca3b736e52f5c6134ed04d242ef12427d"
+            },
+            "include/wasmtime/structref.hh": {
+              "bytes": 1715,
+              "sha256": "f56fe6b322ca4b66f36212f3ba7c413f6ef171b1344b5e34ae6807bc89c157c4"
+            },
+            "include/wasmtime/_eqref_class.hh": {
+              "bytes": 2730,
+              "sha256": "de249e5f5b53eec9544d4222e01e17cb45fec28eb60aa6db0b1cc348aa2a5703"
+            },
+            "include/wasmtime/store.hh": {
+              "bytes": 930,
+              "sha256": "f68ddbba240cab6631510d92cfa9d91eb3464b23a35668edf48dbe531c1d12fb"
+            },
+            "include/wasmtime/tag.h": {
+              "bytes": 2268,
+              "sha256": "0e6261f2f061b2c900b129b12de12e72e2bc37c32380ee95ef6f15e14baa395f"
+            },
+            "include/wasmtime/instance.h": {
+              "bytes": 6362,
+              "sha256": "4abeaef7a3942aa986d29e58b1ad169307d4ffd10e11a796e0f903933bec67b7"
+            },
+            "include/wasmtime/func.hh": {
+              "bytes": 9697,
+              "sha256": "68328055a4b42cbcdc7135a171209e39a41d1b7738b99d8201b4a4dbfa44580d"
+            },
+            "include/wasmtime/module.h": {
+              "bytes": 5768,
+              "sha256": "8c0b889e5235a1017a4844d03628a7dd67090a5088ae289f87f699f6bd6be88e"
+            },
+            "include/wasmtime/externref.hh": {
+              "bytes": 1325,
+              "sha256": "03a2f196f91f680347fd12eddda6aeed5063aa2bf69561fe5570b7446d5b69eb"
+            },
+            "include/wasmtime/module.hh": {
+              "bytes": 5580,
+              "sha256": "106774b8810482e4b70223eeb3768db626fe3580b9e41fcca969ead3d500a25f"
+            },
+            "include/wasmtime/types.hh": {
+              "bytes": 433,
+              "sha256": "568988261b07753fbae59c2649d168119ebb087ffcac79e7e2d393c4cdcf61c5"
+            },
+            "include/wasmtime/eqref.h": {
+              "bytes": 5263,
+              "sha256": "de21b013eac94b2d43eba4bbac34d565c649e2573814868dbbe50e64622ca7be"
+            },
+            "include/wasmtime/func.h": {
+              "bytes": 12787,
+              "sha256": "9a4fee4a295a2b19a141cf84be4ceb9355bfc25394ae761d7f780ac49f2d65ad"
+            },
+            "include/wasmtime/memory.h": {
+              "bytes": 5999,
+              "sha256": "95c0c3b189ea7b0e8c5b523a18de0a19a1bef7db8c5702275a3a2d9e6cea9642"
+            },
+            "include/wasmtime/_val_class.hh": {
+              "bytes": 6987,
+              "sha256": "9dcae719115fc13181fbfca22ddbb19910fc2ebf56f0b2a174971012e307b036"
+            },
+            "include/wasmtime/arrayref.h": {
+              "bytes": 4703,
+              "sha256": "a93ec80b4849edbd6c7bb2c8268b9f41ed4d97b5e0ad537e7521b4551d005521"
+            },
+            "include/wasmtime/val.h": {
+              "bytes": 14826,
+              "sha256": "33ea4fc9b9288f536dc12b15130b25b88b59144c85d1e34c30a8ff8514170148"
+            },
+            "include/wasmtime/_externref_class.hh": {
+              "bytes": 1949,
+              "sha256": "0f39147fd6bff3d781235ca4d2731e67597edb77e924c223208abfb04e54bdfc"
+            },
+            "include/wasmtime/extern.hh": {
+              "bytes": 1901,
+              "sha256": "2608bb08136598b81c0847515aa3dbe665e8ef77802a04c0683a628bf4d39fd9"
+            },
+            "include/wasmtime/wat.h": {
+              "bytes": 1153,
+              "sha256": "7533f9c25ee267c88ea64e21a7550bf28585183184a29c575ceb419eb711fe9f"
+            },
+            "include/wasmtime/span.hh": {
+              "bytes": 2716,
+              "sha256": "da563fddd6e110c419c8ba579de15496a03d1e1e44fde29a7d1744348996ca51"
+            },
+            "include/wasmtime/wasi.hh": {
+              "bytes": 3701,
+              "sha256": "f9318dccdccafe821b1e8ae4173a2444ac88cd87412252eeea06aa1658fd0149"
+            },
+            "include/wasmtime/store.h": {
+              "bytes": 10060,
+              "sha256": "ff307ac99c7e9fa58bd40b518b9e737663c5741abd4e756bbe8452f340f30386"
+            },
+            "include/wasmtime/global.h": {
+              "bytes": 2521,
+              "sha256": "5e51effa5185ec774e47bb53323fbf5f0d0b621158f0a578b5528711d2f18129"
+            },
+            "include/wasmtime/global.hh": {
+              "bytes": 2469,
+              "sha256": "a74e041c6e9c4a48af597896a77b7748a289656f7fad4fe7c2eb226f12fa4666"
+            },
+            "include/wasmtime/exnref.h": {
+              "bytes": 6109,
+              "sha256": "0f03df665b9a8b7ca9405ad638d4068c0ce7d5024165132acea94430bbc626d0"
+            },
+            "include/wasmtime/anyref.hh": {
+              "bytes": 1393,
+              "sha256": "7f7c57d3dc5381ab01d280633827b784e1cb545199bef98943bf056b9379f11b"
+            },
+            "include/wasi.h": {
+              "bytes": 8513,
+              "sha256": "37d15447efe4c47b445996c4bd9d879dfe02402bd96e36a9de5ca195670ce5ea"
+            },
+            "include/wasmtime.hh": {
+              "bytes": 1876,
+              "sha256": "402b06783af1f689b1646d3d2b69c5e4ab8a7ae71f3f87dab09e62a7a51f0db1"
+            },
+            "include/doc-wasm.h": {
+              "bytes": 83333,
+              "sha256": "33c6bca76dbc9ebcfd785798d8d7837ad4f34ca0df9beb1108408edf63a8d195"
+            },
+            "README.md": {
+              "bytes": 7674,
+              "sha256": "61b003ff4ddfbe6123ae3a1123e39e379f1559edc44634e6c14ba3f2671f9fd8"
+            },
+            "LICENSE": {
+              "bytes": 12243,
+              "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+            }
+          }
+        },
+        "helperSha256": "a40bef05d49dfacaa1e2358c4aa05eb71c7a3ced4363f785986d80d50ec35dad",
+        "phase": "complete",
+        "compilation": {
+          "status": 0,
+          "seconds": 162.171891034,
+          "diagnostic": "",
+          "imports": 139,
+          "exports": 27181,
+          "serializedBytes": 610719320,
+          "restoredImports": 139,
+          "restoredExports": 27181
+        },
+        "cache": {
+          "file": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r4/compiled.cwasm",
+          "sha256": "ce4a5bf674a239ae6346deb5fd8a7f89cf7e916b236bb8d429e3242bc604eed4",
+          "bytes": 610719320,
+          "trust": "Produced and reloaded only within this guarded experiment; never an untrusted compiled-code input"
+        },
+        "inputUnchanged": true,
+        "harnessUnchanged": true,
+        "finishedAt": "2026-09-24T05:59:32.463Z"
+      },
+      "resultSha256": "13b1eb7e7846c0b43eb4045f9016aeba8fb11f658cf4106f61575d484c1b1ce8",
+      "resources": {
+        "startedAt": "2026-09-24T05:56:46.081Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "1800s",
+          ".cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=256",
+          "scripts/full-lean/probe-wasmtime-lean-compilation.mjs",
+          ".work/wasmtime-lean-module-r2",
+          ".work/wasmtime-lean-compilation-r4"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "cd52cce6-5e87-400a-a7b8-e005b8f1ce01",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25256919040
+        },
+        "minimumHostAvailable": 20073463808,
+        "peakMemoryBytes": 5545213952,
+        "peakTasks": 13,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r4-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T05:59:32.704Z",
+          "memoryBytes": 630112256,
+          "peakMemoryBytes": 5545213952,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 611438592,
+            "kernel": 18182144,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 611438592,
+            "slab": 18143232
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T05:59:32.752Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 643420160,
+          "peakMemoryBytes": 5545213952,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11665408,
+            "file": 611438592,
+            "kernel": 19181568,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 611438592,
+            "slab": 18255960
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T05:59:32.777Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "log": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-compilation-r4-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 04835de4d05a4a54a493cde760c3204b\n[lasm] Build process uses base pages; memory and pressure guards remain active\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 2min 46.642s\nCPU time consumed: 2min 46.978s\nMemory peak: 5.1G\nMemory swap peak: 0B\n[lasm] Peak 5.16 GiB; success\n"
+    }
+  ],
+  "ordinaryImportConversion": {
+    "result": {
+      "scope": "Format validation and exception conversion of a real generated Lean module; no application executed",
+      "input": "/home/lastmjs/development/lasm/compiler/.work/application-large-stack-deno-r2/relocated deployment/program.wasm",
+      "inputBytes": 160408611,
+      "inputSha256": "68e82dc2bb25375ce737c648fa74bc41fa7d3b8e8264ec52082c0da760203c1d",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "c1e6d5c818e905b19033d4de2d810cd36eb750f6c54df97e6bbae56fcead403e",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "const_fold",
+            "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+            "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+          }
+        ],
+        "signature": "540f068c463b058f625049dbf7af467c6f715efa7020654fd3e1464e5a8b84d8",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "sourceSha256": "593fb94689013695235e6644c0c3d373fd3a4f057df9a3cb7e5b15dcb5a31951",
+      "optimizer": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/bin/wasm-opt",
+      "optimizerSha256": "ece1f96898dc8df0190f21a9641e7323b995eb16aae1a381bd608e80dac3a963",
+      "conversion": {
+        "standardizedExceptions": true,
+        "compactImports": false
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-module-r2-resources.json",
+      "commands": [
+        {
+          "program": "python3",
+          "args": [
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/prepare-wasmtime-probe.py"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"version\": \"49.0.0\", \"archiveSha256\": \"8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131\", \"files\": 115, \"selectedBytes\": 32341429}\n",
+          "stderr": ""
+        },
+        {
+          "program": "cc",
+          "args": [
+            "-std=c11",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-shared",
+            "-fPIC",
+            "-I/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/include",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-helper.c",
+            "-L/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+            "-lwasmtime",
+            "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r2/validator.so"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/bin/wasm-opt",
+          "args": [
+            "--version"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "wasm-opt version 132 (version_132-49-gd03c25ea4)\n",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/bin/wasm-opt",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-large-stack-deno-r2/relocated deployment/program.wasm",
+            "--all-features",
+            "--disable-compact-imports",
+            "--emit-exnref",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r2/converted.wasm"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "passed": true,
+      "helperInput": {
+        "version": "49.0.0",
+        "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+        "archiveBytes": 16115964,
+        "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz",
+        "selectedFiles": {
+          "lib/libwasmtime.so": {
+            "bytes": 31590960,
+            "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+          },
+          "include/wasmtime.h": {
+            "bytes": 10101,
+            "sha256": "a7497ea0048c0cb8a598c35ca05d1611a31725a88809ed9d51a8b1aebfc6b0c7"
+          },
+          "include/wasm.hh": {
+            "bytes": 19096,
+            "sha256": "ff657786aa259af466fd3ea8cb23646e8ada2b5741362c632d9cdad4be6e9c67"
+          },
+          "include/wasm.h": {
+            "bytes": 23796,
+            "sha256": "c8c2ab4be578bf618512e0720f939d1c8b9b0121f007091dd3746e60290977d9"
+          },
+          "include/wasmtime/error.hh": {
+            "bytes": 3674,
+            "sha256": "689e0143742323bc707243b7cfc404ce966964dc32f76d884580224ea52472f5"
+          },
+          "include/wasmtime/linker.hh": {
+            "bytes": 7459,
+            "sha256": "82f5c95ae9b370ddd8d70190cedce68055cb95c190d02b8e925de7b34640e8bc"
+          },
+          "include/wasmtime/tag.hh": {
+            "bytes": 1724,
+            "sha256": "5c7b05e7d25028c4b9b8a2d3a948acad8c6ff273bf97cecc81df02296f44eb58"
+          },
+          "include/wasmtime/eqref.hh": {
+            "bytes": 927,
+            "sha256": "f2c7adc27741bf18545c0bf72a49c8e22538ba3b97380ac621c01455c2c36851"
+          },
+          "include/wasmtime/wat.hh": {
+            "bytes": 1265,
+            "sha256": "0b190e5defe09c91c448c0a6853afc237148a29c34c7972333166388e4a00abe"
+          },
+          "include/wasmtime/trap.hh": {
+            "bytes": 5505,
+            "sha256": "0ff60c6d5b707966e9388e7dc9e313f0363b7003d615ca5f4cbc03247b77ca9f"
+          },
+          "include/wasmtime/arrayref.hh": {
+            "bytes": 1691,
+            "sha256": "a0059e769dd5bfcc75e743fd6b66d1069e98534ef6f937989cf33657871751bd"
+          },
+          "include/wasmtime/sharedmemory.h": {
+            "bytes": 3027,
+            "sha256": "521d632a5f5ee3e28125b22fdf4f517edb2965a49ebd838278d620368377a1fe"
+          },
+          "include/wasmtime/profiling.h": {
+            "bytes": 4400,
+            "sha256": "92ac5516a561bd062aaf302051373512970a0ea9641836a47993d32b1ab8b205"
+          },
+          "include/wasmtime/_structref_class.hh": {
+            "bytes": 1938,
+            "sha256": "8d0473ee26eb96035000146ba17079feec1a70e2968e64faa472d6610dac6fdf"
+          },
+          "include/wasmtime/conf.h": {
+            "bytes": 1272,
+            "sha256": "025c75489f406c4f3097c57944c01e5fa13840c23c28fe124c748e942f5cdaaa"
+          },
+          "include/wasmtime/instance.hh": {
+            "bytes": 4085,
+            "sha256": "3c84c9ae9be96947637fba645769d0de51fea1d21c2a7915fbe36ed205091f83"
+          },
+          "include/wasmtime/helpers.hh": {
+            "bytes": 11810,
+            "sha256": "da70524f69df90a18c80387ea084c57a8219a5286f8005c770002aa34f768f6d"
+          },
+          "include/wasmtime/externref.h": {
+            "bytes": 4643,
+            "sha256": "37f55067f7227ba6dabc3d933812e0f757e711b6b927a89b47460956bf17d8a5"
+          },
+          "include/wasmtime/error.h": {
+            "bytes": 2420,
+            "sha256": "6905acdfe81f5a7d31c49ac1af8221b3d98b61d5341b91a4a8232f2466dce8f0"
+          },
+          "include/wasmtime/table.h": {
+            "bytes": 3924,
+            "sha256": "1d4313d41a85989ae00c8c744c2e2415ac0694ea3bc3fb15d51cddf5fd74d1ba"
+          },
+          "include/wasmtime/_store_class.hh": {
+            "bytes": 10374,
+            "sha256": "c5563b6d8d70c60ba81356cb9f46a68553ec0017b93943c78486f8aa11761b5e"
+          },
+          "include/wasmtime/extern.h": {
+            "bytes": 6263,
+            "sha256": "7486bc71ec8172152cc6d3d0e827946b4d0778f0b1495a1e377130c031d02031"
+          },
+          "include/wasmtime/async.h": {
+            "bytes": 13952,
+            "sha256": "eea9b04b8c59244fc555a713eeefc88d442baade7506f5355b909fac4c5d3a41"
+          },
+          "include/wasmtime/linker.h": {
+            "bytes": 12848,
+            "sha256": "3ccb42d67c0724b7ce20302c45313f0a056b47a3d0754ce83e0c408f8994576d"
+          },
+          "include/wasmtime/config.h": {
+            "bytes": 32567,
+            "sha256": "3840f8ab5abf1a77d93b728cbe99e04d49ad2e91ed88d2b27387a07753ac540c"
+          },
+          "include/wasmtime/_anyref_class.hh": {
+            "bytes": 2442,
+            "sha256": "8d7ee57b683c3fa4b9278ef56b9727fd33c584a402eea642642ed222954610d5"
+          },
+          "include/wasmtime/component.hh": {
+            "bytes": 401,
+            "sha256": "e77c24d71108d85cdb96fd5716fcc74ff22d2feafdb87dfac2602559eb833fd9"
+          },
+          "include/wasmtime/component.h": {
+            "bytes": 324,
+            "sha256": "7230a0a2ef79976c079225a193006289d5538b2d6cb7e6180649c4526b9dd898"
+          },
+          "include/wasmtime/_exnref_class.hh": {
+            "bytes": 1894,
+            "sha256": "94510c65aa8510b68f1449256d88e2e7ce71ed4944fe336ab5b82bee4ffbf167"
+          },
+          "include/wasmtime/engine.hh": {
+            "bytes": 1399,
+            "sha256": "51c8731580795fbbb214e9fa8a33f73f65d7b465b774b9667096a440f487c7b4"
+          },
+          "include/wasmtime/anyref.h": {
+            "bytes": 7419,
+            "sha256": "90cca7935d268d9ae17032a143bc7fa5d5287edf8254a8c49ac69ca0277c900e"
+          },
+          "include/wasmtime/memory.hh": {
+            "bytes": 4012,
+            "sha256": "15d70af6435ff1cdd61c09689e9507dcac32212f24f87a2e41a65158c1fb4d97"
+          },
+          "include/wasmtime/structref.h": {
+            "bytes": 4451,
+            "sha256": "6db53ade4d6ff78404c55d4e096acef881f435a6d5f76cca7dddb5859f8b1a12"
+          },
+          "include/wasmtime/exnref.hh": {
+            "bytes": 982,
+            "sha256": "48afdcb5b04cf01c9299df1ba9c994790db7a353b04658daaf0ba0e844429021"
+          },
+          "include/wasmtime/val.hh": {
+            "bytes": 3136,
+            "sha256": "23d0a1a258bcff223146e4007e68eabd40be41a04010e66df0596e6a51c047e1"
+          },
+          "include/wasmtime/_arrayref_class.hh": {
+            "bytes": 2189,
+            "sha256": "0069d2ccba2e007e868d7822d47aa6c541aa455b9073d592a9b0d785154fd2df"
+          },
+          "include/wasmtime/component/linker.hh": {
+            "bytes": 9391,
+            "sha256": "30f210fab1447396165845b29987b9d060cabfc91a65780e6915a72e38611337"
+          },
+          "include/wasmtime/component/instance.hh": {
+            "bytes": 2354,
+            "sha256": "a38a2fe8dfdc1cdc9cb89572f5c6924f8919a6ccc479afe52be2da6f66ff9ab1"
+          },
+          "include/wasmtime/component/linker.h": {
+            "bytes": 11133,
+            "sha256": "caa8228d65eec38ae44f7605d20a930daff8cbcafb038465d1fc8e99459f22d9"
+          },
+          "include/wasmtime/component/component.hh": {
+            "bytes": 5797,
+            "sha256": "044c6b8c9fc6d5eafe90f256cbe465077c66c3469e4916f7163d7427864d796a"
+          },
+          "include/wasmtime/component/component.h": {
+            "bytes": 5710,
+            "sha256": "c70c86787fe9a684ef5cd09858d7084944690f4c8779df40422be4bd02bcf30f"
+          },
+          "include/wasmtime/component/val.hh": {
+            "bytes": 31889,
+            "sha256": "a501863591fa10dc41d7779542bde7733d19ed117b10669ae5c0202d5893f1b4"
+          },
+          "include/wasmtime/component/types.h": {
+            "bytes": 419,
+            "sha256": "178795777a58f5ec7138a5932498904ed37fd37a1935b58f739fbd9e48a16614"
+          },
+          "include/wasmtime/component/types/instance.hh": {
+            "bytes": 2660,
+            "sha256": "df1aacf584b0b06c089ba78fc926fca79d91911e51e8a75f9902e5b83d22426b"
+          },
+          "include/wasmtime/component/types/resource.h": {
+            "bytes": 2363,
+            "sha256": "29e8ea2ef512969f9bf82700d932d89cd78437c31c2a9c4b9919f2b0581fcdd9"
+          },
+          "include/wasmtime/component/types/component.hh": {
+            "bytes": 11690,
+            "sha256": "52cf1e12e93838772da08f7bd09eba90ad3c5290fae10bb41a9ae82ac66ef856"
+          },
+          "include/wasmtime/component/types/component.h": {
+            "bytes": 9070,
+            "sha256": "9ff90206171ebdc06182c628382790f72d8e11d0d6e2acdc9074c4ec63d5be64"
+          },
+          "include/wasmtime/component/types/val.hh": {
+            "bytes": 20028,
+            "sha256": "f4869c2174bb6c63e4a4ee9ef9713c87dc27920a5fb38266b69aa6682c75b211"
+          },
+          "include/wasmtime/component/types/instance.h": {
+            "bytes": 2080,
+            "sha256": "525d7f53408a04f33f26389bd7a29e52a88fd9a0484a8697d66a2d6282fbb272"
+          },
+          "include/wasmtime/component/types/func.hh": {
+            "bytes": 1758,
+            "sha256": "001f88580a09bbdb866ba583086576f6b4a6f4a738006a7cfb5aa4feef2ad2e7"
+          },
+          "include/wasmtime/component/types/module.h": {
+            "bytes": 1918,
+            "sha256": "04afb394852aa2d22e2dcf0ece8ee4e4a6ae436c7f979ca361d939baf3023592"
+          },
+          "include/wasmtime/component/types/module.hh": {
+            "bytes": 1716,
+            "sha256": "a7d16678120376e97222c691dff5a92a7acee22a04c9d26a90ac74efb2f65f85"
+          },
+          "include/wasmtime/component/types/func.h": {
+            "bytes": 2021,
+            "sha256": "89d65916a8e599cf2abe3fe5734648b2a84ac0701be196d07533a2cef1e1a280"
+          },
+          "include/wasmtime/component/types/val.h": {
+            "bytes": 22894,
+            "sha256": "08d3b8fc7b78a4ccb9cc809d3200911a745d7593d9323a2db7d994f742b9c726"
+          },
+          "include/wasmtime/component/instance.h": {
+            "bytes": 2428,
+            "sha256": "5f2928c0fa8a5b016560d2582b489ddeca28a1200227a7cd351ab4b16d2c8c3f"
+          },
+          "include/wasmtime/component/func.hh": {
+            "bytes": 1991,
+            "sha256": "72aa729643bbf44562121875de26769b4fbbf9a37978dec1935ce81e763b64e1"
+          },
+          "include/wasmtime/component/types.hh": {
+            "bytes": 381,
+            "sha256": "a7b184e68345d1785e9daddd43b9891337d855825034399f0b248116fb18d7a9"
+          },
+          "include/wasmtime/component/func.h": {
+            "bytes": 3866,
+            "sha256": "7a277a0277cc5910f2650b84861d78c36ffc9d2729cfb06833aff9794f663663"
+          },
+          "include/wasmtime/component/val.h": {
+            "bytes": 20576,
+            "sha256": "db3a426f729b16706a3e7b48560a5288b7323efd3faea5b49ea49e31ad44ccd9"
+          },
+          "include/wasmtime/trap.h": {
+            "bytes": 8935,
+            "sha256": "66865a8eaa35eb7d95cdf7c359a8b16a049d16a61e77c619b955d29d61dd3662"
+          },
+          "include/wasmtime/engine.h": {
+            "bytes": 1241,
+            "sha256": "c1a02904ef0d4c660d2baa70477994bbc4cfe291aeebe7143bc1c8b316f77788"
+          },
+          "include/wasmtime/_func_class.hh": {
+            "bytes": 13795,
+            "sha256": "5c80bf9d72abd749cc9d63e386628c8bad2580d690d2c4c7dc12f6a13a0a2d44"
+          },
+          "include/wasmtime/extern_declare.hh": {
+            "bytes": 517,
+            "sha256": "c54d82840a4554f5ea0fc6fe94520fd2b24fb017c73405028e10b8916c61fd62"
+          },
+          "include/wasmtime/types.h": {
+            "bytes": 221,
+            "sha256": "47facddf2717b2ff9b13bc9bdae50cf0cd421c3299622248820f3c4f154fb464"
+          },
+          "include/wasmtime/config.hh": {
+            "bytes": 28665,
+            "sha256": "452ea4a26062cb65cfefcdcee70bbc1fba06cef4fbe0411265d74bba9989df43"
+          },
+          "include/wasmtime/types/tag.hh": {
+            "bytes": 2610,
+            "sha256": "0afd806de505b73b1d562f64dbd995c79d53c8d601c1f6dbd71799a056aa8d20"
+          },
+          "include/wasmtime/types/arrayref.hh": {
+            "bytes": 950,
+            "sha256": "372e35a259ff7a5f5e7465bb8165e6eee044c454ef3dec1d53ec9242f27a8b39"
+          },
+          "include/wasmtime/types/_structref_class.hh": {
+            "bytes": 5428,
+            "sha256": "f158b4b3e8c1b74256a95c1f56e40abf7f9cceeeaa29cec558e246f01bf116f3"
+          },
+          "include/wasmtime/types/memory.hh": {
+            "bytes": 6764,
+            "sha256": "bb22cd0b8b05fa0d088abe445de6a6280640ea6320914389364756af56eb819b"
+          },
+          "include/wasmtime/types/structref.h": {
+            "bytes": 3784,
+            "sha256": "16c0dd4a06bce1efbddefb720dd09dc9ebf166ebaf5a654130f5b7be6ab71b19"
+          },
+          "include/wasmtime/types/exnref.hh": {
+            "bytes": 1625,
+            "sha256": "ad6b76ceaef18ff81e6d5986174c22177927c2bc1db1e8c33889b3c564a31803"
+          },
+          "include/wasmtime/types/val.hh": {
+            "bytes": 13554,
+            "sha256": "29d3ec7490f785394db21f5476069151199aea96c94d7ff3c347379fe3cfd074"
+          },
+          "include/wasmtime/types/export.hh": {
+            "bytes": 2467,
+            "sha256": "cd0621e8659a45a4f3ca3ae5094ab80a86badfc0786aa27c968616a5a2bc4bf0"
+          },
+          "include/wasmtime/types/import.hh": {
+            "bytes": 2727,
+            "sha256": "b94bc37d543ff7d32098128b2acdca89c0cb76e9b1665733e6f004759770e702"
+          },
+          "include/wasmtime/types/table.hh": {
+            "bytes": 3303,
+            "sha256": "00559bb04924a26ddbf0120c73671a0366b2e359312b354742792bfaea33d4a8"
+          },
+          "include/wasmtime/types/structref.hh": {
+            "bytes": 452,
+            "sha256": "2dba4391088a03810e6d248b8b7e50a471003ff729377793c293a22aa524538b"
+          },
+          "include/wasmtime/types/func.hh": {
+            "bytes": 3363,
+            "sha256": "d8c640f7d586d9ad6186b4fae31587c66a075f08fbc89eafd47680567f65f48d"
+          },
+          "include/wasmtime/types/_val_class.hh": {
+            "bytes": 6454,
+            "sha256": "4fcbcd5ac4d435159c90100e781bc77ed6172d95bc55f0f3f57a3fc15d4b9bc4"
+          },
+          "include/wasmtime/types/arrayref.h": {
+            "bytes": 1504,
+            "sha256": "8b978b9ca57092c9b14c846efcb0f80515a1792e87af2e74169d3f2a7a7c8fe3"
+          },
+          "include/wasmtime/types/val.h": {
+            "bytes": 6133,
+            "sha256": "fbc78a085d0ac76a85f63f66986a2b77d0813146a7b715cf269c56115f84b3d3"
+          },
+          "include/wasmtime/types/extern.hh": {
+            "bytes": 2067,
+            "sha256": "fb3ec6f92fedf173c5f1cdf6fc7ea2cd7c9fe1697f02dc69cdf889b7470178a2"
+          },
+          "include/wasmtime/types/global.hh": {
+            "bytes": 2586,
+            "sha256": "d6189adc25faad4d4237c231808629628ed091c13b8a24846eab3e354e18a206"
+          },
+          "include/wasmtime/types/exnref.h": {
+            "bytes": 1214,
+            "sha256": "ff720e11ebec7936f9a439c66fd0de336176d4cecee01198dca936e2ca13383d"
+          },
+          "include/wasmtime/table.hh": {
+            "bytes": 3583,
+            "sha256": "718cf580417e3885dd6450c5734bb71ca3b736e52f5c6134ed04d242ef12427d"
+          },
+          "include/wasmtime/structref.hh": {
+            "bytes": 1715,
+            "sha256": "f56fe6b322ca4b66f36212f3ba7c413f6ef171b1344b5e34ae6807bc89c157c4"
+          },
+          "include/wasmtime/_eqref_class.hh": {
+            "bytes": 2730,
+            "sha256": "de249e5f5b53eec9544d4222e01e17cb45fec28eb60aa6db0b1cc348aa2a5703"
+          },
+          "include/wasmtime/store.hh": {
+            "bytes": 930,
+            "sha256": "f68ddbba240cab6631510d92cfa9d91eb3464b23a35668edf48dbe531c1d12fb"
+          },
+          "include/wasmtime/tag.h": {
+            "bytes": 2268,
+            "sha256": "0e6261f2f061b2c900b129b12de12e72e2bc37c32380ee95ef6f15e14baa395f"
+          },
+          "include/wasmtime/instance.h": {
+            "bytes": 6362,
+            "sha256": "4abeaef7a3942aa986d29e58b1ad169307d4ffd10e11a796e0f903933bec67b7"
+          },
+          "include/wasmtime/func.hh": {
+            "bytes": 9697,
+            "sha256": "68328055a4b42cbcdc7135a171209e39a41d1b7738b99d8201b4a4dbfa44580d"
+          },
+          "include/wasmtime/module.h": {
+            "bytes": 5768,
+            "sha256": "8c0b889e5235a1017a4844d03628a7dd67090a5088ae289f87f699f6bd6be88e"
+          },
+          "include/wasmtime/externref.hh": {
+            "bytes": 1325,
+            "sha256": "03a2f196f91f680347fd12eddda6aeed5063aa2bf69561fe5570b7446d5b69eb"
+          },
+          "include/wasmtime/module.hh": {
+            "bytes": 5580,
+            "sha256": "106774b8810482e4b70223eeb3768db626fe3580b9e41fcca969ead3d500a25f"
+          },
+          "include/wasmtime/types.hh": {
+            "bytes": 433,
+            "sha256": "568988261b07753fbae59c2649d168119ebb087ffcac79e7e2d393c4cdcf61c5"
+          },
+          "include/wasmtime/eqref.h": {
+            "bytes": 5263,
+            "sha256": "de21b013eac94b2d43eba4bbac34d565c649e2573814868dbbe50e64622ca7be"
+          },
+          "include/wasmtime/func.h": {
+            "bytes": 12787,
+            "sha256": "9a4fee4a295a2b19a141cf84be4ceb9355bfc25394ae761d7f780ac49f2d65ad"
+          },
+          "include/wasmtime/memory.h": {
+            "bytes": 5999,
+            "sha256": "95c0c3b189ea7b0e8c5b523a18de0a19a1bef7db8c5702275a3a2d9e6cea9642"
+          },
+          "include/wasmtime/_val_class.hh": {
+            "bytes": 6987,
+            "sha256": "9dcae719115fc13181fbfca22ddbb19910fc2ebf56f0b2a174971012e307b036"
+          },
+          "include/wasmtime/arrayref.h": {
+            "bytes": 4703,
+            "sha256": "a93ec80b4849edbd6c7bb2c8268b9f41ed4d97b5e0ad537e7521b4551d005521"
+          },
+          "include/wasmtime/val.h": {
+            "bytes": 14826,
+            "sha256": "33ea4fc9b9288f536dc12b15130b25b88b59144c85d1e34c30a8ff8514170148"
+          },
+          "include/wasmtime/_externref_class.hh": {
+            "bytes": 1949,
+            "sha256": "0f39147fd6bff3d781235ca4d2731e67597edb77e924c223208abfb04e54bdfc"
+          },
+          "include/wasmtime/extern.hh": {
+            "bytes": 1901,
+            "sha256": "2608bb08136598b81c0847515aa3dbe665e8ef77802a04c0683a628bf4d39fd9"
+          },
+          "include/wasmtime/wat.h": {
+            "bytes": 1153,
+            "sha256": "7533f9c25ee267c88ea64e21a7550bf28585183184a29c575ceb419eb711fe9f"
+          },
+          "include/wasmtime/span.hh": {
+            "bytes": 2716,
+            "sha256": "da563fddd6e110c419c8ba579de15496a03d1e1e44fde29a7d1744348996ca51"
+          },
+          "include/wasmtime/wasi.hh": {
+            "bytes": 3701,
+            "sha256": "f9318dccdccafe821b1e8ae4173a2444ac88cd87412252eeea06aa1658fd0149"
+          },
+          "include/wasmtime/store.h": {
+            "bytes": 10060,
+            "sha256": "ff307ac99c7e9fa58bd40b518b9e737663c5741abd4e756bbe8452f340f30386"
+          },
+          "include/wasmtime/global.h": {
+            "bytes": 2521,
+            "sha256": "5e51effa5185ec774e47bb53323fbf5f0d0b621158f0a578b5528711d2f18129"
+          },
+          "include/wasmtime/global.hh": {
+            "bytes": 2469,
+            "sha256": "a74e041c6e9c4a48af597896a77b7748a289656f7fad4fe7c2eb226f12fa4666"
+          },
+          "include/wasmtime/exnref.h": {
+            "bytes": 6109,
+            "sha256": "0f03df665b9a8b7ca9405ad638d4068c0ce7d5024165132acea94430bbc626d0"
+          },
+          "include/wasmtime/anyref.hh": {
+            "bytes": 1393,
+            "sha256": "7f7c57d3dc5381ab01d280633827b784e1cb545199bef98943bf056b9379f11b"
+          },
+          "include/wasi.h": {
+            "bytes": 8513,
+            "sha256": "37d15447efe4c47b445996c4bd9d879dfe02402bd96e36a9de5ca195670ce5ea"
+          },
+          "include/wasmtime.hh": {
+            "bytes": 1876,
+            "sha256": "402b06783af1f689b1646d3d2b69c5e4ab8a7ae71f3f87dab09e62a7a51f0db1"
+          },
+          "include/doc-wasm.h": {
+            "bytes": 83333,
+            "sha256": "33c6bca76dbc9ebcfd785798d8d7837ad4f34ca0df9beb1108408edf63a8d195"
+          },
+          "README.md": {
+            "bytes": 7674,
+            "sha256": "61b003ff4ddfbe6123ae3a1123e39e379f1559edc44634e6c14ba3f2671f9fd8"
+          },
+          "LICENSE": {
+            "bytes": 12243,
+            "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+          }
+        }
+      },
+      "helperSha256": "cd19a5364e5aa75c80128193819790064961d2dffacdad6a04ea74f0a4692ade",
+      "original": {
+        "accepted": false,
+        "status": 1,
+        "diagnostic": "legacy_exceptions feature required for try instruction (at offset 0x7e1e00)"
+      },
+      "optimizerVersion": "wasm-opt version 132 (version_132-49-gd03c25ea4)",
+      "converted": {
+        "file": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-module-r2/converted.wasm",
+        "bytes": 160484134,
+        "sha256": "17217b0dd3df7cef7d0f24492b4795c197e5188427ef571923780fbee255db9b",
+        "accepted": true,
+        "status": 0,
+        "diagnostic": ""
+      },
+      "inputUnchanged": true,
+      "finishedAt": "2026-09-24T05:52:30.365Z"
+    },
+    "resources": {
+      "startedAt": "2026-09-24T05:51:57.620Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=256",
+        "scripts/full-lean/probe-wasmtime-lean-module.mjs",
+        ".work/application-large-stack-deno-r2/relocated deployment",
+        ".work/wasmtime-lean-module-r2",
+        ".cache/emsdk-6.0.9-dev/upstream/bin/wasm-opt"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "28b15f51-1a1e-47c0-8bd8-4aaf4fa8fe4b",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25605906432
+      },
+      "minimumHostAvailable": 22354845696,
+      "peakMemoryBytes": 3405750272,
+      "peakTasks": 12,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-lean-module-r2-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T05:52:30.265Z",
+        "memoryBytes": 315625472,
+        "peakMemoryBytes": 3405750272,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 44601344,
+          "file": 264306688,
+          "kernel": 6119424,
+          "shmem": 0,
+          "file_mapped": 106496,
+          "inactive_file": 264306688,
+          "slab": 4970232
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T05:52:30.436Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 282492928,
+        "peakMemoryBytes": 3405750272,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11669504,
+          "file": 264306688,
+          "kernel": 5844992,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 264306688,
+          "slab": 4910400
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T05:52:30.463Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "classifications": [
+    "Attempt 1: engine configuration abort; max Wasm stack exceeded the default async-stack size. No memory-resource event.",
+    "Attempt 2: compact-import parsing failure during actual compilation, despite prior validation. Original artifacts retained.",
+    "Attempt 3: compilation and serialization succeeded, but the 610719320-byte output exceeded the 512-MiB experiment disk bound; no file written.",
+    "Attempt 4: compilation, bounded serialization and same-engine trusted reload passed after a 640-MiB disk-output review, keeping the four-GiB disk reserve and all memory guard limits."
+  ],
+  "summary": {
+    "passed": true,
+    "imports": 139,
+    "exports": 27181,
+    "serializedBytes": 610719320,
+    "seconds": 162.171891034,
+    "peakMemoryBytes": 5545213952
+  },
+  "limits": [
+    "No imports supplied and no instance, store or guest linear memory created",
+    "No execution or application/API acceptance claimed",
+    "Host imports, shared memory, table handling, scheduling, native distribution and all six platform checks remain open"
+  ]
+}

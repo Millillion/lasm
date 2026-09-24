@@ -212,6 +212,15 @@ tests and their result receipts were not changed. Two archive-selection
 preflights exited before making changes and are retained separately. Neither
 archival nor the safe disk stop counts as an application test failure.
 
+The [additional storage receipts](evidence/completed-artifact-storage-2026-09-24.json)
+preserve six earlier successful AOT deployments as verified gzip files, then
+share storage for 48 byte-identical archives among 72 completed IO/package
+archive paths. Every path and checksum remains valid. These archives are
+immutable shared files: restore with `gzip -dc ARCHIVE > ORIGINAL`, verify the
+original checksum and apply its recorded mode/time. Do not rewrite an archive
+in place. Original upstream inputs, failed deployments and acceptance counts
+are unaffected.
+
 The mixed registration `pkg/ofScientific` now passes all **10,047 original
 vendored vectors in each of stock Node, Deno and Bun**, using installed `.14`
 on Linux x64. Its original native shell driver and independent native executable

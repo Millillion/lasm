@@ -89,6 +89,18 @@ separately from the earlier runtime evidence below.
   now converts an unchanged 160 MB Lean application module and passes Wasmtime
   validation, with a 3.23 GiB guarded peak. It does not instantiate or execute
   the application; host-import and scheduler integration remain open.
+  The [full-module compilation probe](docs/evidence/wasmtime-real-lean-compilation-2026-09-24.json)
+  now compiles that real module and reloads its 582 MiB trusted native cache,
+  retaining 139 imports and 27,181 exports. Peak memory is 5.16 GiB without
+  resource events. Actual compilation required ordinary import encoding even
+  though the validator accepted compact imports; earlier configuration and
+  output-bound failures remain recorded. No Lean instance has run in the helper.
+  The [memory-view probe](docs/evidence/wasmtime-memory-views-2026-09-24.json)
+  also passes eight-byte external views at address 4 GiB in all three engines,
+  including ordered worker/native/Wasm access. Bun aborts the separate whole-view
+  control without an OOM. Bounded windows offer an adapter path, but they are
+  ordinary ArrayBuffers: JavaScript atomic synchronization, the full host adapter
+  and real application acceptance remain unfinished.
 
 ## Earlier runtime evidence and remaining compatibility work
 
