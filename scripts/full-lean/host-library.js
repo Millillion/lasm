@@ -21,17 +21,46 @@ addToLibrary({
   lasm_host_backtrace: function () {
     var descriptor = Object.getOwnPropertyDescriptor(Error, 'stackTraceLimit');
     var changed = !descriptor || descriptor.configurable;
+    var assignLimit = !descriptor || descriptor.writable || descriptor.set;
+    var formatter = Object.getOwnPropertyDescriptor(Error, 'prepareStackTrace');
+    var formatFrames = process.versions.bun && (!formatter || formatter.configurable);
+    var assignFormatter = !formatter || formatter.writable || formatter.set;
+    var oldLimit = Error.stackTraceLimit, oldFormatter = Error.prepareStackTrace;
     try {
-      if (changed) Object.defineProperty(Error, 'stackTraceLimit', {
-        value: 100, configurable: true, writable: true,
-      });
+      if (changed) {
+        if (assignLimit) Error.stackTraceLimit = 100;
+        else Object.defineProperty(Error, 'stackTraceLimit', {
+          value: 100, configurable: true, writable: true,
+        });
+      }
+      // Bun's default stack string hides Wasm frames as "unknown", whereas
+      // CallSite.toString exposes their actual function indices/names. Avoid
+      // getFunction: reading a Wasm callee as a JS function can crash Bun.
+      if (formatFrames) {
+        var capture = function (_, frames) {
+          return frames.map(function (frame) { return '    at ' + frame.toString(); }).join('\n');
+        };
+        // Bun's writable data properties also control internal stack hooks.
+        // Replacing their descriptors disconnects those hooks; use ordinary
+        // assignment and restore through the same path whenever permitted.
+        if (assignFormatter) Error.prepareStackTrace = capture;
+        else Object.defineProperty(Error, 'prepareStackTrace', {
+          value: capture, configurable: true, writable: true,
+        });
+      }
       var stack = new Error().stack;
       return stringToNewUTF8(typeof stack === 'string'
         ? stack.replace(/^Error\n/, '').trimEnd() : '(stack trace unavailable)');
     } finally {
+      if (formatFrames) {
+        if (assignFormatter) Error.prepareStackTrace = oldFormatter;
+        else Object.defineProperty(Error, 'prepareStackTrace', formatter);
+        if (!formatter) delete Error.prepareStackTrace;
+      }
       if (changed) {
-        if (descriptor) Object.defineProperty(Error, 'stackTraceLimit', descriptor);
-        else delete Error.stackTraceLimit;
+        if (assignLimit) Error.stackTraceLimit = oldLimit;
+        else Object.defineProperty(Error, 'stackTraceLimit', descriptor);
+        if (!descriptor) delete Error.stackTraceLimit;
       }
     }
   },

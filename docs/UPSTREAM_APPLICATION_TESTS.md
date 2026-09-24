@@ -265,11 +265,10 @@ uncaught exceptions match native. `LEAN_BACKTRACE=0` matches complete output;
 enabled traces require real backend frames while preserving their raw output.
 Native ASLR addresses and native/Wasm frame formats differ between executions.
 
-**Bun debug diagnostics remain a failure.** Its stack contains `unknown` Wasm
-frames. A tiny independent probe confirms that retaining Wasm names does not
-repair this; a structured CallSite probe crashes the isolated Bun child at
-about 27 MiB RSS, without pressure or OOM events. These are open engineering
-issues, not fundamental limitations. The [debug receipts](evidence/upstream-debug-2026-09-24.json)
+**Installed `.15` Bun debug diagnostics failed.** Its stack contained `unknown`
+Wasm frames. Retaining Wasm names did not repair the default formatter; one
+structured CallSite probe crashed the isolated Bun child at about 27 MiB RSS,
+without pressure or OOM events. The [debug receipts](evidence/upstream-debug-2026-09-24.json)
 retain both failures and all five passing executable variants, with unchanged
 original drivers and all 7,669 reference entries. Maximum build memory was
 3.46 GiB. Broader panic semantics and native platform coverage remain open.
@@ -292,5 +291,22 @@ redirected settings. Sources are hidden and deployments relocated with empty
 PATH. The [21 comparisons](evidence/panic-semantics-2026-09-24.json) and nine focused
 unit checks pass; maximum build memory was 3.42 GiB without resource events.
 These are additional controls, not unchanged upstream test passes. Private
-Shell panic controls, Bun backtrace identities and native platform parity remain
-open. Earlier failing attempts and verified archival receipts are retained.
+Shell panic controls and native platform parity remain open. Earlier failing
+attempts and verified archival receipts are retained.
+
+The [installed `.18` follow-up](evidence/bun-backtrace-2026-09-24.json) repairs Bun's
+frame identities. The original debug executable and all six parallel controls
+pass in each stock engine on Linux x64: 21 comparisons covering enabled, disabled
+and raw traces, plus abort with traces enabled and disabled. Stable diagnostics
+and termination match native; actual backend frames remain recorded. Every
+original driver and all 7,669 reference entries remain unchanged. Three focused
+restoration checks pass, and the actual adapter captures 75-frame main/worker
+stacks in Node and Bun. Maximum build memory was 3.43 GiB without resource events.
+
+The investigation retains the failed installed `.17` comparison and small
+isolated probes. Bun exposes useful `CallSite.toString()` information, but
+redefining its stack-hook properties disconnects their internal behavior despite
+reported data descriptors. Ordinary assignment preserves those hooks. Reading a
+Wasm callee through `getFunction` causes the separate tiny crash; the adapter
+avoids that operation. Full symbolization, private runtime controls and native
+platform acceptance remain open.

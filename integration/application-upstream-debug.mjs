@@ -38,7 +38,7 @@ const report = { scope: 'Original upstream debug/release executable settings thr
     'The original stage pin and all source bytes remain in independent native and application copies; a separate release-pinned build copy retains every other original byte.',
     'All source copies are hidden before relocated execution, with an empty PATH and no build-tool environment.',
     'Expected assertion failure is observed directly. Exit code, signal, stdout, panic location/message and uncaught exception match exactly. Each backtrace must contain actual backend frames; raw diagnostics remain recorded. Native addresses vary with ASLR and native/Wasm frame formats differ.',
-    'Parallel environment controls additionally require exact native stderr when LEAN_BACKTRACE=0, and actual frames when enabled or LEAN_BACKTRACE_RAW is set. No upstream assertion or expected output is edited.',
+    'Parallel environment controls additionally require exact native stderr when LEAN_BACKTRACE=0, actual frames when enabled or LEAN_BACKTRACE_RAW is set, and native SIGABRT behavior with traces disabled and enabled. No upstream assertion or expected output is edited.',
     'Run through the base-pages and process-tree guard with core dumps disabled. A timeout or resource stop is not a compatibility result.',
   ] };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
@@ -47,13 +47,17 @@ const controls = variant === 'debug' ? [
   { name: 'backtrace enabled', env: { LEAN_BACKTRACE: '1' }, trace: true },
   { name: 'only exact zero suppresses backtrace', env: { LEAN_BACKTRACE: '00' }, trace: true },
   { name: 'raw backtrace', env: { LEAN_BACKTRACE_RAW: '1' }, trace: true },
+  { name: 'abort without backtrace', env: { LEAN_ABORT_ON_PANIC: '1', LEAN_BACKTRACE: '0' }, trace: false, abort: true },
+  { name: 'abort with backtrace', env: { LEAN_ABORT_ON_PANIC: '1', LEAN_BACKTRACE: '1' }, trace: true, abort: true },
 ] : [];
 function diagnosticParts(observation, backend) {
   const marker = '\nbacktrace:\n', start = observation.stderr.indexOf(marker);
   assert.ok(start >= 0, backend + ': missing real panic backtrace');
-  const end = observation.stderr.indexOf('\nuncaught exception:', start + marker.length);
-  assert.ok(end > start, backend + ': missing uncaught exception after backtrace');
-  const frames = observation.stderr.slice(start + marker.length, end).split('\n');
+  const exception = observation.stderr.indexOf('\nuncaught exception:', start + marker.length);
+  if (observation.signal === 'SIGABRT') assert.equal(exception, -1, 'Abort must precede exception handling');
+  else assert.ok(exception > start, backend + ': missing uncaught exception after backtrace');
+  const end = exception < 0 ? observation.stderr.length : exception;
+  const frames = observation.stderr.slice(start + marker.length, end).trimEnd().split('\n');
   assert.ok(frames.length >= 2);
   if (backend === 'native') assert.ok(frames.every(line => /\[0x[0-9a-f]+\]$/.test(line)));
   else {
@@ -61,7 +65,7 @@ function diagnosticParts(observation, backend) {
     assert.ok(frames.some(line => /wasm-function\[\d+\]/.test(line)), 'Backtrace must contain real Wasm frames');
   }
   return { stable: { ...observation, stderr: observation.stderr.slice(0, start)
-    + marker + observation.stderr.slice(end + 1) }, frames };
+    + marker + (exception < 0 ? '' : observation.stderr.slice(end + 1)) }, frames };
 }
 function compare(actual, native, trace) {
   if (!trace) { assert.deepEqual(actual, native); return { exact: true }; }
@@ -115,6 +119,8 @@ try {
   report.environmentControls = controls.map(control => ({ ...control,
     native: run('native ' + control.name, join(native, '.lake/build/bin', variant), [], native,
       { ...env, ...control.env }, false) }));
+  for (const control of report.environmentControls.filter(control => control.abort))
+    assert.equal(control.native.signal, 'SIGABRT');
   report.nativeSourceAfter = await verify(native, originals);
   const dist = join(output, 'dist');
   run('installed application build', process.execPath,

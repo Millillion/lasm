@@ -107,9 +107,9 @@ The [panic runtime repair](../evidence/upstream-debug-2026-09-24.json) replaces
 only `object.cpp.o`, preserving the other 33 runtime archive members and 17
 bundle files. Installed `.15` now captures actual Lean-thread backtraces in
 Node and Deno. The original debug/release project and environment controls
-establish the recorded panic/exit behavior; Bun still lacks identifiable Wasm
-frames. This is partial panic coverage, with symbolization, other termination
-modes and native platform validation still open.
+establish the recorded panic/exit behavior; that candidate still lacked
+identifiable Bun Wasm frames. The later repair below extends this partial
+coverage; full symbolization and native platform validation remain open.
 
 Installed `.16` adds [seven exact native panic comparisons per engine](../evidence/panic-semantics-2026-09-24.json)
 on Linux x64. Ordinary panic fallback, actual redirected stderr, IO failure and
@@ -118,3 +118,10 @@ redirected stderr during abort. The supplementary fixture uses public ordinary
 Lean APIs. The private abort adapter is part of the relocated deployment; it
 does not introduce Lean syntax or public APIs. This leaves private Shell panic
 controls, full symbolization and other native platforms unverified.
+
+Installed `.18` [restores identifiable Bun Wasm frames](../evidence/bun-backtrace-2026-09-24.json)
+without replacing the engine or changing ordinary Lean code. All three engines
+pass the unchanged upstream debug executable and six parallel controls, including
+native abort behavior with backtraces enabled. The adapter preserves the original
+stack-hook settings and captures deep callers. Actual backend frames are retained;
+readable symbolization and the broader platform/API obligations remain open.
