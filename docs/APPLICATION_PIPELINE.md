@@ -823,3 +823,27 @@ per engine are reclaimed. Earlier controls pass again, and the guard releases
 at 293 MiB without resource events. This exercises available receiving event
 loops. Blocked-runtime integration, nested/detached lifecycle, cancellation,
 full application main and shipping integration still remain.
+
+The [unchanged `const_fold` main now passes through the private helper](evidence/wasmtime-real-lean-main-2026-09-24.json)
+in stock Node 26.10.0, Deno 2.9.7 and Bun 1.4.2 on Linux x64. Two runs per
+engine produce exactly `93011 93011` and exit zero, matching both native Lean
+oracles. The original argument `15` and `LEAN_STACK_SIZE_KB=4194304` remain
+unchanged. Lean allocates 4 GiB plus its upstream 128 KiB buffer for the actual
+computation thread, then joins and frees it. Nested creation and host IO use
+guest futex waits so blocked threads can service Wasm mailbox work. The existing
+seven-thread mutex/mailbox/cleanup regression also still passes in every engine.
+
+Full execution exposed a separate FFI stack problem: Koffi's default 1 MiB
+synchronous stack was smaller than Wasmtime's configured budget, despite the
+96 MiB OS worker reservation. The helper now reserves 16 MiB for synchronous
+FFI calls and limits Wasmtime control stacks to 12 MiB. An independent tiny Wasm
+recursion control traps at that limit and then recovers in the same Store.
+Earlier subprocess crashes and harness failures remain recorded; no OOM or
+resource events occurred. The final main guard releases at a 369 MiB peak.
+
+This is execution evidence for one frozen application and runtime, not a new
+shipping backend. Packaging, automatic selection, complete imports/dynamic
+linking, cancellation, larger control stacks, transfers beyond the diagnostic's
+64 MiB bound, and native validation outside Linux x64 remain open. Process exit
+reclaims the remaining main/completion workers after host output is flushed;
+that does not establish reusable-instance or general task cleanup semantics.

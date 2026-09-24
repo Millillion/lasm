@@ -14,8 +14,8 @@ import { ensureResourceGuard } from './resource-guard.mjs';
 await ensureResourceGuard();
 const [outputArg, toolchainCacheArg, restoredCacheArg, profile = 'startup', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && toolchainCacheArg && !extra.length,
-  'Supply NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [VERIFIED_RESTORED_CACHE] [startup|high-allocation|workers]');
-assert.ok(['startup', 'high-allocation', 'workers'].includes(profile));
+  'Supply NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [VERIFIED_RESTORED_CACHE] [startup|high-allocation|workers|main]');
+assert.ok(['startup', 'high-allocation', 'workers', 'main'].includes(profile));
 assert.equal(process.platform + '-' + process.arch, 'linux-x64');
 const root = fileURLToPath(new URL('../..', import.meta.url)), output = resolve(outputArg);
 const toolchainCache = resolve(toolchainCacheArg);
@@ -38,11 +38,14 @@ mkdirSync(output, { recursive: true });
 const inputs = ['scripts/full-lean/probes/wasmtime-instantiate-lean.c',
   'scripts/full-lean/probes/wasmtime-instantiate-lean.mjs',
   'scripts/full-lean/probe-wasmtime-lean-instantiation.mjs', 'integration/fixtures/LeanPureExports.lean',
-  'scripts/full-lean/probes/wasmtime-lean-workers.mjs'];
+  'scripts/full-lean/probes/wasmtime-lean-workers.mjs',
+  'scripts/full-lean/probes/wasmtime-lean-main.mjs', 'src/bun-stack.mjs', 'src/node-host.mjs'];
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
-const report = { scope: 'Instantiate the actual compiled const_fold module and compare pure runtime exports; actual startup/clock/memory metadata, other function imports reject, no application-main/API acceptance',
+const report = { scope: profile === 'main'
+  ? 'Unchanged const_fold main through a private Wasmtime integration and native Lean oracles; not shipping backend or general API acceptance'
+  : 'Instantiate the actual compiled const_fold module and compare pure runtime exports; actual startup/clock/memory metadata, other function imports reject, no application-main/API acceptance',
   inputs: hashes, build: previous.build, trustedCache: cacheIdentity, archive, toolchainCache, profile,
-  resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], results: [], workerResults: [], failures: [], passed: false };
+  resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], results: [], workerResults: [], mainResults: [], failures: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(label, program, args, environment = process.env, timeout = 90_000) {
   const result = spawnSync(program, args, { cwd: output, encoding: 'utf8', timeout,
@@ -83,6 +86,29 @@ try {
   assert.equal(oracle.trim().split('\n').length, 23);
   const oraclePath = join(output, 'oracle.txt'); writeFileSync(oraclePath, oracle);
   report.oracle = { cases: 23, stdout: oracle, nativeCompiledMatches: true };
+  if (profile === 'main') {
+    const original = join(root, '.work/upstream-mixed-native-r1/source/tests/compile_bench/const_fold.lean');
+    const originalInit = original + '.init.sh', source = join(output, 'const_fold.lean');
+    const sourceSha256 = await hashFile(original), initSha256 = await hashFile(originalInit);
+    assert.equal(sourceSha256, previous.build.modules[0].sourceSha256);
+    const init = readFileSync(originalInit, 'utf8');
+    assert.match(init, /TEST_ARGS=\( 15 \)/); assert.match(init, /export LEAN_STACK_SIZE_KB=4194304/);
+    copyFileSync(original, source);
+    const mainEnv = { ...env, LEAN_STACK_SIZE_KB: '4194304' };
+    const interpreted = run('unchanged native interpreted main', lean.lean,
+      ['-Dlinter.all=false', '--run', source, '15'], mainEnv);
+    assert.equal(interpreted, '93011 93011\n');
+    const c = join(output, 'const_fold.c'), executable = join(output, 'const-fold-native');
+    run('generate unchanged native main', lean.lean,
+      ['-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false', '-c', c, source], mainEnv);
+    run('compile unchanged native main', join(lean.prefix, 'bin/leanc'), ['-O2', '-DNDEBUG', '-o', executable, c], mainEnv);
+    assert.equal(run('unchanged native compiled main', executable, ['15'], mainEnv), interpreted);
+    assert.equal(await hashFile(original), sourceSha256); assert.equal(await hashFile(originalInit), initSha256);
+    report.mainOracle = { original, sourceSha256, originalInit, initSha256,
+      args: ['15'], leanStackSizeKb: '4194304', stdout: interpreted, nativeCompiledMatches: true,
+      adaptation: 'CLI linter warnings disabled to compare runtime stdout; upstream source, argument and stack setting are unchanged' };
+    save();
+  }
   const sdk = join(root, '.cache/wasmtime-49.0.0'), helper = join(output, 'instance.so');
   report.helperInput = JSON.parse(readFileSync(join(sdk, 'download.json')));
   run('compile instantiation bridge', 'cc', ['-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fPIC',
@@ -96,9 +122,12 @@ try {
   ]) {
     try { report.results.push(JSON.parse(run('pure runtime exports', engine,
       [...args, join(root, inputs[1]), helper, cache, cacheIdentity.sha256, oraclePath,
-        profile === 'workers' ? 'high-allocation' : profile])));
+        ['workers', 'main'].includes(profile) ? 'high-allocation' : profile])));
       if (profile === 'workers') report.workerResults.push(JSON.parse(run('real guest pthread lifecycle', engine,
         [...args, join(root, inputs[4]), helper, cache, cacheIdentity.sha256])));
+      if (profile === 'main') report.mainResults.push(JSON.parse(run('unchanged application main', engine,
+        [...args, join(root, inputs[5]), helper, cache, cacheIdentity.sha256],
+        { ...process.env, LEAN_STACK_SIZE_KB: '4194304', LASM_VM_STACK_MB: '96' })));
     }
     catch (error) { report.failures.push({ engine, message: error.message }); }
     save();
@@ -108,6 +137,9 @@ try {
     [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
   if (profile === 'workers') assert.deepEqual(report.workerResults.map(row => [row.engine, row.version]),
     [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+  if (profile === 'main') assert.deepEqual(report.mainResults.map(row => [row.engine, row.version, row.stdout, row.code]),
+    ['node', 'deno', 'bun'].map((engine, index) =>
+      [engine, ['26.10.0', '2.9.7', '1.4.2'][index], report.mainOracle.stdout, 0]));
   report.cacheUnchanged = await hashFile(cache) === cacheIdentity.sha256; assert.ok(report.cacheUnchanged);
   report.passed = true;
 } catch (error) { report.error = { message: error.message, stack: error.stack }; throw error; }

@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 // Private diagnostic only. Startup/clock/metadata are real; other imports trap. No
 // application-main/API acceptance may be inferred from pure export calls.
 #include <wasmtime.h>
@@ -9,15 +10,19 @@
 #include <sys/resource.h>
 #include <sys/random.h>
 #include <errno.h>
+#include <pthread.h>
+#include <time.h>
 
 typedef double (*date_callback_t)(void);
 typedef int32_t (*mailbox_callback_t)(uint64_t, uint64_t);
 typedef int32_t (*spawn_callback_t)(uint64_t, uint64_t, uint64_t);
 typedef int32_t (*thread_event_callback_t)(uint32_t, uint64_t);
+typedef int32_t (*runtime_callback_t)(uint32_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t *);
 typedef struct {
     wasm_engine_t *engine;
     wasmtime_module_t *module;
     wasmtime_store_t *store;
+    wasmtime_context_t *active_context;
     wasmtime_sharedmemory_t *memory;
     wasmtime_instance_t instance;
     wasmtime_func_t control;
@@ -40,8 +45,13 @@ typedef struct {
     mailbox_callback_t schedule_mailbox;
     spawn_callback_t spawn;
     thread_event_callback_t thread_event;
+    runtime_callback_t runtime;
 } lean_probe_t;
 typedef struct { lean_probe_t *owner; char name[256]; } rejected_import_t;
+typedef struct { lean_probe_t *owner; uint32_t kind; wasm_valkind_t result_kind; char name[128]; } runtime_import_t;
+static wasmtime_context_t *probe_context(lean_probe_t *probe) {
+    return probe->active_context ? probe->active_context : wasmtime_store_context(probe->store);
+}
 
 static int failure(wasmtime_error_t *error, wasm_trap_t *trap, char *out, size_t capacity) {
     if (!error && !trap) return 0;
@@ -59,6 +69,34 @@ static wasm_trap_t *reject_import(void *data, wasmtime_caller_t *caller,
     rejected_import_t *item = data;
     item->owner->rejected_calls++;
     return wasmtime_trap_new(item->name, strlen(item->name));
+}
+static wasm_trap_t *runtime_import(void *data, wasmtime_caller_t *caller,
+    const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
+    runtime_import_t *item = data;
+    lean_probe_t *probe = item->owner;
+    if (!probe->runtime) {
+        probe->rejected_calls++;
+        return wasmtime_trap_new(item->name, strlen(item->name));
+    }
+    if (nargs > 5 || nresults > 1) return wasmtime_trap_new("unexpected runtime ABI", 22);
+    uint64_t inputs[5] = {0}, result = 0;
+    for (size_t i = 0; i < nargs; i++) {
+        if (args[i].kind == WASMTIME_I64) inputs[i] = (uint64_t)args[i].of.i64;
+        else if (args[i].kind == WASMTIME_I32) inputs[i] = (uint32_t)args[i].of.i32;
+        else return wasmtime_trap_new("noninteger runtime argument", 27);
+    }
+    wasmtime_context_t *previous = probe->active_context;
+    probe->active_context = wasmtime_caller_context(caller);
+    int32_t status = probe->runtime(item->kind, inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], &result);
+    probe->active_context = previous;
+    if (status) return wasmtime_trap_new("runtime host callback failed", 28);
+    if (item->kind == 9) return wasmtime_trap_new("LASM_APPLICATION_EXIT", 21);
+    if (nresults) {
+        if (item->result_kind == WASM_I64) results[0] = (wasmtime_val_t){ .kind = WASMTIME_I64, .of.i64 = (int64_t)result };
+        else if (item->result_kind == WASM_I32) results[0] = (wasmtime_val_t){ .kind = WASMTIME_I32, .of.i32 = (int32_t)result };
+        else return wasmtime_trap_new("noninteger runtime result", 25);
+    }
+    return NULL;
 }
 static wasm_trap_t *clock_import(void *data, wasmtime_caller_t *caller,
     const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
@@ -206,6 +244,27 @@ static wasm_trap_t *environment_get_import(void *data, wasmtime_caller_t *caller
     results[0] = (wasmtime_val_t){ .kind = WASMTIME_I32, .of.i32 = 0 };
     return NULL;
 }
+static wasm_trap_t *clock_time_import(void *data, wasmtime_caller_t *caller,
+    const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
+    (void)caller;
+    lean_probe_t *probe = data;
+    if (nargs != 3 || nresults != 1 || args[0].kind != WASMTIME_I32 ||
+        args[1].kind != WASMTIME_I64 || args[2].kind != WASMTIME_I64)
+        return wasmtime_trap_new("unexpected WASI clock ABI", 25);
+    uint32_t clock = (uint32_t)args[0].of.i32;
+    if (clock > 3) {
+        results[0] = (wasmtime_val_t){ .kind = WASMTIME_I32, .of.i32 = 28 }; return NULL;
+    }
+    uint64_t address = (uint64_t)args[2].of.i64;
+    if (!memory_range(probe, address, 8)) return wasmtime_trap_new("invalid clock output pointer", 28);
+    const clockid_t clocks[] = { CLOCK_REALTIME, CLOCK_MONOTONIC, CLOCK_PROCESS_CPUTIME_ID, CLOCK_THREAD_CPUTIME_ID };
+    struct timespec time;
+    if (clock_gettime(clocks[clock], &time)) return wasmtime_trap_new("native clock read failed", 24);
+    uint64_t value = (uint64_t)time.tv_sec * UINT64_C(1000000000) + (uint64_t)time.tv_nsec;
+    memcpy(wasmtime_sharedmemory_data(probe->memory) + address, &value, sizeof(value));
+    results[0] = (wasmtime_val_t){ .kind = WASMTIME_I32, .of.i32 = 0 };
+    return NULL;
+}
 static wasm_trap_t *invoke_from_import(lean_probe_t *probe, wasmtime_context_t *context,
     const char *name, const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
     wasmtime_extern_t item;
@@ -295,9 +354,12 @@ static wasm_trap_t *pthread_create_import(void *data, wasmtime_caller_t *caller,
     if (nargs != 4 || nresults != 1) return wasmtime_trap_new("unexpected pthread create ABI", 29);
     for (size_t i = 0; i < nargs; i++)
         if (args[i].kind != WASMTIME_I64) return wasmtime_trap_new("unexpected pthread pointer ABI", 30);
-    if (!probe->spawn || probe->is_worker)
+    if (!probe->spawn)
         return wasmtime_trap_new("UNIMPLEMENTED nested pthread creation", 37);
+    wasmtime_context_t *previous = probe->active_context;
+    probe->active_context = wasmtime_caller_context(caller);
     int32_t status = probe->spawn((uint64_t)args[0].of.i64, (uint64_t)args[2].of.i64, (uint64_t)args[3].of.i64);
+    probe->active_context = previous;
     if (!status) probe->pthread_creations++;
     results[0] = (wasmtime_val_t){ .kind = WASMTIME_I32, .of.i32 = status };
     return NULL;
@@ -314,15 +376,30 @@ static wasm_trap_t *pthread_exit_import(void *data, wasmtime_caller_t *caller,
     probe->pthread_exits++;
     return NULL;
 }
+static wasm_trap_t *pthread_strongref_import(void *data, wasmtime_caller_t *caller,
+    const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
+    (void)caller; (void)results;
+    lean_probe_t *probe = data;
+    if (nargs != 1 || nresults || args[0].kind != WASMTIME_I64 || probe->is_worker ||
+        !probe->thread_event || !probe->thread_event(2, (uint64_t)args[0].of.i64))
+        return wasmtime_trap_new("pthread strong reference rejected", 33);
+    return NULL;
+}
 static wasm_trap_t *pthread_cleanup_import(void *data, wasmtime_caller_t *caller,
     const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
     (void)results;
     lean_probe_t *probe = data;
     if (nargs != 1 || nresults || args[0].kind != WASMTIME_I64)
         return wasmtime_trap_new("unexpected pthread cleanup ABI", 30);
-    if (probe->is_worker || !probe->thread_event ||
-        !probe->thread_event(1, (uint64_t)args[0].of.i64))
+    wasmtime_context_t *previous = probe->active_context;
+    probe->active_context = wasmtime_caller_context(caller);
+    int accepted = probe->thread_event && probe->thread_event(1, (uint64_t)args[0].of.i64);
+    probe->active_context = previous;
+    if (!accepted)
         return wasmtime_trap_new("pthread cleanup notification rejected", 37);
+    // A worker delegates ownership to the main JS isolate. That isolate waits
+    // for the target Store to stop before freeing the real guest pthread data.
+    if (probe->is_worker) { probe->pthread_cleanups++; return NULL; }
     wasm_trap_t *trap = invoke_from_import(probe, wasmtime_caller_context(caller),
         "_emscripten_thread_free_data", args, 1, NULL, 0);
     if (!trap) probe->pthread_cleanups++;
@@ -402,7 +479,10 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
     wasmtime_config_parallel_compilation_set(config, false);
     wasmtime_config_cranelift_opt_level_set(config, WASMTIME_OPT_LEVEL_NONE);
     wasmtime_config_memory_reservation_set(config, UINT64_C(8589934592));
-    wasmtime_config_max_wasm_stack_set(config, 64 * 1024 * 1024);
+    // Koffi switches synchronous calls onto its own stack. Keep Wasmtime's
+    // native stack budget below the configured 16 MiB FFI reservation; the
+    // guest's independent linear-memory stack remains the original 4 GiB.
+    wasmtime_config_max_wasm_stack_set(config, 12 * 1024 * 1024);
     wasmtime_config_async_stack_size_set(config, 80 * 1024 * 1024);
     probe->engine = wasm_engine_new_with_config(config);
     if (!probe->engine) { snprintf(error, capacity, "engine allocation failed"); goto failed; }
@@ -413,7 +493,7 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
     }
     probe->store = wasmtime_store_new(probe->engine, NULL, NULL);
     if (!probe->store) { snprintf(error, capacity, "store allocation failed"); goto failed; }
-    wasmtime_context_t *context = wasmtime_store_context(probe->store);
+    wasmtime_context_t *context = probe_context(probe);
     wasm_importtype_vec_t types;
     wasm_exporttype_vec_t exports;
     wasmtime_module_imports(probe->module, &types);
@@ -430,6 +510,31 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
         const wasm_name_t *name = wasm_importtype_name(types.data[i]);
         switch (wasm_externtype_kind(type)) {
         case WASM_EXTERN_FUNC: {
+            uint32_t runtime_kind = 0;
+            if (module->size == 3 && !memcmp(module->data, "env", 3)) {
+                const char *names[] = { "", "lasm_host_platform", "lasm_node_call", "lasm_node_copy",
+                    "lasm_node_start", "lasm_node_release", "lasm_fiber_current", "emscripten_num_logical_cores",
+                    "emscripten_runtime_keepalive_check", "exit" };
+                for (uint32_t k = 1; k < sizeof(names) / sizeof(names[0]); k++)
+                    if (name->size == strlen(names[k]) && !memcmp(name->data, names[k], name->size)) runtime_kind = k;
+            }
+            if (module->size == strlen("wasi_snapshot_preview1") &&
+                !memcmp(module->data, "wasi_snapshot_preview1", module->size) &&
+                name->size == 9 && !memcmp(name->data, "proc_exit", 9)) runtime_kind = 9;
+            if (runtime_kind) {
+                runtime_import_t *item = calloc(1, sizeof(*item));
+                if (!item) { snprintf(error, capacity, "runtime import allocation failed"); status = 1; break; }
+                item->owner = probe; item->kind = runtime_kind;
+                const wasm_functype_t *function = wasm_externtype_as_functype_const(type);
+                const wasm_valtype_vec_t *returns = wasm_functype_results(function);
+                if (returns->size == 1) item->result_kind = wasm_valtype_kind(returns->data[0]);
+                snprintf(item->name, sizeof(item->name), "UNIMPLEMENTED IMPORT %.*s.%.*s",
+                    (int)module->size, module->data, (int)name->size, name->data);
+                imports[i].kind = WASMTIME_EXTERN_FUNC;
+                wasmtime_func_new(context, function, runtime_import, item, free, &imports[i].of.func);
+                if (runtime_kind == 1) probe->control = imports[i].of.func;
+                break;
+            }
             if (module->size == 3 && !memcmp(module->data, "env", 3)) {
                 wasmtime_func_callback_t callback = NULL;
                 if (name->size == strlen("__pthread_create_js") && !memcmp(name->data, "__pthread_create_js", name->size))
@@ -438,6 +543,8 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
                     callback = pthread_exit_import;
                 if (name->size == strlen("_emscripten_thread_cleanup") && !memcmp(name->data, "_emscripten_thread_cleanup", name->size))
                     callback = pthread_cleanup_import;
+                if (name->size == strlen("_emscripten_thread_set_strongref") && !memcmp(name->data, "_emscripten_thread_set_strongref", name->size))
+                    callback = pthread_strongref_import;
                 if (name->size == strlen("emscripten_check_blocking_allowed") && !memcmp(name->data, "emscripten_check_blocking_allowed", name->size))
                     callback = blocking_allowed_import;
                 if (callback) {
@@ -472,6 +579,8 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
                     callback = environment_get_import;
                 if (name->size == strlen("random_get") && !memcmp(name->data, "random_get", name->size))
                     callback = random_import;
+                if (name->size == strlen("clock_time_get") && !memcmp(name->data, "clock_time_get", name->size))
+                    callback = clock_time_import;
                 if (callback) {
                     imports[i].kind = WASMTIME_EXTERN_FUNC;
                     wasmtime_func_new(context, wasm_externtype_as_functype_const(type),
@@ -587,7 +696,7 @@ failed:
 int lasm_lean_instance_call(lean_probe_t *probe, const char *name, const uint64_t *args,
     size_t nargs, uint32_t result_count, uint64_t *result, char *error, size_t capacity) {
     if (nargs > 8 || result_count > 1) { snprintf(error, capacity, "signature bound"); return 2; }
-    wasmtime_context_t *context = wasmtime_store_context(probe->store);
+    wasmtime_context_t *context = probe_context(probe);
     wasmtime_extern_t item;
     if (!wasmtime_instance_export_get(context, &probe->instance, name, strlen(name), &item)) {
         snprintf(error, capacity, "missing export: %s", name); return 2;
@@ -655,13 +764,103 @@ void *lasm_lean_instance_memory_window(lean_probe_t *probe, uint64_t offset, siz
     if (length > 65536 || !memory_range(probe, offset, length)) return NULL;
     return wasmtime_sharedmemory_data(probe->memory) + offset;
 }
+uint64_t lasm_lean_native_stack_bytes(void) {
+    pthread_attr_t attr;
+    if (pthread_getattr_np(pthread_self(), &attr)) return 0;
+    void *address = NULL;
+    size_t size = 0;
+    int status = pthread_attr_getstack(&attr, &address, &size);
+    pthread_attr_destroy(&attr);
+    return status || !address ? 0 : size;
+}
+void lasm_lean_instance_set_runtime(lean_probe_t *probe, runtime_callback_t runtime) {
+    probe->runtime = runtime;
+}
+int lasm_lean_stack_control(lean_probe_t *probe, char *error, size_t capacity) {
+    // Fixed tiny control, compiled with the SAME engine limits as the real
+    // module. Deep recursion must trap before Koffi's native stack is exhausted.
+    const char *wat = "(module (func (export \"recur\") (param i32) (result i32) "
+        "local.get 0 i32.eqz if (result i32) i32.const 0 else "
+        "local.get 0 i32.const 1 i32.sub call 0 i32.const 1 i32.add end))";
+    wasm_byte_vec_t bytes;
+    if (failure(wasmtime_wat2wasm(wat, strlen(wat), &bytes), NULL, error, capacity)) return 1;
+    wasmtime_module_t *module = NULL;
+    int status = failure(wasmtime_module_new(probe->engine, (const uint8_t *)bytes.data, bytes.size, &module),
+        NULL, error, capacity);
+    wasm_byte_vec_delete(&bytes);
+    if (status) return status;
+    wasmtime_store_t *store = wasmtime_store_new(probe->engine, NULL, NULL);
+    if (!store) { wasmtime_module_delete(module); snprintf(error, capacity, "stack control store failed"); return 1; }
+    wasmtime_context_t *context = wasmtime_store_context(store);
+    wasmtime_instance_t instance;
+    wasm_trap_t *trap = NULL;
+    wasmtime_error_t *called = wasmtime_instance_new(context, module, NULL, 0, &instance, &trap);
+    status = failure(called, trap, error, capacity);
+    if (!status) {
+        wasmtime_extern_t entry;
+        if (!wasmtime_instance_export_get(context, &instance, "recur", 5, &entry)) {
+            snprintf(error, capacity, "missing stack control export"); status = 1;
+        } else {
+            wasmtime_val_t argument = { .kind = WASMTIME_I32, .of.i32 = 1000000 }, result;
+            trap = NULL;
+            called = wasmtime_func_call(context, &entry.of.func, &argument, 1, &result, 1, &trap);
+            wasmtime_trap_code_t code;
+            if (called || !trap || !wasmtime_trap_code(trap, &code) || code != WASMTIME_TRAP_CODE_STACK_OVERFLOW) {
+                if (called || trap) failure(called, trap, error, capacity);
+                else { wasmtime_val_unroot(&result); snprintf(error, capacity, "deep recursion did not trap"); }
+                status = 1;
+            } else {
+                wasm_trap_delete(trap); trap = NULL;
+                argument.of.i32 = 4;
+                called = wasmtime_func_call(context, &entry.of.func, &argument, 1, &result, 1, &trap);
+                status = failure(called, trap, error, capacity);
+                if (!status) {
+                    if (result.kind != WASMTIME_I32 || result.of.i32 != 4) {
+                        snprintf(error, capacity, "stack control did not recover"); status = 1;
+                    }
+                    wasmtime_val_unroot(&result);
+                }
+            }
+            wasmtime_extern_delete(&entry);
+        }
+    }
+    wasmtime_store_delete(store); wasmtime_module_delete(module);
+    return status;
+}
+uint32_t lasm_lean_signal_load(lean_probe_t *probe, uint64_t offset) {
+    if (offset % 4 || !memory_range(probe, offset, 4)) return UINT32_MAX;
+    return __atomic_load_n((uint32_t *)(wasmtime_sharedmemory_data(probe->memory) + offset), __ATOMIC_SEQ_CST);
+}
+int lasm_lean_signal_store(lean_probe_t *probe, uint64_t offset, uint32_t value) {
+    if (offset % 4 || !memory_range(probe, offset, 4)) return 1;
+    __atomic_store_n((uint32_t *)(wasmtime_sharedmemory_data(probe->memory) + offset), value, __ATOMIC_SEQ_CST);
+    return 0;
+}
+int lasm_lean_signal_wait(lean_probe_t *probe, uint64_t offset, uint32_t expected,
+    double timeout, char *error, size_t capacity) {
+    if (offset % 4 || !memory_range(probe, offset, 4)) {
+        snprintf(error, capacity, "invalid signal address"); return 1;
+    }
+    wasmtime_val_t args[3] = {
+        { .kind = WASMTIME_I64, .of.i64 = (int64_t)offset },
+        { .kind = WASMTIME_I32, .of.i32 = (int32_t)expected },
+        { .kind = WASMTIME_F64, .of.f64 = timeout } }, result;
+    wasm_trap_t *trap = invoke_from_import(probe, probe_context(probe),
+        "emscripten_futex_wait", args, 3, &result, 1);
+    if (failure(NULL, trap, error, capacity)) return 1;
+    if (result.kind != WASMTIME_I32) {
+        wasmtime_val_unroot(&result); snprintf(error, capacity, "invalid futex result"); return 1;
+    }
+    wasmtime_val_unroot(&result);
+    return 0;
+}
 int lasm_lean_instance_mailbox_register(lean_probe_t *probe, uint64_t pthread, char *error, size_t capacity) {
     wasmtime_val_t arg = { .kind = WASMTIME_I64, .of.i64 = (int64_t)pthread };
     return failure(NULL, mailbox_await_import(probe, NULL, &arg, 1, NULL, 0), error, capacity);
 }
 int lasm_lean_instance_function_pointer(lean_probe_t *probe, const char *name, uint64_t requested,
     uint64_t *pointer, char *error, size_t capacity) {
-    wasmtime_context_t *context = wasmtime_store_context(probe->store);
+    wasmtime_context_t *context = probe_context(probe);
     wasmtime_extern_t table, function;
     const char *table_name = "__indirect_function_table";
     if (!wasmtime_instance_export_get(context, &probe->instance, table_name, strlen(table_name), &table)) {
@@ -695,7 +894,7 @@ done:
 }
 int lasm_lean_instance_call_pointer(lean_probe_t *probe, uint64_t pointer, uint64_t argument,
     uint64_t *result, char *error, size_t capacity) {
-    wasmtime_context_t *context = wasmtime_store_context(probe->store);
+    wasmtime_context_t *context = probe_context(probe);
     const char *name = "__indirect_function_table";
     wasmtime_extern_t table;
     if (!wasmtime_instance_export_get(context, &probe->instance, name, strlen(name), &table)) {
@@ -757,7 +956,7 @@ static wasm_trap_t *proxy_task(void *data, wasmtime_caller_t *caller,
 }
 int lasm_lean_instance_mailbox_prepare(lean_probe_t *probe, uint64_t desired_function,
     uint64_t *function, char *error, size_t capacity) {
-    wasmtime_context_t *context = wasmtime_store_context(probe->store);
+    wasmtime_context_t *context = probe_context(probe);
     if (!probe->main_pthread) { snprintf(error, capacity, "mailbox is not registered"); return 2; }
     if (!probe->proxy_queue) {
         wasmtime_val_t queue;
@@ -800,7 +999,7 @@ int lasm_lean_instance_mailbox_send(lean_probe_t *probe, uint64_t target, uint64
     char *error, size_t capacity) {
     uint64_t function;
     if (lasm_lean_instance_mailbox_prepare(probe, UINT64_MAX, &function, error, capacity)) return 1;
-    wasmtime_context_t *context = wasmtime_store_context(probe->store);
+    wasmtime_context_t *context = probe_context(probe);
     wasmtime_val_t args[4] = {
         { .kind = WASMTIME_I64, .of.i64 = (int64_t)probe->proxy_queue },
         { .kind = WASMTIME_I64, .of.i64 = (int64_t)target },

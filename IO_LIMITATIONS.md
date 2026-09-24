@@ -263,6 +263,19 @@ separately from the earlier runtime evidence below.
   events. Receiving event loops are available during this test; blocked-runtime
   integration, nested/detached workers, cancellation, full main execution and
   installed-package acceptance remain open.
+  [The unchanged benchmark main now passes in the private helper](docs/evidence/wasmtime-real-lean-main-2026-09-24.json)
+  twice per engine, matching fresh interpreted and compiled native Lean with
+  the original argument and 4 GiB stack setting. The actual computation thread
+  has Lean's additional 128 KiB buffer and is joined and reclaimed. Nested
+  creation, host IO and the async completion thread use actual guest futexes;
+  the seven-thread concurrency/mailbox regression still passes. A separate
+  Koffi stack mismatch caused subprocess crashes without OOM and is repaired:
+  16 MiB FFI reservation, 12 MiB Wasmtime control-stack limit, and verified
+  stack-overflow traps/recovery. The final guard peaks at 369 MiB.
+  Shipping integration, the latest runtime candidate, general imports/dynamic
+  linking, cancellation, reusable-instance cleanup, larger control stacks,
+  transfers beyond the diagnostic's 64 MiB bound and other platforms still need
+  work. No fundamental limitation has been demonstrated.
 
 ## Earlier runtime evidence and remaining compatibility work
 

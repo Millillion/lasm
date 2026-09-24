@@ -7,7 +7,9 @@ const [libraryPath, cache, expectedHash, oracle, profile = 'startup'] = process.
 assert.ok(['startup', 'high-allocation'].includes(profile));
 // Deserialization loads trusted native code, so verify again inside EACH engine.
 assert.equal(await hashFile(cache), expectedHash);
-const ffi = createRequire(import.meta.url)('koffi'), library = ffi.load(libraryPath);
+const ffi = createRequire(import.meta.url)('koffi');
+ffi.config({ sync_stack_size: 16 * 1024 ** 2 });
+const library = ffi.load(libraryPath);
 const clockType = ffi.proto('double lasm_probe_date_now(void)');
 const mailboxType = ffi.proto('int32_t lasm_probe_schedule_mailbox(uint64_t target, uint64_t sender)');
 const create = library.func('void *lasm_lean_instance_new(str trusted_cache, lasm_probe_date_now *date_now, lasm_probe_schedule_mailbox *schedule_mailbox, const uint8_t *environment, size_t environment_size, size_t environment_count, str program_name, void *parent, void *spawn, void *thread_event, char *error, size_t capacity)');
@@ -18,6 +20,7 @@ const rejection = library.func('int lasm_lean_instance_rejection_control(void *p
 const enqueue = library.func('int lasm_lean_instance_mailbox_enqueue(void *probe, uint64_t value, char *error, size_t capacity)');
 const checkEnvironment = library.func('int lasm_lean_instance_environment_check(void *probe, char *error, size_t capacity)');
 const window = library.func('void *lasm_lean_instance_memory_window(void *probe, uint64_t offset, size_t length)');
+const stackControl = library.func('int lasm_lean_stack_control(void *probe, char *error, size_t capacity)');
 const error = Buffer.alloc(8192), message = () => error.toString('utf8').split('\0')[0];
 let clockCalls = 0;
 assert.equal(Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 1, 0), 'not-equal',
@@ -54,6 +57,7 @@ function invoke(name, args = [], resultCount = 1) {
   return BigInt(result[0]);
 }
 try {
+  assert.equal(stackControl(probe, error, error.length), 0, message());
   // Same stack bootstrap as stackCheckInit()/setStackLimits() in the original
   // generated loader. Keep the compiled stack-overflow checks active.
   invoke('emscripten_stack_init', [], 0);
@@ -147,7 +151,9 @@ try {
     engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
     version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
     imports: 139, exports: 27181, accessibleMemoryBytes: Number(observed[3]), profile, largeAllocation,
-    stack: { base: String(base), end: String(end), compiledBoundsCheckRetained: true },
+    stack: { base: String(base), end: String(end), compiledBoundsCheckRetained: true,
+      ffiStackBytes: ffi.config().sync_stack_size, wasmControlStackBudget: 12 * 1024 ** 2,
+      excessiveRecursionTrapsAndRecovers: true },
     implementedImports: { emscripten_date_now: { source: 'Date.now()', calls: clockCalls },
       emscripten_get_heap_max: { source: 'Actual Wasmtime memory type maximum', calls: Number(observed[5]) },
       _emscripten_init_main_thread_js: { source: 'Generated loader flags, real Wasm thread/TLS initialization',
