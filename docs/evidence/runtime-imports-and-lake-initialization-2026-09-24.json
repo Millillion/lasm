@@ -1,0 +1,3398 @@
+{
+  "scope": "Installed Lean 4.34 runtime imports and supplementary attribute assertions in stock engines on Linux x64, with explicit module-data inputs",
+  "releases": {
+    "lean": {
+      "tag_name": "v4.34.0",
+      "published_at": "2026-09-14T14:04:36Z",
+      "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest"
+    },
+    "deno": {
+      "tag_name": "v2.9.7",
+      "published_at": "2026-09-17T09:04:55Z",
+      "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest"
+    },
+    "bun": {
+      "tag_name": "bun-v1.4.2",
+      "published_at": "2026-09-05T05:55:48Z",
+      "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest"
+    },
+    "node": {
+      "version": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "v8": "14.6.202.34",
+      "npm": "11.19.1",
+      "source": "https://nodejs.org/dist/index.json"
+    },
+    "checkedAt": "2026-09-24T09:25:30.931726+00:00"
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r16/lasm-compiler-0.1.0-experimental.19.tgz",
+    "sha256": "7e477c20c3f0bd1ea201e83bf3ef92424eaf38472cf4eda890734301440e76b5",
+    "compressedBytes": 125374902,
+    "installedBytes": 629879442,
+    "files": 2673,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-lake-plugin-r1-resources.json",
+    "recordedAt": "2026-09-24T09:43:07.383Z"
+  },
+  "cases": [
+    {
+      "directory": ".work/upstream-runtime-imports-node-r2",
+      "resultSha256": "ec749f78ac1f686a1829bd16454517cab6184550975e18240c39ca0124c13d93",
+      "result": {
+        "scope": "Original user-attribute application with explicit runtime module metadata inputs; installed AOT executes the imports",
+        "name": "pkg/user_attr_app",
+        "target": "node",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2",
+            "seconds": 0.008100463999999192,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "v26.10.0\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native shell driver",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+              "ordinary",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native source/run_test.sh"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native source",
+            "seconds": 4.842168524999999,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "info: user_attr: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/8] Built UserAttr.BlaAttr (844ms)\n\u2714 [3/8] Built UserAttr.BlaAttr:c.o (89ms)\n\u2139 [4/8] Built UserAttr.Tst (830ms)\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\n\u2714 [5/8] Built UserAttr.Tst:c.o (74ms)\n\u26a0 [6/8] Built Main (844ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\n\u2714 [7/8] Built Main:c.o (98ms)\n\u2714 [8/8] Built user_attr:exe (845ms)\n"
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source/Main.lean",
+              "--target",
+              "node",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source",
+            "seconds": 69.653507458,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for node\u2026\ninfo: user_attr: no previous manifest, creating one from scratch\n\u26a0 [4/4] Built Main (854ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/dist\n"
+          },
+          {
+            "label": "compile native runtime-attribute control",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "-rdynamic",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source/.lake/build/ir/UserAttr/BlaAttr.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source/.lake/build/ir/UserAttr/Tst.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/attribute oracle/script.c",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native runtime attribute check"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source",
+            "seconds": 1.0494255310000007,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "build installed runtime-attribute control",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source/RuntimeAttributeImport.lean",
+              "--target",
+              "node",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/attribute dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source",
+            "seconds": 69.17170886400001,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for node\u2026\n\u2139 [3/4] Replayed UserAttr.Tst\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\nBuilding RuntimeAttributeImport.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/attribute dist\n"
+          },
+          {
+            "label": "native compiled runtime import with explicit metadata",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native source.hidden/.lake/build/bin/user_attr",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment",
+            "seconds": 0.7202607930000231,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "deployed runtime import with explicit metadata",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment",
+            "seconds": 12.668704623999977,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native runtime-attribute assertions",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native runtime attribute check",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment",
+            "seconds": 0.598369550000003,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed runtime-attribute assertions",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated attribute deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment",
+            "seconds": 12.084548252000008,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          {
+            "label": "native missing-standard-metadata control",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native source.hidden/.lake/build/bin/user_attr",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment",
+            "seconds": 0.04281387800001539,
+            "timeout": false,
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/missing standard data/lib/lean\n"
+          },
+          {
+            "label": "deployed missing-standard-metadata control",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment",
+            "seconds": 2.721953306999989,
+            "timeout": false,
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/missing standard data/lib/lean\n"
+          }
+        ],
+        "passed": true,
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "harnessSha256": "c088231e06c9ba897ea953e56e8f836b68274c017ae50131e6092b4b680b6527",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-node-r2-resources.json",
+        "adaptations": [
+          "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+          "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+          "The original main intentionally imports compiled Lean modules at runtime. Project metadata is copied as explicit input data. Standard-library metadata remains at the verified managed native prefix, selected by ordinary LEAN_SYSROOT and LEAN_PATH in both native and target controls.",
+          "Both executables run with empty PATH and hidden source copies. No native Lean/Lake process is needed during the deployed import; the retained metadata dependency prevents a self-contained deployment claim.",
+          "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+          "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "v26.10.0",
+        "packageVersion": "0.1.0-experimental.19",
+        "applicationBefore": {
+          "checked": 5,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "nativeDriver": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "info: user_attr: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/8] Built UserAttr.BlaAttr (844ms)\n\u2714 [3/8] Built UserAttr.BlaAttr:c.o (89ms)\n\u2139 [4/8] Built UserAttr.Tst (830ms)\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\n\u2714 [5/8] Built UserAttr.Tst:c.o (74ms)\n\u26a0 [6/8] Built Main (844ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\n\u2714 [7/8] Built Main:c.o (98ms)\n\u2714 [8/8] Built user_attr:exe (845ms)\n"
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "dc8f9b46f5f81a225f7727e0b0cbda00cd44664c02ff84075c1199daf2ae8f0e",
+              "cSha256": "a00205a554514dad6d9658a13ff24fe19de456686daed936410d297f81ab7349"
+            }
+          ],
+          "signature": "5e636c6beb76802d663e75e5c14edd4f36cfa48a3a80edd696734e846c4521ce",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "supplementaryFixture": {
+          "path": "integration/fixtures/RuntimeAttributeImport.lean",
+          "sha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+          "copiedSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929"
+        },
+        "nativeAttributeInputs": [
+          {
+            "module": "+UserAttr.BlaAttr",
+            "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+            "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+          },
+          {
+            "module": "+UserAttr.Tst",
+            "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+            "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+          },
+          {
+            "module": "RuntimeAttributeImport.lean",
+            "sourceSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+            "cSha256": "f54a61f46d39f9e9c4a8558e4dcb35cf2e31539290727f2c60481f9af0fd81f0"
+          }
+        ],
+        "attributeBuild": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "RuntimeAttributeImport.lean",
+              "sourceSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+              "cSha256": "f54a61f46d39f9e9c4a8558e4dcb35cf2e31539290727f2c60481f9af0fd81f0"
+            }
+          ],
+          "signature": "79d06bfdd831171e51aacd479f1c6af83fb2ee4a3355a8f4f89dec42b1f15f96",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "nativeSourceAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "applicationAfter": {
+          "checked": 5,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "moduleData": [
+          {
+            "path": "Main.ilean",
+            "sha256": "465e8545d3f7b3cb0e2827dba002c6bb62bb2d761de11d33b047598390bf5d0a"
+          },
+          {
+            "path": "Main.olean",
+            "sha256": "6a1d2ced76d115a9d9909767f8402cca07cea4611583ce8a7a44e29dc42aab68"
+          },
+          {
+            "path": "UserAttr/BlaAttr.ilean",
+            "sha256": "4d9cc6914fdfc9ca5db39341e06e1c8107e16907244ca1b530b6b69a4e5f0aca"
+          },
+          {
+            "path": "UserAttr/BlaAttr.olean",
+            "sha256": "912d1ac211c5330e637c5102c75607cd76467d3952c40c82636e75dd9cd3beb6"
+          },
+          {
+            "path": "UserAttr/Tst.ilean",
+            "sha256": "88a140c5be253f270896a92fb75a6706d13abdf15899cf86b20103e9130b894b"
+          },
+          {
+            "path": "UserAttr/Tst.olean",
+            "sha256": "4175aacd96f2d5c3c3c0213f003e2b5abb0af702bd5bd3341c711c76c8416a87"
+          }
+        ],
+        "standardModuleData": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/lib/lean",
+          "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "scope": "Explicit external read-only standard module data; automatic deployment packaging is not validated by this probe"
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "buildProcessesUsedAtRuntime": false,
+          "selfContained": false,
+          "wasmSha256": "3f0128162267be4348266c70e4db3776ad11e2b800879123ce695bf9c34b0f96"
+        },
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "attributeDeployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated attribute deployment",
+          "sourceHidden": true,
+          "path": "",
+          "selfContained": false,
+          "wasmSha256": "11c929f221dd30d1ae703ea44d53f1871bb64a016078eece0188b5000ad73cd7"
+        },
+        "runtimeAttributes": {
+          "native": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          "actual": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          }
+        },
+        "missingDataControl": {
+          "native": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/missing standard data/lib/lean\n"
+          },
+          "actual": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/missing standard data/lib/lean\n"
+          }
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T09:55:30.369Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T09:52:14.323Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-upstream-runtime-imports-r2.sh",
+          "node",
+          ".work/upstream-runtime-imports-node-r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "d168f074-bb6c-4996-a389-3abfc4986fa8",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24783007744
+        },
+        "minimumHostAvailable": 21053034496,
+        "peakMemoryBytes": 5113905152,
+        "peakTasks": 36,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-node-r2-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T09:55:30.377Z",
+          "memoryBytes": 1799770112,
+          "peakMemoryBytes": 5113905152,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 96980992,
+            "file": 1663160320,
+            "kernel": 37822464,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1023668224,
+            "slab": 36759696
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T09:55:30.439Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 1711734784,
+          "peakMemoryBytes": 5113905152,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10248192,
+            "file": 1663160320,
+            "kernel": 37511168,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1023787008,
+            "slab": 36689016
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T09:55:30.463Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-node-r2-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment/program.wasm",
+            "originalBytes": 160404494,
+            "originalSha256": "3f0128162267be4348266c70e4db3776ad11e2b800879123ce695bf9c34b0f96",
+            "mode": 509,
+            "mtimeNs": 1790243623169937823,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37238977,
+            "archiveSha256": "32755969cb79a084d0c06eeb0f0438cebdbf0cff80bdcbb32358485d8d539a41",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2",
+              "receiptSha256": "ec749f78ac1f686a1829bd16454517cab6184550975e18240c39ca0124c13d93"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated attribute deployment/program.wasm",
+            "originalBytes": 160406015,
+            "originalSha256": "11c929f221dd30d1ae703ea44d53f1871bb64a016078eece0188b5000ad73cd7",
+            "mode": 509,
+            "mtimeNs": 1790243698959008742,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/relocated attribute deployment/program.wasm.gz",
+            "archiveBytes": 37240791,
+            "archiveSha256": "cbd3576bc54cd62fea177c3a5398e2ca6ab4167e504baca953da389666f4852a",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2",
+              "receiptSha256": "ec749f78ac1f686a1829bd16454517cab6184550975e18240c39ca0124c13d93"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source.hidden/.lake/lasm/applications/0be2f052b308a779/79d06bfdd831171e51aacd479f1c6af83fb2ee4a3355a8f4f89dec42b1f15f96/dist/program.wasm",
+            "originalBytes": 160406015,
+            "originalSha256": "11c929f221dd30d1ae703ea44d53f1871bb64a016078eece0188b5000ad73cd7",
+            "mode": 509,
+            "mtimeNs": 1790243688663994819,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source.hidden/.lake/lasm/applications/0be2f052b308a779/79d06bfdd831171e51aacd479f1c6af83fb2ee4a3355a8f4f89dec42b1f15f96/dist/program.wasm.gz",
+            "archiveBytes": 37240791,
+            "archiveSha256": "cbd3576bc54cd62fea177c3a5398e2ca6ab4167e504baca953da389666f4852a",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2",
+              "receiptSha256": "ec749f78ac1f686a1829bd16454517cab6184550975e18240c39ca0124c13d93"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source.hidden/.lake/lasm/applications/3ba29aff68244872/5e636c6beb76802d663e75e5c14edd4f36cfa48a3a80edd696734e846c4521ce/dist/program.wasm",
+            "originalBytes": 160404494,
+            "originalSha256": "3f0128162267be4348266c70e4db3776ad11e2b800879123ce695bf9c34b0f96",
+            "mode": 509,
+            "mtimeNs": 1790243612596934036,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/release-pinned application source.hidden/.lake/lasm/applications/3ba29aff68244872/5e636c6beb76802d663e75e5c14edd4f36cfa48a3a80edd696734e846c4521ce/dist/program.wasm.gz",
+            "archiveBytes": 37238977,
+            "archiveSha256": "32755969cb79a084d0c06eeb0f0438cebdbf0cff80bdcbb32358485d8d539a41",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2",
+              "receiptSha256": "ec749f78ac1f686a1829bd16454517cab6184550975e18240c39ca0124c13d93"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native source.hidden/.lake/build/bin/user_attr",
+            "originalBytes": 233669232,
+            "originalSha256": "056f8ca5c4b52e85e1205fc5e17acb1de08d84c3ee4627f7d0b925ac1a8d7e0a",
+            "mode": 509,
+            "mtimeNs": 1790243552581943688,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native source.hidden/.lake/build/bin/user_attr.gz",
+            "archiveBytes": 66712611,
+            "archiveSha256": "de9ee9756918546c24dadae601cfb7337d5eac65af7f39760e13244f09091332",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2",
+              "receiptSha256": "ec749f78ac1f686a1829bd16454517cab6184550975e18240c39ca0124c13d93"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native runtime attribute check",
+            "originalBytes": 233668392,
+            "originalSha256": "41afa6ef371dd1dc622c13f68bf2f81efe205767b694f35e5fef31d51e63b554",
+            "mode": 509,
+            "mtimeNs": 1790243629766940979,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2/native runtime attribute check.gz",
+            "archiveBytes": 66714753,
+            "archiveSha256": "fceeecf6038486db8132037d1e256b2e39a9594a801251a835daf8b3187b6d59",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r2",
+              "receiptSha256": "ec749f78ac1f686a1829bd16454517cab6184550975e18240c39ca0124c13d93"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 826571742,
+        "finishedAt": "2026-09-24T09:57:14.165399+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T09:56:50.868Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-runtime-imports-r1.py",
+          ".work/upstream-runtime-imports-node-r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "e3e2ec81-79dc-4575-808c-adc277419b14",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24827437056
+        },
+        "minimumHostAvailable": 24727490560,
+        "peakMemoryBytes": 227934208,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-node-r2-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T09:57:14.100Z",
+          "memoryBytes": 225931264,
+          "peakMemoryBytes": 225931264,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 11370496,
+            "file": 208097280,
+            "kernel": 6328320,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 208023552,
+            "slab": 6208104
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T09:57:14.227Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 227934208,
+          "peakMemoryBytes": 227934208,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 208097280,
+            "kernel": 7254016,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 208039936,
+            "slab": 6316992
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T09:57:14.253Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "directory": ".work/upstream-runtime-imports-deno-r1",
+      "resultSha256": "4b9a9b2f6e3549292b2a73799edb1f11f0b53a85ff3eca2f864b532a64441f59",
+      "result": {
+        "scope": "Original user-attribute application with explicit runtime module metadata inputs; installed AOT executes the imports",
+        "name": "pkg/user_attr_app",
+        "target": "deno",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1",
+            "seconds": 0.010841769999999088,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native shell driver",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+              "ordinary",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native source/run_test.sh"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native source",
+            "seconds": 5.013354022999998,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "info: user_attr: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/8] Built UserAttr.BlaAttr (893ms)\n\u2714 [3/8] Built UserAttr.BlaAttr:c.o (96ms)\n\u2139 [4/8] Built UserAttr.Tst (841ms)\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\n\u2714 [5/8] Built UserAttr.Tst:c.o (76ms)\n\u26a0 [6/8] Built Main (862ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\n\u2714 [7/8] Built Main:c.o (121ms)\n\u2714 [8/8] Built user_attr:exe (938ms)\n"
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source/Main.lean",
+              "--target",
+              "deno",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source",
+            "seconds": 71.128894099,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for deno\u2026\ninfo: user_attr: no previous manifest, creating one from scratch\n\u26a0 [4/4] Built Main (857ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for deno: /home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/dist\n"
+          },
+          {
+            "label": "compile native runtime-attribute control",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "-rdynamic",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source/.lake/build/ir/UserAttr/BlaAttr.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source/.lake/build/ir/UserAttr/Tst.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/attribute oracle/script.c",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native runtime attribute check"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source",
+            "seconds": 1.025105892000007,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "build installed runtime-attribute control",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source/RuntimeAttributeImport.lean",
+              "--target",
+              "deno",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/attribute dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source",
+            "seconds": 68.36868311100001,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for deno\u2026\n\u2139 [3/4] Replayed UserAttr.Tst\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\nBuilding RuntimeAttributeImport.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for deno: /home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/attribute dist\n"
+          },
+          {
+            "label": "native compiled runtime import with explicit metadata",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native source.hidden/.lake/build/bin/user_attr",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment",
+            "seconds": 0.7230988940000243,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "deployed runtime import with explicit metadata",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment",
+            "seconds": 15.090524942999997,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native runtime-attribute assertions",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native runtime attribute check",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment",
+            "seconds": 0.590222243999975,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed runtime-attribute assertions",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated attribute deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment",
+            "seconds": 14.126822566999996,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          {
+            "label": "native missing-standard-metadata control",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native source.hidden/.lake/build/bin/user_attr",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment",
+            "seconds": 0.04301822500000708,
+            "timeout": false,
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/missing standard data/lib/lean\n"
+          },
+          {
+            "label": "deployed missing-standard-metadata control",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment",
+            "seconds": 2.486808881999983,
+            "timeout": false,
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/missing standard data/lib/lean\n"
+          }
+        ],
+        "passed": true,
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "harnessSha256": "c088231e06c9ba897ea953e56e8f836b68274c017ae50131e6092b4b680b6527",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-deno-r1-resources.json",
+        "adaptations": [
+          "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+          "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+          "The original main intentionally imports compiled Lean modules at runtime. Project metadata is copied as explicit input data. Standard-library metadata remains at the verified managed native prefix, selected by ordinary LEAN_SYSROOT and LEAN_PATH in both native and target controls.",
+          "Both executables run with empty PATH and hidden source copies. No native Lean/Lake process is needed during the deployed import; the retained metadata dependency prevents a self-contained deployment claim.",
+          "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+          "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "packageVersion": "0.1.0-experimental.19",
+        "applicationBefore": {
+          "checked": 5,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "nativeDriver": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "info: user_attr: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/8] Built UserAttr.BlaAttr (893ms)\n\u2714 [3/8] Built UserAttr.BlaAttr:c.o (96ms)\n\u2139 [4/8] Built UserAttr.Tst (841ms)\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\n\u2714 [5/8] Built UserAttr.Tst:c.o (76ms)\n\u26a0 [6/8] Built Main (862ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\n\u2714 [7/8] Built Main:c.o (121ms)\n\u2714 [8/8] Built user_attr:exe (938ms)\n"
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "dc8f9b46f5f81a225f7727e0b0cbda00cd44664c02ff84075c1199daf2ae8f0e",
+              "cSha256": "a00205a554514dad6d9658a13ff24fe19de456686daed936410d297f81ab7349"
+            }
+          ],
+          "signature": "71f09688bb345791cc756849d42d789083a270fab23e5785a7736d69fe2e1ccc",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "supplementaryFixture": {
+          "path": "integration/fixtures/RuntimeAttributeImport.lean",
+          "sha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+          "copiedSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929"
+        },
+        "nativeAttributeInputs": [
+          {
+            "module": "+UserAttr.BlaAttr",
+            "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+            "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+          },
+          {
+            "module": "+UserAttr.Tst",
+            "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+            "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+          },
+          {
+            "module": "RuntimeAttributeImport.lean",
+            "sourceSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+            "cSha256": "f54a61f46d39f9e9c4a8558e4dcb35cf2e31539290727f2c60481f9af0fd81f0"
+          }
+        ],
+        "attributeBuild": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "RuntimeAttributeImport.lean",
+              "sourceSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+              "cSha256": "f54a61f46d39f9e9c4a8558e4dcb35cf2e31539290727f2c60481f9af0fd81f0"
+            }
+          ],
+          "signature": "5c007d70653359eab3c2aa2c9fc7c1cad55c3e8d8f28402c1001fbb51b2e52aa",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "nativeSourceAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "applicationAfter": {
+          "checked": 5,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "moduleData": [
+          {
+            "path": "Main.ilean",
+            "sha256": "465e8545d3f7b3cb0e2827dba002c6bb62bb2d761de11d33b047598390bf5d0a"
+          },
+          {
+            "path": "Main.olean",
+            "sha256": "aa79017b77c5109053ee47e8feaa79d325b0cc1017ddcec75bcd73ae62322f19"
+          },
+          {
+            "path": "UserAttr/BlaAttr.ilean",
+            "sha256": "4d9cc6914fdfc9ca5db39341e06e1c8107e16907244ca1b530b6b69a4e5f0aca"
+          },
+          {
+            "path": "UserAttr/BlaAttr.olean",
+            "sha256": "912d1ac211c5330e637c5102c75607cd76467d3952c40c82636e75dd9cd3beb6"
+          },
+          {
+            "path": "UserAttr/Tst.ilean",
+            "sha256": "88a140c5be253f270896a92fb75a6706d13abdf15899cf86b20103e9130b894b"
+          },
+          {
+            "path": "UserAttr/Tst.olean",
+            "sha256": "4175aacd96f2d5c3c3c0213f003e2b5abb0af702bd5bd3341c711c76c8416a87"
+          }
+        ],
+        "standardModuleData": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/lib/lean",
+          "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "scope": "Explicit external read-only standard module data; automatic deployment packaging is not validated by this probe"
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "buildProcessesUsedAtRuntime": false,
+          "selfContained": false,
+          "wasmSha256": "3f0128162267be4348266c70e4db3776ad11e2b800879123ce695bf9c34b0f96"
+        },
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "attributeDeployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated attribute deployment",
+          "sourceHidden": true,
+          "path": "",
+          "selfContained": false,
+          "wasmSha256": "11c929f221dd30d1ae703ea44d53f1871bb64a016078eece0188b5000ad73cd7"
+        },
+        "runtimeAttributes": {
+          "native": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          "actual": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          }
+        },
+        "missingDataControl": {
+          "native": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/missing standard data/lib/lean\n"
+          },
+          "actual": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/missing standard data/lib/lean\n"
+          }
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T10:00:35.499Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T09:57:14.314Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-upstream-runtime-imports-r2.sh",
+          "deno",
+          ".work/upstream-runtime-imports-deno-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "b6f453a0-6a1b-46d0-a913-a019f34b2e6e",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24782241792
+        },
+        "minimumHostAvailable": 21160251392,
+        "peakMemoryBytes": 5380476928,
+        "peakTasks": 37,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-deno-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T10:00:35.567Z",
+          "memoryBytes": 1905987584,
+          "peakMemoryBytes": 5380476928,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11546624,
+            "file": 1855414272,
+            "kernel": 38084608,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1314320384,
+            "slab": 37148936
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:00:35.567Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 1905987584,
+          "peakMemoryBytes": 5380476928,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11546624,
+            "file": 1855414272,
+            "kernel": 38084608,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1314320384,
+            "slab": 37148936
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:00:35.594Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-deno-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment/program.wasm",
+            "originalBytes": 160404494,
+            "originalSha256": "3f0128162267be4348266c70e4db3776ad11e2b800879123ce695bf9c34b0f96",
+            "mode": 509,
+            "mtimeNs": 1790243925185595702,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37238977,
+            "archiveSha256": "32755969cb79a084d0c06eeb0f0438cebdbf0cff80bdcbb32358485d8d539a41",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1",
+              "receiptSha256": "4b9a9b2f6e3549292b2a73799edb1f11f0b53a85ff3eca2f864b532a64441f59"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated attribute deployment/program.wasm",
+            "originalBytes": 160406015,
+            "originalSha256": "11c929f221dd30d1ae703ea44d53f1871bb64a016078eece0188b5000ad73cd7",
+            "mode": 509,
+            "mtimeNs": 1790243999830885903,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/relocated attribute deployment/program.wasm.gz",
+            "archiveBytes": 37240791,
+            "archiveSha256": "cbd3576bc54cd62fea177c3a5398e2ca6ab4167e504baca953da389666f4852a",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1",
+              "receiptSha256": "4b9a9b2f6e3549292b2a73799edb1f11f0b53a85ff3eca2f864b532a64441f59"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source.hidden/.lake/lasm/applications/f547e46b4f1ffdd0/71f09688bb345791cc756849d42d789083a270fab23e5785a7736d69fe2e1ccc/dist/program.wasm",
+            "originalBytes": 160404494,
+            "originalSha256": "3f0128162267be4348266c70e4db3776ad11e2b800879123ce695bf9c34b0f96",
+            "mode": 509,
+            "mtimeNs": 1790243915031559416,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source.hidden/.lake/lasm/applications/f547e46b4f1ffdd0/71f09688bb345791cc756849d42d789083a270fab23e5785a7736d69fe2e1ccc/dist/program.wasm.gz",
+            "archiveBytes": 37238977,
+            "archiveSha256": "32755969cb79a084d0c06eeb0f0438cebdbf0cff80bdcbb32358485d8d539a41",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1",
+              "receiptSha256": "4b9a9b2f6e3549292b2a73799edb1f11f0b53a85ff3eca2f864b532a64441f59"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source.hidden/.lake/lasm/applications/4819f38d128b7689/5c007d70653359eab3c2aa2c9fc7c1cad55c3e8d8f28402c1001fbb51b2e52aa/dist/program.wasm",
+            "originalBytes": 160406015,
+            "originalSha256": "11c929f221dd30d1ae703ea44d53f1871bb64a016078eece0188b5000ad73cd7",
+            "mode": 509,
+            "mtimeNs": 1790243989592843772,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/release-pinned application source.hidden/.lake/lasm/applications/4819f38d128b7689/5c007d70653359eab3c2aa2c9fc7c1cad55c3e8d8f28402c1001fbb51b2e52aa/dist/program.wasm.gz",
+            "archiveBytes": 37240791,
+            "archiveSha256": "cbd3576bc54cd62fea177c3a5398e2ca6ab4167e504baca953da389666f4852a",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1",
+              "receiptSha256": "4b9a9b2f6e3549292b2a73799edb1f11f0b53a85ff3eca2f864b532a64441f59"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native source.hidden/.lake/build/bin/user_attr",
+            "originalBytes": 233669232,
+            "originalSha256": "056f8ca5c4b52e85e1205fc5e17acb1de08d84c3ee4627f7d0b925ac1a8d7e0a",
+            "mode": 509,
+            "mtimeNs": 1790243853136356422,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native source.hidden/.lake/build/bin/user_attr.gz",
+            "archiveBytes": 66712611,
+            "archiveSha256": "de9ee9756918546c24dadae601cfb7337d5eac65af7f39760e13244f09091332",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1",
+              "receiptSha256": "4b9a9b2f6e3549292b2a73799edb1f11f0b53a85ff3eca2f864b532a64441f59"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native runtime attribute check",
+            "originalBytes": 233668392,
+            "originalSha256": "41afa6ef371dd1dc622c13f68bf2f81efe205767b694f35e5fef31d51e63b554",
+            "mode": 509,
+            "mtimeNs": 1790243931459618521,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1/native runtime attribute check.gz",
+            "archiveBytes": 66714753,
+            "archiveSha256": "fceeecf6038486db8132037d1e256b2e39a9594a801251a835daf8b3187b6d59",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-deno-r1",
+              "receiptSha256": "4b9a9b2f6e3549292b2a73799edb1f11f0b53a85ff3eca2f864b532a64441f59"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 826571742,
+        "finishedAt": "2026-09-24T10:00:58.576771+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T10:00:35.652Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-runtime-imports-r1.py",
+          ".work/upstream-runtime-imports-deno-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "431ce451-7af9-47e0-a7b7-fb3a5e5abe71",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24030724096
+        },
+        "minimumHostAvailable": 24022335488,
+        "peakMemoryBytes": 227500032,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-deno-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T10:00:58.487Z",
+          "memoryBytes": 225632256,
+          "peakMemoryBytes": 225882112,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 11374592,
+            "file": 207937536,
+            "kernel": 6320128,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 207937536,
+            "slab": 6212584
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:00:58.643Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 226906112,
+          "peakMemoryBytes": 227500032,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11677696,
+            "file": 207937536,
+            "kernel": 7241728,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 207937536,
+            "slab": 6322624
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:00:58.676Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "directory": ".work/upstream-runtime-imports-bun-r1",
+      "resultSha256": "9954dd05eba778407845f3baca2624222f0de7158e55595f327a8b7f8f3ccd26",
+      "result": {
+        "scope": "Original user-attribute application with explicit runtime module metadata inputs; installed AOT executes the imports",
+        "name": "pkg/user_attr_app",
+        "target": "bun",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1",
+            "seconds": 0.0105111739999993,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "1.4.2\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native shell driver",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+              "ordinary",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native source/run_test.sh"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native source",
+            "seconds": 4.963677362,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "info: user_attr: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/8] Built UserAttr.BlaAttr (850ms)\n\u2714 [3/8] Built UserAttr.BlaAttr:c.o (101ms)\n\u2139 [4/8] Built UserAttr.Tst (871ms)\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\n\u2714 [5/8] Built UserAttr.Tst:c.o (82ms)\n\u26a0 [6/8] Built Main (874ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\n\u2714 [7/8] Built Main:c.o (111ms)\n\u2714 [8/8] Built user_attr:exe (831ms)\n"
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source/Main.lean",
+              "--target",
+              "bun",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source",
+            "seconds": 100.69111037,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for bun\u2026\ninfo: user_attr: no previous manifest, creating one from scratch\n\u26a0 [4/4] Built Main (858ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\nBuilding Main.lean for bun\u2026\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for bun: /home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/dist\n"
+          },
+          {
+            "label": "compile native runtime-attribute control",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "-rdynamic",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source/.lake/build/ir/UserAttr/BlaAttr.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source/.lake/build/ir/UserAttr/Tst.c",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/attribute oracle/script.c",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native runtime attribute check"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source",
+            "seconds": 1.1474378350000043,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "build installed runtime-attribute control",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source/RuntimeAttributeImport.lean",
+              "--target",
+              "bun",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/attribute dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source",
+            "seconds": 98.08460871300001,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for bun\u2026\n\u2139 [3/4] Replayed UserAttr.Tst\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\nBuilding RuntimeAttributeImport.lean for bun\u2026\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for bun: /home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/attribute dist\n"
+          },
+          {
+            "label": "native compiled runtime import with explicit metadata",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native source.hidden/.lake/build/bin/user_attr",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment",
+            "seconds": 0.6128850260000036,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "deployed runtime import with explicit metadata",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment",
+            "seconds": 10.671157753999985,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native runtime-attribute assertions",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native runtime attribute check",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment",
+            "seconds": 0.6093525789999985,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          {
+            "label": "deployed runtime-attribute assertions",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated attribute deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment",
+            "seconds": 11.356288629999996,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          {
+            "label": "native missing-standard-metadata control",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native source.hidden/.lake/build/bin/user_attr",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment",
+            "seconds": 0.05780694300000323,
+            "timeout": false,
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/missing standard data/lib/lean\n"
+          },
+          {
+            "label": "deployed missing-standard-metadata control",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment",
+            "seconds": 2.2008221579999954,
+            "timeout": false,
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/missing standard data/lib/lean\n"
+          }
+        ],
+        "passed": true,
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "harnessSha256": "c088231e06c9ba897ea953e56e8f836b68274c017ae50131e6092b4b680b6527",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-bun-r1-resources.json",
+        "adaptations": [
+          "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+          "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+          "The original main intentionally imports compiled Lean modules at runtime. Project metadata is copied as explicit input data. Standard-library metadata remains at the verified managed native prefix, selected by ordinary LEAN_SYSROOT and LEAN_PATH in both native and target controls.",
+          "Both executables run with empty PATH and hidden source copies. No native Lean/Lake process is needed during the deployed import; the retained metadata dependency prevents a self-contained deployment claim.",
+          "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+          "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "1.4.2",
+        "packageVersion": "0.1.0-experimental.19",
+        "applicationBefore": {
+          "checked": 5,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "nativeDriver": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "info: user_attr: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/8] Built UserAttr.BlaAttr (850ms)\n\u2714 [3/8] Built UserAttr.BlaAttr:c.o (101ms)\n\u2139 [4/8] Built UserAttr.Tst (871ms)\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\n\u2714 [5/8] Built UserAttr.Tst:c.o (82ms)\n\u26a0 [6/8] Built Main (874ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\n\u2714 [7/8] Built Main:c.o (111ms)\n\u2714 [8/8] Built user_attr:exe (831ms)\n"
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "dc8f9b46f5f81a225f7727e0b0cbda00cd44664c02ff84075c1199daf2ae8f0e",
+              "cSha256": "a00205a554514dad6d9658a13ff24fe19de456686daed936410d297f81ab7349"
+            }
+          ],
+          "signature": "c46ee788b5ef6b10d60773a088ee5f0be172cc3b601897c3f74be269325d029f",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "supplementaryFixture": {
+          "path": "integration/fixtures/RuntimeAttributeImport.lean",
+          "sha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+          "copiedSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929"
+        },
+        "nativeAttributeInputs": [
+          {
+            "module": "+UserAttr.BlaAttr",
+            "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+            "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+          },
+          {
+            "module": "+UserAttr.Tst",
+            "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+            "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+          },
+          {
+            "module": "RuntimeAttributeImport.lean",
+            "sourceSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+            "cSha256": "f54a61f46d39f9e9c4a8558e4dcb35cf2e31539290727f2c60481f9af0fd81f0"
+          }
+        ],
+        "attributeBuild": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "54a0eace17673b31d080b7ca6bb5e5e2f905dd4245f5f34072d76d92e40750ae",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "RuntimeAttributeImport.lean",
+              "sourceSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+              "cSha256": "f54a61f46d39f9e9c4a8558e4dcb35cf2e31539290727f2c60481f9af0fd81f0"
+            }
+          ],
+          "signature": "864fe06373ac292fed7e880b68869a986d279e3a3055983a82b090fb5fea6f45",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "nativeSourceAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "applicationAfter": {
+          "checked": 5,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "moduleData": [
+          {
+            "path": "Main.ilean",
+            "sha256": "465e8545d3f7b3cb0e2827dba002c6bb62bb2d761de11d33b047598390bf5d0a"
+          },
+          {
+            "path": "Main.olean",
+            "sha256": "b94257c1aac78d83366ee3420161ad811b629347fec43045e893e6219335e9ff"
+          },
+          {
+            "path": "UserAttr/BlaAttr.ilean",
+            "sha256": "4d9cc6914fdfc9ca5db39341e06e1c8107e16907244ca1b530b6b69a4e5f0aca"
+          },
+          {
+            "path": "UserAttr/BlaAttr.olean",
+            "sha256": "912d1ac211c5330e637c5102c75607cd76467d3952c40c82636e75dd9cd3beb6"
+          },
+          {
+            "path": "UserAttr/Tst.ilean",
+            "sha256": "88a140c5be253f270896a92fb75a6706d13abdf15899cf86b20103e9130b894b"
+          },
+          {
+            "path": "UserAttr/Tst.olean",
+            "sha256": "4175aacd96f2d5c3c3c0213f003e2b5abb0af702bd5bd3341c711c76c8416a87"
+          }
+        ],
+        "standardModuleData": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/lib/lean",
+          "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "scope": "Explicit external read-only standard module data; automatic deployment packaging is not validated by this probe"
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "buildProcessesUsedAtRuntime": false,
+          "selfContained": false,
+          "wasmSha256": "6fba8a6700fc399bf72c77b22fb026ba36192b6a5656293c5df3344b95a8e3f0"
+        },
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "attributeDeployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated attribute deployment",
+          "sourceHidden": true,
+          "path": "",
+          "selfContained": false,
+          "wasmSha256": "80f56584b9da10c4aeb42911b3ae6276097304ab7f52fcbdbe33824569866bf8"
+        },
+        "runtimeAttributes": {
+          "native": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          "actual": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          }
+        },
+        "missingDataControl": {
+          "native": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/missing standard data/lib/lean\n"
+          },
+          "actual": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment/module data\n/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/missing standard data/lib/lean\n"
+          }
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T10:05:11.207Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T10:00:58.730Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-upstream-runtime-imports-r2.sh",
+          "bun",
+          ".work/upstream-runtime-imports-bun-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "e1f37a77-e8d1-448e-b2e7-9727328ad4e3",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24766951424
+        },
+        "minimumHostAvailable": 21021540352,
+        "peakMemoryBytes": 4968427520,
+        "peakTasks": 51,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-bun-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T10:05:11.253Z",
+          "memoryBytes": 1446715392,
+          "peakMemoryBytes": 4968427520,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 4440064,
+            "file": 1402892288,
+            "kernel": 38326272,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 889241600,
+            "slab": 37762480
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:05:11.279Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 1454227456,
+          "peakMemoryBytes": 4968427520,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 1402892288,
+            "kernel": 38719488,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 889241600,
+            "slab": 37779408
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:05:11.303Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-bun-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment/program.wasm",
+            "originalBytes": 166007504,
+            "originalSha256": "6fba8a6700fc399bf72c77b22fb026ba36192b6a5656293c5df3344b95a8e3f0",
+            "mode": 509,
+            "mtimeNs": 1790244178045720121,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 38389032,
+            "archiveSha256": "e3e389e8deabf515c4ab5a723539c91868ef18a8c7a1be8ea419fc00ef305701",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1",
+              "receiptSha256": "9954dd05eba778407845f3baca2624222f0de7158e55595f327a8b7f8f3ccd26"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated attribute deployment/program.wasm",
+            "originalBytes": 166009079,
+            "originalSha256": "80f56584b9da10c4aeb42911b3ae6276097304ab7f52fcbdbe33824569866bf8",
+            "mode": 509,
+            "mtimeNs": 1790244283034285538,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/relocated attribute deployment/program.wasm.gz",
+            "archiveBytes": 38387185,
+            "archiveSha256": "5052987a9d2dc20c5bd94a4ebc2bca3aab032c17b45b0f1be08c80316ab40389",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1",
+              "receiptSha256": "9954dd05eba778407845f3baca2624222f0de7158e55595f327a8b7f8f3ccd26"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source.hidden/.lake/lasm/applications/f321f38d934b5969/864fe06373ac292fed7e880b68869a986d279e3a3055983a82b090fb5fea6f45/dist/program.wasm",
+            "originalBytes": 166009079,
+            "originalSha256": "80f56584b9da10c4aeb42911b3ae6276097304ab7f52fcbdbe33824569866bf8",
+            "mode": 509,
+            "mtimeNs": 1790244272748228125,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source.hidden/.lake/lasm/applications/f321f38d934b5969/864fe06373ac292fed7e880b68869a986d279e3a3055983a82b090fb5fea6f45/dist/program.wasm.gz",
+            "archiveBytes": 38387185,
+            "archiveSha256": "5052987a9d2dc20c5bd94a4ebc2bca3aab032c17b45b0f1be08c80316ab40389",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1",
+              "receiptSha256": "9954dd05eba778407845f3baca2624222f0de7158e55595f327a8b7f8f3ccd26"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source.hidden/.lake/lasm/applications/182a7fd3ea5d0eaf/c46ee788b5ef6b10d60773a088ee5f0be172cc3b601897c3f74be269325d029f/dist/program.wasm",
+            "originalBytes": 166007504,
+            "originalSha256": "6fba8a6700fc399bf72c77b22fb026ba36192b6a5656293c5df3344b95a8e3f0",
+            "mode": 509,
+            "mtimeNs": 1790244167561666346,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/release-pinned application source.hidden/.lake/lasm/applications/182a7fd3ea5d0eaf/c46ee788b5ef6b10d60773a088ee5f0be172cc3b601897c3f74be269325d029f/dist/program.wasm.gz",
+            "archiveBytes": 38389032,
+            "archiveSha256": "e3e389e8deabf515c4ab5a723539c91868ef18a8c7a1be8ea419fc00ef305701",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1",
+              "receiptSha256": "9954dd05eba778407845f3baca2624222f0de7158e55595f327a8b7f8f3ccd26"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native source.hidden/.lake/build/bin/user_attr",
+            "originalBytes": 233669232,
+            "originalSha256": "056f8ca5c4b52e85e1205fc5e17acb1de08d84c3ee4627f7d0b925ac1a8d7e0a",
+            "mode": 509,
+            "mtimeNs": 1790244076436222425,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native source.hidden/.lake/build/bin/user_attr.gz",
+            "archiveBytes": 66712611,
+            "archiveSha256": "de9ee9756918546c24dadae601cfb7337d5eac65af7f39760e13244f09091332",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1",
+              "receiptSha256": "9954dd05eba778407845f3baca2624222f0de7158e55595f327a8b7f8f3ccd26"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native runtime attribute check",
+            "originalBytes": 233668392,
+            "originalSha256": "41afa6ef371dd1dc622c13f68bf2f81efe205767b694f35e5fef31d51e63b554",
+            "mode": 509,
+            "mtimeNs": 1790244184930755719,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1/native runtime attribute check.gz",
+            "archiveBytes": 66714753,
+            "archiveSha256": "fceeecf6038486db8132037d1e256b2e39a9594a801251a835daf8b3187b6d59",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-bun-r1",
+              "receiptSha256": "9954dd05eba778407845f3baca2624222f0de7158e55595f327a8b7f8f3ccd26"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 844390992,
+        "finishedAt": "2026-09-24T10:05:35.795663+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T10:05:11.356Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-runtime-imports-r1.py",
+          ".work/upstream-runtime-imports-bun-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "66faaa2d-5f46-40b3-9ed1-a3c7dc2f0cce",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23774199808
+        },
+        "minimumHostAvailable": 23774199808,
+        "peakMemoryBytes": 230137856,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-bun-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T10:05:35.790Z",
+          "memoryBytes": 229875712,
+          "peakMemoryBytes": 230121472,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 13246464,
+            "file": 210231296,
+            "kernel": 6393856,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 210231296,
+            "slab": 6278488
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:05:35.861Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 230117376,
+          "peakMemoryBytes": 230137856,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 210231296,
+            "kernel": 7311360,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 210231296,
+            "slab": 6389744
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:05:35.887Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "repair": "Initialize the verified managed Lake native library as a Lean plugin before interpreting the private workspace-discovery helper. No ordinary Lean API changes.",
+  "failedCandidate": {
+    "package": {
+      "scope": "Local candidate assembly; installation and runtime checks are separate",
+      "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r15/lasm-compiler-0.1.0-experimental.18.tgz",
+      "sha256": "4fe8cd36994032d1641061066867cf4f3d083be528dd8d07bdb50e4b5fa673ec",
+      "compressedBytes": 125333553,
+      "installedBytes": 629693096,
+      "files": 2673,
+      "runtime": {
+        "name": "lean-4.34.0-wasm64",
+        "identity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee"
+      },
+      "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-bun-trace-r2-resources.json",
+      "recordedAt": "2026-09-24T07:57:45.357Z"
+    },
+    "result": {
+      "scope": "Original user-attribute application with explicit runtime module metadata inputs; installed AOT executes the imports",
+      "name": "pkg/user_attr_app",
+      "target": "node",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r17/workspace/project/node_modules/@lasm/compiler",
+      "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+      "commands": [
+        {
+          "label": "engine version",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1",
+          "seconds": 0.007316769999999451,
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "stdout": "v26.10.0\n",
+          "stderr": ""
+        },
+        {
+          "label": "original native shell driver",
+          "program": "/bin/bash",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+            "ordinary",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/native source/run_test.sh"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/native source",
+          "seconds": 5.342033393000001,
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "info: user_attr: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/8] Built UserAttr.BlaAttr (838ms)\n\u2714 [3/8] Built UserAttr.BlaAttr:c.o (204ms)\n\u2139 [4/8] Built UserAttr.Tst (1.2s)\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\n\u2714 [5/8] Built UserAttr.Tst:c.o (80ms)\n\u26a0 [6/8] Built Main (891ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\n\u2714 [7/8] Built Main:c.o (101ms)\n\u2714 [8/8] Built user_attr:exe (846ms)\n"
+        },
+        {
+          "label": "installed application build",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r17/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/release-pinned application source/Main.lean",
+            "--target",
+            "node",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/release-pinned application source",
+          "seconds": 15.089581229,
+          "timeout": false,
+          "code": 1,
+          "signal": null,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.0 for node\u2026\nLEAN ASSERTION VIOLATION\nFile: /home/runner/work/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\nCommand failed: /home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean -j1 -s8192 --run /home/lastmjs/development/lasm/compiler/.work/application-installed-r17/workspace/project/node_modules/@lasm/compiler/src/lake-module.lean /home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/release-pinned application source/Main.lean\n"
+        }
+      ],
+      "passed": false,
+      "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+      "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+      "harnessSha256": "c088231e06c9ba897ea953e56e8f836b68274c017ae50131e6092b4b680b6527",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-node-r1-resources.json",
+      "adaptations": [
+        "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+        "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+        "The original main intentionally imports compiled Lean modules at runtime. Project metadata is copied as explicit input data. Standard-library metadata remains at the verified managed native prefix, selected by ordinary LEAN_SYSROOT and LEAN_PATH in both native and target controls.",
+        "Both executables run with empty PATH and hidden source copies. No native Lean/Lake process is needed during the deployed import; the retained metadata dependency prevents a self-contained deployment claim.",
+        "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+        "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks."
+      ],
+      "referenceBefore": {
+        "checked": 7669,
+        "modified": []
+      },
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "phase": "installed application build",
+      "engineVersion": "v26.10.0",
+      "packageVersion": "0.1.0-experimental.18",
+      "applicationBefore": {
+        "checked": 5,
+        "modified": []
+      },
+      "parallelPin": {
+        "original": "../../../build/release/stage1\n",
+        "release": "leanprover/lean4:v4.34.0\n"
+      },
+      "nativeDriver": {
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": "info: user_attr: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\n\u2714 [2/8] Built UserAttr.BlaAttr (838ms)\n\u2714 [3/8] Built UserAttr.BlaAttr:c.o (204ms)\n\u2139 [4/8] Built UserAttr.Tst (1.2s)\ninfo: UserAttr/Tst.lean:6:2: Applied @testPred to infSeq\n\u2714 [5/8] Built UserAttr.Tst:c.o (80ms)\n\u26a0 [6/8] Built Main (891ms)\nwarning: Main.lean:16:67: Variable name `env` is not explicitly referenced.\n\nHint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:\n  [apply] _env\n\nNote: This linter can be disabled with `set_option linter.unusedVariables false`\n\u2714 [7/8] Built Main:c.o (101ms)\n\u2714 [8/8] Built user_attr:exe (846ms)\n"
+      },
+      "error": {
+        "message": "installed application build: Preparing Lean 4.34.0 for node\u2026\nLEAN ASSERTION VIOLATION\nFile: /home/runner/work/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\nCommand failed: /home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean -j1 -s8192 --run /home/lastmjs/development/lasm/compiler/.work/application-installed-r17/workspace/project/node_modules/@lasm/compiler/src/lake-module.lean /home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/release-pinned application source/Main.lean\n\n\n1 !== 0\n",
+        "stack": "AssertionError [ERR_ASSERTION]: installed application build: Preparing Lean 4.34.0 for node\u2026\nLEAN ASSERTION VIOLATION\nFile: /home/runner/work/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\nCommand failed: /home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean -j1 -s8192 --run /home/lastmjs/development/lasm/compiler/.work/application-installed-r17/workspace/project/node_modules/@lasm/compiler/src/lake-module.lean /home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/release-pinned application source/Main.lean\n\n\n1 !== 0\n\n    at run (file:///home/lastmjs/development/lasm/compiler/integration/application-upstream-runtime-imports.mjs:55:65)\n    at file:///home/lastmjs/development/lasm/compiler/integration/application-upstream-runtime-imports.mjs:105:3\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+      },
+      "finishedAt": "2026-09-24T09:34:38.478Z"
+    },
+    "resources": {
+      "startedAt": "2026-09-24T09:34:03.470Z",
+      "command": [
+        "/bin/bash",
+        ".work/run-upstream-runtime-imports-r1.sh",
+        "node",
+        ".work/upstream-runtime-imports-node-r1"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "887f65b0-e754-4bae-974d-a9cced10d7f2",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24696659968
+      },
+      "minimumHostAvailable": 24128491520,
+      "peakMemoryBytes": 893181952,
+      "peakTasks": 33,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-runtime-imports-node-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T09:34:38.532Z",
+        "memoryBytes": 255283200,
+        "peakMemoryBytes": 893181952,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 8851456,
+          "file": 237293568,
+          "kernel": 7983104,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 3620864,
+          "slab": 7219672
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T09:34:38.540Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 256593920,
+        "peakMemoryBytes": 893181952,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10244096,
+          "file": 237293568,
+          "kernel": 8048640,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 3620864,
+          "slab": 7219672
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T09:34:38.565Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "diagnosticProbes": [
+    {
+      "directory": ".work/lake-module-initialization-r1",
+      "result": {
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-module-initialization-r1-resources.json",
+        "cases": [
+          {
+            "name": "workspace-only",
+            "helperSha256": "d6081747525df1484f07070cd0449f3fbd865e26746b6b591c956a393302a74e",
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "LEAN ASSERTION VIOLATION\nFile: /home/runner/work/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\n",
+            "seconds": 0.7530122409999985
+          },
+          {
+            "name": "public-lake",
+            "helperSha256": "0b0ab3e501013051121562808b9d7f543993e7d41987f08da797b401ff70c3a7",
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "LEAN ASSERTION VIOLATION\nFile: /home/runner/work/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\n",
+            "seconds": 0.7459854100000012
+          },
+          {
+            "name": "lake-cli",
+            "helperSha256": "89f7ca8dcc23ff77af0b3f8dd0b10462475d77e1d81b736b81d51f561381b77d",
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "LEAN ASSERTION VIOLATION\nFile: /home/runner/work/lean4/lean4/src/library/ir_interpreter.cpp\nLine: 928\nfn_body_tag(decl_fun_body(e.m_decl)) != fn_body_kind::Unreachable\n'unreachable' code was reached\n",
+            "seconds": 0.6889609710000004
+          }
+        ]
+      },
+      "resources": {
+        "startedAt": "2026-09-24T09:37:05.451Z",
+        "command": [
+          "/bin/bash",
+          "-c",
+          "ulimit -c 0; export LASM_TOOLCHAIN_CACHE=\"$PWD/.work/application-installed-r3/workspace/toolchains\"; exec node .work/probe-lake-module-initialization-r1.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "8a1df65c-4311-4361-801a-6d40cd18b33f",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24906072064
+        },
+        "minimumHostAvailable": 24815042560,
+        "peakMemoryBytes": 248303616,
+        "peakTasks": 16,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-module-initialization-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T09:37:21.483Z",
+          "memoryBytes": 13570048,
+          "peakMemoryBytes": 248303616,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 8589312,
+            "file": 3121152,
+            "kernel": 974848,
+            "shmem": 0,
+            "file_mapped": 122880,
+            "inactive_file": 106496,
+            "slab": 211608
+          },
+          "pressureSomeAvg10": 3.07,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T09:37:21.492Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 15142912,
+          "peakMemoryBytes": 248303616,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10248192,
+            "file": 3121152,
+            "kernel": 1032192,
+            "shmem": 0,
+            "file_mapped": 139264,
+            "inactive_file": 106496,
+            "slab": 208240
+          },
+          "pressureSomeAvg10": 3.07,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T09:37:21.518Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "directory": ".work/lake-module-initialization-r2",
+      "result": {
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-module-initialization-r2-resources.json",
+        "cases": [
+          {
+            "name": "lake-plugin",
+            "flags": [
+              "--plugin=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/lib/lean/libLake_shared.so"
+            ],
+            "helperSha256": "d6081747525df1484f07070cd0449f3fbd865e26746b6b591c956a393302a74e",
+            "code": 0,
+            "signal": null,
+            "stdout": "\"/+Main\"\n",
+            "stderr": "info: user_attr: no previous manifest, creating one from scratch\n",
+            "seconds": 1.9676289739999993
+          }
+        ]
+      },
+      "resources": {
+        "startedAt": "2026-09-24T09:39:01.590Z",
+        "command": [
+          "/bin/bash",
+          "-c",
+          "ulimit -c 0; export LASM_TOOLCHAIN_CACHE=\"$PWD/.work/application-installed-r3/workspace/toolchains\"; exec node .work/probe-lake-module-initialization-r2.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "4271c7bf-2710-4ca9-9a15-701a5d47bf64",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24913358848
+        },
+        "minimumHostAvailable": 23585579008,
+        "peakMemoryBytes": 1186418688,
+        "peakTasks": 16,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-module-initialization-r2-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T09:39:19.618Z",
+          "memoryBytes": 1163567104,
+          "peakMemoryBytes": 1186418688,
+          "swapBytes": 0,
+          "tasks": 16,
+          "memoryBreakdown": {
+            "anon": 1126264832,
+            "file": 196608,
+            "kernel": 37052416,
+            "shmem": 0,
+            "file_mapped": 151552,
+            "inactive_file": 196608,
+            "slab": 4216416
+          },
+          "pressureSomeAvg10": 6.47,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "stoppedBecause": "Workload memory pressure reached 5 percent",
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "killed",
+          "exitStatus": "TERM",
+          "capturedAt": "2026-09-24T09:39:19.707Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 519475200,
+          "peakMemoryBytes": 1186418688,
+          "swapBytes": 0,
+          "tasks": 9,
+          "memoryBreakdown": {
+            "anon": 473198592,
+            "file": 299008,
+            "kernel": 34824192,
+            "shmem": 0,
+            "file_mapped": 122880,
+            "inactive_file": 299008,
+            "slab": 4052640
+          },
+          "pressureSomeAvg10": 6.47,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T09:39:19.870Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": true,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "directory": ".work/lake-module-initialization-r3",
+      "result": {
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-module-initialization-r3-resources.json",
+        "cases": [
+          {
+            "name": "attributes",
+            "pkg": "user_attr_app",
+            "entry": "Main.lean",
+            "expected": "/+Main",
+            "flags": [
+              "--plugin=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/lib/lean/libLake_shared.so"
+            ],
+            "helperSha256": "d6081747525df1484f07070cd0449f3fbd865e26746b6b591c956a393302a74e",
+            "code": 0,
+            "signal": null,
+            "stdout": "\"/+Main\"\n",
+            "stderr": "info: user_attr: no previous manifest, creating one from scratch\n",
+            "seconds": 1.692713726
+          },
+          {
+            "name": "runtime-attributes",
+            "pkg": "user_attr_app",
+            "entry": "RuntimeAttributeImport.lean",
+            "expected": {
+              "imports": [
+                "UserAttr.Tst"
+              ]
+            },
+            "flags": [
+              "--plugin=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/lib/lean/libLake_shared.so"
+            ],
+            "helperSha256": "d6081747525df1484f07070cd0449f3fbd865e26746b6b591c956a393302a74e",
+            "code": 0,
+            "signal": null,
+            "stdout": "{\"imports\":[\"UserAttr.Tst\"]}\n",
+            "stderr": "info: user_attr: no previous manifest, creating one from scratch\n",
+            "seconds": 1.894583079
+          },
+          {
+            "name": "spaces",
+            "pkg": "path with spaces",
+            "entry": "Main.lean",
+            "expected": "/+Main",
+            "flags": [
+              "--plugin=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/lib/lean/libLake_shared.so"
+            ],
+            "helperSha256": "d6081747525df1484f07070cd0449f3fbd865e26746b6b591c956a393302a74e",
+            "code": 0,
+            "signal": null,
+            "stdout": "\"/+Main\"\n",
+            "stderr": "info: path with spaces: no previous manifest, creating one from scratch\n",
+            "seconds": 0.5887913500000032
+          },
+          {
+            "name": "clash",
+            "pkg": "def_clash",
+            "entry": "TestUse.lean",
+            "expected": "/+TestUse",
+            "flags": [
+              "--plugin=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/lib/lean/libLake_shared.so"
+            ],
+            "helperSha256": "d6081747525df1484f07070cd0449f3fbd865e26746b6b591c956a393302a74e",
+            "code": 0,
+            "signal": null,
+            "stdout": "\"/+TestUse\"\n",
+            "stderr": "info: test: no previous manifest, creating one from scratch\nwarning: useB: ignoring missing manifest:\n  /home/lastmjs/development/lasm/compiler/.work/lake-module-initialization-r3/clash/project/deps/useB/lake-manifest.json\nwarning: useA: ignoring missing manifest:\n  /home/lastmjs/development/lasm/compiler/.work/lake-module-initialization-r3/clash/project/deps/useA/lake-manifest.json\nwarning: fooB: ignoring missing manifest:\n  /home/lastmjs/development/lasm/compiler/.work/lake-module-initialization-r3/clash/project/deps/fooB/lake-manifest.json\nwarning: fooA: ignoring missing manifest:\n  /home/lastmjs/development/lasm/compiler/.work/lake-module-initialization-r3/clash/project/deps/fooA/lake-manifest.json\n",
+            "seconds": 0.6167865739999979
+          }
+        ]
+      },
+      "resources": {
+        "startedAt": "2026-09-24T09:41:01.847Z",
+        "command": [
+          "/bin/bash",
+          "-c",
+          "ulimit -c 0; export LASM_TOOLCHAIN_CACHE=\"$PWD/.work/application-installed-r3/workspace/toolchains\"; exec python3 scripts/full-lean/base-pages.py node .work/probe-lake-module-initialization-r3.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "6f903081-5b3d-4be5-8bfb-b10c3e8b6154",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24804798464
+        },
+        "minimumHostAvailable": 23537143808,
+        "peakMemoryBytes": 1184837632,
+        "peakTasks": 16,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lake-module-initialization-r3-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T09:41:19.670Z",
+          "memoryBytes": 235352064,
+          "peakMemoryBytes": 1184837632,
+          "swapBytes": 0,
+          "tasks": 16,
+          "memoryBreakdown": {
+            "anon": 199770112,
+            "file": 438272,
+            "kernel": 34701312,
+            "shmem": 0,
+            "file_mapped": 151552,
+            "inactive_file": 438272,
+            "slab": 4202560
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T09:41:19.805Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 13156352,
+          "peakMemoryBytes": 1184837632,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10252288,
+            "file": 442368,
+            "kernel": 1077248,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 442368,
+            "slab": 260248
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T09:41:19.833Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "storage": {
+    ".work/product-acceptance/package-reclamation-r16-stage.json": {
+      "receipt": [
+        {
+          "removedOnlyVerifiedDuplicate": "/home/lastmjs/development/lasm/compiler/.work/application-package-r16/compiler",
+          "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r16/lasm-compiler-0.1.0-experimental.19.tgz",
+          "sha256": "7e477c20c3f0bd1ea201e83bf3ef92424eaf38472cf4eda890734301440e76b5",
+          "verifiedFiles": 2673,
+          "bytes": 629879442
+        }
+      ]
+    },
+    ".work/product-acceptance/package-reclamation-r17-installed.json": {
+      "receipt": [
+        {
+          "removedOnlyVerifiedDuplicate": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r17/workspace/project/node_modules/@lasm/compiler",
+          "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r15/lasm-compiler-0.1.0-experimental.18.tgz",
+          "sha256": "4fe8cd36994032d1641061066867cf4f3d083be528dd8d07bdb50e4b5fa673ec",
+          "verifiedFiles": 2673,
+          "bytes": 629693096
+        }
+      ]
+    },
+    ".work/product-acceptance/completed-application-deno-source-archive-r1.json": {
+      "receipt": {
+        "scope": "Lossless archival of completed upstream source trees, including every generated file and original symlink; no test is edited",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-application-deno-source-archive-r1-resources.json",
+        "archiverSource": "\"\"\"Lossless, verified archival of completed source trees; preserve every original and generated byte.\"\"\"\nimport datetime, decimal, gzip, hashlib, json, os, resource, shutil, stat, tarfile\nfrom pathlib import Path\nresource.setrlimit(resource.RLIMIT_AS, (256 * 1024**2, 256 * 1024**2))\nroot = Path.cwd()\ngroup = Path('/sys/fs/cgroup') / Path('/proc/self/cgroup').read_text().strip().split('::', 1)[1].lstrip('/')\nassert group.name == os.environ['LASM_RESOURCE_UNIT'] and 0 < int((group/'memory.max').read_text()) <= 10*1024**3\nassert (group/'memory.high').read_text().strip() == 'max'\nrecord = root / '.work/product-acceptance/completed-application-deno-source-archive-r1.json'\nassert not record.exists()\nreport = {'scope': 'Lossless archival of completed upstream source trees, including every generated file and original symlink; no test is edited',\n          'resourceReport': os.environ['LASM_RESOURCE_REPORT'], 'archiverSource': Path(__file__).read_text(), 'sources': [],\n          'restore': 'Extract the recorded source.tar.gz into its campaign directory. Verify each file and link against source-archive-manifest.json; mtimeNs and mode are recorded exactly.'}\ndef save(): record.write_text(json.dumps(report, indent=2)+'\\n')\ndef sha_stream(stream):\n    h=hashlib.sha256()\n    while block:=stream.read(1024*1024): h.update(block)\n    return h.hexdigest()\ndef sha(path):\n    with path.open('rb') as f: return sha_stream(f)\ndef inventory(source):\n    paths=[source]\n    for parent, dirs, files in os.walk(source, followlinks=False):\n        paths.extend(Path(parent)/name for name in dirs+files)\n    result={}\n    for p in sorted(paths):\n        s=p.lstat();row={'mode':stat.S_IMODE(s.st_mode),'mtimeNs':s.st_mtime_ns,'uid':s.st_uid,'gid':s.st_gid}\n        if stat.S_ISREG(s.st_mode): row.update(type='file',size=s.st_size,sha256=sha(p))\n        elif stat.S_ISLNK(s.st_mode): row.update(type='symlink',link=os.readlink(p))\n        else:\n            assert stat.S_ISDIR(s.st_mode),str(p)\n            row['type']='directory'\n        result[str(p.relative_to(source.parent))]=row\n    return result\ncampaigns = ['.work/upstream-application-all-deno-r1']\nfor name in campaigns:\n    directory=root/name; source=directory/'source'; execution=directory/'execution.json'\n    e=json.loads(execution.read_text());r=json.loads(Path(e['resourceReport']).read_text())\n    assert r['unitReleased'] and not r['resourceLimited']\n    assert e['execution']['code']==0 and e['registered']==101 and e['counts']=={'passed':97,'upstream-compile-disabled':4}\n    assert e['originalSources']['before']['modified']==e['originalSources']['after']['modified']==[]\n    assert e['harness']['changed']==[]\n    archive=directory/'source.tar.gz';partial=directory/'source.tar.gz.partial'; manifest=directory/'source-archive-manifest.json'\n    assert source.is_dir() and not source.is_symlink() and not archive.exists() and not partial.exists() and not manifest.exists()\n    before=inventory(source)\n    manifest.write_text(json.dumps(before,indent=2)+'\\n')\n    with tarfile.open(partial,'w:gz',compresslevel=1,dereference=False) as tar:\n        for name,row in before.items():\n            def metadata(info):\n                n=row['mtimeNs'];info.pax_headers['mtime']=f'{n//10**9}.{n%10**9:09d}'\n                return info\n            tar.add(directory/name,arcname=name,recursive=False,filter=metadata)\n    with partial.open('rb') as f: os.fsync(f.fileno())\n    seen=set()\n    with tarfile.open(partial,'r:gz') as tar:\n        for member in tar:\n            assert member.name in before and member.name not in seen,member.name\n            seen.add(member.name);row=before[member.name]\n            assert member.mode==row['mode'] and member.uid==row['uid'] and member.gid==row['gid']\n            assert int(decimal.Decimal(member.pax_headers.get('mtime',str(member.mtime)))*10**9)==row['mtimeNs']\n            if row['type']=='file':\n                assert member.isfile() or member.islnk()\n                with tar.extractfile(member) as f: assert sha_stream(f)==row['sha256']\n            elif row['type']=='symlink': assert member.issym() and member.linkname==row['link']\n            else: assert member.isdir()\n    assert seen==set(before)\n    assert inventory(source)==before,'Source changed during archival'\n    partial.rename(archive)\n    item={'campaign':str(directory),'executionSha256':sha(execution),'source':str(source),\n          'treeManifest':str(manifest),'treeManifestSha256':sha(manifest),'archive':str(archive),'archiveSha256':sha(archive),\n          'archiveBytes':archive.stat().st_size,'uncompressedBytes':sum(r.get('size',0) for r in before.values()),\n          'entries':len(before),'verifiedEveryFileAndLink':True,'phase':'verified'}\n    report['sources'].append(item);save()\n    shutil.rmtree(source);item['phase']='archived';save()\n    print(json.dumps({k:item[k] for k in ['campaign','uncompressedBytes','archiveBytes','entries']}),flush=True)\nreport['finishedAt']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()\n",
+        "sources": [
+          {
+            "campaign": "/home/lastmjs/development/lasm/compiler/.work/upstream-application-all-deno-r1",
+            "executionSha256": "e7b85217aea302f566dc53dd122e3a7db29b1e0ab64c42dfc49b6c70eddbf20d",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/upstream-application-all-deno-r1/source",
+            "treeManifest": "/home/lastmjs/development/lasm/compiler/.work/upstream-application-all-deno-r1/source-archive-manifest.json",
+            "treeManifestSha256": "d9fddb0943046b4ea68e2bca4c09cfb224d62e28c3c070765303f73b58fc4ace",
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-application-all-deno-r1/source.tar.gz",
+            "archiveSha256": "caec698b47893728872ce79fa49646f9aa55ca66c72c985f43cd36edf5d4e71e",
+            "archiveBytes": 39223366,
+            "uncompressedBytes": 138101015,
+            "entries": 11451,
+            "verifiedEveryFileAndLink": true,
+            "phase": "archived"
+          }
+        ],
+        "restore": "Extract the recorded source.tar.gz into its campaign directory. Verify each file and link against source-archive-manifest.json; mtimeNs and mode are recorded exactly.",
+        "finishedAt": "2026-09-24T09:33:42.916222+00:00"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T09:33:32.770Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-completed-application-deno-source-r1.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "c1e35ac6-54ce-4022-b30b-64608d7871e2",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24724684800
+        },
+        "minimumHostAvailable": 24632070144,
+        "peakMemoryBytes": 280756224,
+        "peakTasks": 7,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-application-deno-source-archive-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T09:33:42.990Z",
+          "memoryBytes": 56909824,
+          "peakMemoryBytes": 280756224,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10244096,
+            "file": 43249664,
+            "kernel": 2256896,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 43237376,
+            "slab": 1418496
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T09:33:42.988Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 56651776,
+          "peakMemoryBytes": 280756224,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10244096,
+            "file": 43249664,
+            "kernel": 2256896,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 43237376,
+            "slab": 1418496
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T09:33:43.023Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    ".work/product-acceptance/preserved-runtime-and-native-archives-r1.json": {
+      "receipt": {
+        "scope": "Verified lossless preservation of a runtime bundle and the successful native control within a failed application attempt; the failed attempt remains a failure and all build diagnostics stay intact",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/preserved-runtime-and-native-archives-r1-resources.json",
+        "archiverSource": "\"\"\"Lossless, verified archival of completed source trees; preserve every original and generated byte.\"\"\"\nimport datetime, decimal, gzip, hashlib, json, os, resource, shutil, stat, tarfile\nfrom pathlib import Path\nresource.setrlimit(resource.RLIMIT_AS, (256 * 1024**2, 256 * 1024**2))\nroot = Path.cwd()\ngroup = Path('/sys/fs/cgroup') / Path('/proc/self/cgroup').read_text().strip().split('::', 1)[1].lstrip('/')\nassert group.name == os.environ['LASM_RESOURCE_UNIT'] and 0 < int((group/'memory.max').read_text()) <= 10*1024**3\nassert (group/'memory.high').read_text().strip() == 'max'\nrecord = root / '.work/product-acceptance/preserved-runtime-and-native-archives-r1.json'\nassert not record.exists()\nreport = {'scope': 'Verified lossless preservation of a runtime bundle and the successful native control within a failed application attempt; the failed attempt remains a failure and all build diagnostics stay intact',\n          'resourceReport': os.environ['LASM_RESOURCE_REPORT'], 'archiverSource': Path(__file__).read_text(), 'sources': [],\n          'restore': 'Extract each recorded archive into its campaign directory and verify its recorded manifest. Every byte, link, mode and mtimeNs is retained. The current installed package also carries the verified runtime bundle.'}\ndef save(): record.write_text(json.dumps(report, indent=2)+'\\n')\ndef sha_stream(stream):\n    h=hashlib.sha256()\n    while block:=stream.read(1024*1024): h.update(block)\n    return h.hexdigest()\ndef sha(path):\n    with path.open('rb') as f: return sha_stream(f)\ndef inventory(source):\n    paths=[source]\n    for parent, dirs, files in os.walk(source, followlinks=False):\n        paths.extend(Path(parent)/name for name in dirs+files)\n    result={}\n    for p in sorted(paths):\n        s=p.lstat();row={'mode':stat.S_IMODE(s.st_mode),'mtimeNs':s.st_mtime_ns,'uid':s.st_uid,'gid':s.st_gid}\n        if stat.S_ISREG(s.st_mode): row.update(type='file',size=s.st_size,sha256=sha(p))\n        elif stat.S_ISLNK(s.st_mode): row.update(type='symlink',link=os.readlink(p))\n        else:\n            assert stat.S_ISDIR(s.st_mode),str(p)\n            row['type']='directory'\n        result[str(p.relative_to(source.parent))]=row\n    return result\nrecipes = [\n ('.work/application-runtime-backtrace-r1','lean-4.34.0-wasm64','.work/application-package-r16/result.json'),\n ('.work/upstream-runtime-imports-node-r1','native source','.work/upstream-runtime-imports-node-r1/result.json'),\n]\nfor directory_name,source_name,evidence_name in recipes:\n    directory=root/directory_name;source=directory/source_name;execution=root/evidence_name\n    if source_name=='lean-4.34.0-wasm64':\n        package=json.loads(execution.read_text())\n        manifest=json.loads((source/'target.json').read_text())\n        assert sha(source/'target.json')==package['runtime']['identity']\n        installed=root/'.work/application-installed-r18/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64'\n        assert sha(installed/'target.json')==package['runtime']['identity']\n        for name,row in manifest['files'].items():\n            assert (source/name).stat().st_size==row['bytes']\n            assert sha(source/name)==sha(installed/name)==row['sha256']\n        archive_name='runtime-bundle'\n    else:\n        e=json.loads(execution.read_text());r=json.loads(Path(e['resourceReport']).read_text())\n        assert r['unitReleased'] and not r['resourceLimited']\n        assert e['nativeDriver']['code']==0 and e['passed'] is False\n        assert e['commands'][-1]['label']=='installed application build' and e['commands'][-1]['code']==1\n        assert (source/'.lake/build/bin/user_attr').is_file()\n        archive_name='native-control'\n    archive=directory/(archive_name+'.tar.gz');partial=Path(str(archive)+'.partial');manifest=directory/(archive_name+'-archive-manifest.json')\n    assert source.is_dir() and not source.is_symlink() and not archive.exists() and not partial.exists() and not manifest.exists()\n    before=inventory(source)\n    manifest.write_text(json.dumps(before,indent=2)+'\\n')\n    with tarfile.open(partial,'w:gz',compresslevel=1,dereference=False) as tar:\n        for name,row in before.items():\n            def metadata(info):\n                n=row['mtimeNs'];info.pax_headers['mtime']=f'{n//10**9}.{n%10**9:09d}'\n                return info\n            tar.add(directory/name,arcname=name,recursive=False,filter=metadata)\n    with partial.open('rb') as f: os.fsync(f.fileno())\n    seen=set()\n    with tarfile.open(partial,'r:gz') as tar:\n        for member in tar:\n            assert member.name in before and member.name not in seen,member.name\n            seen.add(member.name);row=before[member.name]\n            assert member.mode==row['mode'] and member.uid==row['uid'] and member.gid==row['gid']\n            assert int(decimal.Decimal(member.pax_headers.get('mtime',str(member.mtime)))*10**9)==row['mtimeNs']\n            if row['type']=='file':\n                assert member.isfile() or member.islnk()\n                with tar.extractfile(member) as f: assert sha_stream(f)==row['sha256']\n            elif row['type']=='symlink': assert member.issym() and member.linkname==row['link']\n            else: assert member.isdir()\n    assert seen==set(before)\n    assert inventory(source)==before,'Source changed during archival'\n    partial.rename(archive)\n    item={'campaign':str(directory),'executionSha256':sha(execution),'source':str(source),\n          'treeManifest':str(manifest),'treeManifestSha256':sha(manifest),'archive':str(archive),'archiveSha256':sha(archive),\n          'archiveBytes':archive.stat().st_size,'uncompressedBytes':sum(r.get('size',0) for r in before.values()),\n          'entries':len(before),'verifiedEveryFileAndLink':True,'phase':'verified'}\n    report['sources'].append(item);save()\n    shutil.rmtree(source);item['phase']='archived';save()\n    print(json.dumps({k:item[k] for k in ['campaign','uncompressedBytes','archiveBytes','entries']}),flush=True)\nreport['finishedAt']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()\n",
+        "sources": [
+          {
+            "campaign": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-backtrace-r1",
+            "executionSha256": "e7f993dc782a81ee80a973aef2966fa6c4892458128129b80bea01d84a86476f",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-backtrace-r1/lean-4.34.0-wasm64",
+            "treeManifest": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-backtrace-r1/runtime-bundle-archive-manifest.json",
+            "treeManifestSha256": "b1bee793b5e05aa6c763b552d37a56b2c6aa1544fe2f763167c71a41ef6bbc41",
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-backtrace-r1/runtime-bundle.tar.gz",
+            "archiveSha256": "4ccf600f9e5e1d5ee1f623d6b7f5344ec68c9a3fd90e7602bf17382443565c19",
+            "archiveBytes": 72207776,
+            "uncompressedBytes": 363651056,
+            "entries": 23,
+            "verifiedEveryFileAndLink": true,
+            "phase": "archived"
+          },
+          {
+            "campaign": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1",
+            "executionSha256": "d6ee2c65859796610cae18522cec524a27451e6e555090154115404b879fadd3",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/native source",
+            "treeManifest": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/native-control-archive-manifest.json",
+            "treeManifestSha256": "e904cb6974d76d56d01aeb583a2b85cd3e9833fc9f70360db4a04566e1aa4662",
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-runtime-imports-node-r1/native-control.tar.gz",
+            "archiveSha256": "167c8654431915956759cf46ba158fb44a788e0f14680ea8713b295a32c26ebf",
+            "archiveBytes": 66857617,
+            "uncompressedBytes": 234130679,
+            "entries": 58,
+            "verifiedEveryFileAndLink": true,
+            "phase": "archived"
+          }
+        ],
+        "restore": "Extract each recorded archive into its campaign directory and verify its recorded manifest. Every byte, link, mode and mtimeNs is retained. The current installed package also carries the verified runtime bundle.",
+        "finishedAt": "2026-09-24T09:46:32.784611+00:00"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T09:46:20.139Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-preserved-runtime-and-native-r1.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "8a9c29c2-1195-4197-9c85-1c72b0733823",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24777019392
+        },
+        "minimumHostAvailable": 24721428480,
+        "peakMemoryBytes": 157450240,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/preserved-runtime-and-native-archives-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T09:46:32.760Z",
+          "memoryBytes": 156909568,
+          "peakMemoryBytes": 157450240,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 13238272,
+            "file": 139796480,
+            "kernel": 4288512,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 139796480,
+            "slab": 4172568
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T09:46:32.837Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 155455488,
+          "peakMemoryBytes": 157450240,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10244096,
+            "file": 139264000,
+            "kernel": 5107712,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 139264000,
+            "slab": 4265136
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T09:46:32.863Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    ".work/product-acceptance/completed-native-compile-archives-r1.json": {
+      "receipt": {
+        "scope": "Lossless archival of completed upstream source trees, including every generated file and original symlink; no test is edited",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-native-compile-archives-r1-resources.json",
+        "archiverSource": "\"\"\"Lossless, verified archival of completed source trees; preserve every original and generated byte.\"\"\"\nimport datetime, decimal, gzip, hashlib, json, os, resource, shutil, stat, tarfile\nfrom pathlib import Path\nresource.setrlimit(resource.RLIMIT_AS, (256 * 1024**2, 256 * 1024**2))\nroot = Path.cwd()\ngroup = Path('/sys/fs/cgroup') / Path('/proc/self/cgroup').read_text().strip().split('::', 1)[1].lstrip('/')\nassert group.name == os.environ['LASM_RESOURCE_UNIT'] and 0 < int((group/'memory.max').read_text()) <= 10*1024**3\nassert (group/'memory.high').read_text().strip() == 'max'\nrecord = root / '.work/product-acceptance/completed-native-compile-archives-r1.json'\nassert not record.exists()\nreport = {'scope': 'Lossless archival of completed upstream source trees, including every generated file and original symlink; no test is edited',\n          'resourceReport': os.environ['LASM_RESOURCE_REPORT'], 'archiverSource': Path(__file__).read_text(), 'sources': [],\n          'restore': 'Extract each recorded archive into its recorded campaign directory; verify the corresponding manifest. Every byte, link, mode and mtimeNs is retained. These are completed Lean 4.32 native compile/benchmark directories, not latest-release application passes.'}\ndef save(): record.write_text(json.dumps(report, indent=2)+'\\n')\ndef sha_stream(stream):\n    h=hashlib.sha256()\n    while block:=stream.read(1024*1024): h.update(block)\n    return h.hexdigest()\ndef sha(path):\n    with path.open('rb') as f: return sha_stream(f)\ndef inventory(source):\n    paths=[source]\n    for parent, dirs, files in os.walk(source, followlinks=False):\n        paths.extend(Path(parent)/name for name in dirs+files)\n    result={}\n    for p in sorted(paths):\n        s=p.lstat();row={'mode':stat.S_IMODE(s.st_mode),'mtimeNs':s.st_mtime_ns,'uid':s.st_uid,'gid':s.st_gid}\n        if stat.S_ISREG(s.st_mode): row.update(type='file',size=s.st_size,sha256=sha(p))\n        elif stat.S_ISLNK(s.st_mode): row.update(type='symlink',link=os.readlink(p))\n        else:\n            assert stat.S_ISDIR(s.st_mode),str(p)\n            row['type']='directory'\n        result[str(p.relative_to(source.parent))]=row\n    return result\ncampaign=Path('.work/full-suite-native')\nexecution=campaign/'execution.json'\ne=json.loads(execution.read_text())\nassert e['result']['code']==0 and e['registered']==3891\nassert e['originalSources']['before']['modified']==e['originalSources']['after']['modified']==[]\noriginals=json.loads((campaign/'test-source-hashes.json').read_text())\nfor selection in ['compile','compile_bench']:\n    directory=root/campaign/'lean4-4.32.0/tests';source=directory/selection\n    prefix='tests/'+selection+'/'\n    for key,expected in originals.items():\n        if key.startswith(prefix):\n            f=root/campaign/'lean4-4.32.0'/key\n            if isinstance(expected,str):assert sha(f)==expected\n            else:\n                if 'symlink' in expected:assert f.is_symlink() and os.readlink(f)==expected['symlink']\n                else:assert sha(f)==expected['sha256']\n    archive=directory/(selection+'.tar.gz');partial=Path(str(archive)+'.partial');manifest=directory/(selection+'-archive-manifest.json')\n    assert source.is_dir() and not source.is_symlink() and not archive.exists() and not partial.exists() and not manifest.exists()\n    before=inventory(source)\n    manifest.write_text(json.dumps(before,indent=2)+'\\n')\n    with tarfile.open(partial,'w:gz',compresslevel=1,dereference=False) as tar:\n        for name,row in before.items():\n            def metadata(info):\n                n=row['mtimeNs'];info.pax_headers['mtime']=f'{n//10**9}.{n%10**9:09d}'\n                return info\n            tar.add(directory/name,arcname=name,recursive=False,filter=metadata)\n    with partial.open('rb') as f: os.fsync(f.fileno())\n    seen=set()\n    with tarfile.open(partial,'r:gz') as tar:\n        for member in tar:\n            assert member.name in before and member.name not in seen,member.name\n            seen.add(member.name);row=before[member.name]\n            assert member.mode==row['mode'] and member.uid==row['uid'] and member.gid==row['gid']\n            assert int(decimal.Decimal(member.pax_headers.get('mtime',str(member.mtime)))*10**9)==row['mtimeNs']\n            if row['type']=='file':\n                assert member.isfile() or member.islnk()\n                with tar.extractfile(member) as f: assert sha_stream(f)==row['sha256']\n            elif row['type']=='symlink': assert member.issym() and member.linkname==row['link']\n            else: assert member.isdir()\n    assert seen==set(before)\n    assert inventory(source)==before,'Source changed during archival'\n    partial.rename(archive)\n    item={'campaign':str(directory),'executionSha256':sha(execution),'source':str(source),\n          'treeManifest':str(manifest),'treeManifestSha256':sha(manifest),'archive':str(archive),'archiveSha256':sha(archive),\n          'archiveBytes':archive.stat().st_size,'uncompressedBytes':sum(r.get('size',0) for r in before.values()),\n          'entries':len(before),'verifiedEveryFileAndLink':True,'phase':'verified'}\n    report['sources'].append(item);save()\n    shutil.rmtree(source);item['phase']='archived';save()\n    print(json.dumps({k:item[k] for k in ['campaign','uncompressedBytes','archiveBytes','entries']}),flush=True)\nreport['finishedAt']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()\n",
+        "sources": [
+          {
+            "campaign": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/lean4-4.32.0/tests",
+            "executionSha256": "076b3767cc0af611c418af4d64a7232d1357f9233f24f3d3feb975b152f4c6a9",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/lean4-4.32.0/tests/compile",
+            "treeManifest": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/lean4-4.32.0/tests/compile-archive-manifest.json",
+            "treeManifestSha256": "37724c6f4586143d452d754f78a08ae73a74e790490b66a5959e819510150553",
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/lean4-4.32.0/tests/compile.tar.gz",
+            "archiveSha256": "13d70e178402fe52b66340943e45e8b7dd251116f11dd8ec46449d8f533734e6",
+            "archiveBytes": 563294972,
+            "uncompressedBytes": 1760344879,
+            "entries": 350,
+            "verifiedEveryFileAndLink": true,
+            "phase": "archived"
+          },
+          {
+            "campaign": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/lean4-4.32.0/tests",
+            "executionSha256": "076b3767cc0af611c418af4d64a7232d1357f9233f24f3d3feb975b152f4c6a9",
+            "source": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/lean4-4.32.0/tests/compile_bench",
+            "treeManifest": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/lean4-4.32.0/tests/compile_bench-archive-manifest.json",
+            "treeManifestSha256": "1ebebcf6326c6b19ad385df7ae0a14734c195ef1c24407309b7546be3474cbfa",
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/full-suite-native/lean4-4.32.0/tests/compile_bench.tar.gz",
+            "archiveSha256": "a20acce1788516106fedc621a445ba92c01ec3d0fd7277d7950817cc452b7da6",
+            "archiveBytes": 329439551,
+            "uncompressedBytes": 1027070416,
+            "entries": 165,
+            "verifiedEveryFileAndLink": true,
+            "phase": "archived"
+          }
+        ],
+        "restore": "Extract each recorded archive into its recorded campaign directory; verify the corresponding manifest. Every byte, link, mode and mtimeNs is retained. These are completed Lean 4.32 native compile/benchmark directories, not latest-release application passes.",
+        "finishedAt": "2026-09-24T09:51:27.045338+00:00"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T09:50:23.656Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-completed-native-compile-r1.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "fcbc2048-4a22-4581-acc5-2a0ce745090c",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24643911680
+        },
+        "minimumHostAvailable": 24598503424,
+        "peakMemoryBytes": 2359832576,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-native-compile-archives-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T09:51:26.944Z",
+          "memoryBytes": 1966653440,
+          "peakMemoryBytes": 2359832576,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 16695296,
+            "file": 1920909312,
+            "kernel": 29048832,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 1920909312,
+            "slab": 28921512
+          },
+          "pressureSomeAvg10": 0.02,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T09:51:27.093Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 932601856,
+          "peakMemoryBytes": 2359832576,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 10244096,
+            "file": 893595648,
+            "kernel": 27447296,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 893595648,
+            "slab": 26615200
+          },
+          "pressureSomeAvg10": 0.02,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T09:51:27.120Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  },
+  "recordedAt": "2026-09-24T10:06:57.222035+00:00",
+  "limits": [
+    "Standard module data still comes from the managed native prefix. This does not prove automatic asset packaging or self-contained deployment.",
+    "The original native #eval assertions are build-time checks; the separate fixture repeats all three attribute assertions at deployed runtime.",
+    "No native macOS, Windows or ARM64 application result is established here. Broader API and platform gates remain open."
+  ],
+  "packageAssembly": {
+    "resources": {
+      "startedAt": "2026-09-24T09:42:32.636Z",
+      "command": [
+        "/bin/bash",
+        ".work/package-install-lake-plugin-r1.sh"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "30e20cd9-6a8d-450f-9a22-fd0ab936fa3f",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24880091136
+      },
+      "minimumHostAvailable": 23476973568,
+      "peakMemoryBytes": 2559004672,
+      "peakTasks": 23,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-lake-plugin-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T09:43:30.510Z",
+        "memoryBytes": 1413271552,
+        "peakMemoryBytes": 2559004672,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 0,
+          "file": 1380409344,
+          "kernel": 31993856,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 1380409344,
+          "slab": 31879392
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T09:43:30.551Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 1424355328,
+        "peakMemoryBytes": 2559004672,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10240000,
+          "file": 1380409344,
+          "kernel": 32686080,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 1380409344,
+          "slab": 31861424
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T09:43:30.575Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "scope": "Assembly and offline installation completed. The subsequent cleanup assertion found no old npm cache entry and failed without deleting any such entry.",
+    "logSha256": "401f9be319065a02c4cfa841abde091d10e2b85f50e42123ffd71773282e8319"
+  },
+  "storageInventoryStop": {
+    "startedAt": "2026-09-24T09:48:21.180Z",
+    "command": [
+      "/bin/bash",
+      "-c",
+      "du -sk .work/* > .work/product-acceptance/storage-inventory-r1.txt; sort -n .work/product-acceptance/storage-inventory-r1.txt | tail -n 25"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "c68e6d6f-c3ae-4024-af72-e328dae38a9f",
+    "limits": {
+      "memoryMax": 536870912,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 429496729,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24802578432
+    },
+    "minimumHostAvailable": 24655298560,
+    "peakMemoryBytes": 434671616,
+    "peakTasks": 2,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/storage-inventory-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T09:48:29.795Z",
+      "memoryBytes": 433623040,
+      "peakMemoryBytes": 433623040,
+      "swapBytes": 0,
+      "tasks": 2,
+      "memoryBreakdown": {
+        "anon": 69386240,
+        "file": 18325504,
+        "kernel": 345808896,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 18321408,
+        "slab": 345497728
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-24T09:48:28.993Z",
+      "processes": [
+        {
+          "pid": 3893230,
+          "name": "du",
+          "residentBytes": 69197824,
+          "threads": 1
+        },
+        {
+          "pid": 3893229,
+          "name": "bash",
+          "residentBytes": 4026368,
+          "threads": 1
+        }
+      ]
+    },
+    "stoppedBecause": "Workload reached its proactive memory budget",
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "killed",
+      "exitStatus": "TERM",
+      "capturedAt": "2026-09-24T09:48:29.862Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 376950784,
+      "peakMemoryBytes": 434671616,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10240000,
+        "file": 18325504,
+        "kernel": 347455488,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 18325504,
+        "slab": 346637168
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T09:48:29.886Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": true,
+    "memoryThrottled": false
+  },
+  "deployedComparisons": 9
+}

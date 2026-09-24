@@ -156,3 +156,19 @@ compares the entire native and deployed output. The parallel
 harness allows thirty minutes per phase within the same memory guard and
 records timeouts separately from behavior failures. Harness availability alone
 is not acceptance evidence.
+
+`integration/application-upstream-runtime-imports.mjs` takes
+`NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE` under the same
+resource guard and base-page profile. It runs the unchanged `pkg/user_attr_app`
+native driver, builds its original main through the installed CLI, and compares
+native and deployed runtime imports. A separate ordinary Lean fixture repeats
+the original three attribute assertions at runtime. A missing-standard-data
+control must fail identically in both executables. Original sources, the
+supplementary fixture and copied module data are checked for changes.
+
+Project metadata is copied as explicit runtime input; standard metadata remains
+at the verified managed prefix. Both controls select those inputs with ordinary
+`LEAN_SYSROOT` and `LEAN_PATH`. Source copies are hidden and PATH is empty, but
+this probe does not establish automatic metadata packaging or self-contained
+deployment. Its native supplementary executable uses `-rdynamic`, matching the
+original Lake `supportInterpreter` setting on Linux.

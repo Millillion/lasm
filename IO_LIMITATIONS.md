@@ -55,6 +55,13 @@ separately from the earlier runtime evidence below.
   controls, full symbolization and other native platforms remain open.
 - [ ] Finish managed application packaging, native Windows ARM64 tools and
   deployment validation without source or build tools.
+- [ ] Package runtime module data automatically for ordinary Lean import and
+  environment APIs. Compiled C/library availability alone does not supply the
+  `.olean`, `.ir` and related data that an application can load at runtime.
+  Installed `.19` [passes nine runtime-import comparisons](docs/evidence/runtime-imports-and-lake-initialization-2026-09-24.json)
+  across all three engines on Linux x64, including imported attribute tags and
+  missing-data errors. These probes supply explicit data inputs; their results
+  are not self-contained deployment acceptance.
 - [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and
   `Std.Internal.UV.Loop.alive`. The compiled library declarations are present,
   but their Emscripten C implementations still reject the operation or abort;

@@ -37,7 +37,14 @@ export function applicationSources(source, lean, work, { log = console.error, gi
     const query = target => JSON.parse(run(lean.lake,
       ['--no-cache', '--keep-toolchain', '--quiet', '--json', 'query', target], project));
     const configuredSource = resolve(realpathSync(project), relative(project, source));
-    const entry = JSON.parse(run(lean.lean, ['-j1', '-s8192', '--run',
+    // Lake configuration defaults can refer to native initialized constants
+    // without interpreter bodies. Match Lake's own initialized native library;
+    // importing more Lean modules or loading symbols without the initializer
+    // does not establish that state. These are Lake's upstream install paths.
+    const platform = lean.platform?.split('-')[0] ?? process.platform;
+    const lakePlugin = platform === 'win32' ? join(lean.prefix, 'bin', 'libLake_shared.dll')
+      : join(lean.prefix, 'lib/lean', `libLake_shared.${platform === 'darwin' ? 'dylib' : 'so'}`);
+    const entry = JSON.parse(run(lean.lean, ['-j1', '-s8192', '--plugin=' + lakePlugin, '--run',
       fileURLToPath(new URL('./lake-module.lean', import.meta.url)), configuredSource], project));
     const configured = typeof entry === 'string' && entry.startsWith('/+');
     if (!configured && (!entry || !Array.isArray(entry.imports) || entry.imports.some(name => typeof name !== 'string')))

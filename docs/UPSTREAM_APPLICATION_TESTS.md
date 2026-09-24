@@ -354,3 +354,30 @@ intact. Archived maintainer C/object inputs can be restored from
 `generated-c.tar.gz` into their recorded build directory before rebuilding the
 standard libraries or symbol registry. Broader Lake projects, runtime module
 data and the other native platforms remain open.
+
+The unchanged `pkg/user_attr_app` now passes through installed `.19` in Node,
+Deno and Bun on Linux x64 with explicit runtime module-data inputs. Its original
+driver and compile-time assertions are retained. A separate ordinary Lean main
+also verifies the same three attribute tags after importing the module at runtime.
+Each engine matches native Lean for the original import, those added assertions,
+and a missing-standard-data error: **nine deployed comparisons** in total. All
+7,669 reference entries, original project files, the supplementary fixture and
+copied data remain unchanged. Peak memory was 5.01 GiB without resource events.
+See the [comparisons and repair evidence](evidence/runtime-imports-and-lake-initialization-2026-09-24.json).
+
+Installed `.18` failed before linking this project: its private Lake-discovery
+helper reached a native interpreter assertion for an uninitialized constant.
+Loading the managed Lake library through Lean's ordinary `--plugin` option fixes
+the discovery state; four fresh helper controls and the installed comparisons
+pass. Importing more Lean modules did not fix the failure. A separate symbol-only
+loading probe was stopped by the pressure guard, with no OOM; it remains a
+resource result. Candidate assembly and installation succeeded, while a later
+cleanup assertion found an already-absent npm cache entry. That wrapper failure,
+the original package failure and verified archival receipts remain recorded.
+
+The runtime probes hide source copies and use empty PATH, but explicitly supply
+project metadata and the managed prefix's standard metadata through `LEAN_PATH`
+and `LEAN_SYSROOT`. Automatic asset packaging and self-contained runtime imports
+remain unfinished. The native Lean 4.32 compilation/benchmark directories, the
+current maintainer runtime bundle, and completed native controls have lossless
+archives with restoration manifests; their original evidence is preserved.

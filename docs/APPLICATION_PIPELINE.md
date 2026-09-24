@@ -407,6 +407,15 @@ acceptance Node version is fixed at 26.10.0.
 
 ## Outstanding product work
 
+Installed `.19` [repairs Lake project discovery](evidence/runtime-imports-and-lake-initialization-2026-09-24.json)
+for configurations whose defaults require initialized native Lake constants.
+The private helper now loads the verified managed Lake library as a Lean plugin,
+using Lake's upstream platform-specific library paths. Native Linux discovery
+controls and installed application comparisons in all three engines pass. This
+does not establish discovery acceptance on the other native hosts. The associated
+runtime-import comparisons use explicitly supplied metadata; automatic packaging
+of that data remains required for self-contained deployments.
+
 - [x] Wire managed compiler/linker/runtime artifacts into the primary CLI.
 - [x] Build matching Lean 4.34 application libraries and pass the first three-engine
   differential main probe; full API validation remains required below.
