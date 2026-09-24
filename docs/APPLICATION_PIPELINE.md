@@ -46,7 +46,14 @@ compiles into a passing ARM64 executable. Both compiler and application pass
 the ARM64 COFF checks. The guarded build took 214.38 minutes and peaked at
 1.90 GiB, below its proactive threshold. This proves the native bootstrap;
 relocatable tool packaging, `leantar`, managed provisioning and installed Wasm
-acceptance remain open. Only the completed compiler cache was retained on CI.
+acceptance remain open. That attempt retained only the completed compiler cache.
+The [next run preserves the completed Lean tree](evidence/windows-arm64-completed-tree-2026-09-24.json)
+after repeating those native checks. Its 878.6 MB archive contains 17,686 files
+and passes full decompression/hash verification before entering the included CI
+cache. All seven guarded phases pass; the build takes 215.52 minutes with a
+1.90 GiB peak. The repository's three caches total 1.60 GB, below the 8 GiB
+ceiling. Restoring this checkpoint in a new native job and packaging its external
+dependencies remain separate gates; it is not yet an installable distribution.
 
 The compiler-support bootstrap also has a six-platform catalog for native Python
 3.13.15 from the pinned
@@ -407,7 +414,7 @@ The repository was verified public and runner eligibility was checked against
 and [billing rules](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
 on 2026-09-23, with cache billing rechecked on 2026-09-24. These workflows use
 standard public runners and no Actions artifact uploads. Only the Lean
-bootstrap uses the separately budgeted included compiler cache; reports stay in
+bootstrap uses separately budgeted included compiler and completed-tree caches; reports stay in
 logs and job summaries. Actions are pinned to immutable commits and the
 acceptance Node version is fixed at 26.10.0.
 

@@ -85,6 +85,10 @@ separately from the earlier runtime evidence below.
   controls, full symbolization and other native platforms remain open.
 - [ ] Finish managed application packaging, native Windows ARM64 tools and
   deployment validation without source or build tools.
+  The [completed native Lean tree is now retained and byte-verified in CI](docs/evidence/windows-arm64-completed-tree-2026-09-24.json),
+  with native compiler/Lake/application checks and all resource guards passing.
+  Fresh restore, external dependencies, relocation and installed Wasm acceptance
+  remain open; the cache is not an end-user distribution.
 - [ ] Package runtime module data automatically for ordinary Lean import and
   environment APIs. Compiled C/library availability alone does not supply the
   `.olean`, `.ir` and related data that an application can load at runtime.

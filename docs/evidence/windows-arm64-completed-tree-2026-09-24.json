@@ -1,0 +1,810 @@
+{
+  "scope": "Native Windows ARM64 Lean bootstrap and byte-verified completed-tree CI cache; not a relocatable distribution or installed Wasm acceptance",
+  "recordedAt": "2026-09-24T18:00:20.854856+00:00",
+  "run": {
+    "id": 36009951739,
+    "html_url": "https://github.com/Millillion/lasm/actions/runs/36009951739",
+    "head_sha": "57e6eac759dc8e3cb3de9d15a24d0b428d569656",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-09-24T14:03:00Z",
+    "updated_at": "2026-09-24T17:49:29Z"
+  },
+  "jobs": [
+    {
+      "id": 107667790884,
+      "run_id": 36009951739,
+      "workflow_name": "Native Windows ARM64 Lean bootstrap",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Millillion/lasm/actions/runs/36009951739",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUnm2v88AAAAZEYAcJA",
+      "head_sha": "57e6eac759dc8e3cb3de9d15a24d0b428d569656",
+      "url": "https://api.github.com/repos/Millillion/lasm/actions/jobs/107667790884",
+      "html_url": "https://github.com/Millillion/lasm/actions/runs/36009951739/job/107667790884",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-24T14:03:02Z",
+      "started_at": "2026-09-24T14:03:05Z",
+      "completed_at": "2026-09-24T17:49:28Z",
+      "name": "bootstrap",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-09-24T14:03:06Z",
+          "completed_at": "2026-09-24T14:03:08Z"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-09-24T14:03:08Z",
+          "completed_at": "2026-09-24T14:03:18Z"
+        },
+        {
+          "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-09-24T14:03:18Z",
+          "completed_at": "2026-09-24T14:03:30Z"
+        },
+        {
+          "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-09-24T14:03:30Z",
+          "completed_at": "2026-09-24T14:03:46Z"
+        },
+        {
+          "name": "Check the native host",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-09-24T14:03:46Z",
+          "completed_at": "2026-09-24T14:03:46Z"
+        },
+        {
+          "name": "Verify completed-tree archives and storage accounting",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-09-24T14:03:46Z",
+          "completed_at": "2026-09-24T14:03:47Z"
+        },
+        {
+          "name": "Check descendant memory accounting below the cap",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-09-24T14:03:47Z",
+          "completed_at": "2026-09-24T14:04:17Z"
+        },
+        {
+          "name": "Verify the guard control",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-09-24T14:04:17Z",
+          "completed_at": "2026-09-24T14:04:18Z"
+        },
+        {
+          "name": "Run msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-09-24T14:04:18Z",
+          "completed_at": "2026-09-24T14:06:26Z"
+        },
+        {
+          "name": "Record the exact native compiler-cache recipe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-09-24T14:06:26Z",
+          "completed_at": "2026-09-24T14:06:32Z"
+        },
+        {
+          "name": "Find a checksum-addressed checkpoint for this exact recipe",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-09-24T14:06:32Z",
+          "completed_at": "2026-09-24T14:06:33Z"
+        },
+        {
+          "name": "Restore the selected compiler cache",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-09-24T14:06:33Z",
+          "completed_at": "2026-09-24T14:06:46Z"
+        },
+        {
+          "name": "Verify the restored archive, recipe and every file before use",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-09-24T14:06:46Z",
+          "completed_at": "2026-09-24T14:10:10Z"
+        },
+        {
+          "name": "Build one worker with a 260-minute guarded deadline",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-09-24T14:10:10Z",
+          "completed_at": "2026-09-24T17:45:45Z"
+        },
+        {
+          "name": "Collect completed compiler results after the build guard closes",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-09-24T17:45:45Z",
+          "completed_at": "2026-09-24T17:45:52Z"
+        },
+        {
+          "name": "Package only the completed compiler cache",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-09-24T17:45:52Z",
+          "completed_at": "2026-09-24T17:46:19Z"
+        },
+        {
+          "name": "Verify included storage budget before saving",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-09-24T17:46:19Z",
+          "completed_at": "2026-09-24T17:46:20Z"
+        },
+        {
+          "name": "Save checksum-addressed completed compiler results",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-09-24T17:46:20Z",
+          "completed_at": "2026-09-24T17:46:39Z"
+        },
+        {
+          "name": "Retain this checkpoint and one previous fallback",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2026-09-24T17:46:39Z",
+          "completed_at": "2026-09-24T17:46:40Z"
+        },
+        {
+          "name": "Verify and archive the completed native installation",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2026-09-24T17:46:40Z",
+          "completed_at": "2026-09-24T17:48:42Z"
+        },
+        {
+          "name": "Check included storage for the completed build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-09-24T17:48:42Z",
+          "completed_at": "2026-09-24T17:48:43Z"
+        },
+        {
+          "name": "Save the verified completed build for distribution work",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-09-24T17:48:43Z",
+          "completed_at": "2026-09-24T17:49:11Z"
+        },
+        {
+          "name": "Preserve bounded bootstrap results in logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-09-24T17:49:11Z",
+          "completed_at": "2026-09-24T17:49:11Z"
+        },
+        {
+          "name": "Require a complete native Lean bootstrap",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24,
+          "started_at": "2026-09-24T17:49:11Z",
+          "completed_at": "2026-09-24T17:49:12Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 47,
+          "started_at": "2026-09-24T17:49:12Z",
+          "completed_at": "2026-09-24T17:49:12Z"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 48,
+          "started_at": "2026-09-24T17:49:12Z",
+          "completed_at": "2026-09-24T17:49:16Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 49,
+          "started_at": "2026-09-24T17:49:17Z",
+          "completed_at": "2026-09-24T17:49:17Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Millillion/lasm/check-runs/107667790884",
+      "labels": [
+        "windows-11-arm"
+      ],
+      "runner_id": 1000000168,
+      "runner_name": "GitHub Actions 1000000168",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ],
+  "sourceInputs": {
+    "verifiedCommitted": [
+      {
+        "path": "scripts/ci/windows-lean-cache.sh",
+        "sha256": "ba0a64f9795e48b02c6b6e7dfd300ec6583486e99197e8f3ba7b50e482af3876",
+        "lineEndings": "LF",
+        "verification": "Matches committed content at the successful run head with recorded checkout line endings"
+      },
+      {
+        "path": "scripts/ci/windows-lean-cache.mjs",
+        "sha256": "732519af5b2cbbad53a210c02b940138f2402bd8e48726ac7aad20e075b05ed4",
+        "lineEndings": "CRLF Windows checkout",
+        "verification": "Matches committed content at the successful run head with recorded checkout line endings"
+      },
+      {
+        "path": "scripts/full-lean/bootstrap-windows-arm64.sh",
+        "sha256": "f88af1f83cf47a80ba5a4c3f730d2c7c9d7880d022d5d3fb5fbbbb0f66bba482",
+        "lineEndings": "LF",
+        "verification": "Matches committed content at the successful run head with recorded checkout line endings"
+      },
+      {
+        "path": "scripts/full-lean/patch-windows-manifest.mjs",
+        "sha256": "4879ac63ef26eb14f6e05ebe69c1d9923e304e229ed577b4fe4903de93e27ede",
+        "lineEndings": "CRLF Windows checkout",
+        "verification": "Matches committed content at the successful run head with recorded checkout line endings"
+      }
+    ],
+    "ciGenerated": [
+      {
+        "path": ".work/windows-arm64-bootstrap-cache/ccache.conf",
+        "sha256": "4b94e45cbf40c7314cd246a3083befeff51ccf458bd9a0e2c1a2d59d3252abd3",
+        "verification": "Recorded by the CI recipe, not independently reconstructed locally"
+      },
+      {
+        "path": ".work/windows-arm64-bootstrap-cache/ccache-version.txt",
+        "sha256": "ebf2ece80071da6541232f769fbcc04f09c1f7a4936b47b3f095e0359daecea3",
+        "verification": "Recorded by the CI recipe, not independently reconstructed locally"
+      },
+      {
+        "path": ".work/windows-arm64-bootstrap-cache/clang-version.txt",
+        "sha256": "c5e1f96e0759a3bc82aac94f4979230bd915c1b232ab0665146c2b3faa78108d",
+        "verification": "Recorded by the CI recipe, not independently reconstructed locally"
+      },
+      {
+        "path": ".work/windows-arm64-bootstrap-cache/package-versions.txt",
+        "sha256": "d2e4f1278a7ab127fefc8df843a6f9d135666177c6847d35b5f37e9de7c2acb5",
+        "verification": "Recorded by the CI recipe, not independently reconstructed locally"
+      }
+    ]
+  },
+  "log": {
+    "path": ".work/windows-completed-tree-r1/job.log",
+    "sha256": "1bec31a3a8057a5d4a9ce177a40ead187f153fd78a25dbe1372f45859f62c835",
+    "bytes": 2583987,
+    "nativeValidationLines": [
+      "bootstrap\tBuild one worker with a 260-minute guarded deadline\t2026-09-24T17:45:42.0042835Z Lean (version 4.34.0, aarch64-w64-windows-gnu, commit 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b, Release)",
+      "bootstrap\tBuild one worker with a 260-minute guarded deadline\t2026-09-24T17:45:42.2457762Z Lake version 5.0.0-src+293d5d0 (Lean version 4.34.0)",
+      "bootstrap\tBuild one worker with a 260-minute guarded deadline\t2026-09-24T17:45:42.9859445Z native Windows ARM64 Lean",
+      "bootstrap\tBuild one worker with a 260-minute guarded deadline\t2026-09-24T17:45:44.7305951Z native Windows ARM64 Lean"
+    ]
+  },
+  "receipts": {
+    "windows-arm64-bootstrap-cache__budget.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-arm64-bootstrap-cache__budget.json",
+      "sha256": "d6db22230e8a98d31b2b22f50aa6bd7109f1d4e3f021dcaedee5075e2f90323e",
+      "content": {
+        "payloadBytes": 362658240,
+        "reportedBytes": 722053759,
+        "listedBytes": 722053759,
+        "usedBytes": 722053759,
+        "uploadUpperBound": 386688621,
+        "ceilingBytes": 8589934592,
+        "includedAllowanceBytes": 10737418240,
+        "maximumAfterUpload": 1108742380,
+        "cacheEntries": 2,
+        "repository": "Millillion/lasm",
+        "payload": ".work/windows-arm64-compiler-cache.tgz",
+        "serializedWriterGroup": "lasm-cache-writer",
+        "checkedAt": "2026-09-24T17:46:20.544Z",
+        "billingSource": "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+      }
+    },
+    "windows-arm64-bootstrap-cache__identity.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-arm64-bootstrap-cache__identity.json",
+      "sha256": "d0685dcac9f4935239c251982f041b4c3fc4e3449bda419a16d7bd9bdbb8e036",
+      "content": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "platform": "win32",
+        "arch": "arm64",
+        "node": "26.10.0",
+        "workspace": "C:\\a\\lasm\\lasm",
+        "files": {
+          ".work/windows-arm64-bootstrap-cache/ccache.conf": "4b94e45cbf40c7314cd246a3083befeff51ccf458bd9a0e2c1a2d59d3252abd3",
+          ".work/windows-arm64-bootstrap-cache/ccache-version.txt": "ebf2ece80071da6541232f769fbcc04f09c1f7a4936b47b3f095e0359daecea3",
+          ".work/windows-arm64-bootstrap-cache/clang-version.txt": "c5e1f96e0759a3bc82aac94f4979230bd915c1b232ab0665146c2b3faa78108d",
+          ".work/windows-arm64-bootstrap-cache/package-versions.txt": "d2e4f1278a7ab127fefc8df843a6f9d135666177c6847d35b5f37e9de7c2acb5",
+          "scripts/ci/windows-lean-cache.sh": "ba0a64f9795e48b02c6b6e7dfd300ec6583486e99197e8f3ba7b50e482af3876",
+          "scripts/ci/windows-lean-cache.mjs": "732519af5b2cbbad53a210c02b940138f2402bd8e48726ac7aad20e075b05ed4",
+          "scripts/full-lean/bootstrap-windows-arm64.sh": "f88af1f83cf47a80ba5a4c3f730d2c7c9d7880d022d5d3fb5fbbbb0f66bba482",
+          "scripts/full-lean/patch-windows-manifest.mjs": "4879ac63ef26eb14f6e05ebe69c1d9923e304e229ed577b4fe4903de93e27ede"
+        }
+      }
+    },
+    "windows-arm64-bootstrap-cache__pruning.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-arm64-bootstrap-cache__pruning.json",
+      "sha256": "f3aacfc9ba7d19db398f73fd8677c820e5d2db9ebfccfcc24dc05fb1080edd05",
+      "content": {
+        "operation": "prune",
+        "identity": "d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9",
+        "kept": [
+          {
+            "id": 8082832075,
+            "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-053231a75b5bc5ad6370257fce0e7e35e33de370329dbe573a07d88a38f9b08f"
+          },
+          {
+            "id": 8072053311,
+            "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-f755664994dfe5775289e6d9ed44b471d2b68992148e835f976c3be26ecabdd8"
+          }
+        ],
+        "deleted": [
+          {
+            "id": 8063370281,
+            "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-02ed96890d8484b53f14b39026cc223af01926dc92f21afb8804eefbcad5c7a9",
+            "sizeInBytes": 359873789
+          }
+        ],
+        "checkedAt": "2026-09-24T17:46:40.833Z"
+      }
+    },
+    "windows-arm64-bootstrap-cache__receipt.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-arm64-bootstrap-cache__receipt.json",
+      "sha256": "e1649767bcdc0c7d81c1015924e50012ef9071f4301acb3fe544da823fcf8099",
+      "content": {
+        "scope": "Completed native C/C++ compiler cache only; full Lean acceptance remains separate",
+        "buildStatus": "passed",
+        "stats": {
+          "autoconf_test": 0,
+          "bad_compiler_arguments": 0,
+          "bad_input_file": 0,
+          "bad_output_file": 0,
+          "cache_miss": 5,
+          "cache_size_kibibyte": 400704,
+          "called_for_link": 20,
+          "called_for_preprocessing": 0,
+          "cleanups_performed": 0,
+          "compile_failed": 0,
+          "compiler_check_failed": 0,
+          "compiler_produced_empty_output": 0,
+          "compiler_produced_no_output": 0,
+          "compiler_produced_stdout": 0,
+          "could_not_find_compiler": 0,
+          "could_not_use_modules": 0,
+          "could_not_use_precompiled_header": 0,
+          "direct_cache_hit": 10400,
+          "direct_cache_miss": 5,
+          "disabled": 0,
+          "error_hashing_extra_file": 0,
+          "files_in_cache": 20817,
+          "internal_error": 0,
+          "local_storage_hit": 10400,
+          "local_storage_miss": 5,
+          "local_storage_read_hit": 20800,
+          "local_storage_read_miss": 9,
+          "local_storage_write": 5,
+          "max_cache_size_kibibyte": 1048576,
+          "max_files_in_cache": 0,
+          "missing_cache_file": 0,
+          "modified_input_file": 0,
+          "multiple_source_files": 0,
+          "no_input_file": 0,
+          "output_to_stdout": 0,
+          "preprocessed_cache_hit": 0,
+          "preprocessed_cache_miss": 5,
+          "preprocessor_error": 0,
+          "recache": 0,
+          "remote_storage_error": 0,
+          "remote_storage_hit": 0,
+          "remote_storage_miss": 0,
+          "remote_storage_read_hit": 0,
+          "remote_storage_read_miss": 0,
+          "remote_storage_timeout": 0,
+          "remote_storage_write": 0,
+          "stats_updated_timestamp": 1790271951,
+          "stats_zeroed_timestamp": 1790259014,
+          "unsupported_code_directive": 0,
+          "unsupported_compiler_option": 0,
+          "unsupported_environment_variable": 0,
+          "unsupported_source_encoding": 0,
+          "unsupported_source_language": 0
+        }
+      }
+    },
+    "windows-arm64-bootstrap-cache__selection.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-arm64-bootstrap-cache__selection.json",
+      "sha256": "a05aace890879d0bb5e55d2d31347150d59d5cb8880066b7cec142dd6e3a9499",
+      "content": {
+        "operation": "select",
+        "identity": "d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9",
+        "selected": {
+          "id": 8072053311,
+          "ref": "refs/heads/main",
+          "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-f755664994dfe5775289e6d9ed44b471d2b68992148e835f976c3be26ecabdd8",
+          "version": "9212dfecd7d8f1b3047db58178860280c0bfadf2029b00ede146cd714dca79a1",
+          "last_accessed_at": "2026-09-24T13:31:04.290677Z",
+          "created_at": "2026-09-24T13:31:04.290677Z",
+          "size_in_bytes": 362179970,
+          "identity": "d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9",
+          "sha256": "f755664994dfe5775289e6d9ed44b471d2b68992148e835f976c3be26ecabdd8"
+        },
+        "checkedAt": "2026-09-24T14:06:33.263Z"
+      }
+    },
+    "windows-arm64-bootstrap-resources.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-arm64-bootstrap-resources.json",
+      "sha256": "c886e9dfafd556eb55e7beda47cafe70449c885006c63e371c2f0627c2923b33",
+      "content": {
+        "status": "passed",
+        "command": [
+          "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+          "--login",
+          "scripts/ci/windows-lean-cache.sh",
+          "build"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 13202464768
+        },
+        "limits": {
+          "jobCommittedBytes": 8584714240,
+          "stopCommittedBytes": 6867771392,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 15600
+        },
+        "peakCommittedBytes": 2041683968,
+        "minimumHostAvailable": 11377094656,
+        "startedAt": 1790259013.289438,
+        "unit": "Local\\LasmResource-5f0a7f7f-7463-4cdb-984c-f97f4d8c50b8",
+        "pid": 8568,
+        "lastSampleAt": 1790271944.5813296,
+        "exitCode": 0,
+        "finishedAt": 1790271944.769602
+      }
+    },
+    "windows-arm64-compiler-cache.tgz.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-arm64-compiler-cache.tgz.json",
+      "sha256": "8040ac81e625254e184fc34932d6cd4e75f59f61acd2a91a30f70dc631f5b7ae",
+      "content": {
+        "operation": "pack",
+        "identitySha256": "d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9",
+        "sha256": "053231a75b5bc5ad6370257fce0e7e35e33de370329dbe573a07d88a38f9b08f",
+        "bytes": 362658240,
+        "files": 21105,
+        "contentBytes": 361620618
+      }
+    },
+    "windows-arm64-lean-stage1.tgz.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-arm64-lean-stage1.tgz.json",
+      "sha256": "18769f6026da841e89e9865363b66939686184e6cbf3d84f1dd5146ab9526d6c",
+      "content": {
+        "scope": "Completed CI bootstrap checkpoint; external MSYS2 DLLs, native compiler relocation and leantar still require distribution work",
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "sha256": "fb5206a8a323bcd470c0de200759d0cb874a1f0baebca9db60ecd1c23dc90182",
+        "bytes": 878625556,
+        "identitySha256": "93fecaea106928b459f0fad938f0eb010b09e25bd171cea27e8a10072433877f",
+        "files": 17686,
+        "contentBytes": 3068574191,
+        "verifiedDecompression": true,
+        "archive": ".work/windows-arm64-lean-stage1.tgz",
+        "createdAt": "2026-09-24T17:48:42.262Z"
+      }
+    },
+    "windows-cache-collect-resources.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-cache-collect-resources.json",
+      "sha256": "4f59356c8e93c98904de0f6a5b1fbb01d8db18464f6bf35970276791ab884c29",
+      "content": {
+        "status": "passed",
+        "command": [
+          "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+          "--login",
+          "scripts/ci/windows-lean-cache.sh",
+          "finish"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 12354600960
+        },
+        "limits": {
+          "jobCommittedBytes": 2147483648,
+          "stopCommittedBytes": 1717986918,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": null
+        },
+        "peakCommittedBytes": 107028480,
+        "minimumHostAvailable": 12249251840,
+        "startedAt": 1790271948.9337115,
+        "unit": "Local\\LasmResource-66e97a3c-e0e6-4667-a470-70dae1c8df11",
+        "pid": 10728,
+        "lastSampleAt": 1790271952.024008,
+        "exitCode": 0,
+        "finishedAt": 1790271952.0760393
+      }
+    },
+    "windows-cache-pack-resources.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-cache-pack-resources.json",
+      "sha256": "7e85b77023d14c4235554b25cfe78c97cb5d9a33e2220ae9bfe5a82a0c6260da",
+      "content": {
+        "status": "passed",
+        "command": [
+          "node",
+          "scripts/ci/compiler-cache.mjs",
+          "pack",
+          ".work/windows-arm64-bootstrap-cache/cache",
+          ".work/windows-arm64-compiler-cache.tgz",
+          ".work/windows-arm64-bootstrap-cache/identity.json"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 12296548352
+        },
+        "limits": {
+          "jobCommittedBytes": 2147483648,
+          "stopCommittedBytes": 1717986918,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": null
+        },
+        "peakCommittedBytes": 217886720,
+        "minimumHostAvailable": 11938320384,
+        "startedAt": 1790271954.9587224,
+        "unit": "Local\\LasmResource-15c9e3fd-d488-4d77-bc30-c5fcefe3fd39",
+        "pid": 4016,
+        "lastSampleAt": 1790271979.1329823,
+        "exitCode": 0,
+        "finishedAt": 1790271979.1879332
+      }
+    },
+    "windows-cache-prepare-resources.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-cache-prepare-resources.json",
+      "sha256": "3d66bb421680300beccf58973ac5f1a527f630bf3cf1fed8ddf95ade5b8c310d",
+      "content": {
+        "status": "passed",
+        "command": [
+          "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+          "--login",
+          "scripts/ci/windows-lean-cache.sh",
+          "prepare"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 12753375232
+        },
+        "limits": {
+          "jobCommittedBytes": 2147483648,
+          "stopCommittedBytes": 1717986918,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": null
+        },
+        "peakCommittedBytes": 107040768,
+        "minimumHostAvailable": 12722597888,
+        "startedAt": 1790258789.1279247,
+        "unit": "Local\\LasmResource-961ccb1f-3901-4dec-9fcf-1cd0a11c0aaf",
+        "pid": 3708,
+        "lastSampleAt": 1790258792.0216792,
+        "exitCode": 0,
+        "finishedAt": 1790258792.097052
+      }
+    },
+    "windows-cache-restore-resources.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-cache-restore-resources.json",
+      "sha256": "39f501b63c10bffa3bef5ca223e4a72e91dd12e541d9f8b9318bc6a45863cb10",
+      "content": {
+        "status": "passed",
+        "command": [
+          "node",
+          "scripts/ci/compiler-cache.mjs",
+          "unpack",
+          ".work/windows-arm64-bootstrap-cache/cache",
+          ".work/windows-arm64-compiler-cache.tgz",
+          ".work/windows-arm64-bootstrap-cache/identity.json"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 12736962560
+        },
+        "limits": {
+          "jobCommittedBytes": 2147483648,
+          "stopCommittedBytes": 1717986918,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": null
+        },
+        "peakCommittedBytes": 261427200,
+        "minimumHostAvailable": 12644954112,
+        "startedAt": 1790258809.0815754,
+        "unit": "Local\\LasmResource-406387a4-4841-4ea6-a144-f66419740c60",
+        "pid": 9896,
+        "lastSampleAt": 1790259010.1114867,
+        "exitCode": 0,
+        "finishedAt": 1790259010.2641635
+      }
+    },
+    "windows-guard-control.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-guard-control.json",
+      "sha256": "97ddc2a65374ec90c931cc4e0ab0b2274e0a44ce7dd8c77cb44483febe1afcec",
+      "content": {
+        "status": "passed",
+        "command": [
+          "node",
+          "test/fixtures/windows-guard.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 13480026112
+        },
+        "limits": {
+          "jobCommittedBytes": 536870912,
+          "stopCommittedBytes": 429496729,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": null
+        },
+        "peakCommittedBytes": 112238592,
+        "minimumHostAvailable": 13378150400,
+        "startedAt": 1790258656.551033,
+        "unit": "Local\\LasmResource-8162fe82-6e55-4616-9621-befe082f8b27",
+        "pid": 7536,
+        "lastSampleAt": 1790258657.7953677,
+        "exitCode": 0,
+        "finishedAt": 1790258657.8046448
+      }
+    },
+    "windows-stage-cache-budget.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-stage-cache-budget.json",
+      "sha256": "b9b6f36c8a849ebcc03c54c23cd4765bcdee8ff48fd061ec021ca33ce2eec28d",
+      "content": {
+        "payloadBytes": 878625556,
+        "reportedBytes": 1084722264,
+        "listedBytes": 724848475,
+        "usedBytes": 1084722264,
+        "uploadUpperBound": 912975284,
+        "ceilingBytes": 8589934592,
+        "includedAllowanceBytes": 10737418240,
+        "maximumAfterUpload": 1997697548,
+        "cacheEntries": 2,
+        "repository": "Millillion/lasm",
+        "payload": ".work/windows-arm64-lean-stage1.tgz",
+        "serializedWriterGroup": "lasm-cache-writer",
+        "checkedAt": "2026-09-24T17:48:43.662Z",
+        "billingSource": "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+      }
+    },
+    "windows-stage-pack-resources.json": {
+      "path": ".work/windows-completed-tree-r1/receipts/windows-stage-pack-resources.json",
+      "sha256": "87ad214afe36cf3de4dfd6ddb0c7b8850d2c973f83fe6f359e527c0b2000333c",
+      "content": {
+        "status": "passed",
+        "command": [
+          "node",
+          "--max-old-space-size=512",
+          "scripts/ci/windows-lean-stage.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169428480,
+          "available": 12352090112
+        },
+        "limits": {
+          "jobCommittedBytes": 2147483648,
+          "stopCommittedBytes": 1717986918,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 1800
+        },
+        "peakCommittedBytes": 215269376,
+        "minimumHostAvailable": 11032485888,
+        "startedAt": 1790272003.7023392,
+        "unit": "Local\\LasmResource-8c53f6a8-7d1f-4a29-bd9d-45c569373a5a",
+        "pid": 1412,
+        "lastSampleAt": 1790272122.219088,
+        "exitCode": 0,
+        "finishedAt": 1790272122.2893898
+      }
+    }
+  },
+  "cacheInventory": {
+    "path": ".work/windows-completed-tree-r1/current-caches.json",
+    "sha256": "fe0baebac21bd05121976124e6d78b8915cd4461fd9483885eb4cc7d0d5b8019",
+    "content": {
+      "total_count": 3,
+      "actions_caches": [
+        {
+          "id": 8082926474,
+          "ref": "refs/heads/main",
+          "key": "lasm-win-arm64-lean-stage1-v1-93fecaea106928b459f0fad938f0eb010b09e25bd171cea27e8a10072433877f-fb5206a8a323bcd470c0de200759d0cb874a1f0baebca9db60ecd1c23dc90182",
+          "version": "4dbbc7e02d5b77996f3957c50bf695a9244e407b6e9975f571e011c3ff99287e",
+          "last_accessed_at": "2026-09-24T17:49:11.000666Z",
+          "created_at": "2026-09-24T17:49:11.000666Z",
+          "size_in_bytes": 877805399
+        },
+        {
+          "id": 8082832075,
+          "ref": "refs/heads/main",
+          "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-053231a75b5bc5ad6370257fce0e7e35e33de370329dbe573a07d88a38f9b08f",
+          "version": "9212dfecd7d8f1b3047db58178860280c0bfadf2029b00ede146cd714dca79a1",
+          "last_accessed_at": "2026-09-24T17:46:39.476761Z",
+          "created_at": "2026-09-24T17:46:39.476761Z",
+          "size_in_bytes": 362668505
+        },
+        {
+          "id": 8072053311,
+          "ref": "refs/heads/main",
+          "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-f755664994dfe5775289e6d9ed44b471d2b68992148e835f976c3be26ecabdd8",
+          "version": "9212dfecd7d8f1b3047db58178860280c0bfadf2029b00ede146cd714dca79a1",
+          "last_accessed_at": "2026-09-24T14:06:34.079028Z",
+          "created_at": "2026-09-24T13:31:04.290677Z",
+          "size_in_bytes": 362179970
+        }
+      ]
+    }
+  },
+  "cacheUsage": {
+    "path": ".work/windows-completed-tree-r1/current-cache-usage.json",
+    "sha256": "c6ae7eca1fb5c590dec284c8ec3cfa6877a4c4664ff098c6e87306b84c66ae56",
+    "content": {
+      "full_name": "Millillion/lasm",
+      "active_caches_size_in_bytes": 1602653874,
+      "active_caches_count": 3
+    }
+  },
+  "validated": {
+    "nativeLeanAndLake": "Lean 4.34.0, ARM64 Windows",
+    "interpretedAndCompiledMain": true,
+    "arm64PeHeaders": true,
+    "guardedPhasesPassed": 7,
+    "buildMinutes": 215.52466940085094,
+    "peakCommittedBytes": 2041683968,
+    "archiveVerifiedByDecompression": true,
+    "archiveFiles": 17686,
+    "archiveContentBytes": 3068574191,
+    "archiveBytes": 878625556,
+    "savedCacheId": 8082926474,
+    "repositoryCacheBytes": 1602653874,
+    "repositoryCacheCeilingBytes": 8589934592
+  },
+  "remaining": [
+    "Restore and revalidate this archive in a new native job.",
+    "Package external ARM64 DLLs, native compiler and sysroot; verify relocation with original tools hidden.",
+    "Run the pending native leantar reference-trace repair after authorized SSH access is restored.",
+    "Verify complete Node/npm-only managed installation and installed Wasm application acceptance.",
+    "MSYS2 x64 POSIX build helpers were used; this is not an all-native managed build toolchain."
+  ],
+  "distribution": "No release assets, npm publication or Actions artifacts were uploaded. Only bounded included CI caches were saved."
+}
