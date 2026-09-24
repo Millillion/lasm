@@ -1,6 +1,6 @@
 // Preserve the original failing benchmark, including its 4 GiB stack setting.
 import assert from 'node:assert/strict';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
@@ -30,8 +30,8 @@ const lean = await provisionLean(source);
 // the unchanged benchmark configuration. The outer runner also applies the
 // sidecar's unlimited host-stack setting, while keeping all memory guards.
 const env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '2', LEAN_STACK_SIZE_KB: '4194304' };
-const run = (program, args, cwd = output) => {
-  const result = spawnSync(program, args, { cwd, env, encoding: 'utf8', timeout: 90_000, maxBuffer: 1024 * 1024 });
+const run = (program, args, cwd = output, environment = env) => {
+  const result = spawnSync(program, args, { cwd, env: environment, encoding: 'utf8', timeout: 90_000, maxBuffer: 1024 * 1024 });
   assert.ifError(result.error); return { code: result.status, stdout: result.stdout, stderr: result.stderr };
 };
 const interpreted = run(lean.lean, ['-Dlinter.all=false', '--run', source, '15']);
@@ -52,11 +52,22 @@ for (let index = 0; index < 30; index++) {
 }
 
 assert.equal(await hashFile(source), sources['tests/compile_bench/const_fold.lean'].sha256);
+const deployed = join(output, 'relocated deployment'), empty = join(output, 'empty-cwd');
+renameSync(dist, deployed); renameSync(source, source + '.hidden');
+mkdirSync(empty);
+const deployedEnvironment = Object.fromEntries(Object.entries(process.env)
+  .filter(([name]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_TOOLCHAIN_CACHE)/.test(name)));
+Object.assign(deployedEnvironment, { PATH: '', DENO_DISABLE_NODE_SHIM: '1',
+  LEAN_NUM_THREADS: '2', LEAN_STACK_SIZE_KB: '4194304' });
+const relocated = run(engine, [...prefix, join(deployed, 'main.mjs'), '15'], empty, deployedEnvironment);
+assert.deepEqual(relocated, expected, 'relocated deployment without source/tool paths');
 const report = { scope: 'Unchanged upstream const_fold native compiled/interpreted controls and 30 installed-application repetitions with its original 4 GiB thread-stack setting',
   target, engineVersion: execFileSync(engine, ['--version'], { encoding: 'utf8' }).trim(), compiler,
-  sourceSha256: await hashFile(source), expected, results,
-  wasmSha256: await hashFile(join(dist, 'program.wasm')), glueSha256: await hashFile(join(dist, 'program.cjs')),
-  build: JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8')),
+  sourceSha256: await hashFile(source + '.hidden'), expected, results,
+  deployment: { directory: deployed, sourceHidden: true, path: '', buildToolEnvironmentRemoved: true,
+    unchangedStackSetting: '4194304', result: relocated },
+  wasmSha256: await hashFile(join(deployed, 'program.wasm')), glueSha256: await hashFile(join(deployed, 'program.cjs')),
+  build: JSON.parse(readFileSync(join(deployed, 'build-info.json'), 'utf8')),
   resourceReport: process.env.LASM_RESOURCE_REPORT };
 writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify({ target, ordinaryPassed: results.length }));

@@ -1,0 +1,65 @@
+name: Native Deno application startup controls
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deno-stack-controls-${{ github.ref }}
+  cancel-in-progress: false
+
+# Small startup/recursion controls only, not Lean compilation or an upstream
+# suite. Each JS heap is capped at 128 MiB, every child has a deadline, and
+# Linux additionally uses the process-tree guard. No caches or artifact uploads.
+jobs:
+  startup:
+    if: github.event.repository.visibility == 'public'
+    name: Deno startup ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+          - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
+          - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
+    env:
+      LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: 2.9.7
+          cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Check native engines and retain exact Deno path
+        run: |
+          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)"
+          deno eval "if(Deno.version.deno!=='2.9.7'||process.platform+'-'+process.arch!==process.env.LASM_EXPECT_PLATFORM)throw Error('Incorrect engine'); console.log(Deno.version)"
+          printf 'LASM_TEST_DENO=%s\n' "$(command -v deno)" >> "$GITHUB_ENV"
+      - name: Enable Linux resource guard
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Guarded Linux startup controls
+        if: runner.os == 'Linux'
+        run: |
+          ulimit -c 0
+          node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/deno-stack-controls-resources.json -- node --max-old-space-size=128 --test --test-concurrency=1 test/deno-stack.test.mjs test/application-output.test.mjs
+      - name: Small macOS startup controls
+        if: runner.os == 'macOS'
+        run: |
+          ulimit -c 0
+          node --max-old-space-size=128 --test --test-concurrency=1 test/deno-stack.test.mjs test/application-output.test.mjs
+      - name: Preserve Linux guard receipt
+        if: always() && runner.os == 'Linux'
+        run: node -e "const f=require('node:fs');const p='.work/deno-stack-controls-resources.json';if(f.existsSync(p))console.log(f.readFileSync(p,'utf8'))"

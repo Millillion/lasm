@@ -427,3 +427,14 @@ link 1.48.0. This validates the host decoder, not all IO operations, deployed
 Wasm, other engines on those runners, or the complete six-platform installation
 contract. The earlier cold-extraction resource stops and seven Windows failures
 remain preserved alongside the passing follow-up.
+
+The [Deno startup adapter](evidence/deno-stack-startup-2026-09-24.json) configures
+V8's execution stack before a directly launched POSIX application initializes,
+using native exec with the original Deno arguments and permission flags. Seven
+Linux x64 source controls pass, including a failing unconfigured recursion
+control, same-PID signal delivery, stdio, empty/Unicode arguments, environment
+restoration, and explicit network/subprocess denials. A separate prototype runs
+the unchanged Lean benchmark five times. Installed-candidate and native macOS
+checks remain pending. Windows needs a different implementation. Imported or
+preloaded mains keep their caller's engine configuration to avoid replaying user
+effects; those embedding cases remain a deep-stack acceptance gap.

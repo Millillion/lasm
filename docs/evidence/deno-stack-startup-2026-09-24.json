@@ -1,0 +1,578 @@
+{
+  "scope": "POSIX Deno startup adapter: Linux x64 source controls and unchanged benchmark prototype; installed-package and native macOS acceptance pending",
+  "engine": "Deno 2.9.7",
+  "sources": {
+    "src/deno-stack.mjs": "12c07f14c0806e5203046aa6c855f703a994568612e08257721433a20f94ff70",
+    "src/application-output.mjs": "4429733c3436fca00d36a74ee16880f4d0d9e1478bfcba7025d71e3d62510eca",
+    "test/deno-stack.test.mjs": "5f3703a88bee0b56c0831f45bc967372a485d25b89b687e6c20493b7adfac83e",
+    "test/fixtures/deno-stack.mjs": "e763f3feb2c452722a88702655911488ea4299dc4f4e97b45cd88500fe8ff7f5"
+  },
+  "CLIFlagProbes": [
+    {
+      "scope": "Controlled CLI-flag investigation; not a transparent deployment fix",
+      "native": {
+        "code": 0,
+        "signal": null,
+        "stdout": "93011 93011\n",
+        "stderr": ""
+      },
+      "rows": [
+        {
+          "stackKiB": 1024,
+          "result": {
+            "code": 134,
+            "signal": null,
+            "stdout": "",
+            "stderr": "\nStack overflow detected. Aborting.\n"
+          },
+          "matchesNative": false
+        },
+        {
+          "stackKiB": 2048,
+          "result": {
+            "code": 134,
+            "signal": null,
+            "stdout": "",
+            "stderr": "\nStack overflow detected. Aborting.\n"
+          },
+          "matchesNative": false
+        },
+        {
+          "stackKiB": 3072,
+          "result": {
+            "code": 134,
+            "signal": null,
+            "stdout": "",
+            "stderr": "\nStack overflow detected. Aborting.\n"
+          },
+          "matchesNative": false
+        }
+      ],
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "6de6663a9d4ccaaa8957eeeaf39f059fb18e09d183deb2bd1877ca7de5714bed",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "const_fold",
+            "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+            "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+          }
+        ],
+        "signature": "fb9643d4960ce5eecef2fa3b127e1be16d9e005859749447c89b0768947a4b2e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "68e82dc2bb25375ce737c648fa74bc41fa7d3b8e8264ec52082c0da760203c1d",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-cli-stack-r2-resources.json"
+    },
+    {
+      "scope": "Controlled CLI-flag investigation; not a transparent deployment fix",
+      "native": {
+        "code": 0,
+        "signal": null,
+        "stdout": "93011 93011\n",
+        "stderr": ""
+      },
+      "rows": [
+        {
+          "stackKiB": 8192,
+          "result": {
+            "code": 0,
+            "signal": null,
+            "stdout": "93011 93011\n",
+            "stderr": ""
+          },
+          "matchesNative": true
+        },
+        {
+          "stackKiB": 16384,
+          "result": {
+            "code": 0,
+            "signal": null,
+            "stdout": "93011 93011\n",
+            "stderr": ""
+          },
+          "matchesNative": true
+        },
+        {
+          "stackKiB": 32768,
+          "result": {
+            "code": 0,
+            "signal": null,
+            "stdout": "93011 93011\n",
+            "stderr": ""
+          },
+          "matchesNative": true
+        },
+        {
+          "stackKiB": 61440,
+          "result": {
+            "code": 0,
+            "signal": null,
+            "stdout": "93011 93011\n",
+            "stderr": ""
+          },
+          "matchesNative": true
+        }
+      ],
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "6de6663a9d4ccaaa8957eeeaf39f059fb18e09d183deb2bd1877ca7de5714bed",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "const_fold",
+            "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+            "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+          }
+        ],
+        "signature": "fb9643d4960ce5eecef2fa3b127e1be16d9e005859749447c89b0768947a4b2e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "68e82dc2bb25375ce737c648fa74bc41fa7d3b8e8264ec52082c0da760203c1d",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-cli-stack-r3-resources.json"
+    }
+  ],
+  "prototype": {
+    "scope": "Prototype same-PID Deno restart, not an installed package acceptance",
+    "rows": [
+      {
+        "code": 0,
+        "signal": null,
+        "stdout": "93011 93011\n",
+        "stderr": ""
+      },
+      {
+        "code": 0,
+        "signal": null,
+        "stdout": "93011 93011\n",
+        "stderr": ""
+      },
+      {
+        "code": 0,
+        "signal": null,
+        "stdout": "93011 93011\n",
+        "stderr": ""
+      },
+      {
+        "code": 0,
+        "signal": null,
+        "stdout": "93011 93011\n",
+        "stderr": ""
+      },
+      {
+        "code": 0,
+        "signal": null,
+        "stdout": "93011 93011\n",
+        "stderr": ""
+      }
+    ],
+    "restricted": {
+      "code": 0,
+      "signal": null,
+      "stdout": "{\"args\":[\"\u03bb \u65e5\u672c\u8a9e\",\"\",\"a b\",\"--target\",\"application-value\"],\"pid\":3640127,\"restricted\":true}\n",
+      "stderr": ""
+    },
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-stack-selfexec-r1-resources.json"
+  },
+  "sourceControls": {
+    "passed": 7,
+    "logSha256": "6a1bf07fd2d085e35a4dbe2e416ee1a472e16765ca82f711a34d68ff2b08707e"
+  },
+  "resources": [
+    {
+      "startedAt": "2026-09-24T01:57:22.952Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "/bin/bash",
+        "-c",
+        "ulimit -c 0; exec .cache/js-runtimes/node-26.10.0/bin/node .work/probe-deno-cli-stack-r1.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "4fbb245b-fbe3-4341-934f-7f1905a4446d",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25574965248
+      },
+      "minimumHostAvailable": 24181170176,
+      "peakMemoryBytes": 1363542016,
+      "peakTasks": 25,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-cli-stack-r2-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T01:57:30.561Z",
+        "memoryBytes": 212799488,
+        "peakMemoryBytes": 1363542016,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 35483648,
+          "file": 174866432,
+          "kernel": 1626112,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 172875776,
+          "slab": 417376
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T01:57:30.701Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 188407808,
+        "peakMemoryBytes": 1363542016,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11649024,
+          "file": 174866432,
+          "kernel": 1286144,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 172875776,
+          "slab": 361288
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T01:57:30.724Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    {
+      "startedAt": "2026-09-24T02:02:47.668Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "/bin/bash",
+        "-c",
+        "ulimit -c 0; ulimit -s 65536; exec .cache/js-runtimes/node-26.10.0/bin/node .work/probe-deno-cli-stack-r3.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "c14525b3-71d7-4e7f-8cb4-94940c63f489",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25622503424
+      },
+      "minimumHostAvailable": 23898877952,
+      "peakMemoryBytes": 1207492608,
+      "peakTasks": 26,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-cli-stack-r3-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T02:02:58.087Z",
+        "memoryBytes": 38993920,
+        "peakMemoryBytes": 1207492608,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 35172352,
+          "file": 1253376,
+          "kernel": 1445888,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 1253376,
+          "slab": 238696
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T02:02:58.190Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 14942208,
+        "peakMemoryBytes": 1207492608,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11640832,
+          "file": 1253376,
+          "kernel": 1105920,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 1253376,
+          "slab": 182344
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T02:02:58.218Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    {
+      "startedAt": "2026-09-24T02:05:52.228Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "/bin/bash",
+        "-c",
+        "ulimit -c 0; exec .cache/js-runtimes/node-26.10.0/bin/node .work/deno-stack-selfexec-r1.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "540779ec-ad08-4aba-9f46-20c31ee63c56",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25581428736
+      },
+      "minimumHostAvailable": 23775064064,
+      "peakMemoryBytes": 1163509760,
+      "peakTasks": 22,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-stack-selfexec-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T02:06:03.040Z",
+        "memoryBytes": 14077952,
+        "peakMemoryBytes": 1163509760,
+        "swapBytes": 0,
+        "tasks": 8,
+        "memoryBreakdown": {
+          "anon": 11067392,
+          "file": 217088,
+          "kernel": 1282048,
+          "shmem": 0,
+          "file_mapped": 114688,
+          "inactive_file": 86016,
+          "slab": 286960
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T02:06:03.164Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 14450688,
+        "peakMemoryBytes": 1163509760,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11661312,
+          "file": 307200,
+          "kernel": 1101824,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 94208,
+          "slab": 149552
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T02:06:03.187Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    {
+      "startedAt": "2026-09-24T02:17:24.732Z",
+      "command": [
+        "/bin/bash",
+        "-c",
+        "ulimit -c 0; exec .cache/js-runtimes/node-26.10.0/bin/node --max-old-space-size=128 --test --test-concurrency=1 test/deno-stack.test.mjs test/application-output.test.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "5fc13a6a-1dbb-4df2-aebe-906a389043fe",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25279766528
+      },
+      "minimumHostAvailable": 25199128576,
+      "peakMemoryBytes": 59473920,
+      "peakTasks": 21,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-stack-controls-r2-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T02:17:25.937Z",
+        "memoryBytes": 11976704,
+        "peakMemoryBytes": 59473920,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10027008,
+          "file": 90112,
+          "kernel": 1032192,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 90112,
+          "slab": 157200
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T02:17:25.943Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 13795328,
+        "peakMemoryBytes": 59473920,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11657216,
+          "file": 90112,
+          "kernel": 1105920,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 90112,
+          "slab": 153256
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T02:17:25.969Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  ],
+  "remaining": [
+    "Fresh installed-package and relocated unchanged benchmark acceptance.",
+    "Native POSIX ARM64/macOS controls and deployed platform campaigns.",
+    "Transparent Windows Deno stack configuration.",
+    "Preloaded or imported entry points retain the caller engine configuration to avoid repeating user effects; transparent deep-stack callable embedding remains open."
+  ]
+}

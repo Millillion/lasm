@@ -30,12 +30,15 @@ separately from the earlier runtime evidence below.
   4 GiB thread-stack setting for `const_fold`; allocation, reclamation and
   unchanged SDK regression checks pass. See the
   [targeted repair evidence](docs/evidence/application-large-stack-node-2026-09-23.json).
-  Stock Deno still aborts on the same unchanged benchmark: its 64 MiB worker
-  reservation does not increase the separate V8 execution-stack budget. The
-  runtime `setFlagsFromString` stack option is ignored in Deno 2.9.7, and ordinary
-  promise-wrapped Wasm calls also exhaust their default stack. A transparent
-  deployment solution that preserves permissions and process behavior remains
-  open; requiring users to supply engine flags would not meet the product plan.
+  The original stock Deno deployment aborts on the same unchanged benchmark:
+  its worker reservation does not raise the separate V8 execution budget.
+  The [POSIX startup adapter](docs/evidence/deno-stack-startup-2026-09-24.json)
+  now configures that budget through same-PID native exec before application
+  initialization. Linux source controls preserve permissions, arguments,
+  environment, stdio and signals; installed-package and native macOS checks are
+  pending. Windows needs its own solution. Preloaded or imported entry points
+  retain their caller's configuration to avoid repeating arbitrary user effects;
+  transparent deep-stack callable embedding remains open.
   Bun's lowered-memory backend still has a 4 GiB capacity ceiling; replacing
   that backend or resolving its stock-engine integration is open engineering
   work, not a demonstrated fundamental limitation.
