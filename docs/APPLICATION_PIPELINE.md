@@ -31,6 +31,14 @@ and Windows x64. **A native Windows ARM64 distribution remains missing.** The
 installer reports that gap and does not substitute an emulated x64 compiler.
 That missing artifact is an engineering gap, not a fundamental limitation.
 
+The [native Windows ARM64 bootstrap checkpoint](evidence/windows-arm64-bootstrap-checkpoint-2026-09-24.json)
+reached its 260-minute guard deadline while compiling stage1 Lean modules, with
+a 1.90 GiB committed-memory peak. Completed compiler-cache entries were verified
+and saved as a 228 MB archive within the included repository allowance. A rerun
+of the same recipe has been dispatched to reuse them. The build remains
+incomplete, and the final CI assertion correctly fails until the native Lean,
+Lake and compiled-main checks finish; a checkpoint is not a platform pass.
+
 The compiler-support bootstrap also has a six-platform catalog for native Python
 3.13.15 from the pinned
 [20260901 standalone release](https://github.com/astral-sh/python-build-standalone/releases/tag/20260901).
