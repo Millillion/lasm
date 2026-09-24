@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Bun application results](evidence/upstream-applications-bun-disk-stop-2026-09-24.json): 77 passes, four upstream-disabled, one worker-cloning failure and 19 incomplete at the disk reserve; no OOM or source changes. [Native leantar CI](evidence/windows-arm64-leantar-preflight-2026-09-24.json) is prepared from pinned upstream sources because its Windows ARM64 release binary is missing; execution remains pending.
+**Changed:** [Verified lossless archival](evidence/historical-generated-wasm-archive-2026-09-24.json) reclaimed 11.46 GiB from 113 historical generated binaries, peaking at 0.57 GiB without OOM. [Windows leantar shell setup](evidence/windows-arm64-leantar-shell-repair-2026-09-24.json) now uses the supported ARM64 target with explicitly recorded x64 C compiler helpers; the native test rerun remains pending.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

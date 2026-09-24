@@ -23,7 +23,7 @@ jobs:
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Require native ARM64 Node
         run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-arm64')"
-      - name: Build and test pinned leantar with native ARM64 compilers
+      - name: Build and test native ARM64 leantar with recorded compiler hosts
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 --timeout-seconds 2100 --report .work/windows-leantar-resources.json -- pwsh -NoProfile -File scripts/ci/windows-leantar.ps1
       - name: Preserve resource and native test results in logs
         if: always()

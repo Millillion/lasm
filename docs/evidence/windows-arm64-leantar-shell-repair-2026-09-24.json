@@ -1,0 +1,17 @@
+{
+  "scope": "Native CI setup failure and supported shell repair; native leantar tests still pending",
+  "run": {
+    "id": 36011018387,
+    "url": "https://github.com/Millillion/lasm/actions/runs/36011018387",
+    "headSha": "dfc4858627f0c158a6b9e4f565c3fd956d49ceda"
+  },
+  "failure": "Launch-VsDevShell.ps1 HostArch accepts x86 or amd64, not arm64. No source build or tests ran.",
+  "repair": "Use the supported amd64-host / arm64-target MSVC helper configuration. Rust and Cargo and leantar still require ARM64 PE headers; record the x64 C compiler helper emulation explicitly.",
+  "source": "https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2022",
+  "logFile": ".work/product-acceptance/windows-arm64-leantar-ci-r1.log",
+  "logSha256": "b418f82a923038f47a9a075aa84dbfcf0bc79cc0431ba21d08ae9153576618ce",
+  "sources": {
+    "scripts/ci/windows-leantar.ps1": "a3ee6f9d6e2e6d260d7110b7433664185a0ac889e436ef32ba6d4fa182e97266",
+    "scripts/ci/windows-leantar.mjs": "0863d53006dcd8a86d64618ee3cc99ad64b991e751543cb2d74471b95e2f42d2"
+  }
+}

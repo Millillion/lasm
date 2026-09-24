@@ -41,7 +41,7 @@ await verifyNativeProgram(compiler, 'win32', 'arm64');
 await verifyNativeProgram(cargo, 'win32', 'arm64');
 const version = run(compiler, ['-vV']); assert.match(version, /^host: aarch64-pc-windows-msvc$/m);
 const nativeCC = run('where.exe', ['cl.exe']).trim().split(/\r?\n/)[0];
-await verifyNativeProgram(nativeCC, 'win32', 'arm64');
+await verifyNativeProgram(nativeCC, 'win32', 'x64');
 environment.RUSTUP_TOOLCHAIN = rust;
 run(cargo, ['test', '--release', '--locked', '--target', 'aarch64-pc-windows-msvc', '--jobs', '1', '--', '--test-threads=1'], { cwd: source });
 run(cargo, ['build', '--release', '--locked', '--target', 'aarch64-pc-windows-msvc', '--jobs', '1', '--bin', 'leantar'], { cwd: source });
@@ -67,7 +67,8 @@ for (const name of names) {
 }
 const report = { scope: 'Native Windows ARM64 leantar, unchanged upstream tests and relocated CLI archive roundtrip; managed toolchain packaging remains separate',
   upstream: { version: '0.1.20', commit, url: 'https://github.com/digama0/leangz/releases/tag/v0.1.20' },
-  rust: { toolchain: rust, version, nativeCompiler: true, nativeCargo: true, nativeCCompiler: true },
+  rust: { toolchain: rust, version, nativeCompiler: true, nativeCargo: true,
+    cCompiler: { host: 'x64', target: 'arm64', helperEmulation: true, path: nativeCC } },
   inputs: originals, executable: { sha256: await hashFile(executable), nativeArm64: true, leantarVersion, emptyPath: true },
   roundtrip, createdAt: new Date().toISOString() };
 writeFileSync(join(base, 'result.json'), JSON.stringify(report, null, 2) + '\n');
