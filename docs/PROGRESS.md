@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [The memory64 scalar atomic adapter passes twenty groups per engine](evidence/native-atomic-views-2026-09-24.json), covering eight integer formats, coercions and concurrent Wasm updates. Original primitive/wait controls pass again. The guard released at a 91 MiB peak. This is internal adapter progress; no Lean application has run through the helper. Pushes await restored SSH credentials.
+**Changed:** [Memory64 blocking wait/notify passes sixteen groups per engine](evidence/native-atomic-waits-2026-09-24.json), including shared Wasm queues, mixed-width waiters and exact wake counts. Scalar/primitive controls still pass. The guard released at a 63 MiB peak. Async waits, long-duration transport and real Lean integration remain open. Pushes await restored SSH credentials.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

@@ -757,3 +757,11 @@ Atomics behavior on Linux x64. The sparse probe touches 36 cells below and above
 4 GiB and peaks at 91 MiB under a 1 GiB guard. The original primitive and wait
 controls also still pass. This is a backend component under development;
 ordinary heap access, wait scheduling and real Lean execution remain required.
+
+[Blocking waits and notifications](evidence/native-atomic-waits-2026-09-24.json)
+now share the native Wasm queue across independent JavaScript workers in all
+three engines. Sixteen groups per engine compare statuses, coercions and wake
+counts; mixed 32/64-bit waiters and notifications in both directions pass.
+The guard releases at a 63 MiB peak. Async scheduling, general heap access,
+finite durations beyond the prototype's signed-nanosecond transport, and real
+Lean application integration remain open. No shipping backend selection changes.

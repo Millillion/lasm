@@ -15,9 +15,9 @@ assert.ok(!existsSync(output), 'Preserve earlier probes'); mkdirSync(output, { r
 const inputs = ['scripts/full-lean/probes/wasmtime-atomics.c', 'scripts/full-lean/probes/wasmtime-atomics.mjs',
   'scripts/full-lean/probes/wasmtime-memory-view.c', 'scripts/full-lean/probes/wasmtime-helper.c',
   'scripts/full-lean/native-atomic-views.mjs', 'scripts/full-lean/probes/native-atomic-views.mjs',
-  'scripts/full-lean/probe-native-atomic-views.mjs'];
+  'scripts/full-lean/probe-native-atomic-views.mjs', 'scripts/full-lean/probes/native-atomic-waits.mjs'];
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
-const report = { scope: 'Scalar JS atomic semantics on sparse memory64, original native primitives, and concurrent Wasm/JS workers; no shipping backend or Lean execution',
+const report = { scope: 'Scalar and blocking-wait JS atomic semantics on sparse memory64, original native primitives, and concurrent Wasm/JS workers; no shipping backend or Lean execution',
   specification: 'https://tc39.es/ecma262/multipage/structured-data.html#sec-atomics-object',
   inputs: hashes, resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], results: [], failures: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
@@ -45,7 +45,8 @@ try {
     try {
       const primitive = JSON.parse(run(engine, [...args, join(root, inputs[1]), helper]));
       const facade = JSON.parse(run(engine, [...args, join(root, inputs[5]), helper]));
-      report.results.push({ engine: facade.engine, version: facade.version, primitive, facade });
+      const waits = JSON.parse(run(engine, [...args, join(root, inputs[7]), helper]));
+      report.results.push({ engine: facade.engine, version: facade.version, primitive, facade, waits });
     } catch (error) { report.failures.push({ engine, message: error.message }); }
     save();
   }

@@ -1,6 +1,6 @@
 // Internal memory64 adapter under development; no shipping runtime uses it yet.
 // These branded spans describe native memory without allocating a huge JS view.
-// They are not TypedArrays: ordinary indexed access, growth and wait scheduling
+// They are not TypedArrays: ordinary indexed access, growth and async scheduling
 // belong to the remaining heap/scheduler adapter. Never replace global Atomics.
 
 const native = Atomics;
@@ -21,7 +21,7 @@ function indexWithin(value, length) {
   return index;
 }
 
-export function createNativeAtomicViews({ byteLength, atomic }) {
+export function createNativeAtomicViews({ byteLength, atomic, wait, notify }) {
   if (!Number.isSafeInteger(byteLength) || byteLength < 0 || typeof atomic !== 'function')
     throw new TypeError('Native atomics require a bounded memory and atomic primitive');
   const spans = new WeakMap();
@@ -81,6 +81,38 @@ export function createNativeAtomicViews({ byteLength, atomic }) {
       return name === 'store' ? input.converted : decode(format, BigInt(result));
     };
   }
+  function waitingAddress(format, index) {
+    ensureOpen();
+    if (format.Type !== Int32Array && format.Type !== BigInt64Array)
+      throw new TypeError('Atomic waiting requires Int32 or BigInt64 elements');
+    return format.byteOffset + indexWithin(index, format.length) * format.width;
+  }
+  atomics.wait = (span, index, value, timeout) => {
+    const format = spans.get(span);
+    if (!format) return native.wait(span, index, value, timeout);
+    if (typeof wait !== 'function') throw new TypeError('Native atomic wait adapter is not implemented');
+    const offset = waitingAddress(format, index);
+    const expected = convert(format, value).bits;
+    const number = +timeout;
+    const milliseconds = Number.isNaN(number) ? Infinity : Math.max(number, 0);
+    ensureOpen();
+    const result = Number(wait(offset, format.width, expected, milliseconds));
+    if (result !== 0 && result !== 1 && result !== 2) throw new Error('Invalid native atomic wait result');
+    return ['ok', 'not-equal', 'timed-out'][result];
+  };
+  atomics.notify = (span, index, count) => {
+    const format = spans.get(span);
+    if (!format) return native.notify(span, index, count);
+    if (typeof notify !== 'function') throw new TypeError('Native atomic notify adapter is not implemented');
+    const offset = waitingAddress(format, index);
+    let converted = Infinity;
+    if (count !== undefined) {
+      const number = +count;
+      converted = Number.isNaN(number) ? 0 : Math.max(Math.trunc(number), 0);
+    }
+    ensureOpen();
+    return Number(notify(offset, converted));
+  };
   for (const name of Object.getOwnPropertyNames(native)) {
     if (name in atomics || typeof native[name] !== 'function') continue;
     atomics[name] = (...args) => {

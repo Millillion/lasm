@@ -207,6 +207,13 @@ separately from the earlier runtime evidence below.
   pass. The unchanged primitive wait/notify controls pass again. Peak memory is
   91 MiB. These spans are not general TypedArrays; wait scheduling, growing heap
   views, real Lean execution and shipping integration remain open.
+  [Blocking wait/notify now also passes](docs/evidence/native-atomic-waits-2026-09-24.json)
+  sixteen groups per engine, including shared Wasm/native wait queues, wake
+  counts, mixed-width waiters, conversions and nineteen rejection controls.
+  Original scalar and primitive controls still pass; peak memory is 63 MiB.
+  Async waits remain unimplemented. The prototype wait transport also rejects
+  finite durations above signed 64-bit nanoseconds instead of silently reducing
+  them; that engineering gap must close before full compatibility is claimed.
 
 ## Earlier runtime evidence and remaining compatibility work
 

@@ -87,13 +87,13 @@ fail:
     lasm_probe_delete(probe); return NULL;
 }
 
-int lasm_probe_atomic_wasm(probe_t *probe, const char *name, uint64_t offset, uint64_t value,
-                           int64_t timeout, uint64_t *result, char *error, size_t capacity) {
+static int atomic_wasm(probe_t *probe, const char *name, uint64_t offset, uint64_t value,
+                       int64_t timeout, uint64_t *result, char *error, size_t capacity, bool bounded) {
     uint32_t width = strstr(name, "64") ? 8 : strstr(name, "16") ? 2 : strstr(name, "read8") ? 1 : 4;
     void *address;
     if (atomic_address(probe, offset, width, &address)) return 2;
     if (strncmp(name, "add", 3) == 0 && value > 200000) return 2;
-    if (strncmp(name, "wait", 4) == 0 && (timeout < 0 || timeout > INT64_C(5000000000))) return 2;
+    if (bounded && strncmp(name, "wait", 4) == 0 && (timeout < 0 || timeout > INT64_C(5000000000))) return 2;
     wasmtime_store_t *store = wasmtime_store_new(probe->engine, NULL, NULL);
     if (!store) { snprintf(error, capacity, "store allocation failed"); return 1; }
     wasmtime_context_t *context = wasmtime_store_context(store);
@@ -132,4 +132,19 @@ int lasm_probe_atomic_wasm(probe_t *probe, const char *name, uint64_t offset, ui
 cleanup:
     wasmtime_sharedmemory_delete(memory); wasmtime_store_delete(store);
     return status;
+}
+
+// Preserve the original bounded probe contract and its invalid-input controls.
+int lasm_probe_atomic_wasm(probe_t *probe, const char *name, uint64_t offset, uint64_t value,
+                           int64_t timeout, uint64_t *result, char *error, size_t capacity) {
+    return atomic_wasm(probe, name, offset, value, timeout, result, error, capacity, true);
+}
+
+// Blocking adapter boundary. -1 is Wasm's infinite timeout; all exercised equal
+// waits remain bounded by a finite deadline. Invalid-address checks still apply.
+int lasm_probe_atomic_wait(probe_t *probe, uint64_t offset, uint32_t width, uint64_t value,
+                           int64_t timeout, uint64_t *result, char *error, size_t capacity) {
+    if ((width != 4 && width != 8) || timeout < -1) return 2;
+    return atomic_wasm(probe, width == 8 ? "wait64" : "wait32", offset, value,
+                       timeout, result, error, capacity, false);
 }
