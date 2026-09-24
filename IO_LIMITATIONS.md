@@ -458,8 +458,16 @@ and do not establish full-suite conformance. See
   registrations, seven package tests and three released-engine package controls
   pass. This describes guest libraries, not a guarantee about host API coverage;
   see [the metadata repair](docs/evidence/runtime-library-metadata-2026-09-22.json).
-- [ ] Windows named time zones other than UTC return an explicit unsupported
-  error. Date/time behavior beyond tested UTC HTTP dates needs broader OS coverage.
+- [ ] Complete native OS acceptance of the Windows timezone APIs and broader
+  date/time behavior. Installed `.24` [repairs all 13 observed Linux differences](docs/evidence/windows-timezone-installed-2026-09-24.json)
+  in Node, Deno and Bun: ordinary Windows-only calls, including UTC, now retain
+  native Linux's error constructors, messages and errno 22. The prior UTC
+  shortcut and guest errno 28 are preserved in the failed baseline. The private
+  adapter uses Windows ICU for named zones and local identifiers. Its
+  [27 cases per engine against original Lean ICU function bodies](docs/evidence/windows-timezone-icu-controls-2026-09-24.json)
+  pass using Linux ICU; this does not establish Windows behavior. A native
+  Windows CI comparison is prepared but awaits restored SSH access. The
+  retained Lean 4.32 callable runtime has not been rebuilt with this repair.
 - [ ] Complete native Windows, macOS, and ARM64 wall-clock comparisons. On Linux
   x64, the private clock bridge now preserves pinned native Lean's microsecond
   precision; the old `Date.now()` adapter exposed only milliseconds. Full Node,

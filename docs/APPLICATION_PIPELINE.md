@@ -642,6 +642,19 @@ least 9 GiB available disk before starting. All six successful cases use the
 same installed `.23` candidate, in separate sequential guards. Other native
 platforms and complete dynamic-module handling remain open.
 
+Installed `.24` [repairs the ordinary Windows timezone APIs on Linux](evidence/windows-timezone-installed-2026-09-24.json):
+all 13 observations match native Lean in each of Node, Deno and Bun. The old
+package returned a synthetic UTC value, unsupported-operation errors for named
+zones and a guest errno for local-zone lookup. The private host dispatch now
+retains the corresponding host's behavior. On Windows, its implementation binds
+the same ICU C functions used by Lean. A supplementary cross-language control
+executes the original upstream function bodies with Linux ICU and matches 27
+cases per engine. Native Windows validation is prepared separately and has not
+run; the Linux control is not a Windows acceptance result. The runtime derivation
+verifies both changed archive members and every unchanged member, without
+rebuilding the 2,516 standard modules. The retained Lean 4.32 runtime stays outside
+this latest-release repair's claim.
+
 The [cold runtime-source workflow](../.github/workflows/application-runtime-source.yml)
 now prepares the application libraries from committed patches and pinned public
 Lean, GMP, SDK and host-helper inputs on a standard Linux x64 runner. Native

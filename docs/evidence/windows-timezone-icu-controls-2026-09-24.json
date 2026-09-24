@@ -1,0 +1,3457 @@
+{
+  "scope": "Original Lean Windows ICU function bodies executed with Linux ICU; FFI and error/representation controls only, not Windows or Wasm acceptance",
+  "report": {
+    "scope": "Original Lean Windows ICU function bodies executed with Linux ICU; FFI and error/representation controls only, not Windows or Wasm acceptance",
+    "lean": "4.34.0",
+    "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+    "adaptations": [
+      "The two original runtime functions are extracted with identical bodies. Only their external names change to linker --wrap entry points.",
+      "LEAN_WINDOWS is defined after Linux Lean/ICU headers, selecting only these functions' original ICU branches.",
+      "A separate ordinary Lean fixture calls the original APIs. Native compiler tests and upstream test files remain unchanged.",
+      "All engines bind the same Linux ICU shared library with its versioned symbols. The production adapter still loads Windows icu.dll only on Windows."
+    ],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/windows-timezone-icu-r4-resources.json",
+    "commands": [
+      {
+        "label": "native C++ version",
+        "program": "c++",
+        "args": [
+          "--version"
+        ],
+        "seconds": 0.005501973999998882,
+        "code": 0,
+        "signal": null,
+        "stdout": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "stderr": ""
+      },
+      {
+        "label": "local ICU version",
+        "program": "pkg-config",
+        "args": [
+          "--modversion",
+          "icu-i18n"
+        ],
+        "seconds": 0.004174678000003041,
+        "code": 0,
+        "signal": null,
+        "stdout": "74.2\n",
+        "stderr": ""
+      },
+      {
+        "label": "compile original ICU functions",
+        "program": "c++",
+        "args": [
+          "-std=c++20",
+          "-O2",
+          "-DNDEBUG",
+          "-fPIC",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source/src",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/original-icu.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/original-icu.o"
+        ],
+        "seconds": 0.5825253559999983,
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "generate native fixture",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+        "args": [
+          "-j1",
+          "-Dlinter.all=false",
+          "-Dcompiler.postponeCompile=false",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/Main.lean.c",
+          "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/Main.lean"
+        ],
+        "seconds": 0.4271587130000007,
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "link native fixture to original ICU functions",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+        "args": [
+          "-O2",
+          "-DNDEBUG",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+          "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/Main.lean.c",
+          "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/original-icu.o",
+          "-Wl,--wrap=lean_windows_get_next_transition",
+          "-Wl,--wrap=lean_get_windows_local_timezone_id_at",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "/usr/lib/x86_64-linux-gnu/libicuuc.so"
+        ],
+        "seconds": 0.42238124400000016,
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "node version",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "--version"
+        ],
+        "seconds": 0.0077427110000026006,
+        "code": 0,
+        "signal": null,
+        "stdout": "v26.10.0\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno version",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "--version"
+        ],
+        "seconds": 0.007257933000000776,
+        "code": 0,
+        "signal": null,
+        "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun version",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "--version"
+        ],
+        "seconds": 0.004105053999999654,
+        "code": 0,
+        "signal": null,
+        "stdout": "1.4.2\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "UTC",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.030237539999998262,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|0|false|Coordinated Universal Time|UTC\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.07253138299999773,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|0|false|Coordinated Universal Time|UTC\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.1293967929999999,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|0|false|Coordinated Universal Time|UTC\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.034982068000001164,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|0|false|Coordinated Universal Time|UTC\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "UTC",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.01631163199999719,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.05973044799999843,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.06332449699999779,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.028313732000002347,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "UTC",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.01473613800000021,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.05764403999999922,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.07392756299999746,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.03208032400000229,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "UTC",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.06722755099999995,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.05432550499999707,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.06392344400000002,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "UTC",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.027244572999999946,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.015725736000000323,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|-14400|true|Eastern Daylight Time|EDT\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.05366175400000066,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|-14400|true|Eastern Daylight Time|EDT\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.06221992699999828,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|-14400|true|Eastern Daylight Time|EDT\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.02589781700000094,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|-14400|true|Eastern Daylight Time|EDT\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "America/New_York",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.014518551999997726,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|954658800|-18000|false|Eastern Standard Time|EST\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.04959388700000272,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|954658800|-18000|false|Eastern Standard Time|EST\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.06231872400000066,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|954658800|-18000|false|Eastern Standard Time|EST\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.027650674000000437,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|954658800|-18000|false|Eastern Standard Time|EST\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "America/New_York",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.013036585999998351,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|972799200|-14400|true|Eastern Daylight Time|EDT\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.050252251000001705,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|972799200|-14400|true|Eastern Daylight Time|EDT\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.07042479100000128,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|972799200|-14400|true|Eastern Daylight Time|EDT\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.029128861999997754,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|972799200|-14400|true|Eastern Daylight Time|EDT\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.01615964399999939,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|-1633280400|-18000|false|Eastern Standard Time|EST\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.06471156399999745,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|-1633280400|-18000|false|Eastern Standard Time|EST\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.0675858530000005,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|-1633280400|-18000|false|Eastern Standard Time|EST\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.026137516999999208,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|-1633280400|-18000|false|Eastern Standard Time|EST\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.016786618999998608,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|7200|true|Central European Summer Time|GMT+2\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.05762780500000008,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|7200|true|Central European Summer Time|GMT+2\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.06194264599999951,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|7200|true|Central European Summer Time|GMT+2\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.02613981100000092,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|7200|true|Central European Summer Time|GMT+2\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Europe/Berlin",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.014389084000002186,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|954032400|3600|false|Central European Standard Time|GMT+1\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.05612904200000048,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|954032400|3600|false|Central European Standard Time|GMT+1\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.06330654499999946,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|954032400|3600|false|Central European Standard Time|GMT+1\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.025695314000000507,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|954032400|3600|false|Central European Standard Time|GMT+1\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Europe/Berlin",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.013697588999999425,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|972781200|7200|true|Central European Summer Time|GMT+2\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.0512195759999995,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|972781200|7200|true|Central European Summer Time|GMT+2\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.0637895290000015,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|972781200|7200|true|Central European Summer Time|GMT+2\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.02574710700000287,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|972781200|7200|true|Central European Summer Time|GMT+2\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.014030690999999934,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|-1693706400|3600|false|Central European Standard Time|GMT+1\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.05287198699999863,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|-1693706400|3600|false|Central European Standard Time|GMT+1\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.06390849700000036,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|-1693706400|3600|false|Central European Standard Time|GMT+1\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.027455316999999924,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|-1693706400|3600|false|Central European Standard Time|GMT+1\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.013326348000002326,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.055835033000003025,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.0692585020000006,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.025917568000000755,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Australia/Lord_Howe",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.01338836000000083,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|953996400|39600|true|Lord Howe Daylight Time|GMT+11\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.04932317400000102,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|953996400|39600|true|Lord Howe Daylight Time|GMT+11\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.0701282769999998,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|953996400|39600|true|Lord Howe Daylight Time|GMT+11\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.02605425000000105,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|953996400|39600|true|Lord Howe Daylight Time|GMT+11\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Australia/Lord_Howe",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.014475941000000603,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|967303800|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.06289815499999896,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|967303800|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.06557196900000054,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|967303800|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.02649285699999746,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|967303800|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.01302320200000031,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|352216800|36000|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.053271090000002005,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|352216800|36000|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.06240585699999792,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|352216800|36000|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.0261784090000001,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|352216800|36000|false|Lord Howe Standard Time|GMT+10:30\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.013622467000001052,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|0|false|GMT|GMT\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.05663141299999916,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|0|false|GMT|GMT\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.06869933099999981,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|0|false|GMT|GMT\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.027192418999999062,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|some|0|0|false|GMT|GMT\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Lasm/No_such_zone",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.013170716000000538,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.05299268700000175,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.07294858300000123,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.02583157200000278,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Lasm/No_such_zone",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.01368205400000079,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.05179193800000212,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.06995029999999679,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.025493256000001567,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.013446774000000005,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.053130228000001806,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.06338426300000356,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.025714348000001337,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|none\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.10977796700000181,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.047146262999998724,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.05721427200000107,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "true"
+        ],
+        "seconds": 0.023355142000000342,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.010697159999999713,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.05248676100000012,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.06621163399999933,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "946684800",
+          "false"
+        ],
+        "seconds": 0.02221382900000026,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.009389553000000888,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.061099594000002984,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.06150259200000073,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "962409600",
+          "false"
+        ],
+        "seconds": 0.02206910699999935,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.010465413000001717,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.04760908500000005,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.06283325500000138,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "false"
+        ],
+        "seconds": 0.022210643999998864,
+        "code": 0,
+        "signal": null,
+        "stdout": "error|22|failed to read identifier\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "local",
+          "0"
+        ],
+        "seconds": 0.015477156999997533,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "local",
+          "0"
+        ],
+        "seconds": 0.05554384299999947,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "local",
+          "0"
+        ],
+        "seconds": 0.06715221100000053,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "local",
+          "0"
+        ],
+        "seconds": 0.025377603000000817,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "local",
+          "-2147483648"
+        ],
+        "seconds": 0.013546951999996963,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "local",
+          "-2147483648"
+        ],
+        "seconds": 0.05244351800000004,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "local",
+          "-2147483648"
+        ],
+        "seconds": 0.06304071900000054,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "local",
+          "-2147483648"
+        ],
+        "seconds": 0.02565646999999808,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "native ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-icu-r4/native-icu",
+        "args": [
+          "local",
+          "946684800"
+        ],
+        "seconds": 0.013144539000000805,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "node ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "local",
+          "946684800"
+        ],
+        "seconds": 0.05631645000000208,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "args": [
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "local",
+          "946684800"
+        ],
+        "seconds": 0.06178530800000226,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun ICU case",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "args": [
+          "/home/lastmjs/development/lasm/compiler/integration/fixtures/windows-timezone-icu-host.mjs",
+          "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+          "_74",
+          "local",
+          "946684800"
+        ],
+        "seconds": 0.02526603299999988,
+        "code": 0,
+        "signal": null,
+        "stdout": "value|America/New_York\n",
+        "stderr": ""
+      }
+    ],
+    "cases": [
+      {
+        "args": [
+          "transition",
+          "UTC",
+          "-2147483648",
+          "true"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|0|0|false|Coordinated Universal Time|UTC\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|0|false|Coordinated Universal Time|UTC\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|0|false|Coordinated Universal Time|UTC\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|0|false|Coordinated Universal Time|UTC\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "UTC",
+          "946684800",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|none\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "UTC",
+          "962409600",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|none\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "UTC",
+          "-2147483648",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|none\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "true"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|0|-14400|true|Eastern Daylight Time|EDT\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|-14400|true|Eastern Daylight Time|EDT\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|-14400|true|Eastern Daylight Time|EDT\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|-14400|true|Eastern Daylight Time|EDT\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "America/New_York",
+          "946684800",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|954658800|-18000|false|Eastern Standard Time|EST\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|954658800|-18000|false|Eastern Standard Time|EST\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|954658800|-18000|false|Eastern Standard Time|EST\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|954658800|-18000|false|Eastern Standard Time|EST\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "America/New_York",
+          "962409600",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|972799200|-14400|true|Eastern Daylight Time|EDT\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|972799200|-14400|true|Eastern Daylight Time|EDT\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|972799200|-14400|true|Eastern Daylight Time|EDT\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|972799200|-14400|true|Eastern Daylight Time|EDT\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "America/New_York",
+          "-2147483648",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|-1633280400|-18000|false|Eastern Standard Time|EST\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|-1633280400|-18000|false|Eastern Standard Time|EST\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|-1633280400|-18000|false|Eastern Standard Time|EST\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|-1633280400|-18000|false|Eastern Standard Time|EST\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "true"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|0|7200|true|Central European Summer Time|GMT+2\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|7200|true|Central European Summer Time|GMT+2\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|7200|true|Central European Summer Time|GMT+2\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|7200|true|Central European Summer Time|GMT+2\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Europe/Berlin",
+          "946684800",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|954032400|3600|false|Central European Standard Time|GMT+1\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|954032400|3600|false|Central European Standard Time|GMT+1\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|954032400|3600|false|Central European Standard Time|GMT+1\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|954032400|3600|false|Central European Standard Time|GMT+1\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Europe/Berlin",
+          "962409600",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|972781200|7200|true|Central European Summer Time|GMT+2\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|972781200|7200|true|Central European Summer Time|GMT+2\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|972781200|7200|true|Central European Summer Time|GMT+2\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|972781200|7200|true|Central European Summer Time|GMT+2\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Europe/Berlin",
+          "-2147483648",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|-1693706400|3600|false|Central European Standard Time|GMT+1\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|-1693706400|3600|false|Central European Standard Time|GMT+1\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|-1693706400|3600|false|Central European Standard Time|GMT+1\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|-1693706400|3600|false|Central European Standard Time|GMT+1\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "true"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|0|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Australia/Lord_Howe",
+          "946684800",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|953996400|39600|true|Lord Howe Daylight Time|GMT+11\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|953996400|39600|true|Lord Howe Daylight Time|GMT+11\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|953996400|39600|true|Lord Howe Daylight Time|GMT+11\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|953996400|39600|true|Lord Howe Daylight Time|GMT+11\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Australia/Lord_Howe",
+          "962409600",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|967303800|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|967303800|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|967303800|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|967303800|37800|false|Lord Howe Standard Time|GMT+10:30\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Australia/Lord_Howe",
+          "-2147483648",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|352216800|36000|false|Lord Howe Standard Time|GMT+10:30\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|352216800|36000|false|Lord Howe Standard Time|GMT+10:30\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|352216800|36000|false|Lord Howe Standard Time|GMT+10:30\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|352216800|36000|false|Lord Howe Standard Time|GMT+10:30\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "true"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|some|0|0|false|GMT|GMT\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|0|false|GMT|GMT\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|0|false|GMT|GMT\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|some|0|0|false|GMT|GMT\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Lasm/No_such_zone",
+          "946684800",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|none\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Lasm/No_such_zone",
+          "962409600",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|none\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "Lasm/No_such_zone",
+          "-2147483648",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|none\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|none\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "true"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "error|22|failed to read identifier\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "946684800",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "error|22|failed to read identifier\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "962409600",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "error|22|failed to read identifier\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "transition",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "-2147483648",
+          "false"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "error|22|failed to read identifier\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "error|22|failed to read identifier\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "local",
+          "0"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|America/New_York\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|America/New_York\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|America/New_York\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|America/New_York\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "local",
+          "-2147483648"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|America/New_York\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|America/New_York\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|America/New_York\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|America/New_York\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      },
+      {
+        "args": [
+          "local",
+          "946684800"
+        ],
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "value|America/New_York\n",
+          "stderr": ""
+        },
+        "engines": [
+          {
+            "name": "node",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|America/New_York\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "deno",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|America/New_York\n",
+              "stderr": ""
+            },
+            "equal": true
+          },
+          {
+            "name": "bun",
+            "actual": {
+              "code": 0,
+              "signal": null,
+              "stdout": "value|America/New_York\n",
+              "stderr": ""
+            },
+            "equal": true
+          }
+        ]
+      }
+    ],
+    "passed": true,
+    "sourceSha256": "426bd6862706a516dbdf70fe7d8993efc028b115d386cef06fe0b081c14a5dcf",
+    "sourceArchive": {
+      "file": "/home/lastmjs/development/lasm/compiler/.cache/downloads/lean4-v4.34.0.tar.gz",
+      "sha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+      "member": "*/src/runtime/io.cpp",
+      "extractedSha256": "426bd6862706a516dbdf70fe7d8993efc028b115d386cef06fe0b081c14a5dcf"
+    },
+    "extractedSha256": "666f8879d58ce90000f665665ca07b324c2c667af3b076af0539a51160b6a8c3",
+    "wrapperSha256": "d31b4d49af037acaea0706142ad566e1eb2ca37d7c7c8833c8c5c166f05d526f",
+    "compiler": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "icuVersion": "74.2",
+    "library": "/usr/lib/x86_64-linux-gnu/libicui18n.so",
+    "librarySha256": "3550b194eb2cf2e6f798f033eb9ca279d498c21296b4a18790ce158d2023e47b",
+    "fixtureSha256": "f5e6bf06562dabc2336c653f240a068a88b77b9033f7f694ec2ca051c0bd556f",
+    "nativeSha256": "3d77c6c8863559a66caa80a7ab3541ec9528084335a1660a199921f59292a719",
+    "engines": [
+      {
+        "name": "node",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "version": "v26.10.0"
+      },
+      {
+        "name": "deno",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3"
+      },
+      {
+        "name": "bun",
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2"
+      }
+    ],
+    "hostFixtureSha256": "7b1ce7afb9a6f886cdee0478789c812414f02e3e9f49a8e609829c9e261ff4f6",
+    "hostModuleSha256": "a0ff6db97ac171acb6b1c5e093ffde8de26936617ad9fefb226cd9034a0d51dc",
+    "sourcesUnchanged": true,
+    "finishedAt": "2026-09-24T15:58:21.071Z"
+  },
+  "resources": {
+    "startedAt": "2026-09-24T15:57:58.009Z",
+    "command": [
+      "bash",
+      "-c",
+      "set -e; export LASM_TOOLCHAIN_CACHE=\"$PWD/.work/application-installed-r3/workspace/toolchains\"; exec .cache/js-runtimes/node-26.10.0/bin/node --max-old-space-size=256 scripts/full-lean/probe-windows-timezone-icu.mjs .work/upstream-mixed-native-r1/source .work/windows-timezone-icu-r4 .cache/js-runtimes/deno-2.9.7/deno .cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "625c2d54-67b3-4e75-9b04-5cc9e38c71a6",
+    "limits": {
+      "memoryMax": 2147483648,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 1717986918,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24077750272
+    },
+    "minimumHostAvailable": 23925436416,
+    "peakMemoryBytes": 234643456,
+    "peakTasks": 19,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/windows-timezone-icu-r4-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T15:58:21.038Z",
+      "memoryBytes": 161345536,
+      "peakMemoryBytes": 234643456,
+      "swapBytes": 0,
+      "tasks": 13,
+      "memoryBreakdown": {
+        "anon": 136658944,
+        "file": 17489920,
+        "kernel": 3678208,
+        "shmem": 0,
+        "file_mapped": 241664,
+        "inactive_file": 2646016,
+        "slab": 786624
+      },
+      "pressureSomeAvg10": 1.75,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T15:58:21.145Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 31383552,
+      "peakMemoryBytes": 234643456,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11444224,
+        "file": 17489920,
+        "kernel": 1396736,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 2646016,
+        "slab": 485776
+      },
+      "pressureSomeAvg10": 1.75,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T15:58:21.170Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "units": {
+    "hostPacketAndPosixErrors": {
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "skip": 0,
+      "logSha256": "1e91a59e1347b14704af6d25e5cf52d411bdb887f15c1e23337befdaa3019c99"
+    },
+    "deploymentOutput": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skip": 0,
+      "logSha256": "1fc351383c1796881ecaeb508d3dfe744ca7fa35b5fff5fd4ec28192cc8911d7"
+    }
+  },
+  "preservedSetupFailures": [
+    {
+      "file": ".work/windows-timezone-icu-r1/result.json",
+      "sha256": "123567086037eeb91552e61f6fd463c65429bbce1d0db7450857da8001dd1e11",
+      "why": "The verifier initially compared the pristine release source to the separately patched Wasm source index.",
+      "resourceReport": ".work/product-acceptance/windows-timezone-icu-r1-resources.json",
+      "peakMemoryBytes": 151851008,
+      "result": {
+        "code": 1,
+        "signal": null
+      }
+    },
+    {
+      "file": ".work/windows-timezone-icu-r2/result.json",
+      "sha256": "f3f4a101402a90ce8d104325802010c0d0a497497e793caa46fb765279457861",
+      "why": "An overly broad archive wildcard included stage0/src/runtime/io.cpp as well as src/runtime/io.cpp.",
+      "resourceReport": ".work/product-acceptance/windows-timezone-icu-r2-resources.json",
+      "peakMemoryBytes": 201244672,
+      "result": {
+        "code": 1,
+        "signal": null
+      }
+    },
+    {
+      "file": ".work/windows-timezone-icu-r3/result.json",
+      "sha256": "e6bf185e0a118105b2bdee9a5f8fbed5715ba5c9d43560d2981bc84b7a685afa",
+      "why": "Adding the system ICU library directory changed the native Lean CRT search order. Explicit ICU library file paths preserve that order.",
+      "resourceReport": ".work/product-acceptance/windows-timezone-icu-r3-resources.json",
+      "peakMemoryBytes": 282660864,
+      "result": {
+        "code": 1,
+        "signal": null
+      }
+    }
+  ],
+  "officialWindowsApiReference": "https://learn.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-)",
+  "remaining": [
+    "Installed AOT pre-fix/fixed comparisons",
+    "Native Windows ICU and installed application acceptance",
+    "Other native platforms and full API coverage"
+  ]
+}

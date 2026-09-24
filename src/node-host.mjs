@@ -6,6 +6,7 @@ import { randomBytes } from 'node:crypto';
 import { createNodeNetwork } from './node-network.mjs';
 import { nativeFiles } from './native-files.mjs';
 import { nativeClock } from './native-clock.mjs';
+import { nativeWindowsTimeZone } from './native-windows-timezone.mjs';
 import { createNodeProcesses } from './node-process.mjs';
 import { createNodeUdp } from './node-udp.mjs';
 import { nativeDns } from './native-dns.mjs';
@@ -146,6 +147,13 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
   const pending = new HandleTable();
   function dispatch(op, id, arg, bytes, context, state) {
     const path = bytes => pathAt(bytes, state);
+    if (op === 180) {
+      const zone = nativeWindowsTimeZone().nextTransition(bytes, arg, id !== 0);
+      return zone === null ? numbers(0) : Buffer.concat([
+        numbers(1, zone.timestamp, zone.offset, Number(zone.isDST), zone.name.length), zone.name, zone.abbreviation,
+      ]);
+    }
+    if (op === 181) return nativeWindowsTimeZone().localIdentifier(arg);
     if (op >= 160 && op <= 164) return signals.dispatch(op, id, arg);
     if (op >= 120 && op <= 144) return system.dispatch(op, id, arg, bytes);
     if (op === 115) {

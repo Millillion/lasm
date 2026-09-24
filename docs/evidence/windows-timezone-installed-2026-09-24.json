@@ -1,0 +1,2706 @@
+{
+  "scope": "Installed .24 ordinary Lean Windows timezone APIs now match native Linux rejection semantics in Node, Deno and Bun; private ICU implementation has separate Linux ABI controls, while native Windows validation is pending.",
+  "recordedAt": "2026-09-24T16:10:36.855372+00:00",
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r21/lasm-compiler-0.1.0-experimental.24.tgz",
+    "sha256": "f165c4b409f576369c86efcd0c20367371e34bbbad9c84ba0a4d5d440be618d4",
+    "compressedBytes": 125634487,
+    "installedBytes": 631040511,
+    "files": 2697,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-timezone-r1-resources.json",
+    "recordedAt": "2026-09-24T16:02:42.123Z"
+  },
+  "cases": [
+    {
+      "file": ".work/application-io-node-windows-timezone-fixed-r1/result.json",
+      "sha256": "ea72f9fd216b737feb372416891ddbf7c1774d5c2e194a219afa5918bd54e974",
+      "report": {
+        "scope": "Independent native-interpreted/native-compiled and installed relocated application IO comparisons",
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "host": "linux-x64",
+        "target": "node",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-node-windows-timezone-fixed-r1-resources.json",
+        "cases": [
+          {
+            "name": "windows-timezone",
+            "source": "integration/fixtures/WindowsTimezone.lean",
+            "marker": "windows timezone observations completed\n",
+            "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+            "passed": true,
+            "interpreted": {
+              "code": 0,
+              "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+              "stderr": ""
+            },
+            "nativeCompiled": {
+              "code": 0,
+              "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+              "stderr": ""
+            },
+            "build": {
+              "schema": 1,
+              "lean": "4.34.0",
+              "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+              "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+              "emscripten": "6.0.9",
+              "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+              "runtimeIdentity": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a",
+              "buildDriverIdentity": "4fa31710c112a0f98a25ba47e953397375391d9c644f17851ce7874500992599",
+              "target": "node",
+              "memoryMode": 1,
+              "modules": [
+                {
+                  "module": "Main",
+                  "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+                  "cSha256": "4ed90de776f6e790104863fd9ae0332c16b772c701a603e83cd110b67ce2e2f4"
+                }
+              ],
+              "signature": "bd7763def8dfe0e2b8de0fe9fb073430c68d7c34cff895bf6c421fa336ab972a",
+              "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+              "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+            },
+            "wasmSha256": "df9778912afd05527877de05c6a25d17c19777cf18c660821ee3592873709602",
+            "actual": {
+              "code": 0,
+              "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+              "stderr": ""
+            },
+            "deployment": {
+              "sourceHidden": true,
+              "path": "",
+              "buildEnvironmentRemoved": true,
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/relocated deployment"
+            },
+            "sourceUnchanged": true,
+            "status": "passed"
+          }
+        ],
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.007334270999999717,
+            "stdout": "v26.10.0\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/native-interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "-Dlinter.all=false",
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source/Main.lean",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/native-interpreted",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.39743049299999983,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/generate native C",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "-j1",
+              "-Dlinter.all=false",
+              "-Dcompiler.postponeCompile=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source/Main.lean.c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source/Main.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.37946573200000056,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/compile native",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "-DNDEBUG",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source/native",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source/Main.lean.c"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.5936073610000003,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/native-compiled",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source/native",
+            "args": [
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/native-compiled",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.006474788999999873,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/build application",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source/Main.lean",
+              "--target",
+              "node",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 62.952362449,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/dist\n"
+          },
+          {
+            "label": "windows-timezone/deployed",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/relocated deployment/main.mjs",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/deployed",
+            "code": 0,
+            "signal": null,
+            "seconds": 1.851507648999992,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "engineVersion": "v26.10.0",
+        "finishedAt": "2026-09-24T16:05:25.268Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T16:04:05.758Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-io-case-r3.sh",
+          "node",
+          "windows-timezone",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "6d7d5964-3184-46e6-baa4-2c72ec962282",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24102858752
+        },
+        "minimumHostAvailable": 20427309056,
+        "peakMemoryBytes": 3522674688,
+        "peakTasks": 36,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-node-windows-timezone-fixed-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T16:05:25.259Z",
+          "memoryBytes": 569741312,
+          "peakMemoryBytes": 3522674688,
+          "swapBytes": 0,
+          "tasks": 12,
+          "memoryBreakdown": {
+            "anon": 154914816,
+            "file": 367546368,
+            "kernel": 14819328,
+            "shmem": 0,
+            "file_mapped": 929792,
+            "inactive_file": 362639360,
+            "slab": 11909048
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T16:05:25.338Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 393408512,
+          "peakMemoryBytes": 3522674688,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 367554560,
+            "kernel": 12623872,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 362647552,
+            "slab": 11668896
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T16:05:25.361Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-node-windows-timezone-fixed-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/relocated deployment/program.wasm",
+            "originalBytes": 160424359,
+            "originalSha256": "df9778912afd05527877de05c6a25d17c19777cf18c660821ee3592873709602",
+            "mode": 509,
+            "mtimeNs": 1790265922946395372,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37268541,
+            "archiveSha256": "a3e65576101060722687d0db4b9923de30d95f913cdc3d00dceb23c50e3f1d60",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1",
+              "receiptSha256": "ea72f9fd216b737feb372416891ddbf7c1774d5c2e194a219afa5918bd54e974"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source.hidden/.lake/lasm/applications/7cac868b0be9177f/bd7763def8dfe0e2b8de0fe9fb073430c68d7c34cff895bf6c421fa336ab972a/dist/program.wasm",
+            "originalBytes": 160424359,
+            "originalSha256": "df9778912afd05527877de05c6a25d17c19777cf18c660821ee3592873709602",
+            "mode": 509,
+            "mtimeNs": 1790265912143284602,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source.hidden/.lake/lasm/applications/7cac868b0be9177f/bd7763def8dfe0e2b8de0fe9fb073430c68d7c34cff895bf6c421fa336ab972a/dist/program.wasm.gz",
+            "archiveBytes": 37268541,
+            "archiveSha256": "a3e65576101060722687d0db4b9923de30d95f913cdc3d00dceb23c50e3f1d60",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1",
+              "receiptSha256": "ea72f9fd216b737feb372416891ddbf7c1774d5c2e194a219afa5918bd54e974"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source.hidden/native",
+            "originalBytes": 4904464,
+            "originalSha256": "88fe5d25019488b4848d34ab0a77cc8da19b2272138e193967ec3c9361907de8",
+            "mode": 509,
+            "mtimeNs": 1790265859999748074,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1/windows-timezone/source.hidden/native.gz",
+            "archiveBytes": 1425583,
+            "archiveSha256": "bf5118e531d4c169edeaf5254298022bbe2bd616bc14501badeb9c8712879250",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-windows-timezone-fixed-r1",
+              "receiptSha256": "ea72f9fd216b737feb372416891ddbf7c1774d5c2e194a219afa5918bd54e974"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 249790517,
+        "finishedAt": "2026-09-24T16:05:31.699386+00:00"
+      }
+    },
+    {
+      "file": ".work/application-io-deno-windows-timezone-fixed-r1/result.json",
+      "sha256": "fd9ddffa2eb6b2e38d77a37175c9e98909d53979344a38888b1c2c6939db9b74",
+      "report": {
+        "scope": "Independent native-interpreted/native-compiled and installed relocated application IO comparisons",
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "host": "linux-x64",
+        "target": "deno",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-deno-windows-timezone-fixed-r1-resources.json",
+        "cases": [
+          {
+            "name": "windows-timezone",
+            "source": "integration/fixtures/WindowsTimezone.lean",
+            "marker": "windows timezone observations completed\n",
+            "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+            "passed": true,
+            "interpreted": {
+              "code": 0,
+              "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+              "stderr": ""
+            },
+            "nativeCompiled": {
+              "code": 0,
+              "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+              "stderr": ""
+            },
+            "build": {
+              "schema": 1,
+              "lean": "4.34.0",
+              "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+              "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+              "emscripten": "6.0.9",
+              "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+              "runtimeIdentity": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a",
+              "buildDriverIdentity": "4fa31710c112a0f98a25ba47e953397375391d9c644f17851ce7874500992599",
+              "target": "deno",
+              "memoryMode": 1,
+              "modules": [
+                {
+                  "module": "Main",
+                  "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+                  "cSha256": "4ed90de776f6e790104863fd9ae0332c16b772c701a603e83cd110b67ce2e2f4"
+                }
+              ],
+              "signature": "61987d05ed1c0d03e0520fbd2c348154ffd3afa8ff0e66d0593ff1fe96a9b1fe",
+              "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+              "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+            },
+            "wasmSha256": "df9778912afd05527877de05c6a25d17c19777cf18c660821ee3592873709602",
+            "actual": {
+              "code": 0,
+              "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+              "stderr": ""
+            },
+            "deployment": {
+              "sourceHidden": true,
+              "path": "",
+              "buildEnvironmentRemoved": true,
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/relocated deployment"
+            },
+            "sourceUnchanged": true,
+            "status": "passed"
+          }
+        ],
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.0072489709999990735,
+            "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/native-interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "-Dlinter.all=false",
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source/Main.lean",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/native-interpreted",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.3582528570000013,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/generate native C",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "-j1",
+              "-Dlinter.all=false",
+              "-Dcompiler.postponeCompile=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source/Main.lean.c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source/Main.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.3746797339999994,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/compile native",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "-DNDEBUG",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source/native",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source/Main.lean.c"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.5926066740000006,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/native-compiled",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source/native",
+            "args": [
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/native-compiled",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.006420489000000089,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/build application",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source/Main.lean",
+              "--target",
+              "deno",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 61.772609205,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for deno\u2026\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for deno: /home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/dist\n"
+          },
+          {
+            "label": "windows-timezone/deployed",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/relocated deployment/main.mjs",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/deployed",
+            "code": 0,
+            "signal": null,
+            "seconds": 2.365222178000011,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "finishedAt": "2026-09-24T16:06:50.864Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T16:05:31.824Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-io-case-r3.sh",
+          "deno",
+          "windows-timezone",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "e741e5d7-e3ba-49da-9d33-3aa3072cb004",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23817199616
+        },
+        "minimumHostAvailable": 20545773568,
+        "peakMemoryBytes": 3536908288,
+        "peakTasks": 37,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-deno-windows-timezone-fixed-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T16:06:50.915Z",
+          "memoryBytes": 394096640,
+          "peakMemoryBytes": 3536908288,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 7634944,
+            "file": 373092352,
+            "kernel": 12492800,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 368025600,
+            "slab": 11793672
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T16:06:50.931Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 398221312,
+          "peakMemoryBytes": 3536908288,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11661312,
+            "file": 373092352,
+            "kernel": 12738560,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 368025600,
+            "slab": 11807632
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T16:06:50.958Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-deno-windows-timezone-fixed-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/relocated deployment/program.wasm",
+            "originalBytes": 160424359,
+            "originalSha256": "df9778912afd05527877de05c6a25d17c19777cf18c660821ee3592873709602",
+            "mode": 509,
+            "mtimeNs": 1790266007968262926,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37268541,
+            "archiveSha256": "a3e65576101060722687d0db4b9923de30d95f913cdc3d00dceb23c50e3f1d60",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1",
+              "receiptSha256": "fd9ddffa2eb6b2e38d77a37175c9e98909d53979344a38888b1c2c6939db9b74"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source.hidden/.lake/lasm/applications/efd25ac23d3bf175/61987d05ed1c0d03e0520fbd2c348154ffd3afa8ff0e66d0593ff1fe96a9b1fe/dist/program.wasm",
+            "originalBytes": 160424359,
+            "originalSha256": "df9778912afd05527877de05c6a25d17c19777cf18c660821ee3592873709602",
+            "mode": 509,
+            "mtimeNs": 1790265997629157805,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source.hidden/.lake/lasm/applications/efd25ac23d3bf175/61987d05ed1c0d03e0520fbd2c348154ffd3afa8ff0e66d0593ff1fe96a9b1fe/dist/program.wasm.gz",
+            "archiveBytes": 37268541,
+            "archiveSha256": "a3e65576101060722687d0db4b9923de30d95f913cdc3d00dceb23c50e3f1d60",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1",
+              "receiptSha256": "fd9ddffa2eb6b2e38d77a37175c9e98909d53979344a38888b1c2c6939db9b74"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source.hidden/native",
+            "originalBytes": 4904464,
+            "originalSha256": "88fe5d25019488b4848d34ab0a77cc8da19b2272138e193967ec3c9361907de8",
+            "mode": 509,
+            "mtimeNs": 1790265946209633475,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1/windows-timezone/source.hidden/native.gz",
+            "archiveBytes": 1425583,
+            "archiveSha256": "bf5118e531d4c169edeaf5254298022bbe2bd616bc14501badeb9c8712879250",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-windows-timezone-fixed-r1",
+              "receiptSha256": "fd9ddffa2eb6b2e38d77a37175c9e98909d53979344a38888b1c2c6939db9b74"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 249790517,
+        "finishedAt": "2026-09-24T16:06:57.259943+00:00"
+      }
+    },
+    {
+      "file": ".work/application-io-bun-windows-timezone-fixed-r1/result.json",
+      "sha256": "ac70d92754354ca21d4c8bf6d102832b94b0a2228ebd040a45a0d5f5d8d7f17f",
+      "report": {
+        "scope": "Independent native-interpreted/native-compiled and installed relocated application IO comparisons",
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "host": "linux-x64",
+        "target": "bun",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-bun-windows-timezone-fixed-r1-resources.json",
+        "cases": [
+          {
+            "name": "windows-timezone",
+            "source": "integration/fixtures/WindowsTimezone.lean",
+            "marker": "windows timezone observations completed\n",
+            "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+            "passed": true,
+            "interpreted": {
+              "code": 0,
+              "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+              "stderr": ""
+            },
+            "nativeCompiled": {
+              "code": 0,
+              "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+              "stderr": ""
+            },
+            "build": {
+              "schema": 1,
+              "lean": "4.34.0",
+              "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+              "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+              "emscripten": "6.0.9",
+              "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+              "runtimeIdentity": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a",
+              "buildDriverIdentity": "4fa31710c112a0f98a25ba47e953397375391d9c644f17851ce7874500992599",
+              "target": "bun",
+              "memoryMode": 2,
+              "modules": [
+                {
+                  "module": "Main",
+                  "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+                  "cSha256": "4ed90de776f6e790104863fd9ae0332c16b772c701a603e83cd110b67ce2e2f4"
+                }
+              ],
+              "signature": "7d14f7ca8eb231ee684e20a4c69422ac0e22ef84a09996b0d44765b59e2fbed2",
+              "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+              "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+            },
+            "wasmSha256": "439e85a9f8936d819dd352639dc9784c2b419f639fb67162fc9971f928169e52",
+            "actual": {
+              "code": 0,
+              "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+              "stderr": ""
+            },
+            "deployment": {
+              "sourceHidden": true,
+              "path": "",
+              "buildEnvironmentRemoved": true,
+              "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/relocated deployment"
+            },
+            "sourceUnchanged": true,
+            "status": "passed"
+          }
+        ],
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.004549365999999282,
+            "stdout": "1.4.2\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/native-interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "-Dlinter.all=false",
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source/Main.lean",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/native-interpreted",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.37023562000000126,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/generate native C",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "-j1",
+              "-Dlinter.all=false",
+              "-Dcompiler.postponeCompile=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source/Main.lean.c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source/Main.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.3656517499999991,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/compile native",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "-DNDEBUG",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source/native",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source/Main.lean.c"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.583263347,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/native-compiled",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source/native",
+            "args": [
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/native-compiled",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.006653887000000395,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/build application",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source/Main.lean",
+              "--target",
+              "bun",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 91.809036994,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for bun\u2026\nBuilding Main.lean for bun\u2026\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for bun: /home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/dist\n"
+          },
+          {
+            "label": "windows-timezone/deployed",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/relocated deployment/main.mjs",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/deployed",
+            "code": 0,
+            "signal": null,
+            "seconds": 2.1608906209999987,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "engineVersion": "1.4.2",
+        "finishedAt": "2026-09-24T16:08:46.395Z"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T16:06:57.395Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-io-case-r3.sh",
+          "bun",
+          "windows-timezone",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "b21d0423-792c-4cbd-9dc6-5dbc17f33db5",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23554207744
+        },
+        "minimumHostAvailable": 20205973504,
+        "peakMemoryBytes": 3691913216,
+        "peakTasks": 46,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-bun-windows-timezone-fixed-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T16:08:46.328Z",
+          "memoryBytes": 1528815616,
+          "peakMemoryBytes": 3691913216,
+          "swapBytes": 0,
+          "tasks": 13,
+          "memoryBreakdown": {
+            "anon": 1083047936,
+            "file": 386031616,
+            "kernel": 18477056,
+            "shmem": 0,
+            "file_mapped": 888832,
+            "inactive_file": 381124608,
+            "slab": 12431528
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T16:08:46.464Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 412536832,
+          "peakMemoryBytes": 3691913216,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 386039808,
+            "kernel": 13180928,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 381132800,
+            "slab": 12212896
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T16:08:46.488Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-bun-windows-timezone-fixed-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/relocated deployment/program.wasm",
+            "originalBytes": 166028330,
+            "originalSha256": "439e85a9f8936d819dd352639dc9784c2b419f639fb67162fc9971f928169e52",
+            "mode": 509,
+            "mtimeNs": 1790266123739433716,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/relocated deployment/program.wasm.gz",
+            "archiveBytes": 38416566,
+            "archiveSha256": "1409b3b3b039183fb57b47ad6f953c27e5eeeaf9a896a31902549ea54ed4ad1b",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1",
+              "receiptSha256": "ac70d92754354ca21d4c8bf6d102832b94b0a2228ebd040a45a0d5f5d8d7f17f"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source.hidden/.lake/lasm/applications/d62949249cb5f727/7d14f7ca8eb231ee684e20a4c69422ac0e22ef84a09996b0d44765b59e2fbed2/dist/program.wasm",
+            "originalBytes": 166028330,
+            "originalSha256": "439e85a9f8936d819dd352639dc9784c2b419f639fb67162fc9971f928169e52",
+            "mode": 509,
+            "mtimeNs": 1790266113889334518,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source.hidden/.lake/lasm/applications/d62949249cb5f727/7d14f7ca8eb231ee684e20a4c69422ac0e22ef84a09996b0d44765b59e2fbed2/dist/program.wasm.gz",
+            "archiveBytes": 38416566,
+            "archiveSha256": "1409b3b3b039183fb57b47ad6f953c27e5eeeaf9a896a31902549ea54ed4ad1b",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1",
+              "receiptSha256": "ac70d92754354ca21d4c8bf6d102832b94b0a2228ebd040a45a0d5f5d8d7f17f"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source.hidden/native",
+            "originalBytes": 4904464,
+            "originalSha256": "88fe5d25019488b4848d34ab0a77cc8da19b2272138e193967ec3c9361907de8",
+            "mode": 509,
+            "mtimeNs": 1790266031936506242,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1/windows-timezone/source.hidden/native.gz",
+            "archiveBytes": 1425583,
+            "archiveSha256": "bf5118e531d4c169edeaf5254298022bbe2bd616bc14501badeb9c8712879250",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-windows-timezone-fixed-r1",
+              "receiptSha256": "ac70d92754354ca21d4c8bf6d102832b94b0a2228ebd040a45a0d5f5d8d7f17f"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 258702409,
+        "finishedAt": "2026-09-24T16:08:53.040994+00:00"
+      }
+    }
+  ],
+  "passed": true,
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "expected": "v4.34.0",
+      "tag": "v4.34.0",
+      "publishedAt": "2026-09-14T14:04:36Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "expected": "v2.9.7",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "expected": "bun-v1.4.2",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "expected": "v26.10.0",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false
+    },
+    "checkedAt": "2026-09-24T15:47:23.152Z"
+  },
+  "baseline": {
+    "file": ".work/windows-timezone-node-baseline-r1/result.json",
+    "sha256": "eec7205adffa99c0cbe983cad352be53d3993fd36527afe5583c65232658ea8a",
+    "report": {
+      "scope": "Independent native-interpreted/native-compiled and installed relocated application IO comparisons",
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "host": "linux-x64",
+      "target": "node",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/windows-timezone-node-baseline-r1-resources.json",
+      "cases": [
+        {
+          "name": "windows-timezone",
+          "source": "integration/fixtures/WindowsTimezone.lean",
+          "marker": "windows timezone observations completed\n",
+          "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+          "passed": false,
+          "interpreted": {
+            "code": 0,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          "build": {
+            "schema": 1,
+            "lean": "4.34.0",
+            "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+            "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+            "buildDriverIdentity": "01be8862dbe04da5df61295ff7ac6fa1da1c1a2f2d71991215285e76891635ea",
+            "target": "node",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "Main",
+                "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+                "cSha256": "4ed90de776f6e790104863fd9ae0332c16b772c701a603e83cd110b67ce2e2f4"
+              }
+            ],
+            "signature": "f72ef763905a5ac9e60786d290de90491da184f27b3b68bad890b5e3a72d19a6",
+            "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+            "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+          },
+          "wasmSha256": "87a59024b588ed2b785020db23a21caf429914d2cb91b2318a437ff133c41819",
+          "actual": {
+            "code": 0,
+            "stdout": "utc initial: value some (-2147483648, { offset := { second := 0 }, name := \"UTC\", abbreviation := \"UTC\", isDST := false })\nutc next: value none\nnew-york initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nnew-york next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nberlin initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nberlin next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nunknown initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nunknown next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nembedded-nul initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nembedded-nul next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nlong-name initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nlong-name next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 28 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          "deployment": {
+            "sourceHidden": true,
+            "path": "",
+            "buildEnvironmentRemoved": true,
+            "directory": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/relocated deployment"
+          }
+        }
+      ],
+      "commands": [
+        {
+          "label": "engine version",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.006949889999999868,
+          "stdout": "v26.10.0\n",
+          "stderr": ""
+        },
+        {
+          "label": "windows-timezone/native-interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source/Main.lean",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/native-interpreted",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.36831876899999955,
+          "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "windows-timezone/generate native C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.37346844299999976,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "windows-timezone/compile native",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.5718539229999987,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "windows-timezone/native-compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source/native",
+          "args": [
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/native-compiled",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.006116871000000174,
+          "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "windows-timezone/build application",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source/Main.lean",
+            "--target",
+            "node",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 64.249819911,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.0 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/dist\n"
+        },
+        {
+          "label": "windows-timezone/deployed",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/relocated deployment/main.mjs",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/windows-timezone-node-baseline-r1/windows-timezone/deployed",
+          "code": 0,
+          "signal": null,
+          "seconds": 1.787913154000009,
+          "stdout": "utc initial: value some (-2147483648, { offset := { second := 0 }, name := \"UTC\", abbreviation := \"UTC\", isDST := false })\nutc next: value none\nnew-york initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nnew-york next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nberlin initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nberlin next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nunknown initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nunknown next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nembedded-nul initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nembedded-nul next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nlong-name initial: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nlong-name next: error IO.Error.unsupportedOperation 0 \"Windows time zone transitions are not supported\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 28 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+          "stderr": ""
+        }
+      ],
+      "passed": false,
+      "engineVersion": "v26.10.0",
+      "finishedAt": "2026-09-24T16:00:05.183Z"
+    },
+    "resources": {
+      "startedAt": "2026-09-24T15:58:43.974Z",
+      "command": [
+        "bash",
+        ".work/run-io-case-r3.sh",
+        "node",
+        "windows-timezone",
+        ".work/windows-timezone-node-baseline-r1",
+        ".work/application-installed-r22/workspace/project/node_modules/@lasm/compiler"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "b1d499dd-bc2a-480f-bb1a-aad4f6f98311",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24072671232
+      },
+      "minimumHostAvailable": 20362809344,
+      "peakMemoryBytes": 4060942336,
+      "peakTasks": 36,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/windows-timezone-node-baseline-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T16:00:05.081Z",
+        "memoryBytes": 1947254784,
+        "peakMemoryBytes": 4060942336,
+        "swapBytes": 0,
+        "tasks": 27,
+        "memoryBreakdown": {
+          "anon": 1018986496,
+          "file": 899588096,
+          "kernel": 25657344,
+          "shmem": 0,
+          "file_mapped": 1114112,
+          "inactive_file": 894681088,
+          "slab": 12657896
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T16:00:05.257Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 924930048,
+        "peakMemoryBytes": 4060942336,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11661312,
+          "file": 899600384,
+          "kernel": 12693504,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 894693376,
+          "slab": 11765312
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T16:00:05.282Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "sourceUnchangedAfterFailure": true,
+    "differences": 13
+  },
+  "runtimeDerivation": {
+    "scope": "Verified two-object runtime derivation; installed application differentials remain separate",
+    "target": "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64",
+    "manifestSha256": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a",
+    "baseManifestSha256": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+    "buildInputSha256": "0f9170a8d96c28bb92c3c199cc0920f1896019cab37462497ff2e9ad519233f2",
+    "derivations": [
+      {
+        "archive": "lib/libleanrt.a",
+        "member": "io.cpp.o",
+        "source": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/source/src/runtime/io.cpp",
+        "sourceSha256": "f6f64ce4284a0f5f19b968861a2ed7562ef5aa18c644b07b615082441cc493d0",
+        "beforeSha256": "cbcad580958e789c6fb358d6c751a1b3bc66add97019f90f1bbec5b8a3a51b2d",
+        "afterSha256": "90d7a512820629066d842eb3eff6e2bcb6a6acf6c8d76fb072d9e479ac6e68f9",
+        "flags": [
+          "-DLEAN_USE_GMP",
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-DLEAN_EMSCRIPTEN",
+          "-sALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-ffp-contract=off",
+          "-DLEAN_MULTI_THREAD",
+          "-DLEAN_BUILD_TYPE=\"Release\"",
+          "-DLEAN_EXPORTING",
+          "-D__CLANG__",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/libuv/src/libuv/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/source/src",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build",
+          "-ftls-model=local-exec",
+          "-Dlean_io_prim_handle_mk=lasm_original_lean_io_prim_handle_mk",
+          "-Dlean_io_prim_handle_read=lasm_original_lean_io_prim_handle_read",
+          "-Dlean_io_prim_handle_write=lasm_original_lean_io_prim_handle_write",
+          "-Dlean_io_prim_handle_put_str=lasm_original_lean_io_prim_handle_put_str",
+          "-Dlean_io_prim_handle_get_line=lasm_original_lean_io_prim_handle_get_line",
+          "-Dlean_io_prim_handle_flush=lasm_original_lean_io_prim_handle_flush",
+          "-Dlean_io_prim_handle_rewind=lasm_original_lean_io_prim_handle_rewind",
+          "-Dlean_io_prim_handle_truncate=lasm_original_lean_io_prim_handle_truncate",
+          "-Dlean_io_prim_handle_is_tty=lasm_original_lean_io_prim_handle_is_tty",
+          "-Dlean_io_prim_handle_lock=lasm_original_lean_io_prim_handle_lock",
+          "-Dlean_io_prim_handle_try_lock=lasm_original_lean_io_prim_handle_try_lock",
+          "-Dlean_io_prim_handle_unlock=lasm_original_lean_io_prim_handle_unlock",
+          "-Dlean_io_metadata=lasm_original_lean_io_metadata",
+          "-Dlean_io_symlink_metadata=lasm_original_lean_io_symlink_metadata",
+          "-Dlean_io_realpath=lasm_original_lean_io_realpath",
+          "-Dlean_io_read_dir=lasm_original_lean_io_read_dir",
+          "-Dlean_io_create_dir=lasm_original_lean_io_create_dir",
+          "-Dlean_io_remove_file=lasm_original_lean_io_remove_file",
+          "-Dlean_io_remove_dir=lasm_original_lean_io_remove_dir",
+          "-Dlean_io_rename=lasm_original_lean_io_rename",
+          "-Dlean_io_hard_link=lasm_original_lean_io_hard_link",
+          "-Dlean_chmod=lasm_original_lean_chmod",
+          "-Dlean_io_create_tempfile=lasm_original_lean_io_create_tempfile",
+          "-Dlean_io_create_tempdir=lasm_original_lean_io_create_tempdir",
+          "-Dlean_io_getenv=lasm_original_lean_io_getenv",
+          "-Dlean_io_current_dir=lasm_original_lean_io_current_dir",
+          "-Dlean_io_app_path=lasm_original_lean_io_app_path",
+          "-Dlean_io_mono_ms_now=lasm_original_lean_io_mono_ms_now",
+          "-Dlean_io_mono_nanos_now=lasm_original_lean_io_mono_nanos_now",
+          "-Dlean_get_current_time=lasm_original_lean_get_current_time",
+          "-Dlean_io_get_random_bytes=lasm_original_lean_io_get_random_bytes",
+          "-Dlean_io_exit=lasm_original_lean_io_exit",
+          "-Dlean_io_force_exit=lasm_original_lean_io_force_exit",
+          "-Dlean_get_stdin=lasm_original_lean_get_stdin",
+          "-Dlean_get_stdout=lasm_original_lean_get_stdout",
+          "-Dlean_get_stderr=lasm_original_lean_get_stderr",
+          "-Dlean_get_set_stdin=lasm_original_lean_get_set_stdin",
+          "-Dlean_get_set_stdout=lasm_original_lean_get_set_stdout",
+          "-Dlean_get_set_stderr=lasm_original_lean_get_set_stderr",
+          "-Dlean_windows_get_next_transition=lasm_original_lean_windows_get_next_transition",
+          "-Dlean_get_windows_local_timezone_id_at=lasm_original_lean_get_windows_local_timezone_id_at"
+        ]
+      },
+      {
+        "archive": "lib/liblasmhost.a",
+        "member": "node-async.cpp.o",
+        "source": "/home/lastmjs/development/lasm/compiler/runtime/node-async.cpp",
+        "sourceSha256": "965a08173d61158e8fa34f109daa3076ab61275c738f61deb1cbdb85a15735b6",
+        "beforeSha256": "9726a74a9651670be0a8a659e132ea71287ebddeddbb687379560c21ca3ab725",
+        "afterSha256": "e3c464de7058d80e61b6c5d58400dfe8a8367284d5b7f24e5b75691e10c02bab",
+        "flags": [
+          "-DLEAN_USE_GMP",
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-DLEAN_EMSCRIPTEN",
+          "-sALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-ffp-contract=off",
+          "-DLEAN_MULTI_THREAD",
+          "-DLEAN_BUILD_TYPE=\"Release\"",
+          "-DLEAN_EXPORTING",
+          "-D__CLANG__",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/libuv/src/libuv/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/source/src",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build",
+          "-DLASM_FULL_NATIVE_THREADS=1",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/runtime"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/em++",
+        "args": [
+          "-DLEAN_USE_GMP",
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-DLEAN_EMSCRIPTEN",
+          "-sALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-ffp-contract=off",
+          "-DLEAN_MULTI_THREAD",
+          "-DLEAN_BUILD_TYPE=\"Release\"",
+          "-DLEAN_EXPORTING",
+          "-D__CLANG__",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/libuv/src/libuv/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/source/src",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build",
+          "-ftls-model=local-exec",
+          "-Dlean_io_prim_handle_mk=lasm_original_lean_io_prim_handle_mk",
+          "-Dlean_io_prim_handle_read=lasm_original_lean_io_prim_handle_read",
+          "-Dlean_io_prim_handle_write=lasm_original_lean_io_prim_handle_write",
+          "-Dlean_io_prim_handle_put_str=lasm_original_lean_io_prim_handle_put_str",
+          "-Dlean_io_prim_handle_get_line=lasm_original_lean_io_prim_handle_get_line",
+          "-Dlean_io_prim_handle_flush=lasm_original_lean_io_prim_handle_flush",
+          "-Dlean_io_prim_handle_rewind=lasm_original_lean_io_prim_handle_rewind",
+          "-Dlean_io_prim_handle_truncate=lasm_original_lean_io_prim_handle_truncate",
+          "-Dlean_io_prim_handle_is_tty=lasm_original_lean_io_prim_handle_is_tty",
+          "-Dlean_io_prim_handle_lock=lasm_original_lean_io_prim_handle_lock",
+          "-Dlean_io_prim_handle_try_lock=lasm_original_lean_io_prim_handle_try_lock",
+          "-Dlean_io_prim_handle_unlock=lasm_original_lean_io_prim_handle_unlock",
+          "-Dlean_io_metadata=lasm_original_lean_io_metadata",
+          "-Dlean_io_symlink_metadata=lasm_original_lean_io_symlink_metadata",
+          "-Dlean_io_realpath=lasm_original_lean_io_realpath",
+          "-Dlean_io_read_dir=lasm_original_lean_io_read_dir",
+          "-Dlean_io_create_dir=lasm_original_lean_io_create_dir",
+          "-Dlean_io_remove_file=lasm_original_lean_io_remove_file",
+          "-Dlean_io_remove_dir=lasm_original_lean_io_remove_dir",
+          "-Dlean_io_rename=lasm_original_lean_io_rename",
+          "-Dlean_io_hard_link=lasm_original_lean_io_hard_link",
+          "-Dlean_chmod=lasm_original_lean_chmod",
+          "-Dlean_io_create_tempfile=lasm_original_lean_io_create_tempfile",
+          "-Dlean_io_create_tempdir=lasm_original_lean_io_create_tempdir",
+          "-Dlean_io_getenv=lasm_original_lean_io_getenv",
+          "-Dlean_io_current_dir=lasm_original_lean_io_current_dir",
+          "-Dlean_io_app_path=lasm_original_lean_io_app_path",
+          "-Dlean_io_mono_ms_now=lasm_original_lean_io_mono_ms_now",
+          "-Dlean_io_mono_nanos_now=lasm_original_lean_io_mono_nanos_now",
+          "-Dlean_get_current_time=lasm_original_lean_get_current_time",
+          "-Dlean_io_get_random_bytes=lasm_original_lean_io_get_random_bytes",
+          "-Dlean_io_exit=lasm_original_lean_io_exit",
+          "-Dlean_io_force_exit=lasm_original_lean_io_force_exit",
+          "-Dlean_get_stdin=lasm_original_lean_get_stdin",
+          "-Dlean_get_stdout=lasm_original_lean_get_stdout",
+          "-Dlean_get_stderr=lasm_original_lean_get_stderr",
+          "-Dlean_get_set_stdin=lasm_original_lean_get_set_stdin",
+          "-Dlean_get_set_stdout=lasm_original_lean_get_set_stdout",
+          "-Dlean_get_set_stderr=lasm_original_lean_get_set_stderr",
+          "-Dlean_windows_get_next_transition=lasm_original_lean_windows_get_next_transition",
+          "-Dlean_get_windows_local_timezone_id_at=lasm_original_lean_get_windows_local_timezone_id_at",
+          "-MMD",
+          "-MF",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/build/io.cpp.o.d",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/build/io.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/build/io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/liblasmhost.a",
+          "node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/em++",
+        "args": [
+          "-DLEAN_USE_GMP",
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-DLEAN_EMSCRIPTEN",
+          "-sALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-ffp-contract=off",
+          "-DLEAN_MULTI_THREAD",
+          "-DLEAN_BUILD_TYPE=\"Release\"",
+          "-DLEAN_EXPORTING",
+          "-D__CLANG__",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/libuv/src/libuv/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/source/src",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build",
+          "-DLASM_FULL_NATIVE_THREADS=1",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/runtime",
+          "-MMD",
+          "-MF",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/build/node-async.cpp.o.d",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/build/node-async.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/build/node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "rcs",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/build/io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "t",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "t",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "debug.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "debug.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "thread.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "thread.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mpz.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mpz.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "utf8.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "utf8.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "object.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "object.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "apply.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "apply.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "exception.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "exception.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "interrupt.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "interrupt.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "memory.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "memory.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "stackinfo.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "stackinfo.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "compact.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "compact.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "init_module.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "init_module.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "hash.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "hash.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "byteslice.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "byteslice.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "platform.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "platform.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "alloc.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "alloc.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "allocprof.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "allocprof.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "sharecommon.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "sharecommon.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "stack_overflow.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "stack_overflow.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "process.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "process.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "object_ref.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "object_ref.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mpn.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mpn.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mutex.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mutex.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "libuv.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "libuv.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "net_addr.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "net_addr.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "event_loop.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "event_loop.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "timer.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "timer.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "tcp.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "tcp.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "udp.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "udp.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "dns.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "dns.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "system.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "system.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "signal.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "signal.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "openssl.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "openssl.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "rcs",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/liblasmhost.a",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/build/node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "t",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/liblasmhost.a"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "t",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/liblasmhost.a"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/liblasmhost.a",
+          "node-io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/liblasmhost.a",
+          "node-io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/liblasmhost.a",
+          "node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/liblasmhost.a",
+          "node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64/lib/liblasmhost.a",
+          "node-system.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/timezone-runtime-derivation-r1/lean-4.34.0-wasm64/lib/liblasmhost.a",
+          "node-system.cpp.o"
+        ]
+      }
+    ],
+    "verifiedMembers": [
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "debug.cpp.o",
+        "before": "68cb8d7122a7856b826f9610b6a5db7021735d71874862790ae6afab36c65d90",
+        "after": "68cb8d7122a7856b826f9610b6a5db7021735d71874862790ae6afab36c65d90"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "thread.cpp.o",
+        "before": "7815016ad014774421f549334ffe7cbacaaa5a4eda69c200f2a1367b04dfc968",
+        "after": "7815016ad014774421f549334ffe7cbacaaa5a4eda69c200f2a1367b04dfc968"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "mpz.cpp.o",
+        "before": "4dbac6b2b8963a114c9238e5e69a0073133ea9c5add8f58c20b5272946105b44",
+        "after": "4dbac6b2b8963a114c9238e5e69a0073133ea9c5add8f58c20b5272946105b44"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "utf8.cpp.o",
+        "before": "b6826556ce567e978bb2c0f5c11e5a1610eb0919234b8dd1274c6c52f112cd89",
+        "after": "b6826556ce567e978bb2c0f5c11e5a1610eb0919234b8dd1274c6c52f112cd89"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "object.cpp.o",
+        "before": "99cd64ffc101c33e73b2fa14c88072ea0b990564bde7fcc5292ba1dcf3969c2f",
+        "after": "99cd64ffc101c33e73b2fa14c88072ea0b990564bde7fcc5292ba1dcf3969c2f"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "apply.cpp.o",
+        "before": "789c8b7725b8b5e9c9de1939d5de3a140501d8a35ad3a4da84d502ca83ed8580",
+        "after": "789c8b7725b8b5e9c9de1939d5de3a140501d8a35ad3a4da84d502ca83ed8580"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "exception.cpp.o",
+        "before": "bd8ef5899ebb9cec375bea7f06d685883e78b8bb0108026e6a33a978a3cec829",
+        "after": "bd8ef5899ebb9cec375bea7f06d685883e78b8bb0108026e6a33a978a3cec829"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "interrupt.cpp.o",
+        "before": "428ca18a7ef01478848be70f8afe84d2e5c77b67ec8c739f024a183e9885d56a",
+        "after": "428ca18a7ef01478848be70f8afe84d2e5c77b67ec8c739f024a183e9885d56a"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "memory.cpp.o",
+        "before": "5f4ebd71b7ff81fa1a20ceae6ae6135dd2cdf7f01261a201daf7d8ef87ad4245",
+        "after": "5f4ebd71b7ff81fa1a20ceae6ae6135dd2cdf7f01261a201daf7d8ef87ad4245"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "stackinfo.cpp.o",
+        "before": "bf0e19d85e6e55553846c2d85da7d3e65f349e773da44c7b06e7b1c455ff8473",
+        "after": "bf0e19d85e6e55553846c2d85da7d3e65f349e773da44c7b06e7b1c455ff8473"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "compact.cpp.o",
+        "before": "80d1391ae79314b9a4af60746307e3d0c984595009b4d606a6e592090288930b",
+        "after": "80d1391ae79314b9a4af60746307e3d0c984595009b4d606a6e592090288930b"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "init_module.cpp.o",
+        "before": "6e17298180405e9d6483d2fae325483a402b1a7d66279e7dcf4425a779ae2f7f",
+        "after": "6e17298180405e9d6483d2fae325483a402b1a7d66279e7dcf4425a779ae2f7f"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "io.cpp.o",
+        "before": "cbcad580958e789c6fb358d6c751a1b3bc66add97019f90f1bbec5b8a3a51b2d",
+        "after": "90d7a512820629066d842eb3eff6e2bcb6a6acf6c8d76fb072d9e479ac6e68f9"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "hash.cpp.o",
+        "before": "299244b5b2beecfc575a2a30f3a33b38b4e03fae781d766645080606b4e2b59c",
+        "after": "299244b5b2beecfc575a2a30f3a33b38b4e03fae781d766645080606b4e2b59c"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "byteslice.cpp.o",
+        "before": "16a7488e381d13cf79d361d61a85d8c6a674f565582375b266a2231b8693ee4b",
+        "after": "16a7488e381d13cf79d361d61a85d8c6a674f565582375b266a2231b8693ee4b"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "platform.cpp.o",
+        "before": "a7c368bbf8e9a837b5dd3d529d3810cbd3de68369a3154205dc8213b75d11234",
+        "after": "a7c368bbf8e9a837b5dd3d529d3810cbd3de68369a3154205dc8213b75d11234"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "alloc.cpp.o",
+        "before": "b6664f6cef7c08d17612bbaa099f7b5737848c63c905dbbdcb3f2343f8f41ef0",
+        "after": "b6664f6cef7c08d17612bbaa099f7b5737848c63c905dbbdcb3f2343f8f41ef0"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "allocprof.cpp.o",
+        "before": "e423266ec5245c92f0185ea4df8bc211ee302d15815dd219e0ac78c380f9c96d",
+        "after": "e423266ec5245c92f0185ea4df8bc211ee302d15815dd219e0ac78c380f9c96d"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "sharecommon.cpp.o",
+        "before": "95132b1fa8baa3a75fb8f029aad0c958719674e7ef9a0d0540be8825d7fcd6e2",
+        "after": "95132b1fa8baa3a75fb8f029aad0c958719674e7ef9a0d0540be8825d7fcd6e2"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "stack_overflow.cpp.o",
+        "before": "46e89f203979344b22b5d867b4b73997ef15f683b7e6b848e258422109f56de6",
+        "after": "46e89f203979344b22b5d867b4b73997ef15f683b7e6b848e258422109f56de6"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "process.cpp.o",
+        "before": "f12ecef77b9932dcf7231bd13ace694916fe07de555b900178c8e61615d87e9d",
+        "after": "f12ecef77b9932dcf7231bd13ace694916fe07de555b900178c8e61615d87e9d"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "object_ref.cpp.o",
+        "before": "a15302af2dc26e350e9d9de03010d5f64957f5807d87d22b1d6f4eedf83d47c9",
+        "after": "a15302af2dc26e350e9d9de03010d5f64957f5807d87d22b1d6f4eedf83d47c9"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "mpn.cpp.o",
+        "before": "ab971e7c33b2d93452440d8f47863836e0a0ca777bbaf550c3a35530e7e8cdff",
+        "after": "ab971e7c33b2d93452440d8f47863836e0a0ca777bbaf550c3a35530e7e8cdff"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "mutex.cpp.o",
+        "before": "f563e3d06e30bd11dd8c8b73cb66a6c7cb27f6b84843ccd67d2e6296889b9d0a",
+        "after": "f563e3d06e30bd11dd8c8b73cb66a6c7cb27f6b84843ccd67d2e6296889b9d0a"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "libuv.cpp.o",
+        "before": "b448de47fef590cf4cc6827b2030b1e63261df8926f929744a053bf6804b115c",
+        "after": "b448de47fef590cf4cc6827b2030b1e63261df8926f929744a053bf6804b115c"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "net_addr.cpp.o",
+        "before": "694b9ce068af1b8bda9656ab00b468073668987b16722309d929c4259102474d",
+        "after": "694b9ce068af1b8bda9656ab00b468073668987b16722309d929c4259102474d"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "event_loop.cpp.o",
+        "before": "1eb67d8105558f522ad9e24c9df62472d7f249577c5c3755b55e42786fd8843d",
+        "after": "1eb67d8105558f522ad9e24c9df62472d7f249577c5c3755b55e42786fd8843d"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "timer.cpp.o",
+        "before": "3c547d4beaced93def87d026dfaf5c15b08326d3c62e0eeafd21ae76e7de0b2f",
+        "after": "3c547d4beaced93def87d026dfaf5c15b08326d3c62e0eeafd21ae76e7de0b2f"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "tcp.cpp.o",
+        "before": "96f916bf9b757328a0a28dab0c815797efc461a1630f28b488128ebc6ff192e7",
+        "after": "96f916bf9b757328a0a28dab0c815797efc461a1630f28b488128ebc6ff192e7"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "udp.cpp.o",
+        "before": "025a809a9202c1fa7dd6dda01bcd20e34b400678f83df8b2fc8f3f12a3033324",
+        "after": "025a809a9202c1fa7dd6dda01bcd20e34b400678f83df8b2fc8f3f12a3033324"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "dns.cpp.o",
+        "before": "d65533481d8cbe6b63c7f119da8daec6893ddec14b36269874c85e32781f0c24",
+        "after": "d65533481d8cbe6b63c7f119da8daec6893ddec14b36269874c85e32781f0c24"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "system.cpp.o",
+        "before": "c1d3b7ee6b1eaaa35c6fa3715ac2128b8695ef322f8a9841298cfdceb2fffd58",
+        "after": "c1d3b7ee6b1eaaa35c6fa3715ac2128b8695ef322f8a9841298cfdceb2fffd58"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "signal.cpp.o",
+        "before": "c738e1f171c51dcad76936eae1a65285db63c57428d27da196244378d367f057",
+        "after": "c738e1f171c51dcad76936eae1a65285db63c57428d27da196244378d367f057"
+      },
+      {
+        "archive": "lib/libleanrt.a",
+        "name": "openssl.cpp.o",
+        "before": "e49e182afbefaaf416de3c45c88f3fe466452515a9217ac6275a7792c383d44c",
+        "after": "e49e182afbefaaf416de3c45c88f3fe466452515a9217ac6275a7792c383d44c"
+      },
+      {
+        "archive": "lib/liblasmhost.a",
+        "name": "node-io.cpp.o",
+        "before": "dd5ec6f5a046d4e32853d51afa6263a89dc2dbaed34a050b032d77ece048f1e9",
+        "after": "dd5ec6f5a046d4e32853d51afa6263a89dc2dbaed34a050b032d77ece048f1e9"
+      },
+      {
+        "archive": "lib/liblasmhost.a",
+        "name": "node-async.cpp.o",
+        "before": "9726a74a9651670be0a8a659e132ea71287ebddeddbb687379560c21ca3ab725",
+        "after": "e3c464de7058d80e61b6c5d58400dfe8a8367284d5b7f24e5b75691e10c02bab"
+      },
+      {
+        "archive": "lib/liblasmhost.a",
+        "name": "node-system.cpp.o",
+        "before": "69deafa4a1a67aedfb5b1d3e6e32e15e967db74e859fb11669e9ff865e5bb0c7",
+        "after": "69deafa4a1a67aedfb5b1d3e6e32e15e967db74e859fb11669e9ff865e5bb0c7"
+      }
+    ],
+    "unchangedFiles": [
+      "exports.json",
+      "include/lean/config.h",
+      "include/lean/lean_gmp.h",
+      "include/lean/lean_libuv.h",
+      "include/lean/lean.h",
+      "include/lean/mimalloc.h",
+      "include/lean/version.h",
+      "lib/libgmp.a",
+      "lib/libInit.a",
+      "lib/libLake.a",
+      "lib/liblasmsymbols.a",
+      "lib/libLean.a",
+      "lib/libleancpp.a",
+      "lib/libStd.a",
+      "lib/libuv.a",
+      "THIRD_PARTY_NOTICES.txt"
+    ],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/timezone-runtime-derivation-r1-resources.json",
+    "recordedAt": "2026-09-24T16:01:07.162Z"
+  },
+  "derivationResources": {
+    "startedAt": "2026-09-24T16:00:55.537Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      ".cache/js-runtimes/node-26.10.0/bin/node",
+      "--max-old-space-size=256",
+      "scripts/full-lean/derive-timezone-runtime.mjs",
+      ".work/application-runtime-4.34.0",
+      ".work/application-installed-r22/workspace/project/node_modules/@lasm/compiler/targets/lean-4.34.0-wasm64",
+      ".work/timezone-runtime-derivation-r1"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "7aac59de-4a2d-4b25-976d-ec120183e278",
+    "limits": {
+      "memoryMax": 2147483648,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 1717986918,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 23910432768
+    },
+    "minimumHostAvailable": 23666069504,
+    "peakMemoryBytes": 238051328,
+    "peakTasks": 12,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/timezone-runtime-derivation-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T16:01:07.160Z",
+      "memoryBytes": 177217536,
+      "peakMemoryBytes": 238051328,
+      "swapBytes": 0,
+      "tasks": 11,
+      "memoryBreakdown": {
+        "anon": 70664192,
+        "file": 103743488,
+        "kernel": 2072576,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 7348224,
+        "slab": 808864
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T16:01:07.223Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 118894592,
+      "peakMemoryBytes": 238051328,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11649024,
+        "file": 103796736,
+        "kernel": 1699840,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 7401472,
+        "slab": 752592
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T16:01:07.248Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "packageResources": {
+    "startedAt": "2026-09-24T16:02:07.888Z",
+    "command": [
+      "bash",
+      ".work/package-install-timezone-r1.sh"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "6cc52d9b-0895-43d4-9f58-ca6c3f687059",
+    "limits": {
+      "memoryMax": 4294967296,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 3435973836,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24086339584
+    },
+    "minimumHostAvailable": 22877523968,
+    "peakMemoryBytes": 2247589888,
+    "peakTasks": 23,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-timezone-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T16:03:00.153Z",
+      "memoryBytes": 1956507648,
+      "peakMemoryBytes": 2247589888,
+      "swapBytes": 0,
+      "tasks": 12,
+      "memoryBreakdown": {
+        "anon": 743309312,
+        "file": 1174294528,
+        "kernel": 37560320,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1174085632,
+        "slab": 32330168
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T16:03:00.257Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 1220349952,
+      "peakMemoryBytes": 2247589888,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11657216,
+        "file": 1174642688,
+        "kernel": 33079296,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1174642688,
+        "slab": 32126168
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T16:03:00.288Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "icuControls": {
+    "file": "docs/evidence/windows-timezone-icu-controls-2026-09-24.json",
+    "sha256": "1db89c734c22152adeea8cf69880957a57708cb496cd3921d39a533588cd0e98",
+    "casesPerEngine": 27,
+    "engines": 3,
+    "scope": "Original upstream Windows function bodies versus the private host adapter using the same Linux ICU library; not native Windows acceptance"
+  },
+  "windowsCi": {
+    "file": ".github/workflows/windows-timezone-host.yml",
+    "sha256": "1ff820d2f7c93d29eee5c73079e2ca05f194902a4db42dddcf090219f21ab68a",
+    "status": "Prepared and syntax checked, not executed; SSH push awaits restored credentials. Native Windows x64 host API comparisons only, not full Wasm or ARM64 acceptance."
+  },
+  "limitations": [
+    "Native Windows and macOS timezone comparisons remain unexecuted.",
+    "The retained Lean 4.32 callable runtime was not rebuilt or relabeled.",
+    "Passing these timezone fixtures is not complete Std.Time, IO.FS or standard-library acceptance."
+  ]
+}

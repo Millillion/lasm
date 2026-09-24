@@ -25,6 +25,8 @@ const cases = [
     marker: 'filesystem error observations completed\n', removesData: true },
   { name: 'filesystem-devices', source: 'integration/fixtures/FilesystemDevices.lean',
     marker: 'filesystem device observations completed\n', linux: true },
+  { name: 'windows-timezone', source: 'integration/fixtures/WindowsTimezone.lean',
+    marker: 'windows timezone observations completed\n' },
   { name: 'standard-io', source: 'test/fixtures/standard-io/Main.lean',
     marker: 'standard IO checks passed\n', removesData: true },
   { name: 'getline-state', source: 'test/fixtures/getline-state/Main.lean',

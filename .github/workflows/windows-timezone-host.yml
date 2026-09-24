@@ -1,0 +1,46 @@
+name: Native Windows timezone host comparisons
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-timezone-host-${{ github.ref }}
+  cancel-in-progress: false
+
+# Standard public runner only, with a Windows Job Object cap. No stored cache
+# or artifact uploads. Native ARM64 needs the separately unfinished managed SDK.
+jobs:
+  compare:
+    if: github.event.repository.visibility == 'public'
+    runs-on: windows-2022
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: x64
+          package-manager-cache: false
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: 2.9.7
+          cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.2
+          no-cache: true
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Verify host and latest stable pins
+        run: |
+          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'win32-x64')"
+          node --max-old-space-size=128 scripts/ci/check-acceptance-versions.mjs .work/windows-timezone-versions.json
+      - name: Compare native Lean with the production host adapter
+        shell: pwsh
+        run: |
+          $nodeBinary = (Get-Command node.exe).Source
+          $denoBinary = (Get-Command deno.exe).Source
+          $bunBinary = (Get-Command bun.exe).Source
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/windows-timezone-resources.json -- node --max-old-space-size=256 integration/windows-timezone-host.mjs .work/windows-timezone $nodeBinary $denoBinary $bunBinary
+      - name: Preserve native observations and guard receipt in the job log
+        if: always()
+        run: node -e "const f=require('node:fs');for(const p of ['.work/windows-timezone/result.json','.work/windows-timezone-resources.json','.work/windows-timezone-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
