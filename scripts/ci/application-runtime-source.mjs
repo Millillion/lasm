@@ -86,6 +86,9 @@ try {
     run(sdk.tool('emmake'), ['make', '-j1'], { cwd: build, env });
     run(sdk.tool('emmake'), ['make', '-j1', 'install'], { cwd: build, env });
     result.gmp = { flags, archiveSha256: await hashFile(join(prefix, 'lib/libgmp.a')), sdkIdentity: sdk.identity };
+    const verified = await maintainerSdk({ managed: true, cache });
+    assert.equal(verified.identity, sdk.identity); assert.equal(verified.driverIdentity, sdk.driverIdentity);
+    result.gmp.toolTreesUnchanged = true;
   } else if (phase === 'hosts') {
     run(process.execPath, ['scripts/prepare-native.mjs']);
     result.manifests = Object.fromEntries(await Promise.all(['manifest.json', 'process/manifest.json', 'bun-stack/manifest.json', 'signals/manifest.json']

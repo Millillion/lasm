@@ -628,3 +628,18 @@ on all six native platforms, including Windows ARM64. The
 passes all nine without skips after limiting child fixture heaps. This workflow
 does not build Lean or the runtime, and its results will not replace installed
 Wasm import tests or the missing macOS guard for heavy workloads.
+
+The [native file matrix](evidence/application-module-data-six-platforms-2026-09-24.json)
+passes all nine controls without skips on every Linux/macOS/Windows × x64/ARM64
+combination: 54 passes on stock Node 26.10.0. This verifies the small module-data
+and loader fixtures on real hosts; full installed Wasm imports remain pending.
+
+The [second cold source attempt](evidence/application-runtime-source-python-2026-09-24.json)
+passes all source checks, GMP and host-helper builds, then rejects a changed
+managed Python inventory before compiling Init/Std. A focused local control
+reproduces bytecode creation when Emscripten passes Python `-E`, which ignores
+the environment's `PYTHONDONTWRITEBYTECODE`. The private maintainer launcher
+now passes `-B -s` explicitly, and GMP immediately rechecks both immutable tool
+trees. Four local controls pass. This is the likely cause of the CI mutation;
+the failed run did not record individual changed entries, and fresh CI remains
+necessary. All seven previous guards released without resource events.

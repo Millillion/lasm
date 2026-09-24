@@ -89,7 +89,8 @@ separately from the earlier runtime evidence below.
   missing-data errors. These probes supply explicit data inputs; their results
   are not self-contained deployment acceptance.
   Automatic deployment copying and relocation defaults now have
-  [nine unit controls and native Linux x64/ARM64 import passes](docs/evidence/application-module-data-native-ci-2026-09-24.json).
+  [nine unit controls on all six native platforms](docs/evidence/application-module-data-six-platforms-2026-09-24.json)
+  and [real Linux x64/ARM64 import passes](docs/evidence/application-module-data-native-ci-2026-09-24.json).
   Relocated project, dependency and standard module data works with sources
   hidden; missing standard data produces a real import failure. Installed Wasm
   validation, complete dynamic-module handling and other platforms stay open.

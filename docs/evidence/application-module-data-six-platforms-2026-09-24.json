@@ -1,0 +1,104 @@
+{
+  "scope": "Tiny module-data file and generated-loader controls on six native hosts; not Lean/Wasm application acceptance",
+  "run": {
+    "status": "completed",
+    "conclusion": "success",
+    "headSha": "39f9aa3cf22d7ca603ba3927bf7490be48aa2ccd",
+    "url": "https://github.com/Millillion/lasm/actions/runs/36003379352"
+  },
+  "logFile": ".work/product-acceptance/module-data-files-ci-36003379352.log",
+  "logSha256": "61eb87470c770c611eef3a2829d56ac657abde5756ee96ea2220cfc7cef429e1",
+  "platforms": [
+    {
+      "platform": "linux-x64",
+      "host": {
+        "platform": "linux",
+        "architecture": "x64",
+        "node": "26.10.0"
+      },
+      "counts": {
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "platform": "linux-arm64",
+      "host": {
+        "platform": "linux",
+        "architecture": "arm64",
+        "node": "26.10.0"
+      },
+      "counts": {
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "platform": "darwin-x64",
+      "host": {
+        "platform": "darwin",
+        "architecture": "x64",
+        "node": "26.10.0"
+      },
+      "counts": {
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "platform": "darwin-arm64",
+      "host": {
+        "platform": "darwin",
+        "architecture": "arm64",
+        "node": "26.10.0"
+      },
+      "counts": {
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "platform": "win32-x64",
+      "host": {
+        "platform": "win32",
+        "architecture": "x64",
+        "node": "26.10.0"
+      },
+      "counts": {
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "platform": "win32-arm64",
+      "host": {
+        "platform": "win32",
+        "architecture": "arm64",
+        "node": "26.10.0"
+      },
+      "counts": {
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "totalPassed": 54,
+  "limitations": [
+    "Synthetic module-data fixtures exercise file semantics and loader defaults. They do not compile or execute Lean.",
+    "Real native Lean/Lake import data was separately verified on Linux x64/ARM64; installed Wasm imports remain pending.",
+    "Small fixture heaps do not provide an aggregate guard for heavy macOS builds."
+  ],
+  "recordedAt": "2026-09-24T13:13:28.258320+00:00"
+}

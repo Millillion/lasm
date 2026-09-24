@@ -38,7 +38,7 @@ jobs:
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: SDK integrity and ABI-cache controls
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/ci-application-runtime/units-resources.json -- node --max-old-space-size=128 --test --test-concurrency=1 test/sdk-repairs.test.mjs test/runtime-abi-cache.test.mjs
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/ci-application-runtime/units-resources.json -- node --max-old-space-size=128 --test --test-concurrency=1 test/sdk-repairs.test.mjs test/runtime-abi-cache.test.mjs test/maintainer-python.test.mjs
       - name: Cold managed Lean provisioning
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/lean-resources.json -- node scripts/ci/application-runtime-source.mjs lean
       - name: Cold managed SDK provisioning
