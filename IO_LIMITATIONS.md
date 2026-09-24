@@ -199,6 +199,14 @@ separately from the earlier runtime evidence below.
   code-generation failure; explicit compare-exchange loops pass at the same
   optimization level. This supplies internal synchronization primitives, not
   a complete JavaScript Atomics facade or a working Lean backend.
+  The [scalar adapter follow-up](docs/evidence/native-atomic-views-2026-09-24.json)
+  implements nine operations on internal native-memory spans. All eight integer
+  formats match each engine's own Atomics results, stored bits, coercion ordering
+  and exception classes below and above 4 GiB. Twenty groups per engine include
+  concurrent JavaScript/Wasm updates; sixteen rejection/lifetime controls also
+  pass. The unchanged primitive wait/notify controls pass again. Peak memory is
+  91 MiB. These spans are not general TypedArrays; wait scheduling, growing heap
+  views, real Lean execution and shipping integration remain open.
 
 ## Earlier runtime evidence and remaining compatibility work
 

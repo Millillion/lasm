@@ -1,0 +1,1507 @@
+{
+  "scope": "Scalar JS atomic semantics on sparse memory64, original native primitives, and concurrent Wasm/JS workers; no shipping backend or Lean execution",
+  "recordedAt": "2026-09-24T16:25:10.190231+00:00",
+  "versionCheck": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "expected": "v4.34.0",
+      "tag": "v4.34.0",
+      "publishedAt": "2026-09-14T14:04:36Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "expected": "v2.9.7",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "expected": "bun-v1.4.2",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "expected": "v26.10.0",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false
+    },
+    "checkedAt": "2026-09-24T16:18:52.182Z"
+  },
+  "result": {
+    "path": ".work/native-atomic-views-r1/result.json",
+    "sha256": "a6a43765518f022c343900ed5bc27dc8ff092335ee6c3c04e4d714f33931f5b4",
+    "content": {
+      "scope": "Scalar JS atomic semantics on sparse memory64, original native primitives, and concurrent Wasm/JS workers; no shipping backend or Lean execution",
+      "specification": "https://tc39.es/ecma262/multipage/structured-data.html#sec-atomics-object",
+      "inputs": {
+        "scripts/full-lean/probes/wasmtime-atomics.c": "3721145eaac1f1607e0c43c1aac417947ea5267fbd2e7d707391e73ee1c33e63",
+        "scripts/full-lean/probes/wasmtime-atomics.mjs": "260bca963af160f731edd89d194eea39b23cb13439bc55891466f8c9f15f5401",
+        "scripts/full-lean/probes/wasmtime-memory-view.c": "2040ebcf87d374f8199172226cd94d26814bf83f01d6c3b3375feb98ce757dc0",
+        "scripts/full-lean/probes/wasmtime-helper.c": "593fb94689013695235e6644c0c3d373fd3a4f057df9a3cb7e5b15dcb5a31951",
+        "scripts/full-lean/native-atomic-views.mjs": "650c6fbbfb2d42dc19f42e3baaae068f9cf460c03b5d1c7f42345bd4cb057a4f",
+        "scripts/full-lean/probes/native-atomic-views.mjs": "6a97d3abc11a2051c680592afb86d99539dd36d066bed98a1c32d1f2accde901",
+        "scripts/full-lean/probe-native-atomic-views.mjs": "71a57d6dfdc7c9075563051719a188218f3940edf9be83d18ca58a0c61f65588"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/native-atomic-views-r1-resources.json",
+      "commands": [
+        {
+          "program": "python3",
+          "args": [
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/prepare-wasmtime-probe.py"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"version\": \"49.0.0\", \"archiveSha256\": \"8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131\", \"files\": 115, \"selectedBytes\": 32341429}\n",
+          "stderr": ""
+        },
+        {
+          "program": "cc",
+          "args": [
+            "-std=c11",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-shared",
+            "-fPIC",
+            "-DLASM_PROBE_SPARSE_HIGH_MEMORY=1",
+            "-I/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/include",
+            "scripts/full-lean/probes/wasmtime-atomics.c",
+            "-L/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+            "-lwasmtime",
+            "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/native-atomic-views-r1/atomics.so"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "--max-old-space-size=128",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-atomics.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/native-atomic-views-r1/atomics.so"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"scope\":\"Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration\",\"engine\":\"node\",\"version\":\"26.10.0\",\"accessibleGuestBytes\":4295098368,\"touchedCells\":12,\"checks\":[{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":16,\"width\":1,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":32,\"width\":2,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":64,\"width\":4,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":128,\"width\":8,\"operations\":12},{\"kind\":\"wait-notify\",\"offset\":320,\"width\":4,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":320,\"width\":4,\"increments\":20000},{\"kind\":\"wait-notify\",\"offset\":384,\"width\":8,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":384,\"width\":8,\"increments\":20000},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967312,\"width\":1,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967328,\"width\":2,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967360,\"width\":4,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967424,\"width\":8,\"operations\":12},{\"kind\":\"wait-notify\",\"offset\":4294967616,\"width\":4,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":4294967616,\"width\":4,\"increments\":20000},{\"kind\":\"wait-notify\",\"offset\":4294967680,\"width\":8,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":4294967680,\"width\":8,\"increments\":20000}],\"invalidNativeAddressesAndOperationsRejected\":5,\"invalidWasmInputsRejected\":5}\n",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "--max-old-space-size=128",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/native-atomic-views.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/native-atomic-views-r1/atomics.so"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"scope\":\"Nine scalar JS Atomics operations on branded sparse native spans; waits, general heap views, shipping backend and Lean acceptance remain separate\",\"engine\":\"node\",\"version\":\"26.10.0\",\"accessibleGuestBytes\":4295098368,\"touchedGuestCells\":36,\"groups\":[{\"base\":0,\"type\":\"Int8Array\",\"width\":1,\"actions\":201},{\"base\":0,\"type\":\"Uint8Array\",\"width\":1,\"actions\":201},{\"base\":0,\"type\":\"Int16Array\",\"width\":2,\"actions\":201},{\"base\":0,\"type\":\"Uint16Array\",\"width\":2,\"actions\":201},{\"base\":0,\"type\":\"Int32Array\",\"width\":4,\"actions\":201},{\"base\":0,\"type\":\"Uint32Array\",\"width\":4,\"actions\":201},{\"base\":0,\"type\":\"BigInt64Array\",\"width\":8,\"actions\":138},{\"base\":0,\"type\":\"BigUint64Array\",\"width\":8,\"actions\":138},{\"base\":0,\"width\":4,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000},{\"base\":0,\"width\":8,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000},{\"base\":4294967296,\"type\":\"Int8Array\",\"width\":1,\"actions\":201},{\"base\":4294967296,\"type\":\"Uint8Array\",\"width\":1,\"actions\":201},{\"base\":4294967296,\"type\":\"Int16Array\",\"width\":2,\"actions\":201},{\"base\":4294967296,\"type\":\"Uint16Array\",\"width\":2,\"actions\":201},{\"base\":4294967296,\"type\":\"Int32Array\",\"width\":4,\"actions\":201},{\"base\":4294967296,\"type\":\"Uint32Array\",\"width\":4,\"actions\":201},{\"base\":4294967296,\"type\":\"BigInt64Array\",\"width\":8,\"actions\":138},{\"base\":4294967296,\"type\":\"BigUint64Array\",\"width\":8,\"actions\":138},{\"base\":4294967296,\"width\":4,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000},{\"base\":4294967296,\"width\":8,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000}],\"comparisons\":14255,\"rejectionControls\":16}\n",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "args": [
+            "run",
+            "-A",
+            "--v8-flags=--max-old-space-size=128",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-atomics.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/native-atomic-views-r1/atomics.so"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"scope\":\"Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration\",\"engine\":\"deno\",\"version\":\"2.9.7\",\"accessibleGuestBytes\":4295098368,\"touchedCells\":12,\"checks\":[{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":16,\"width\":1,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":32,\"width\":2,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":64,\"width\":4,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":128,\"width\":8,\"operations\":12},{\"kind\":\"wait-notify\",\"offset\":320,\"width\":4,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":320,\"width\":4,\"increments\":20000},{\"kind\":\"wait-notify\",\"offset\":384,\"width\":8,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":384,\"width\":8,\"increments\":20000},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967312,\"width\":1,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967328,\"width\":2,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967360,\"width\":4,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967424,\"width\":8,\"operations\":12},{\"kind\":\"wait-notify\",\"offset\":4294967616,\"width\":4,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":4294967616,\"width\":4,\"increments\":20000},{\"kind\":\"wait-notify\",\"offset\":4294967680,\"width\":8,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":4294967680,\"width\":8,\"increments\":20000}],\"invalidNativeAddressesAndOperationsRejected\":5,\"invalidWasmInputsRejected\":5}\n",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "args": [
+            "run",
+            "-A",
+            "--v8-flags=--max-old-space-size=128",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/native-atomic-views.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/native-atomic-views-r1/atomics.so"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"scope\":\"Nine scalar JS Atomics operations on branded sparse native spans; waits, general heap views, shipping backend and Lean acceptance remain separate\",\"engine\":\"deno\",\"version\":\"2.9.7\",\"accessibleGuestBytes\":4295098368,\"touchedGuestCells\":36,\"groups\":[{\"base\":0,\"type\":\"Int8Array\",\"width\":1,\"actions\":201},{\"base\":0,\"type\":\"Uint8Array\",\"width\":1,\"actions\":201},{\"base\":0,\"type\":\"Int16Array\",\"width\":2,\"actions\":201},{\"base\":0,\"type\":\"Uint16Array\",\"width\":2,\"actions\":201},{\"base\":0,\"type\":\"Int32Array\",\"width\":4,\"actions\":201},{\"base\":0,\"type\":\"Uint32Array\",\"width\":4,\"actions\":201},{\"base\":0,\"type\":\"BigInt64Array\",\"width\":8,\"actions\":138},{\"base\":0,\"type\":\"BigUint64Array\",\"width\":8,\"actions\":138},{\"base\":0,\"width\":4,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000},{\"base\":0,\"width\":8,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000},{\"base\":4294967296,\"type\":\"Int8Array\",\"width\":1,\"actions\":201},{\"base\":4294967296,\"type\":\"Uint8Array\",\"width\":1,\"actions\":201},{\"base\":4294967296,\"type\":\"Int16Array\",\"width\":2,\"actions\":201},{\"base\":4294967296,\"type\":\"Uint16Array\",\"width\":2,\"actions\":201},{\"base\":4294967296,\"type\":\"Int32Array\",\"width\":4,\"actions\":201},{\"base\":4294967296,\"type\":\"Uint32Array\",\"width\":4,\"actions\":201},{\"base\":4294967296,\"type\":\"BigInt64Array\",\"width\":8,\"actions\":138},{\"base\":4294967296,\"type\":\"BigUint64Array\",\"width\":8,\"actions\":138},{\"base\":4294967296,\"width\":4,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000},{\"base\":4294967296,\"width\":8,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000}],\"comparisons\":14255,\"rejectionControls\":16}\n",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-atomics.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/native-atomic-views-r1/atomics.so"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"scope\":\"Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration\",\"engine\":\"bun\",\"version\":\"1.4.2\",\"accessibleGuestBytes\":4295098368,\"touchedCells\":12,\"checks\":[{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":16,\"width\":1,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":32,\"width\":2,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":64,\"width\":4,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":128,\"width\":8,\"operations\":12},{\"kind\":\"wait-notify\",\"offset\":320,\"width\":4,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":320,\"width\":4,\"increments\":20000},{\"kind\":\"wait-notify\",\"offset\":384,\"width\":8,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":384,\"width\":8,\"increments\":20000},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967312,\"width\":1,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967328,\"width\":2,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967360,\"width\":4,\"operations\":12},{\"kind\":\"scalar-native-js-and-wasm\",\"offset\":4294967424,\"width\":8,\"operations\":12},{\"kind\":\"wait-notify\",\"offset\":4294967616,\"width\":4,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":4294967616,\"width\":4,\"increments\":20000},{\"kind\":\"wait-notify\",\"offset\":4294967680,\"width\":8,\"notEqual\":1,\"timeout\":2,\"awakened\":0},{\"kind\":\"two-worker-native-and-wasm-add\",\"offset\":4294967680,\"width\":8,\"increments\":20000}],\"invalidNativeAddressesAndOperationsRejected\":5,\"invalidWasmInputsRejected\":5}\n",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/native-atomic-views.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/native-atomic-views-r1/atomics.so"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"scope\":\"Nine scalar JS Atomics operations on branded sparse native spans; waits, general heap views, shipping backend and Lean acceptance remain separate\",\"engine\":\"bun\",\"version\":\"1.4.2\",\"accessibleGuestBytes\":4295098368,\"touchedGuestCells\":36,\"groups\":[{\"base\":0,\"type\":\"Int8Array\",\"width\":1,\"actions\":201},{\"base\":0,\"type\":\"Uint8Array\",\"width\":1,\"actions\":201},{\"base\":0,\"type\":\"Int16Array\",\"width\":2,\"actions\":201},{\"base\":0,\"type\":\"Uint16Array\",\"width\":2,\"actions\":201},{\"base\":0,\"type\":\"Int32Array\",\"width\":4,\"actions\":201},{\"base\":0,\"type\":\"Uint32Array\",\"width\":4,\"actions\":201},{\"base\":0,\"type\":\"BigInt64Array\",\"width\":8,\"actions\":138},{\"base\":0,\"type\":\"BigUint64Array\",\"width\":8,\"actions\":138},{\"base\":0,\"width\":4,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000},{\"base\":0,\"width\":8,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000},{\"base\":4294967296,\"type\":\"Int8Array\",\"width\":1,\"actions\":201},{\"base\":4294967296,\"type\":\"Uint8Array\",\"width\":1,\"actions\":201},{\"base\":4294967296,\"type\":\"Int16Array\",\"width\":2,\"actions\":201},{\"base\":4294967296,\"type\":\"Uint16Array\",\"width\":2,\"actions\":201},{\"base\":4294967296,\"type\":\"Int32Array\",\"width\":4,\"actions\":201},{\"base\":4294967296,\"type\":\"Uint32Array\",\"width\":4,\"actions\":201},{\"base\":4294967296,\"type\":\"BigInt64Array\",\"width\":8,\"actions\":138},{\"base\":4294967296,\"type\":\"BigUint64Array\",\"width\":8,\"actions\":138},{\"base\":4294967296,\"width\":4,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000},{\"base\":4294967296,\"width\":8,\"kind\":\"facade-and-Wasm-workers\",\"increments\":20000}],\"comparisons\":14255,\"rejectionControls\":16}\n",
+          "stderr": ""
+        }
+      ],
+      "results": [
+        {
+          "engine": "node",
+          "version": "26.10.0",
+          "primitive": {
+            "scope": "Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration",
+            "engine": "node",
+            "version": "26.10.0",
+            "accessibleGuestBytes": 4295098368,
+            "touchedCells": 12,
+            "checks": [
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 16,
+                "width": 1,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 32,
+                "width": 2,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 64,
+                "width": 4,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 128,
+                "width": 8,
+                "operations": 12
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 320,
+                "width": 4,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 320,
+                "width": 4,
+                "increments": 20000
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 384,
+                "width": 8,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 384,
+                "width": 8,
+                "increments": 20000
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967312,
+                "width": 1,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967328,
+                "width": 2,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967360,
+                "width": 4,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967424,
+                "width": 8,
+                "operations": 12
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 4294967616,
+                "width": 4,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 4294967616,
+                "width": 4,
+                "increments": 20000
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 4294967680,
+                "width": 8,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 4294967680,
+                "width": 8,
+                "increments": 20000
+              }
+            ],
+            "invalidNativeAddressesAndOperationsRejected": 5,
+            "invalidWasmInputsRejected": 5
+          },
+          "facade": {
+            "scope": "Nine scalar JS Atomics operations on branded sparse native spans; waits, general heap views, shipping backend and Lean acceptance remain separate",
+            "engine": "node",
+            "version": "26.10.0",
+            "accessibleGuestBytes": 4295098368,
+            "touchedGuestCells": 36,
+            "groups": [
+              {
+                "base": 0,
+                "type": "Int8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Uint8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Int16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Uint16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Int32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Uint32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "BigInt64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 0,
+                "type": "BigUint64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 0,
+                "width": 4,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              },
+              {
+                "base": 0,
+                "width": 8,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              },
+              {
+                "base": 4294967296,
+                "type": "Int8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Uint8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Int16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Uint16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Int32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Uint32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "BigInt64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 4294967296,
+                "type": "BigUint64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 4294967296,
+                "width": 4,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              },
+              {
+                "base": 4294967296,
+                "width": 8,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              }
+            ],
+            "comparisons": 14255,
+            "rejectionControls": 16
+          }
+        },
+        {
+          "engine": "deno",
+          "version": "2.9.7",
+          "primitive": {
+            "scope": "Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration",
+            "engine": "deno",
+            "version": "2.9.7",
+            "accessibleGuestBytes": 4295098368,
+            "touchedCells": 12,
+            "checks": [
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 16,
+                "width": 1,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 32,
+                "width": 2,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 64,
+                "width": 4,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 128,
+                "width": 8,
+                "operations": 12
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 320,
+                "width": 4,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 320,
+                "width": 4,
+                "increments": 20000
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 384,
+                "width": 8,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 384,
+                "width": 8,
+                "increments": 20000
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967312,
+                "width": 1,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967328,
+                "width": 2,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967360,
+                "width": 4,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967424,
+                "width": 8,
+                "operations": 12
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 4294967616,
+                "width": 4,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 4294967616,
+                "width": 4,
+                "increments": 20000
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 4294967680,
+                "width": 8,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 4294967680,
+                "width": 8,
+                "increments": 20000
+              }
+            ],
+            "invalidNativeAddressesAndOperationsRejected": 5,
+            "invalidWasmInputsRejected": 5
+          },
+          "facade": {
+            "scope": "Nine scalar JS Atomics operations on branded sparse native spans; waits, general heap views, shipping backend and Lean acceptance remain separate",
+            "engine": "deno",
+            "version": "2.9.7",
+            "accessibleGuestBytes": 4295098368,
+            "touchedGuestCells": 36,
+            "groups": [
+              {
+                "base": 0,
+                "type": "Int8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Uint8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Int16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Uint16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Int32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Uint32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "BigInt64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 0,
+                "type": "BigUint64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 0,
+                "width": 4,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              },
+              {
+                "base": 0,
+                "width": 8,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              },
+              {
+                "base": 4294967296,
+                "type": "Int8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Uint8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Int16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Uint16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Int32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Uint32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "BigInt64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 4294967296,
+                "type": "BigUint64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 4294967296,
+                "width": 4,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              },
+              {
+                "base": 4294967296,
+                "width": 8,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              }
+            ],
+            "comparisons": 14255,
+            "rejectionControls": 16
+          }
+        },
+        {
+          "engine": "bun",
+          "version": "1.4.2",
+          "primitive": {
+            "scope": "Sparse memory64 host atomic primitives and Wasm wait/notify; no full JS Atomics facade or Lean application integration",
+            "engine": "bun",
+            "version": "1.4.2",
+            "accessibleGuestBytes": 4295098368,
+            "touchedCells": 12,
+            "checks": [
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 16,
+                "width": 1,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 32,
+                "width": 2,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 64,
+                "width": 4,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 128,
+                "width": 8,
+                "operations": 12
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 320,
+                "width": 4,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 320,
+                "width": 4,
+                "increments": 20000
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 384,
+                "width": 8,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 384,
+                "width": 8,
+                "increments": 20000
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967312,
+                "width": 1,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967328,
+                "width": 2,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967360,
+                "width": 4,
+                "operations": 12
+              },
+              {
+                "kind": "scalar-native-js-and-wasm",
+                "offset": 4294967424,
+                "width": 8,
+                "operations": 12
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 4294967616,
+                "width": 4,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 4294967616,
+                "width": 4,
+                "increments": 20000
+              },
+              {
+                "kind": "wait-notify",
+                "offset": 4294967680,
+                "width": 8,
+                "notEqual": 1,
+                "timeout": 2,
+                "awakened": 0
+              },
+              {
+                "kind": "two-worker-native-and-wasm-add",
+                "offset": 4294967680,
+                "width": 8,
+                "increments": 20000
+              }
+            ],
+            "invalidNativeAddressesAndOperationsRejected": 5,
+            "invalidWasmInputsRejected": 5
+          },
+          "facade": {
+            "scope": "Nine scalar JS Atomics operations on branded sparse native spans; waits, general heap views, shipping backend and Lean acceptance remain separate",
+            "engine": "bun",
+            "version": "1.4.2",
+            "accessibleGuestBytes": 4295098368,
+            "touchedGuestCells": 36,
+            "groups": [
+              {
+                "base": 0,
+                "type": "Int8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Uint8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Int16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Uint16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Int32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "Uint32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 0,
+                "type": "BigInt64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 0,
+                "type": "BigUint64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 0,
+                "width": 4,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              },
+              {
+                "base": 0,
+                "width": 8,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              },
+              {
+                "base": 4294967296,
+                "type": "Int8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Uint8Array",
+                "width": 1,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Int16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Uint16Array",
+                "width": 2,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Int32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "Uint32Array",
+                "width": 4,
+                "actions": 201
+              },
+              {
+                "base": 4294967296,
+                "type": "BigInt64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 4294967296,
+                "type": "BigUint64Array",
+                "width": 8,
+                "actions": 138
+              },
+              {
+                "base": 4294967296,
+                "width": 4,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              },
+              {
+                "base": 4294967296,
+                "width": 8,
+                "kind": "facade-and-Wasm-workers",
+                "increments": 20000
+              }
+            ],
+            "comparisons": 14255,
+            "rejectionControls": 16
+          }
+        }
+      ],
+      "failures": [],
+      "passed": true,
+      "helperInput": {
+        "version": "49.0.0",
+        "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+        "archiveBytes": 16115964,
+        "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz",
+        "selectedFiles": {
+          "lib/libwasmtime.so": {
+            "bytes": 31590960,
+            "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+          },
+          "include/wasmtime.h": {
+            "bytes": 10101,
+            "sha256": "a7497ea0048c0cb8a598c35ca05d1611a31725a88809ed9d51a8b1aebfc6b0c7"
+          },
+          "include/wasm.hh": {
+            "bytes": 19096,
+            "sha256": "ff657786aa259af466fd3ea8cb23646e8ada2b5741362c632d9cdad4be6e9c67"
+          },
+          "include/wasm.h": {
+            "bytes": 23796,
+            "sha256": "c8c2ab4be578bf618512e0720f939d1c8b9b0121f007091dd3746e60290977d9"
+          },
+          "include/wasmtime/error.hh": {
+            "bytes": 3674,
+            "sha256": "689e0143742323bc707243b7cfc404ce966964dc32f76d884580224ea52472f5"
+          },
+          "include/wasmtime/linker.hh": {
+            "bytes": 7459,
+            "sha256": "82f5c95ae9b370ddd8d70190cedce68055cb95c190d02b8e925de7b34640e8bc"
+          },
+          "include/wasmtime/tag.hh": {
+            "bytes": 1724,
+            "sha256": "5c7b05e7d25028c4b9b8a2d3a948acad8c6ff273bf97cecc81df02296f44eb58"
+          },
+          "include/wasmtime/eqref.hh": {
+            "bytes": 927,
+            "sha256": "f2c7adc27741bf18545c0bf72a49c8e22538ba3b97380ac621c01455c2c36851"
+          },
+          "include/wasmtime/wat.hh": {
+            "bytes": 1265,
+            "sha256": "0b190e5defe09c91c448c0a6853afc237148a29c34c7972333166388e4a00abe"
+          },
+          "include/wasmtime/trap.hh": {
+            "bytes": 5505,
+            "sha256": "0ff60c6d5b707966e9388e7dc9e313f0363b7003d615ca5f4cbc03247b77ca9f"
+          },
+          "include/wasmtime/arrayref.hh": {
+            "bytes": 1691,
+            "sha256": "a0059e769dd5bfcc75e743fd6b66d1069e98534ef6f937989cf33657871751bd"
+          },
+          "include/wasmtime/sharedmemory.h": {
+            "bytes": 3027,
+            "sha256": "521d632a5f5ee3e28125b22fdf4f517edb2965a49ebd838278d620368377a1fe"
+          },
+          "include/wasmtime/profiling.h": {
+            "bytes": 4400,
+            "sha256": "92ac5516a561bd062aaf302051373512970a0ea9641836a47993d32b1ab8b205"
+          },
+          "include/wasmtime/_structref_class.hh": {
+            "bytes": 1938,
+            "sha256": "8d0473ee26eb96035000146ba17079feec1a70e2968e64faa472d6610dac6fdf"
+          },
+          "include/wasmtime/conf.h": {
+            "bytes": 1272,
+            "sha256": "025c75489f406c4f3097c57944c01e5fa13840c23c28fe124c748e942f5cdaaa"
+          },
+          "include/wasmtime/instance.hh": {
+            "bytes": 4085,
+            "sha256": "3c84c9ae9be96947637fba645769d0de51fea1d21c2a7915fbe36ed205091f83"
+          },
+          "include/wasmtime/helpers.hh": {
+            "bytes": 11810,
+            "sha256": "da70524f69df90a18c80387ea084c57a8219a5286f8005c770002aa34f768f6d"
+          },
+          "include/wasmtime/externref.h": {
+            "bytes": 4643,
+            "sha256": "37f55067f7227ba6dabc3d933812e0f757e711b6b927a89b47460956bf17d8a5"
+          },
+          "include/wasmtime/error.h": {
+            "bytes": 2420,
+            "sha256": "6905acdfe81f5a7d31c49ac1af8221b3d98b61d5341b91a4a8232f2466dce8f0"
+          },
+          "include/wasmtime/table.h": {
+            "bytes": 3924,
+            "sha256": "1d4313d41a85989ae00c8c744c2e2415ac0694ea3bc3fb15d51cddf5fd74d1ba"
+          },
+          "include/wasmtime/_store_class.hh": {
+            "bytes": 10374,
+            "sha256": "c5563b6d8d70c60ba81356cb9f46a68553ec0017b93943c78486f8aa11761b5e"
+          },
+          "include/wasmtime/extern.h": {
+            "bytes": 6263,
+            "sha256": "7486bc71ec8172152cc6d3d0e827946b4d0778f0b1495a1e377130c031d02031"
+          },
+          "include/wasmtime/async.h": {
+            "bytes": 13952,
+            "sha256": "eea9b04b8c59244fc555a713eeefc88d442baade7506f5355b909fac4c5d3a41"
+          },
+          "include/wasmtime/linker.h": {
+            "bytes": 12848,
+            "sha256": "3ccb42d67c0724b7ce20302c45313f0a056b47a3d0754ce83e0c408f8994576d"
+          },
+          "include/wasmtime/config.h": {
+            "bytes": 32567,
+            "sha256": "3840f8ab5abf1a77d93b728cbe99e04d49ad2e91ed88d2b27387a07753ac540c"
+          },
+          "include/wasmtime/_anyref_class.hh": {
+            "bytes": 2442,
+            "sha256": "8d7ee57b683c3fa4b9278ef56b9727fd33c584a402eea642642ed222954610d5"
+          },
+          "include/wasmtime/component.hh": {
+            "bytes": 401,
+            "sha256": "e77c24d71108d85cdb96fd5716fcc74ff22d2feafdb87dfac2602559eb833fd9"
+          },
+          "include/wasmtime/component.h": {
+            "bytes": 324,
+            "sha256": "7230a0a2ef79976c079225a193006289d5538b2d6cb7e6180649c4526b9dd898"
+          },
+          "include/wasmtime/_exnref_class.hh": {
+            "bytes": 1894,
+            "sha256": "94510c65aa8510b68f1449256d88e2e7ce71ed4944fe336ab5b82bee4ffbf167"
+          },
+          "include/wasmtime/engine.hh": {
+            "bytes": 1399,
+            "sha256": "51c8731580795fbbb214e9fa8a33f73f65d7b465b774b9667096a440f487c7b4"
+          },
+          "include/wasmtime/anyref.h": {
+            "bytes": 7419,
+            "sha256": "90cca7935d268d9ae17032a143bc7fa5d5287edf8254a8c49ac69ca0277c900e"
+          },
+          "include/wasmtime/memory.hh": {
+            "bytes": 4012,
+            "sha256": "15d70af6435ff1cdd61c09689e9507dcac32212f24f87a2e41a65158c1fb4d97"
+          },
+          "include/wasmtime/structref.h": {
+            "bytes": 4451,
+            "sha256": "6db53ade4d6ff78404c55d4e096acef881f435a6d5f76cca7dddb5859f8b1a12"
+          },
+          "include/wasmtime/exnref.hh": {
+            "bytes": 982,
+            "sha256": "48afdcb5b04cf01c9299df1ba9c994790db7a353b04658daaf0ba0e844429021"
+          },
+          "include/wasmtime/val.hh": {
+            "bytes": 3136,
+            "sha256": "23d0a1a258bcff223146e4007e68eabd40be41a04010e66df0596e6a51c047e1"
+          },
+          "include/wasmtime/_arrayref_class.hh": {
+            "bytes": 2189,
+            "sha256": "0069d2ccba2e007e868d7822d47aa6c541aa455b9073d592a9b0d785154fd2df"
+          },
+          "include/wasmtime/component/linker.hh": {
+            "bytes": 9391,
+            "sha256": "30f210fab1447396165845b29987b9d060cabfc91a65780e6915a72e38611337"
+          },
+          "include/wasmtime/component/instance.hh": {
+            "bytes": 2354,
+            "sha256": "a38a2fe8dfdc1cdc9cb89572f5c6924f8919a6ccc479afe52be2da6f66ff9ab1"
+          },
+          "include/wasmtime/component/linker.h": {
+            "bytes": 11133,
+            "sha256": "caa8228d65eec38ae44f7605d20a930daff8cbcafb038465d1fc8e99459f22d9"
+          },
+          "include/wasmtime/component/component.hh": {
+            "bytes": 5797,
+            "sha256": "044c6b8c9fc6d5eafe90f256cbe465077c66c3469e4916f7163d7427864d796a"
+          },
+          "include/wasmtime/component/component.h": {
+            "bytes": 5710,
+            "sha256": "c70c86787fe9a684ef5cd09858d7084944690f4c8779df40422be4bd02bcf30f"
+          },
+          "include/wasmtime/component/val.hh": {
+            "bytes": 31889,
+            "sha256": "a501863591fa10dc41d7779542bde7733d19ed117b10669ae5c0202d5893f1b4"
+          },
+          "include/wasmtime/component/types.h": {
+            "bytes": 419,
+            "sha256": "178795777a58f5ec7138a5932498904ed37fd37a1935b58f739fbd9e48a16614"
+          },
+          "include/wasmtime/component/types/instance.hh": {
+            "bytes": 2660,
+            "sha256": "df1aacf584b0b06c089ba78fc926fca79d91911e51e8a75f9902e5b83d22426b"
+          },
+          "include/wasmtime/component/types/resource.h": {
+            "bytes": 2363,
+            "sha256": "29e8ea2ef512969f9bf82700d932d89cd78437c31c2a9c4b9919f2b0581fcdd9"
+          },
+          "include/wasmtime/component/types/component.hh": {
+            "bytes": 11690,
+            "sha256": "52cf1e12e93838772da08f7bd09eba90ad3c5290fae10bb41a9ae82ac66ef856"
+          },
+          "include/wasmtime/component/types/component.h": {
+            "bytes": 9070,
+            "sha256": "9ff90206171ebdc06182c628382790f72d8e11d0d6e2acdc9074c4ec63d5be64"
+          },
+          "include/wasmtime/component/types/val.hh": {
+            "bytes": 20028,
+            "sha256": "f4869c2174bb6c63e4a4ee9ef9713c87dc27920a5fb38266b69aa6682c75b211"
+          },
+          "include/wasmtime/component/types/instance.h": {
+            "bytes": 2080,
+            "sha256": "525d7f53408a04f33f26389bd7a29e52a88fd9a0484a8697d66a2d6282fbb272"
+          },
+          "include/wasmtime/component/types/func.hh": {
+            "bytes": 1758,
+            "sha256": "001f88580a09bbdb866ba583086576f6b4a6f4a738006a7cfb5aa4feef2ad2e7"
+          },
+          "include/wasmtime/component/types/module.h": {
+            "bytes": 1918,
+            "sha256": "04afb394852aa2d22e2dcf0ece8ee4e4a6ae436c7f979ca361d939baf3023592"
+          },
+          "include/wasmtime/component/types/module.hh": {
+            "bytes": 1716,
+            "sha256": "a7d16678120376e97222c691dff5a92a7acee22a04c9d26a90ac74efb2f65f85"
+          },
+          "include/wasmtime/component/types/func.h": {
+            "bytes": 2021,
+            "sha256": "89d65916a8e599cf2abe3fe5734648b2a84ac0701be196d07533a2cef1e1a280"
+          },
+          "include/wasmtime/component/types/val.h": {
+            "bytes": 22894,
+            "sha256": "08d3b8fc7b78a4ccb9cc809d3200911a745d7593d9323a2db7d994f742b9c726"
+          },
+          "include/wasmtime/component/instance.h": {
+            "bytes": 2428,
+            "sha256": "5f2928c0fa8a5b016560d2582b489ddeca28a1200227a7cd351ab4b16d2c8c3f"
+          },
+          "include/wasmtime/component/func.hh": {
+            "bytes": 1991,
+            "sha256": "72aa729643bbf44562121875de26769b4fbbf9a37978dec1935ce81e763b64e1"
+          },
+          "include/wasmtime/component/types.hh": {
+            "bytes": 381,
+            "sha256": "a7b184e68345d1785e9daddd43b9891337d855825034399f0b248116fb18d7a9"
+          },
+          "include/wasmtime/component/func.h": {
+            "bytes": 3866,
+            "sha256": "7a277a0277cc5910f2650b84861d78c36ffc9d2729cfb06833aff9794f663663"
+          },
+          "include/wasmtime/component/val.h": {
+            "bytes": 20576,
+            "sha256": "db3a426f729b16706a3e7b48560a5288b7323efd3faea5b49ea49e31ad44ccd9"
+          },
+          "include/wasmtime/trap.h": {
+            "bytes": 8935,
+            "sha256": "66865a8eaa35eb7d95cdf7c359a8b16a049d16a61e77c619b955d29d61dd3662"
+          },
+          "include/wasmtime/engine.h": {
+            "bytes": 1241,
+            "sha256": "c1a02904ef0d4c660d2baa70477994bbc4cfe291aeebe7143bc1c8b316f77788"
+          },
+          "include/wasmtime/_func_class.hh": {
+            "bytes": 13795,
+            "sha256": "5c80bf9d72abd749cc9d63e386628c8bad2580d690d2c4c7dc12f6a13a0a2d44"
+          },
+          "include/wasmtime/extern_declare.hh": {
+            "bytes": 517,
+            "sha256": "c54d82840a4554f5ea0fc6fe94520fd2b24fb017c73405028e10b8916c61fd62"
+          },
+          "include/wasmtime/types.h": {
+            "bytes": 221,
+            "sha256": "47facddf2717b2ff9b13bc9bdae50cf0cd421c3299622248820f3c4f154fb464"
+          },
+          "include/wasmtime/config.hh": {
+            "bytes": 28665,
+            "sha256": "452ea4a26062cb65cfefcdcee70bbc1fba06cef4fbe0411265d74bba9989df43"
+          },
+          "include/wasmtime/types/tag.hh": {
+            "bytes": 2610,
+            "sha256": "0afd806de505b73b1d562f64dbd995c79d53c8d601c1f6dbd71799a056aa8d20"
+          },
+          "include/wasmtime/types/arrayref.hh": {
+            "bytes": 950,
+            "sha256": "372e35a259ff7a5f5e7465bb8165e6eee044c454ef3dec1d53ec9242f27a8b39"
+          },
+          "include/wasmtime/types/_structref_class.hh": {
+            "bytes": 5428,
+            "sha256": "f158b4b3e8c1b74256a95c1f56e40abf7f9cceeeaa29cec558e246f01bf116f3"
+          },
+          "include/wasmtime/types/memory.hh": {
+            "bytes": 6764,
+            "sha256": "bb22cd0b8b05fa0d088abe445de6a6280640ea6320914389364756af56eb819b"
+          },
+          "include/wasmtime/types/structref.h": {
+            "bytes": 3784,
+            "sha256": "16c0dd4a06bce1efbddefb720dd09dc9ebf166ebaf5a654130f5b7be6ab71b19"
+          },
+          "include/wasmtime/types/exnref.hh": {
+            "bytes": 1625,
+            "sha256": "ad6b76ceaef18ff81e6d5986174c22177927c2bc1db1e8c33889b3c564a31803"
+          },
+          "include/wasmtime/types/val.hh": {
+            "bytes": 13554,
+            "sha256": "29d3ec7490f785394db21f5476069151199aea96c94d7ff3c347379fe3cfd074"
+          },
+          "include/wasmtime/types/export.hh": {
+            "bytes": 2467,
+            "sha256": "cd0621e8659a45a4f3ca3ae5094ab80a86badfc0786aa27c968616a5a2bc4bf0"
+          },
+          "include/wasmtime/types/import.hh": {
+            "bytes": 2727,
+            "sha256": "b94bc37d543ff7d32098128b2acdca89c0cb76e9b1665733e6f004759770e702"
+          },
+          "include/wasmtime/types/table.hh": {
+            "bytes": 3303,
+            "sha256": "00559bb04924a26ddbf0120c73671a0366b2e359312b354742792bfaea33d4a8"
+          },
+          "include/wasmtime/types/structref.hh": {
+            "bytes": 452,
+            "sha256": "2dba4391088a03810e6d248b8b7e50a471003ff729377793c293a22aa524538b"
+          },
+          "include/wasmtime/types/func.hh": {
+            "bytes": 3363,
+            "sha256": "d8c640f7d586d9ad6186b4fae31587c66a075f08fbc89eafd47680567f65f48d"
+          },
+          "include/wasmtime/types/_val_class.hh": {
+            "bytes": 6454,
+            "sha256": "4fcbcd5ac4d435159c90100e781bc77ed6172d95bc55f0f3f57a3fc15d4b9bc4"
+          },
+          "include/wasmtime/types/arrayref.h": {
+            "bytes": 1504,
+            "sha256": "8b978b9ca57092c9b14c846efcb0f80515a1792e87af2e74169d3f2a7a7c8fe3"
+          },
+          "include/wasmtime/types/val.h": {
+            "bytes": 6133,
+            "sha256": "fbc78a085d0ac76a85f63f66986a2b77d0813146a7b715cf269c56115f84b3d3"
+          },
+          "include/wasmtime/types/extern.hh": {
+            "bytes": 2067,
+            "sha256": "fb3ec6f92fedf173c5f1cdf6fc7ea2cd7c9fe1697f02dc69cdf889b7470178a2"
+          },
+          "include/wasmtime/types/global.hh": {
+            "bytes": 2586,
+            "sha256": "d6189adc25faad4d4237c231808629628ed091c13b8a24846eab3e354e18a206"
+          },
+          "include/wasmtime/types/exnref.h": {
+            "bytes": 1214,
+            "sha256": "ff720e11ebec7936f9a439c66fd0de336176d4cecee01198dca936e2ca13383d"
+          },
+          "include/wasmtime/table.hh": {
+            "bytes": 3583,
+            "sha256": "718cf580417e3885dd6450c5734bb71ca3b736e52f5c6134ed04d242ef12427d"
+          },
+          "include/wasmtime/structref.hh": {
+            "bytes": 1715,
+            "sha256": "f56fe6b322ca4b66f36212f3ba7c413f6ef171b1344b5e34ae6807bc89c157c4"
+          },
+          "include/wasmtime/_eqref_class.hh": {
+            "bytes": 2730,
+            "sha256": "de249e5f5b53eec9544d4222e01e17cb45fec28eb60aa6db0b1cc348aa2a5703"
+          },
+          "include/wasmtime/store.hh": {
+            "bytes": 930,
+            "sha256": "f68ddbba240cab6631510d92cfa9d91eb3464b23a35668edf48dbe531c1d12fb"
+          },
+          "include/wasmtime/tag.h": {
+            "bytes": 2268,
+            "sha256": "0e6261f2f061b2c900b129b12de12e72e2bc37c32380ee95ef6f15e14baa395f"
+          },
+          "include/wasmtime/instance.h": {
+            "bytes": 6362,
+            "sha256": "4abeaef7a3942aa986d29e58b1ad169307d4ffd10e11a796e0f903933bec67b7"
+          },
+          "include/wasmtime/func.hh": {
+            "bytes": 9697,
+            "sha256": "68328055a4b42cbcdc7135a171209e39a41d1b7738b99d8201b4a4dbfa44580d"
+          },
+          "include/wasmtime/module.h": {
+            "bytes": 5768,
+            "sha256": "8c0b889e5235a1017a4844d03628a7dd67090a5088ae289f87f699f6bd6be88e"
+          },
+          "include/wasmtime/externref.hh": {
+            "bytes": 1325,
+            "sha256": "03a2f196f91f680347fd12eddda6aeed5063aa2bf69561fe5570b7446d5b69eb"
+          },
+          "include/wasmtime/module.hh": {
+            "bytes": 5580,
+            "sha256": "106774b8810482e4b70223eeb3768db626fe3580b9e41fcca969ead3d500a25f"
+          },
+          "include/wasmtime/types.hh": {
+            "bytes": 433,
+            "sha256": "568988261b07753fbae59c2649d168119ebb087ffcac79e7e2d393c4cdcf61c5"
+          },
+          "include/wasmtime/eqref.h": {
+            "bytes": 5263,
+            "sha256": "de21b013eac94b2d43eba4bbac34d565c649e2573814868dbbe50e64622ca7be"
+          },
+          "include/wasmtime/func.h": {
+            "bytes": 12787,
+            "sha256": "9a4fee4a295a2b19a141cf84be4ceb9355bfc25394ae761d7f780ac49f2d65ad"
+          },
+          "include/wasmtime/memory.h": {
+            "bytes": 5999,
+            "sha256": "95c0c3b189ea7b0e8c5b523a18de0a19a1bef7db8c5702275a3a2d9e6cea9642"
+          },
+          "include/wasmtime/_val_class.hh": {
+            "bytes": 6987,
+            "sha256": "9dcae719115fc13181fbfca22ddbb19910fc2ebf56f0b2a174971012e307b036"
+          },
+          "include/wasmtime/arrayref.h": {
+            "bytes": 4703,
+            "sha256": "a93ec80b4849edbd6c7bb2c8268b9f41ed4d97b5e0ad537e7521b4551d005521"
+          },
+          "include/wasmtime/val.h": {
+            "bytes": 14826,
+            "sha256": "33ea4fc9b9288f536dc12b15130b25b88b59144c85d1e34c30a8ff8514170148"
+          },
+          "include/wasmtime/_externref_class.hh": {
+            "bytes": 1949,
+            "sha256": "0f39147fd6bff3d781235ca4d2731e67597edb77e924c223208abfb04e54bdfc"
+          },
+          "include/wasmtime/extern.hh": {
+            "bytes": 1901,
+            "sha256": "2608bb08136598b81c0847515aa3dbe665e8ef77802a04c0683a628bf4d39fd9"
+          },
+          "include/wasmtime/wat.h": {
+            "bytes": 1153,
+            "sha256": "7533f9c25ee267c88ea64e21a7550bf28585183184a29c575ceb419eb711fe9f"
+          },
+          "include/wasmtime/span.hh": {
+            "bytes": 2716,
+            "sha256": "da563fddd6e110c419c8ba579de15496a03d1e1e44fde29a7d1744348996ca51"
+          },
+          "include/wasmtime/wasi.hh": {
+            "bytes": 3701,
+            "sha256": "f9318dccdccafe821b1e8ae4173a2444ac88cd87412252eeea06aa1658fd0149"
+          },
+          "include/wasmtime/store.h": {
+            "bytes": 10060,
+            "sha256": "ff307ac99c7e9fa58bd40b518b9e737663c5741abd4e756bbe8452f340f30386"
+          },
+          "include/wasmtime/global.h": {
+            "bytes": 2521,
+            "sha256": "5e51effa5185ec774e47bb53323fbf5f0d0b621158f0a578b5528711d2f18129"
+          },
+          "include/wasmtime/global.hh": {
+            "bytes": 2469,
+            "sha256": "a74e041c6e9c4a48af597896a77b7748a289656f7fad4fe7c2eb226f12fa4666"
+          },
+          "include/wasmtime/exnref.h": {
+            "bytes": 6109,
+            "sha256": "0f03df665b9a8b7ca9405ad638d4068c0ce7d5024165132acea94430bbc626d0"
+          },
+          "include/wasmtime/anyref.hh": {
+            "bytes": 1393,
+            "sha256": "7f7c57d3dc5381ab01d280633827b784e1cb545199bef98943bf056b9379f11b"
+          },
+          "include/wasi.h": {
+            "bytes": 8513,
+            "sha256": "37d15447efe4c47b445996c4bd9d879dfe02402bd96e36a9de5ca195670ce5ea"
+          },
+          "include/wasmtime.hh": {
+            "bytes": 1876,
+            "sha256": "402b06783af1f689b1646d3d2b69c5e4ab8a7ae71f3f87dab09e62a7a51f0db1"
+          },
+          "include/doc-wasm.h": {
+            "bytes": 83333,
+            "sha256": "33c6bca76dbc9ebcfd785798d8d7837ad4f34ca0df9beb1108408edf63a8d195"
+          },
+          "README.md": {
+            "bytes": 7674,
+            "sha256": "61b003ff4ddfbe6123ae3a1123e39e379f1559edc44634e6c14ba3f2671f9fd8"
+          },
+          "LICENSE": {
+            "bytes": 12243,
+            "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+          }
+        }
+      },
+      "helperSha256": "41a5c41034b00c439624146eba9764d289d7fd4b38b1e4d01686164d0e15772f",
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-24T16:23:49.332Z"
+    }
+  },
+  "guard": {
+    "path": ".work/product-acceptance/native-atomic-views-r1-resources.json",
+    "sha256": "25d4270008a67183af1297a85ea4abcfb8c76a3afec991e1522642daffd57353",
+    "content": {
+      "startedAt": "2026-09-24T16:23:44.349Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=128",
+        "scripts/full-lean/probe-native-atomic-views.mjs",
+        ".work/native-atomic-views-r1"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "13a7bbdd-49da-43ed-8344-4bd03323c39a",
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 23934861312
+      },
+      "minimumHostAvailable": 23882600448,
+      "peakMemoryBytes": 94924800,
+      "peakTasks": 26,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/native-atomic-views-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T16:23:49.358Z",
+        "memoryBytes": 30855168,
+        "peakMemoryBytes": 94924800,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 4096,
+          "file": 29822976,
+          "kernel": 155648,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 5275648,
+          "slab": 115920
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T16:23:49.398Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 43532288,
+        "peakMemoryBytes": 94924800,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11653120,
+          "file": 29822976,
+          "kernel": 1171456,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 5275648,
+          "slab": 238032
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T16:23:49.424Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "preparedCI": {
+    "path": ".github/workflows/wasmtime-helper-probe.yml",
+    "sha256": "103560d61234e7aed1ed9f683e04cd378ac20834003c31cd35e7d3162c50c3c9",
+    "status": "Prepared locally; not pushed or dispatched while SSH credentials are expired"
+  },
+  "limitations": [
+    "Linux x64 only; latest stock engines remain pinned to the recorded versions.",
+    "The internal branded spans are not general TypedArray or growing-heap implementations.",
+    "wait, waitAsync and notify reject native spans explicitly pending scheduler integration; the underlying primitive wait/notify probes do pass.",
+    "No shipping application pipeline or real Lean execution uses this adapter yet.",
+    "Sparse addressability and atomic semantics do not establish dense multi-gigabyte capacity."
+  ]
+}

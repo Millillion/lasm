@@ -748,3 +748,12 @@ Each relocated deployment runs with source hidden, PATH empty and build
 environment removed. All six build/archive guards release without resource
 events; the largest build peak is 3.45 GiB. This adds verified device behavior,
 not complete device or platform acceptance.
+
+The internal [scalar atomic adapter](evidence/native-atomic-views-2026-09-24.json)
+now connects JavaScript integer conversions to the tested memory64 primitives.
+Nine operations, eight signed/unsigned integer formats, reentrant coercions and
+four concurrent Wasm/JavaScript worker controls match each stock engine's own
+Atomics behavior on Linux x64. The sparse probe touches 36 cells below and above
+4 GiB and peaks at 91 MiB under a 1 GiB guard. The original primitive and wait
+controls also still pass. This is a backend component under development;
+ordinary heap access, wait scheduling and real Lean execution remain required.
