@@ -57,3 +57,13 @@ symbol's behavior field remains `unverified`. The review exposes the unadapted
 Lean 4.34 Linux query and the zero-valued libuv/OpenSSL version branches alongside
 the known event-loop stubs. Dependency version semantics need explicit review;
 target metadata must describe the actual compiled artifact.
+
+The supplementary filesystem/console fixtures now have verified
+[native interpreted and C-compiled controls](../evidence/application-io-native-controls-2026-09-24.json):
+five cases each on Linux x64 and ARM64, and three portable cases on Windows x64.
+The filesystem-surface fixture completes 50 labeled assertions, including
+handle modes and cursors, buffering, lock lifetime, and temporary-resource
+cleanup. The two unchanged POSIX process fixtures remain inapplicable to Windows;
+parallel portable coverage is still needed. These controls establish expected
+behavior only. Installed Wasm comparisons and the other three native platforms
+remain pending.
