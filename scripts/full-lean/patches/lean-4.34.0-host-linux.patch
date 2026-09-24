@@ -1,0 +1,13 @@
+--- a/src/runtime/platform.cpp
++++ b/src/runtime/platform.cpp
+@@ -42,7 +42,9 @@
+ }
+ 
+ extern "C" LEAN_EXPORT uint8 lean_system_platform_linux(obj_arg) {
+-#if defined(__linux__) && !defined(LEAN_EMSCRIPTEN)
++#if defined(__EMSCRIPTEN__)
++    return lasm_host_platform() == 0;
++#elif defined(__linux__)
+     return 1;
+ #else
+     return 0;

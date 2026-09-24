@@ -75,3 +75,12 @@ C-compiled outputs match exactly on each host. The first attempt exposed two
 missing display instances in the supplementary fixture; that failure and the
 repair are retained separately. The rerun passes all six native cases on Linux
 and all four portable cases on Windows. Deployed Wasm comparison is still pending.
+
+The [installed Linux-query repair](../evidence/application-platform-linux-2026-09-24.json)
+now makes `System.Platform.isLinux` match native Linux in all three stock engines.
+The original source-index snapshot remains unchanged; the new runtime derives a
+single patched object, with every other archive member and bundle file verified.
+`isWindows`, `isOSX`, pointer width and the tested path behavior also match native
+Linux. Other native hosts remain unvalidated. LLVM target and Emscripten status
+describe the actual Wasm artifact; zero libuv/OpenSSL version observations remain
+an open semantics audit.

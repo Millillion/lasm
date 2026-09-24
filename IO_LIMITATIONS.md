@@ -19,11 +19,13 @@ separately from the earlier runtime evidence below.
   covers all 2,516 compiled modules and 72,983 non-theorem, non-internal
   declarations, including 925 extern declarations. Implementation and behavior
   coverage remain unverified individually; these counts are not API passes.
-- [ ] Repair Lean 4.34's new `System.Platform.isLinux` host query and validate
-  the ordinary platform APIs through installed deployments. The
-  [source audit](docs/evidence/runtime-extern-source-index-2026-09-24.json) finds
-  that its Emscripten branch returns false instead of consulting the host.
-  A source repair is being prepared; runtime differential validation is pending.
+- [ ] Complete native platform-query acceptance on all six host combinations.
+  The [Lean 4.34 Linux-query repair](docs/evidence/application-platform-linux-2026-09-24.json)
+  preserves the failing installed `.13` comparison and changes only the affected
+  runtime object. Installed `.14` now matches native Linux host queries in Node,
+  Deno and Bun after relocation with source hidden and an empty PATH. The other
+  native hosts and architecture remain pending; target/dependency metadata is
+  recorded separately.
 - [ ] Audit `Lean.libUVVersion` and `Lean.openSSLVersion` metadata semantics.
   Their current Emscripten implementations return zero. Record actual deployed
   dependencies and native differences without substituting invented version

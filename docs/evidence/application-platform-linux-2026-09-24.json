@@ -1,0 +1,1744 @@
+{
+  "scope": "Ordinary Lean host-platform queries through installed relocated deployments on Linux x64; other native platforms remain pending",
+  "recordedAt": "2026-09-24T04:37:18.540636+00:00",
+  "fixtureSha256": "946837d24d60f56acb08ce926d8dcb16fcf4d8c41621ab26495eed5a25b6301b",
+  "patchSha256": "77f66fc789821bcce694a9683dd079d5ce0f8c73902b91095d8a8f10fd88fa4a",
+  "originalFailure": {
+    "result": {
+      "scope": "Native versus installed ordinary Lean host-platform queries; build/dependency metadata recorded separately",
+      "target": "node",
+      "host": "linux-x64",
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r12/workspace/project/node_modules/@lasm/compiler",
+      "fixtureSha256": "946837d24d60f56acb08ce926d8dcb16fcf4d8c41621ab26495eed5a25b6301b",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-platform-baseline-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "--version"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "v26.10.0\n",
+          "stderr": ""
+        },
+        {
+          "label": "native interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+          "args": [
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/Main.lean"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=x86_64-unknown-linux-gnu\nemscripten=false\nlibuv=77824\nopenssl=811597824\n",
+          "stderr": ""
+        },
+        {
+          "label": "native generate C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+          "args": [
+            "-j1",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/Main.lean"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "native compile",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+          "args": [
+            "-O2",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/Main.lean.c"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "native compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/native",
+          "args": [],
+          "code": 0,
+          "signal": null,
+          "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=x86_64-unknown-linux-gnu\nemscripten=false\nlibuv=77824\nopenssl=811597824\n",
+          "stderr": ""
+        },
+        {
+          "label": "build",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r12/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/Main.lean",
+            "--target",
+            "node",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/dist"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.0 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/dist\n"
+        },
+        {
+          "label": "deployed",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/relocated deployment/main.mjs"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "windows=false\nmacos=false\nlinux=false\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=wasm64-unknown-emscripten\nemscripten=true\nlibuv=0\nopenssl=0\n",
+          "stderr": ""
+        }
+      ],
+      "passed": false,
+      "engineVersion": "v26.10.0",
+      "native": {
+        "host": {
+          "windows": "false",
+          "macos": "false",
+          "linux": "true",
+          "bits": "64",
+          "path": "data/todos.json",
+          "absolute": "false"
+        },
+        "metadata": {
+          "llvmTarget": "x86_64-unknown-linux-gnu",
+          "emscripten": "false",
+          "libuv": "77824",
+          "openssl": "811597824"
+        }
+      },
+      "nativeCompiled": {
+        "host": {
+          "windows": "false",
+          "macos": "false",
+          "linux": "true",
+          "bits": "64",
+          "path": "data/todos.json",
+          "absolute": "false"
+        },
+        "metadata": {
+          "llvmTarget": "x86_64-unknown-linux-gnu",
+          "emscripten": "false",
+          "libuv": "77824",
+          "openssl": "811597824"
+        }
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "c1e6d5c818e905b19033d4de2d810cd36eb750f6c54df97e6bbae56fcead403e",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "946837d24d60f56acb08ce926d8dcb16fcf4d8c41621ab26495eed5a25b6301b",
+            "cSha256": "b19dd7d3d631270cda28730346d135752b4e5d54a39d1b8c299c5a062303e66b"
+          }
+        ],
+        "signature": "d35599e2d68b7a557abc3eb744672dc4e60b60c84c0e294628ea045b8e241b10",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "deployed": {
+        "host": {
+          "windows": "false",
+          "macos": "false",
+          "linux": "false",
+          "bits": "64",
+          "path": "data/todos.json",
+          "absolute": "false"
+        },
+        "metadata": {
+          "llvmTarget": "wasm64-unknown-emscripten",
+          "emscripten": "true",
+          "libuv": "0",
+          "openssl": "0"
+        }
+      },
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-platform-baseline-r1/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildToolEnvironmentRemoved": true,
+        "wasmSha256": "b2a4102d9912ddf8e0ac3580696c93e05628511ef1571d1e2207dd9dc8e569b3"
+      },
+      "hostEquivalent": false,
+      "metadataAssessment": "Actual build target differs intentionally; dependency version semantics remain under audit",
+      "fixtureUnchanged": true,
+      "finishedAt": "2026-09-24T04:24:42.790Z"
+    },
+    "resources": {
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "peakMemoryBytes": 3650203648,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "derivation": {
+    "scope": "Verified single-object runtime derivation; application behavior validation is separate",
+    "target": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64",
+    "manifestSha256": "fb5d096b306d52e88b59366dacfd7136285eeef56d8e3f92798846ce2a17d9bb",
+    "baseManifestSha256": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+    "buildInputSha256": "0f9170a8d96c28bb92c3c199cc0920f1896019cab37462497ff2e9ad519233f2",
+    "sourceBeforeSha256": "5566f1773654afa4c8b3e65d703ae1a74ca16793767dcf2006ec5dd6e84018c6",
+    "sourceAfterSha256": "4f7addd679a9acb2f7d6863213d640c676a0c767717f3776825cd87e05dcf07e",
+    "patchSha256": "77f66fc789821bcce694a9683dd079d5ce0f8c73902b91095d8a8f10fd88fa4a",
+    "flags": [
+      "-DLEAN_USE_GMP",
+      "-Wall",
+      "-Wextra",
+      "-std=c++20",
+      "-DLEAN_EMSCRIPTEN",
+      "-sALLOW_MEMORY_GROWTH=1",
+      "-sMEMORY64=1",
+      "-fwasm-exceptions",
+      "-pthread",
+      "-ffp-contract=off",
+      "-DLEAN_MULTI_THREAD",
+      "-DLEAN_BUILD_TYPE=\"Release\"",
+      "-DLEAN_EXPORTING",
+      "-D__CLANG__",
+      "-fPIC",
+      "-O3",
+      "-DNDEBUG",
+      "-ftls-model=local-exec",
+      "-I",
+      "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/include",
+      "-I",
+      "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/libuv/src/libuv/include",
+      "-I",
+      "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/include",
+      "-I",
+      "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/source/src",
+      "-I",
+      "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build"
+    ],
+    "commands": [
+      {
+        "program": "patch",
+        "args": [
+          "--batch",
+          "--forward",
+          "-p1"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "platform.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/em++",
+        "args": [
+          "-DLEAN_USE_GMP",
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-DLEAN_EMSCRIPTEN",
+          "-sALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-ffp-contract=off",
+          "-DLEAN_MULTI_THREAD",
+          "-DLEAN_BUILD_TYPE=\"Release\"",
+          "-DLEAN_EXPORTING",
+          "-D__CLANG__",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-ftls-model=local-exec",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/libuv/src/libuv/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/source/src",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.0/build",
+          "-MMD",
+          "-MF",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/build/platform.d",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/build/src/runtime/platform.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/build/platform.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "rcs",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/build/platform.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "t",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "t",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "debug.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "debug.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "thread.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "thread.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mpz.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mpz.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "utf8.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "utf8.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "object.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "object.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "apply.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "apply.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "exception.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "exception.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "interrupt.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "interrupt.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "memory.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "memory.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "stackinfo.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "stackinfo.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "compact.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "compact.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "init_module.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "init_module.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "hash.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "hash.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "byteslice.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "byteslice.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "platform.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "platform.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "alloc.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "alloc.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "allocprof.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "allocprof.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "sharecommon.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "sharecommon.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "stack_overflow.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "stack_overflow.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "process.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "process.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "object_ref.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "object_ref.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mpn.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mpn.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mutex.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "mutex.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "libuv.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "libuv.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "net_addr.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "net_addr.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "event_loop.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "event_loop.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "timer.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "timer.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "tcp.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "tcp.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "udp.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "udp.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "dns.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "dns.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "system.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "system.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "signal.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "signal.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "openssl.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.cache/emsdk-6.0.9-dev/upstream/emscripten/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-linux-r1/lean-4.34.0-wasm64/lib/libleanrt.a",
+          "openssl.cpp.o"
+        ]
+      }
+    ],
+    "verifiedMembers": [
+      {
+        "name": "debug.cpp.o",
+        "before": "68cb8d7122a7856b826f9610b6a5db7021735d71874862790ae6afab36c65d90",
+        "after": "68cb8d7122a7856b826f9610b6a5db7021735d71874862790ae6afab36c65d90"
+      },
+      {
+        "name": "thread.cpp.o",
+        "before": "7815016ad014774421f549334ffe7cbacaaa5a4eda69c200f2a1367b04dfc968",
+        "after": "7815016ad014774421f549334ffe7cbacaaa5a4eda69c200f2a1367b04dfc968"
+      },
+      {
+        "name": "mpz.cpp.o",
+        "before": "4dbac6b2b8963a114c9238e5e69a0073133ea9c5add8f58c20b5272946105b44",
+        "after": "4dbac6b2b8963a114c9238e5e69a0073133ea9c5add8f58c20b5272946105b44"
+      },
+      {
+        "name": "utf8.cpp.o",
+        "before": "b6826556ce567e978bb2c0f5c11e5a1610eb0919234b8dd1274c6c52f112cd89",
+        "after": "b6826556ce567e978bb2c0f5c11e5a1610eb0919234b8dd1274c6c52f112cd89"
+      },
+      {
+        "name": "object.cpp.o",
+        "before": "439611613bda2b9bcda686b250fc13d7162071aea4ebec54f739f92ae20e6ff1",
+        "after": "439611613bda2b9bcda686b250fc13d7162071aea4ebec54f739f92ae20e6ff1"
+      },
+      {
+        "name": "apply.cpp.o",
+        "before": "789c8b7725b8b5e9c9de1939d5de3a140501d8a35ad3a4da84d502ca83ed8580",
+        "after": "789c8b7725b8b5e9c9de1939d5de3a140501d8a35ad3a4da84d502ca83ed8580"
+      },
+      {
+        "name": "exception.cpp.o",
+        "before": "bd8ef5899ebb9cec375bea7f06d685883e78b8bb0108026e6a33a978a3cec829",
+        "after": "bd8ef5899ebb9cec375bea7f06d685883e78b8bb0108026e6a33a978a3cec829"
+      },
+      {
+        "name": "interrupt.cpp.o",
+        "before": "428ca18a7ef01478848be70f8afe84d2e5c77b67ec8c739f024a183e9885d56a",
+        "after": "428ca18a7ef01478848be70f8afe84d2e5c77b67ec8c739f024a183e9885d56a"
+      },
+      {
+        "name": "memory.cpp.o",
+        "before": "5f4ebd71b7ff81fa1a20ceae6ae6135dd2cdf7f01261a201daf7d8ef87ad4245",
+        "after": "5f4ebd71b7ff81fa1a20ceae6ae6135dd2cdf7f01261a201daf7d8ef87ad4245"
+      },
+      {
+        "name": "stackinfo.cpp.o",
+        "before": "bf0e19d85e6e55553846c2d85da7d3e65f349e773da44c7b06e7b1c455ff8473",
+        "after": "bf0e19d85e6e55553846c2d85da7d3e65f349e773da44c7b06e7b1c455ff8473"
+      },
+      {
+        "name": "compact.cpp.o",
+        "before": "80d1391ae79314b9a4af60746307e3d0c984595009b4d606a6e592090288930b",
+        "after": "80d1391ae79314b9a4af60746307e3d0c984595009b4d606a6e592090288930b"
+      },
+      {
+        "name": "init_module.cpp.o",
+        "before": "6e17298180405e9d6483d2fae325483a402b1a7d66279e7dcf4425a779ae2f7f",
+        "after": "6e17298180405e9d6483d2fae325483a402b1a7d66279e7dcf4425a779ae2f7f"
+      },
+      {
+        "name": "io.cpp.o",
+        "before": "cbcad580958e789c6fb358d6c751a1b3bc66add97019f90f1bbec5b8a3a51b2d",
+        "after": "cbcad580958e789c6fb358d6c751a1b3bc66add97019f90f1bbec5b8a3a51b2d"
+      },
+      {
+        "name": "hash.cpp.o",
+        "before": "299244b5b2beecfc575a2a30f3a33b38b4e03fae781d766645080606b4e2b59c",
+        "after": "299244b5b2beecfc575a2a30f3a33b38b4e03fae781d766645080606b4e2b59c"
+      },
+      {
+        "name": "byteslice.cpp.o",
+        "before": "16a7488e381d13cf79d361d61a85d8c6a674f565582375b266a2231b8693ee4b",
+        "after": "16a7488e381d13cf79d361d61a85d8c6a674f565582375b266a2231b8693ee4b"
+      },
+      {
+        "name": "platform.cpp.o",
+        "before": "d2049086c49ade22cb6b0f1afc0002944c38094999337dc32a6085ec3d423230",
+        "after": "a7c368bbf8e9a837b5dd3d529d3810cbd3de68369a3154205dc8213b75d11234"
+      },
+      {
+        "name": "alloc.cpp.o",
+        "before": "b6664f6cef7c08d17612bbaa099f7b5737848c63c905dbbdcb3f2343f8f41ef0",
+        "after": "b6664f6cef7c08d17612bbaa099f7b5737848c63c905dbbdcb3f2343f8f41ef0"
+      },
+      {
+        "name": "allocprof.cpp.o",
+        "before": "e423266ec5245c92f0185ea4df8bc211ee302d15815dd219e0ac78c380f9c96d",
+        "after": "e423266ec5245c92f0185ea4df8bc211ee302d15815dd219e0ac78c380f9c96d"
+      },
+      {
+        "name": "sharecommon.cpp.o",
+        "before": "95132b1fa8baa3a75fb8f029aad0c958719674e7ef9a0d0540be8825d7fcd6e2",
+        "after": "95132b1fa8baa3a75fb8f029aad0c958719674e7ef9a0d0540be8825d7fcd6e2"
+      },
+      {
+        "name": "stack_overflow.cpp.o",
+        "before": "46e89f203979344b22b5d867b4b73997ef15f683b7e6b848e258422109f56de6",
+        "after": "46e89f203979344b22b5d867b4b73997ef15f683b7e6b848e258422109f56de6"
+      },
+      {
+        "name": "process.cpp.o",
+        "before": "f12ecef77b9932dcf7231bd13ace694916fe07de555b900178c8e61615d87e9d",
+        "after": "f12ecef77b9932dcf7231bd13ace694916fe07de555b900178c8e61615d87e9d"
+      },
+      {
+        "name": "object_ref.cpp.o",
+        "before": "a15302af2dc26e350e9d9de03010d5f64957f5807d87d22b1d6f4eedf83d47c9",
+        "after": "a15302af2dc26e350e9d9de03010d5f64957f5807d87d22b1d6f4eedf83d47c9"
+      },
+      {
+        "name": "mpn.cpp.o",
+        "before": "ab971e7c33b2d93452440d8f47863836e0a0ca777bbaf550c3a35530e7e8cdff",
+        "after": "ab971e7c33b2d93452440d8f47863836e0a0ca777bbaf550c3a35530e7e8cdff"
+      },
+      {
+        "name": "mutex.cpp.o",
+        "before": "f563e3d06e30bd11dd8c8b73cb66a6c7cb27f6b84843ccd67d2e6296889b9d0a",
+        "after": "f563e3d06e30bd11dd8c8b73cb66a6c7cb27f6b84843ccd67d2e6296889b9d0a"
+      },
+      {
+        "name": "libuv.cpp.o",
+        "before": "b448de47fef590cf4cc6827b2030b1e63261df8926f929744a053bf6804b115c",
+        "after": "b448de47fef590cf4cc6827b2030b1e63261df8926f929744a053bf6804b115c"
+      },
+      {
+        "name": "net_addr.cpp.o",
+        "before": "694b9ce068af1b8bda9656ab00b468073668987b16722309d929c4259102474d",
+        "after": "694b9ce068af1b8bda9656ab00b468073668987b16722309d929c4259102474d"
+      },
+      {
+        "name": "event_loop.cpp.o",
+        "before": "1eb67d8105558f522ad9e24c9df62472d7f249577c5c3755b55e42786fd8843d",
+        "after": "1eb67d8105558f522ad9e24c9df62472d7f249577c5c3755b55e42786fd8843d"
+      },
+      {
+        "name": "timer.cpp.o",
+        "before": "3c547d4beaced93def87d026dfaf5c15b08326d3c62e0eeafd21ae76e7de0b2f",
+        "after": "3c547d4beaced93def87d026dfaf5c15b08326d3c62e0eeafd21ae76e7de0b2f"
+      },
+      {
+        "name": "tcp.cpp.o",
+        "before": "96f916bf9b757328a0a28dab0c815797efc461a1630f28b488128ebc6ff192e7",
+        "after": "96f916bf9b757328a0a28dab0c815797efc461a1630f28b488128ebc6ff192e7"
+      },
+      {
+        "name": "udp.cpp.o",
+        "before": "025a809a9202c1fa7dd6dda01bcd20e34b400678f83df8b2fc8f3f12a3033324",
+        "after": "025a809a9202c1fa7dd6dda01bcd20e34b400678f83df8b2fc8f3f12a3033324"
+      },
+      {
+        "name": "dns.cpp.o",
+        "before": "d65533481d8cbe6b63c7f119da8daec6893ddec14b36269874c85e32781f0c24",
+        "after": "d65533481d8cbe6b63c7f119da8daec6893ddec14b36269874c85e32781f0c24"
+      },
+      {
+        "name": "system.cpp.o",
+        "before": "c1d3b7ee6b1eaaa35c6fa3715ac2128b8695ef322f8a9841298cfdceb2fffd58",
+        "after": "c1d3b7ee6b1eaaa35c6fa3715ac2128b8695ef322f8a9841298cfdceb2fffd58"
+      },
+      {
+        "name": "signal.cpp.o",
+        "before": "c738e1f171c51dcad76936eae1a65285db63c57428d27da196244378d367f057",
+        "after": "c738e1f171c51dcad76936eae1a65285db63c57428d27da196244378d367f057"
+      },
+      {
+        "name": "openssl.cpp.o",
+        "before": "e49e182afbefaaf416de3c45c88f3fe466452515a9217ac6275a7792c383d44c",
+        "after": "e49e182afbefaaf416de3c45c88f3fe466452515a9217ac6275a7792c383d44c"
+      }
+    ],
+    "untouchedBundleFiles": [
+      "exports.json",
+      "include/lean/config.h",
+      "include/lean/lean_gmp.h",
+      "include/lean/lean_libuv.h",
+      "include/lean/lean.h",
+      "include/lean/mimalloc.h",
+      "include/lean/version.h",
+      "lib/libgmp.a",
+      "lib/libInit.a",
+      "lib/libLake.a",
+      "lib/liblasmhost.a",
+      "lib/liblasmsymbols.a",
+      "lib/libLean.a",
+      "lib/libleancpp.a",
+      "lib/libStd.a",
+      "lib/libuv.a",
+      "THIRD_PARTY_NOTICES.txt"
+    ],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-runtime-linux-r1-resources.json",
+    "recordedAt": "2026-09-24T04:25:26.733Z"
+  },
+  "derivationResources": {
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "peakMemoryBytes": 839372800,
+    "unitReleased": true,
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r11/lasm-compiler-0.1.0-experimental.14.tgz",
+    "sha256": "fc656ee164ce5831e4e6a91266d3757db9ab92ed5dcf7b54a4a4168c7fffa571",
+    "compressedBytes": 125161765,
+    "installedBytes": 628948726,
+    "files": 2672,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "fb5d096b306d52e88b59366dacfd7136285eeef56d8e3f92798846ce2a17d9bb"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-platform-package-r1-resources.json",
+    "recordedAt": "2026-09-24T04:27:44.601Z"
+  },
+  "packageResources": {
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "peakMemoryBytes": 2223992832,
+    "unitReleased": true,
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "rows": [
+    {
+      "target": "node",
+      "result": {
+        "scope": "Native versus installed ordinary Lean host-platform queries; build/dependency metadata recorded separately",
+        "target": "node",
+        "host": "linux-x64",
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler",
+        "fixtureSha256": "946837d24d60f56acb08ce926d8dcb16fcf4d8c41621ab26495eed5a25b6301b",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-platform-node-r1-resources.json",
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "--version"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "v26.10.0\n",
+            "stderr": ""
+          },
+          {
+            "label": "native interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/Main.lean"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=x86_64-unknown-linux-gnu\nemscripten=false\nlibuv=77824\nopenssl=811597824\n",
+            "stderr": ""
+          },
+          {
+            "label": "native generate C",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "-j1",
+              "-Dcompiler.postponeCompile=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/Main.lean.c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/Main.lean"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native compile",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/native",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/Main.lean.c"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native compiled",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/native",
+            "args": [],
+            "code": 0,
+            "signal": null,
+            "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=x86_64-unknown-linux-gnu\nemscripten=false\nlibuv=77824\nopenssl=811597824\n",
+            "stderr": ""
+          },
+          {
+            "label": "build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/Main.lean",
+              "--target",
+              "node",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/dist"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/dist\n"
+          },
+          {
+            "label": "deployed",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/relocated deployment/main.mjs"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=wasm64-unknown-emscripten\nemscripten=true\nlibuv=0\nopenssl=0\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "engineVersion": "v26.10.0",
+        "native": {
+          "host": {
+            "windows": "false",
+            "macos": "false",
+            "linux": "true",
+            "bits": "64",
+            "path": "data/todos.json",
+            "absolute": "false"
+          },
+          "metadata": {
+            "llvmTarget": "x86_64-unknown-linux-gnu",
+            "emscripten": "false",
+            "libuv": "77824",
+            "openssl": "811597824"
+          }
+        },
+        "nativeCompiled": {
+          "host": {
+            "windows": "false",
+            "macos": "false",
+            "linux": "true",
+            "bits": "64",
+            "path": "data/todos.json",
+            "absolute": "false"
+          },
+          "metadata": {
+            "llvmTarget": "x86_64-unknown-linux-gnu",
+            "emscripten": "false",
+            "libuv": "77824",
+            "openssl": "811597824"
+          }
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "fb5d096b306d52e88b59366dacfd7136285eeef56d8e3f92798846ce2a17d9bb",
+          "buildDriverIdentity": "49a8613ba5ab03b4ba7ff4b7eec88faf7728804a3007fa9f5e9f05d0b66fa191",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "946837d24d60f56acb08ce926d8dcb16fcf4d8c41621ab26495eed5a25b6301b",
+              "cSha256": "b19dd7d3d631270cda28730346d135752b4e5d54a39d1b8c299c5a062303e66b"
+            }
+          ],
+          "signature": "ac2cf79759b73430d1da358259d1a21031efe7942985743cb4f211b31c55b0f0",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "deployed": {
+          "host": {
+            "windows": "false",
+            "macos": "false",
+            "linux": "true",
+            "bits": "64",
+            "path": "data/todos.json",
+            "absolute": "false"
+          },
+          "metadata": {
+            "llvmTarget": "wasm64-unknown-emscripten",
+            "emscripten": "true",
+            "libuv": "0",
+            "openssl": "0"
+          }
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "buildToolEnvironmentRemoved": true,
+          "wasmSha256": "fc4d59184777fb58c034953b95af36da5a8e626dc0e2c23d937739229456b07b"
+        },
+        "hostEquivalent": true,
+        "metadataAssessment": "Actual build target differs intentionally; dependency version semantics remain under audit",
+        "fixtureUnchanged": true,
+        "finishedAt": "2026-09-24T04:30:17.737Z"
+      },
+      "receiptSha256": "00eef7c97c7fbffdae44008881193c54cfa6ec3e4440fe511616edead020ba45",
+      "resources": {
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 3640406016,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "target": "deno",
+      "result": {
+        "scope": "Native versus installed ordinary Lean host-platform queries; build/dependency metadata recorded separately",
+        "target": "deno",
+        "host": "linux-x64",
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler",
+        "fixtureSha256": "946837d24d60f56acb08ce926d8dcb16fcf4d8c41621ab26495eed5a25b6301b",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-platform-deno-r1-resources.json",
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "--version"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderr": ""
+          },
+          {
+            "label": "native interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/Main.lean"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=x86_64-unknown-linux-gnu\nemscripten=false\nlibuv=77824\nopenssl=811597824\n",
+            "stderr": ""
+          },
+          {
+            "label": "native generate C",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "-j1",
+              "-Dcompiler.postponeCompile=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/Main.lean.c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/Main.lean"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native compile",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/native",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/Main.lean.c"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native compiled",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/native",
+            "args": [],
+            "code": 0,
+            "signal": null,
+            "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=x86_64-unknown-linux-gnu\nemscripten=false\nlibuv=77824\nopenssl=811597824\n",
+            "stderr": ""
+          },
+          {
+            "label": "build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/Main.lean",
+              "--target",
+              "deno",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/dist"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for deno\u2026\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nBuilt Lean 4.34.0 for deno: /home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/dist\n"
+          },
+          {
+            "label": "deployed",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/relocated deployment/main.mjs"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=wasm64-unknown-emscripten\nemscripten=true\nlibuv=0\nopenssl=0\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "native": {
+          "host": {
+            "windows": "false",
+            "macos": "false",
+            "linux": "true",
+            "bits": "64",
+            "path": "data/todos.json",
+            "absolute": "false"
+          },
+          "metadata": {
+            "llvmTarget": "x86_64-unknown-linux-gnu",
+            "emscripten": "false",
+            "libuv": "77824",
+            "openssl": "811597824"
+          }
+        },
+        "nativeCompiled": {
+          "host": {
+            "windows": "false",
+            "macos": "false",
+            "linux": "true",
+            "bits": "64",
+            "path": "data/todos.json",
+            "absolute": "false"
+          },
+          "metadata": {
+            "llvmTarget": "x86_64-unknown-linux-gnu",
+            "emscripten": "false",
+            "libuv": "77824",
+            "openssl": "811597824"
+          }
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "fb5d096b306d52e88b59366dacfd7136285eeef56d8e3f92798846ce2a17d9bb",
+          "buildDriverIdentity": "49a8613ba5ab03b4ba7ff4b7eec88faf7728804a3007fa9f5e9f05d0b66fa191",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "946837d24d60f56acb08ce926d8dcb16fcf4d8c41621ab26495eed5a25b6301b",
+              "cSha256": "b19dd7d3d631270cda28730346d135752b4e5d54a39d1b8c299c5a062303e66b"
+            }
+          ],
+          "signature": "b3dcea9f779ca97ff6f83c2795127d6587dda52dce4ab285b7b628adff359a90",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "deployed": {
+          "host": {
+            "windows": "false",
+            "macos": "false",
+            "linux": "true",
+            "bits": "64",
+            "path": "data/todos.json",
+            "absolute": "false"
+          },
+          "metadata": {
+            "llvmTarget": "wasm64-unknown-emscripten",
+            "emscripten": "true",
+            "libuv": "0",
+            "openssl": "0"
+          }
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "buildToolEnvironmentRemoved": true,
+          "wasmSha256": "fc4d59184777fb58c034953b95af36da5a8e626dc0e2c23d937739229456b07b"
+        },
+        "hostEquivalent": true,
+        "metadataAssessment": "Actual build target differs intentionally; dependency version semantics remain under audit",
+        "fixtureUnchanged": true,
+        "finishedAt": "2026-09-24T04:33:54.984Z"
+      },
+      "receiptSha256": "39c6aa48b2397427b8cfacdd44ccb3e3db79aa6dbaa5ae2e257ce10f11db353d",
+      "resources": {
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 3956457472,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "target": "bun",
+      "result": {
+        "scope": "Native versus installed ordinary Lean host-platform queries; build/dependency metadata recorded separately",
+        "target": "bun",
+        "host": "linux-x64",
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler",
+        "fixtureSha256": "946837d24d60f56acb08ce926d8dcb16fcf4d8c41621ab26495eed5a25b6301b",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-platform-bun-r1-resources.json",
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "--version"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "1.4.2\n",
+            "stderr": ""
+          },
+          {
+            "label": "native interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/Main.lean"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=x86_64-unknown-linux-gnu\nemscripten=false\nlibuv=77824\nopenssl=811597824\n",
+            "stderr": ""
+          },
+          {
+            "label": "native generate C",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+            "args": [
+              "-j1",
+              "-Dcompiler.postponeCompile=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/Main.lean.c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/Main.lean"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native compile",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+            "args": [
+              "-O2",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/native",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/Main.lean.c"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "native compiled",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/native",
+            "args": [],
+            "code": 0,
+            "signal": null,
+            "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=x86_64-unknown-linux-gnu\nemscripten=false\nlibuv=77824\nopenssl=811597824\n",
+            "stderr": ""
+          },
+          {
+            "label": "build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/Main.lean",
+              "--target",
+              "bun",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/dist"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for bun\u2026\nBuilding Main.lean for bun\u2026\nBuilt Lean 4.34.0 for bun: /home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/dist\n"
+          },
+          {
+            "label": "deployed",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/relocated deployment/main.mjs"
+            ],
+            "code": 0,
+            "signal": null,
+            "stdout": "windows=false\nmacos=false\nlinux=true\nbits=64\npath=data/todos.json\nabsolute=false\ntarget=wasm64-unknown-emscripten\nemscripten=true\nlibuv=0\nopenssl=0\n",
+            "stderr": ""
+          }
+        ],
+        "passed": true,
+        "engineVersion": "1.4.2",
+        "native": {
+          "host": {
+            "windows": "false",
+            "macos": "false",
+            "linux": "true",
+            "bits": "64",
+            "path": "data/todos.json",
+            "absolute": "false"
+          },
+          "metadata": {
+            "llvmTarget": "x86_64-unknown-linux-gnu",
+            "emscripten": "false",
+            "libuv": "77824",
+            "openssl": "811597824"
+          }
+        },
+        "nativeCompiled": {
+          "host": {
+            "windows": "false",
+            "macos": "false",
+            "linux": "true",
+            "bits": "64",
+            "path": "data/todos.json",
+            "absolute": "false"
+          },
+          "metadata": {
+            "llvmTarget": "x86_64-unknown-linux-gnu",
+            "emscripten": "false",
+            "libuv": "77824",
+            "openssl": "811597824"
+          }
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "fb5d096b306d52e88b59366dacfd7136285eeef56d8e3f92798846ce2a17d9bb",
+          "buildDriverIdentity": "49a8613ba5ab03b4ba7ff4b7eec88faf7728804a3007fa9f5e9f05d0b66fa191",
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "946837d24d60f56acb08ce926d8dcb16fcf4d8c41621ab26495eed5a25b6301b",
+              "cSha256": "b19dd7d3d631270cda28730346d135752b4e5d54a39d1b8c299c5a062303e66b"
+            }
+          ],
+          "signature": "5f06bb7167fb76c6553456c086aa3bbd9d9df53eab8b6d1103a27bb541b6c17f",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "deployed": {
+          "host": {
+            "windows": "false",
+            "macos": "false",
+            "linux": "true",
+            "bits": "64",
+            "path": "data/todos.json",
+            "absolute": "false"
+          },
+          "metadata": {
+            "llvmTarget": "wasm64-unknown-emscripten",
+            "emscripten": "true",
+            "libuv": "0",
+            "openssl": "0"
+          }
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "buildToolEnvironmentRemoved": true,
+          "wasmSha256": "518f9af0ff37c2390eda52cad0948a4f41b93d30b35b1949c2d5e14d67bb9114"
+        },
+        "hostEquivalent": true,
+        "metadataAssessment": "Actual build target differs intentionally; dependency version semantics remain under audit",
+        "fixtureUnchanged": true,
+        "finishedAt": "2026-09-24T04:36:44.880Z"
+      },
+      "receiptSha256": "7e1f88e60ad6fae891806ba624ec67806d5838e84f214a01866752126b8dde86",
+      "resources": {
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 3817914368,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "versionsRechecked": {
+    "at": "2026-09-24T04:14:00Z",
+    "Lean": {
+      "version": "4.34.0",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0"
+    },
+    "Node": {
+      "version": "26.10.0",
+      "url": "https://nodejs.org/en/download/current"
+    },
+    "Deno": {
+      "version": "2.9.7",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7"
+    },
+    "Bun": {
+      "version": "1.4.2",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2"
+    }
+  },
+  "remaining": [
+    "Native host-platform comparisons on the other five OS/architecture combinations",
+    "libuv/OpenSSL dependency version semantics: both still report zero in the Wasm runtime",
+    "Broad upstream and API campaigns on the repaired runtime; prior .13 campaign retains its original bundle identity"
+  ]
+}

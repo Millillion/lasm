@@ -40,7 +40,7 @@ cpSync(join(root, 'examples/lean-server-latest'), join(staging, 'examples/lean-s
 });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 writeFileSync(join(staging, 'package.json'), JSON.stringify({
-  name: sourcePackage.name, version: '0.1.0-experimental.13', private: true, license: 'UNLICENSED',
+  name: sourcePackage.name, version: '0.1.0-experimental.14', private: true, license: 'UNLICENSED',
   type: 'module', description: 'Experimental managed Lean application compiler for Node, Deno, and Bun',
   bin: sourcePackage.bin, engines: sourcePackage.engines, os: ['linux', 'darwin', 'win32'], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'lean', 'scripts', 'targets', 'tools', 'docs', 'examples',

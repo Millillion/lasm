@@ -37,10 +37,15 @@ if (!existsSync(source)) {
 }
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const patches = {};
-for (const name of ['wasm-build', 'compact-alignment', 'thread-runtime', 'sdk-mimalloc', 'c-inputs', 'region-allocation', 'host-platform']) {
+const patchInputs = ['wasm-build', 'compact-alignment', 'thread-runtime', 'sdk-mimalloc', 'c-inputs', 'region-allocation', 'host-platform']
+  .map(name => ({ name, file: `lean-4.32.0-${name}.patch` }));
+// getIsLinux was added after the original host-platform patch. Keep the older
+// version's patch applicable to its own sources.
+patchInputs.push({ name: 'host-linux', file: 'lean-4.34.0-host-linux.patch' });
+for (const { name, file } of patchInputs) {
   // These reviewed runtime changes still apply to 4.34. Record the actual patch
   // bytes and source commit; never treat old 4.32 tests as validation of 4.34.
-  let patch = readFileSync(join(root, 'scripts/full-lean/patches', `lean-4.32.0-${name}.patch`), 'utf8');
+  let patch = readFileSync(join(root, 'scripts/full-lean/patches', file), 'utf8');
   if (name === 'wasm-build') patch = patch.replace('8c9756b28d64dab099da31a4c09229a9e6a2ef35', expectedCommit);
   patches[name] = hash(patch);
   const check = reverse => spawnSync('patch', ['--force', '--dry-run', reverse ? '--reverse' : '--forward', '-p1'], { cwd: source, input: patch });
