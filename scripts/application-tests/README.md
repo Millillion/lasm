@@ -88,6 +88,15 @@ including the completion benchmark's actual native language-server processes.
 The separately recorded [three-engine result](../../docs/evidence/upstream-compile-disabled-all-engines-2026-09-24.json)
 does not change the default compilation-disabled markers.
 
+`integration/application-upstream-signal.mjs` separately runs the original
+upstream-excluded `pkg/signal` driver and its unchanged application. Arguments
+are `NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE`; run under
+the resource guard and base-page wrapper. A separate release-pinned application
+copy preserves the original stage pin. Its native/deployed controller sends the
+same four signals, with the same one-second readiness delay, after hiding source
+copies and relocating output with empty PATH. Exact output and termination must
+match. It preserves upstream's exclusion rather than changing the default suite.
+
 Each case has a 900-second deadline and CTest runs with one job. The resource
 report distinguishes memory/pressure aborts from behavior failures. Case reports
 record the native/build/runtime phase, package build inputs and Wasm hash.

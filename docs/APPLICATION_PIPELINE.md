@@ -508,3 +508,12 @@ preload controls. The maximum guarded peak is 65.9 MiB, with no resource events.
 Local strict-GCC compilation, rebuilt Zig helpers and fifteen startup/output
 controls also pass. These results retain the earlier failed run and do not
 establish complete installed application acceptance on ARM64.
+
+Installed `.21` [repairs Deno SIGUSR1 delivery](evidence/upstream-signal-2026-09-24.json)
+without starting its debugger. The private native signal helper ships in both
+the npm candidate and deployment, requires no user compiler, and adds no Lean
+API. The unchanged excluded upstream signal application now matches native
+stdout, stderr and termination in Node, Deno and Bun on Linux x64 with sources
+hidden and PATH empty. Nine focused controls pass; the largest application
+campaign peaks at 3.45 GiB without resource events. Other native platforms,
+the complete signal API and Deno-native observer coexistence remain pending.

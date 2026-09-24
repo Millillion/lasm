@@ -420,3 +420,21 @@ and `LEAN_SYSROOT`. Automatic asset packaging and self-contained runtime imports
 remain unfinished. The native Lean 4.32 compilation/benchmark directories, the
 current maintainer runtime bundle, and completed native controls have lossless
 archives with restoration manifests; their original evidence is preserved.
+
+The upstream-excluded `pkg/signal` application now passes through installed `.21`
+in all three stock engines on Linux x64. The original native shell driver runs
+unchanged; a separate controller then sends its four signals to native and
+relocated deployed processes at their original PIDs, retaining the one-second
+waits and exact stdout, stderr and termination comparisons. Sources are hidden
+and PATH is empty. All 7,669 reference entries remain unchanged. The maximum
+build/run peak is 3.45 GiB without resource events. See the
+[signal comparisons and retained failure](evidence/upstream-signal-2026-09-24.json).
+
+Installed `.20` delivered SIGUSR1 correctly in Deno but also started its debugger.
+The private host repair uses a bundled signal-safe pipe while Lean owns that
+signal, then restores the previous handler and releases the pipe after its
+pending read returns. No output filtering or upstream test changes are used.
+Nine focused controls pass with zero skips. Native ARM64/musl/macOS acceptance,
+the full signal set, default-handler behavior and interoperability with Deno's
+own `addSignalListener` observers remain open; Node-compatible process listeners
+receive the routed event. This separate experiment retains upstream's exclusion.

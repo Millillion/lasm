@@ -1,5 +1,6 @@
 import { constants } from 'node:os';
 import { numbers } from './node-host.mjs';
+import { retainDenoUserSignal } from './deno-signals.mjs';
 
 const names = { 1: 'SIGHUP', 2: 'SIGINT', 3: 'SIGQUIT', 6: 'SIGABRT', 15: 'SIGTERM', 28: 'SIGWINCH',
   5: 'SIGTRAP', 10: 'SIGUSR1', 12: 'SIGUSR2', 14: 'SIGALRM', 17: 'SIGCHLD', 18: 'SIGCONT',
@@ -19,12 +20,19 @@ export function createNodeSignals({ add, get }) {
     };
     signal.listener = () => {
       if (signal.promise && !signal.done) { signal.done = true; signal.resolve(numbers(constants.signals[name])); }
-      if (!repeating) { process.off(name, signal.listener); clearInterval(signal.keepAlive); signal.phase = 'finished'; }
+      if (!repeating) { signal.unwatch(); signal.phase = 'finished'; }
+    };
+    signal.unwatch = () => {
+      if (name) process.off(name, signal.listener);
+      signal.releaseNative?.(); signal.releaseNative = undefined;
+      clearInterval(signal.keepAlive);
     };
     signal.start = () => {
       if (!name || constants.signals[name] === undefined)
         throw Object.assign(new Error('invalid argument'), { code: 'EINVAL', errno: -22 });
       process.on(name, signal.listener);
+      try { signal.releaseNative = retainDenoUserSignal(name); }
+      catch (error) { process.off(name, signal.listener); throw error; }
       // Node signal watchers are unreferenced. A Lean main awaiting a signal
       // must remain alive even when this is its only pending host operation.
       signal.keepAlive = setInterval(() => {}, 2_147_483_647);
@@ -35,8 +43,7 @@ export function createNodeSignals({ add, get }) {
       signal.promise = undefined; signal.generation++;
     };
     signal.close = () => {
-      if (name) process.off(name, signal.listener);
-      clearInterval(signal.keepAlive);
+      signal.unwatch();
       signal.drop(); signal.phase = 'finished';
     };
     return signal;
@@ -56,7 +63,7 @@ export function createNodeSignals({ add, get }) {
     case 164:
       if (signal.phase !== 'running' || !signal.promise) return numbers(0);
       signal.drop();
-      if (!signal.repeating) { process.off(signal.name, signal.listener); clearInterval(signal.keepAlive); signal.phase = 'initial'; }
+      if (!signal.repeating) { signal.unwatch(); signal.phase = 'initial'; }
       return numbers(1);
     default: throw new Error(`Unknown Lean signal operation ${op}`);
     }

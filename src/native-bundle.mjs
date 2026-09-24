@@ -6,6 +6,7 @@ export function copyNativeBundle(root, output) {
   if (!source) throw new Error('Native Node file adapter is missing. Maintainers: run node scripts/prepare-native.mjs. Installed users: reinstall the complete Lasm package.');
   if (!existsSync(join(source, 'process/manifest.json'))) throw new Error('Native process launcher is missing. Maintainers: run node scripts/build-process-launcher.mjs.');
   if (!existsSync(join(source, 'bun-stack/manifest.json'))) throw new Error('Native Bun stack helper is missing. Maintainers: run node scripts/build-bun-stack.mjs.');
+  if (!existsSync(join(source, 'signals/manifest.json'))) throw new Error('Native signal helper is missing. Maintainers: run node scripts/build-signal-helper.mjs.');
   cpSync(source, join(output, 'native'), { recursive: true });
 }
 

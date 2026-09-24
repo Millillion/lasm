@@ -37,3 +37,4 @@ for (const name of names) {
 writeFileSync(join(output, 'manifest.json'), JSON.stringify({ nodeApi: 8, packages: records }, null, 2) + '\n');
 await import('./build-process-launcher.mjs');
 await import('./build-bun-stack.mjs');
+await import('./build-signal-helper.mjs');

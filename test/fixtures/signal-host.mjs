@@ -10,6 +10,7 @@ try {
   const handle = Number((await call(160, 10, 1n)).readBigUInt64LE());
   const first = await call(161, handle);
   assert.deepEqual(await call(161, handle), first);
+  if (process.argv[2]) await new Promise(resolve => setTimeout(resolve, Number(process.argv[2])));
   let id = host.start(162, handle, 0n, Buffer.alloc(0));
   process.kill(process.pid, 'SIGUSR1');
   await host.whenReady(id);
@@ -26,6 +27,18 @@ try {
   await host.whenReady(id);
   assert.equal((await host.request(90, id)).error, false);
   await call(163, handle);
+  assert.equal(process.listenerCount('SIGUSR1'), 0);
+  // Independent Lean subscriptions share delivery and can close separately.
+  const left = Number((await call(160, 10, 1n)).readBigUInt64LE());
+  const right = Number((await call(160, 10)).readBigUInt64LE());
+  await call(161, left); await call(161, right);
+  const waits = [left, right].map(value => host.start(162, value, 0n, Buffer.alloc(0)));
+  process.kill(process.pid, 'SIGUSR1');
+  for (const wait of waits) {
+    await host.whenReady(wait);
+    assert.equal((await host.request(90, wait)).bytes.readBigUInt64LE(), BigInt(constants.signals.SIGUSR1));
+  }
+  await call(163, left); await call(163, right);
   assert.equal(process.listenerCount('SIGUSR1'), 0);
   const once = Number((await call(160, 12)).readBigUInt64LE());
   const generation = await call(161, once);

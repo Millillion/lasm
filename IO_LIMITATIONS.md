@@ -37,6 +37,16 @@ separately from the earlier runtime evidence below.
   Their current Emscripten implementations return zero. Record actual deployed
   dependencies and native differences without substituting invented version
   values; runtime comparisons and any required implementation are still open.
+- [ ] Finish full signal delivery, cancellation, default-handler and native
+  platform parity. The unchanged excluded `pkg/signal` application
+  [passes in all three installed `.21` engines](docs/evidence/upstream-signal-2026-09-24.json)
+  on Linux x64, including exact native output and termination. A bundled private
+  pipe adapter fixes Deno's extra SIGUSR1 debugger activation; nine focused
+  controls pass with zero skips. The full signal set, restored default behavior,
+  native ARM64/musl/macOS acceptance and interoperability with independently
+  registered `Deno.addSignalListener` observers remain unresolved. The latter
+  uses a different observer path from the supported Node-compatible process
+  listeners. None of these gaps is demonstrated fundamental.
 - [ ] Complete panic diagnostics, symbolization and termination parity.
   Installed `.15` [restores real panic backtraces](docs/evidence/upstream-debug-2026-09-24.json)
   in Node and Deno on Linux x64, including exact output with `LEAN_BACKTRACE=0`.

@@ -7,7 +7,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 export const applicationHostFiles = [
   'node-host.mjs', 'lean-io-errors.mjs', 'deno-stack.mjs', 'bun-stack.mjs', 'posix-arguments.mjs', 'working-directory.mjs', 'handle-table.mjs', 'node-network.mjs', 'native-tcp.mjs',
   'node-process.mjs', 'native-process.mjs', 'process-launcher.mjs', 'process-exec.mjs', 'node-udp.mjs',
-  'node-system.mjs', 'node-signal.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-files.mjs',
+  'node-system.mjs', 'node-signal.mjs', 'deno-signals.mjs', 'thread-id.cjs', 'native-pthread-factory.cjs', 'native-files.mjs',
   'native-clock.mjs', 'native-file-worker.mjs', 'native-file-worker-pool.mjs', 'native-file-worker-deno.mjs',
   'native-worker-cwd.cjs', 'worker-stdio.cjs', 'native-dns.mjs', 'native-interfaces.mjs', 'native-abort.cjs',
 ];

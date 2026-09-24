@@ -1,0 +1,2716 @@
+{
+  "scope": "Unchanged upstream-excluded signal application, native driver and supplementary installed-package comparisons on Linux x64; not default-suite or complete signal API acceptance",
+  "releases": {
+    "lean": {
+      "tag_name": "v4.34.0",
+      "published_at": "2026-09-14T14:04:36Z",
+      "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest"
+    },
+    "deno": {
+      "tag_name": "v2.9.7",
+      "published_at": "2026-09-17T09:04:55Z",
+      "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest"
+    },
+    "bun": {
+      "tag_name": "bun-v1.4.2",
+      "published_at": "2026-09-05T05:55:48Z",
+      "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest"
+    },
+    "node": {
+      "version": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "v8": "14.6.202.34",
+      "npm": "11.19.1",
+      "source": "https://nodejs.org/dist/index.json"
+    },
+    "checkedAt": "2026-09-24T11:18:07.352558+00:00"
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r18/lasm-compiler-0.1.0-experimental.21.tgz",
+    "sha256": "e237348e62750421ba8878b67ee98dac7431c6f5199d5f806b0a089874ad8930",
+    "compressedBytes": 125498197,
+    "installedBytes": 630448634,
+    "files": 2692,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-deno-signals-r1-resources.json",
+    "recordedAt": "2026-09-24T11:18:45.332Z"
+  },
+  "packageResources": {
+    "startedAt": "2026-09-24T11:18:07.413Z",
+    "command": [
+      "/bin/bash",
+      ".work/package-install-deno-signals-r1.sh"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "52245a1d-e283-4cc1-ac52-d9b89c2b0316",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24652558336
+    },
+    "minimumHostAvailable": 23662981120,
+    "peakMemoryBytes": 2241544192,
+    "peakTasks": 25,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-deno-signals-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T11:19:03.687Z",
+      "memoryBytes": 1205149696,
+      "peakMemoryBytes": 2241544192,
+      "swapBytes": 0,
+      "tasks": 1,
+      "memoryBreakdown": {
+        "anon": 0,
+        "file": 1173221376,
+        "kernel": 31870976,
+        "shmem": 0,
+        "file_mapped": 0,
+        "inactive_file": 1173110784,
+        "slab": 31813328
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T11:19:03.737Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 1219067904,
+      "peakMemoryBytes": 2241544192,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11649024,
+        "file": 1173221376,
+        "kernel": 32874496,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 1173143552,
+        "slab": 31935744
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T11:19:03.763Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "cases": [
+    {
+      "result": {
+        "scope": "Separate original upstream-exclusion driver and unchanged installed signal application; not a default-suite pass",
+        "target": "deno",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "excluded": {
+          "source": "tests/pkg/signal",
+          "reason": "upstream CMake flaky/nondeterministic exclusion"
+        },
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2",
+            "seconds": 0.007310814999998911,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native signal driver",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+              "ordinary",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/native source/run_test.sh"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/native source",
+            "seconds": 5.119965806,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "\u2714 [2/4] Built Main (416ms)\n\u2714 [3/4] Built Main:c.o (314ms)\n\u2714 [4/4] Built release:exe (212ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3953351\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3953351 to finish...\nProcess completed successfully\n",
+            "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/release-pinned application source/Main.lean",
+              "--target",
+              "deno",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/release-pinned application source",
+            "seconds": 62.633826713000005,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for deno\u2026\ninfo: debug: no previous manifest, creating one from scratch\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for deno: /home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/dist\n"
+          },
+          {
+            "label": "native signal control",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/native source.hidden/.lake/build/bin/release",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/relocated deployment",
+            "pid": 3953696,
+            "signals": [
+              {
+                "signal": "SIGUSR1",
+                "sent": true,
+                "pid": 3953696
+              },
+              {
+                "signal": "SIGHUP",
+                "sent": true,
+                "pid": 3953696
+              },
+              {
+                "signal": "SIGQUIT",
+                "sent": true,
+                "pid": 3953696
+              },
+              {
+                "signal": "SIGINT",
+                "sent": true,
+                "pid": 3953696
+              }
+            ],
+            "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+            "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "seconds": 4.031992024000006
+          },
+          {
+            "label": "deployed signal control",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "args": [
+              "run",
+              "-A",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/relocated deployment",
+            "pid": 3953706,
+            "signals": [
+              {
+                "signal": "SIGUSR1",
+                "sent": true,
+                "pid": 3953706
+              },
+              {
+                "signal": "SIGHUP",
+                "sent": true,
+                "pid": 3953706
+              },
+              {
+                "signal": "SIGQUIT",
+                "sent": true,
+                "pid": 3953706
+              },
+              {
+                "signal": "SIGINT",
+                "sent": true,
+                "pid": 3953706
+              }
+            ],
+            "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+            "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "seconds": 6.669068484000003
+          }
+        ],
+        "passed": true,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-deno-r2-resources.json",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "harnessSha256": "31d7a7c48b68897d67f4fdc04dc13e7b802f989148c14c88e222f6e90ddfc5f1",
+        "nativeDriverWrapperSha256": "104d70816b1cc551669a893bb80a4f18beb35529f344229569a2c378b1ce2ae6",
+        "adaptations": [
+          "Run the original shell driver unchanged with managed native Lean/Lake, retaining its FIFO, signal sequence, one-second waits and all Lean assertions.",
+          "A separately identified application copy changes only the upstream stage-directory pin to the matching published release; every original source byte and assertion remains intact.",
+          "A parallel controller runs the same main as native code and installed AOT after hiding all source copies. It sends the same four signals one second after each exact readiness line and compares stdout, stderr and termination.",
+          "The deployed process has an empty PATH and no build-tool environment. The timeout is an outer controller deadline, not a changed wait or assertion inside the Lean test."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "packageVersion": "0.1.0-experimental.21",
+        "applicationBefore": {
+          "checked": 3,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "nativeDriver": {
+          "code": 0,
+          "signal": null,
+          "stdout": "\u2714 [2/4] Built Main (416ms)\n\u2714 [3/4] Built Main:c.o (314ms)\n\u2714 [4/4] Built release:exe (212ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3953351\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3953351 to finish...\nProcess completed successfully\n",
+          "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        "nativeSourceAfter": {
+          "checked": 4,
+          "modified": []
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "85386ec6ac5dae968b1b9faa96aac7ea2a59f0ac046d21a395629256d9b448e2",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "/+Main",
+              "sourceSha256": "c678cfa636b471dcf64f474b3ef1787a8c812bcbe9b4394abfe0d7c811f056c6",
+              "cSha256": "2e80a4765a0c786ade342784c1a33832e4f85e2bf7bb08a1597509733634ccdd"
+            }
+          ],
+          "signature": "40900924e729ce3b0ffe7fea060da7c9a89616b0f03b42db6537d6c873fa7408",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "applicationAfter": {
+          "checked": 3,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 4,
+          "modified": []
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "wasmSha256": "1077e3d44263133b8d164fd549f5c5a76c69dd529950c7b26254c940c9b12ab0"
+        },
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T11:20:59.290Z"
+      },
+      "resultSha256": "dc5828c98e44cbeb0bffc251f3188db0a8822748da86ca2514aa04b0002b1ad8",
+      "resources": {
+        "startedAt": "2026-09-24T11:19:24.828Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-upstream-signal-r2.sh",
+          "deno",
+          ".work/upstream-signal-deno-r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "034cf4fc-1be8-41c9-9c0b-d2e3efebd8ea",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24687083520
+        },
+        "minimumHostAvailable": 21172060160,
+        "peakMemoryBytes": 3544109056,
+        "peakTasks": 39,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-deno-r2-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T11:20:59.367Z",
+          "memoryBytes": 389775360,
+          "peakMemoryBytes": 3544109056,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 4513792,
+            "file": 371630080,
+            "kernel": 12210176,
+            "shmem": 0,
+            "file_mapped": 28672,
+            "inactive_file": 365592576,
+            "slab": 11825800
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T11:20:59.363Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 397410304,
+          "peakMemoryBytes": 3544109056,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 371625984,
+            "kernel": 12775424,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 365588480,
+            "slab": 11830120
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T11:20:59.388Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-deno-r2-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/relocated deployment/program.wasm",
+            "originalBytes": 160418496,
+            "originalSha256": "1077e3d44263133b8d164fd549f5c5a76c69dd529950c7b26254c940c9b12ab0",
+            "mode": 509,
+            "mtimeNs": 1790248847006269206,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37247736,
+            "archiveSha256": "c03e762bb2e61aab2ba5ccc45705d3c59065cc0a74e6bc6a9be99f8730f92d33",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2",
+              "receiptSha256": "dc5828c98e44cbeb0bffc251f3188db0a8822748da86ca2514aa04b0002b1ad8"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/release-pinned application source.hidden/.lake/lasm/applications/b9207521fff025b4/40900924e729ce3b0ffe7fea060da7c9a89616b0f03b42db6537d6c873fa7408/dist/program.wasm",
+            "originalBytes": 160418496,
+            "originalSha256": "1077e3d44263133b8d164fd549f5c5a76c69dd529950c7b26254c940c9b12ab0",
+            "mode": 509,
+            "mtimeNs": 1790248836785173614,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/release-pinned application source.hidden/.lake/lasm/applications/b9207521fff025b4/40900924e729ce3b0ffe7fea060da7c9a89616b0f03b42db6537d6c873fa7408/dist/program.wasm.gz",
+            "archiveBytes": 37247736,
+            "archiveSha256": "c03e762bb2e61aab2ba5ccc45705d3c59065cc0a74e6bc6a9be99f8730f92d33",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2",
+              "receiptSha256": "dc5828c98e44cbeb0bffc251f3188db0a8822748da86ca2514aa04b0002b1ad8"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/native source.hidden/.lake/build/bin/release",
+            "originalBytes": 6034192,
+            "originalSha256": "ce3f690dcb07d15df28a1d321c6b65c6176b473dcd2ac48b14fb0eb319f9d4b0",
+            "mode": 509,
+            "mtimeNs": 1790248780264640422,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2/native source.hidden/.lake/build/bin/release.gz",
+            "archiveBytes": 1657165,
+            "archiveSha256": "54c77d13348018ab765ee55584deae329273683a74588d28ecca7b7f12810f32",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r2",
+              "receiptSha256": "dc5828c98e44cbeb0bffc251f3188db0a8822748da86ca2514aa04b0002b1ad8"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 250718547,
+        "finishedAt": "2026-09-24T11:21:05.976367+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T11:20:59.455Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-signal-r1.py",
+          ".work/upstream-signal-deno-r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "1e997e9e-6211-40b2-a0a1-bf6537dda338",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24228888576
+        },
+        "minimumHostAvailable": 24219090944,
+        "peakMemoryBytes": 87085056,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-deno-r2-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T11:21:05.872Z",
+          "memoryBytes": 46809088,
+          "peakMemoryBytes": 87085056,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 8142848,
+            "file": 37265408,
+            "kernel": 1257472,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 37265408,
+            "slab": 1147488
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T11:21:06.025Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 53997568,
+          "peakMemoryBytes": 87085056,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11661312,
+            "file": 38924288,
+            "kernel": 2228224,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 38924288,
+            "slab": 1301088
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T11:21:06.049Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "result": {
+        "scope": "Separate original upstream-exclusion driver and unchanged installed signal application; not a default-suite pass",
+        "target": "bun",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "excluded": {
+          "source": "tests/pkg/signal",
+          "reason": "upstream CMake flaky/nondeterministic exclusion"
+        },
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1",
+            "seconds": 0.005182992000000013,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "1.4.2\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native signal driver",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+              "ordinary",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/native source/run_test.sh"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/native source",
+            "seconds": 5.127957865999999,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "\u2714 [2/4] Built Main (413ms)\n\u2714 [3/4] Built Main:c.o (325ms)\n\u2714 [4/4] Built release:exe (217ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3953928\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3953928 to finish...\nProcess completed successfully\n",
+            "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/release-pinned application source/Main.lean",
+              "--target",
+              "bun",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/release-pinned application source",
+            "seconds": 93.941672881,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for bun\u2026\ninfo: debug: no previous manifest, creating one from scratch\nBuilding Main.lean for bun\u2026\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for bun: /home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/dist\n"
+          },
+          {
+            "label": "native signal control",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/native source.hidden/.lake/build/bin/release",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/relocated deployment",
+            "pid": 3954271,
+            "signals": [
+              {
+                "signal": "SIGUSR1",
+                "sent": true,
+                "pid": 3954271
+              },
+              {
+                "signal": "SIGHUP",
+                "sent": true,
+                "pid": 3954271
+              },
+              {
+                "signal": "SIGQUIT",
+                "sent": true,
+                "pid": 3954271
+              },
+              {
+                "signal": "SIGINT",
+                "sent": true,
+                "pid": 3954271
+              }
+            ],
+            "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+            "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "seconds": 4.030123228000011
+          },
+          {
+            "label": "deployed signal control",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/relocated deployment",
+            "pid": 3954324,
+            "signals": [
+              {
+                "signal": "SIGUSR1",
+                "sent": true,
+                "pid": 3954324
+              },
+              {
+                "signal": "SIGHUP",
+                "sent": true,
+                "pid": 3954324
+              },
+              {
+                "signal": "SIGQUIT",
+                "sent": true,
+                "pid": 3954324
+              },
+              {
+                "signal": "SIGINT",
+                "sent": true,
+                "pid": 3954324
+              }
+            ],
+            "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+            "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "seconds": 6.408161629000009
+          }
+        ],
+        "passed": true,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-bun-r1-resources.json",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "harnessSha256": "31d7a7c48b68897d67f4fdc04dc13e7b802f989148c14c88e222f6e90ddfc5f1",
+        "nativeDriverWrapperSha256": "104d70816b1cc551669a893bb80a4f18beb35529f344229569a2c378b1ce2ae6",
+        "adaptations": [
+          "Run the original shell driver unchanged with managed native Lean/Lake, retaining its FIFO, signal sequence, one-second waits and all Lean assertions.",
+          "A separately identified application copy changes only the upstream stage-directory pin to the matching published release; every original source byte and assertion remains intact.",
+          "A parallel controller runs the same main as native code and installed AOT after hiding all source copies. It sends the same four signals one second after each exact readiness line and compares stdout, stderr and termination.",
+          "The deployed process has an empty PATH and no build-tool environment. The timeout is an outer controller deadline, not a changed wait or assertion inside the Lean test."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "1.4.2",
+        "packageVersion": "0.1.0-experimental.21",
+        "applicationBefore": {
+          "checked": 3,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "nativeDriver": {
+          "code": 0,
+          "signal": null,
+          "stdout": "\u2714 [2/4] Built Main (413ms)\n\u2714 [3/4] Built Main:c.o (325ms)\n\u2714 [4/4] Built release:exe (217ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3953928\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3953928 to finish...\nProcess completed successfully\n",
+          "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        "nativeSourceAfter": {
+          "checked": 4,
+          "modified": []
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "85386ec6ac5dae968b1b9faa96aac7ea2a59f0ac046d21a395629256d9b448e2",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "/+Main",
+              "sourceSha256": "c678cfa636b471dcf64f474b3ef1787a8c812bcbe9b4394abfe0d7c811f056c6",
+              "cSha256": "2e80a4765a0c786ade342784c1a33832e4f85e2bf7bb08a1597509733634ccdd"
+            }
+          ],
+          "signature": "128783f2a5ea634d904b643ed21e5ceaf6539dffd83b84f30548fae4389bc88c",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "applicationAfter": {
+          "checked": 3,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 4,
+          "modified": []
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "wasmSha256": "8952b2d3833e3982d9221491c10edabb86a6799dff8b122576e9126977cb8804"
+        },
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T11:23:12.758Z"
+      },
+      "resultSha256": "db859f49a5424bea95a8fc051409f54e0d713109440df7f6aebf4cac88cf9d00",
+      "resources": {
+        "startedAt": "2026-09-24T11:21:06.102Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-upstream-signal-r2.sh",
+          "bun",
+          ".work/upstream-signal-bun-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "e5daa3bf-00b5-417c-b834-4f0e60070b93",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24549126144
+        },
+        "minimumHostAvailable": 20980383744,
+        "peakMemoryBytes": 3708301312,
+        "peakTasks": 54,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-bun-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T11:23:12.678Z",
+          "memoryBytes": 509063168,
+          "peakMemoryBytes": 3708301312,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 106905600,
+            "file": 387334144,
+            "kernel": 14139392,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 381296640,
+            "slab": 12355176
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T11:23:12.811Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 413351936,
+          "peakMemoryBytes": 3708301312,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 387334144,
+            "kernel": 13234176,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 381296640,
+            "slab": 12288728
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T11:23:12.836Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-bun-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/relocated deployment/program.wasm",
+            "originalBytes": 166022314,
+            "originalSha256": "8952b2d3833e3982d9221491c10edabb86a6799dff8b122576e9126977cb8804",
+            "mode": 509,
+            "mtimeNs": 1790248980214494611,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 38403097,
+            "archiveSha256": "8597e6d22d79d98d8c64f626d7f46031510a613625371e71fa09449870cb721b",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1",
+              "receiptSha256": "db859f49a5424bea95a8fc051409f54e0d713109440df7f6aebf4cac88cf9d00"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/release-pinned application source.hidden/.lake/lasm/applications/91a1e5e975bad4b0/128783f2a5ea634d904b643ed21e5ceaf6539dffd83b84f30548fae4389bc88c/dist/program.wasm",
+            "originalBytes": 166022314,
+            "originalSha256": "8952b2d3833e3982d9221491c10edabb86a6799dff8b122576e9126977cb8804",
+            "mode": 509,
+            "mtimeNs": 1790248970325404834,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/release-pinned application source.hidden/.lake/lasm/applications/91a1e5e975bad4b0/128783f2a5ea634d904b643ed21e5ceaf6539dffd83b84f30548fae4389bc88c/dist/program.wasm.gz",
+            "archiveBytes": 38403097,
+            "archiveSha256": "8597e6d22d79d98d8c64f626d7f46031510a613625371e71fa09449870cb721b",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1",
+              "receiptSha256": "db859f49a5424bea95a8fc051409f54e0d713109440df7f6aebf4cac88cf9d00"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/native source.hidden/.lake/build/bin/release",
+            "originalBytes": 6034192,
+            "originalSha256": "ce3f690dcb07d15df28a1d321c6b65c6176b473dcd2ac48b14fb0eb319f9d4b0",
+            "mode": 509,
+            "mtimeNs": 1790248882163596199,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1/native source.hidden/.lake/build/bin/release.gz",
+            "archiveBytes": 1657165,
+            "archiveSha256": "54c77d13348018ab765ee55584deae329273683a74588d28ecca7b7f12810f32",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-bun-r1",
+              "receiptSha256": "db859f49a5424bea95a8fc051409f54e0d713109440df7f6aebf4cac88cf9d00"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 259615461,
+        "finishedAt": "2026-09-24T11:23:19.471104+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T11:23:12.902Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-signal-r1.py",
+          ".work/upstream-signal-bun-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "a5bb70e7-d137-4b66-8c4e-eabd8920f138",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24581111808
+        },
+        "minimumHostAvailable": 24576593920,
+        "peakMemoryBytes": 90345472,
+        "peakTasks": 7,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-bun-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T11:23:19.514Z",
+          "memoryBytes": 51277824,
+          "peakMemoryBytes": 90345472,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 8282112,
+            "file": 40067072,
+            "kernel": 2121728,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 40067072,
+            "slab": 1335496
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T11:23:19.527Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 54947840,
+          "peakMemoryBytes": 90345472,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11649024,
+            "file": 40067072,
+            "kernel": 2265088,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 40067072,
+            "slab": 1332760
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T11:23:19.555Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "result": {
+        "scope": "Separate original upstream-exclusion driver and unchanged installed signal application; not a default-suite pass",
+        "target": "node",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler",
+        "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+        "excluded": {
+          "source": "tests/pkg/signal",
+          "reason": "upstream CMake flaky/nondeterministic exclusion"
+        },
+        "commands": [
+          {
+            "label": "engine version",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "--version"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2",
+            "seconds": 0.007119792999999845,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "v26.10.0\n",
+            "stderr": ""
+          },
+          {
+            "label": "original native signal driver",
+            "program": "/bin/bash",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+              "ordinary",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/native source/run_test.sh"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/native source",
+            "seconds": 5.099318388000001,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "\u2714 [2/4] Built Main (409ms)\n\u2714 [3/4] Built Main:c.o (326ms)\n\u2714 [4/4] Built release:exe (223ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3954516\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3954516 to finish...\nProcess completed successfully\n",
+            "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+          },
+          {
+            "label": "installed application build",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+              "build",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/release-pinned application source/Main.lean",
+              "--target",
+              "node",
+              "--output",
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/dist"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/release-pinned application source",
+            "seconds": 64.283322636,
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "stdout": "",
+            "stderr": "Preparing Lean 4.34.0 for node\u2026\ninfo: debug: no previous manifest, creating one from scratch\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r20/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/dist\n"
+          },
+          {
+            "label": "native signal control",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/native source.hidden/.lake/build/bin/release",
+            "args": [],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/relocated deployment",
+            "pid": 3954847,
+            "signals": [
+              {
+                "signal": "SIGUSR1",
+                "sent": true,
+                "pid": 3954847
+              },
+              {
+                "signal": "SIGHUP",
+                "sent": true,
+                "pid": 3954847
+              },
+              {
+                "signal": "SIGQUIT",
+                "sent": true,
+                "pid": 3954847
+              },
+              {
+                "signal": "SIGINT",
+                "sent": true,
+                "pid": 3954847
+              }
+            ],
+            "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+            "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "seconds": 4.0362411770000035
+          },
+          {
+            "label": "deployed signal control",
+            "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "args": [
+              "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/relocated deployment/main.mjs"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/relocated deployment",
+            "pid": 3954853,
+            "signals": [
+              {
+                "signal": "SIGUSR1",
+                "sent": true,
+                "pid": 3954853
+              },
+              {
+                "signal": "SIGHUP",
+                "sent": true,
+                "pid": 3954853
+              },
+              {
+                "signal": "SIGQUIT",
+                "sent": true,
+                "pid": 3954853
+              },
+              {
+                "signal": "SIGINT",
+                "sent": true,
+                "pid": 3954853
+              }
+            ],
+            "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+            "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+            "timeout": false,
+            "code": 0,
+            "signal": null,
+            "seconds": 5.988611066999991
+          }
+        ],
+        "passed": true,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-node-r2-resources.json",
+        "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+        "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+        "harnessSha256": "31d7a7c48b68897d67f4fdc04dc13e7b802f989148c14c88e222f6e90ddfc5f1",
+        "nativeDriverWrapperSha256": "104d70816b1cc551669a893bb80a4f18beb35529f344229569a2c378b1ce2ae6",
+        "adaptations": [
+          "Run the original shell driver unchanged with managed native Lean/Lake, retaining its FIFO, signal sequence, one-second waits and all Lean assertions.",
+          "A separately identified application copy changes only the upstream stage-directory pin to the matching published release; every original source byte and assertion remains intact.",
+          "A parallel controller runs the same main as native code and installed AOT after hiding all source copies. It sends the same four signals one second after each exact readiness line and compares stdout, stderr and termination.",
+          "The deployed process has an empty PATH and no build-tool environment. The timeout is an outer controller deadline, not a changed wait or assertion inside the Lean test."
+        ],
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "phase": "complete",
+        "engineVersion": "v26.10.0",
+        "packageVersion": "0.1.0-experimental.21",
+        "applicationBefore": {
+          "checked": 3,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "nativeDriver": {
+          "code": 0,
+          "signal": null,
+          "stdout": "\u2714 [2/4] Built Main (409ms)\n\u2714 [3/4] Built Main:c.o (326ms)\n\u2714 [4/4] Built release:exe (223ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3954516\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3954516 to finish...\nProcess completed successfully\n",
+          "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        "nativeSourceAfter": {
+          "checked": 4,
+          "modified": []
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "85386ec6ac5dae968b1b9faa96aac7ea2a59f0ac046d21a395629256d9b448e2",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "/+Main",
+              "sourceSha256": "c678cfa636b471dcf64f474b3ef1787a8c812bcbe9b4394abfe0d7c811f056c6",
+              "cSha256": "2e80a4765a0c786ade342784c1a33832e4f85e2bf7bb08a1597509733634ccdd"
+            }
+          ],
+          "signature": "63476ce6042412f669d7e86025a84fcf17c6e3303ec69bb302cafc3c852bea5c",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+        },
+        "applicationAfter": {
+          "checked": 3,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 4,
+          "modified": []
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "wasmSha256": "1077e3d44263133b8d164fd549f5c5a76c69dd529950c7b26254c940c9b12ab0"
+        },
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "finishedAt": "2026-09-24T11:24:55.297Z"
+      },
+      "resultSha256": "58a0cb28d4b6c5f7426f546a871a5f03cfd2511dcec34f6f9d73827f0b0c4ce8",
+      "resources": {
+        "startedAt": "2026-09-24T11:23:19.623Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-upstream-signal-r2.sh",
+          "node",
+          ".work/upstream-signal-node-r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "0e8459ad-8116-428c-9965-aa7b0a392ac2",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24694800384
+        },
+        "minimumHostAvailable": 21339865088,
+        "peakMemoryBytes": 3546484736,
+        "peakTasks": 36,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-node-r2-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T11:24:55.373Z",
+          "memoryBytes": 394018816,
+          "peakMemoryBytes": 3546484736,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11636736,
+            "file": 368623616,
+            "kernel": 12656640,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 362586112,
+            "slab": 11717328
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T11:24:55.372Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 394018816,
+          "peakMemoryBytes": 3546484736,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11636736,
+            "file": 368623616,
+            "kernel": 12656640,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 362586112,
+            "slab": 11717328
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T11:24:55.396Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-node-r2-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/relocated deployment/program.wasm",
+            "originalBytes": 160418496,
+            "originalSha256": "1077e3d44263133b8d164fd549f5c5a76c69dd529950c7b26254c940c9b12ab0",
+            "mode": 509,
+            "mtimeNs": 1790249083460422121,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37247736,
+            "archiveSha256": "c03e762bb2e61aab2ba5ccc45705d3c59065cc0a74e6bc6a9be99f8730f92d33",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2",
+              "receiptSha256": "58a0cb28d4b6c5f7426f546a871a5f03cfd2511dcec34f6f9d73827f0b0c4ce8"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/release-pinned application source.hidden/.lake/lasm/applications/11668af483cbcdd7/63476ce6042412f669d7e86025a84fcf17c6e3303ec69bb302cafc3c852bea5c/dist/program.wasm",
+            "originalBytes": 160418496,
+            "originalSha256": "1077e3d44263133b8d164fd549f5c5a76c69dd529950c7b26254c940c9b12ab0",
+            "mode": 509,
+            "mtimeNs": 1790249073153330279,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/release-pinned application source.hidden/.lake/lasm/applications/11668af483cbcdd7/63476ce6042412f669d7e86025a84fcf17c6e3303ec69bb302cafc3c852bea5c/dist/program.wasm.gz",
+            "archiveBytes": 37247736,
+            "archiveSha256": "c03e762bb2e61aab2ba5ccc45705d3c59065cc0a74e6bc6a9be99f8730f92d33",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2",
+              "receiptSha256": "58a0cb28d4b6c5f7426f546a871a5f03cfd2511dcec34f6f9d73827f0b0c4ce8"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/native source.hidden/.lake/build/bin/release",
+            "originalBytes": 6034192,
+            "originalSha256": "ce3f690dcb07d15df28a1d321c6b65c6176b473dcd2ac48b14fb0eb319f9d4b0",
+            "mode": 509,
+            "mtimeNs": 1790249015095809909,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2/native source.hidden/.lake/build/bin/release.gz",
+            "archiveBytes": 1657165,
+            "archiveSha256": "54c77d13348018ab765ee55584deae329273683a74588d28ecca7b7f12810f32",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r2",
+              "receiptSha256": "58a0cb28d4b6c5f7426f546a871a5f03cfd2511dcec34f6f9d73827f0b0c4ce8"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 250718547,
+        "finishedAt": "2026-09-24T11:25:02.284221+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T11:24:55.445Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-signal-r1.py",
+          ".work/upstream-signal-node-r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "eca7ca32-30e5-4080-a350-75297a403803",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24712015872
+        },
+        "minimumHostAvailable": 24706887680,
+        "peakMemoryBytes": 87044096,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-node-r2-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T11:25:02.256Z",
+          "memoryBytes": 50012160,
+          "peakMemoryBytes": 87044096,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 9723904,
+            "file": 38912000,
+            "kernel": 1302528,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 38912000,
+            "slab": 1194688
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T11:25:02.333Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 54218752,
+          "peakMemoryBytes": 87044096,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11661312,
+            "file": 38912000,
+            "kernel": 2224128,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 38912000,
+            "slab": 1292520
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T11:25:02.361Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "earlierDenoFailure": {
+    "result": {
+      "scope": "Separate original upstream-exclusion driver and unchanged installed signal application; not a default-suite pass",
+      "target": "deno",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler",
+      "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+      "excluded": {
+        "source": "tests/pkg/signal",
+        "reason": "upstream CMake flaky/nondeterministic exclusion"
+      },
+      "commands": [
+        {
+          "label": "engine version",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "args": [
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1",
+          "seconds": 0.007814594999999827,
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+          "stderr": ""
+        },
+        {
+          "label": "original native signal driver",
+          "program": "/bin/bash",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+            "ordinary",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/native source/run_test.sh"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/native source",
+          "seconds": 5.121685996999998,
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "stdout": "\u2714 [2/4] Built Main (425ms)\n\u2714 [3/4] Built Main:c.o (320ms)\n\u2714 [4/4] Built release:exe (214ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3949612\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3949612 to finish...\nProcess completed successfully\n",
+          "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        {
+          "label": "installed application build",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/release-pinned application source/Main.lean",
+            "--target",
+            "deno",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/release-pinned application source",
+          "seconds": 64.31910251999999,
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.0 for deno\u2026\ninfo: debug: no previous manifest, creating one from scratch\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for deno: /home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/dist\n"
+        },
+        {
+          "label": "native signal control",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/native source.hidden/.lake/build/bin/release",
+          "args": [],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/relocated deployment",
+          "pid": 3949766,
+          "signals": [
+            {
+              "signal": "SIGUSR1",
+              "sent": true,
+              "pid": 3949766
+            },
+            {
+              "signal": "SIGHUP",
+              "sent": true,
+              "pid": 3949766
+            },
+            {
+              "signal": "SIGQUIT",
+              "sent": true,
+              "pid": 3949766
+            },
+            {
+              "signal": "SIGINT",
+              "sent": true,
+              "pid": 3949766
+            }
+          ],
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "seconds": 4.034604051999995
+        },
+        {
+          "label": "deployed signal control",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "args": [
+            "run",
+            "-A",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/relocated deployment/main.mjs"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/relocated deployment",
+          "pid": 3949775,
+          "signals": [
+            {
+              "signal": "SIGUSR1",
+              "sent": true,
+              "pid": 3949775
+            },
+            {
+              "signal": "SIGHUP",
+              "sent": true,
+              "pid": 3949775
+            },
+            {
+              "signal": "SIGQUIT",
+              "sent": true,
+              "pid": 3949775
+            },
+            {
+              "signal": "SIGINT",
+              "sent": true,
+              "pid": 3949775
+            }
+          ],
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Debugger listening on ws://127.0.0.1:9229/80eff571-16d0-42a7-aeb0-1d6fa0fdd6ec\nVisit chrome://inspect to connect to the debugger.\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "seconds": 6.524024163999988
+        }
+      ],
+      "passed": false,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-deno-r1-resources.json",
+      "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+      "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+      "harnessSha256": "31d7a7c48b68897d67f4fdc04dc13e7b802f989148c14c88e222f6e90ddfc5f1",
+      "nativeDriverWrapperSha256": "104d70816b1cc551669a893bb80a4f18beb35529f344229569a2c378b1ce2ae6",
+      "adaptations": [
+        "Run the original shell driver unchanged with managed native Lean/Lake, retaining its FIFO, signal sequence, one-second waits and all Lean assertions.",
+        "A separately identified application copy changes only the upstream stage-directory pin to the matching published release; every original source byte and assertion remains intact.",
+        "A parallel controller runs the same main as native code and installed AOT after hiding all source copies. It sends the same four signals one second after each exact readiness line and compares stdout, stderr and termination.",
+        "The deployed process has an empty PATH and no build-tool environment. The timeout is an outer controller deadline, not a changed wait or assertion inside the Lean test."
+      ],
+      "referenceBefore": {
+        "checked": 7669,
+        "modified": []
+      },
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "phase": "deployed signal control",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "packageVersion": "0.1.0-experimental.20",
+      "applicationBefore": {
+        "checked": 3,
+        "modified": []
+      },
+      "parallelPin": {
+        "original": "../../../build/release/stage1\n",
+        "release": "leanprover/lean4:v4.34.0\n"
+      },
+      "nativeDriver": {
+        "code": 0,
+        "signal": null,
+        "stdout": "\u2714 [2/4] Built Main (425ms)\n\u2714 [3/4] Built Main:c.o (320ms)\n\u2714 [4/4] Built release:exe (214ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3949612\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3949612 to finish...\nProcess completed successfully\n",
+        "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+      },
+      "nativeSourceAfter": {
+        "checked": 4,
+        "modified": []
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+        "buildDriverIdentity": "2ea658e4982493abd5c16c47d967ed0f6ca112359e42a2788664ef0b7849c48a",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "/+Main",
+            "sourceSha256": "c678cfa636b471dcf64f474b3ef1787a8c812bcbe9b4394abfe0d7c811f056c6",
+            "cSha256": "2e80a4765a0c786ade342784c1a33832e4f85e2bf7bb08a1597509733634ccdd"
+          }
+        ],
+        "signature": "4f3a3e43ec0be7e1d7bfbc1f4f7751d638b6611377f3c10233a027a69475eaeb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "applicationAfter": {
+        "checked": 3,
+        "modified": []
+      },
+      "originalApplicationAfter": {
+        "checked": 4,
+        "modified": []
+      },
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-deno-r1/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "wasmSha256": "1077e3d44263133b8d164fd549f5c5a76c69dd529950c7b26254c940c9b12ab0"
+      },
+      "native": {
+        "code": 0,
+        "signal": null,
+        "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+        "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+      },
+      "actual": {
+        "code": 0,
+        "signal": null,
+        "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+        "stderr": "Debugger listening on ws://127.0.0.1:9229/80eff571-16d0-42a7-aeb0-1d6fa0fdd6ec\nVisit chrome://inspect to connect to the debugger.\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+      },
+      "error": {
+        "message": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    code: 0,\n    signal: null,\n+   stderr: 'Debugger listening on ws://127.0.0.1:9229/80eff571-16d0-42a7-aeb0-1d6fa0fdd6ec\\n' +\n+     'Visit chrome://inspect to connect to the debugger.\\n' +\n+     'Received Std.Async.Signal.sigusr1\\n' +\n-   stderr: 'Received Std.Async.Signal.sigusr1\\n' +\n      'Received Std.Async.Signal.sighup\\n' +\n      'Received Std.Async.Signal.sigquit\\n' +\n      'Received Std.Async.Signal.sigint\\n',\n    stdout: 'Waiting for a signal\\n' +\n      'Waiting for a signal\\n' +\n",
+        "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    code: 0,\n    signal: null,\n+   stderr: 'Debugger listening on ws://127.0.0.1:9229/80eff571-16d0-42a7-aeb0-1d6fa0fdd6ec\\n' +\n+     'Visit chrome://inspect to connect to the debugger.\\n' +\n+     'Received Std.Async.Signal.sigusr1\\n' +\n-   stderr: 'Received Std.Async.Signal.sigusr1\\n' +\n      'Received Std.Async.Signal.sighup\\n' +\n      'Received Std.Async.Signal.sigquit\\n' +\n      'Received Std.Async.Signal.sigint\\n',\n    stdout: 'Waiting for a signal\\n' +\n      'Waiting for a signal\\n' +\n\n    at file:///home/lastmjs/development/lasm/compiler/integration/application-upstream-signal.mjs:142:10\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+      },
+      "finishedAt": "2026-09-24T11:03:57.766Z"
+    },
+    "resultSha256": "6ee6e3bd8e8dfb642837a56d1be874afa5c4e2a18597c8c2b2703db4131a126a",
+    "resources": {
+      "startedAt": "2026-09-24T11:02:23.251Z",
+      "command": [
+        "/bin/bash",
+        ".work/run-upstream-signal-r1.sh",
+        "deno",
+        ".work/upstream-signal-deno-r1"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "4ab30a64-0c7c-4024-88b8-56846228a26d",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24774160384
+      },
+      "minimumHostAvailable": 21175734272,
+      "peakMemoryBytes": 3544203264,
+      "peakTasks": 40,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-deno-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T11:03:57.805Z",
+        "memoryBytes": 385708032,
+        "peakMemoryBytes": 3544203264,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 1466368,
+          "file": 371855360,
+          "kernel": 11837440,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 364957696,
+          "slab": 11662984
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T11:03:57.844Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 396951552,
+        "peakMemoryBytes": 3544203264,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11657216,
+          "file": 371855360,
+          "kernel": 12693504,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 364957696,
+          "slab": 11770584
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T11:03:57.872Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "earlierNodePass": {
+    "result": {
+      "scope": "Separate original upstream-exclusion driver and unchanged installed signal application; not a default-suite pass",
+      "target": "node",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler",
+      "reference": "/home/lastmjs/development/lasm/compiler/.work/upstream-mixed-native-r1/source",
+      "excluded": {
+        "source": "tests/pkg/signal",
+        "reason": "upstream CMake flaky/nondeterministic exclusion"
+      },
+      "commands": [
+        {
+          "label": "engine version",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1",
+          "seconds": 0.007588138999999501,
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "stdout": "v26.10.0\n",
+          "stderr": ""
+        },
+        {
+          "label": "original native signal driver",
+          "program": "/bin/bash",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/scripts/application-tests/mixed-native.sh",
+            "ordinary",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/native source/run_test.sh"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/native source",
+          "seconds": 5.119451087,
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "stdout": "\u2714 [2/4] Built Main (406ms)\n\u2714 [3/4] Built Main:c.o (328ms)\n\u2714 [4/4] Built release:exe (220ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3948910\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3948910 to finish...\nProcess completed successfully\n",
+          "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+        },
+        {
+          "label": "installed application build",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/release-pinned application source/Main.lean",
+            "--target",
+            "node",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/release-pinned application source",
+          "seconds": 65.16533292000001,
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.0 for node\u2026\ninfo: debug: no previous manifest, creating one from scratch\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-r19/workspace/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.0 for node: /home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/dist\n"
+        },
+        {
+          "label": "native signal control",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/native source.hidden/.lake/build/bin/release",
+          "args": [],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/relocated deployment",
+          "pid": 3949200,
+          "signals": [
+            {
+              "signal": "SIGUSR1",
+              "sent": true,
+              "pid": 3949200
+            },
+            {
+              "signal": "SIGHUP",
+              "sent": true,
+              "pid": 3949200
+            },
+            {
+              "signal": "SIGQUIT",
+              "sent": true,
+              "pid": 3949200
+            },
+            {
+              "signal": "SIGINT",
+              "sent": true,
+              "pid": 3949200
+            }
+          ],
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "seconds": 4.033700464000009
+        },
+        {
+          "label": "deployed signal control",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/relocated deployment/main.mjs"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/relocated deployment",
+          "pid": 3949214,
+          "signals": [
+            {
+              "signal": "SIGUSR1",
+              "sent": true,
+              "pid": 3949214
+            },
+            {
+              "signal": "SIGHUP",
+              "sent": true,
+              "pid": 3949214
+            },
+            {
+              "signal": "SIGQUIT",
+              "sent": true,
+              "pid": 3949214
+            },
+            {
+              "signal": "SIGINT",
+              "sent": true,
+              "pid": 3949214
+            }
+          ],
+          "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+          "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n",
+          "timeout": false,
+          "code": 0,
+          "signal": null,
+          "seconds": 5.999511945999998
+        }
+      ],
+      "passed": true,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-node-r1-resources.json",
+      "sourceManifestSha256": "32980ae081c9407b79f8a5fe07ebe528ca517e7e9af7cf798dc3b16dbf6a768b",
+      "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+      "harnessSha256": "31d7a7c48b68897d67f4fdc04dc13e7b802f989148c14c88e222f6e90ddfc5f1",
+      "nativeDriverWrapperSha256": "104d70816b1cc551669a893bb80a4f18beb35529f344229569a2c378b1ce2ae6",
+      "adaptations": [
+        "Run the original shell driver unchanged with managed native Lean/Lake, retaining its FIFO, signal sequence, one-second waits and all Lean assertions.",
+        "A separately identified application copy changes only the upstream stage-directory pin to the matching published release; every original source byte and assertion remains intact.",
+        "A parallel controller runs the same main as native code and installed AOT after hiding all source copies. It sends the same four signals one second after each exact readiness line and compares stdout, stderr and termination.",
+        "The deployed process has an empty PATH and no build-tool environment. The timeout is an outer controller deadline, not a changed wait or assertion inside the Lean test."
+      ],
+      "referenceBefore": {
+        "checked": 7669,
+        "modified": []
+      },
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "nativeArtifactIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "phase": "complete",
+      "engineVersion": "v26.10.0",
+      "packageVersion": "0.1.0-experimental.20",
+      "applicationBefore": {
+        "checked": 3,
+        "modified": []
+      },
+      "parallelPin": {
+        "original": "../../../build/release/stage1\n",
+        "release": "leanprover/lean4:v4.34.0\n"
+      },
+      "nativeDriver": {
+        "code": 0,
+        "signal": null,
+        "stdout": "\u2714 [2/4] Built Main (406ms)\n\u2714 [3/4] Built Main:c.o (328ms)\n\u2714 [4/4] Built release:exe (220ms)\nBuild completed successfully (4 jobs).\nStarted process with PID: 3948910\nReceived line: Waiting for a signal\nSending USR1 signal...\nReceived line: Waiting for a signal\nSending HUP signal...\nReceived line: Waiting for a signal\nSending QUIT signal...\nReceived line: Waiting for a signal\nSending INT signal...\nWaiting for process 3948910 to finish...\nProcess completed successfully\n",
+        "stderr": "info: debug: no previous manifest, creating one from scratch\ninfo: toolchain not updated; already up-to-date\nReceived Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+      },
+      "nativeSourceAfter": {
+        "checked": 4,
+        "modified": []
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+        "buildDriverIdentity": "2ea658e4982493abd5c16c47d967ed0f6ca112359e42a2788664ef0b7849c48a",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "/+Main",
+            "sourceSha256": "c678cfa636b471dcf64f474b3ef1787a8c812bcbe9b4394abfe0d7c811f056c6",
+            "cSha256": "2e80a4765a0c786ade342784c1a33832e4f85e2bf7bb08a1597509733634ccdd"
+          }
+        ],
+        "signature": "b084d49e389de9159ced044cb964e913fbae1f2e2c4bb72a51e38808274c59f8",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "applicationAfter": {
+        "checked": 3,
+        "modified": []
+      },
+      "originalApplicationAfter": {
+        "checked": 4,
+        "modified": []
+      },
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-signal-node-r1/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "wasmSha256": "1077e3d44263133b8d164fd549f5c5a76c69dd529950c7b26254c940c9b12ab0"
+      },
+      "native": {
+        "code": 0,
+        "signal": null,
+        "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+        "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+      },
+      "actual": {
+        "code": 0,
+        "signal": null,
+        "stdout": "Waiting for a signal\nWaiting for a signal\nWaiting for a signal\nWaiting for a signal\n",
+        "stderr": "Received Std.Async.Signal.sigusr1\nReceived Std.Async.Signal.sighup\nReceived Std.Async.Signal.sigquit\nReceived Std.Async.Signal.sigint\n"
+      },
+      "referenceAfter": {
+        "checked": 7669,
+        "modified": []
+      },
+      "finishedAt": "2026-09-24T11:01:08.306Z"
+    },
+    "resources": {
+      "startedAt": "2026-09-24T10:59:30.858Z",
+      "command": [
+        "/bin/bash",
+        ".work/run-upstream-signal-r1.sh",
+        "node",
+        ".work/upstream-signal-node-r1"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "db6e7f2e-6da6-4448-9d26-f4765677e2ee",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24782172160
+      },
+      "minimumHostAvailable": 21284024320,
+      "peakMemoryBytes": 3663450112,
+      "peakTasks": 37,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-signal-node-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T11:01:08.215Z",
+        "memoryBytes": 630255616,
+        "peakMemoryBytes": 3663450112,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 125837312,
+          "file": 489586688,
+          "kernel": 14061568,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 483500032,
+          "slab": 11804288
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T11:01:08.374Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 513687552,
+        "peakMemoryBytes": 3663450112,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 10248192,
+          "file": 489586688,
+          "kernel": 12525568,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 483500032,
+          "slab": 11681040
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T11:01:08.400Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "controls": {
+    "tests": 9,
+    "failed": 0,
+    "skipped": 0,
+    "log": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-signal-helper-controls-r1-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 1b491f43bb6447c893ba67b7d623dcbb\nBuilt linux-x64-gnu.so: 14872 bytes\nBuilt linux-x64-musl.so: 14176 bytes\nBuilt darwin-x64.dylib: 14096 bytes\nBuilt linux-arm64-gnu.so: 15520 bytes\nBuilt linux-arm64-musl.so: 14832 bytes\nBuilt darwin-arm64.dylib: 51560 bytes\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (54.177946ms)\n\u2714 wrong engines fail before executing the application payload (36.152909ms)\n\u2714 all full-runtime host support files exist and target validation is strict (2.322743ms)\n\u2714 node signals preserve waiter lifecycle after 0 ms (83.9908ms)\n\u2714 node signals preserve waiter lifecycle after 1000 ms (1081.555158ms)\n\u2714 deno signals preserve waiter lifecycle after 0 ms (151.883971ms)\n\u2714 deno signals preserve waiter lifecycle after 1000 ms (1100.99798ms)\n\u2714 bun signals preserve waiter lifecycle after 0 ms (58.477901ms)\n\u2714 bun signals preserve waiter lifecycle after 1000 ms (1051.876923ms)\n\u2139 tests 9\n\u2139 suites 0\n\u2139 pass 9\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 3768.813073\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 10.347s\nCPU time consumed: 7.134s\nMemory peak: 237.0M\nMemory swap peak: 0B\n[lasm] Peak 0.23 GiB; success\n",
+    "resources": {
+      "startedAt": "2026-09-24T11:16:50.022Z",
+      "command": [
+        "/bin/bash",
+        "-c",
+        "set -euo pipefail; ulimit -c 0; .cache/js-runtimes/node-26.10.0/bin/node scripts/build-signal-helper.mjs; LASM_REQUIRE_SIGNAL_ENGINES=1 .cache/js-runtimes/node-26.10.0/bin/node --test --test-concurrency=1 test/node-signal.test.mjs test/application-output.test.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "9505426d-25d7-49a1-a6ab-d6edcc128263",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24808292352
+      },
+      "minimumHostAvailable": 24663400448,
+      "peakMemoryBytes": 248598528,
+      "peakTasks": 23,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/deno-signal-helper-controls-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T11:17:00.244Z",
+        "memoryBytes": 110362624,
+        "peakMemoryBytes": 248598528,
+        "swapBytes": 0,
+        "tasks": 23,
+        "memoryBreakdown": {
+          "anon": 32927744,
+          "file": 73916416,
+          "kernel": 3518464,
+          "shmem": 0,
+          "file_mapped": 274432,
+          "inactive_file": 69763072,
+          "slab": 1109104
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T11:17:00.391Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 88211456,
+        "peakMemoryBytes": 248598528,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11657216,
+          "file": 73916416,
+          "kernel": 1671168,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 69763072,
+          "slab": 755808
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T11:17:00.418Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "helperManifest": {
+    "protocol": 1,
+    "source": "native/posix-signal.c",
+    "sourceSha256": "117a1d8c0c3a4cc2f958e67a089518ff3da58817eac9c09b1a4e8602af412126",
+    "compiler": "Zig 0.16.0",
+    "files": {
+      "linux-x64-gnu.so": {
+        "target": "x86_64-linux-gnu.2.17",
+        "sha256": "87dba57f838a1bb6b5e76274d0a817e9be25503517594e0dc5970dcc7511ce4b",
+        "bytes": 14872
+      },
+      "linux-x64-musl.so": {
+        "target": "x86_64-linux-musl",
+        "sha256": "215b8538618344334af5c5523636c0a4743fa60b6578b102436d3b523b9acb37",
+        "bytes": 14176
+      },
+      "darwin-x64.dylib": {
+        "target": "x86_64-macos.13.0",
+        "sha256": "b4e8ddd786068cae8334e19a3ee7150b45d558386049babf335b995110514a08",
+        "bytes": 14096
+      },
+      "linux-arm64-gnu.so": {
+        "target": "aarch64-linux-gnu.2.17",
+        "sha256": "f362337233551a93097f2835a2bb23a2e057ea727a3341197321a57bfd0d66af",
+        "bytes": 15520
+      },
+      "linux-arm64-musl.so": {
+        "target": "aarch64-linux-musl",
+        "sha256": "9d6f5cad9e97b88559b9ec9c35361b4c44160c334e34dfd9c1b63e69a4a27353",
+        "bytes": 14832
+      },
+      "darwin-arm64.dylib": {
+        "target": "aarch64-macos.13.0",
+        "sha256": "f8fd958745eb78f702015f4e8867e587ea12f8bf66c4401c25b133522ef9f1c9",
+        "bytes": 51560
+      }
+    },
+    "validation": "Cross-compilation is not native execution validation."
+  },
+  "implementationSha256": {
+    "src/deno-signals.mjs": "5030493b58afcf19a7dccca82b33a6ba1a819b9e5c7571a58d0ea300b1439885",
+    "src/node-signal.mjs": "4ef1e74af9dc7c687152a50d1adf620e281fd8ae7abdf1e21500fcb4726a78fa",
+    "src/application-output.mjs": "4dd78d41fb89fc83a33a5d3cb48b02171462f2780b2e71eb0d762ec10ad8faa9",
+    "src/native-bundle.mjs": "7ae9d234806291c025825daa85beb279df0982b13203e3168c44f790beceabeb",
+    "native/posix-signal.c": "117a1d8c0c3a4cc2f958e67a089518ff3da58817eac9c09b1a4e8602af412126",
+    "scripts/build-signal-helper.mjs": "8d9acd29b508f1ea02d03d3c192d1a241403ce102a90ce6cf11162bb86e9f428",
+    "test/node-signal.test.mjs": "21db8ff9b889a663bf57f9d678fb84418045e5be3d276b162593c9a88caab5aa",
+    "test/fixtures/signal-host.mjs": "b1a4d601928e5572ecc23b73160c6efbc67257b2aa384dd0a22b6086ed6ac684",
+    "integration/application-upstream-signal.mjs": "31d7a7c48b68897d67f4fdc04dc13e7b802f989148c14c88e222f6e90ddfc5f1"
+  },
+  "cause": {
+    "description": "Deno 2.9.7 subscribes its inspector directly to SIGUSR1 after a 500 ms grace period; the JavaScript listener does not suppress that internal subscription.",
+    "source": "https://github.com/denoland/deno/blob/v2.9.7/cli/worker.rs",
+    "localSourceSha256": "055707a709898c4faefe0795d48194631b12642b4c6c2eaf73684858cd5da366",
+    "dispatcherSource": "https://github.com/denoland/deno/blob/v2.9.7/ext/signals/lib.rs",
+    "dispatcherSourceSha256": "4caf8b74001f68c9c856ca3d9eb9385b18f0890a00a610a5f0c42f2230963648"
+  },
+  "repair": "A bundled signal-safe native pipe routes SIGUSR1 to process listeners while Lean owns subscriptions, without notifying the inspector. The last release restores the previous handler and wakes the pending native read before freeing its state. Other engines and signals keep the existing route.",
+  "limits": [
+    "The upstream test is explicitly excluded by upstream CMake; the separate passing controls do not remove that exclusion.",
+    "Only Linux x64 installed applications are validated. ARM64, musl and macOS helpers are cross-compiled; native validation is separate.",
+    "The original test exercises four signals. The full signal set, restored default behavior, stress and complete API parity remain open.",
+    "While Lean owns Deno SIGUSR1, delivery targets Node-compatible process listeners. Interoperation with independently registered Deno.addSignalListener observers remains unresolved.",
+    "This is not complete installed engine, callable embedding or native-platform acceptance. No gap is shown fundamental."
+  ],
+  "storage": {
+    "receipt": {
+      "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/old-compiler-wasm-archives-r1-resources.json",
+      "files": [
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v4/bin/lean.wasm",
+          "originalBytes": 193711327,
+          "originalSha256": "bb54484e76bd007bad3604089499ba6caa0e2c28bccd5f445fc8a72498fa67ee",
+          "mode": 509,
+          "mtimeNs": 1789786568685701760,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v4/bin/lean.wasm.gz",
+          "archiveBytes": 40714888,
+          "archiveSha256": "be4efe02cd725093d7f89a9eaa398c554b66da3dbf5af449bdadafd2545006a5",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v4/snapshot.json",
+            "snapshotSha256": "eee9a78d26d29b9c83951504c51557f9361f0a847adef751c5fba4a76b090822",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v6/bin/lean.wasm",
+          "originalBytes": 193702813,
+          "originalSha256": "cf562b696fdf5e6c16df08f9a707bcbead069ef88ddf527ed5c4b761988a2eb4",
+          "mode": 509,
+          "mtimeNs": 1789788247647788959,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v6/bin/lean.wasm.gz",
+          "archiveBytes": 40720418,
+          "archiveSha256": "edf94b6798ee35c60d2da23959502365a19c21e685ad276758da3602f89aa9a0",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v6/snapshot.json",
+            "snapshotSha256": "bdf6984de776b84d7f08ef023a35e5c30aadd2a9b0fa29246011a69da7b1c86c",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v7/bin/lean.wasm",
+          "originalBytes": 193704364,
+          "originalSha256": "95bc12bb2a19d884aba7f2ca53ba8f8349e1f2fdf1d864b2a516951a0e51514c",
+          "mode": 509,
+          "mtimeNs": 1789788930339735044,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v7/bin/lean.wasm.gz",
+          "archiveBytes": 40716271,
+          "archiveSha256": "e0911f369b4db780eea679acf4baaca8408925c9dbbb8c79a3fab96a4bc89167",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v7/snapshot.json",
+            "snapshotSha256": "c3b200cdbe9b1106e1e40cbba58f75ff51ee9858e6d816e29665a105cec30f4b",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v11/bin/lean.wasm",
+          "originalBytes": 193713505,
+          "originalSha256": "afb086cd0593ab4a38f485da967948e22826e147f5ef860e7926597e9b8d4158",
+          "mode": 509,
+          "mtimeNs": 1789790652931884524,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v11/bin/lean.wasm.gz",
+          "archiveBytes": 40728877,
+          "archiveSha256": "36e17784d1159e394889f6d2712ec6f0add033e5597fd3e6713adf7823c37102",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v11/snapshot.json",
+            "snapshotSha256": "be19210ce721c96144ff056dfaff75e9867fc4f18419df923af4ac3e548dcc92",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v12/bin/lean.wasm",
+          "originalBytes": 193713521,
+          "originalSha256": "1b65e450b732eadcdc76fdd2a1c47f1dd61e8eabc75bc9a6704e000cea3aab23",
+          "mode": 509,
+          "mtimeNs": 1789791417877546414,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v12/bin/lean.wasm.gz",
+          "archiveBytes": 40729284,
+          "archiveSha256": "1e01fabc03cab86cd0298962c7a8a60b1bd0139a822df2cac6d776f9a0b9fec8",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v12/snapshot.json",
+            "snapshotSha256": "8551346bfa0672aa85122d491df1169a92d7343b6a5886e65cd15c708ac2bc19",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v13/bin/lean.wasm",
+          "originalBytes": 193713521,
+          "originalSha256": "1b65e450b732eadcdc76fdd2a1c47f1dd61e8eabc75bc9a6704e000cea3aab23",
+          "mode": 509,
+          "mtimeNs": 1789792157742278111,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v13/bin/lean.wasm.gz",
+          "archiveBytes": 40729284,
+          "archiveSha256": "1e01fabc03cab86cd0298962c7a8a60b1bd0139a822df2cac6d776f9a0b9fec8",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v13/snapshot.json",
+            "snapshotSha256": "88d69fc16f5ffe3294d88ad79ca5a8ed08a24f634b1afa422d85a88f8e73917a",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v15/bin/lean.wasm",
+          "originalBytes": 193714175,
+          "originalSha256": "a9d2df7ad35d9c68444526a8fa0425a2aa330fcc997b57e748e6b9b33914fa51",
+          "mode": 509,
+          "mtimeNs": 1789793700858748391,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v15/bin/lean.wasm.gz",
+          "archiveBytes": 40728068,
+          "archiveSha256": "a318377dfb3415a2768fbeec90f05ffc53b8a2687c7760de34da271aba66c7bd",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v15/snapshot.json",
+            "snapshotSha256": "2715d1b47e7fa53b4db8f1b01ed14103e5050c2d6f3fe748b43c7f5eccb12bd9",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v16/bin/lean.wasm",
+          "originalBytes": 193714175,
+          "originalSha256": "a9d2df7ad35d9c68444526a8fa0425a2aa330fcc997b57e748e6b9b33914fa51",
+          "mode": 509,
+          "mtimeNs": 1789794028859207944,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v16/bin/lean.wasm.gz",
+          "archiveBytes": 40728068,
+          "archiveSha256": "a318377dfb3415a2768fbeec90f05ffc53b8a2687c7760de34da271aba66c7bd",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v16/snapshot.json",
+            "snapshotSha256": "1394dc05e8a96c77648d3cebc7c6c91a49a8289204028858efe975ba5e78c8ea",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v17/bin/lean.wasm",
+          "originalBytes": 193887547,
+          "originalSha256": "bd454eb1696c1b18952ffa746d6f6cb897f42171c2a1f69080b019c32319d8d7",
+          "mode": 509,
+          "mtimeNs": 1789818815203454189,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v17/bin/lean.wasm.gz",
+          "archiveBytes": 40775263,
+          "archiveSha256": "23523a5d1d690c12e46c2b262586e0d636d38d882cdca42c1d2e1af6a62b9132",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v17/snapshot.json",
+            "snapshotSha256": "86e0669722387f347bc84311543ae86a57098e8492cac1d294e5ca1681f3cee7",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v19/bin/lean.wasm",
+          "originalBytes": 195936264,
+          "originalSha256": "fa70c402cdcb5a4198a11ccec75f37f4c9294bac99a81312de102222fc6a10ea",
+          "mode": 509,
+          "mtimeNs": 1789819368744815338,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v19/bin/lean.wasm.gz",
+          "archiveBytes": 41452117,
+          "archiveSha256": "e34482d4618722a6ba92961e053ae28711458ec3e101f0a86f03ed926bcfff3c",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v19/snapshot.json",
+            "snapshotSha256": "0f829f4772508fd0aad6ba0e15c9696f249edaebca8e0685503ac12c1ce63082",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v20/bin/lean.wasm",
+          "originalBytes": 195936312,
+          "originalSha256": "bdaa757ba189856632c09093612afa5d4844fc4aca25291940ca678687278c56",
+          "mode": 509,
+          "mtimeNs": 1789819849577249836,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v20/bin/lean.wasm.gz",
+          "archiveBytes": 41450412,
+          "archiveSha256": "48b32352ed6d1df15951f9174aac356404b7a956fcbd2ffbeeff63faea15c17e",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v20/snapshot.json",
+            "snapshotSha256": "50a697ba0e705d0d5260b7bc7ba65a5174726e779d06d96b9d7080cfeda9eeab",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v22/bin/lean.wasm",
+          "originalBytes": 195983928,
+          "originalSha256": "1e21a1200f45db5cbd1f9d7071b79d0f89eac4001d4f791af9e030767f7bf4e4",
+          "mode": 509,
+          "mtimeNs": 1789820831966879847,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v22/bin/lean.wasm.gz",
+          "archiveBytes": 41468615,
+          "archiveSha256": "11227b7376b34665790aeb0c2d541cefc566022bcdd5d04c98a173aa876eeeef",
+          "verifiedDecompression": true,
+          "provenance": {
+            "frozenCompilerSnapshot": "/home/lastmjs/development/lasm/compiler/.work/full-artifacts/wasm64-v22/snapshot.json",
+            "snapshotSha256": "e86da59cc4f2ba24d38d19d20ae2d1abe443e78e2707ac670cf3aeabe50af6b3",
+            "scope": "Historical compiler-in-Wasm artifacts; application and latest paused-campaign artifacts remain intact."
+          },
+          "phase": "archived"
+        }
+      ],
+      "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+      "savedBytes": 1840489887,
+      "finishedAt": "2026-09-24T11:15:37.816753+00:00"
+    },
+    "resources": {
+      "startedAt": "2026-09-24T11:14:54.177Z",
+      "command": [
+        "python3",
+        "-I",
+        "-B",
+        ".work/archive-old-compiler-wasm-r1.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "d0719f90-d789-48a8-8be1-2fc53d8599c2",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24873750528
+      },
+      "minimumHostAvailable": 24744738816,
+      "peakMemoryBytes": 2390949888,
+      "peakTasks": 1,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/old-compiler-wasm-archives-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T11:15:37.833Z",
+        "memoryBytes": 426446848,
+        "peakMemoryBytes": 2390949888,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 225280,
+          "file": 413245440,
+          "kernel": 12419072,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 413245440,
+          "slab": 12340608
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T11:15:37.871Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 439234560,
+        "peakMemoryBytes": 2390949888,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11649024,
+          "file": 413245440,
+          "kernel": 13385728,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 413245440,
+          "slab": 12452608
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T11:15:37.900Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "packageStageReceipt": [
+      {
+        "removedOnlyVerifiedDuplicate": "/home/lastmjs/development/lasm/compiler/.work/application-package-r18/compiler",
+        "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r18/lasm-compiler-0.1.0-experimental.21.tgz",
+        "sha256": "e237348e62750421ba8878b67ee98dac7431c6f5199d5f806b0a089874ad8930",
+        "verifiedFiles": 2692,
+        "bytes": 630448634
+      }
+    ]
+  },
+  "ci": {
+    "workflow": ".github/workflows/signal-controls.yml",
+    "status": "prepared, not yet dispatched at this snapshot",
+    "platforms": [
+      "linux-x64",
+      "linux-arm64"
+    ],
+    "runners": [
+      "ubuntu-24.04",
+      "ubuntu-24.04-arm"
+    ],
+    "actionsCaches": false,
+    "artifactUploads": false
+  },
+  "recordedAt": "2026-09-24T11:26:00.275508+00:00"
+}
