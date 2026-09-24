@@ -20,6 +20,8 @@ if (nativeOnly && (engineArg || compilerArg || selection.length)) throw new Erro
 const cases = [
   { name: 'filesystem-surface', source: 'integration/fixtures/FilesystemSurface.lean',
     marker: 'filesystem surface checks passed\n', removesData: true },
+  { name: 'filesystem-errors', source: 'integration/fixtures/FilesystemErrors.lean',
+    marker: 'filesystem error observations completed\n', removesData: true },
   { name: 'standard-io', source: 'test/fixtures/standard-io/Main.lean',
     marker: 'standard IO checks passed\n', removesData: true },
   { name: 'getline-state', source: 'test/fixtures/getline-state/Main.lean',

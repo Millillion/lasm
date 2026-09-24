@@ -1,0 +1,38 @@
+{
+  "scope": "Supplementary ordinary Lean filesystem-error differential fixture; native and deployed execution pending",
+  "recordedAt": "2026-09-24T04:05:12.755332+00:00",
+  "files": {
+    "integration/fixtures/FilesystemErrors.lean": "49649acbe70fa3c384ff80a5985f9683a68d5a5d300e238d0d0889445e745510",
+    "integration/application-io-regressions.mjs": "8c484c327eb1b6fbf5d7c20bd3b01c802c8803bbbf51eaa4f894609236f0b4e5"
+  },
+  "observations": 28,
+  "coverage": [
+    "Actual missing/wrong-kind path operations",
+    "All file opening modes and invalid handle directions",
+    "Directory removal, rename, hard-link and realPath failures",
+    "Invalid UTF8 and embedded-NUL path semantics"
+  ],
+  "oracle": "Run the unchanged supplementary fixture interpreted and C-compiled natively on each host, then compare exact stdout/stderr/status with installed relocated deployments. Do not prescribe JavaScript API behavior as the Lean oracle.",
+  "javascriptSyntax": "passed",
+  "native": "pending",
+  "deployed": "pending",
+  "releasesRechecked": {
+    "Lean": {
+      "version": "4.34.0",
+      "url": "https://github.com/leanprover/lean4/releases/latest"
+    },
+    "Node": {
+      "version": "26.10.0",
+      "url": "https://nodejs.org/en/download/current"
+    },
+    "Deno": {
+      "version": "2.9.7",
+      "url": "https://github.com/denoland/deno/releases/latest"
+    },
+    "Bun": {
+      "version": "1.4.2",
+      "url": "https://github.com/oven-sh/bun/releases/latest"
+    }
+  },
+  "ci": "Existing public standard Linux x64/ARM64 and Windows x64 resource-guard workflow; no caches or artifact uploads"
+}
