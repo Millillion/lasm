@@ -1,0 +1,52 @@
+name: Bounded CI checkpoint storage control
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: lasm-cache-writer
+  cancel-in-progress: false
+jobs:
+  control:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: windows-11-arm
+    timeout-minutes: 10
+    env:
+      LASM_CACHE_WRITER_GROUP: lasm-cache-writer
+      CACHE_KEY: lasm-cache-control-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: arm64
+          package-manager-cache: false
+      - name: Check budget boundaries without allocating large buffers
+        run: node --max-old-space-size=64 --test test/ci-cache-budget.test.mjs
+      - run: node integration/ci-cache-control.mjs create
+      - name: Verify public eligibility and repository cache headroom
+        id: budget
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/cache-budget.mjs .work/ci-cache-control/payload.json .work/ci-cache-control/budget.json
+      - name: Save the tiny control payload within the verified allowance
+        if: steps.budget.outputs.allowed == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/ci-cache-control/payload.json
+          key: ${{ env.CACHE_KEY }}
+      - run: node integration/ci-cache-control.mjs remove
+      - name: Restore the same payload
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/ci-cache-control/payload.json
+          key: ${{ env.CACHE_KEY }}
+          fail-on-cache-miss: true
+      - run: node integration/ci-cache-control.mjs verify
+      - name: Delete this disposable control cache
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method DELETE "repos/$env:GITHUB_REPOSITORY/actions/caches?key=$env:CACHE_KEY&ref=refs/heads/main"
+      # Standard public runner, one tiny disposable cache, no artifact upload.
