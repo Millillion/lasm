@@ -39,6 +39,7 @@ probe_t *lasm_probe_new(char *error, size_t size) {
     wasm_config_t *config = wasm_config_new();
     wasmtime_config_wasm_memory64_set(config, true);
     wasmtime_config_wasm_threads_set(config, true);
+    wasmtime_config_shared_memory_set(config, true);
     wasmtime_config_wasm_exceptions_set(config, true);
     wasmtime_config_parallel_compilation_set(config, false);
     wasmtime_config_max_wasm_stack_set(config, 1024 * 1024);

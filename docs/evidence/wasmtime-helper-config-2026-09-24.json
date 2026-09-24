@@ -1,0 +1,165 @@
+{
+  "scope": "Preserved helper configuration failure in all three stock engines; no guest executed",
+  "recordedAt": "2026-09-24T03:34:19.981862+00:00",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35951824033",
+  "commit": "e6caee98b6271f7ca946b53ef78da47e35047838",
+  "logSha256": "2b1ae8689a178d412aaeaf750463ede4473b31960dc2a1388a32f4c32239c584",
+  "commands": [
+    {
+      "program": "cc",
+      "args": [
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-shared",
+        "-fPIC",
+        "-I/home/runner/work/lasm/lasm/.cache/wasmtime-49.0.0/include",
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.c",
+        "-L/home/runner/work/lasm/lasm/.cache/wasmtime-49.0.0/lib",
+        "-lwasmtime",
+        "-Wl,-rpath,/home/runner/work/lasm/lasm/.cache/wasmtime-49.0.0/lib",
+        "-o",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "program": "node",
+      "args": [
+        "--max-old-space-size=128",
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:111\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: shared memory support is disabled for this engine -- see `Config::shared_memory`\n    at file:///home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs:40:10\n    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n    at async node:internal/modules/esm/loader:650:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:105:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: null,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v26.10.0\n"
+    },
+    {
+      "program": "deno",
+      "args": [
+        "run",
+        "-A",
+        "--v8-flags=--max-old-space-size=128",
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Uncaught (in promise) AssertionError: shared memory support is disabled for this engine -- see `Config::shared_memory`\n  assert.ok(probe, message());\n\u001b[0m\u001b[31m         ^\u001b[0m\n    at \u001b[0m\u001b[2m\u001b[38;5;245mfile:///home/runner/work/lasm/lasm/\u001b[0m\u001b[0m\u001b[36mscripts/full-lean/probes/wasmtime-helper.mjs\u001b[0m:\u001b[0m\u001b[33m40\u001b[0m:\u001b[0m\u001b[33m10\u001b[0m\n"
+    },
+    {
+      "program": "bun",
+      "args": [
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "35 |   const result = run(workerData.probe, 41);\n36 |   parentPort.postMessage({ ...result, memory: describe(workerData.probe), threadPeek: Number(peek(workerData.probe)) });\n37 | } else {\n38 |   let worker;\n39 |   const probe = create(error, error.length);\n40 |   assert.ok(probe, message());\n              ^\nAssertionError: shared memory support is disabled for this engine -- see `Config::shared_memory`\n generatedMessage: false,\n     actual: null,\n   expected: true,\n   operator: \"==\",\n       diff: \"simple\",\n       code: \"ERR_ASSERTION\"\n\n      at /home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs:40:10\n\nBun v1.4.2 (Linux x64)\n"
+    }
+  ],
+  "resources": {
+    "startedAt": "2026-09-24T03:32:08.302Z",
+    "command": [
+      "node",
+      "--max-old-space-size=128",
+      "scripts/full-lean/probe-wasmtime-helper.mjs",
+      ".work/wasmtime-helper",
+      "node",
+      "deno",
+      "bun"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "1594e38e-b477-4d78-9bfe-9f352248e325",
+    "limits": {
+      "memoryMax": 1073741824,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 858993459,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 16766414848,
+      "available": 15089328128
+    },
+    "minimumHostAvailable": 15072354304,
+    "peakMemoryBytes": 135024640,
+    "peakTasks": 19,
+    "report": "/home/runner/work/lasm/lasm/.work/wasmtime-helper-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-24T03:32:11.520Z",
+      "memoryBytes": 126889984,
+      "peakMemoryBytes": 127766528,
+      "swapBytes": 0,
+      "tasks": 19,
+      "memoryBreakdown": {
+        "anon": 47394816,
+        "file": 74948608,
+        "kernel": 4005888,
+        "shmem": 0,
+        "file_mapped": 212992,
+        "inactive_file": 50331648,
+        "slab": 2229304
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "exit-code",
+      "exitCode": "exited",
+      "exitStatus": "1",
+      "capturedAt": "2026-09-24T03:32:11.639Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 94056448,
+      "peakMemoryBytes": 135024640,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13651968,
+        "file": 77053952,
+        "kernel": 2985984,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 52486144,
+        "slab": 2069328
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T03:32:11.656Z",
+    "result": {
+      "code": 1,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "repair": "Explicitly enable Wasmtime shared_memory as well as wasm_threads. The pinned 49.0.0 config.h documents these as distinct settings, both disabled by default. Follow-up execution pending.",
+  "headerSha256": "3840f8ab5abf1a77d93b728cbe99e04d49ad2e91ed88d2b27387a07753ac540c"
+}

@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Unresolved Deno/Bun runtime behavior and incomplete API auditing prevent a defensible milestone forecast.
 
-**Changed:** The [first helper experiment](evidence/wasmtime-helper-first-attempt-2026-09-24.json) verified official downloads and compiled the C helper, then stopped at an invalid FFI declaration before guest execution. Corrected the buffer declaration; follow-up CI is pending. Deno's separate application campaign continues.
+**Changed:** All three stock engines reached the helper's [shared-memory configuration check](evidence/wasmtime-helper-config-2026-09-24.json). Enabled the separate Wasmtime shared-memory option documented by its pinned headers; follow-up execution is pending. Earlier failures remain preserved. Deno's separate application suite continues.
 
 **Remaining:** Shipping pipeline and engine parity, including callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
