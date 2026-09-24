@@ -1,0 +1,1339 @@
+{
+  "scope": "Installed .23 automatic module data, original imports, missing-data failures, and supplementary runtime attributes on Node and Deno Linux x64. Bun evidence follows separately.",
+  "recordedAt": "2026-09-24T15:45:34.390374+00:00",
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r20/lasm-compiler-0.1.0-experimental.23.tgz",
+    "sha256": "7f5beec9feadda1302f8d6d65b324eda00eb4c2d2c5f2824a95c733f6705dc8a",
+    "compressedBytes": 125592670,
+    "installedBytes": 630848139,
+    "files": 2696,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-module-data-r1-resources.json",
+    "recordedAt": "2026-09-24T15:00:03.143Z"
+  },
+  "cases": [
+    {
+      "resultFile": ".work/bundled-module-data-node-original-r1/result.json",
+      "resultSha256": "4b96cee0d7eafd185e765ca17080942fce3f91be9ac24545075493ba2bcf4f34",
+      "observations": {
+        "target": "node",
+        "engineVersion": "v26.10.0",
+        "packageVersion": "0.1.0-experimental.23",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "01be8862dbe04da5df61295ff7ac6fa1da1c1a2f2d71991215285e76891635ea",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "moduleDataIdentity": "30c08b45558301a44378aef90ef3378e9a812ee72658de8249d4173a64a23c42",
+          "moduleDataBytes": 2212604382,
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "dc8f9b46f5f81a225f7727e0b0cbda00cd44664c02ff84075c1199daf2ae8f0e",
+              "cSha256": "a00205a554514dad6d9658a13ff24fe19de456686daed936410d297f81ab7349"
+            }
+          ],
+          "signature": "df0c824c9832dbf77357218b36677916070a2f29a133f35ed77f64e8eea4aced",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "missingDataControl": {
+          "native": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/relocated deployment/lean/packages/0\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/missing standard data/lib/lean\n"
+          },
+          "actual": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/relocated deployment/lean/packages/0\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/missing standard data/lib/lean\n"
+          }
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "buildProcessesUsedAtRuntime": false,
+          "selfContained": true,
+          "suppliedLeanPaths": false,
+          "wasmSha256": "fa90cc24bf3a4ca2d200fb792745cd4da4e8fefc255c93373e85a8f80b2297ce"
+        },
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "nativeSourceAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "applicationAfter": {
+          "checked": 5,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "adaptations": [
+          "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+          "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+          "The original main intentionally imports compiled Lean modules at runtime. All module data must be supplied automatically by the installed Lasm build. Native controls explicitly select the same deployed data; deployed processes receive neither LEAN_SYSROOT nor LEAN_PATH.",
+          "Both executables run with empty PATH and hidden source copies. All module data paths used by the deployed import are inside the relocated dist; no native Lean/Lake process is needed at runtime.",
+          "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+          "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks.",
+          "The optional case selection separates complete original/missing-data and supplementary-attribute controls into independent guarded runs. Aggregate acceptance still requires both selections; it does not omit any assertion."
+        ],
+        "harnessSha256": "bc537d61ce2fb1b9a534d166a0ab4becfa306e9c0e17f178fbfd6172371f93dc"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T15:00:56.595Z",
+        "command": [
+          "bash",
+          ".work/run-bundled-module-data-case-r1.sh",
+          "node",
+          "original",
+          ".work/bundled-module-data-node-original-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "e6433237-cef5-4cc0-b652-2df87e8e8d8a",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24220364800
+        },
+        "minimumHostAvailable": 20758265856,
+        "peakMemoryBytes": 8054063104,
+        "peakTasks": 36,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-node-original-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T15:05:28.716Z",
+          "memoryBytes": 5409394688,
+          "peakMemoryBytes": 8054063104,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 60882944,
+            "file": 5147455488,
+            "kernel": 190971904,
+            "shmem": 0,
+            "file_mapped": 184320,
+            "inactive_file": 4912488448,
+            "slab": 190379288
+          },
+          "pressureSomeAvg10": 0.27,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-24T15:04:55.879Z",
+          "processes": [
+            {
+              "pid": 4035532,
+              "name": "node-MainThread",
+              "residentBytes": 1071726592,
+              "threads": 11
+            },
+            {
+              "pid": 4032736,
+              "name": "node-MainThread",
+              "residentBytes": 205770752,
+              "threads": 11
+            }
+          ]
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T15:05:28.778Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 5351211008,
+          "peakMemoryBytes": 8054063104,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 5147455488,
+            "kernel": 191250432,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 4912488448,
+            "slab": 190313880
+          },
+          "pressureSomeAvg10": 0.22,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T15:05:28.804Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archives": [
+        {
+          "file": ".work/bundled-module-data-node-original-r1/module-data-archive.json",
+          "sha256": "e87a05b6257e157f7423371a5d4eb85d5907229cbd2f2849f4daadb907b35d63",
+          "receipt": {
+            "resultSha256": "4b96cee0d7eafd185e765ca17080942fce3f91be9ac24545075493ba2bcf4f34",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-node-original-r1-archive-resources.json",
+            "copies": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/relocated deployment/lean",
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/original-module-data.tgz",
+                "sha256": "e772e96b9919d08dcea1db08485770865c7e2951c9a054b024405a2824ed5c81",
+                "bytes": 688708713,
+                "identitySha256": "2abedf98277aa8168df34152bc734a78266ce49e32c8003daa5660e42c46f79f",
+                "files": 12601,
+                "contentBytes": 2214446488,
+                "verifiedDecompression": true,
+                "removedVerifiedDuplicate": true,
+                "restore": "Use restoreCompletedTree from scripts/ci/tree-archive.mjs with the recorded checksum, ceilings and a fresh destination."
+              }
+            ],
+            "passed": true
+          }
+        },
+        {
+          "file": ".work/bundled-module-data-node-original-r1/archive.json",
+          "sha256": "9f5d640b5c8944b9acca047b84be827f9ef9157732e2eae8f27784a04a60c7f7",
+          "receipt": {
+            "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-binaries-archive-r1-resources.json",
+            "files": [
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/relocated deployment/program.wasm",
+                "originalBytes": 160404494,
+                "originalSha256": "fa90cc24bf3a4ca2d200fb792745cd4da4e8fefc255c93373e85a8f80b2297ce",
+                "mode": 509,
+                "mtimeNs": 1790262282323843961,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/relocated deployment/program.wasm.gz",
+                "archiveBytes": 37238940,
+                "archiveSha256": "947a1255ab5a75d81342369f87abe56e989b9011fbaa6e959933bae2c10eef3a",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1",
+                  "receiptSha256": "4b96cee0d7eafd185e765ca17080942fce3f91be9ac24545075493ba2bcf4f34"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/release-pinned application source.hidden/.lake/lasm/applications/f5c5e09d1bb0ab0e/df0c824c9832dbf77357218b36677916070a2f29a133f35ed77f64e8eea4aced/dist/program.wasm",
+                "originalBytes": 160404494,
+                "originalSha256": "fa90cc24bf3a4ca2d200fb792745cd4da4e8fefc255c93373e85a8f80b2297ce",
+                "mode": 509,
+                "mtimeNs": 1790262239010410788,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/release-pinned application source.hidden/.lake/lasm/applications/f5c5e09d1bb0ab0e/df0c824c9832dbf77357218b36677916070a2f29a133f35ed77f64e8eea4aced/dist/program.wasm.gz",
+                "archiveBytes": 37238940,
+                "archiveSha256": "947a1255ab5a75d81342369f87abe56e989b9011fbaa6e959933bae2c10eef3a",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1",
+                  "receiptSha256": "4b96cee0d7eafd185e765ca17080942fce3f91be9ac24545075493ba2bcf4f34"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/native source.hidden/.lake/build/bin/user_attr",
+                "originalBytes": 233669232,
+                "originalSha256": "056f8ca5c4b52e85e1205fc5e17acb1de08d84c3ee4627f7d0b925ac1a8d7e0a",
+                "mode": 509,
+                "mtimeNs": 1790262077017763640,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1/native source.hidden/.lake/build/bin/user_attr.gz",
+                "archiveBytes": 66712611,
+                "archiveSha256": "de9ee9756918546c24dadae601cfb7337d5eac65af7f39760e13244f09091332",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-original-r1",
+                  "receiptSha256": "4b96cee0d7eafd185e765ca17080942fce3f91be9ac24545075493ba2bcf4f34"
+                },
+                "phase": "archived"
+              }
+            ],
+            "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+            "savedBytes": 413287729,
+            "finishedAt": "2026-09-24T15:37:57.385323+00:00"
+          }
+        }
+      ],
+      "bundled": {
+        "bytes": 2212604382,
+        "files": 12600,
+        "roots": [
+          "packages/0"
+        ],
+        "manifestSha256": "446f343eb9ec212dc4e5df1b17e5396627c007b01c87a941292bb32a484bf319"
+      }
+    },
+    {
+      "resultFile": ".work/bundled-module-data-node-attributes-r1/result.json",
+      "resultSha256": "01b65b768ac8b968e3707dcf4342827f197dfe1e1659763da614662b7e6957c6",
+      "observations": {
+        "target": "node",
+        "engineVersion": "v26.10.0",
+        "packageVersion": "0.1.0-experimental.23",
+        "attributeBuild": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "01be8862dbe04da5df61295ff7ac6fa1da1c1a2f2d71991215285e76891635ea",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "moduleDataIdentity": "6784faf1e253f39e52e997092de342d7e9f1f68986af2de32d607184be1f6c36",
+          "moduleDataBytes": 2212526757,
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "RuntimeAttributeImport.lean",
+              "sourceSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+              "cSha256": "f54a61f46d39f9e9c4a8558e4dcb35cf2e31539290727f2c60481f9af0fd81f0"
+            }
+          ],
+          "signature": "0829cd93ff185673120799bf6e8096420c024872d22fe880a3288002eb50a15d",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "runtimeAttributes": {
+          "native": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          "actual": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          }
+        },
+        "attributeDeployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/relocated attribute deployment",
+          "sourceHidden": true,
+          "path": "",
+          "selfContained": true,
+          "suppliedLeanPaths": false,
+          "wasmSha256": "d3527acbbb47691696d45e369e3c2eb48be63d85da14acd2c1c2eef72b0a7c61"
+        },
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "nativeSourceAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "applicationAfter": {
+          "checked": 5,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "adaptations": [
+          "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+          "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+          "The original main intentionally imports compiled Lean modules at runtime. All module data must be supplied automatically by the installed Lasm build. Native controls explicitly select the same deployed data; deployed processes receive neither LEAN_SYSROOT nor LEAN_PATH.",
+          "Both executables run with empty PATH and hidden source copies. All module data paths used by the deployed import are inside the relocated dist; no native Lean/Lake process is needed at runtime.",
+          "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+          "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks.",
+          "The optional case selection separates complete original/missing-data and supplementary-attribute controls into independent guarded runs. Aggregate acceptance still requires both selections; it does not omit any assertion.",
+          "After each completed build, every generated cache/deployment metadata member is hashed and compared. Only the redundant generated cache copy is removed before execution; sources and deployed data are retained. This lowers memory/disk use without changing any test input or assertion."
+        ],
+        "harnessSha256": "b7528e0df991f8c2b80fbedcf03855df24b9fb261bf80306eba90b41728e43a4",
+        "reclamationHelperSha256": "1b75c74ae91df123a280a80a633b5d40da210b3d22f141fd094bfe87d1efa58a"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T15:14:16.277Z",
+        "command": [
+          "bash",
+          ".work/run-bundled-module-data-case-r1.sh",
+          "node",
+          "attributes",
+          ".work/bundled-module-data-node-attributes-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "f2e3c26c-3962-4cd3-a2f3-4ae24ddda2ae",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23950004224
+        },
+        "minimumHostAvailable": 20465967104,
+        "peakMemoryBytes": 8144797696,
+        "peakTasks": 36,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-node-attributes-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T15:17:39.308Z",
+          "memoryBytes": 4962521088,
+          "peakMemoryBytes": 8144797696,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 144007168,
+            "file": 4696027136,
+            "kernel": 121610240,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 4212080640,
+            "slab": 119297168
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-24T15:16:40.442Z",
+          "processes": [
+            {
+              "pid": 4037899,
+              "name": "node-MainThread",
+              "residentBytes": 307036160,
+              "threads": 11
+            },
+            {
+              "pid": 4037486,
+              "name": "node-MainThread",
+              "residentBytes": 188952576,
+              "threads": 11
+            }
+          ]
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T15:17:39.474Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 4832727040,
+          "peakMemoryBytes": 8144797696,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11665408,
+            "file": 4699795456,
+            "kernel": 120135680,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 4215992320,
+            "slab": 119198488
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T15:17:39.500Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archives": [
+        {
+          "file": ".work/bundled-module-data-node-attributes-r1/module-data-archive.json",
+          "sha256": "1b2d10187afa8f341bed1f0bbfeccfb8533ecc9ae23f5970ac7a3703f422f3de",
+          "receipt": {
+            "resultSha256": "01b65b768ac8b968e3707dcf4342827f197dfe1e1659763da614662b7e6957c6",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-node-attributes-r1-archive-resources.json",
+            "copies": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/relocated attribute deployment/lean",
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/attributes-module-data.tgz",
+                "sha256": "09adb986348f181fd8c791cd352e9edfbf9bd98f8a2f335c468e7bf4ca78d919",
+                "bytes": 688684019,
+                "identitySha256": "336f2264810c97e57afb020eed30b8b00df4a9035f4dac8968d1caed3f4eb95e",
+                "files": 12599,
+                "contentBytes": 2214368618,
+                "verifiedDecompression": true,
+                "removedVerifiedDuplicate": true,
+                "restore": "Use restoreCompletedTree from scripts/ci/tree-archive.mjs with the recorded checksum, ceilings and a fresh destination."
+              }
+            ],
+            "passed": true
+          }
+        },
+        {
+          "file": ".work/bundled-module-data-node-attributes-r1/archive.json",
+          "sha256": "382cf6de275bc9f7d6a57b3db78a040765f1c861bcd9b7d50a84a858e085a8ad",
+          "receipt": {
+            "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-binaries-archive-r1-resources.json",
+            "files": [
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/relocated attribute deployment/program.wasm",
+                "originalBytes": 160406015,
+                "originalSha256": "d3527acbbb47691696d45e369e3c2eb48be63d85da14acd2c1c2eef72b0a7c61",
+                "mode": 509,
+                "mtimeNs": 1790262999430759713,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/relocated attribute deployment/program.wasm.gz",
+                "archiveBytes": 37240791,
+                "archiveSha256": "2179f892f93a4da3e41a2a875d5936c9f308c48e833743729999606a963ce214",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1",
+                  "receiptSha256": "01b65b768ac8b968e3707dcf4342827f197dfe1e1659763da614662b7e6957c6"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/release-pinned application source.hidden/.lake/lasm/applications/34740452ea60cc6c/0829cd93ff185673120799bf6e8096420c024872d22fe880a3288002eb50a15d/dist/program.wasm",
+                "originalBytes": 160406015,
+                "originalSha256": "d3527acbbb47691696d45e369e3c2eb48be63d85da14acd2c1c2eef72b0a7c61",
+                "mode": 509,
+                "mtimeNs": 1790262956471353930,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/release-pinned application source.hidden/.lake/lasm/applications/34740452ea60cc6c/0829cd93ff185673120799bf6e8096420c024872d22fe880a3288002eb50a15d/dist/program.wasm.gz",
+                "archiveBytes": 37240791,
+                "archiveSha256": "2179f892f93a4da3e41a2a875d5936c9f308c48e833743729999606a963ce214",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1",
+                  "receiptSha256": "01b65b768ac8b968e3707dcf4342827f197dfe1e1659763da614662b7e6957c6"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/native source.hidden/.lake/build/bin/user_attr",
+                "originalBytes": 233669232,
+                "originalSha256": "056f8ca5c4b52e85e1205fc5e17acb1de08d84c3ee4627f7d0b925ac1a8d7e0a",
+                "mode": 509,
+                "mtimeNs": 1790262875432586560,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/native source.hidden/.lake/build/bin/user_attr.gz",
+                "archiveBytes": 66712611,
+                "archiveSha256": "de9ee9756918546c24dadae601cfb7337d5eac65af7f39760e13244f09091332",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1",
+                  "receiptSha256": "01b65b768ac8b968e3707dcf4342827f197dfe1e1659763da614662b7e6957c6"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/native runtime attribute check",
+                "originalBytes": 233668392,
+                "originalSha256": "41afa6ef371dd1dc622c13f68bf2f81efe205767b694f35e5fef31d51e63b554",
+                "mode": 509,
+                "mtimeNs": 1790262885318680318,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/native runtime attribute check.gz",
+                "archiveBytes": 66714753,
+                "archiveSha256": "fceeecf6038486db8132037d1e256b2e39a9594a801251a835daf8b3187b6d59",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1",
+                  "receiptSha256": "01b65b768ac8b968e3707dcf4342827f197dfe1e1659763da614662b7e6957c6"
+                },
+                "phase": "archived"
+              }
+            ],
+            "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+            "savedBytes": 580240708,
+            "finishedAt": "2026-09-24T15:38:14.515322+00:00"
+          }
+        }
+      ],
+      "attributeBundled": {
+        "bytes": 2212526757,
+        "files": 12598,
+        "roots": [
+          "packages/0"
+        ],
+        "manifestSha256": "722d19ef37f784d88754363620b32c1ec25da0512421e6e5bce5f402d2d2f027"
+      },
+      "reclaimedAttributeCache": {
+        "removed": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/release-pinned application source/.lake/lasm/applications/34740452ea60cc6c/0829cd93ff185673120799bf6e8096420c024872d22fe880a3288002eb50a15d/dist/lean",
+        "retained": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-node-attributes-r1/attribute dist/lean",
+        "files": 12599,
+        "metadataBytes": 2212526757,
+        "metadataSha256": "722d19ef37f784d88754363620b32c1ec25da0512421e6e5bce5f402d2d2f027",
+        "reason": "Avoid charging a second generated module-data copy during execution"
+      }
+    },
+    {
+      "resultFile": ".work/bundled-module-data-deno-original-r1/result.json",
+      "resultSha256": "577130bad7518f8f8f06fa6bde68aaaa24ac6349873f7935ec8588a180eca441",
+      "observations": {
+        "target": "deno",
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "packageVersion": "0.1.0-experimental.23",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "01be8862dbe04da5df61295ff7ac6fa1da1c1a2f2d71991215285e76891635ea",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "moduleDataIdentity": "16e315a0c78a0f745271823a83d60f1828d56c3196abe62f34336e61c2e32d96",
+          "moduleDataBytes": 2212604382,
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "dc8f9b46f5f81a225f7727e0b0cbda00cd44664c02ff84075c1199daf2ae8f0e",
+              "cSha256": "a00205a554514dad6d9658a13ff24fe19de456686daed936410d297f81ab7349"
+            }
+          ],
+          "signature": "3800106f047ef99ed3b4ab40e244a8a6cc7d37e7c626df88480bd4018787eb1c",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "missingDataControl": {
+          "native": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/relocated deployment/lean/packages/0\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/missing standard data/lib/lean\n"
+          },
+          "actual": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/relocated deployment/lean/packages/0\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/missing standard data/lib/lean\n"
+          }
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "buildProcessesUsedAtRuntime": false,
+          "selfContained": true,
+          "suppliedLeanPaths": false,
+          "wasmSha256": "fa90cc24bf3a4ca2d200fb792745cd4da4e8fefc255c93373e85a8f80b2297ce"
+        },
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "nativeSourceAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "applicationAfter": {
+          "checked": 5,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "adaptations": [
+          "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+          "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+          "The original main intentionally imports compiled Lean modules at runtime. All module data must be supplied automatically by the installed Lasm build. Native controls explicitly select the same deployed data; deployed processes receive neither LEAN_SYSROOT nor LEAN_PATH.",
+          "Both executables run with empty PATH and hidden source copies. All module data paths used by the deployed import are inside the relocated dist; no native Lean/Lake process is needed at runtime.",
+          "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+          "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks.",
+          "The optional case selection separates complete original/missing-data and supplementary-attribute controls into independent guarded runs. Aggregate acceptance still requires both selections; it does not omit any assertion.",
+          "After each completed build, every generated cache/deployment metadata member is hashed and compared. Only the redundant generated cache copy is removed before execution; sources and deployed data are retained. This lowers memory/disk use without changing any test input or assertion."
+        ],
+        "harnessSha256": "b7528e0df991f8c2b80fbedcf03855df24b9fb261bf80306eba90b41728e43a4",
+        "reclamationHelperSha256": "1b75c74ae91df123a280a80a633b5d40da210b3d22f141fd094bfe87d1efa58a"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T15:21:23.170Z",
+        "command": [
+          "bash",
+          ".work/run-bundled-module-data-case-r1.sh",
+          "deno",
+          "original",
+          ".work/bundled-module-data-deno-original-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "9be46afa-9b64-47ec-a584-a5876f5a838e",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24113987584
+        },
+        "minimumHostAvailable": 20516352000,
+        "peakMemoryBytes": 6660517888,
+        "peakTasks": 37,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-deno-original-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T15:24:41.810Z",
+          "memoryBytes": 3354730496,
+          "peakMemoryBytes": 6660517888,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 153059328,
+            "file": 3088932864,
+            "kernel": 111681536,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 2713567232,
+            "slab": 109383280
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-24T15:24:27.394Z",
+          "processes": [
+            {
+              "pid": 4039621,
+              "name": "deno",
+              "residentBytes": 3060281344,
+              "threads": 21
+            },
+            {
+              "pid": 4039119,
+              "name": "node-MainThread",
+              "residentBytes": 235216896,
+              "threads": 11
+            }
+          ]
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T15:24:41.933Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 3211964416,
+          "peakMemoryBytes": 6660517888,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 3088998400,
+            "kernel": 110227456,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 2713567232,
+            "slab": 109288928
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T15:24:41.962Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archives": [
+        {
+          "file": ".work/bundled-module-data-deno-original-r1/module-data-archive.json",
+          "sha256": "dc0be743c50c5d0918e5e81526ab9383e1ddc82baac3313954a14452e06878c7",
+          "receipt": {
+            "resultSha256": "577130bad7518f8f8f06fa6bde68aaaa24ac6349873f7935ec8588a180eca441",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-deno-original-r1-archive-resources.json",
+            "copies": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/relocated deployment/lean",
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/original-module-data.tgz",
+                "sha256": "c01785579beca037006dae34717a6b38346d30284052fcdb1b9a885cf26ef3ee",
+                "bytes": 688707912,
+                "identitySha256": "e714580bdb73c4e1f38371dc6a675a6ebc4f351df528024608a01efebcdf0d97",
+                "files": 12601,
+                "contentBytes": 2214446488,
+                "verifiedDecompression": true,
+                "removedVerifiedDuplicate": true,
+                "restore": "Use restoreCompletedTree from scripts/ci/tree-archive.mjs with the recorded checksum, ceilings and a fresh destination."
+              }
+            ],
+            "passed": true
+          }
+        },
+        {
+          "file": ".work/bundled-module-data-deno-original-r1/archive.json",
+          "sha256": "12e000fe6af68023e2fae22fdc2422225ac1965616fe1377f8a05d9c7ddacc8b",
+          "receipt": {
+            "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-binaries-archive-r1-resources.json",
+            "files": [
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/relocated deployment/program.wasm",
+                "originalBytes": 160404494,
+                "originalSha256": "fa90cc24bf3a4ca2d200fb792745cd4da4e8fefc255c93373e85a8f80b2297ce",
+                "mode": 509,
+                "mtimeNs": 1790263415831666931,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/relocated deployment/program.wasm.gz",
+                "archiveBytes": 37238940,
+                "archiveSha256": "947a1255ab5a75d81342369f87abe56e989b9011fbaa6e959933bae2c10eef3a",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1",
+                  "receiptSha256": "577130bad7518f8f8f06fa6bde68aaaa24ac6349873f7935ec8588a180eca441"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/release-pinned application source.hidden/.lake/lasm/applications/69d0973902b0e19b/3800106f047ef99ed3b4ab40e244a8a6cc7d37e7c626df88480bd4018787eb1c/dist/program.wasm",
+                "originalBytes": 160404494,
+                "originalSha256": "fa90cc24bf3a4ca2d200fb792745cd4da4e8fefc255c93373e85a8f80b2297ce",
+                "mode": 509,
+                "mtimeNs": 1790263373044267091,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/release-pinned application source.hidden/.lake/lasm/applications/69d0973902b0e19b/3800106f047ef99ed3b4ab40e244a8a6cc7d37e7c626df88480bd4018787eb1c/dist/program.wasm.gz",
+                "archiveBytes": 37238940,
+                "archiveSha256": "947a1255ab5a75d81342369f87abe56e989b9011fbaa6e959933bae2c10eef3a",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1",
+                  "receiptSha256": "577130bad7518f8f8f06fa6bde68aaaa24ac6349873f7935ec8588a180eca441"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/native source.hidden/.lake/build/bin/user_attr",
+                "originalBytes": 233669232,
+                "originalSha256": "056f8ca5c4b52e85e1205fc5e17acb1de08d84c3ee4627f7d0b925ac1a8d7e0a",
+                "mode": 509,
+                "mtimeNs": 1790263302481607028,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/native source.hidden/.lake/build/bin/user_attr.gz",
+                "archiveBytes": 66712611,
+                "archiveSha256": "de9ee9756918546c24dadae601cfb7337d5eac65af7f39760e13244f09091332",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1",
+                  "receiptSha256": "577130bad7518f8f8f06fa6bde68aaaa24ac6349873f7935ec8588a180eca441"
+                },
+                "phase": "archived"
+              }
+            ],
+            "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+            "savedBytes": 413287729,
+            "finishedAt": "2026-09-24T15:38:25.986804+00:00"
+          }
+        }
+      ],
+      "bundled": {
+        "bytes": 2212604382,
+        "files": 12600,
+        "roots": [
+          "packages/0"
+        ],
+        "manifestSha256": "933ac52f4eeef44cc294b08c92e22a6a27db28f342162da2490c96af2f323d1a"
+      },
+      "reclaimedOriginalCache": {
+        "removed": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/release-pinned application source/.lake/lasm/applications/69d0973902b0e19b/3800106f047ef99ed3b4ab40e244a8a6cc7d37e7c626df88480bd4018787eb1c/dist/lean",
+        "retained": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-original-r1/dist/lean",
+        "files": 12601,
+        "metadataBytes": 2212604382,
+        "metadataSha256": "933ac52f4eeef44cc294b08c92e22a6a27db28f342162da2490c96af2f323d1a",
+        "reason": "Avoid charging a second generated module-data copy during execution"
+      }
+    },
+    {
+      "resultFile": ".work/bundled-module-data-deno-attributes-r1/result.json",
+      "resultSha256": "819621488c8a7202dde1c7749372aa1b4c7dad9201dbded724c86dfe037735ca",
+      "observations": {
+        "target": "deno",
+        "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "packageVersion": "0.1.0-experimental.23",
+        "attributeBuild": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "01be8862dbe04da5df61295ff7ac6fa1da1c1a2f2d71991215285e76891635ea",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "moduleDataIdentity": "6784faf1e253f39e52e997092de342d7e9f1f68986af2de32d607184be1f6c36",
+          "moduleDataBytes": 2212526757,
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "RuntimeAttributeImport.lean",
+              "sourceSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+              "cSha256": "f54a61f46d39f9e9c4a8558e4dcb35cf2e31539290727f2c60481f9af0fd81f0"
+            }
+          ],
+          "signature": "eba131b1bc3c01b4ca26e7c52863fdae783574ac332ba60379e020f0dbf3c2fe",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "runtimeAttributes": {
+          "native": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          "actual": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          }
+        },
+        "attributeDeployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/relocated attribute deployment",
+          "sourceHidden": true,
+          "path": "",
+          "selfContained": true,
+          "suppliedLeanPaths": false,
+          "wasmSha256": "d3527acbbb47691696d45e369e3c2eb48be63d85da14acd2c1c2eef72b0a7c61"
+        },
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "nativeSourceAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "applicationAfter": {
+          "checked": 5,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "adaptations": [
+          "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+          "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+          "The original main intentionally imports compiled Lean modules at runtime. All module data must be supplied automatically by the installed Lasm build. Native controls explicitly select the same deployed data; deployed processes receive neither LEAN_SYSROOT nor LEAN_PATH.",
+          "Both executables run with empty PATH and hidden source copies. All module data paths used by the deployed import are inside the relocated dist; no native Lean/Lake process is needed at runtime.",
+          "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+          "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks.",
+          "The optional case selection separates complete original/missing-data and supplementary-attribute controls into independent guarded runs. Aggregate acceptance still requires both selections; it does not omit any assertion.",
+          "After each completed build, every generated cache/deployment metadata member is hashed and compared. Only the redundant generated cache copy is removed before execution; sources and deployed data are retained. This lowers memory/disk use without changing any test input or assertion."
+        ],
+        "harnessSha256": "b7528e0df991f8c2b80fbedcf03855df24b9fb261bf80306eba90b41728e43a4",
+        "reclamationHelperSha256": "1b75c74ae91df123a280a80a633b5d40da210b3d22f141fd094bfe87d1efa58a"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T15:29:11.721Z",
+        "command": [
+          "bash",
+          ".work/run-bundled-module-data-case-r1.sh",
+          "deno",
+          "attributes",
+          ".work/bundled-module-data-deno-attributes-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "afb2e709-75b6-4dba-837c-9d7247bb5b8e",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24351498240
+        },
+        "minimumHostAvailable": 20614414336,
+        "peakMemoryBytes": 6803808256,
+        "peakTasks": 37,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-deno-attributes-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T15:32:34.984Z",
+          "memoryBytes": 3384770560,
+          "peakMemoryBytes": 6803808256,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 36655104,
+            "file": 3226894336,
+            "kernel": 116699136,
+            "shmem": 0,
+            "file_mapped": 28672,
+            "inactive_file": 2758373376,
+            "slab": 116112888
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-24T15:32:21.970Z",
+          "processes": [
+            {
+              "pid": 4041767,
+              "name": "deno",
+              "residentBytes": 2969542656,
+              "threads": 21
+            },
+            {
+              "pid": 4040864,
+              "name": "node-MainThread",
+              "residentBytes": 222621696,
+              "threads": 11
+            }
+          ]
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T15:32:35.047Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 3356229632,
+          "peakMemoryBytes": 6803808256,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11661312,
+            "file": 3226894336,
+            "kernel": 116977664,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 2758373376,
+            "slab": 116049472
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T15:32:35.075Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archives": [
+        {
+          "file": ".work/bundled-module-data-deno-attributes-r1/module-data-archive.json",
+          "sha256": "143af1449c0ed2a8bae06656ee7eaa97d968442415f9d309e9e04775b98942ca",
+          "receipt": {
+            "resultSha256": "819621488c8a7202dde1c7749372aa1b4c7dad9201dbded724c86dfe037735ca",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-deno-attributes-r1-archive-resources.json",
+            "copies": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/relocated attribute deployment/lean",
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/attributes-module-data.tgz",
+                "sha256": "978d06791923e408d7b34829f5c2d1a1cb346a0c6c63058b42529589ccd021c2",
+                "bytes": 688684856,
+                "identitySha256": "bb58381e33f0503f7bc931a12a35f05cad336274de3d30c76c48d0578a3ba26b",
+                "files": 12599,
+                "contentBytes": 2214368618,
+                "verifiedDecompression": true,
+                "removedVerifiedDuplicate": true,
+                "restore": "Use restoreCompletedTree from scripts/ci/tree-archive.mjs with the recorded checksum, ceilings and a fresh destination."
+              }
+            ],
+            "passed": true
+          }
+        },
+        {
+          "file": ".work/bundled-module-data-deno-attributes-r1/archive.json",
+          "sha256": "d59e03a34dded37379f72b21b3dc7af917c7f494ef72924761f84c374fe2fe15",
+          "receipt": {
+            "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-binaries-archive-r1-resources.json",
+            "files": [
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/relocated attribute deployment/program.wasm",
+                "originalBytes": 160406015,
+                "originalSha256": "d3527acbbb47691696d45e369e3c2eb48be63d85da14acd2c1c2eef72b0a7c61",
+                "mode": 509,
+                "mtimeNs": 1790263890825091345,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/relocated attribute deployment/program.wasm.gz",
+                "archiveBytes": 37240791,
+                "archiveSha256": "2179f892f93a4da3e41a2a875d5936c9f308c48e833743729999606a963ce214",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1",
+                  "receiptSha256": "819621488c8a7202dde1c7749372aa1b4c7dad9201dbded724c86dfe037735ca"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/release-pinned application source.hidden/.lake/lasm/applications/c2caf658829724e2/eba131b1bc3c01b4ca26e7c52863fdae783574ac332ba60379e020f0dbf3c2fe/dist/program.wasm",
+                "originalBytes": 160406015,
+                "originalSha256": "d3527acbbb47691696d45e369e3c2eb48be63d85da14acd2c1c2eef72b0a7c61",
+                "mode": 509,
+                "mtimeNs": 1790263848468697587,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/release-pinned application source.hidden/.lake/lasm/applications/c2caf658829724e2/eba131b1bc3c01b4ca26e7c52863fdae783574ac332ba60379e020f0dbf3c2fe/dist/program.wasm.gz",
+                "archiveBytes": 37240791,
+                "archiveSha256": "2179f892f93a4da3e41a2a875d5936c9f308c48e833743729999606a963ce214",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1",
+                  "receiptSha256": "819621488c8a7202dde1c7749372aa1b4c7dad9201dbded724c86dfe037735ca"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/native source.hidden/.lake/build/bin/user_attr",
+                "originalBytes": 233669232,
+                "originalSha256": "056f8ca5c4b52e85e1205fc5e17acb1de08d84c3ee4627f7d0b925ac1a8d7e0a",
+                "mode": 509,
+                "mtimeNs": 1790263770396971501,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/native source.hidden/.lake/build/bin/user_attr.gz",
+                "archiveBytes": 66712611,
+                "archiveSha256": "de9ee9756918546c24dadae601cfb7337d5eac65af7f39760e13244f09091332",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1",
+                  "receiptSha256": "819621488c8a7202dde1c7749372aa1b4c7dad9201dbded724c86dfe037735ca"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/native runtime attribute check",
+                "originalBytes": 233668392,
+                "originalSha256": "41afa6ef371dd1dc622c13f68bf2f81efe205767b694f35e5fef31d51e63b554",
+                "mode": 509,
+                "mtimeNs": 1790263779611057217,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/native runtime attribute check.gz",
+                "archiveBytes": 66714753,
+                "archiveSha256": "fceeecf6038486db8132037d1e256b2e39a9594a801251a835daf8b3187b6d59",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1",
+                  "receiptSha256": "819621488c8a7202dde1c7749372aa1b4c7dad9201dbded724c86dfe037735ca"
+                },
+                "phase": "archived"
+              }
+            ],
+            "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+            "savedBytes": 580240708,
+            "finishedAt": "2026-09-24T15:38:42.332530+00:00"
+          }
+        }
+      ],
+      "attributeBundled": {
+        "bytes": 2212526757,
+        "files": 12598,
+        "roots": [
+          "packages/0"
+        ],
+        "manifestSha256": "722d19ef37f784d88754363620b32c1ec25da0512421e6e5bce5f402d2d2f027"
+      },
+      "reclaimedAttributeCache": {
+        "removed": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/release-pinned application source/.lake/lasm/applications/c2caf658829724e2/eba131b1bc3c01b4ca26e7c52863fdae783574ac332ba60379e020f0dbf3c2fe/dist/lean",
+        "retained": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-deno-attributes-r1/attribute dist/lean",
+        "files": 12599,
+        "metadataBytes": 2212526757,
+        "metadataSha256": "722d19ef37f784d88754363620b32c1ec25da0512421e6e5bce5f402d2d2f027",
+        "reason": "Avoid charging a second generated module-data copy during execution"
+      }
+    }
+  ],
+  "passed": true,
+  "limitations": [
+    "Only Linux x64 installed applications are claimed. Other native platforms, complete dynamic-module handling and native shared-library dependencies remain open.",
+    "Cache metadata reclamation is a parallel harness resource adaptation; it does not change test inputs. Build peaks remain up to 7.59 GiB, so no aggregate memory reduction is claimed.",
+    "Completed metadata and binaries have verified archives and restore receipts; unpacked deployments are no longer immediately runnable."
+  ]
+}

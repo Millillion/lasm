@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Installed Node runtime imports](evidence/application-module-data-node-original-2026-09-24.json) pass with automatically bundled metadata and correct missing-data errors. The run peaked at 7.50 GiB without memory-limit or OOM events. Verified archival and three duplicate-reclamation controls preserve headroom; attributes and other engines remain pending. Pushes await restored SSH credentials.
+**Changed:** [Installed Node and Deno imports](evidence/application-module-data-node-deno-2026-09-24.json) now pass both original and supplementary attribute checks with automatically bundled metadata and correct missing-data errors. Unchanged sources, released guards and verified archives are recorded. Bun and other platforms remain pending. Pushes await restored SSH credentials.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

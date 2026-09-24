@@ -621,7 +621,19 @@ at 7.50 GiB without memory-limit or OOM events. Afterward, every deployed module
 was archived and verified; an identical generated build-cache copy was removed.
 Three integrity controls cover a new parallel-harness step that verifies and
 removes only that redundant cache copy before future execution. The effect on
-execution peak, the separate attribute assertions and Deno/Bun remain pending.
+execution peak was not yet measured in that initial result.
+
+[Both selections now pass on Node and Deno](evidence/application-module-data-node-deno-2026-09-24.json)
+with installed `.23`: original imports, exact missing-standard-data errors and
+the three supplementary runtime attribute checks. All 7,669 upstream source
+hashes remain unchanged. Deployed processes have no Lean path environment inputs,
+an empty executable search path and hidden source directories. The Node attribute
+run peaked at 7.59 GiB; Deno's original and attribute runs peaked at 6.20 and
+6.34 GiB. All four guards released without OOM, memory-limit or throttle events.
+Removing duplicate metadata after the build reduces retained data, but these
+results do not show a lower overall build peak. Every completed deployment's
+metadata and generated binaries have verified archives and restore receipts.
+Bun and other native platforms remain separate acceptance work.
 
 The [cold runtime-source workflow](../.github/workflows/application-runtime-source.yml)
 now prepares the application libraries from committed patches and pinned public
