@@ -1,0 +1,98 @@
+{
+  "scope": "Source startup/loader controls in native Deno 2.9.7 on four POSIX platforms; not full Lean application or six-platform acceptance",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35947347479",
+  "commit": "93ba8ac9ccb18b262211bb4d75b70029dc75553e",
+  "conclusion": "success",
+  "rows": [
+    {
+      "platform": "linux-x64",
+      "job": 107468152288,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0
+      },
+      "checks": [
+        "entrypoint resolves host/glue relative to deployment, independent of build and working directory (39.907968ms)",
+        "wrong engines fail before executing the application payload (29.709775ms)",
+        "all full-runtime host support files exist and target validation is strict (2.00742ms)",
+        "Deno automatic stack setup fixes deep Wasm calls with no caller flags (359.080332ms)",
+        "Deno restart preserves PID, restricted permissions, environment, arguments and stdio (232.079022ms)",
+        "Deno restarted process receives signals at its original PID (181.075497ms)",
+        "Deno initialization never repeats preload or embedding side effects (176.529887ms)"
+      ],
+      "logSha256": "acebdd475850122301544a1527953198eaf9f70e9f0d295e964f05a588da89a2",
+      "resourceProfile": "Linux process-tree guard at 512 MiB and 128 MiB JS heaps"
+    },
+    {
+      "platform": "linux-arm64",
+      "job": 107468152543,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0
+      },
+      "checks": [
+        "entrypoint resolves host/glue relative to deployment, independent of build and working directory (26.038226ms)",
+        "wrong engines fail before executing the application payload (20.254144ms)",
+        "all full-runtime host support files exist and target validation is strict (1.779296ms)",
+        "Deno automatic stack setup fixes deep Wasm calls with no caller flags (280.058194ms)",
+        "Deno restart preserves PID, restricted permissions, environment, arguments and stdio (219.394684ms)",
+        "Deno restarted process receives signals at its original PID (157.508716ms)",
+        "Deno initialization never repeats preload or embedding side effects (136.476725ms)"
+      ],
+      "logSha256": "0b136041e7ac55ec8d67e6471e3ae3e32ba7dad30fec8ef4097a2fd5cf866f39",
+      "resourceProfile": "Linux process-tree guard at 512 MiB and 128 MiB JS heaps"
+    },
+    {
+      "platform": "darwin-x64",
+      "job": 107468152422,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0
+      },
+      "checks": [
+        "entrypoint resolves host/glue relative to deployment, independent of build and working directory (74.888972ms)",
+        "wrong engines fail before executing the application payload (72.124395ms)",
+        "all full-runtime host support files exist and target validation is strict (3.787481ms)",
+        "Deno automatic stack setup fixes deep Wasm calls with no caller flags (1099.90378ms)",
+        "Deno restart preserves PID, restricted permissions, environment, arguments and stdio (858.306446ms)",
+        "Deno restarted process receives signals at its original PID (609.775683ms)",
+        "Deno initialization never repeats preload or embedding side effects (694.408543ms)"
+      ],
+      "logSha256": "ba09a901c7fdca0921023cce38b5e0fb80bf2bb41095f68fe706bbb824dd0e9d",
+      "resourceProfile": "Linux process-tree guard at 512 MiB and 128 MiB JS heaps; macOS bounded child deadlines and 128 MiB JS heaps, without a process-tree memory receipt"
+    },
+    {
+      "platform": "darwin-arm64",
+      "job": 107468152473,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0
+      },
+      "checks": [
+        "entrypoint resolves host/glue relative to deployment, independent of build and working directory (35.9475ms)",
+        "wrong engines fail before executing the application payload (42.811ms)",
+        "all full-runtime host support files exist and target validation is strict (12.39275ms)",
+        "Deno automatic stack setup fixes deep Wasm calls with no caller flags (224.293584ms)",
+        "Deno restart preserves PID, restricted permissions, environment, arguments and stdio (169.873125ms)",
+        "Deno restarted process receives signals at its original PID (126.734083ms)",
+        "Deno initialization never repeats preload or embedding side effects (114.650084ms)"
+      ],
+      "logSha256": "30deec4c8f2d106a9c4f215f8091819d0e54b92d992a08580a3a47ac09e1c898",
+      "resourceProfile": "Linux process-tree guard at 512 MiB and 128 MiB JS heaps; macOS bounded child deadlines and 128 MiB JS heaps, without a process-tree memory receipt"
+    }
+  ],
+  "earlierSkippedLinuxEvidence": "deno-stack-installed-2026-09-24.json",
+  "remaining": [
+    "Windows Deno startup implementation",
+    "Broader installed-package native platform campaigns",
+    "Deep-stack callable/preloaded embedding"
+  ]
+}

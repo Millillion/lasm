@@ -449,3 +449,9 @@ Seven startup controls also pass on each native macOS architecture. The first
 Linux CI jobs were green but skipped four Deno checks because their engine path
 was not forwarded through systemd; their logs are preserved and the corrected
 workflow requires that engine rather than accepting an implicit skip.
+
+The [corrected Deno startup matrix](evidence/deno-stack-native-ci-2026-09-24.json)
+now executes **all seven controls with zero skips on Linux and macOS, each on
+x64 and ARM64**. This confirms the adapter's native argument-vector handling
+and observed startup behavior on those four platforms. It remains source-level
+startup evidence, separate from full deployed Lean application acceptance.

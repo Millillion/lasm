@@ -38,7 +38,9 @@ separately from the earlier runtime evidence below.
   environment, stdio and signals. [Installed candidate `.13`](docs/evidence/deno-stack-installed-2026-09-24.json)
   passes thirty unchanged benchmark runs and source-free relocation on Linux
   x64; seven startup controls pass on each native macOS architecture. The Linux
-  CI forwarding correction and broader application campaigns remain pending.
+  [CI forwarding correction](docs/evidence/deno-stack-native-ci-2026-09-24.json)
+  now runs all seven controls without skips on all four POSIX platforms.
+  Broader application campaigns remain pending.
   Windows needs its own solution. Preloaded or imported entry points
   retain their caller's configuration to avoid repeating arbitrary user effects;
   transparent deep-stack callable embedding remains open.
