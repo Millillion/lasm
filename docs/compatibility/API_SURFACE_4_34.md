@@ -32,6 +32,7 @@ audit peaked at 386 MiB with no resource events.
 
 - [x] Inventory every compiled standard module and its exported declarations.
 - [x] Record extern metadata and exact native/runtime source identities.
+- [x] Locate source implementation candidates for all 875 standard C symbols.
 - [ ] Trace executable dependencies, private helpers and dynamic callbacks.
 - [ ] Audit each runtime implementation, including platform-specific branches.
 - [ ] Map unchanged upstream and supplementary differential tests to APIs.
@@ -40,3 +41,19 @@ audit peaked at 386 MiB with no resource events.
 The existing Emscripten implementations of `Std.Internal.UV.Loop.configure`
 and `alive` are explicit unsupported branches. Their linked symbols do not make
 those APIs implemented. The open item is recorded in [IO_LIMITATIONS.md](../../IO_LIMITATIONS.md).
+
+The [source index](lean-4.34-runtime-source-index.json) now links every standard
+C extern to review candidates: 767 have C/C++ bodies or inline headers, 59 have
+Lean exports with matching generated C definitions, and 49 refer to SDK math
+sources. The index identifies 125 Lasm replacement symbols separately from the
+upstream bodies renamed by the build. All 2,516 Lean module source hashes and the
+referenced generated C hashes match the recorded compiled-library inventory.
+See the [source audit evidence](../evidence/runtime-extern-source-index-2026-09-24.json).
+
+These are source locations, not preprocessing/linkage proof or API passes. The
+lexical scanner records both conditional alternatives; macro expansion, private
+helpers, callbacks, inline extern forms and behavioral tests remain open. Every
+symbol's behavior field remains `unverified`. The review exposes the unadapted
+Lean 4.34 Linux query and the zero-valued libuv/OpenSSL version branches alongside
+the known event-loop stubs. Dependency version semantics need explicit review;
+target metadata must describe the actual compiled artifact.
