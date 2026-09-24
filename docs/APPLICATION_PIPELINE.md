@@ -417,3 +417,13 @@ execution and complete API differential coverage remain unfinished.
 These are implementation milestones, not replacements for any acceptance
 requirement in the plan. Broader compiler-in-Wasm research is checkpointed and
 paused while this product work proceeds.
+
+The [native IO error comparison](evidence/io-error-ci-passed-2026-09-24.json)
+passes on standard native Linux x64, Linux ARM64 and Windows x64 runners with
+Lean 4.34.0 and Node 26.10.0. Linux checks 221 error inputs per architecture;
+Windows checks 168. Constructors, numeric codes and diagnostic messages match
+the original native library. Windows uses libuv 1.52.1; the Linux distributions
+link 1.48.0. This validates the host decoder, not all IO operations, deployed
+Wasm, other engines on those runners, or the complete six-platform installation
+contract. The earlier cold-extraction resource stops and seven Windows failures
+remain preserved alongside the passing follow-up.
