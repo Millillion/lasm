@@ -1,0 +1,335 @@
+{
+  "scope": "Linux x64 Node-API callback and stack prerequisite; no Wasmtime or Lean integration acceptance",
+  "recordedAt": "2026-09-24T18:38:53.851349+00:00",
+  "versionCheck": {
+    "path": ".work/product-acceptance/lean-instantiation-versions-2026-09-24-r1.json",
+    "sha256": "9ce9aeafce9cd219004a2fb23846ce5d32d99bedf861d4b1d11283cd3b5abe85",
+    "content": {
+      "lean": {
+        "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+        "expected": "v4.34.0",
+        "tag": "v4.34.0",
+        "publishedAt": "2026-09-14T14:04:36Z",
+        "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+        "draft": false,
+        "prerelease": false
+      },
+      "deno": {
+        "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+        "expected": "v2.9.7",
+        "tag": "v2.9.7",
+        "publishedAt": "2026-09-17T09:04:55Z",
+        "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+        "draft": false,
+        "prerelease": false
+      },
+      "bun": {
+        "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+        "expected": "bun-v1.4.2",
+        "tag": "bun-v1.4.2",
+        "publishedAt": "2026-09-05T05:55:48Z",
+        "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+        "draft": false,
+        "prerelease": false
+      },
+      "node": {
+        "source": "https://nodejs.org/dist/index.json",
+        "expected": "v26.10.0",
+        "tag": "v26.10.0",
+        "date": "2026-09-21",
+        "lts": false
+      },
+      "checkedAt": "2026-09-24T16:39:01.561Z"
+    }
+  },
+  "result": {
+    "path": ".work/native-api-stack-r1/result.json",
+    "sha256": "dac5bdc60e0107c0af52d82e55d7c6284e864a8284a1bf3d75d268710c7cb9ee",
+    "content": {
+      "scope": "Direct Node-API and registered FFI callback interoperability; no Lean or shipping backend acceptance",
+      "inputs": {
+        "scripts/full-lean/probes/native-api-stack.c": "d5468cf3db9b120eccc858b211bda547e202a7faa8507120f34e998b8f6e1ef3",
+        "scripts/full-lean/probes/native-api-stack.mjs": "a3e60092703d5ebaec45f66f0f96d482dd46015b880d336d3d08bd1a590f3ff7",
+        "scripts/full-lean/probe-native-api-stack.mjs": "53f0ec138611b9041516541f39f1b0a39129ee3fe461b2607c5811b36e0fe32b",
+        "src/bun-stack.mjs": "085c48a6e1a98059c770d641f841741905730dc34a227c4ee500d322654b8af3"
+      },
+      "headers": {
+        "node_api.h": "2d4560831e525b47b060ec8a0864ab73993df9e20215ce9f0fe7b24cd31af32a",
+        "node_api_types.h": "a25356630d3058f0a0c8937d9f297e9471e037fda58c2696d8a505c2bd99cb00",
+        "js_native_api.h": "82d3708ce120f8000ec34d72e1aa70b0d7d8a43027986293681374a71b2cb840",
+        "js_native_api_types.h": "c12406a8c0036aefdb66b98065fc88e2e7a053c1f274deef33af6c26c099b933"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/native-api-stack-r1-resources.json",
+      "commands": [
+        {
+          "program": "cc",
+          "args": [
+            "-std=c11",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-pthread",
+            "-shared",
+            "-fPIC",
+            "-I/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/include/node",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/native-api-stack.c",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/native-api-stack-r1/native-stack.node"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "--max-old-space-size=128",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/native-api-stack.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/native-api-stack-r1/native-stack.node"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"engine\":\"node\",\"version\":\"26.10.0\",\"main\":{\"nativeStackBytes\":\"8388608\",\"ffiStackBytes\":1048576,\"nativeEntryUsesOsStack\":true,\"ffiEntryUsesSeparateStack\":true,\"scalarComparisons\":10,\"nestedCallbackDepth\":20,\"callbackCalls\":31,\"rejectionControls\":3,\"smallMainStackRejectedBeforeAllocation\":true},\"worker\":{\"nativeStackBytes\":\"100663296\",\"ffiStackBytes\":1048576,\"nativeEntryUsesOsStack\":true,\"ffiEntryUsesSeparateStack\":true,\"scalarComparisons\":10,\"nestedCallbackDepth\":20,\"callbackCalls\":32,\"rejectionControls\":3,\"deepNativeStackBytes\":25169920,\"deepResult\":\"854040\",\"smallMainStackRejectedBeforeAllocation\":false}}\n",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "args": [
+            "run",
+            "-A",
+            "--v8-flags=--max-old-space-size=128",
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/native-api-stack.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/native-api-stack-r1/native-stack.node"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"engine\":\"deno\",\"version\":\"2.9.7\",\"main\":{\"nativeStackBytes\":\"8384512\",\"ffiStackBytes\":1048576,\"nativeEntryUsesOsStack\":true,\"ffiEntryUsesSeparateStack\":true,\"scalarComparisons\":10,\"nestedCallbackDepth\":20,\"callbackCalls\":31,\"rejectionControls\":3,\"smallMainStackRejectedBeforeAllocation\":true},\"worker\":{\"nativeStackBytes\":\"100663296\",\"ffiStackBytes\":1048576,\"nativeEntryUsesOsStack\":true,\"ffiEntryUsesSeparateStack\":true,\"scalarComparisons\":10,\"nestedCallbackDepth\":20,\"callbackCalls\":32,\"rejectionControls\":3,\"deepNativeStackBytes\":25169920,\"deepResult\":\"854040\",\"smallMainStackRejectedBeforeAllocation\":false}}\n",
+          "stderr": ""
+        },
+        {
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/native-api-stack.mjs",
+            "/home/lastmjs/development/lasm/compiler/.work/native-api-stack-r1/native-stack.node"
+          ],
+          "code": 0,
+          "signal": null,
+          "stdout": "{\"engine\":\"bun\",\"version\":\"1.4.2\",\"main\":{\"nativeStackBytes\":\"8388608\",\"ffiStackBytes\":1048576,\"nativeEntryUsesOsStack\":true,\"ffiEntryUsesSeparateStack\":true,\"scalarComparisons\":10,\"nestedCallbackDepth\":20,\"callbackCalls\":31,\"rejectionControls\":3,\"smallMainStackRejectedBeforeAllocation\":true},\"worker\":{\"nativeStackBytes\":\"100663296\",\"ffiStackBytes\":1048576,\"nativeEntryUsesOsStack\":true,\"ffiEntryUsesSeparateStack\":true,\"scalarComparisons\":10,\"nestedCallbackDepth\":20,\"callbackCalls\":32,\"rejectionControls\":3,\"deepNativeStackBytes\":25169920,\"deepResult\":\"854040\",\"smallMainStackRejectedBeforeAllocation\":false}}\n",
+          "stderr": ""
+        }
+      ],
+      "results": [
+        {
+          "engine": "node",
+          "version": "26.10.0",
+          "main": {
+            "nativeStackBytes": "8388608",
+            "ffiStackBytes": 1048576,
+            "nativeEntryUsesOsStack": true,
+            "ffiEntryUsesSeparateStack": true,
+            "scalarComparisons": 10,
+            "nestedCallbackDepth": 20,
+            "callbackCalls": 31,
+            "rejectionControls": 3,
+            "smallMainStackRejectedBeforeAllocation": true
+          },
+          "worker": {
+            "nativeStackBytes": "100663296",
+            "ffiStackBytes": 1048576,
+            "nativeEntryUsesOsStack": true,
+            "ffiEntryUsesSeparateStack": true,
+            "scalarComparisons": 10,
+            "nestedCallbackDepth": 20,
+            "callbackCalls": 32,
+            "rejectionControls": 3,
+            "deepNativeStackBytes": 25169920,
+            "deepResult": "854040",
+            "smallMainStackRejectedBeforeAllocation": false
+          }
+        },
+        {
+          "engine": "deno",
+          "version": "2.9.7",
+          "main": {
+            "nativeStackBytes": "8384512",
+            "ffiStackBytes": 1048576,
+            "nativeEntryUsesOsStack": true,
+            "ffiEntryUsesSeparateStack": true,
+            "scalarComparisons": 10,
+            "nestedCallbackDepth": 20,
+            "callbackCalls": 31,
+            "rejectionControls": 3,
+            "smallMainStackRejectedBeforeAllocation": true
+          },
+          "worker": {
+            "nativeStackBytes": "100663296",
+            "ffiStackBytes": 1048576,
+            "nativeEntryUsesOsStack": true,
+            "ffiEntryUsesSeparateStack": true,
+            "scalarComparisons": 10,
+            "nestedCallbackDepth": 20,
+            "callbackCalls": 32,
+            "rejectionControls": 3,
+            "deepNativeStackBytes": 25169920,
+            "deepResult": "854040",
+            "smallMainStackRejectedBeforeAllocation": false
+          }
+        },
+        {
+          "engine": "bun",
+          "version": "1.4.2",
+          "main": {
+            "nativeStackBytes": "8388608",
+            "ffiStackBytes": 1048576,
+            "nativeEntryUsesOsStack": true,
+            "ffiEntryUsesSeparateStack": true,
+            "scalarComparisons": 10,
+            "nestedCallbackDepth": 20,
+            "callbackCalls": 31,
+            "rejectionControls": 3,
+            "smallMainStackRejectedBeforeAllocation": true
+          },
+          "worker": {
+            "nativeStackBytes": "100663296",
+            "ffiStackBytes": 1048576,
+            "nativeEntryUsesOsStack": true,
+            "ffiEntryUsesSeparateStack": true,
+            "scalarComparisons": 10,
+            "nestedCallbackDepth": 20,
+            "callbackCalls": 32,
+            "rejectionControls": 3,
+            "deepNativeStackBytes": 25169920,
+            "deepResult": "854040",
+            "smallMainStackRejectedBeforeAllocation": false
+          }
+        }
+      ],
+      "passed": true,
+      "helperSha256": "d03e6ac4daa1facd020e8bf5d36a4938570cfe8d25e576e37cf6754182200558",
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-24T18:36:03.220Z"
+    }
+  },
+  "resources": {
+    "path": ".work/product-acceptance/native-api-stack-r1-resources.json",
+    "sha256": "6c7ab2425a6cfbec47425398a42468d6c1c8d319297fb5df08f19af87e119955",
+    "content": {
+      "startedAt": "2026-09-24T18:36:02.678Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=128",
+        "scripts/full-lean/probe-native-api-stack.mjs",
+        ".work/native-api-stack-r1"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "0efe251e-71ff-4a50-b4d2-487e34be7d6a",
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 23671697408
+      },
+      "minimumHostAvailable": 23610429440,
+      "peakMemoryBytes": 72306688,
+      "peakTasks": 20,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/native-api-stack-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T18:36:03.084Z",
+        "memoryBytes": 44433408,
+        "peakMemoryBytes": 67047424,
+        "swapBytes": 0,
+        "tasks": 20,
+        "memoryBreakdown": {
+          "anon": 41148416,
+          "file": 167936,
+          "kernel": 2846720,
+          "shmem": 0,
+          "file_mapped": 212992,
+          "inactive_file": 167936,
+          "slab": 437592
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "cgroupRemovedAfterExit": {
+        "at": "2026-09-24T18:36:03.283Z",
+        "code": "ENOENT",
+        "message": "ENOENT: no such file or directory, open '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service/memory.current'",
+        "capturedAt": "2026-09-24T18:36:03.275Z"
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T18:36:03.275Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 14528512,
+        "peakMemoryBytes": 72306688,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11649024,
+          "file": 172032,
+          "kernel": 1085440,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 172032,
+          "slab": 160440
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T18:36:03.299Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "verified": [
+    "All three stock engines load the same Node-API 8 addon.",
+    "Twenty uint64 comparisons per engine agree across direct Node-API and Koffi invocation.",
+    "Twenty nested callback levels work on both main and worker threads, with three argument rejection controls each.",
+    "Actual addresses confirm direct addon calls use the OS stack and Koffi calls use a different stack.",
+    "The main thread is rejected before deep execution because it has less than the required 48 MiB headroom.",
+    "Each 96 MiB worker safely touches about 24 MiB of native call stack, returns the correct checksum, and executes another callback afterward.",
+    "The guard releases at a 69 MiB peak without OOM, pressure, swap or resource events."
+  ],
+  "remaining": [
+    "Wire this call path into real Wasmtime stores, callbacks and error/lifetime handling.",
+    "Move runtime ownership to a worker with a verified native stack before increasing Wasmtime limits; the process main stack is only about 8 MiB.",
+    "Validate other native platforms, package the addon and complete installed shipping acceptance."
+  ],
+  "fundamentalLimitationDemonstrated": false
+}

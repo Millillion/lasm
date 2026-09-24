@@ -276,6 +276,11 @@ separately from the earlier runtime evidence below.
   linking, cancellation, reusable-instance cleanup, larger control stacks,
   transfers beyond the diagnostic's 64 MiB bound and other platforms still need
   work. No fundamental limitation has been demonstrated.
+  A [direct Node-API stack control](docs/evidence/native-api-stack-2026-09-24.json)
+  passes in all three engines: registered/nested callbacks work and a verified
+  96 MiB worker safely uses about 24 MiB of native stack, beyond Koffi's maximum.
+  The process main stack is only about 8 MiB and rejects this workload before
+  execution. Integrating this path with actual Wasmtime execution remains open.
 
 ## Earlier runtime evidence and remaining compatibility work
 

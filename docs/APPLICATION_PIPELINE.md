@@ -847,3 +847,12 @@ linking, cancellation, larger control stacks, transfers beyond the diagnostic's
 64 MiB bound, and native validation outside Linux x64 remain open. Process exit
 reclaims the remaining main/completion workers after host output is flushed;
 that does not establish reusable-instance or general task cleanup semantics.
+
+A [direct Node-API prerequisite passes](evidence/native-api-stack-2026-09-24.json)
+in all three stock engines. The same small addon invokes registered FFI
+callbacks, including nested calls, while executing on the actual OS thread
+stack. Each 96 MiB worker safely uses about 24 MiB of native stack and then calls
+back into JavaScript again; small main stacks are rejected before that workload.
+Peak memory is 69 MiB. This provides a tested route beyond Koffi's 16 MiB stack
+ceiling. Real Wasmtime integration and relocating runtime ownership onto a
+verified worker stack are still required before increasing its current limit.
