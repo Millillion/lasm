@@ -138,6 +138,16 @@ phase took 663.02 seconds; preparation and execution peaked at 3.40 GiB with no
 resource events. The [per-case evidence](evidence/upstream-docparse-node-2026-09-23.json)
 does not imply Deno, Bun or other-platform passes for this category.
 
+The follow-up [Deno/Bun campaigns](evidence/upstream-docparse-other-engines-2026-09-24.json)
+now pass **all 202 inputs in each engine**, using installed candidate
+`0.1.0-experimental.10`, stock Deno 2.9.7 and Bun 1.4.2 on Linux x64. Original
+drivers, assertions, all 7,669 source entries and harness hashes remain unchanged.
+The sequential campaigns took 976.54 and 819.41 seconds in their test phases;
+preparation and execution peaked at 3.99 GiB without resource events. This
+completes this category across the three engines locally, but the earlier Node
+result used candidate `.9`; a complete same-package platform campaign is still
+required.
+
 The [mixed-driver review](evidence/lean-4.34-mixed-driver-classification.json)
 now assigns execution obligations to all 110 shell registrations: 78 native
 build-time checks, 27 with additional ordinary compiled-application phases,
