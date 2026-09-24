@@ -67,3 +67,11 @@ cleanup. The two unchanged POSIX process fixtures remain inapplicable to Windows
 parallel portable coverage is still needed. These controls establish expected
 behavior only. Installed Wasm comparisons and the other three native platforms
 remain pending.
+
+The [filesystem-error controls](../evidence/filesystem-errors-native-2026-09-24.json)
+add 28 observed results on Linux x64/ARM64 and Windows x64, including actual
+path/handle failures, invalid UTF-8 and embedded NUL paths. Interpreted and native
+C-compiled outputs match exactly on each host. The first attempt exposed two
+missing display instances in the supplementary fixture; that failure and the
+repair are retained separately. The rerun passes all six native cases on Linux
+and all four portable cases on Windows. Deployed Wasm comparison is still pending.

@@ -49,7 +49,10 @@ separately from the earlier runtime evidence below.
   x64; seven startup controls pass on each native macOS architecture. The Linux
   [CI forwarding correction](docs/evidence/deno-stack-native-ci-2026-09-24.json)
   now runs all seven controls without skips on all four POSIX platforms.
-  Broader application campaigns remain pending.
+  The [complete Deno compiled-application campaign](docs/evidence/upstream-applications-deno-r1-2026-09-24.json)
+  now records 97 passed and four upstream-compilation-disabled registrations
+  on Linux x64, with unchanged tests and no resource events. Other categories
+  and platforms remain pending.
   Windows needs its own solution. Preloaded or imported entry points
   retain their caller's configuration to avoid repeating arbitrary user effects;
   transparent deep-stack callable embedding remains open.

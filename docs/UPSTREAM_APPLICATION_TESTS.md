@@ -181,3 +181,15 @@ harness hashes remain unchanged. The preparation and execution run took
 [per-case evidence](evidence/upstream-mixed-native-2026-09-24.json) covers native
 build-time behavior only. The other 31 mixed registrations retain their ordinary
 application or foreign-runtime deployment obligations.
+
+The full installed **Deno 2.9.7 compiled-application campaign now finishes 97
+passed and four upstream-compilation-disabled registrations**, with no failed
+cases. Candidate `.13` runs all enabled inputs with original arguments, outputs
+and assertions, including the formerly failing `const_fold` benchmark and both
+HTTP benchmarks. All 7,669 original files/links and active harness hashes remain
+unchanged. Peak guarded memory is 4.81 GiB without pressure or OOM events. The
+[complete per-case record](evidence/upstream-applications-deno-r1-2026-09-24.json)
+identifies the six fixtures that deliberately launch native Lean children; their
+compiler behavior remains native evidence. The four disabled inputs require
+separate explained probes. Other categories, API gaps, repaired-package Node/Bun
+campaigns and the other native platforms remain open.
