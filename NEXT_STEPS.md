@@ -35,6 +35,9 @@ below retain their original, narrower scope.
 - [ ] Validate the HTTP and Express examples and callable JS/TypeScript bindings
   through that shipping pipeline.
 - [ ] Supply and validate native Windows ARM64 Lean and compiler SDK bundles.
+  The [native Lean bootstrap](docs/evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json)
+  now passes compiler/Lake, interpreted-main and compiled ARM64-main checks;
+  managed relocatable distribution and complete package acceptance remain open.
 - [ ] Run unchanged upstream tests through their appropriate native build-time
   and compiled-application paths, including the reviewed mixed drivers.
 - [ ] Audit and differentially test all standard APIs, including IO.FS and Std.Http.

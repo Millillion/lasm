@@ -39,10 +39,14 @@ of the same recipe reused 6,923 compiler results and completed 3,445 additional
 compilations without compiler errors. That [second checkpoint](evidence/windows-arm64-bootstrap-checkpoint-2-2026-09-24.json)
 reached the same deadline while linking the stage1 Lean shared library, with a
 1.90 GiB peak. Its verified cache archive is 360 MB; both retained checkpoints
-occupy 588 MB within the existing included-storage bound. A third attempt is
-running from that checkpoint. The build remains incomplete, and the final CI
-assertion correctly fails until the native Lean, Lake and compiled-main checks
-finish; a checkpoint is not a platform pass.
+occupied 588 MB within the existing included-storage bound. The
+[third attempt completes](evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json):
+native Lean 4.34.0 and Lake run, an interpreted main passes, and generated C
+compiles into a passing ARM64 executable. Both compiler and application pass
+the ARM64 COFF checks. The guarded build took 214.38 minutes and peaked at
+1.90 GiB, below its proactive threshold. This proves the native bootstrap;
+relocatable tool packaging, `leantar`, managed provisioning and installed Wasm
+acceptance remain open. Only the completed compiler cache was retained on CI.
 
 The compiler-support bootstrap also has a six-platform catalog for native Python
 3.13.15 from the pinned
@@ -365,16 +369,18 @@ small allocations in a parent and child. The build has one worker, a hard memory
 cap no larger than half the runner's RAM, and a proactive stop at 80% of that cap.
 MSYS2's Clang tools target native ARM64; its POSIX shell/make utilities are x64
 helpers. This experiment is **not** an all-native managed distribution pass.
-The native Lean compiler, its generated executable, dependencies and missing
-ARM64 `leantar` packaging still need verification. The first long run reached
+The native Lean compiler and its generated executable now pass their
+[bootstrap checks](evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json);
+relocatable dependencies and missing ARM64 `leantar` packaging still need
+verification. The first long run reached
 stage1 shared-library linking and was cancelled at the 330-minute job deadline.
 Its last resource sample was 1.89 GiB; it has no completed guard receipt. See the
 [preserved deadline evidence](evidence/windows-arm64-lean-deadline-2026-09-24.json).
 The workflow now uses an earlier guarded deadline and a checksum-verified cache
 of completed C/C++ compilations, within the [included storage policy](CI_STORAGE.md).
 Fresh source/build trees avoid reusing partially written compiler outputs.
-Successful small native cache/deadline controls do not yet prove the full
-resumable Lean bootstrap or end-user packaging.
+The third checkpoint-assisted attempt proves the complete native bootstrap;
+end-user packaging remains a separate acceptance gate.
 
 The separate [Windows ARM64 SDK bootstrap](evidence/windows-arm64-sdk-bootstrap-2026-09-23.json)
 now passes on that native runner. Clang/LLD 24 and Binaryen 132 have verified

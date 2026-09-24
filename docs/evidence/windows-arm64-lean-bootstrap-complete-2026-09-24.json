@@ -1,0 +1,337 @@
+{
+  "scope": "Complete native Windows ARM64 Lean source bootstrap; managed distribution and installed Wasm acceptance remain separate",
+  "run": {
+    "id": 35940044349,
+    "attempt": 3,
+    "headSha": "d3f81e12f0604aea8a3573825317d07e3f90a239",
+    "conclusion": "success",
+    "url": "https://github.com/Millillion/lasm/actions/runs/35940044349/attempts/3"
+  },
+  "logFile": ".work/product-acceptance/windows-arm64-bootstrap-attempt3.log",
+  "logSha256": "e945af021c213510f817fef81657d5652b27be68e2b4202493b811568ddc9692",
+  "nativeChecks": [
+    "Lean (version 4.34.0, aarch64-w64-windows-gnu, commit 293d5d0c0c3f3dded4688b3ccd6a33939ac5102b, Release)",
+    "Lake version 5.0.0-src+293d5d0 (Lean version 4.34.0)",
+    "native Windows ARM64 Lean",
+    "native Windows ARM64 Lean"
+  ],
+  "architectureAssertions": "The unchanged bootstrap script requires ARM64 COFF headers for lean.exe and its generated compiled application; a successful script exit includes both assertions.",
+  "buildMinutes": 214.37547447284064,
+  "reports": {
+    ".work/windows-arm64-bootstrap-resources.json": {
+      "status": "passed",
+      "command": [
+        "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+        "--login",
+        "scripts/ci/windows-lean-cache.sh",
+        "build"
+      ],
+      "hostAtStart": {
+        "total": 17169387520,
+        "available": 13284732928
+      },
+      "limits": {
+        "jobCommittedBytes": 8584693760,
+        "stopCommittedBytes": 6867755008,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": 15600
+      },
+      "peakCommittedBytes": 2044964864,
+      "minimumHostAvailable": 10972971008,
+      "startedAt": 1790243760.2900577,
+      "unit": "Local\\LasmResource-c20e4d6f-790f-4786-87b8-e980173c6a94",
+      "pid": 10868,
+      "lastSampleAt": 1790256622.6883757,
+      "exitCode": 0,
+      "finishedAt": 1790256622.818526
+    },
+    ".work/windows-arm64-compiler-cache.tgz.json": {
+      "operation": "pack",
+      "identitySha256": "d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9",
+      "sha256": "f755664994dfe5775289e6d9ed44b471d2b68992148e835f976c3be26ecabdd8",
+      "bytes": 362170071,
+      "files": 21100,
+      "contentBytes": 361126427
+    },
+    ".work/windows-cache-collect-resources.json": {
+      "status": "passed",
+      "command": [
+        "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+        "--login",
+        "scripts/ci/windows-lean-cache.sh",
+        "finish"
+      ],
+      "hostAtStart": {
+        "total": 17169387520,
+        "available": 12289724416
+      },
+      "limits": {
+        "jobCommittedBytes": 2147483648,
+        "stopCommittedBytes": 1717986918,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": null
+      },
+      "peakCommittedBytes": 107057152,
+      "minimumHostAvailable": 12238725120,
+      "startedAt": 1790256626.1814106,
+      "unit": "Local\\LasmResource-57614d9b-7040-4a8c-9289-550170828fc7",
+      "pid": 6384,
+      "lastSampleAt": 1790256630.611052,
+      "exitCode": 0,
+      "finishedAt": 1790256630.6209288
+    },
+    ".work/windows-cache-pack-resources.json": {
+      "status": "passed",
+      "command": [
+        "node",
+        "scripts/ci/compiler-cache.mjs",
+        "pack",
+        ".work/windows-arm64-bootstrap-cache/cache",
+        ".work/windows-arm64-compiler-cache.tgz",
+        ".work/windows-arm64-bootstrap-cache/identity.json"
+      ],
+      "hostAtStart": {
+        "total": 17169387520,
+        "available": 12280365056
+      },
+      "limits": {
+        "jobCommittedBytes": 2147483648,
+        "stopCommittedBytes": 1717986918,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": null
+      },
+      "peakCommittedBytes": 224481280,
+      "minimumHostAvailable": 11842678784,
+      "startedAt": 1790256633.4134982,
+      "unit": "Local\\LasmResource-2a28a3e5-5c34-4ecc-83bf-cc80c4e59839",
+      "pid": 6300,
+      "lastSampleAt": 1790256656.9136424,
+      "exitCode": 0,
+      "finishedAt": 1790256657.023196
+    },
+    ".work/windows-cache-prepare-resources.json": {
+      "status": "passed",
+      "command": [
+        "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+        "--login",
+        "scripts/ci/windows-lean-cache.sh",
+        "prepare"
+      ],
+      "hostAtStart": {
+        "total": 17169387520,
+        "available": 12877975552
+      },
+      "limits": {
+        "jobCommittedBytes": 2147483648,
+        "stopCommittedBytes": 1717986918,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": null
+      },
+      "peakCommittedBytes": 108118016,
+      "minimumHostAvailable": 12847783936,
+      "startedAt": 1790243534.2791836,
+      "unit": "Local\\LasmResource-24137c13-bc6d-440c-8cc2-ad6cd66e32ad",
+      "pid": 4992,
+      "lastSampleAt": 1790243537.3796573,
+      "exitCode": 0,
+      "finishedAt": 1790243537.5486746
+    },
+    ".work/windows-cache-restore-resources.json": {
+      "status": "passed",
+      "command": [
+        "node",
+        "scripts/ci/compiler-cache.mjs",
+        "unpack",
+        ".work/windows-arm64-bootstrap-cache/cache",
+        ".work/windows-arm64-compiler-cache.tgz",
+        ".work/windows-arm64-bootstrap-cache/identity.json"
+      ],
+      "hostAtStart": {
+        "total": 17169387520,
+        "available": 12752543744
+      },
+      "limits": {
+        "jobCommittedBytes": 2147483648,
+        "stopCommittedBytes": 1717986918,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": null
+      },
+      "peakCommittedBytes": 258744320,
+      "minimumHostAvailable": 12688863232,
+      "startedAt": 1790243551.0125582,
+      "unit": "Local\\LasmResource-40a48e97-cf4a-4685-af11-2758bcfc6a82",
+      "pid": 6232,
+      "lastSampleAt": 1790243756.9011338,
+      "exitCode": 0,
+      "finishedAt": 1790243757.086818
+    },
+    ".work/windows-guard-control.json": {
+      "status": "passed",
+      "command": [
+        "node",
+        "test/fixtures/windows-guard.mjs"
+      ],
+      "hostAtStart": {
+        "total": 17169387520,
+        "available": 13584916480
+      },
+      "limits": {
+        "jobCommittedBytes": 536870912,
+        "stopCommittedBytes": 429496729,
+        "hostReserveBytes": 2147483648,
+        "timeoutSeconds": null
+      },
+      "peakCommittedBytes": 111828992,
+      "minimumHostAvailable": 13500555264,
+      "startedAt": 1790243403.9231791,
+      "unit": "Local\\LasmResource-e7adec16-601d-4705-9aa2-c9f10e5d794b",
+      "pid": 5092,
+      "lastSampleAt": 1790243404.9618392,
+      "exitCode": 0,
+      "finishedAt": 1790243405.1625967
+    },
+    ".work/windows-arm64-bootstrap-cache/budget.json": {
+      "payloadBytes": 362170071,
+      "reportedBytes": 588251780,
+      "listedBytes": 588251780,
+      "usedBytes": 588251780,
+      "uploadUpperBound": 386190689,
+      "ceilingBytes": 8589934592,
+      "includedAllowanceBytes": 10737418240,
+      "maximumAfterUpload": 974442469,
+      "cacheEntries": 2,
+      "repository": "Millillion/lasm",
+      "payload": ".work/windows-arm64-compiler-cache.tgz",
+      "serializedWriterGroup": "lasm-cache-writer",
+      "checkedAt": "2026-09-24T13:30:58.319Z",
+      "billingSource": "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+    },
+    ".work/windows-arm64-bootstrap-cache/identity.json": {
+      "schema": 1,
+      "lean": "4.34.0",
+      "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+      "platform": "win32",
+      "arch": "arm64",
+      "node": "26.10.0",
+      "workspace": "C:\\a\\lasm\\lasm",
+      "files": {
+        ".work/windows-arm64-bootstrap-cache/ccache.conf": "4b94e45cbf40c7314cd246a3083befeff51ccf458bd9a0e2c1a2d59d3252abd3",
+        ".work/windows-arm64-bootstrap-cache/ccache-version.txt": "ebf2ece80071da6541232f769fbcc04f09c1f7a4936b47b3f095e0359daecea3",
+        ".work/windows-arm64-bootstrap-cache/clang-version.txt": "c5e1f96e0759a3bc82aac94f4979230bd915c1b232ab0665146c2b3faa78108d",
+        ".work/windows-arm64-bootstrap-cache/package-versions.txt": "d2e4f1278a7ab127fefc8df843a6f9d135666177c6847d35b5f37e9de7c2acb5",
+        "scripts/ci/windows-lean-cache.sh": "ba0a64f9795e48b02c6b6e7dfd300ec6583486e99197e8f3ba7b50e482af3876",
+        "scripts/ci/windows-lean-cache.mjs": "732519af5b2cbbad53a210c02b940138f2402bd8e48726ac7aad20e075b05ed4",
+        "scripts/full-lean/bootstrap-windows-arm64.sh": "f88af1f83cf47a80ba5a4c3f730d2c7c9d7880d022d5d3fb5fbbbb0f66bba482",
+        "scripts/full-lean/patch-windows-manifest.mjs": "4879ac63ef26eb14f6e05ebe69c1d9923e304e229ed577b4fe4903de93e27ede"
+      }
+    },
+    ".work/windows-arm64-bootstrap-cache/pruning.json": {
+      "operation": "prune",
+      "identity": "d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9",
+      "kept": [
+        {
+          "id": 8072053311,
+          "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-f755664994dfe5775289e6d9ed44b471d2b68992148e835f976c3be26ecabdd8"
+        },
+        {
+          "id": 8063370281,
+          "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-02ed96890d8484b53f14b39026cc223af01926dc92f21afb8804eefbcad5c7a9"
+        }
+      ],
+      "deleted": [
+        {
+          "id": 8054994170,
+          "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-6bb03af00a062c07ee70210a4771c72508e92bb4421ed3d2167ee5a1efcc643c",
+          "sizeInBytes": 228377991
+        }
+      ],
+      "checkedAt": "2026-09-24T13:31:05.065Z"
+    },
+    ".work/windows-arm64-bootstrap-cache/receipt.json": {
+      "scope": "Completed native C/C++ compiler cache only; full Lean acceptance remains separate",
+      "buildStatus": "passed",
+      "stats": {
+        "autoconf_test": 0,
+        "bad_compiler_arguments": 0,
+        "bad_input_file": 0,
+        "bad_output_file": 0,
+        "cache_miss": 41,
+        "cache_size_kibibyte": 400204,
+        "called_for_link": 20,
+        "called_for_preprocessing": 0,
+        "cleanups_performed": 0,
+        "compile_failed": 0,
+        "compiler_check_failed": 0,
+        "compiler_produced_empty_output": 0,
+        "compiler_produced_no_output": 0,
+        "compiler_produced_stdout": 0,
+        "could_not_find_compiler": 0,
+        "could_not_use_modules": 0,
+        "could_not_use_precompiled_header": 0,
+        "direct_cache_hit": 10364,
+        "direct_cache_miss": 41,
+        "disabled": 0,
+        "error_hashing_extra_file": 0,
+        "files_in_cache": 20812,
+        "internal_error": 0,
+        "local_storage_hit": 10364,
+        "local_storage_miss": 41,
+        "local_storage_read_hit": 20728,
+        "local_storage_read_miss": 81,
+        "local_storage_write": 77,
+        "max_cache_size_kibibyte": 1048576,
+        "max_files_in_cache": 0,
+        "missing_cache_file": 0,
+        "modified_input_file": 0,
+        "multiple_source_files": 0,
+        "no_input_file": 0,
+        "output_to_stdout": 0,
+        "preprocessed_cache_hit": 0,
+        "preprocessed_cache_miss": 41,
+        "preprocessor_error": 0,
+        "recache": 0,
+        "remote_storage_error": 0,
+        "remote_storage_hit": 0,
+        "remote_storage_miss": 0,
+        "remote_storage_read_hit": 0,
+        "remote_storage_read_miss": 0,
+        "remote_storage_timeout": 0,
+        "remote_storage_write": 0,
+        "stats_updated_timestamp": 1790256630,
+        "stats_zeroed_timestamp": 1790243761,
+        "unsupported_code_directive": 0,
+        "unsupported_compiler_option": 0,
+        "unsupported_environment_variable": 0,
+        "unsupported_source_encoding": 0,
+        "unsupported_source_language": 0
+      }
+    },
+    ".work/windows-arm64-bootstrap-cache/selection.json": {
+      "operation": "select",
+      "identity": "d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9",
+      "selected": {
+        "id": 8063370281,
+        "ref": "refs/heads/main",
+        "key": "lasm-win-arm64-lean-ccache-v1-d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9-02ed96890d8484b53f14b39026cc223af01926dc92f21afb8804eefbcad5c7a9",
+        "version": "9212dfecd7d8f1b3047db58178860280c0bfadf2029b00ede146cd714dca79a1",
+        "last_accessed_at": "2026-09-24T09:42:12.510652Z",
+        "created_at": "2026-09-24T09:42:12.510652Z",
+        "size_in_bytes": 359873789,
+        "identity": "d552f88ee4209f1632936ff714d437e0742a2a2004ee5d39e89d85d2aff3d5e9",
+        "sha256": "02ed96890d8484b53f14b39026cc223af01926dc92f21afb8804eefbcad5c7a9"
+      },
+      "checkedAt": "2026-09-24T09:52:18.531Z"
+    }
+  },
+  "limitations": [
+    "MSYS2 x64 shell/make utilities were used in this maintainer bootstrap; the Lean compiler and generated program are ARM64.",
+    "The relocatable managed distribution, transitive DLL dependencies, native compiler/linker packaging and ARM64 leantar remain unvalidated.",
+    "Only completed C/C++ compiler cache objects were retained in bounded Actions cache; the complete stage1 installation was not uploaded.",
+    "These native compiler/main checks do not execute a Lasm Wasm application or close six-platform installation."
+  ],
+  "preservedEarlierAttempts": [
+    "windows-arm64-bootstrap-checkpoint-2026-09-24.json",
+    "windows-arm64-bootstrap-checkpoint-2-2026-09-24.json"
+  ],
+  "recordedAt": "2026-09-24T13:48:26.576345+00:00"
+}
