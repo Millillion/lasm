@@ -1,0 +1,88 @@
+name: Native Windows ARM64 compiler cache control
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: lasm-cache-writer
+  cancel-in-progress: false
+jobs:
+  control:
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    runs-on: windows-11-arm
+    timeout-minutes: 25
+    env:
+      LASM_CACHE_WRITER_GROUP: lasm-cache-writer
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
+      MSYSTEM: CLANGARM64
+      CHERE_INVOKING: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: arm64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2.32.0
+        id: msys2
+        with:
+          msystem: CLANGARM64
+          cache: false
+          path-type: minimal
+          install: >-
+            diffutils
+            mingw-w64-clang-aarch64-clang
+            mingw-w64-clang-aarch64-ccache
+      - name: Compile the native control and verify a cache hit
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
+          $env:LASM_BOOTSTRAP_NODE = (Get-Command node).Source
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/ccache-create-resources.json -- $bash --login scripts/ci/compiler-cache-control.sh create
+      - name: Package and checksum only the compiler cache
+        id: package
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/ccache-pack-resources.json -- node scripts/ci/compiler-cache.mjs pack .work/compiler-cache-control/cache .work/compiler-cache-control.tgz .work/compiler-cache-control/identity.json
+      - name: Verify included storage budget
+        id: budget
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/cache-budget.mjs .work/compiler-cache-control.tgz .work/compiler-cache-control/budget.json
+      - name: Save checksum-addressed compiler cache
+        if: steps.budget.outputs.allowed == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/compiler-cache-control.tgz
+          key: lasm-ccache-control-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.package.outputs.sha256 }}
+      - name: Remove both local copies before restoration
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/ccache-remove-resources.json -- node scripts/ci/compiler-cache-control.mjs remove
+          Remove-Item .work/compiler-cache-control.tgz
+      - name: Restore exact compiler cache archive
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/compiler-cache-control.tgz
+          key: lasm-ccache-control-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.package.outputs.sha256 }}
+          fail-on-cache-miss: true
+      - name: Verify all restored bytes before use
+        env:
+          LASM_CHECKPOINT_SHA256: ${{ steps.package.outputs.sha256 }}
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/ccache-unpack-resources.json -- node scripts/ci/compiler-cache.mjs unpack .work/compiler-cache-control/cache .work/compiler-cache-control.tgz .work/compiler-cache-control/identity.json
+      - name: Verify a native compiler hit after restoration
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
+          $env:LASM_BOOTSTRAP_NODE = (Get-Command node).Source
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/ccache-verify-resources.json -- $bash --login scripts/ci/compiler-cache-control.sh verify
+      - name: Delete this disposable control cache
+        if: always() && steps.package.outputs.sha256 != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CACHE_KEY: lasm-ccache-control-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.package.outputs.sha256 }}
+        run: gh api --method DELETE "repos/${env:GITHUB_REPOSITORY}/actions/caches?key=${env:CACHE_KEY}&ref=refs/heads/main"
+      - name: Preserve bounded control receipts in logs
+        if: always()
+        run: node -e "const f=require('node:fs');for(const n of f.readdirSync('.work').filter(n=>n.startsWith('ccache-')&&n.endsWith('.json')))console.log(n+'\n'+f.readFileSync('.work/'+n,'utf8'))"
