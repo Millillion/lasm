@@ -1,0 +1,596 @@
+{
+  "scope": "Lossless archival of completed generated binary evidence; original test/source files and failure deployments remain in place",
+  "recordedAt": "2026-09-24T04:43:34.546020+00:00",
+  "files": 28,
+  "savedBytes": 3203359644,
+  "rows": [
+    {
+      "receipt": ".work/product-acceptance/application-wasm-archives-r1.json",
+      "receiptSha256": "9542b2319584aaca44b6c4a4252d66d350a693aed450a9391dfd10a139e285fd",
+      "record": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-wasm-archives-r1-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-docparse-node-r1/driver-dist/program.wasm",
+            "originalBytes": 160422793,
+            "originalSha256": "e55d443fd94215ff5f228d90530be71a1a1476313f07b5ef9cf0d65734827d07",
+            "mode": 509,
+            "mtimeNs": 1790206563559068443,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-docparse-node-r1/driver-dist/program.wasm.gz",
+            "archiveBytes": 37245015,
+            "archiveSha256": "959e1cb3fb85ff89e73624e1964ee88fbf39e585f46daac55d7beacfe5f7c967",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedCampaign": "upstream-docparse-node-r1",
+              "receiptSha256": "a5940d1c0fa1f4af45443243cd313d358747d3c6a6c01f5cc64cbf83091cf7c1"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-docparse-deno-r1/driver-dist/program.wasm",
+            "originalBytes": 160422793,
+            "originalSha256": "e55d443fd94215ff5f228d90530be71a1a1476313f07b5ef9cf0d65734827d07",
+            "mode": 509,
+            "mtimeNs": 1790210535125244521,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-docparse-deno-r1/driver-dist/program.wasm.gz",
+            "archiveBytes": 37245015,
+            "archiveSha256": "959e1cb3fb85ff89e73624e1964ee88fbf39e585f46daac55d7beacfe5f7c967",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedCampaign": "upstream-docparse-deno-r1",
+              "receiptSha256": "252f000550083de7d8faaa8a0f0085eb52e9adb4d0ccf3cfb57cc01df488590d"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-docparse-bun-r1/driver-dist/program.wasm",
+            "originalBytes": 166026571,
+            "originalSha256": "8dae10fc3ae28ce0393c318912e030493294d3cfac3b1ced49303a60a9c577a5",
+            "mode": 509,
+            "mtimeNs": 1790211664296572797,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-docparse-bun-r1/driver-dist/program.wasm.gz",
+            "archiveBytes": 38387956,
+            "archiveSha256": "956b529c9aafd8322c67d778f2ec84b7939cf0e6d850de1754e11ddfd334e92a",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedCampaign": "upstream-docparse-bun-r1",
+              "receiptSha256": "e050b9a41dbc5ad5499249a418f3d40c8fd30b7af607a36e25c494bed5425580"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-lsp-project-node-r1/driver-dist/program.wasm",
+            "originalBytes": 160393092,
+            "originalSha256": "b34fde06bae9ab21189be54ca104b91cb1d5ec4c7c4c6594ae12a687127d29de",
+            "mode": 509,
+            "mtimeNs": 1790209148501373726,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-lsp-project-node-r1/driver-dist/program.wasm.gz",
+            "archiveBytes": 37226367,
+            "archiveSha256": "564a29d2cf4376bd17022046d3c74b68dfb3492f417322b7378f24c6774e01c4",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedCampaign": "upstream-lsp-project-node-r1",
+              "receiptSha256": "a21f4bf2a993ba82b566c8970363f4fe779a3733f1ea5f6d927be13661424a04"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-lsp-interactive-node-r1/driver-dist/program.wasm",
+            "originalBytes": 160393092,
+            "originalSha256": "b34fde06bae9ab21189be54ca104b91cb1d5ec4c7c4c6594ae12a687127d29de",
+            "mode": 509,
+            "mtimeNs": 1790209246361674809,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-lsp-interactive-node-r1/driver-dist/program.wasm.gz",
+            "archiveBytes": 37226367,
+            "archiveSha256": "564a29d2cf4376bd17022046d3c74b68dfb3492f417322b7378f24c6774e01c4",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedCampaign": "upstream-lsp-interactive-node-r1",
+              "receiptSha256": "2dafc0f30692650926de5a6bad5e97cd136057917c1ba17545b96595241bf0da"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/build/lean-symbols.c",
+            "originalBytes": 112112592,
+            "originalSha256": "e6ee7a2aa42aa570c23f9b0e653923794fd74cb81931568ef2fa5e19f00786e4",
+            "mode": 436,
+            "mtimeNs": 1790186710710182623,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/build/lean-symbols.c.gz",
+            "archiveBytes": 10223036,
+            "archiveSha256": "7d0d03c0971d5df928f16e81dc3ac08ada688f4b2af8842f1396cb7819991ec9",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedPackage": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1",
+              "receiptSha256": "4be07af6d01998d8f2835751454c15c78d9a80a882d1947d831ecef5558629f6"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/build/lean-symbols.o",
+            "originalBytes": 72497006,
+            "originalSha256": "b925880be8b60cefa3aefe8301272711e77f70f37ea083498053430fdf018588",
+            "mode": 436,
+            "mtimeNs": 1790186720959011578,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1/build/lean-symbols.o.gz",
+            "archiveBytes": 11225146,
+            "archiveSha256": "8865637fad5eb336deacdc9d6fc0cf28bc7fe7ef6888e66fe7ddfe5d15e4b124",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedPackage": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34-r1",
+              "receiptSha256": "4be07af6d01998d8f2835751454c15c78d9a80a882d1947d831ecef5558629f6"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 783489037,
+        "finishedAt": "2026-09-24T04:22:59.231544+00:00"
+      },
+      "resources": {
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 807829504,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "receipt": ".work/application-platform-node-r1/archive.json",
+      "receiptSha256": "987577e7919dbb9ae6fbee675e3bc21cef447bf43f9b1b81256d4e0feafac624",
+      "record": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-platform-node-r1-archive-r2-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/relocated deployment/program.wasm",
+            "originalBytes": 160397570,
+            "originalSha256": "fc4d59184777fb58c034953b95af36da5a8e626dc0e2c23d937739229456b07b",
+            "mode": 509,
+            "mtimeNs": 1790224215159121124,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37242510,
+            "archiveSha256": "b0e155a315432d41028d96189486a9dad46e2d3514708aaf5272c25db0767ec0",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1",
+              "receiptSha256": "00eef7c97c7fbffdae44008881193c54cfa6ec3e4440fe511616edead020ba45"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/.lake/lasm/applications/4d7506b7f31c9f93/ac2cf79759b73430d1da358259d1a21031efe7942985743cb4f211b31c55b0f0/dist/program.wasm",
+            "originalBytes": 160397570,
+            "originalSha256": "fc4d59184777fb58c034953b95af36da5a8e626dc0e2c23d937739229456b07b",
+            "mode": 509,
+            "mtimeNs": 1790224205014020775,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/.lake/lasm/applications/4d7506b7f31c9f93/ac2cf79759b73430d1da358259d1a21031efe7942985743cb4f211b31c55b0f0/dist/program.wasm.gz",
+            "archiveBytes": 37242510,
+            "archiveSha256": "b0e155a315432d41028d96189486a9dad46e2d3514708aaf5272c25db0767ec0",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1",
+              "receiptSha256": "00eef7c97c7fbffdae44008881193c54cfa6ec3e4440fe511616edead020ba45"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/native",
+            "originalBytes": 121927440,
+            "originalSha256": "a2a439d3a2255c3373de45f300d788177fc6e194a4d4cfef5ecb67cebb29ac03",
+            "mode": 509,
+            "mtimeNs": 1790224154795523028,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1/native.gz",
+            "archiveBytes": 39270036,
+            "archiveSha256": "736e590a1aa043559a61393f01c260e86dfbf2341e1e43aee365cc8d58a0bd30",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-platform-node-r1",
+              "receiptSha256": "00eef7c97c7fbffdae44008881193c54cfa6ec3e4440fe511616edead020ba45"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 328967524,
+        "finishedAt": "2026-09-24T04:32:08.301786+00:00"
+      },
+      "resources": {
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 130838528,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "receipt": ".work/application-platform-deno-r1/archive.json",
+      "receiptSha256": "8197abd9f5cc24fa810c9a8c8857fbde41fe37b1ae4f86ea67c2a53f9723b1ae",
+      "record": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-platform-deno-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/relocated deployment/program.wasm",
+            "originalBytes": 160397570,
+            "originalSha256": "fc4d59184777fb58c034953b95af36da5a8e626dc0e2c23d937739229456b07b",
+            "mode": 509,
+            "mtimeNs": 1790224431871250953,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37242510,
+            "archiveSha256": "b0e155a315432d41028d96189486a9dad46e2d3514708aaf5272c25db0767ec0",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1",
+              "receiptSha256": "39c6aa48b2397427b8cfacdd44ccb3e3db79aa6dbaa5ae2e257ce10f11db353d"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/.lake/lasm/applications/26fb7def902a2f16/b3dcea9f779ca97ff6f83c2795127d6587dda52dce4ab285b7b628adff359a90/dist/program.wasm",
+            "originalBytes": 160397570,
+            "originalSha256": "fc4d59184777fb58c034953b95af36da5a8e626dc0e2c23d937739229456b07b",
+            "mode": 509,
+            "mtimeNs": 1790224421229146895,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/.lake/lasm/applications/26fb7def902a2f16/b3dcea9f779ca97ff6f83c2795127d6587dda52dce4ab285b7b628adff359a90/dist/program.wasm.gz",
+            "archiveBytes": 37242510,
+            "archiveSha256": "b0e155a315432d41028d96189486a9dad46e2d3514708aaf5272c25db0767ec0",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1",
+              "receiptSha256": "39c6aa48b2397427b8cfacdd44ccb3e3db79aa6dbaa5ae2e257ce10f11db353d"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/native",
+            "originalBytes": 121927440,
+            "originalSha256": "a2a439d3a2255c3373de45f300d788177fc6e194a4d4cfef5ecb67cebb29ac03",
+            "mode": 509,
+            "mtimeNs": 1790224370322648452,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1/native.gz",
+            "archiveBytes": 39270036,
+            "archiveSha256": "736e590a1aa043559a61393f01c260e86dfbf2341e1e43aee365cc8d58a0bd30",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-platform-deno-r1",
+              "receiptSha256": "39c6aa48b2397427b8cfacdd44ccb3e3db79aa6dbaa5ae2e257ce10f11db353d"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 328967524,
+        "finishedAt": "2026-09-24T04:34:31.611039+00:00"
+      },
+      "resources": {
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 130445312,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "receipt": ".work/application-platform-bun-r1/archive.json",
+      "receiptSha256": "daba4fbacc391f16f086ca2f1653e103503fb34ddea86db3b914386a04a95f89",
+      "record": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-probe-archives-r2-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/relocated deployment/program.wasm",
+            "originalBytes": 166000513,
+            "originalSha256": "518f9af0ff37c2390eda52cad0948a4f41b93d30b35b1949c2d5e14d67bb9114",
+            "mode": 509,
+            "mtimeNs": 1790224602126909905,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/relocated deployment/program.wasm.gz",
+            "archiveBytes": 38386015,
+            "archiveSha256": "d15ff790ea726f335e99493e96f696e2e1a22e7a27d5e253fb986270d4128527",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1",
+              "receiptSha256": "7e1f88e60ad6fae891806ba624ec67806d5838e84f214a01866752126b8dde86"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/.lake/lasm/applications/a35b6b46274dfa1d/5f06bb7167fb76c6553456c086aa3bbd9d9df53eab8b6d1103a27bb541b6c17f/dist/program.wasm",
+            "originalBytes": 166000513,
+            "originalSha256": "518f9af0ff37c2390eda52cad0948a4f41b93d30b35b1949c2d5e14d67bb9114",
+            "mode": 509,
+            "mtimeNs": 1790224592244813882,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/.lake/lasm/applications/a35b6b46274dfa1d/5f06bb7167fb76c6553456c086aa3bbd9d9df53eab8b6d1103a27bb541b6c17f/dist/program.wasm.gz",
+            "archiveBytes": 38386015,
+            "archiveSha256": "d15ff790ea726f335e99493e96f696e2e1a22e7a27d5e253fb986270d4128527",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1",
+              "receiptSha256": "7e1f88e60ad6fae891806ba624ec67806d5838e84f214a01866752126b8dde86"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/native",
+            "originalBytes": 121927440,
+            "originalSha256": "a2a439d3a2255c3373de45f300d788177fc6e194a4d4cfef5ecb67cebb29ac03",
+            "mode": 509,
+            "mtimeNs": 1790224510976023023,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1/native.gz",
+            "archiveBytes": 39270036,
+            "archiveSha256": "736e590a1aa043559a61393f01c260e86dfbf2341e1e43aee365cc8d58a0bd30",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-platform-bun-r1",
+              "receiptSha256": "7e1f88e60ad6fae891806ba624ec67806d5838e84f214a01866752126b8dde86"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 337886400,
+        "finishedAt": "2026-09-24T04:38:15.357329+00:00"
+      },
+      "resources": {
+        "limits": {
+          "memoryMax": 4294967296,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 3435973836,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 2014744576,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "receipt": ".work/product-acceptance/completed-driver-archives-r1.json",
+      "receiptSha256": "840e50de3c814327c0bda051e9b8da250912bf0816f3d22dbd32dd26b6f5e536",
+      "record": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-probe-archives-r2-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v139-standalone/driver.wasm",
+            "originalBytes": 152221181,
+            "originalSha256": "f212594ab49162ceb3d8664c151e36e8f980fc116614351966b3b237d8cb7209",
+            "mode": 509,
+            "mtimeNs": 1790065649816152421,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v139-standalone/driver.wasm.gz",
+            "archiveBytes": 35494725,
+            "archiveSha256": "3ac3d45930fba42879fc689cebe0cfbe6873e2502fd08e38c33540901287461b",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/standalone-server-driver-2026-09-22.json",
+              "receiptSha256": "c797fa83e3ca3b71dcf3fcc4b6e70cc26e4643df493802d07769c525a0a39553"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v144-split-optimization/driver.wasm",
+            "originalBytes": 152128018,
+            "originalSha256": "b1cb0b92c0e3d57e383e1a0c65ff435b9591ed666f8430bf66aca1526cb44a1c",
+            "mode": 509,
+            "mtimeNs": 1790073626988741564,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v144-split-optimization/driver.wasm.gz",
+            "archiveBytes": 35461706,
+            "archiveSha256": "cba9f64c98368c973df23640d07051f666c5ad504e9e6876524143cf0661ea6b",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/standalone-link-server-driver-2026-09-22.json",
+              "receiptSha256": "8fa3e1f3e57de95b6ef9000550c4a8fb9256dabb27969ec9cdd724271a9b5d78"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.wasm",
+            "originalBytes": 152128016,
+            "originalSha256": "671755ef3a0aa029b2485c99b9caad22be9fba8727433cbecffda58291fd7beb",
+            "mode": 509,
+            "mtimeNs": 1790089624488090426,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v145-runtime-metadata/driver.wasm.gz",
+            "archiveBytes": 35463754,
+            "archiveSha256": "f69d9e5631e14dd0cf6a61f65736019b9d4d769515c3fd828b5897d778d9de92",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/runtime-library-metadata-server-2026-09-22.json",
+              "receiptSha256": "b4db29eb6a2906f0b1b6b178863426d7ff93c2828a7b9b3fa55d258015778dff"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.wasm",
+            "originalBytes": 152128016,
+            "originalSha256": "6e0809d087c07b19a762edc0b45c6c285532fa05ed48ce2e9bec8ddea0f0706d",
+            "mode": 509,
+            "mtimeNs": 1790109585122346370,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v146-lean-symbol-loader/driver.wasm.gz",
+            "archiveBytes": 35461668,
+            "archiveSha256": "d213bb95f5660f5594402554ded8b0d2081a6a595f89cc514a81a797a7319c5b",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/server-project-driver-2026-09-22.json",
+              "receiptSha256": "1859dfd377d4c8a7f9b759b1c1ddf02aa42e9b7d9a8503798eedb1d9eb364a20"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.wasm",
+            "originalBytes": 152128016,
+            "originalSha256": "416e61300b485fcfb8032e6b996c095a4725e2aae4ce4473d960f23c07abb124",
+            "mode": 509,
+            "mtimeNs": 1790109762825515633,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v146-lean-symbol-loader/driver.wasm.gz",
+            "archiveBytes": 35461673,
+            "archiveSha256": "4306fcf52131ad155873880605fa70c6f77c2897fb1144497b880edd21ba7724",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/server-project-driver-2026-09-22.json",
+              "receiptSha256": "1859dfd377d4c8a7f9b759b1c1ddf02aa42e9b7d9a8503798eedb1d9eb364a20"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.wasm",
+            "originalBytes": 152128016,
+            "originalSha256": "e7c3dc3bfceb8091f2ebe694bc9dc91bd53be3fbf9a3b5c2fa17ae2ebc9e99c0",
+            "mode": 509,
+            "mtimeNs": 1790109967587947491,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/server-driver-bun-v146-lean-symbol-loader/driver.wasm.gz",
+            "archiveBytes": 35461741,
+            "archiveSha256": "89f41f22d45c737217d1c99b766923699f433063546321b54c3b5f4242e1653e",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/server-project-driver-2026-09-22.json",
+              "receiptSha256": "1859dfd377d4c8a7f9b759b1c1ddf02aa42e9b7d9a8503798eedb1d9eb364a20"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v147-temporary-files/driver.wasm",
+            "originalBytes": 152128016,
+            "originalSha256": "88b8c5fb9e3f68ad8662ebfd1628fea4d99af6a67ffa2f311fc714eefe3bf0cc",
+            "mode": 509,
+            "mtimeNs": 1790115363340759845,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/server-driver-node-v147-temporary-files/driver.wasm.gz",
+            "archiveBytes": 35463803,
+            "archiveSha256": "4f1494ded48a266db29d9ff98437a6dc70b9accdccf08a2dfc07b4b7d03a021c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/server-project-v147-temporary-files-2026-09-22.json",
+              "receiptSha256": "8042c5d1bd4214aad952fbe1553a2f4dc388ee8b12b231b764d2c7dd1cfd0723"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.wasm",
+            "originalBytes": 152128016,
+            "originalSha256": "1a175f417e1e4f6400d2d9940c20637dd018ec398664df34ace1450f5c6c2ac9",
+            "mode": 509,
+            "mtimeNs": 1790165768137097254,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/server-driver-deno-v151-system-directories/driver.wasm.gz",
+            "archiveBytes": 35461676,
+            "archiveSha256": "133860b0b8fa5b79920b40fb452fbe4ba5bc8bc2d9783c4f01a8a4f964956efb",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/server-project-deno-v151-system-directories-2026-09-23.json",
+              "receiptSha256": "b4f14992503d6cb9099c4c56e1bb319952f5b83f2a24a416d145afd6a7863582"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver.wasm",
+            "originalBytes": 152221117,
+            "originalSha256": "94bf0e0dadc3d685f17f2e4153713519cac9c68eb41186cdbc508a7dabdca471",
+            "mode": 509,
+            "mtimeNs": 1790028607797054178,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/full-engine-probe/server-driver-node-v119-cc-inputs/driver.wasm.gz",
+            "archiveBytes": 35494052,
+            "archiveSha256": "69b2c519a30ed63f25b0bc5c9024a848ead4c592f67bfc9e0dd8f6418178396b",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/node-v119-server-driver-2026-09-21.json",
+              "receiptSha256": "f6f4fb92938e262f2abbd284ccba714f54ac25b8c8cf88f175235bfa1ad9983b"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/filesystem-node-fixed-r2/relocated deployment/program.wasm",
+            "originalBytes": 160407773,
+            "originalSha256": "4b5574dcb78c4fb8f8068357ebaeed766ad7c92060927b856a35ee0643f4b596",
+            "mode": 509,
+            "mtimeNs": 1790213837252978459,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/filesystem-node-fixed-r2/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37245578,
+            "archiveSha256": "43e6b8fe5802a0aa01194c1162dbfea99dad7eae1bbe3505692c80e8b15ca2bd",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/lean-4.34-io-errors-2026-09-24.json",
+              "receiptSha256": "311b6be01efecfcdf49ad0964a62f737fb48eba5fc738e217497d6584e511b6a"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/filesystem-deno-fixed-r2/relocated deployment/program.wasm",
+            "originalBytes": 160407773,
+            "originalSha256": "4b5574dcb78c4fb8f8068357ebaeed766ad7c92060927b856a35ee0643f4b596",
+            "mode": 509,
+            "mtimeNs": 1790213915187944738,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/filesystem-deno-fixed-r2/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37245578,
+            "archiveSha256": "43e6b8fe5802a0aa01194c1162dbfea99dad7eae1bbe3505692c80e8b15ca2bd",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/lean-4.34-io-errors-2026-09-24.json",
+              "receiptSha256": "311b6be01efecfcdf49ad0964a62f737fb48eba5fc738e217497d6584e511b6a"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/filesystem-bun-fixed-r2/relocated deployment/program.wasm",
+            "originalBytes": 166010973,
+            "originalSha256": "d8d743b0b407db9ec9acbe1b3030fdd1e442dc4e65237a3aa7630f3fe22325bd",
+            "mode": 509,
+            "mtimeNs": 1790214022417241751,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/filesystem-bun-fixed-r2/relocated deployment/program.wasm.gz",
+            "archiveBytes": 38399818,
+            "archiveSha256": "f879ddddb476a9adf52dbfc4f02eb4c5a441fdaa883d36b0f9d9d1bb6f501bd4",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/lean-4.34-io-errors-2026-09-24.json",
+              "receiptSha256": "311b6be01efecfcdf49ad0964a62f737fb48eba5fc738e217497d6584e511b6a"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 1424049159,
+        "finishedAt": "2026-09-24T04:38:48.464761+00:00"
+      },
+      "resources": {
+        "limits": {
+          "memoryMax": 4294967296,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 3435973836,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "peakMemoryBytes": 2014744576,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "restore": "Decompress the recorded gzip archive to its original path, verify original byte length and SHA256, then restore mode and mtimeNs before replaying that historical probe.",
+  "preflightFailure": {
+    "resourceReport": ".work/product-acceptance/application-platform-node-r1-archive-resources.json",
+    "reason": "A file selector also counted native-support directories; prevalidation stopped before mutations. The corrected selector requires ordinary files."
+  }
+}

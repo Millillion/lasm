@@ -78,7 +78,10 @@ separately from the earlier runtime evidence below.
   now preserves the original legacy-exception result after translation to
   standardized exceptions in every helper/engine profile. Converting and running
   real generated Lean applications, with all imports and scheduler behavior,
-  remains separate unfinished work.
+  remains separate unfinished work. A [real-module format probe](docs/evidence/wasmtime-real-lean-format-2026-09-24.json)
+  now converts an unchanged 160 MB Lean application module and passes Wasmtime
+  validation, with a 3.23 GiB guarded peak. It does not instantiate or execute
+  the application; host-import and scheduler integration remain open.
 
 ## Earlier runtime evidence and remaining compatibility work
 

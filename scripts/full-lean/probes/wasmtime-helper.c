@@ -174,6 +174,13 @@ int lasm_probe_legacy_exception(probe_t *probe, const uint8_t *bytes, size_t len
     return status;
 }
 
+// Validation only: this must not instantiate or execute an unadapted Lean
+// application. Its imports, scheduler and loader still need a full adapter.
+int lasm_probe_validate_module(probe_t *probe, const uint8_t *bytes, size_t length, char *error, size_t size) {
+    if (length > 512 * 1024 * 1024) { snprintf(error, size, "module exceeds experiment input bound"); return 2; }
+    return error_text(wasmtime_module_validate(probe->engine, bytes, length), NULL, error, size);
+}
+
 int lasm_probe_standalone(probe_t *probe, const uint8_t *bytes, size_t length,
                           int64_t *result, char *error, size_t size) {
     if (length > 65536) { snprintf(error, size, "standalone control exceeds tiny probe bound"); return 2; }

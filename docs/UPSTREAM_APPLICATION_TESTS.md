@@ -193,3 +193,12 @@ identifies the six fixtures that deliberately launch native Lean children; their
 compiler behavior remains native evidence. The four disabled inputs require
 separate explained probes. Other categories, API gaps, repaired-package Node/Bun
 campaigns and the other native platforms remain open.
+
+Completed generated binaries may be stored as verified gzip archives to preserve
+the disk reserve. The [archival receipts](evidence/completed-artifact-archives-2026-09-24.json)
+record original paths, lengths, checksums, modes and modification times, together
+with verified archive checksums and decompression results. Restore and verify a
+binary before replaying its historical probe. This affects only the listed
+completed experiment binaries, including older standalone test drivers; original
+upstream sources, expected outputs, result receipts and failure deployments
+remain in place. It does not add or remove compatibility passes.
