@@ -26,6 +26,8 @@ below retain their original, narrower scope.
 - [x] Verify an installed candidate's pinned Lake Git dependency, custom source
   roots, symlinked main, cache reuse/invalidation, asset preservation, compatibility
   launchers and relocated deployment in all three stock engines on Linux x64.
+- [x] Verify ordinary scripts outside configured Lake targets, preserving package
+  compiler options and the above workflow checks in all three engines on Linux x64.
 - [ ] Finish and package the primary `lasm Main.lean` / `lasm build Main.lean`
   pipeline with automatic tools, Lake dependencies and reliable cache reuse.
 - [ ] Validate the HTTP and Express examples and callable JS/TypeScript bindings

@@ -13,8 +13,9 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [outputArg, target = 'node', engineArg = process.execPath, compilerArg = root] = process.argv.slice(2);
-if (!outputArg || !['node', 'deno', 'bun'].includes(target)) throw new Error('Supply NEW_OUTPUT [TARGET ENGINE INSTALLED_COMPILER]');
+const [outputArg, target = 'node', engineArg = process.execPath, compilerArg = root, entryKind = 'configured'] = process.argv.slice(2);
+if (!outputArg || !['node', 'deno', 'bun'].includes(target) || !['configured', 'script'].includes(entryKind))
+  throw new Error('Supply NEW_OUTPUT [TARGET ENGINE INSTALLED_COMPILER configured|script]');
 const base = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg);
 if (existsSync(base)) throw new Error('Use a fresh Lake acceptance directory');
 const project = join(base, 'consumer λ'), dependency = join(base, 'dependency origin'), dist = join(base, 'dist');
@@ -32,15 +33,21 @@ const gitRun = args => execFileSync(git.executable, args, { cwd: dependency, env
 gitRun(['-c', 'init.defaultBranch=main', 'init']); gitRun(['add', '.']);
 gitRun(['-c', 'user.name=Lasm fixture', '-c', 'user.email=lasm-fixture@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '-m', 'Pinned dependency fixture']);
 const revision = gitRun(['rev-parse', 'HEAD']);
-writeFileSync(join(project, 'lakefile.toml'), `name = "consumer"\nversion = "0.1.0"\nsrcDir = "app"\n\n[[require]]\nname = "dependency"\ngit = ${JSON.stringify(pathToFileURL(dependency).href)}\nrev = ${JSON.stringify(revision)}\n\n[[lean_lib]]\nname = "Local"\n\n[[lean_exe]]\nname = "consumer"\nroot = "Main"\n`);
+writeFileSync(join(project, 'lakefile.toml'), `name = "consumer"\nversion = "0.1.0"\nsrcDir = "app"\nmoreLeanArgs = ["-DmaxRecDepth=4096"]\n\n[[require]]\nname = "dependency"\ngit = ${JSON.stringify(pathToFileURL(dependency).href)}\nrev = ${JSON.stringify(revision)}\n\n[[lean_lib]]\nname = "Local"\n\n[[lean_exe]]\nname = "consumer"\nroot = "Main"\n`);
 writeFileSync(join(project, 'app/Local.lean'), 'import Dependency\ndef localValue : Nat := dependencyValue + 5\n');
-const source = join(project, 'app/Main.lean');
-const mainText = 'import Local\ndef main (args : List String) : IO Unit := do\n  IO.println s!"dependency={localValue}; args={String.intercalate "|" args}"\n';
-if (process.platform === 'win32') writeFileSync(source, mainText);
+const configuredSource = join(project, 'app/Main.lean');
+const source = entryKind === 'script' ? join(project, 'tools/Run.lean') : configuredSource;
+const mainText = 'import Lean\nimport Local\nopen Lean\nrun_elab do\n  unless maxRecDepth.get (← getOptions) == 4096 do\n    throwError "Lake package compiler options were lost"\ndef main (args : List String) : IO Unit := do\n  IO.println s!"dependency={localValue}; args={String.intercalate "|" args}"\n';
+if (entryKind === 'script') mkdirSync(join(project, 'tools'));
+if (process.platform === 'win32') {
+  writeFileSync(configuredSource, mainText);
+  if (entryKind === 'script') writeFileSync(source, mainText);
+}
 else {
   mkdirSync(join(project, 'entry sources'));
   writeFileSync(join(project, 'entry sources/Main.lean'), mainText);
-  symlinkSync('../entry sources/Main.lean', source);
+  symlinkSync('../entry sources/Main.lean', configuredSource);
+  if (entryKind === 'script') symlinkSync('../entry sources/Main.lean', source);
 }
 const cli = args => execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), ...args],
   { cwd: project, env, encoding: 'utf8', timeout: 1800_000, stdio: ['ignore', 'pipe', 'inherit'] });
@@ -93,10 +100,10 @@ const actual = compare(engine, [...(target === 'deno' ? ['run', '-A'] : []), joi
 assert.deepEqual(actual, expected);
 const result = { scope: 'Ordinary Lake Git dependency through application CLI, native control and relocated deployment',
   target, platform: process.platform + '-' + process.arch, node: process.version,
-  engineVersion: execFileSync(engine, ['--version'], { encoding: 'utf8' }).trim(), compiler,
+  engineVersion: execFileSync(engine, ['--version'], { encoding: 'utf8' }).trim(), compiler, entryKind,
   dependencyRevision: revision, gitIdentity: git.identity, build: JSON.parse(readFileSync(join(deployed, 'build-info.json'), 'utf8')),
   wasmSha256: await hashFile(join(deployed, 'program.wasm')), expected, actual,
-  checks: { pinnedGitDependency: 'passed', nonDefaultSourceRoots: 'passed',
+  checks: { pinnedGitDependency: 'passed', nonDefaultSourceRoots: 'passed', packageCompilerOptions: 'passed',
     sourceSymlink: process.platform === 'win32' ? 'not-run: Windows link creation needs separate coverage' : 'passed',
     exactCacheReuse: 'passed', sourceInvalidation: 'passed', addedAssetsPreserved: 'passed', compatibilityLauncher: 'passed', relocatedDeployment: 'passed' },
   resourceReport: process.env.LASM_RESOURCE_REPORT, recordedAt: new Date().toISOString() };

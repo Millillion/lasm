@@ -39,17 +39,33 @@ export function applicationSources(source, lean, work, { log = console.error, gi
     const configuredSource = resolve(realpathSync(project), relative(project, source));
     const entry = JSON.parse(run(lean.lean, ['-j1', '-s8192', '--run',
       fileURLToPath(new URL('./lake-module.lean', import.meta.url)), configuredSource], project));
-    if (typeof entry !== 'string' || !entry.startsWith('/+')) throw new Error('Unexpected Lake module identity');
-    const modules = query(entry + ':transImports');
-    if (!Array.isArray(modules) || modules.some(module => typeof module !== 'string'))
-      throw new Error('Unexpected Lake transitive module inventory');
+    const configured = typeof entry === 'string' && entry.startsWith('/+');
+    if (!configured && (!entry || !Array.isArray(entry.imports) || entry.imports.some(name => typeof name !== 'string')))
+      throw new Error('Unexpected Lake module identity');
+    const targets = [];
+    for (const target of configured ? [entry] : entry.imports.map(name => '+' + name)) {
+      const modules = query(target + ':transImports');
+      if (!Array.isArray(modules) || modules.some(module => typeof module !== 'string'))
+        throw new Error('Unexpected Lake transitive module inventory');
+      targets.push(...modules.map(name => '+' + name), target);
+    }
     const sources = [], inputs = [];
-    for (const target of [...modules.map(name => '+' + name), entry]) {
+    for (const target of new Set(targets)) {
       log(`Generating Lean C: ${target}`);
       const file = query(target + ':c');
       if (typeof file !== 'string') throw new Error(`Lake returned no C file for ${target}`);
       sources.push(resolve(project, file));
       inputs.push({ module: target, source: resolve(project, query(target + ':lean')) });
+    }
+    if (!configured) {
+      const file = join(work, 'script.c');
+      // Lake supplies dependency artifacts, package options and build-time
+      // plugins for unregistered source files through its ordinary command.
+      // Re-elaborate the script to observe configuration/plugin changes; the
+      // content-based application cache still reuses an unchanged final link.
+      run(lean.lake, ['--no-cache', '--keep-toolchain', 'lean', configuredSource,
+        '--', '-j1', '-s8192', '-Dcompiler.postponeCompile=false', '-c', file], project);
+      sources.push(file); inputs.push({ module: relative(project, source).replaceAll('\\', '/'), source });
     }
     return { project, sources, inputs, env };
   }

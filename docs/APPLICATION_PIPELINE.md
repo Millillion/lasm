@@ -287,6 +287,18 @@ private Node build bridge now receives one JSON payload, preserving those string
 Earlier failures remain recorded. Other native platforms, remote Lake transports,
 and concurrent full CLI builds still require end-to-end validation.
 
+Installed candidate `0.1.0-experimental.10` also accepts ordinary Lake scripts
+outside the configured library/executable targets. Lake supplies imports, package
+compiler options and build-time setup through its standard `lake lean` command.
+The script is re-elaborated to observe setup changes; unchanged generated inputs
+still reuse the final compiled application. All three stock engines pass the
+same dependency, symlink, cache, asset and relocation checks, including a
+compile-time assertion that the package's `maxRecDepth` option is honored. The
+sequential campaign peaked at 5.03 GiB with no resource events. See the
+[installed script evidence](evidence/installed-lake-scripts-three-engines-2026-09-24.json).
+A preparatory native probe was safely stopped for memory pressure before adding
+the required base-page wrapper; it remains a separate resource result.
+
 ## Native CI
 
 `managed-tools.yml` tests provisioning on the six required standard native runner
