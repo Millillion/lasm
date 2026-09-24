@@ -313,7 +313,11 @@ and do not establish full-suite conformance. See
   ARM64](docs/evidence/filesystem-devices-native-ci-2026-09-24.json), with bounded
   transfers through null/zero/full devices and procfs. Buffered writes, repeated
   flushes, errno values and zero-size procfs reads agree across both architectures.
-  Installed Wasm comparisons remain pending.
+  [Installed `.24` now matches all 24 observations per engine](docs/evidence/filesystem-devices-installed-2026-09-24.json)
+  in Node, Deno and Bun on Linux x64, including six complete error values per
+  engine. Relocated deployments run with source hidden, PATH empty and build
+  environment variables removed. This adds device coverage without closing the
+  broader platform, pipe, large-file and race requirements.
   `Handle.truncate` now preserves
   the native call sequence even when querying the stream position fails; Linux
   regular-file and pipe comparisons match native Lean in all three packaged and

@@ -1,0 +1,1017 @@
+{
+  "scope": "Installed .24 matches native-interpreted and native-compiled Lean for 24 Linux character-device/procfs observations per engine; other device classes and platforms remain open.",
+  "recordedAt": "2026-09-24T16:17:12.958843+00:00",
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r21/lasm-compiler-0.1.0-experimental.24.tgz",
+    "sha256": "f165c4b409f576369c86efcd0c20367371e34bbbad9c84ba0a4d5d440be618d4",
+    "compressedBytes": 125634487,
+    "installedBytes": 631040511,
+    "files": 2697,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-timezone-r1-resources.json",
+    "recordedAt": "2026-09-24T16:02:42.123Z"
+  },
+  "versions": {
+    "lean": "4.34.0",
+    "node": "26.10.0",
+    "deno": "2.9.7",
+    "bun": "1.4.2",
+    "officialLatestRecheckedOn": "2026-09-24"
+  },
+  "officialLatestCheck": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "expected": "v4.34.0",
+      "tag": "v4.34.0",
+      "publishedAt": "2026-09-14T14:04:36Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "expected": "v2.9.7",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "expected": "bun-v1.4.2",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "expected": "v26.10.0",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false
+    },
+    "checkedAt": "2026-09-24T15:47:23.152Z"
+  },
+  "sourceHashes": {
+    "integration/application-io-regressions.mjs": "33bd9323230d630c72435d2cbdbab8ae92de16bb526f9cf3b36e73970b0f93fc",
+    ".work/run-io-case-r3.sh": "17b05f072ff7a1b35d5ea4af155bc7829d24fd73e9fa1ffeb166503888a8bace",
+    ".work/archive-passed-application-probe-r1.py": "72b41433f99f32876374ff45226094b0df727e23dcd3901ad14959f949ba012c",
+    "integration/fixtures/WindowsTimezone.lean": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+    "integration/fixtures/FilesystemDevices.lean": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219"
+  },
+  "campaign": {
+    "path": ".work/product-acceptance/timezone-devices-campaign-r1.json",
+    "sha256": "c631199842c5dada7c11b861a7862f0b673a3bb5ec7b3fcf47d94a67a45698d0",
+    "passed": true,
+    "finishedAt": "2026-09-24T16:13:43.305Z"
+  },
+  "cases": [
+    {
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "resultPath": ".work/application-io-node-filesystem-devices-fixed-r1/result.json",
+      "resultSha256": "a2c946a78162e3fc8c649ab672ef6ead885afd2af234943d1098d53c4ee01b1d",
+      "observations": 24,
+      "errorObservations": 6,
+      "case": {
+        "name": "filesystem-devices",
+        "source": "integration/fixtures/FilesystemDevices.lean",
+        "marker": "filesystem device observations completed\n",
+        "linux": true,
+        "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+        "passed": true,
+        "interpreted": {
+          "code": 0,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        "nativeCompiled": {
+          "code": 0,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a",
+          "buildDriverIdentity": "4fa31710c112a0f98a25ba47e953397375391d9c644f17851ce7874500992599",
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+              "cSha256": "2e4ccf162529f130f4147ec26acb7b3f9d17d348be7c79a667c5224dd9ea6645"
+            }
+          ],
+          "signature": "ecc2f9390f9557e7273ea61c215115a824a0d93a31d0c9a4fed639fa97fb19b8",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "wasmSha256": "ce84896c3e91230981af4bcf54584e0d257d0ae300533a2a974331e176178579",
+        "actual": {
+          "code": 0,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        "deployment": {
+          "sourceHidden": true,
+          "path": "",
+          "buildEnvironmentRemoved": true,
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1/filesystem-devices/relocated deployment"
+        },
+        "sourceUnchanged": true,
+        "status": "passed"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T16:08:53.179Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-io-case-r3.sh",
+          "node",
+          "filesystem-devices",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "2f1dfad9-52d5-44da-bf8a-1f13e95c3078",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23428083712
+        },
+        "minimumHostAvailable": 20533538816,
+        "peakMemoryBytes": 3522678784,
+        "peakTasks": 36,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-node-filesystem-devices-fixed-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T16:10:13.084Z",
+          "memoryBytes": 621826048,
+          "peakMemoryBytes": 3522678784,
+          "swapBytes": 0,
+          "tasks": 12,
+          "memoryBreakdown": {
+            "anon": 230297600,
+            "file": 367489024,
+            "kernel": 14942208,
+            "shmem": 0,
+            "file_mapped": 995328,
+            "inactive_file": 362934272,
+            "slab": 12013192
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T16:10:13.182Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 392855552,
+          "peakMemoryBytes": 3522678784,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11661312,
+            "file": 367493120,
+            "kernel": 12582912,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 362938368,
+            "slab": 11650432
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T16:10:13.207Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-node-filesystem-devices-fixed-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1/filesystem-devices/relocated deployment/program.wasm",
+            "originalBytes": 160430902,
+            "originalSha256": "ce84896c3e91230981af4bcf54584e0d257d0ae300533a2a974331e176178579",
+            "mode": 509,
+            "mtimeNs": 1790266210696306400,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1/filesystem-devices/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37249671,
+            "archiveSha256": "a445a266862499b92e85068d5c3d16734765f8e8b6d3a80bcdc7733815ec695c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1",
+              "receiptSha256": "a2c946a78162e3fc8c649ab672ef6ead885afd2af234943d1098d53c4ee01b1d"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/.lake/lasm/applications/3a0c13b147b78033/ecc2f9390f9557e7273ea61c215115a824a0d93a31d0c9a4fed639fa97fb19b8/dist/program.wasm",
+            "originalBytes": 160430902,
+            "originalSha256": "ce84896c3e91230981af4bcf54584e0d257d0ae300533a2a974331e176178579",
+            "mode": 509,
+            "mtimeNs": 1790266200181201200,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/.lake/lasm/applications/3a0c13b147b78033/ecc2f9390f9557e7273ea61c215115a824a0d93a31d0c9a4fed639fa97fb19b8/dist/program.wasm.gz",
+            "archiveBytes": 37249671,
+            "archiveSha256": "a445a266862499b92e85068d5c3d16734765f8e8b6d3a80bcdc7733815ec695c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1",
+              "receiptSha256": "a2c946a78162e3fc8c649ab672ef6ead885afd2af234943d1098d53c4ee01b1d"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/native",
+            "originalBytes": 4554208,
+            "originalSha256": "fb15d2682aad85184735ffaea09be84c67b49de906716409c2eb5314878686ef",
+            "mode": 509,
+            "mtimeNs": 1790266147743675100,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/native.gz",
+            "archiveBytes": 1347163,
+            "archiveSha256": "d2141f525c117c4d86df91f5f74bd31e5afb8995f03768a77988dd7c30611866",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1",
+              "receiptSha256": "a2c946a78162e3fc8c649ab672ef6ead885afd2af234943d1098d53c4ee01b1d"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 249569507,
+        "finishedAt": "2026-09-24T16:10:19.639957+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T16:10:13.263Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-application-probe-r1.py",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-node-filesystem-devices-fixed-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "5848bb6c-515d-4f58-9e35-c82fea6083d3",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23359000576
+        },
+        "minimumHostAvailable": 23356690432,
+        "peakMemoryBytes": 91635712,
+        "peakTasks": 6,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-node-filesystem-devices-fixed-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T16:10:19.675Z",
+          "memoryBytes": 84783104,
+          "peakMemoryBytes": 88408064,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 5173248,
+            "file": 75857920,
+            "kernel": 2961408,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 75857920,
+            "slab": 2373336
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T16:10:19.698Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 91635712,
+          "peakMemoryBytes": 91635712,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11644928,
+            "file": 75857920,
+            "kernel": 3321856,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 75857920,
+            "slab": 2400648
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T16:10:19.722Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "resultPath": ".work/application-io-deno-filesystem-devices-fixed-r1/result.json",
+      "resultSha256": "cf35ca84ccb1b0ca6552d1195aa591089d641148e931fd6410ed0bcda0f1b1e6",
+      "observations": 24,
+      "errorObservations": 6,
+      "case": {
+        "name": "filesystem-devices",
+        "source": "integration/fixtures/FilesystemDevices.lean",
+        "marker": "filesystem device observations completed\n",
+        "linux": true,
+        "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+        "passed": true,
+        "interpreted": {
+          "code": 0,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        "nativeCompiled": {
+          "code": 0,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a",
+          "buildDriverIdentity": "4fa31710c112a0f98a25ba47e953397375391d9c644f17851ce7874500992599",
+          "target": "deno",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+              "cSha256": "2e4ccf162529f130f4147ec26acb7b3f9d17d348be7c79a667c5224dd9ea6645"
+            }
+          ],
+          "signature": "46aba50acd6e4aac8524f7215cfe214ff94a0e0ab7f2e73258f7f44b0529b111",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "wasmSha256": "ce84896c3e91230981af4bcf54584e0d257d0ae300533a2a974331e176178579",
+        "actual": {
+          "code": 0,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        "deployment": {
+          "sourceHidden": true,
+          "path": "",
+          "buildEnvironmentRemoved": true,
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1/filesystem-devices/relocated deployment"
+        },
+        "sourceUnchanged": true,
+        "status": "passed"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T16:10:19.775Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-io-case-r3.sh",
+          "deno",
+          "filesystem-devices",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "bd0c1877-3ac2-4d25-97c6-1e8fe70ddbac",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23675006976
+        },
+        "minimumHostAvailable": 20361232384,
+        "peakMemoryBytes": 3537276928,
+        "peakTasks": 39,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-deno-filesystem-devices-fixed-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T16:11:41.273Z",
+          "memoryBytes": 392667136,
+          "peakMemoryBytes": 3537276928,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11620352,
+            "file": 367800320,
+            "kernel": 12582912,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 363114496,
+            "slab": 11663160
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T16:11:41.272Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 392667136,
+          "peakMemoryBytes": 3537276928,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11620352,
+            "file": 367800320,
+            "kernel": 12582912,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 363114496,
+            "slab": 11663160
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T16:11:41.302Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-deno-filesystem-devices-fixed-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1/filesystem-devices/relocated deployment/program.wasm",
+            "originalBytes": 160430902,
+            "originalSha256": "ce84896c3e91230981af4bcf54584e0d257d0ae300533a2a974331e176178579",
+            "mode": 509,
+            "mtimeNs": 1790266298235180300,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1/filesystem-devices/relocated deployment/program.wasm.gz",
+            "archiveBytes": 37249671,
+            "archiveSha256": "a445a266862499b92e85068d5c3d16734765f8e8b6d3a80bcdc7733815ec695c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1",
+              "receiptSha256": "cf35ca84ccb1b0ca6552d1195aa591089d641148e931fd6410ed0bcda0f1b1e6"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/.lake/lasm/applications/be869f83d83b6d4b/46aba50acd6e4aac8524f7215cfe214ff94a0e0ab7f2e73258f7f44b0529b111/dist/program.wasm",
+            "originalBytes": 160430902,
+            "originalSha256": "ce84896c3e91230981af4bcf54584e0d257d0ae300533a2a974331e176178579",
+            "mode": 509,
+            "mtimeNs": 1790266287314071600,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/.lake/lasm/applications/be869f83d83b6d4b/46aba50acd6e4aac8524f7215cfe214ff94a0e0ab7f2e73258f7f44b0529b111/dist/program.wasm.gz",
+            "archiveBytes": 37249671,
+            "archiveSha256": "a445a266862499b92e85068d5c3d16734765f8e8b6d3a80bcdc7733815ec695c",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1",
+              "receiptSha256": "cf35ca84ccb1b0ca6552d1195aa591089d641148e931fd6410ed0bcda0f1b1e6"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/native",
+            "originalBytes": 4554208,
+            "originalSha256": "fb15d2682aad85184735ffaea09be84c67b49de906716409c2eb5314878686ef",
+            "mode": 509,
+            "mtimeNs": 1790266234304542700,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/native.gz",
+            "archiveBytes": 1347163,
+            "archiveSha256": "d2141f525c117c4d86df91f5f74bd31e5afb8995f03768a77988dd7c30611866",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1",
+              "receiptSha256": "cf35ca84ccb1b0ca6552d1195aa591089d641148e931fd6410ed0bcda0f1b1e6"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 249569507,
+        "finishedAt": "2026-09-24T16:11:48.352305+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T16:11:41.359Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-application-probe-r1.py",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-deno-filesystem-devices-fixed-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "6fcb2f99-62ae-49c0-aa90-e4a917292b87",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23486930944
+        },
+        "minimumHostAvailable": 23479459840,
+        "peakMemoryBytes": 91807744,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-deno-filesystem-devices-fixed-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T16:11:48.372Z",
+          "memoryBytes": 78491648,
+          "peakMemoryBytes": 88363008,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 4096,
+            "file": 75857920,
+            "kernel": 2310144,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 75857920,
+            "slab": 2266808
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T16:11:48.412Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 91807744,
+          "peakMemoryBytes": 91807744,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 75857920,
+            "kernel": 3334144,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 75857920,
+            "slab": 2397424
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T16:11:48.439Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "resultPath": ".work/application-io-bun-filesystem-devices-fixed-r1/result.json",
+      "resultSha256": "2ccc56818b3fa09244371c3611d94a017846395eb9bc0f6704fdbeced08e79dc",
+      "observations": 24,
+      "errorObservations": 6,
+      "case": {
+        "name": "filesystem-devices",
+        "source": "integration/fixtures/FilesystemDevices.lean",
+        "marker": "filesystem device observations completed\n",
+        "linux": true,
+        "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+        "passed": true,
+        "interpreted": {
+          "code": 0,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        "nativeCompiled": {
+          "code": 0,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "37ede9f5998fe2179e9f4f911fa01cba4c393323f34ecbd817804b5ab8b7682a",
+          "buildDriverIdentity": "4fa31710c112a0f98a25ba47e953397375391d9c644f17851ce7874500992599",
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "Main",
+              "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+              "cSha256": "2e4ccf162529f130f4147ec26acb7b3f9d17d348be7c79a667c5224dd9ea6645"
+            }
+          ],
+          "signature": "9dcf6e7909c87d673d9b89cc54dcc8798daa068dc299bad73352986a61b6f6f9",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "wasmSha256": "bcc5ff06b30e613adb194603bdba8f3b9311e94c772d5a39211f927ac9ceb29d",
+        "actual": {
+          "code": 0,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        "deployment": {
+          "sourceHidden": true,
+          "path": "",
+          "buildEnvironmentRemoved": true,
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1/filesystem-devices/relocated deployment"
+        },
+        "sourceUnchanged": true,
+        "status": "passed"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T16:11:48.500Z",
+        "command": [
+          "/bin/bash",
+          ".work/run-io-case-r3.sh",
+          "bun",
+          "filesystem-devices",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r23/workspace/project/node_modules/@lasm/compiler"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "a339e504-de04-41c1-85c8-b63710bb540a",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23620927488
+        },
+        "minimumHostAvailable": 20392775680,
+        "peakMemoryBytes": 3695104000,
+        "peakTasks": 55,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-bun-filesystem-devices-fixed-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T16:13:36.652Z",
+          "memoryBytes": 409391104,
+          "peakMemoryBytes": 3695104000,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 8667136,
+            "file": 386195456,
+            "kernel": 13021184,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 381640704,
+            "slab": 12221808
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T16:13:36.668Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 411856896,
+          "peakMemoryBytes": 3695104000,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 386195456,
+            "kernel": 13144064,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 381640704,
+            "slab": 12215688
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T16:13:36.695Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archive": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-bun-filesystem-devices-fixed-r1-archive-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1/filesystem-devices/relocated deployment/program.wasm",
+            "originalBytes": 166035073,
+            "originalSha256": "bcc5ff06b30e613adb194603bdba8f3b9311e94c772d5a39211f927ac9ceb29d",
+            "mode": 509,
+            "mtimeNs": 1790266413925329200,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1/filesystem-devices/relocated deployment/program.wasm.gz",
+            "archiveBytes": 38402751,
+            "archiveSha256": "cad9fc6796445a6fae3c478b9adaf35b46a25b34d909936fc78d7fec4b426569",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1",
+              "receiptSha256": "2ccc56818b3fa09244371c3611d94a017846395eb9bc0f6704fdbeced08e79dc"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/.lake/lasm/applications/4faf3d86abc35874/9dcf6e7909c87d673d9b89cc54dcc8798daa068dc299bad73352986a61b6f6f9/dist/program.wasm",
+            "originalBytes": 166035073,
+            "originalSha256": "bcc5ff06b30e613adb194603bdba8f3b9311e94c772d5a39211f927ac9ceb29d",
+            "mode": 509,
+            "mtimeNs": 1790266403777228800,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/.lake/lasm/applications/4faf3d86abc35874/9dcf6e7909c87d673d9b89cc54dcc8798daa068dc299bad73352986a61b6f6f9/dist/program.wasm.gz",
+            "archiveBytes": 38402751,
+            "archiveSha256": "cad9fc6796445a6fae3c478b9adaf35b46a25b34d909936fc78d7fec4b426569",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1",
+              "receiptSha256": "2ccc56818b3fa09244371c3611d94a017846395eb9bc0f6704fdbeced08e79dc"
+            },
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/native",
+            "originalBytes": 4554208,
+            "originalSha256": "fb15d2682aad85184735ffaea09be84c67b49de906716409c2eb5314878686ef",
+            "mode": 509,
+            "mtimeNs": 1790266322686423800,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1/filesystem-devices/source.hidden/native.gz",
+            "archiveBytes": 1347163,
+            "archiveSha256": "d2141f525c117c4d86df91f5f74bd31e5afb8995f03768a77988dd7c30611866",
+            "verifiedDecompression": true,
+            "provenance": {
+              "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1",
+              "receiptSha256": "2ccc56818b3fa09244371c3611d94a017846395eb9bc0f6704fdbeced08e79dc"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 258471689,
+        "finishedAt": "2026-09-24T16:13:43.219739+00:00"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T16:13:36.748Z",
+        "command": [
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-passed-application-probe-r1.py",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-bun-filesystem-devices-fixed-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "a49b3471-af11-4dcf-baa8-6e214168de5e",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23352893440
+        },
+        "minimumHostAvailable": 23165902848,
+        "peakMemoryBytes": 93872128,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-bun-filesystem-devices-fixed-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T16:13:43.160Z",
+          "memoryBytes": 88268800,
+          "peakMemoryBytes": 89653248,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 8187904,
+            "file": 77545472,
+            "kernel": 2449408,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 77545472,
+            "slab": 2340896
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T16:13:43.273Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 93872128,
+          "peakMemoryBytes": 93872128,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11640832,
+            "file": 78159872,
+            "kernel": 3383296,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 78159872,
+            "slab": 2465664
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T16:13:43.299Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "observations": 72,
+  "errorObservations": 18,
+  "allPassed": true,
+  "limitations": [
+    "Linux x64 installed applications only; Linux ARM64 evidence is native oracle only.",
+    "No new runtime repair was required for these fixtures; this adds behavioral coverage.",
+    "Generated Wasm/native binaries are losslessly archived after byte verification; restore using each archive receipt before rerunning.",
+    "Devices, pipes, FIFOs, large files, permission races and other OS behavior are not fully covered."
+  ]
+}

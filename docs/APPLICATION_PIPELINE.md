@@ -741,5 +741,10 @@ passes on Linux x64 and ARM64, comparing interpreted and compiled Lean with
 identical observations across architectures. In particular, a small buffered
 `/dev/full` write succeeds before flush reports errno 28; repeating the flush
 succeeds, while a large write reports errno 28. All guards release without
-resource events. Installed Wasm comparisons remain queued behind the current
-guarded Bun campaign and disk reclamation; this does not close device coverage.
+resource events. [Installed `.24` comparisons now pass](evidence/filesystem-devices-installed-2026-09-24.json)
+in all three engines on Linux x64: 24 observations per engine, including six
+complete error values, match native interpreted and compiled Lean exactly.
+Each relocated deployment runs with source hidden, PATH empty and build
+environment removed. All six build/archive guards release without resource
+events; the largest build peak is 3.45 GiB. This adds verified device behavior,
+not complete device or platform acceptance.
