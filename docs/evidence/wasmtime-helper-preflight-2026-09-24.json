@@ -1,0 +1,54 @@
+{
+  "scope": "Prepared native-helper feasibility experiment; execution pending, no shipping backend change or Lean acceptance claim",
+  "recordedAt": "2026-09-24T03:28:25.548725+00:00",
+  "checks": {
+    "javascriptSyntax": "passed",
+    "pythonSyntax": "passed",
+    "workflowStructure": "passed",
+    "compilerAndRuntime": "pending"
+  },
+  "files": {
+    "scripts/full-lean/prepare-wasmtime-probe.py": "edc25522f134eed8affe87087959b21278e937a11abd0524be61cfae7b2885eb",
+    "scripts/full-lean/probe-wasmtime-helper.mjs": "45746aa38603cbd106978fb540cf12e3465209397b7bfeaf2e16509f5742e6ec",
+    "scripts/full-lean/probes/wasmtime-helper.c": "826fc377e32d22dc6620bdbe3fea549b8a71a2ff4c49997525cbffc3957f1c43",
+    "scripts/full-lean/probes/wasmtime-helper.mjs": "d095281357264374b8fe57f4379586e565da4c1bbf359b6d940ae994898e951b",
+    ".github/workflows/wasmtime-helper-probe.yml": "9f694cfa72a791dd52cd182655384bdf45d494a2e0e6e880f65e04c249fa4e7c"
+  },
+  "hypothesis": "A managed Wasmtime helper may provide memory64 and shared memory across stock engine worker isolates without their WebAssembly memory limits. A tiny probe cannot establish whole Lean runtime compatibility.",
+  "limits": {
+    "processTreeMiB": 1024,
+    "guestPages": 2,
+    "guestAllocatedBytes": 131072,
+    "declaredMaximumBytes": 8589934592,
+    "compilerWorkers": 1,
+    "childSeconds": 60,
+    "workflowMinutes": 12
+  },
+  "engines": {
+    "Node": "26.10.0",
+    "Deno": "2.9.7",
+    "Bun": "1.4.2"
+  },
+  "helper": {
+    "version": "49.0.0",
+    "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+    "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz"
+  },
+  "sourceDocumentation": [
+    "https://docs.wasmtime.dev/c-api/sharedmemory_8h.html",
+    "https://docs.wasmtime.dev/c-api/config_8h.html"
+  ],
+  "ci": {
+    "visibility": "public",
+    "runner": "ubuntu-24.04",
+    "artifactUploads": false,
+    "cacheUploads": false,
+    "billingChecked": "2026-09-24",
+    "billingSource": "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+  },
+  "remaining": [
+    "Execute and diagnose the bounded helper probe",
+    "Only if successful, evaluate actual Lean imports, exception formats, threads and memory access",
+    "Six-platform packaging and complete application/API acceptance remain required"
+  ]
+}
