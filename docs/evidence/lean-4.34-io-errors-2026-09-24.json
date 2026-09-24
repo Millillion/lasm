@@ -1,0 +1,4010 @@
+{
+  "scope": "Pinned Lean 4.34 IO error translation and actual POSIX filesystem behavior in stock Node/Deno/Bun on Linux x64; not complete IO.FS or platform acceptance",
+  "packages": {
+    "initial": {
+      "scope": "Local candidate assembly; installation and runtime checks are separate",
+      "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r7/lasm-compiler-0.1.0-experimental.10.tgz",
+      "sha256": "6b0d786c5e79a3f8fdfa10e3a58e9eb9457810f022cd4f341f71d2a24c641748",
+      "compressedBytes": 124954946,
+      "installedBytes": 627540981,
+      "files": 2667,
+      "runtime": {
+        "name": "lean-4.34.0-wasm64",
+        "identity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb"
+      },
+      "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-package-install-r10-resources.json",
+      "recordedAt": "2026-09-23T23:53:20.188Z"
+    },
+    "intermediate": {
+      "scope": "Local candidate assembly; installation and runtime checks are separate",
+      "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r8/lasm-compiler-0.1.0-experimental.11.tgz",
+      "sha256": "fa853f1916f48be520598ecafff7f862b6a4e56ea40cca4d0d3cd4347744a7c9",
+      "compressedBytes": 125004347,
+      "installedBytes": 627741658,
+      "files": 2670,
+      "runtime": {
+        "name": "lean-4.34.0-wasm64",
+        "identity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb"
+      },
+      "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-release-r1-resources.json",
+      "recordedAt": "2026-09-24T01:28:27.421Z"
+    },
+    "repaired": {
+      "scope": "Local candidate assembly; installation and runtime checks are separate",
+      "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r9/lasm-compiler-0.1.0-experimental.12.tgz",
+      "sha256": "270bd64ef622109952829cf00f65021406a1bb50e76955df8d0c52ae55108fbf",
+      "compressedBytes": 125045208,
+      "installedBytes": 627923327,
+      "files": 2670,
+      "runtime": {
+        "name": "lean-4.34.0-wasm64",
+        "identity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb"
+      },
+      "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-release-r2-resources.json",
+      "recordedAt": "2026-09-24T01:35:38.042Z"
+    }
+  },
+  "failures": {
+    "filesystemNodeBeforeRepair": {
+      "scope": "Ordinary filesystem fixture in installed Lean 4.34 AOT application; native interpreter and C executable controls",
+      "target": "node",
+      "platform": "linux-x64",
+      "engineVersion": "v26.10.0",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r9/workspace/project/node_modules/@lasm/compiler",
+      "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+      "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "interpreted": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "compiled": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "actual": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 4294967294)\n  file: missing\nmissing metadata: no such file or directory (error code: 4294967294)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 4294967276, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 4294967276, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 4294967275, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 4294967294)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, cannot allocate memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "a020123f49ddeb6c4cf53e33c42f59d419b958725495f9c2d9fb1eda94a1ab19",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+            "cSha256": "ce331bee1bda78eb6fc1dcf6971c17dfd3a809ce0977065ac19b993a07c10549"
+          }
+        ],
+        "signature": "f00924724ee741ae581d73df8397714a4a83faefc36359140ca499b6402b496f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "4b5574dcb78c4fb8f8068357ebaeed766ad7c92060927b856a35ee0643f4b596",
+      "assertions": "Original error, bounds, byte-order, symlink/metadata and failed-write assertions; exact native output, stderr and exit comparison",
+      "deployment": "Relocated complete output, hidden source/build directory, empty PATH and no Lean/Lake/Elan environment",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/filesystem-baseline-r1-resources.json",
+      "recordedAt": "2026-09-24T01:16:46.816Z"
+    },
+    "filesystemDenoAfterErrorTranslationBeforeNativeUnlink": {
+      "scope": "Ordinary filesystem fixture in installed Lean 4.34 AOT application; native interpreter and C executable controls",
+      "target": "deno",
+      "platform": "linux-x64",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r10/workspace/project/node_modules/@lasm/compiler",
+      "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+      "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "interpreted": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "compiled": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "actual": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: directory not empty (error code: 39)\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "847248b4d4ece4f2440f8b6376eb8425f31d230e6aea6862eff786012c680d9b",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+            "cSha256": "ce331bee1bda78eb6fc1dcf6971c17dfd3a809ce0977065ac19b993a07c10549"
+          }
+        ],
+        "signature": "2d67f69a472d1cc9625720dad8cc3e4a6670c87a1d430014bea0ceec6c4bcddf",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "4b5574dcb78c4fb8f8068357ebaeed766ad7c92060927b856a35ee0643f4b596",
+      "assertions": "Original error, bounds, byte-order, symlink/metadata and failed-write assertions; exact native output, stderr and exit comparison",
+      "deployment": "Relocated complete output, hidden source/build directory, empty PATH and no Lean/Lake/Elan environment",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-release-r1-resources.json",
+      "recordedAt": "2026-09-24T01:31:28.767Z"
+    },
+    "installedDecoderBaseline": {
+      "localReport": ".work/io-decoder-installed-baseline-r1/result.json",
+      "sha256": "b23db5de78b740f2921364bbbf8eba316627e5bfc2bdbd3d03e4e5a47d3c944b",
+      "comparisons": [
+        {
+          "engine": "node",
+          "checked": 221,
+          "mismatches": 221,
+          "decoderExceptions": 0,
+          "examples": [
+            {
+              "key": "crt_E2BIG_0",
+              "expected": {
+                "constructor": "resourceExhausted",
+                "code": 7,
+                "message": "argument list too long"
+              },
+              "actual": {
+                "constructor": "resourceExhausted",
+                "code": 7,
+                "message": "Argument list too long"
+              }
+            },
+            {
+              "key": "crt_EACCES_1",
+              "expected": {
+                "constructor": "permissionDenied",
+                "code": 13,
+                "message": "permission denied"
+              },
+              "actual": {
+                "constructor": "permissionDenied",
+                "code": 13,
+                "message": "Permission denied"
+              }
+            },
+            {
+              "key": "crt_EADDRINUSE_2",
+              "expected": {
+                "constructor": "resourceBusy",
+                "code": 98,
+                "message": "address already in use"
+              },
+              "actual": {
+                "constructor": "resourceBusy",
+                "code": 98,
+                "message": "Address already in use"
+              }
+            }
+          ]
+        },
+        {
+          "engine": "deno",
+          "checked": 221,
+          "mismatches": 221,
+          "decoderExceptions": 6,
+          "examples": [
+            {
+              "key": "crt_E2BIG_0",
+              "expected": {
+                "constructor": "resourceExhausted",
+                "code": 7,
+                "message": "argument list too long"
+              },
+              "actual": {
+                "constructor": "resourceExhausted",
+                "code": 7,
+                "message": "Argument list too long"
+              }
+            },
+            {
+              "key": "crt_EACCES_1",
+              "expected": {
+                "constructor": "permissionDenied",
+                "code": 13,
+                "message": "permission denied"
+              },
+              "actual": {
+                "constructor": "permissionDenied",
+                "code": 13,
+                "message": "Permission denied"
+              }
+            },
+            {
+              "key": "crt_EADDRINUSE_2",
+              "expected": {
+                "constructor": "resourceBusy",
+                "code": 98,
+                "message": "address already in use"
+              },
+              "actual": {
+                "constructor": "resourceBusy",
+                "code": 98,
+                "message": "Address already in use"
+              }
+            }
+          ]
+        },
+        {
+          "engine": "bun",
+          "checked": 221,
+          "mismatches": 221,
+          "decoderExceptions": 0,
+          "examples": [
+            {
+              "key": "crt_E2BIG_0",
+              "expected": {
+                "constructor": "resourceExhausted",
+                "code": 7,
+                "message": "argument list too long"
+              },
+              "actual": {
+                "constructor": "resourceExhausted",
+                "code": 7,
+                "message": "Argument list too long"
+              }
+            },
+            {
+              "key": "crt_EACCES_1",
+              "expected": {
+                "constructor": "permissionDenied",
+                "code": 13,
+                "message": "permission denied"
+              },
+              "actual": {
+                "constructor": "permissionDenied",
+                "code": 13,
+                "message": "Permission denied"
+              }
+            },
+            {
+              "key": "crt_EADDRINUSE_2",
+              "expected": {
+                "constructor": "resourceBusy",
+                "code": 98,
+                "message": "address already in use"
+              },
+              "actual": {
+                "constructor": "resourceBusy",
+                "code": 98,
+                "message": "Address already in use"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "nativeDecoderComparison": {
+    "scope": "Unmodified native Lean library error decoders; private test-only C helper",
+    "platform": "linux-x64",
+    "lean": "4.34.0",
+    "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+    "uvVersion": 77824,
+    "sourceHashes": {
+      "Main.lean": "7ba660815f8ea26fd3e86c646ab3c3149354de6c57e2bdff7cf1532b998ff5aa",
+      "probe.c": "abd4817590820bc667c892c1d6dc638da1e756ee3f6fd78fe425ea4d06bcea59",
+      "lean-toolchain": "8733782dc070a99b312039cda424f601b80f3be6f6f512627da5ba25adc27632"
+    },
+    "hostModule": "/home/lastmjs/development/lasm/compiler/src/node-host.mjs",
+    "hostModuleSha256": "ab9bc5f8be3bb1c0acb3a4f97ab614a19cd9a1e141cb6dee0047addcc90c2d81",
+    "rows": [
+      {
+        "origin": "crt",
+        "name": "E2BIG",
+        "errno": 7,
+        "path": "",
+        "key": "crt_E2BIG_0",
+        "inputMessage": "Argument list too long",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 7,
+          "message": "argument list too long",
+          "repr": "IO.Error.resourceExhausted none 7 \"argument list too long\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EACCES",
+        "errno": 13,
+        "path": "",
+        "key": "crt_EACCES_1",
+        "inputMessage": "Permission denied",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 13,
+          "message": "permission denied",
+          "repr": "IO.Error.permissionDenied none 13 \"permission denied\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EADDRINUSE",
+        "errno": 98,
+        "path": "",
+        "key": "crt_EADDRINUSE_2",
+        "inputMessage": "Address already in use",
+        "native": {
+          "constructor": "resourceBusy",
+          "code": 98,
+          "message": "address already in use",
+          "repr": "IO.Error.resourceBusy 98 \"address already in use\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EADDRNOTAVAIL",
+        "errno": 99,
+        "path": "",
+        "key": "crt_EADDRNOTAVAIL_3",
+        "inputMessage": "Cannot assign requested address",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 99,
+          "message": "address not available",
+          "repr": "IO.Error.unsupportedOperation 99 \"address not available\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EADV",
+        "errno": 68,
+        "path": "",
+        "key": "crt_EADV_4",
+        "inputMessage": "Advertise error",
+        "native": {
+          "constructor": "otherError",
+          "code": 68,
+          "message": "Unknown system error -68",
+          "repr": "IO.Error.otherError 68 \"Unknown system error -68\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EAFNOSUPPORT",
+        "errno": 97,
+        "path": "",
+        "key": "crt_EAFNOSUPPORT_5",
+        "inputMessage": "Address family not supported by protocol",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 97,
+          "message": "address family not supported",
+          "repr": "IO.Error.unsupportedOperation 97 \"address family not supported\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EAGAIN",
+        "errno": 11,
+        "path": "",
+        "key": "crt_EAGAIN_6",
+        "inputMessage": "Resource temporarily unavailable",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 11,
+          "message": "resource temporarily unavailable",
+          "repr": "IO.Error.resourceExhausted none 11 \"resource temporarily unavailable\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EALREADY",
+        "errno": 114,
+        "path": "",
+        "key": "crt_EALREADY_7",
+        "inputMessage": "Operation already in progress",
+        "native": {
+          "constructor": "otherError",
+          "code": 114,
+          "message": "connection already in progress",
+          "repr": "IO.Error.otherError 114 \"connection already in progress\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EBADE",
+        "errno": 52,
+        "path": "",
+        "key": "crt_EBADE_8",
+        "inputMessage": "Invalid exchange",
+        "native": {
+          "constructor": "otherError",
+          "code": 52,
+          "message": "Unknown system error -52",
+          "repr": "IO.Error.otherError 52 \"Unknown system error -52\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EBADF",
+        "errno": 9,
+        "path": "",
+        "key": "crt_EBADF_9",
+        "inputMessage": "Bad file descriptor",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 9,
+          "message": "bad file descriptor",
+          "repr": "IO.Error.invalidArgument none 9 \"bad file descriptor\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EBADFD",
+        "errno": 77,
+        "path": "",
+        "key": "crt_EBADFD_10",
+        "inputMessage": "File descriptor in bad state",
+        "native": {
+          "constructor": "otherError",
+          "code": 77,
+          "message": "Unknown system error -77",
+          "repr": "IO.Error.otherError 77 \"Unknown system error -77\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EBADMSG",
+        "errno": 74,
+        "path": "",
+        "key": "crt_EBADMSG_11",
+        "inputMessage": "Bad message",
+        "native": {
+          "constructor": "protocolError",
+          "code": 74,
+          "message": "protocol error",
+          "repr": "IO.Error.protocolError 74 \"protocol error\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EBADR",
+        "errno": 53,
+        "path": "",
+        "key": "crt_EBADR_12",
+        "inputMessage": "Invalid request descriptor",
+        "native": {
+          "constructor": "otherError",
+          "code": 53,
+          "message": "Unknown system error -53",
+          "repr": "IO.Error.otherError 53 \"Unknown system error -53\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EBADRQC",
+        "errno": 56,
+        "path": "",
+        "key": "crt_EBADRQC_13",
+        "inputMessage": "Invalid request code",
+        "native": {
+          "constructor": "otherError",
+          "code": 56,
+          "message": "Unknown system error -56",
+          "repr": "IO.Error.otherError 56 \"Unknown system error -56\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EBADSLT",
+        "errno": 57,
+        "path": "",
+        "key": "crt_EBADSLT_14",
+        "inputMessage": "Invalid slot",
+        "native": {
+          "constructor": "otherError",
+          "code": 57,
+          "message": "Unknown system error -57",
+          "repr": "IO.Error.otherError 57 \"Unknown system error -57\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EBFONT",
+        "errno": 59,
+        "path": "",
+        "key": "crt_EBFONT_15",
+        "inputMessage": "Bad font file format",
+        "native": {
+          "constructor": "otherError",
+          "code": 59,
+          "message": "Unknown system error -59",
+          "repr": "IO.Error.otherError 59 \"Unknown system error -59\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EBUSY",
+        "errno": 16,
+        "path": "",
+        "key": "crt_EBUSY_16",
+        "inputMessage": "Device or resource busy",
+        "native": {
+          "constructor": "resourceBusy",
+          "code": 16,
+          "message": "resource busy or locked",
+          "repr": "IO.Error.resourceBusy 16 \"resource busy or locked\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ECANCELED",
+        "errno": 125,
+        "path": "",
+        "key": "crt_ECANCELED_17",
+        "inputMessage": "Operation canceled",
+        "native": {
+          "constructor": "otherError",
+          "code": 125,
+          "message": "operation canceled",
+          "repr": "IO.Error.otherError 125 \"operation canceled\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ECHILD",
+        "errno": 10,
+        "path": "",
+        "key": "crt_ECHILD_18",
+        "inputMessage": "No child processes",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 10,
+          "message": "no such process",
+          "repr": "IO.Error.noSuchThing none 10 \"no such process\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ECHRNG",
+        "errno": 44,
+        "path": "",
+        "key": "crt_ECHRNG_19",
+        "inputMessage": "Channel number out of range",
+        "native": {
+          "constructor": "otherError",
+          "code": 44,
+          "message": "Unknown system error -44",
+          "repr": "IO.Error.otherError 44 \"Unknown system error -44\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ECOMM",
+        "errno": 70,
+        "path": "",
+        "key": "crt_ECOMM_20",
+        "inputMessage": "Communication error on send",
+        "native": {
+          "constructor": "otherError",
+          "code": 70,
+          "message": "Unknown system error -70",
+          "repr": "IO.Error.otherError 70 \"Unknown system error -70\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ECONNABORTED",
+        "errno": 103,
+        "path": "",
+        "key": "crt_ECONNABORTED_21",
+        "inputMessage": "Software caused connection abort",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 103,
+          "message": "software caused connection abort",
+          "repr": "IO.Error.permissionDenied none 103 \"software caused connection abort\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ECONNREFUSED",
+        "errno": 111,
+        "path": "",
+        "key": "crt_ECONNREFUSED_22",
+        "inputMessage": "Connection refused",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 111,
+          "message": "connection refused",
+          "repr": "IO.Error.noSuchThing none 111 \"connection refused\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ECONNRESET",
+        "errno": 104,
+        "path": "",
+        "key": "crt_ECONNRESET_23",
+        "inputMessage": "Connection reset by peer",
+        "native": {
+          "constructor": "resourceVanished",
+          "code": 104,
+          "message": "connection reset by peer",
+          "repr": "IO.Error.resourceVanished 104 \"connection reset by peer\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EDEADLK",
+        "errno": 35,
+        "path": "",
+        "key": "crt_EDEADLK_24",
+        "inputMessage": "Resource deadlock avoided",
+        "native": {
+          "constructor": "resourceBusy",
+          "code": 35,
+          "message": "resource busy or locked",
+          "repr": "IO.Error.resourceBusy 35 \"resource busy or locked\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EDEADLOCK",
+        "errno": 35,
+        "path": "",
+        "key": "crt_EDEADLOCK_25",
+        "inputMessage": "Resource deadlock avoided",
+        "native": {
+          "constructor": "resourceBusy",
+          "code": 35,
+          "message": "resource busy or locked",
+          "repr": "IO.Error.resourceBusy 35 \"resource busy or locked\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EDESTADDRREQ",
+        "errno": 89,
+        "path": "",
+        "key": "crt_EDESTADDRREQ_26",
+        "inputMessage": "Destination address required",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 89,
+          "message": "destination address required",
+          "repr": "IO.Error.invalidArgument none 89 \"destination address required\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EDOM",
+        "errno": 33,
+        "path": "",
+        "key": "crt_EDOM_27",
+        "inputMessage": "Numerical argument out of domain",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 33,
+          "message": "invalid argument",
+          "repr": "IO.Error.invalidArgument none 33 \"invalid argument\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EDOTDOT",
+        "errno": 73,
+        "path": "",
+        "key": "crt_EDOTDOT_28",
+        "inputMessage": "RFS specific error",
+        "native": {
+          "constructor": "otherError",
+          "code": 73,
+          "message": "Unknown system error -73",
+          "repr": "IO.Error.otherError 73 \"Unknown system error -73\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EDQUOT",
+        "errno": 122,
+        "path": "",
+        "key": "crt_EDQUOT_29",
+        "inputMessage": "Disk quota exceeded",
+        "native": {
+          "constructor": "otherError",
+          "code": 122,
+          "message": "Unknown system error -122",
+          "repr": "IO.Error.otherError 122 \"Unknown system error -122\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EEXIST",
+        "errno": 17,
+        "path": "",
+        "key": "crt_EEXIST_30",
+        "inputMessage": "File exists",
+        "native": {
+          "constructor": "alreadyExists",
+          "code": 17,
+          "message": "file already exists",
+          "repr": "IO.Error.alreadyExists none 17 \"file already exists\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EFAULT",
+        "errno": 14,
+        "path": "",
+        "key": "crt_EFAULT_31",
+        "inputMessage": "Bad address",
+        "native": {
+          "constructor": "otherError",
+          "code": 14,
+          "message": "bad address in system call argument",
+          "repr": "IO.Error.otherError 14 \"bad address in system call argument\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EFBIG",
+        "errno": 27,
+        "path": "",
+        "key": "crt_EFBIG_32",
+        "inputMessage": "File too large",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 27,
+          "message": "file too large",
+          "repr": "IO.Error.permissionDenied none 27 \"file too large\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EHOSTDOWN",
+        "errno": 112,
+        "path": "",
+        "key": "crt_EHOSTDOWN_33",
+        "inputMessage": "Host is down",
+        "native": {
+          "constructor": "otherError",
+          "code": 112,
+          "message": "host is down",
+          "repr": "IO.Error.otherError 112 \"host is down\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EHOSTUNREACH",
+        "errno": 113,
+        "path": "",
+        "key": "crt_EHOSTUNREACH_34",
+        "inputMessage": "No route to host",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 113,
+          "message": "host is unreachable",
+          "repr": "IO.Error.noSuchThing none 113 \"host is unreachable\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EHWPOISON",
+        "errno": 133,
+        "path": "",
+        "key": "crt_EHWPOISON_35",
+        "inputMessage": "Memory page has hardware error",
+        "native": {
+          "constructor": "otherError",
+          "code": 133,
+          "message": "Unknown system error -133",
+          "repr": "IO.Error.otherError 133 \"Unknown system error -133\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EIDRM",
+        "errno": 43,
+        "path": "",
+        "key": "crt_EIDRM_36",
+        "inputMessage": "Identifier removed",
+        "native": {
+          "constructor": "resourceVanished",
+          "code": 43,
+          "message": "broken pipe",
+          "repr": "IO.Error.resourceVanished 43 \"broken pipe\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EILSEQ",
+        "errno": 84,
+        "path": "",
+        "key": "crt_EILSEQ_37",
+        "inputMessage": "Invalid or incomplete multibyte or wide character",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 84,
+          "message": "illegal byte sequence",
+          "repr": "IO.Error.invalidArgument none 84 \"illegal byte sequence\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EINPROGRESS",
+        "errno": 115,
+        "path": "",
+        "key": "crt_EINPROGRESS_38",
+        "inputMessage": "Operation now in progress",
+        "native": {
+          "constructor": "alreadyExists",
+          "code": 115,
+          "message": "socket is already connected",
+          "repr": "IO.Error.alreadyExists none 115 \"socket is already connected\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EINTR",
+        "errno": 4,
+        "path": "probe",
+        "key": "crt_EINTR_39",
+        "inputMessage": "Interrupted system call",
+        "native": {
+          "constructor": "interrupted",
+          "code": 4,
+          "message": "interrupted system call",
+          "repr": "IO.Error.interrupted \"probe\" 4 \"interrupted system call\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EINVAL",
+        "errno": 22,
+        "path": "",
+        "key": "crt_EINVAL_40",
+        "inputMessage": "Invalid argument",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 22,
+          "message": "invalid argument",
+          "repr": "IO.Error.invalidArgument none 22 \"invalid argument\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EIO",
+        "errno": 5,
+        "path": "",
+        "key": "crt_EIO_41",
+        "inputMessage": "Input/output error",
+        "native": {
+          "constructor": "hardwareFault",
+          "code": 5,
+          "message": "i/o error",
+          "repr": "IO.Error.hardwareFault 5 \"i/o error\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EISCONN",
+        "errno": 106,
+        "path": "",
+        "key": "crt_EISCONN_42",
+        "inputMessage": "Transport endpoint is already connected",
+        "native": {
+          "constructor": "alreadyExists",
+          "code": 106,
+          "message": "socket is already connected",
+          "repr": "IO.Error.alreadyExists none 106 \"socket is already connected\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EISDIR",
+        "errno": 21,
+        "path": "",
+        "key": "crt_EISDIR_43",
+        "inputMessage": "Is a directory",
+        "native": {
+          "constructor": "inappropriateType",
+          "code": 21,
+          "message": "illegal operation on a directory",
+          "repr": "IO.Error.inappropriateType none 21 \"illegal operation on a directory\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EISNAM",
+        "errno": 120,
+        "path": "",
+        "key": "crt_EISNAM_44",
+        "inputMessage": "Is a named type file",
+        "native": {
+          "constructor": "otherError",
+          "code": 120,
+          "message": "Unknown system error -120",
+          "repr": "IO.Error.otherError 120 \"Unknown system error -120\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EKEYEXPIRED",
+        "errno": 127,
+        "path": "",
+        "key": "crt_EKEYEXPIRED_45",
+        "inputMessage": "Key has expired",
+        "native": {
+          "constructor": "otherError",
+          "code": 127,
+          "message": "Unknown system error -127",
+          "repr": "IO.Error.otherError 127 \"Unknown system error -127\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EKEYREJECTED",
+        "errno": 129,
+        "path": "",
+        "key": "crt_EKEYREJECTED_46",
+        "inputMessage": "Key was rejected by service",
+        "native": {
+          "constructor": "otherError",
+          "code": 129,
+          "message": "Unknown system error -129",
+          "repr": "IO.Error.otherError 129 \"Unknown system error -129\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EKEYREVOKED",
+        "errno": 128,
+        "path": "",
+        "key": "crt_EKEYREVOKED_47",
+        "inputMessage": "Key has been revoked",
+        "native": {
+          "constructor": "otherError",
+          "code": 128,
+          "message": "Unknown system error -128",
+          "repr": "IO.Error.otherError 128 \"Unknown system error -128\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EL2HLT",
+        "errno": 51,
+        "path": "",
+        "key": "crt_EL2HLT_48",
+        "inputMessage": "Level 2 halted",
+        "native": {
+          "constructor": "otherError",
+          "code": 51,
+          "message": "Unknown system error -51",
+          "repr": "IO.Error.otherError 51 \"Unknown system error -51\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EL2NSYNC",
+        "errno": 45,
+        "path": "",
+        "key": "crt_EL2NSYNC_49",
+        "inputMessage": "Level 2 not synchronized",
+        "native": {
+          "constructor": "otherError",
+          "code": 45,
+          "message": "Unknown system error -45",
+          "repr": "IO.Error.otherError 45 \"Unknown system error -45\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EL3HLT",
+        "errno": 46,
+        "path": "",
+        "key": "crt_EL3HLT_50",
+        "inputMessage": "Level 3 halted",
+        "native": {
+          "constructor": "otherError",
+          "code": 46,
+          "message": "Unknown system error -46",
+          "repr": "IO.Error.otherError 46 \"Unknown system error -46\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EL3RST",
+        "errno": 47,
+        "path": "",
+        "key": "crt_EL3RST_51",
+        "inputMessage": "Level 3 reset",
+        "native": {
+          "constructor": "otherError",
+          "code": 47,
+          "message": "Unknown system error -47",
+          "repr": "IO.Error.otherError 47 \"Unknown system error -47\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ELIBACC",
+        "errno": 79,
+        "path": "",
+        "key": "crt_ELIBACC_52",
+        "inputMessage": "Can not access a needed shared library",
+        "native": {
+          "constructor": "otherError",
+          "code": 79,
+          "message": "Unknown system error -79",
+          "repr": "IO.Error.otherError 79 \"Unknown system error -79\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ELIBBAD",
+        "errno": 80,
+        "path": "",
+        "key": "crt_ELIBBAD_53",
+        "inputMessage": "Accessing a corrupted shared library",
+        "native": {
+          "constructor": "otherError",
+          "code": 80,
+          "message": "Unknown system error -80",
+          "repr": "IO.Error.otherError 80 \"Unknown system error -80\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ELIBEXEC",
+        "errno": 83,
+        "path": "",
+        "key": "crt_ELIBEXEC_54",
+        "inputMessage": "Cannot exec a shared library directly",
+        "native": {
+          "constructor": "otherError",
+          "code": 83,
+          "message": "Unknown system error -83",
+          "repr": "IO.Error.otherError 83 \"Unknown system error -83\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ELIBMAX",
+        "errno": 82,
+        "path": "",
+        "key": "crt_ELIBMAX_55",
+        "inputMessage": "Attempting to link in too many shared libraries",
+        "native": {
+          "constructor": "otherError",
+          "code": 82,
+          "message": "Unknown system error -82",
+          "repr": "IO.Error.otherError 82 \"Unknown system error -82\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ELIBSCN",
+        "errno": 81,
+        "path": "",
+        "key": "crt_ELIBSCN_56",
+        "inputMessage": ".lib section in a.out corrupted",
+        "native": {
+          "constructor": "otherError",
+          "code": 81,
+          "message": "Unknown system error -81",
+          "repr": "IO.Error.otherError 81 \"Unknown system error -81\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ELNRNG",
+        "errno": 48,
+        "path": "",
+        "key": "crt_ELNRNG_57",
+        "inputMessage": "Link number out of range",
+        "native": {
+          "constructor": "otherError",
+          "code": 48,
+          "message": "Unknown system error -48",
+          "repr": "IO.Error.otherError 48 \"Unknown system error -48\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ELOOP",
+        "errno": 40,
+        "path": "",
+        "key": "crt_ELOOP_58",
+        "inputMessage": "Too many levels of symbolic links",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 40,
+          "message": "too many symbolic links encountered",
+          "repr": "IO.Error.invalidArgument none 40 \"too many symbolic links encountered\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EMEDIUMTYPE",
+        "errno": 124,
+        "path": "",
+        "key": "crt_EMEDIUMTYPE_59",
+        "inputMessage": "Wrong medium type",
+        "native": {
+          "constructor": "otherError",
+          "code": 124,
+          "message": "Unknown system error -124",
+          "repr": "IO.Error.otherError 124 \"Unknown system error -124\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EMFILE",
+        "errno": 24,
+        "path": "",
+        "key": "crt_EMFILE_60",
+        "inputMessage": "Too many open files",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 24,
+          "message": "too many open files",
+          "repr": "IO.Error.resourceExhausted none 24 \"too many open files\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EMLINK",
+        "errno": 31,
+        "path": "",
+        "key": "crt_EMLINK_61",
+        "inputMessage": "Too many links",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 31,
+          "message": "too many links",
+          "repr": "IO.Error.resourceExhausted none 31 \"too many links\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EMSGSIZE",
+        "errno": 90,
+        "path": "",
+        "key": "crt_EMSGSIZE_62",
+        "inputMessage": "Message too long",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 90,
+          "message": "message too long",
+          "repr": "IO.Error.resourceExhausted none 90 \"message too long\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EMULTIHOP",
+        "errno": 72,
+        "path": "",
+        "key": "crt_EMULTIHOP_63",
+        "inputMessage": "Multihop attempted",
+        "native": {
+          "constructor": "otherError",
+          "code": 72,
+          "message": "Unknown system error -72",
+          "repr": "IO.Error.otherError 72 \"Unknown system error -72\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENAMETOOLONG",
+        "errno": 36,
+        "path": "",
+        "key": "crt_ENAMETOOLONG_64",
+        "inputMessage": "File name too long",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 36,
+          "message": "name too long",
+          "repr": "IO.Error.invalidArgument none 36 \"name too long\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENAVAIL",
+        "errno": 119,
+        "path": "",
+        "key": "crt_ENAVAIL_65",
+        "inputMessage": "No XENIX semaphores available",
+        "native": {
+          "constructor": "otherError",
+          "code": 119,
+          "message": "Unknown system error -119",
+          "repr": "IO.Error.otherError 119 \"Unknown system error -119\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENETDOWN",
+        "errno": 100,
+        "path": "",
+        "key": "crt_ENETDOWN_66",
+        "inputMessage": "Network is down",
+        "native": {
+          "constructor": "resourceVanished",
+          "code": 100,
+          "message": "network is down",
+          "repr": "IO.Error.resourceVanished 100 \"network is down\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENETRESET",
+        "errno": 102,
+        "path": "",
+        "key": "crt_ENETRESET_67",
+        "inputMessage": "Network dropped connection on reset",
+        "native": {
+          "constructor": "resourceVanished",
+          "code": 102,
+          "message": "connection reset by peer",
+          "repr": "IO.Error.resourceVanished 102 \"connection reset by peer\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENETUNREACH",
+        "errno": 101,
+        "path": "",
+        "key": "crt_ENETUNREACH_68",
+        "inputMessage": "Network is unreachable",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 101,
+          "message": "network is unreachable",
+          "repr": "IO.Error.noSuchThing none 101 \"network is unreachable\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENFILE",
+        "errno": 23,
+        "path": "",
+        "key": "crt_ENFILE_69",
+        "inputMessage": "Too many open files in system",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 23,
+          "message": "file table overflow",
+          "repr": "IO.Error.resourceExhausted none 23 \"file table overflow\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOANO",
+        "errno": 55,
+        "path": "",
+        "key": "crt_ENOANO_70",
+        "inputMessage": "No anode",
+        "native": {
+          "constructor": "otherError",
+          "code": 55,
+          "message": "Unknown system error -55",
+          "repr": "IO.Error.otherError 55 \"Unknown system error -55\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOBUFS",
+        "errno": 105,
+        "path": "",
+        "key": "crt_ENOBUFS_71",
+        "inputMessage": "No buffer space available",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 105,
+          "message": "no buffer space available",
+          "repr": "IO.Error.resourceExhausted none 105 \"no buffer space available\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOCSI",
+        "errno": 50,
+        "path": "",
+        "key": "crt_ENOCSI_72",
+        "inputMessage": "No CSI structure available",
+        "native": {
+          "constructor": "otherError",
+          "code": 50,
+          "message": "Unknown system error -50",
+          "repr": "IO.Error.otherError 50 \"Unknown system error -50\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENODATA",
+        "errno": 61,
+        "path": "",
+        "key": "crt_ENODATA_73",
+        "inputMessage": "No data available",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 61,
+          "message": "no data available",
+          "repr": "IO.Error.noSuchThing none 61 \"no data available\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENODEV",
+        "errno": 19,
+        "path": "",
+        "key": "crt_ENODEV_74",
+        "inputMessage": "No such device",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 19,
+          "message": "no such device",
+          "repr": "IO.Error.unsupportedOperation 19 \"no such device\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOENT",
+        "errno": 2,
+        "path": "probe",
+        "key": "crt_ENOENT_75",
+        "inputMessage": "No such file or directory",
+        "native": {
+          "constructor": "noFileOrDirectory",
+          "code": 2,
+          "message": "no such file or directory",
+          "repr": "IO.Error.noFileOrDirectory \"probe\" 2 \"no such file or directory\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOEXEC",
+        "errno": 8,
+        "path": "",
+        "key": "crt_ENOEXEC_76",
+        "inputMessage": "Exec format error",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 8,
+          "message": "Unknown system error -8",
+          "repr": "IO.Error.invalidArgument none 8 \"Unknown system error -8\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOKEY",
+        "errno": 126,
+        "path": "",
+        "key": "crt_ENOKEY_77",
+        "inputMessage": "Required key not available",
+        "native": {
+          "constructor": "otherError",
+          "code": 126,
+          "message": "Unknown system error -126",
+          "repr": "IO.Error.otherError 126 \"Unknown system error -126\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOLCK",
+        "errno": 37,
+        "path": "",
+        "key": "crt_ENOLCK_78",
+        "inputMessage": "No locks available",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 37,
+          "message": "resource temporarily unavailable",
+          "repr": "IO.Error.resourceExhausted none 37 \"resource temporarily unavailable\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOLINK",
+        "errno": 67,
+        "path": "",
+        "key": "crt_ENOLINK_79",
+        "inputMessage": "Link has been severed",
+        "native": {
+          "constructor": "resourceVanished",
+          "code": 67,
+          "message": "connection reset by peer",
+          "repr": "IO.Error.resourceVanished 67 \"connection reset by peer\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOMEDIUM",
+        "errno": 123,
+        "path": "",
+        "key": "crt_ENOMEDIUM_80",
+        "inputMessage": "No medium found",
+        "native": {
+          "constructor": "otherError",
+          "code": 123,
+          "message": "Unknown system error -123",
+          "repr": "IO.Error.otherError 123 \"Unknown system error -123\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOMEM",
+        "errno": 12,
+        "path": "",
+        "key": "crt_ENOMEM_81",
+        "inputMessage": "Cannot allocate memory",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 12,
+          "message": "not enough memory",
+          "repr": "IO.Error.resourceExhausted none 12 \"not enough memory\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOMSG",
+        "errno": 42,
+        "path": "",
+        "key": "crt_ENOMSG_82",
+        "inputMessage": "No message of desired type",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 42,
+          "message": "no data available",
+          "repr": "IO.Error.noSuchThing none 42 \"no data available\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENONET",
+        "errno": 64,
+        "path": "",
+        "key": "crt_ENONET_83",
+        "inputMessage": "Machine is not on the network",
+        "native": {
+          "constructor": "otherError",
+          "code": 64,
+          "message": "machine is not on the network",
+          "repr": "IO.Error.otherError 64 \"machine is not on the network\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOPKG",
+        "errno": 65,
+        "path": "",
+        "key": "crt_ENOPKG_84",
+        "inputMessage": "Package not installed",
+        "native": {
+          "constructor": "otherError",
+          "code": 65,
+          "message": "Unknown system error -65",
+          "repr": "IO.Error.otherError 65 \"Unknown system error -65\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOPROTOOPT",
+        "errno": 92,
+        "path": "",
+        "key": "crt_ENOPROTOOPT_85",
+        "inputMessage": "Protocol not available",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 92,
+          "message": "protocol not available",
+          "repr": "IO.Error.unsupportedOperation 92 \"protocol not available\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOSPC",
+        "errno": 28,
+        "path": "",
+        "key": "crt_ENOSPC_86",
+        "inputMessage": "No space left on device",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 28,
+          "message": "no space left on device",
+          "repr": "IO.Error.resourceExhausted none 28 \"no space left on device\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOSR",
+        "errno": 63,
+        "path": "",
+        "key": "crt_ENOSR_87",
+        "inputMessage": "Out of streams resources",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 63,
+          "message": "no buffer space available",
+          "repr": "IO.Error.resourceExhausted none 63 \"no buffer space available\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOSTR",
+        "errno": 60,
+        "path": "",
+        "key": "crt_ENOSTR_88",
+        "inputMessage": "Device not a stream",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 60,
+          "message": "invalid argument",
+          "repr": "IO.Error.invalidArgument none 60 \"invalid argument\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOSYS",
+        "errno": 38,
+        "path": "",
+        "key": "crt_ENOSYS_89",
+        "inputMessage": "Function not implemented",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 38,
+          "message": "function not implemented",
+          "repr": "IO.Error.unsupportedOperation 38 \"function not implemented\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTBLK",
+        "errno": 15,
+        "path": "",
+        "key": "crt_ENOTBLK_90",
+        "inputMessage": "Block device required",
+        "native": {
+          "constructor": "otherError",
+          "code": 15,
+          "message": "Unknown system error -15",
+          "repr": "IO.Error.otherError 15 \"Unknown system error -15\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTCONN",
+        "errno": 107,
+        "path": "",
+        "key": "crt_ENOTCONN_91",
+        "inputMessage": "Transport endpoint is not connected",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 107,
+          "message": "socket is not connected",
+          "repr": "IO.Error.invalidArgument none 107 \"socket is not connected\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTDIR",
+        "errno": 20,
+        "path": "",
+        "key": "crt_ENOTDIR_92",
+        "inputMessage": "Not a directory",
+        "native": {
+          "constructor": "inappropriateType",
+          "code": 20,
+          "message": "not a directory",
+          "repr": "IO.Error.inappropriateType none 20 \"not a directory\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTEMPTY",
+        "errno": 39,
+        "path": "",
+        "key": "crt_ENOTEMPTY_93",
+        "inputMessage": "Directory not empty",
+        "native": {
+          "constructor": "unsatisfiedConstraints",
+          "code": 39,
+          "message": "directory not empty",
+          "repr": "IO.Error.unsatisfiedConstraints 39 \"directory not empty\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTNAM",
+        "errno": 118,
+        "path": "",
+        "key": "crt_ENOTNAM_94",
+        "inputMessage": "Not a XENIX named type file",
+        "native": {
+          "constructor": "otherError",
+          "code": 118,
+          "message": "Unknown system error -118",
+          "repr": "IO.Error.otherError 118 \"Unknown system error -118\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTRECOVERABLE",
+        "errno": 131,
+        "path": "",
+        "key": "crt_ENOTRECOVERABLE_95",
+        "inputMessage": "State not recoverable",
+        "native": {
+          "constructor": "otherError",
+          "code": 131,
+          "message": "Unknown system error -131",
+          "repr": "IO.Error.otherError 131 \"Unknown system error -131\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTSOCK",
+        "errno": 88,
+        "path": "",
+        "key": "crt_ENOTSOCK_96",
+        "inputMessage": "Socket operation on non-socket",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 88,
+          "message": "socket operation on non-socket",
+          "repr": "IO.Error.invalidArgument none 88 \"socket operation on non-socket\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTSUP",
+        "errno": 95,
+        "path": "",
+        "key": "crt_ENOTSUP_97",
+        "inputMessage": "Operation not supported",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 95,
+          "message": "operation not supported on socket",
+          "repr": "IO.Error.unsupportedOperation 95 \"operation not supported on socket\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTTY",
+        "errno": 25,
+        "path": "",
+        "key": "crt_ENOTTY_98",
+        "inputMessage": "Inappropriate ioctl for device",
+        "native": {
+          "constructor": "illegalOperation",
+          "code": 25,
+          "message": "inappropriate ioctl for device",
+          "repr": "IO.Error.illegalOperation 25 \"inappropriate ioctl for device\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENOTUNIQ",
+        "errno": 76,
+        "path": "",
+        "key": "crt_ENOTUNIQ_99",
+        "inputMessage": "Name not unique on network",
+        "native": {
+          "constructor": "otherError",
+          "code": 76,
+          "message": "Unknown system error -76",
+          "repr": "IO.Error.otherError 76 \"Unknown system error -76\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ENXIO",
+        "errno": 6,
+        "path": "",
+        "key": "crt_ENXIO_100",
+        "inputMessage": "No such device or address",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 6,
+          "message": "no such device or address",
+          "repr": "IO.Error.noSuchThing none 6 \"no such device or address\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EOPNOTSUPP",
+        "errno": 95,
+        "path": "",
+        "key": "crt_EOPNOTSUPP_101",
+        "inputMessage": "Operation not supported",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 95,
+          "message": "operation not supported on socket",
+          "repr": "IO.Error.unsupportedOperation 95 \"operation not supported on socket\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EOVERFLOW",
+        "errno": 75,
+        "path": "",
+        "key": "crt_EOVERFLOW_102",
+        "inputMessage": "Value too large for defined data type",
+        "native": {
+          "constructor": "otherError",
+          "code": 75,
+          "message": "value too large for defined data type",
+          "repr": "IO.Error.otherError 75 \"value too large for defined data type\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EOWNERDEAD",
+        "errno": 130,
+        "path": "",
+        "key": "crt_EOWNERDEAD_103",
+        "inputMessage": "Owner died",
+        "native": {
+          "constructor": "otherError",
+          "code": 130,
+          "message": "Unknown system error -130",
+          "repr": "IO.Error.otherError 130 \"Unknown system error -130\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EPERM",
+        "errno": 1,
+        "path": "",
+        "key": "crt_EPERM_104",
+        "inputMessage": "Operation not permitted",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 1,
+          "message": "operation not permitted",
+          "repr": "IO.Error.permissionDenied none 1 \"operation not permitted\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EPFNOSUPPORT",
+        "errno": 96,
+        "path": "",
+        "key": "crt_EPFNOSUPPORT_105",
+        "inputMessage": "Protocol family not supported",
+        "native": {
+          "constructor": "otherError",
+          "code": 96,
+          "message": "Unknown system error -96",
+          "repr": "IO.Error.otherError 96 \"Unknown system error -96\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EPIPE",
+        "errno": 32,
+        "path": "",
+        "key": "crt_EPIPE_106",
+        "inputMessage": "Broken pipe",
+        "native": {
+          "constructor": "resourceVanished",
+          "code": 32,
+          "message": "broken pipe",
+          "repr": "IO.Error.resourceVanished 32 \"broken pipe\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EPROTO",
+        "errno": 71,
+        "path": "",
+        "key": "crt_EPROTO_107",
+        "inputMessage": "Protocol error",
+        "native": {
+          "constructor": "protocolError",
+          "code": 71,
+          "message": "protocol error",
+          "repr": "IO.Error.protocolError 71 \"protocol error\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EPROTONOSUPPORT",
+        "errno": 93,
+        "path": "",
+        "key": "crt_EPROTONOSUPPORT_108",
+        "inputMessage": "Protocol not supported",
+        "native": {
+          "constructor": "protocolError",
+          "code": 93,
+          "message": "protocol not supported",
+          "repr": "IO.Error.protocolError 93 \"protocol not supported\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EPROTOTYPE",
+        "errno": 91,
+        "path": "",
+        "key": "crt_EPROTOTYPE_109",
+        "inputMessage": "Protocol wrong type for socket",
+        "native": {
+          "constructor": "protocolError",
+          "code": 91,
+          "message": "protocol wrong type for socket",
+          "repr": "IO.Error.protocolError 91 \"protocol wrong type for socket\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ERANGE",
+        "errno": 34,
+        "path": "",
+        "key": "crt_ERANGE_110",
+        "inputMessage": "Numerical result out of range",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 34,
+          "message": "result too large",
+          "repr": "IO.Error.unsupportedOperation 34 \"result too large\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EREMCHG",
+        "errno": 78,
+        "path": "",
+        "key": "crt_EREMCHG_111",
+        "inputMessage": "Remote address changed",
+        "native": {
+          "constructor": "otherError",
+          "code": 78,
+          "message": "Unknown system error -78",
+          "repr": "IO.Error.otherError 78 \"Unknown system error -78\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EREMOTE",
+        "errno": 66,
+        "path": "",
+        "key": "crt_EREMOTE_112",
+        "inputMessage": "Object is remote",
+        "native": {
+          "constructor": "otherError",
+          "code": 66,
+          "message": "Unknown system error -66",
+          "repr": "IO.Error.otherError 66 \"Unknown system error -66\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EREMOTEIO",
+        "errno": 121,
+        "path": "",
+        "key": "crt_EREMOTEIO_113",
+        "inputMessage": "Remote I/O error",
+        "native": {
+          "constructor": "otherError",
+          "code": 121,
+          "message": "remote I/O error",
+          "repr": "IO.Error.otherError 121 \"remote I/O error\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ERESTART",
+        "errno": 85,
+        "path": "",
+        "key": "crt_ERESTART_114",
+        "inputMessage": "Interrupted system call should be restarted",
+        "native": {
+          "constructor": "otherError",
+          "code": 85,
+          "message": "Unknown system error -85",
+          "repr": "IO.Error.otherError 85 \"Unknown system error -85\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ERFKILL",
+        "errno": 132,
+        "path": "",
+        "key": "crt_ERFKILL_115",
+        "inputMessage": "Operation not possible due to RF-kill",
+        "native": {
+          "constructor": "otherError",
+          "code": 132,
+          "message": "Unknown system error -132",
+          "repr": "IO.Error.otherError 132 \"Unknown system error -132\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EROFS",
+        "errno": 30,
+        "path": "",
+        "key": "crt_EROFS_116",
+        "inputMessage": "Read-only file system",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 30,
+          "message": "read-only file system",
+          "repr": "IO.Error.permissionDenied none 30 \"read-only file system\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ESHUTDOWN",
+        "errno": 108,
+        "path": "",
+        "key": "crt_ESHUTDOWN_117",
+        "inputMessage": "Cannot send after transport endpoint shutdown",
+        "native": {
+          "constructor": "otherError",
+          "code": 108,
+          "message": "cannot send after transport endpoint shutdown",
+          "repr": "IO.Error.otherError 108 \"cannot send after transport endpoint shutdown\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ESOCKTNOSUPPORT",
+        "errno": 94,
+        "path": "",
+        "key": "crt_ESOCKTNOSUPPORT_118",
+        "inputMessage": "Socket type not supported",
+        "native": {
+          "constructor": "otherError",
+          "code": 94,
+          "message": "socket type not supported",
+          "repr": "IO.Error.otherError 94 \"socket type not supported\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ESPIPE",
+        "errno": 29,
+        "path": "",
+        "key": "crt_ESPIPE_119",
+        "inputMessage": "Illegal seek",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 29,
+          "message": "invalid seek",
+          "repr": "IO.Error.unsupportedOperation 29 \"invalid seek\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ESRCH",
+        "errno": 3,
+        "path": "",
+        "key": "crt_ESRCH_120",
+        "inputMessage": "No such process",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 3,
+          "message": "no such process",
+          "repr": "IO.Error.noSuchThing none 3 \"no such process\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ESRMNT",
+        "errno": 69,
+        "path": "",
+        "key": "crt_ESRMNT_121",
+        "inputMessage": "Srmount error",
+        "native": {
+          "constructor": "otherError",
+          "code": 69,
+          "message": "Unknown system error -69",
+          "repr": "IO.Error.otherError 69 \"Unknown system error -69\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ESTALE",
+        "errno": 116,
+        "path": "",
+        "key": "crt_ESTALE_122",
+        "inputMessage": "Stale file handle",
+        "native": {
+          "constructor": "otherError",
+          "code": 116,
+          "message": "Unknown system error -116",
+          "repr": "IO.Error.otherError 116 \"Unknown system error -116\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ESTRPIPE",
+        "errno": 86,
+        "path": "",
+        "key": "crt_ESTRPIPE_123",
+        "inputMessage": "Streams pipe error",
+        "native": {
+          "constructor": "otherError",
+          "code": 86,
+          "message": "Unknown system error -86",
+          "repr": "IO.Error.otherError 86 \"Unknown system error -86\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ETIME",
+        "errno": 62,
+        "path": "",
+        "key": "crt_ETIME_124",
+        "inputMessage": "Timer expired",
+        "native": {
+          "constructor": "timeExpired",
+          "code": 62,
+          "message": "connection timed out",
+          "repr": "IO.Error.timeExpired 62 \"connection timed out\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ETIMEDOUT",
+        "errno": 110,
+        "path": "",
+        "key": "crt_ETIMEDOUT_125",
+        "inputMessage": "Connection timed out",
+        "native": {
+          "constructor": "timeExpired",
+          "code": 110,
+          "message": "connection timed out",
+          "repr": "IO.Error.timeExpired 110 \"connection timed out\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ETOOMANYREFS",
+        "errno": 109,
+        "path": "",
+        "key": "crt_ETOOMANYREFS_126",
+        "inputMessage": "Too many references: cannot splice",
+        "native": {
+          "constructor": "otherError",
+          "code": 109,
+          "message": "Unknown system error -109",
+          "repr": "IO.Error.otherError 109 \"Unknown system error -109\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "ETXTBSY",
+        "errno": 26,
+        "path": "",
+        "key": "crt_ETXTBSY_127",
+        "inputMessage": "Text file busy",
+        "native": {
+          "constructor": "resourceBusy",
+          "code": 26,
+          "message": "text file is busy",
+          "repr": "IO.Error.resourceBusy 26 \"text file is busy\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EUCLEAN",
+        "errno": 117,
+        "path": "",
+        "key": "crt_EUCLEAN_128",
+        "inputMessage": "Structure needs cleaning",
+        "native": {
+          "constructor": "otherError",
+          "code": 117,
+          "message": "Unknown system error -117",
+          "repr": "IO.Error.otherError 117 \"Unknown system error -117\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EUNATCH",
+        "errno": 49,
+        "path": "",
+        "key": "crt_EUNATCH_129",
+        "inputMessage": "Protocol driver not attached",
+        "native": {
+          "constructor": "otherError",
+          "code": 49,
+          "message": "protocol driver not attached",
+          "repr": "IO.Error.otherError 49 \"protocol driver not attached\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EUSERS",
+        "errno": 87,
+        "path": "",
+        "key": "crt_EUSERS_130",
+        "inputMessage": "Too many users",
+        "native": {
+          "constructor": "otherError",
+          "code": 87,
+          "message": "Unknown system error -87",
+          "repr": "IO.Error.otherError 87 \"Unknown system error -87\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EWOULDBLOCK",
+        "errno": 11,
+        "path": "",
+        "key": "crt_EWOULDBLOCK_131",
+        "inputMessage": "Resource temporarily unavailable",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 11,
+          "message": "resource temporarily unavailable",
+          "repr": "IO.Error.resourceExhausted none 11 \"resource temporarily unavailable\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EXDEV",
+        "errno": 18,
+        "path": "",
+        "key": "crt_EXDEV_132",
+        "inputMessage": "Invalid cross-device link",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 18,
+          "message": "cross-device link not permitted",
+          "repr": "IO.Error.unsupportedOperation 18 \"cross-device link not permitted\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "EXFULL",
+        "errno": 54,
+        "path": "",
+        "key": "crt_EXFULL_133",
+        "inputMessage": "Exchange full",
+        "native": {
+          "constructor": "otherError",
+          "code": 54,
+          "message": "Unknown system error -54",
+          "repr": "IO.Error.otherError 54 \"Unknown system error -54\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "E2BIG",
+        "errno": -7,
+        "path": "",
+        "key": "uv_E2BIG_134",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 7,
+          "message": "argument list too long",
+          "repr": "IO.Error.resourceExhausted none 7 \"argument list too long\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EACCES",
+        "errno": -13,
+        "path": "",
+        "key": "uv_EACCES_135",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 13,
+          "message": "permission denied",
+          "repr": "IO.Error.permissionDenied none 13 \"permission denied\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EADDRINUSE",
+        "errno": -98,
+        "path": "",
+        "key": "uv_EADDRINUSE_136",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceBusy",
+          "code": 98,
+          "message": "address already in use",
+          "repr": "IO.Error.resourceBusy 98 \"address already in use\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EADDRNOTAVAIL",
+        "errno": -99,
+        "path": "",
+        "key": "uv_EADDRNOTAVAIL_137",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 99,
+          "message": "address not available",
+          "repr": "IO.Error.unsupportedOperation 99 \"address not available\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAFNOSUPPORT",
+        "errno": -97,
+        "path": "",
+        "key": "uv_EAFNOSUPPORT_138",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 97,
+          "message": "address family not supported",
+          "repr": "IO.Error.unsupportedOperation 97 \"address family not supported\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAGAIN",
+        "errno": -11,
+        "path": "",
+        "key": "uv_EAGAIN_139",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 11,
+          "message": "resource temporarily unavailable",
+          "repr": "IO.Error.resourceExhausted none 11 \"resource temporarily unavailable\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_ADDRFAMILY",
+        "errno": -3000,
+        "path": "",
+        "key": "uv_EAI_ADDRFAMILY_140",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3000,
+          "message": "address family not supported",
+          "repr": "IO.Error.otherError 3000 \"address family not supported\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_AGAIN",
+        "errno": -3001,
+        "path": "",
+        "key": "uv_EAI_AGAIN_141",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3001,
+          "message": "temporary failure",
+          "repr": "IO.Error.otherError 3001 \"temporary failure\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_BADFLAGS",
+        "errno": -3002,
+        "path": "",
+        "key": "uv_EAI_BADFLAGS_142",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3002,
+          "message": "bad ai_flags value",
+          "repr": "IO.Error.otherError 3002 \"bad ai_flags value\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_BADHINTS",
+        "errno": -3013,
+        "path": "",
+        "key": "uv_EAI_BADHINTS_143",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3013,
+          "message": "invalid value for hints",
+          "repr": "IO.Error.otherError 3013 \"invalid value for hints\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_CANCELED",
+        "errno": -3003,
+        "path": "",
+        "key": "uv_EAI_CANCELED_144",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3003,
+          "message": "request canceled",
+          "repr": "IO.Error.otherError 3003 \"request canceled\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_FAIL",
+        "errno": -3004,
+        "path": "",
+        "key": "uv_EAI_FAIL_145",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3004,
+          "message": "permanent failure",
+          "repr": "IO.Error.otherError 3004 \"permanent failure\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_FAMILY",
+        "errno": -3005,
+        "path": "",
+        "key": "uv_EAI_FAMILY_146",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3005,
+          "message": "ai_family not supported",
+          "repr": "IO.Error.otherError 3005 \"ai_family not supported\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_MEMORY",
+        "errno": -3006,
+        "path": "",
+        "key": "uv_EAI_MEMORY_147",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3006,
+          "message": "out of memory",
+          "repr": "IO.Error.otherError 3006 \"out of memory\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_NODATA",
+        "errno": -3007,
+        "path": "",
+        "key": "uv_EAI_NODATA_148",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3007,
+          "message": "no address",
+          "repr": "IO.Error.otherError 3007 \"no address\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_NONAME",
+        "errno": -3008,
+        "path": "",
+        "key": "uv_EAI_NONAME_149",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3008,
+          "message": "unknown node or service",
+          "repr": "IO.Error.otherError 3008 \"unknown node or service\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_OVERFLOW",
+        "errno": -3009,
+        "path": "",
+        "key": "uv_EAI_OVERFLOW_150",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3009,
+          "message": "argument buffer overflow",
+          "repr": "IO.Error.otherError 3009 \"argument buffer overflow\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_PROTOCOL",
+        "errno": -3014,
+        "path": "",
+        "key": "uv_EAI_PROTOCOL_151",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3014,
+          "message": "resolved protocol is unknown",
+          "repr": "IO.Error.otherError 3014 \"resolved protocol is unknown\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_SERVICE",
+        "errno": -3010,
+        "path": "",
+        "key": "uv_EAI_SERVICE_152",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3010,
+          "message": "service not available for socket type",
+          "repr": "IO.Error.otherError 3010 \"service not available for socket type\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EAI_SOCKTYPE",
+        "errno": -3011,
+        "path": "",
+        "key": "uv_EAI_SOCKTYPE_153",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 3011,
+          "message": "socket type not supported",
+          "repr": "IO.Error.otherError 3011 \"socket type not supported\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EALREADY",
+        "errno": -114,
+        "path": "",
+        "key": "uv_EALREADY_154",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 114,
+          "message": "connection already in progress",
+          "repr": "IO.Error.otherError 114 \"connection already in progress\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EBADF",
+        "errno": -9,
+        "path": "",
+        "key": "uv_EBADF_155",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 9,
+          "message": "bad file descriptor",
+          "repr": "IO.Error.invalidArgument none 9 \"bad file descriptor\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EBUSY",
+        "errno": -16,
+        "path": "",
+        "key": "uv_EBUSY_156",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceBusy",
+          "code": 16,
+          "message": "resource busy or locked",
+          "repr": "IO.Error.resourceBusy 16 \"resource busy or locked\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ECANCELED",
+        "errno": -125,
+        "path": "",
+        "key": "uv_ECANCELED_157",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 125,
+          "message": "operation canceled",
+          "repr": "IO.Error.otherError 125 \"operation canceled\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ECHARSET",
+        "errno": -4080,
+        "path": "",
+        "key": "uv_ECHARSET_158",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 4080,
+          "message": "invalid Unicode character",
+          "repr": "IO.Error.otherError 4080 \"invalid Unicode character\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ECONNABORTED",
+        "errno": -103,
+        "path": "",
+        "key": "uv_ECONNABORTED_159",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 103,
+          "message": "software caused connection abort",
+          "repr": "IO.Error.permissionDenied none 103 \"software caused connection abort\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ECONNREFUSED",
+        "errno": -111,
+        "path": "",
+        "key": "uv_ECONNREFUSED_160",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 111,
+          "message": "connection refused",
+          "repr": "IO.Error.noSuchThing none 111 \"connection refused\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ECONNRESET",
+        "errno": -104,
+        "path": "",
+        "key": "uv_ECONNRESET_161",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceVanished",
+          "code": 104,
+          "message": "connection reset by peer",
+          "repr": "IO.Error.resourceVanished 104 \"connection reset by peer\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EDESTADDRREQ",
+        "errno": -89,
+        "path": "",
+        "key": "uv_EDESTADDRREQ_162",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 89,
+          "message": "destination address required",
+          "repr": "IO.Error.invalidArgument none 89 \"destination address required\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EEXIST",
+        "errno": -17,
+        "path": "",
+        "key": "uv_EEXIST_163",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "alreadyExists",
+          "code": 17,
+          "message": "file already exists",
+          "repr": "IO.Error.alreadyExists none 17 \"file already exists\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EFAULT",
+        "errno": -14,
+        "path": "",
+        "key": "uv_EFAULT_164",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 14,
+          "message": "bad address in system call argument",
+          "repr": "IO.Error.otherError 14 \"bad address in system call argument\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EFBIG",
+        "errno": -27,
+        "path": "",
+        "key": "uv_EFBIG_165",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 27,
+          "message": "file too large",
+          "repr": "IO.Error.permissionDenied none 27 \"file too large\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EHOSTUNREACH",
+        "errno": -113,
+        "path": "",
+        "key": "uv_EHOSTUNREACH_166",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 113,
+          "message": "host is unreachable",
+          "repr": "IO.Error.noSuchThing none 113 \"host is unreachable\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EINTR",
+        "errno": -4,
+        "path": "probe",
+        "key": "uv_EINTR_167",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "interrupted",
+          "code": 4,
+          "message": "interrupted system call",
+          "repr": "IO.Error.interrupted \"probe\" 4 \"interrupted system call\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EINVAL",
+        "errno": -22,
+        "path": "",
+        "key": "uv_EINVAL_168",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 22,
+          "message": "invalid argument",
+          "repr": "IO.Error.invalidArgument none 22 \"invalid argument\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EIO",
+        "errno": -5,
+        "path": "",
+        "key": "uv_EIO_169",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "hardwareFault",
+          "code": 5,
+          "message": "i/o error",
+          "repr": "IO.Error.hardwareFault 5 \"i/o error\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EISCONN",
+        "errno": -106,
+        "path": "",
+        "key": "uv_EISCONN_170",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "alreadyExists",
+          "code": 106,
+          "message": "socket is already connected",
+          "repr": "IO.Error.alreadyExists none 106 \"socket is already connected\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EISDIR",
+        "errno": -21,
+        "path": "",
+        "key": "uv_EISDIR_171",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "inappropriateType",
+          "code": 21,
+          "message": "illegal operation on a directory",
+          "repr": "IO.Error.inappropriateType none 21 \"illegal operation on a directory\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ELOOP",
+        "errno": -40,
+        "path": "",
+        "key": "uv_ELOOP_172",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 40,
+          "message": "too many symbolic links encountered",
+          "repr": "IO.Error.invalidArgument none 40 \"too many symbolic links encountered\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EMFILE",
+        "errno": -24,
+        "path": "",
+        "key": "uv_EMFILE_173",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 24,
+          "message": "too many open files",
+          "repr": "IO.Error.resourceExhausted none 24 \"too many open files\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EMSGSIZE",
+        "errno": -90,
+        "path": "",
+        "key": "uv_EMSGSIZE_174",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 90,
+          "message": "message too long",
+          "repr": "IO.Error.resourceExhausted none 90 \"message too long\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENAMETOOLONG",
+        "errno": -36,
+        "path": "",
+        "key": "uv_ENAMETOOLONG_175",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 36,
+          "message": "name too long",
+          "repr": "IO.Error.invalidArgument none 36 \"name too long\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENETDOWN",
+        "errno": -100,
+        "path": "",
+        "key": "uv_ENETDOWN_176",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceVanished",
+          "code": 100,
+          "message": "network is down",
+          "repr": "IO.Error.resourceVanished 100 \"network is down\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENETUNREACH",
+        "errno": -101,
+        "path": "",
+        "key": "uv_ENETUNREACH_177",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 101,
+          "message": "network is unreachable",
+          "repr": "IO.Error.noSuchThing none 101 \"network is unreachable\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENFILE",
+        "errno": -23,
+        "path": "",
+        "key": "uv_ENFILE_178",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 23,
+          "message": "file table overflow",
+          "repr": "IO.Error.resourceExhausted none 23 \"file table overflow\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOBUFS",
+        "errno": -105,
+        "path": "",
+        "key": "uv_ENOBUFS_179",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 105,
+          "message": "no buffer space available",
+          "repr": "IO.Error.resourceExhausted none 105 \"no buffer space available\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENODEV",
+        "errno": -19,
+        "path": "",
+        "key": "uv_ENODEV_180",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 19,
+          "message": "no such device",
+          "repr": "IO.Error.unsupportedOperation 19 \"no such device\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOENT",
+        "errno": -2,
+        "path": "probe",
+        "key": "uv_ENOENT_181",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "noFileOrDirectory",
+          "code": 2,
+          "message": "no such file or directory",
+          "repr": "IO.Error.noFileOrDirectory \"probe\" 2 \"no such file or directory\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOMEM",
+        "errno": -12,
+        "path": "",
+        "key": "uv_ENOMEM_182",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 12,
+          "message": "not enough memory",
+          "repr": "IO.Error.resourceExhausted none 12 \"not enough memory\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENONET",
+        "errno": -64,
+        "path": "",
+        "key": "uv_ENONET_183",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 64,
+          "message": "machine is not on the network",
+          "repr": "IO.Error.otherError 64 \"machine is not on the network\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOPROTOOPT",
+        "errno": -92,
+        "path": "",
+        "key": "uv_ENOPROTOOPT_184",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 92,
+          "message": "protocol not available",
+          "repr": "IO.Error.unsupportedOperation 92 \"protocol not available\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOSPC",
+        "errno": -28,
+        "path": "",
+        "key": "uv_ENOSPC_185",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 28,
+          "message": "no space left on device",
+          "repr": "IO.Error.resourceExhausted none 28 \"no space left on device\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOSYS",
+        "errno": -38,
+        "path": "",
+        "key": "uv_ENOSYS_186",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 38,
+          "message": "function not implemented",
+          "repr": "IO.Error.unsupportedOperation 38 \"function not implemented\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOTCONN",
+        "errno": -107,
+        "path": "",
+        "key": "uv_ENOTCONN_187",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 107,
+          "message": "socket is not connected",
+          "repr": "IO.Error.invalidArgument none 107 \"socket is not connected\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOTDIR",
+        "errno": -20,
+        "path": "",
+        "key": "uv_ENOTDIR_188",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "inappropriateType",
+          "code": 20,
+          "message": "not a directory",
+          "repr": "IO.Error.inappropriateType none 20 \"not a directory\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOTEMPTY",
+        "errno": -39,
+        "path": "",
+        "key": "uv_ENOTEMPTY_189",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsatisfiedConstraints",
+          "code": 39,
+          "message": "directory not empty",
+          "repr": "IO.Error.unsatisfiedConstraints 39 \"directory not empty\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOTSOCK",
+        "errno": -88,
+        "path": "",
+        "key": "uv_ENOTSOCK_190",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 88,
+          "message": "socket operation on non-socket",
+          "repr": "IO.Error.invalidArgument none 88 \"socket operation on non-socket\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOTSUP",
+        "errno": -95,
+        "path": "",
+        "key": "uv_ENOTSUP_191",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 95,
+          "message": "operation not supported on socket",
+          "repr": "IO.Error.unsupportedOperation 95 \"operation not supported on socket\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EOVERFLOW",
+        "errno": -75,
+        "path": "",
+        "key": "uv_EOVERFLOW_192",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 75,
+          "message": "value too large for defined data type",
+          "repr": "IO.Error.otherError 75 \"value too large for defined data type\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EPERM",
+        "errno": -1,
+        "path": "",
+        "key": "uv_EPERM_193",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 1,
+          "message": "operation not permitted",
+          "repr": "IO.Error.permissionDenied none 1 \"operation not permitted\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EPIPE",
+        "errno": -32,
+        "path": "",
+        "key": "uv_EPIPE_194",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceVanished",
+          "code": 32,
+          "message": "broken pipe",
+          "repr": "IO.Error.resourceVanished 32 \"broken pipe\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EPROTO",
+        "errno": -71,
+        "path": "",
+        "key": "uv_EPROTO_195",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "protocolError",
+          "code": 71,
+          "message": "protocol error",
+          "repr": "IO.Error.protocolError 71 \"protocol error\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EPROTONOSUPPORT",
+        "errno": -93,
+        "path": "",
+        "key": "uv_EPROTONOSUPPORT_196",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "protocolError",
+          "code": 93,
+          "message": "protocol not supported",
+          "repr": "IO.Error.protocolError 93 \"protocol not supported\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EPROTOTYPE",
+        "errno": -91,
+        "path": "",
+        "key": "uv_EPROTOTYPE_197",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "protocolError",
+          "code": 91,
+          "message": "protocol wrong type for socket",
+          "repr": "IO.Error.protocolError 91 \"protocol wrong type for socket\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ERANGE",
+        "errno": -34,
+        "path": "",
+        "key": "uv_ERANGE_198",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 34,
+          "message": "result too large",
+          "repr": "IO.Error.unsupportedOperation 34 \"result too large\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EROFS",
+        "errno": -30,
+        "path": "",
+        "key": "uv_EROFS_199",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "permissionDenied",
+          "code": 30,
+          "message": "read-only file system",
+          "repr": "IO.Error.permissionDenied none 30 \"read-only file system\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ESHUTDOWN",
+        "errno": -108,
+        "path": "",
+        "key": "uv_ESHUTDOWN_200",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 108,
+          "message": "cannot send after transport endpoint shutdown",
+          "repr": "IO.Error.otherError 108 \"cannot send after transport endpoint shutdown\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ESPIPE",
+        "errno": -29,
+        "path": "",
+        "key": "uv_ESPIPE_201",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 29,
+          "message": "invalid seek",
+          "repr": "IO.Error.unsupportedOperation 29 \"invalid seek\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ESRCH",
+        "errno": -3,
+        "path": "",
+        "key": "uv_ESRCH_202",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 3,
+          "message": "no such process",
+          "repr": "IO.Error.noSuchThing none 3 \"no such process\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ETIMEDOUT",
+        "errno": -110,
+        "path": "",
+        "key": "uv_ETIMEDOUT_203",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "timeExpired",
+          "code": 110,
+          "message": "connection timed out",
+          "repr": "IO.Error.timeExpired 110 \"connection timed out\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ETXTBSY",
+        "errno": -26,
+        "path": "",
+        "key": "uv_ETXTBSY_204",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceBusy",
+          "code": 26,
+          "message": "text file is busy",
+          "repr": "IO.Error.resourceBusy 26 \"text file is busy\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EXDEV",
+        "errno": -18,
+        "path": "",
+        "key": "uv_EXDEV_205",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "unsupportedOperation",
+          "code": 18,
+          "message": "cross-device link not permitted",
+          "repr": "IO.Error.unsupportedOperation 18 \"cross-device link not permitted\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "UNKNOWN",
+        "errno": -4094,
+        "path": "",
+        "key": "uv_UNKNOWN_206",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 4094,
+          "message": "unknown error",
+          "repr": "IO.Error.otherError 4094 \"unknown error\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EOF",
+        "errno": -4095,
+        "path": "",
+        "key": "uv_EOF_207",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 4095,
+          "message": "end of file",
+          "repr": "IO.Error.otherError 4095 \"end of file\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENXIO",
+        "errno": -6,
+        "path": "",
+        "key": "uv_ENXIO_208",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 6,
+          "message": "no such device or address",
+          "repr": "IO.Error.noSuchThing none 6 \"no such device or address\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EMLINK",
+        "errno": -31,
+        "path": "",
+        "key": "uv_EMLINK_209",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "resourceExhausted",
+          "code": 31,
+          "message": "too many links",
+          "repr": "IO.Error.resourceExhausted none 31 \"too many links\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EHOSTDOWN",
+        "errno": -112,
+        "path": "",
+        "key": "uv_EHOSTDOWN_210",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 112,
+          "message": "host is down",
+          "repr": "IO.Error.otherError 112 \"host is down\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EREMOTEIO",
+        "errno": -121,
+        "path": "",
+        "key": "uv_EREMOTEIO_211",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 121,
+          "message": "remote I/O error",
+          "repr": "IO.Error.otherError 121 \"remote I/O error\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOTTY",
+        "errno": -25,
+        "path": "",
+        "key": "uv_ENOTTY_212",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "illegalOperation",
+          "code": 25,
+          "message": "inappropriate ioctl for device",
+          "repr": "IO.Error.illegalOperation 25 \"inappropriate ioctl for device\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EFTYPE",
+        "errno": -4028,
+        "path": "",
+        "key": "uv_EFTYPE_213",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 4028,
+          "message": "inappropriate file type or format",
+          "repr": "IO.Error.otherError 4028 \"inappropriate file type or format\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EILSEQ",
+        "errno": -84,
+        "path": "",
+        "key": "uv_EILSEQ_214",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 84,
+          "message": "illegal byte sequence",
+          "repr": "IO.Error.invalidArgument none 84 \"illegal byte sequence\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ESOCKTNOSUPPORT",
+        "errno": -94,
+        "path": "",
+        "key": "uv_ESOCKTNOSUPPORT_215",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 94,
+          "message": "socket type not supported",
+          "repr": "IO.Error.otherError 94 \"socket type not supported\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENODATA",
+        "errno": -61,
+        "path": "",
+        "key": "uv_ENODATA_216",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "noSuchThing",
+          "code": 61,
+          "message": "no data available",
+          "repr": "IO.Error.noSuchThing none 61 \"no data available\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "EUNATCH",
+        "errno": -49,
+        "path": "",
+        "key": "uv_EUNATCH_217",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 49,
+          "message": "protocol driver not attached",
+          "repr": "IO.Error.otherError 49 \"protocol driver not attached\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "ENOEXEC",
+        "errno": -8,
+        "path": "",
+        "key": "uv_ENOEXEC_218",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "invalidArgument",
+          "code": 8,
+          "message": "Unknown system error -8",
+          "repr": "IO.Error.invalidArgument none 8 \"Unknown system error -8\""
+        }
+      },
+      {
+        "origin": "crt",
+        "name": "UNKNOWN",
+        "errno": 12345,
+        "path": "",
+        "key": "crt_UNKNOWN_219",
+        "inputMessage": "Unknown error 12345",
+        "native": {
+          "constructor": "otherError",
+          "code": 12345,
+          "message": "Unknown system error -12345",
+          "repr": "IO.Error.otherError 12345 \"Unknown system error -12345\""
+        }
+      },
+      {
+        "origin": "uv",
+        "name": "UNKNOWN",
+        "errno": -12345,
+        "path": "",
+        "key": "uv_UNKNOWN_220",
+        "inputMessage": "System operation failed",
+        "native": {
+          "constructor": "otherError",
+          "code": 12345,
+          "message": "Unknown system error -12345",
+          "repr": "IO.Error.otherError 12345 \"Unknown system error -12345\""
+        }
+      }
+    ],
+    "comparisons": [
+      {
+        "engine": "node",
+        "checked": 221,
+        "failures": []
+      },
+      {
+        "engine": "deno",
+        "checked": 221,
+        "failures": []
+      },
+      {
+        "engine": "bun",
+        "checked": 221,
+        "failures": []
+      }
+    ],
+    "recordedAt": "2026-09-24T01:24:29.114Z",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-decoder-fixed-r1-resources.json"
+  },
+  "decoderUnchangedInRepairedCandidate": {
+    "encoderSha256": "cbb1fd8757297a5936818db46c2bdd90111a431263069914e749a0c647b68516",
+    "policySha256": "4cd9b9f8a8399832559e7ebd81362f8ddc2080a269aa2dfe94f3a4bccde3cb00",
+    "comparison": "Intermediate deployment and final installed candidate have identical encodeError bodies and complete version policy modules; the subsequent repair changes the POSIX unlink dispatch."
+  },
+  "installedFilesystemComparisons": [
+    {
+      "scope": "Ordinary filesystem fixture in installed Lean 4.34 AOT application; native interpreter and C executable controls",
+      "target": "node",
+      "platform": "linux-x64",
+      "engineVersion": "v26.10.0",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r11/workspace/project/node_modules/@lasm/compiler",
+      "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+      "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "interpreted": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "compiled": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "actual": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "c7ce617cd37d9404dbe5ff861f188dd886e50b505bb2494de219e026e382e087",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+            "cSha256": "ce331bee1bda78eb6fc1dcf6971c17dfd3a809ce0977065ac19b993a07c10549"
+          }
+        ],
+        "signature": "0979275af8a55ae29c5e88af39b2e8bbc57b75f4766735f07fd2bc907e002f1c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "4b5574dcb78c4fb8f8068357ebaeed766ad7c92060927b856a35ee0643f4b596",
+      "assertions": "Original error, bounds, byte-order, symlink/metadata and failed-write assertions; exact native output, stderr and exit comparison",
+      "deployment": "Relocated complete output, hidden source/build directory, empty PATH and no Lean/Lake/Elan environment",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-release-r2-resources.json",
+      "recordedAt": "2026-09-24T01:37:19.588Z"
+    },
+    {
+      "scope": "Ordinary filesystem fixture in installed Lean 4.34 AOT application; native interpreter and C executable controls",
+      "target": "deno",
+      "platform": "linux-x64",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r11/workspace/project/node_modules/@lasm/compiler",
+      "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+      "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "interpreted": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "compiled": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "actual": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "c7ce617cd37d9404dbe5ff861f188dd886e50b505bb2494de219e026e382e087",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+            "cSha256": "ce331bee1bda78eb6fc1dcf6971c17dfd3a809ce0977065ac19b993a07c10549"
+          }
+        ],
+        "signature": "4ca94bef3724e53dec255b4d5dfd85cfb65dca99ddd29e32936d785891745d6d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "4b5574dcb78c4fb8f8068357ebaeed766ad7c92060927b856a35ee0643f4b596",
+      "assertions": "Original error, bounds, byte-order, symlink/metadata and failed-write assertions; exact native output, stderr and exit comparison",
+      "deployment": "Relocated complete output, hidden source/build directory, empty PATH and no Lean/Lake/Elan environment",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-release-r2-resources.json",
+      "recordedAt": "2026-09-24T01:38:37.915Z"
+    },
+    {
+      "scope": "Ordinary filesystem fixture in installed Lean 4.34 AOT application; native interpreter and C executable controls",
+      "target": "bun",
+      "platform": "linux-x64",
+      "engineVersion": "1.4.2",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r11/workspace/project/node_modules/@lasm/compiler",
+      "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+      "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+      "interpreted": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "compiled": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "actual": {
+        "code": 0,
+        "signal": null,
+        "stdout": "missing read: no such file or directory (error code: 2)\n  file: missing\nmissing metadata: no such file or directory (error code: 2)\n  file: missing\nmissing realpath: no such file or directory (error code: 2)\n  file: missing\nmissing readDir: no such file or directory (error code: 2)\n  file: missing\nempty path: no such file or directory (error code: 2)\n  file: \nnot a directory: inappropriate type (error code: 20, not a directory)\n  file: target/../target\ntrailing slash: inappropriate type (error code: 20, not a directory)\n  file: target/\nduplicate mkdir: already exists (error code: 17, file already exists)\n  file: directory\nmissing mkdir parent: no such file or directory (error code: 2)\n  file: missing/child\nmissing rmdir: no such file or directory (error code: 2)\n  file: missing\nnonempty rmdir: directory not empty (error code: 39)\nremove directory as file: inappropriate type (error code: 21, illegal operation on a directory)\n  file: directory\nmissing rename: no such file or directory (error code: 2)\n  file: missing and/or destination\nmissing hard link: no such file or directory (error code: 2)\n  file: missing\nmissing chmod: no such file or directory (error code: 2)\n  file: missing\nNUL second rename path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL second hard link path: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nNUL realpath: invalid argument (error code: 22, string contains NUL bytes)\n  file: bad\u0000path\nread handle write: invalid argument (error code: 9, bad file descriptor)\nread handle truncate: invalid argument (error code: 22, invalid argument)\noverflow read: resource exhausted (error code: 12, not enough memory)\ndirectory order: #[\"z\", \"a\", \"\u03bb\"]\nfilesystem conformance passed\n",
+        "stderr": ""
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.0",
+        "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+        "buildDriverIdentity": "c7ce617cd37d9404dbe5ff861f188dd886e50b505bb2494de219e026e382e087",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "cad390897f4e84167f206a0b53a5819da19be918bf6e3856489ccee76c1dc5dd",
+            "cSha256": "ce331bee1bda78eb6fc1dcf6971c17dfd3a809ce0977065ac19b993a07c10549"
+          }
+        ],
+        "signature": "d89fa9747b7df8d20efbc2c735dbf2a2403862044711f3a16cc2e4fd76a88242",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+      },
+      "wasmSha256": "d8d743b0b407db9ec9acbe1b3030fdd1e442dc4e65237a3aa7630f3fe22325bd",
+      "assertions": "Original error, bounds, byte-order, symlink/metadata and failed-write assertions; exact native output, stderr and exit comparison",
+      "deployment": "Relocated complete output, hidden source/build directory, empty PATH and no Lean/Lake/Elan environment",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-release-r2-resources.json",
+      "recordedAt": "2026-09-24T01:40:25.543Z"
+    }
+  ],
+  "additionalControls": {
+    "focusedNodeRegressions": 17,
+    "posixUnlinkEngines": [
+      "node",
+      "deno",
+      "bun"
+    ],
+    "unlinkSourceSha256": "8aecac358f03f35bd83fdb2b117fe030ae466e6da38c70da8bf514f700ac7431",
+    "log": ".work/product-acceptance/io-release-r2.log",
+    "logSha256": "c072bbb6c14b36012c1b27c9db68ce73c8ce7fe69d651d5b35bbcb7fbf870957"
+  },
+  "resources": {
+    "nativeDecoder": {
+      "startedAt": "2026-09-24T01:24:15.163Z",
+      "command": [
+        "/usr/bin/env",
+        "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "integration/io-error-decoder.mjs",
+        ".work/io-decoder-fixed-r1",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        ".cache/js-runtimes/deno-2.9.7/deno",
+        ".cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "031448c7-8c5f-476b-8f2d-4d4e11ae1dd5",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25627394048
+      },
+      "minimumHostAvailable": 25434177536,
+      "peakMemoryBytes": 230875136,
+      "peakTasks": 18,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-decoder-fixed-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T01:24:29.185Z",
+        "memoryBytes": 19791872,
+        "peakMemoryBytes": 230875136,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11456512,
+          "file": 5308416,
+          "kernel": 1228800,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 565248,
+          "slab": 310720
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T01:24:29.186Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 19791872,
+        "peakMemoryBytes": 230875136,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11456512,
+          "file": 5308416,
+          "kernel": 1228800,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 565248,
+          "slab": 310720
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T01:24:29.210Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "initialInstalledFailure": {
+      "startedAt": "2026-09-24T01:15:21.062Z",
+      "command": [
+        "/usr/bin/env",
+        "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "/bin/bash",
+        ".work/run-filesystem-baseline-r1.sh"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "f48c8383-bdc7-4cac-9f30-3ad0df7c54d3",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25663406080
+      },
+      "minimumHostAvailable": 22088372224,
+      "peakMemoryBytes": 4454064128,
+      "peakTasks": 37,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/filesystem-baseline-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T01:16:46.785Z",
+        "memoryBytes": 1653428224,
+        "peakMemoryBytes": 4454064128,
+        "swapBytes": 0,
+        "tasks": 23,
+        "memoryBreakdown": {
+          "anon": 348655616,
+          "file": 1285120000,
+          "kernel": 18616320,
+          "shmem": 0,
+          "file_mapped": 1040384,
+          "inactive_file": 1280507904,
+          "slab": 12209624
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T01:16:46.883Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 1310326784,
+        "peakMemoryBytes": 4454064128,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11657216,
+          "file": 1285341184,
+          "kernel": 12529664,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 1280524288,
+          "slab": 11591464
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T01:16:46.908Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "intermediateDenoFailure": {
+      "startedAt": "2026-09-24T01:27:34.900Z",
+      "command": [
+        "/usr/bin/env",
+        "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "/bin/bash",
+        ".work/run-io-release-r1.sh"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "422c3286-bab9-43a4-8ac1-81202ea91a9e",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25539014656
+      },
+      "minimumHostAvailable": 21883457536,
+      "peakMemoryBytes": 5467394048,
+      "peakTasks": 40,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-release-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T01:31:28.789Z",
+        "memoryBytes": 2322448384,
+        "peakMemoryBytes": 5467394048,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 0,
+          "file": 2266656768,
+          "kernel": 55390208,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 2247278592,
+          "slab": 55280912
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T01:31:28.846Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 2335240192,
+        "peakMemoryBytes": 5467394048,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11673600,
+          "file": 2266656768,
+          "kernel": 56213504,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2247278592,
+          "slab": 55283608
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T01:31:28.879Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "repairedPackage": {
+      "startedAt": "2026-09-24T01:34:57.395Z",
+      "command": [
+        "/usr/bin/env",
+        "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "/bin/bash",
+        ".work/run-io-release-r2.sh"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "e224faf9-2720-401f-a1d7-33873027c4f2",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25521295360
+      },
+      "minimumHostAvailable": 22145503232,
+      "peakMemoryBytes": 6078332928,
+      "peakTasks": 53,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/io-release-r2-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T01:40:25.590Z",
+        "memoryBytes": 2779058176,
+        "peakMemoryBytes": 6078332928,
+        "swapBytes": 0,
+        "tasks": 6,
+        "memoryBreakdown": {
+          "anon": 3018752,
+          "file": 2707042304,
+          "kernel": 67207168,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2690277376,
+          "slab": 66716376
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T01:40:25.618Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 2787885056,
+        "peakMemoryBytes": 6078332928,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11657216,
+          "file": 2707042304,
+          "kernel": 67674112,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2690277376,
+          "slab": 66742608
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T01:40:25.643Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "harnessNotes": [
+    "The first native decoder helper lacked a Repr instance and failed to compile; its output is preserved as io-decoder-baseline-r1.",
+    "The second baseline exposed a Deno decoder exception. The parallel driver now records exceptions per case so every comparison completes.",
+    "The decoder oracle calls the unmodified native Lean library through a private test-only C helper; no helper is part of the public Lean API.",
+    "All filesystem runs copy the same existing Lean fixture without changing its source. Native interpreted and C-compiled controls use independent trees.",
+    "Failures, their deployments and all release tarballs remain preserved. Only verified duplicate caches or installed copies were reclaimed."
+  ],
+  "limitations": [
+    "Native-library profile verified on Linux x64; other native platforms remain unverified.",
+    "The actual-file regression covers selected error/bounds/path/order cases, not every filesystem or standard API.",
+    "POSIX unlink uses the native helper. Windows still uses the engine filesystem adapter pending its own native differential."
+  ]
+}

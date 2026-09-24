@@ -8,6 +8,11 @@ separately from the earlier runtime evidence below.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.
+  The [release-specific error repair](docs/evidence/lean-4.34-io-errors-2026-09-24.json)
+  now matches 221 native-library decoder cases in each stock engine on Linux
+  x64. Installed ordinary filesystem probes also match native after correcting
+  Deno's POSIX unlink behavior. These checks leave broader API and native
+  platform coverage open; Windows removal behavior is not covered by this fix.
 - [ ] Complete the latest-release declaration/API audit and native differential
   coverage in all three stock engines and all six OS/architecture combinations.
   The [Lean 4.34 surface inventory](docs/compatibility/API_SURFACE_4_34.md) now

@@ -23,6 +23,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
         const path = process.env.LASM_FULL_HOST_MODULE;
         if (!path) throw new Error('LASM_FULL_HOST_MODULE must point to the Lasm host module');
         lasmFullHost = import(path).then(m => m.createNodeRuntimeHost({
+          leanVersion: Module.lasmLeanVersion,
           args: process.argv.slice(2), appPath: process.env.LASM_FULL_APP_PATH ?? __filename, propagateCwd: true, processExit: true,
           applicationCommand: process.env.LASM_FULL_APP_PATH ? {
             executable: process.execPath,

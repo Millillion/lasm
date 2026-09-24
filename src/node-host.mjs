@@ -14,6 +14,7 @@ import { createNodeSignals } from './node-signal.mjs';
 import nativeThreadId from './thread-id.cjs';
 import { HandleTable } from './handle-table.mjs';
 import { createWorkingDirectory } from './working-directory.mjs';
+import { checkLeanIOVersion, leanIOError } from './lean-io-errors.mjs';
 
 const empty = Buffer.alloc(0);
 export class LeanExit extends Error { constructor(code, force = false) { super(`Lean exited with status ${code}`); this.name = 'LeanExit'; this.code = code; this.force = force; } }
@@ -23,11 +24,14 @@ export function numbers(...values) {
   return result;
 }
 function error(code, message) { return Object.assign(new Error(message), { code }); }
-export function encodeError(err) {
+export function encodeError(err, leanVersion = '4.32.0') {
+  checkLeanIOVersion(leanVersion);
   // node:os wraps libuv errors in SystemError; preserve the underlying code.
   if (err.info?.code && typeof err.info.errno === 'number') err = { ...err, ...err.info };
+  err = leanIOError(err, leanVersion);
   // Keep constructor families in sync with Lean's lean_decode_io_error and
-  // lean_decode_uv_error. Libuv errors retain their signed value (UInt32 in Lean).
+  // lean_decode_uv_error. The selected release policy translates errno and
+  // messages before classification; the older callable runtime keeps its ABI.
   const groups = [[], ['ENOENT'], ['EACCES', 'EPERM', 'EROFS', 'ECONNABORTED', 'EFBIG'], ['EEXIST', 'EINPROGRESS', 'EISCONN'],
     ['EINVAL', 'EBADF', 'ELOOP', 'ENAMETOOLONG', 'EDESTADDRREQ', 'EDOM', 'EILSEQ', 'ENOEXEC', 'ENOSTR', 'ENOTCONN', 'ENOTSOCK', 'ERR_INVALID_ARG_VALUE'],
     ['EISDIR', 'ENOTDIR', 'EBADMSG'], ['EBUSY', 'EADDRINUSE', 'EDEADLK', 'ETXTBSY'], ['ETIMEDOUT', 'ETIME'],
@@ -39,14 +43,16 @@ export function encodeError(err) {
   const kind = err.leanUserError ? 18 : Math.max(0, groups.findIndex(group => group.includes(err.code)));
   let message = String(err.message);
   if (err.errno < 0 && !err.nativeMessage) {
-    try { message = getSystemErrorMessage(err.errno); } catch { /* preserve non-system errors */ }
+    try { message = getSystemErrorMessage(err.errno) ?? `Unknown system error ${err.errno}`; }
+    catch { /* preserve non-system errors */ }
   }
   return { error: true, bytes: Buffer.concat([numbers(kind, err.errno ?? 0), Buffer.from(message)]) };
 }
 
 /** Private Node implementation of Lean's runtime primitives, not a Lean API. */
 export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = {}, appPath = process.execPath,
-  applicationCommand, propagateCwd = false, processExit = false } = {}) {
+  applicationCommand, propagateCwd = false, processExit = false, leanVersion = '4.32.0' } = {}) {
+  checkLeanIOVersion(leanVersion);
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))
     throw new TypeError('Lean main arguments must be Unicode strings without NUL characters');
   const directory = createWorkingDirectory(cwd, propagateCwd);
@@ -189,7 +195,8 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
       } catch (err) { if (err.nativeMessage) throw err; throw nativeFiles().fromNodeError(err); }
     })();
     case 14: return fsp.mkdir(path(bytes)).then(() => empty, err => { throw nativeFiles().fromNodeError(err); });
-    case 15: return fsp.unlink(path(bytes)).then(() => empty);
+    case 15: return (process.platform === 'win32' ? fsp.unlink(path(bytes))
+      : nativeFiles().removeFile(path(bytes))).then(() => empty);
     case 16: return fsp.rmdir(path(bytes)).then(() => empty, err => { throw nativeFiles().fromNodeError(err); });
     case 17: case 18: return (op === 17 ? fsp.rename : fsp.link)(path(bytes.subarray(0, n)), path(bytes.subarray(n + 1))).then(() => empty, err => {
       if (op === 17 && process.platform !== 'win32') throw nativeFiles().fromNodeError(err);
@@ -265,7 +272,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
         state = directory.retain();
       const result = dispatch(op, id, arg, Buffer.from(bytes), context, state);
       if (result?.then) {
-        const response = result.then(bytes => ({ error: false, bytes }), err => { if (err instanceof LeanExit) throw err; return encodeError(err); });
+        const response = result.then(bytes => ({ error: false, bytes }), err => { if (err instanceof LeanExit) throw err; return encodeError(err, leanVersion); });
         return state ? response.finally(() => directory.release(state)) : response;
       }
       if (state) directory.release(state);
@@ -274,7 +281,7 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     } catch (err) {
       if (state) directory.release(state);
       if (err instanceof LeanExit) throw err;
-      return encodeError(err);
+      return encodeError(err, leanVersion);
     }
   }
   return { request, release, platform: process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0,

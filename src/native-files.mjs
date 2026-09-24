@@ -47,6 +47,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const strerror = bind('strerror', 'str', ['int']);
   const free = bind('free', 'void', ['void *']);
   const realpath = windows ? null : bind('realpath', 'void *', ['str', 'void *']);
+  const unlink = windows ? null : bind('unlink', 'int', ['str']);
   const mkdtemp = windows ? null : bind('mkdtemp', 'void *', ['void *']);
   const mkstemp = windows ? null : bind('mkstemp', 'int', ['void *']);
   let mkostemp;
@@ -81,7 +82,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const fgetc = bind('fgetc', 'int', ['void *']);
   const codes = Object.fromEntries(Object.entries(ffi.os.errno).map(([name, number]) => [number, name]));
   function failure(errno = ffi.errno()) {
-    return Object.assign(new Error(strerror(errno)), { code: codes[errno] ?? 'EIO', errno, nativeMessage: true });
+    return Object.assign(new Error(strerror(errno)), { code: codes[errno], errno, nativeMessage: true, errorOrigin: 'crt' });
   }
   const fromNodeError = error => failure(ffi.os.errno[error.code] ?? ffi.os.errno.EIO);
   function directoryBuffer(bytes) {
@@ -306,6 +307,14 @@ export function nativeFiles({ synchronous = false } = {}) {
       try { return Buffer.from(new Uint8Array(ffi.view(value, Number(strlen(value))))); }
       finally { free(value); }
     },
+    async removeFile(path) {
+      if (!unlink) throw new Error('Native unlink is POSIX-only');
+      // Engine adapters can implement unlink via a general remove operation,
+      // which also deletes empty directories. Lean uses uv_fs_unlink instead.
+      // Call the actual POSIX primitive, retaining libuv's errno convention.
+      const { value, errno } = await call(unlink, path);
+      if (value < 0) throw Object.assign(failure(errno), { errno: -errno, nativeMessage: false, errorOrigin: 'uv' });
+    },
     async groupInfo(gid) {
       if (windows) throw Object.assign(failure(ffi.os.errno.ENOSYS), { errno: -ffi.os.errno.ENOSYS });
       for (let size = 1024; ; size *= 2) {
@@ -482,6 +491,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     async getLine(file) { return buffer(await callNativeFile('getLine', [reference(file)])); },
     async readDirectory(path) { return (await callNativeFile('readDirectory', [path])).map(buffer); },
     async realPath(path) { return buffer(await callNativeFile('realPath', [path])); },
+    removeFile(path) { return callNativeFile('removeFile', [path]); },
     groupInfo(gid) { return callNativeFile('groupInfo', [gid]); },
     checkDirectorySearch(path) { return callNativeFile('checkDirectorySearch', [path]); },
   };

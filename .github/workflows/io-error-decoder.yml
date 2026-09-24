@@ -1,0 +1,51 @@
+name: Native Lean IO error ABI comparison
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: io-error-decoder-${{ github.ref }}
+  cancel-in-progress: false
+
+# Narrow native-library comparison, not full Wasm/platform acceptance. The
+# current process-tree guard supports Linux and Windows. macOS and the missing
+# native Windows ARM64 Lean distribution remain separate acceptance work.
+# Standard public runners only; no cache or artifact uploads.
+jobs:
+  compare:
+    if: github.event.repository.visibility == 'public'
+    name: Native IO errors ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+          - { platform: win32-x64, runner: windows-2022, arch: x64 }
+    env:
+      LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch, process.env.LASM_EXPECT_PLATFORM)"
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Enable the guard on this disposable Linux runner
+        if: runner.os == 'Linux'
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Compare the native Lean library and host decoder
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/io-error-ci-resources.json -- node integration/io-error-decoder.mjs .work/io-error-ci
+      - name: Verify actual worker errors and explicit Lean messages
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/io-error-controls-resources.json -- node --test --test-concurrency=1 test/lean-io-errors.test.mjs
+      - name: Preserve bounded native comparison receipts
+        if: always()
+        run: node -e "const f=require('node:fs');for(const p of ['.work/io-error-ci/result.json','.work/io-error-ci/oracle.json','.work/io-error-ci-resources.json','.work/io-error-controls-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

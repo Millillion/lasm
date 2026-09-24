@@ -98,6 +98,10 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   objects.push(registryObject);
   const exportsFile = join(temporary, 'exports.json');
   await writeFile(exportsFile, JSON.stringify([...new Set([...JSON.parse(await readFile(join(runtime.directory, 'exports.json'), 'utf8')), ...registry.exports])].sort()) + '\n');
+  // Bake the verified release into the private runtime prelude. It must not
+  // depend on mutable process environment or alter Lean's visible environment.
+  const applicationPrelude = join(temporary, 'application-pre.js');
+  await writeFile(applicationPrelude, `Module.lasmLeanVersion = ${JSON.stringify(lean.version)};\n`);
   const link = [...objects, '-O1', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${memoryMode}`, '-sMALLOC=mimalloc',
     '-sMAIN_MODULE=2', `-sEXPORTED_FUNCTIONS=@${exportsFile}`, '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=4',
     '-sEXPORTED_RUNTIME_METHODS=stringToNewUTF8', '-sEXIT_RUNTIME=1', '-sNODERAWFS=1',
@@ -107,6 +111,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
     '-Wno-experimental', '-Wno-pthreads-mem-growth', '-Wl,--start-group',
     ...runtime.manifest.libraries.map(name => join(runtime.directory, name)), '-Wl,--end-group',
     '--pre-js', join(root, 'scripts/full-lean/emscripten-pre.js'),
+    '--pre-js', applicationPrelude,
     '--pre-js', join(root, 'scripts/full-lean/host-pre.js'),
     '--js-library', join(root, 'scripts/full-lean/host-library.js'), '-o', join(dist, 'program.cjs')];
   const argumentsFile = join(temporary, 'link.rsp'); await writeFile(argumentsFile, responseFile(link));

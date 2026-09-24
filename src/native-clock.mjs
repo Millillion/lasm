@@ -38,7 +38,7 @@ export function nativeClock() {
       const time = {};
       if (read(0 /* CLOCK_REALTIME on Linux/macOS */, time) !== 0) {
         const errno = ffi.errno();
-        throw Object.assign(new Error(strerror(errno)), { errno, code: codes[errno] ?? 'EIO', nativeMessage: true });
+        throw Object.assign(new Error(strerror(errno)), { errno, code: codes[errno], nativeMessage: true, errorOrigin: 'crt' });
       }
       return posixWallTime(time.seconds, time.nanoseconds);
     } };

@@ -10,7 +10,7 @@ const port = parentPort ?? {
   postMessage(value, transfer) { globalThis.postMessage(value, transfer); },
 };
 const operations = new Set(['open', 'read', 'write', 'flush', 'rewind', 'truncate', 'getLine',
-  'closeAsync', 'readDirectory', 'realPath', 'groupInfo', 'checkDirectorySearch', 'createTemporary']);
+  'closeAsync', 'readDirectory', 'realPath', 'removeFile', 'groupInfo', 'checkDirectorySearch', 'createTemporary']);
 port.on('message', async ({ operation, args }) => {
   try {
     if (!operations.has(operation)) throw new Error(`Invalid native file operation: ${operation}`);
@@ -31,6 +31,6 @@ port.on('message', async ({ operation, args }) => {
   } catch (error) {
     port.postMessage({ ok: false, error: { message: error.message,
       code: error.code, errno: error.errno, nativeMessage: error.nativeMessage,
-      leanUserError: error.leanUserError } });
+      leanUserError: error.leanUserError, errorOrigin: error.errorOrigin } });
   }
 });

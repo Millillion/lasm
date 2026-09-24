@@ -302,6 +302,29 @@ the required base-page wrapper; it remains a separate resource result.
 
 ## Native CI
 
+The [Lean 4.34 IO error comparison](evidence/lean-4.34-io-errors-2026-09-24.json)
+found and repaired a release-specific mismatch: the newer runtime uses libuv
+messages for CRT failures and positive numbers for libuv errors. The private
+application prelude now selects the matching Lean error policy; the retained
+Lean 4.32 path keeps its earlier ABI. All 221 native-library decoder cases match
+in Node, Deno and Bun on Linux x64, including otherwise-unrepresentable errno
+values. Explicit Lean messages, such as NUL-path errors, remain intact.
+
+The installed filesystem differential then caught Deno's general removal
+operation behind its Node-compatible `unlink`. The POSIX host now calls the
+native `unlink` primitive, so file removal preserves directories and native
+errors. Candidate `0.1.0-experimental.12` passes the unchanged ordinary Lean
+filesystem fixture in all three engines against interpreted and native-compiled
+controls, with relocated output, hidden build sources and empty PATH. Separate
+unlink controls pass in each engine and 17 focused Node regressions pass. The
+final guarded campaign peaked at 5.66 GiB without resource events. Earlier
+failures remain recorded; complete API and native-platform coverage are open.
+
+`io-error-decoder.yml` adds a narrow native-library ABI comparison on guarded
+Linux x64/ARM64 and Windows x64 runners. It uploads no caches or artifacts and
+does not replace full application acceptance. macOS needs a suitable process-tree
+guard for this harness, and Windows ARM64 still needs its native Lean artifact.
+
 `managed-tools.yml` tests provisioning on the six required standard native runner
 types. Windows ARM64 remains a failing acceptance row until its distribution is
 implemented. CI provisioning results do not constitute Wasm application passes.
