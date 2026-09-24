@@ -244,6 +244,13 @@ separately from the earlier runtime evidence below.
   254 MiB, without resource events. These are sequential pure-entry threads;
   deep execution, concurrent Lean scheduling, nested spawning, worker mailbox
   routing and the unchanged benchmark main still require implementation/tests.
+  A [concurrent-pthread follow-up](docs/evidence/wasmtime-real-lean-concurrency-2026-09-24.json)
+  now runs a 2 MiB and 4 GiB thread together in each engine. The actual guest
+  mutex reports contention and protects 1,000 shared updates; 1,000 concurrent
+  GCD/allocator checks also pass. All five threads per engine exit, join and
+  clean up, while earlier controls remain passing. Peak memory is 295 MiB
+  without resource events. This does not yet validate the full Lean scheduler,
+  nested spawning, cross-worker mailboxes or the original benchmark main.
 
 ## Earlier runtime evidence and remaining compatibility work
 

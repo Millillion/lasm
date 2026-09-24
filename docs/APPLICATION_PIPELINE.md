@@ -799,3 +799,11 @@ All earlier startup and allocation controls pass again. The guard releases at
 254 MiB with no resource events. This establishes a sequential worker path;
 concurrent/nested scheduling, complete host imports, the original benchmark main,
 and the shipping backend remain open.
+
+[Concurrent guest threads also pass](evidence/wasmtime-real-lean-concurrency-2026-09-24.json)
+with independent stores on the same real memory: one 2 MiB and one 4 GiB stack,
+verified mutex contention, 1,000 protected shared updates and 1,000 concurrent
+GCD checks per engine. All five sequential/concurrent threads per engine exit,
+join and clean up. Repeated startup and allocation controls pass; peak memory is
+295 MiB with no resource events. Complete Lean task scheduling, nested spawning,
+cross-worker mailbox routing and full application execution remain separate work.

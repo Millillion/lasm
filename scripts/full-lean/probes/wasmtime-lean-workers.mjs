@@ -24,7 +24,7 @@ const functionPointer = library.func('int lasm_lean_instance_function_pointer(vo
 const callPointer = library.func('int lasm_lean_instance_call_pointer(void *probe, uint64_t pointer, uint64_t argument, _Out_ uint64_t *result, char *error, size_t capacity)');
 const error = Buffer.alloc(8192), message = () => error.toString('utf8').split('\0')[0];
 const workers = new Map(), timers = new Set(), registered = [];
-let probe, closed = false, callbackError, exitNotification = false;
+let probe, closed = false, callbackError, exitNotification = false, activeGroup;
 function callback(fn, type) { const value = ffi.register(fn, ffi.pointer(type)); registered.push(value); return value; }
 function invoke(name, args = [], resultCount = 1) {
   const result = [0];
@@ -65,6 +65,8 @@ const spawn = isMainThread ? callback((pthread, start, argument) => {
     assert.ok(!previous || previous.cleaned, 'Live thread address cannot be reused');
     const worker = new Worker(fileURLToPath(import.meta.url), { workerData: {
       arguments: [libraryPath, cache, expectedHash], parent: ffi.address(probe), pthread, start, argument,
+      concurrent: activeGroup ? { barrier: activeGroup.barrier, mutex: activeGroup.mutex,
+        counter: activeGroup.counter, index: activeGroup.next++ } : undefined,
     } });
     const record = { worker, completed: false, exited: false, cleaned: false };
     record.result = new Promise((resolve, reject) => {
@@ -110,13 +112,48 @@ try {
     assert.equal(callPointer(probe, start, argument, result, error, error.length), 0, message());
     const returned = BigInt(result[0]);
     assert.equal(returned, 13n, 'Guest log2(100) returns encoded Nat 6');
+    let concurrent;
+    if (workerData.concurrent) {
+      const { mutex, counter, index } = workerData.concurrent;
+      const barrier = new Int32Array(workerData.concurrent.barrier);
+      Atomics.add(barrier, 0, 1);
+      assert.notEqual(Atomics.wait(barrier, 1, 0, 10_000), 'timed-out');
+      // Keep one real guest mutex held until the peer demonstrates contention.
+      // The coordination buffer is ordinary host shared memory; the mutex and
+      // protected counter are in the REAL guest memory shared by the Stores.
+      let busyResult;
+      if (index === 0) {
+        assert.equal(invoke('pthread_mutex_lock', [mutex]), 0n);
+        Atomics.store(barrier, 2, 1); Atomics.notify(barrier, 2);
+        assert.notEqual(Atomics.wait(barrier, 3, 0, 5000), 'timed-out');
+        Atomics.wait(barrier, 4, 0, 20);
+        assert.equal(invoke('pthread_mutex_unlock', [mutex]), 0n);
+      } else {
+        assert.notEqual(Atomics.wait(barrier, 2, 0, 5000), 'timed-out');
+        busyResult = invoke('pthread_mutex_trylock', [mutex]);
+        assert.notEqual(busyResult, 0n, 'Held guest mutex excludes the other Wasm instance');
+        Atomics.store(barrier, 3, 1); Atomics.notify(barrier, 3);
+        assert.equal(invoke('pthread_mutex_lock', [mutex]), 0n);
+        assert.equal(invoke('pthread_mutex_unlock', [mutex]), 0n);
+      }
+      for (let i = 0; i < 500; i++) {
+        assert.equal(invoke('lean_nat_gcd', [49n, 37n]), 13n);
+        assert.equal(invoke('pthread_mutex_lock', [mutex]), 0n);
+        try {
+          const value = view(counter).getBigUint64(0, true);
+          view(counter).setBigUint64(0, value + 1n, true);
+        } finally { assert.equal(invoke('pthread_mutex_unlock', [mutex]), 0n); }
+      }
+      concurrent = { index, guestGcdCalls: 500, protectedUpdates: 500,
+        busyResult: busyResult === undefined ? undefined : String(busyResult) };
+    }
     invoke('_emscripten_thread_exit', [returned], 0);
     assert.equal(invoke('pthread_self'), 0n);
     assert.ok(exitNotification, 'Real Wasm exit must notify its joinable state');
     const state = snapshot(); assert.equal(state[2], 0n); assert.equal(state[24], 1n);
     output = { pthread: String(pthread), stack: { top: String(top), bottom: String(bottom), size: String(size) },
       tls: String(tls), result: String(returned), realWasmExit: true, rejectedImports: 0,
-      sharedBytes: String(state[3]), independentStore: true };
+      sharedBytes: String(state[3]), independentStore: true, concurrent };
   } else {
     invoke('emscripten_stack_init', [], 0);
     invoke('__set_stack_limits', [invoke('emscripten_stack_get_base'), invoke('emscripten_stack_get_end')], 0);
@@ -148,15 +185,54 @@ try {
         results.push({ ...result, joinedResult: '13', cleanupVerified: true });
       } finally { clearTimeout(deadline); }
     }
+    const mutex = invoke('malloc', [128n]), counter = invoke('malloc', [8n]);
+    assert.ok(mutex > 0n && counter > 0n);
+    assert.equal(invoke('pthread_mutex_init', [mutex, 0n]), 0n);
+    view(counter).setBigUint64(0, 0n, true);
+    activeGroup = { barrier: new SharedArrayBuffer(5 * 4), mutex, counter, next: 0 };
+    const pair = [];
+    for (const size of [2n * 1024n ** 2n, 4n * 1024n ** 3n]) {
+      assert.equal(invoke('pthread_attr_init', [attr]), 0n);
+      assert.equal(invoke('pthread_attr_setstacksize', [attr, size]), 0n);
+      assert.equal(invoke('pthread_create', [slots, attr, threadEntry, 201n]), 0n);
+      if (callbackError) throw callbackError;
+      const pthread = view(slots).getBigUint64(0, true);
+      pair.push({ pthread, size, record: workers.get(String(pthread)) });
+      assert.equal(invoke('pthread_attr_destroy', [attr]), 0n);
+    }
+    const barrier = new Int32Array(activeGroup.barrier), readyDeadline = performance.now() + 10_000;
+    while (Atomics.load(barrier, 0) !== 2 && performance.now() < readyDeadline)
+      await new Promise(resolve => setTimeout(resolve, 1));
+    assert.equal(Atomics.load(barrier, 0), 2, 'Both real guest threads must be alive together');
+    Atomics.store(barrier, 1, 1); Atomics.notify(barrier, 1, 2);
+    const concurrentResults = [];
+    for (const { pthread, size, record } of pair) {
+      let deadline;
+      try {
+        const [result] = await Promise.race([
+          Promise.all([record.result, record.exit]),
+          new Promise((_, reject) => { deadline = setTimeout(() => reject(new Error('concurrent pthread deadline')), 15_000); }),
+        ]);
+        assert.equal(result.stack.size, String(size));
+        assert.equal(invoke('pthread_join', [pthread, slots + 8n]), 0n);
+        assert.equal(view(slots + 8n).getBigUint64(0, true), 13n);
+        assert.ok(record.cleaned);
+        concurrentResults.push({ ...result, joinedResult: '13', cleanupVerified: true });
+      } finally { clearTimeout(deadline); }
+    }
+    assert.equal(view(counter).getBigUint64(0, true), 1000n);
+    assert.equal(invoke('pthread_mutex_destroy', [mutex]), 0n);
+    invoke('free', [mutex], 0); invoke('free', [counter], 0);
     invoke('free', [attr], 0); invoke('free', [slots], 0);
     assert.equal(invoke('lean_nat_gcd', [49n, 37n]), 13n);
     const state = snapshot();
-    assert.equal(state[2], 0n); assert.equal(state[22], 3n); assert.equal(state[23], 3n);
-    assert.equal(state[25], 3n);
+    assert.equal(state[2], 0n); assert.equal(state[22], 5n); assert.equal(state[23], 5n);
+    assert.equal(state[25], 5n);
     output = { scope: 'Real guest pthread creation, separate JS worker Stores, TLS, guest entry execution, exit and join; no full Lean main or general scheduler acceptance',
       engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
       version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
-      results, sharedBytes: String(state[3]), created: 3, joined: 3, cleaned: 3,
+      results, concurrentResults, concurrentProtectedUpdates: 1000,
+      sharedBytes: String(state[3]), created: 5, joined: 5, cleaned: 5,
       postJoinArithmeticPassed: true, rejectedImports: 0 };
   }
 } finally {
