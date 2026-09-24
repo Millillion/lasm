@@ -35,8 +35,11 @@ separately from the earlier runtime evidence below.
   The [POSIX startup adapter](docs/evidence/deno-stack-startup-2026-09-24.json)
   now configures that budget through same-PID native exec before application
   initialization. Linux source controls preserve permissions, arguments,
-  environment, stdio and signals; installed-package and native macOS checks are
-  pending. Windows needs its own solution. Preloaded or imported entry points
+  environment, stdio and signals. [Installed candidate `.13`](docs/evidence/deno-stack-installed-2026-09-24.json)
+  passes thirty unchanged benchmark runs and source-free relocation on Linux
+  x64; seven startup controls pass on each native macOS architecture. The Linux
+  CI forwarding correction and broader application campaigns remain pending.
+  Windows needs its own solution. Preloaded or imported entry points
   retain their caller's configuration to avoid repeating arbitrary user effects;
   transparent deep-stack callable embedding remains open.
   Bun's lowered-memory backend still has a 4 GiB capacity ceiling; replacing

@@ -8,6 +8,8 @@ import { pathToFileURL } from 'node:url';
 
 const engine = resolve(process.env.LASM_TEST_DENO ?? '.cache/js-runtimes/deno-2.9.7/deno');
 const enabled = ['linux', 'darwin'].includes(process.platform) && existsSync(engine);
+if (process.env.LASM_REQUIRE_DENO_TESTS === '1' && !enabled)
+  throw new Error('Required native Deno startup tests cannot locate a supported engine: ' + engine);
 const fixture = resolve('test/fixtures/deno-stack.mjs');
 const args = ['λ 日本語', '', 'a b', '--target', '--v8-flags=application-value'];
 const env = { PATH: '', DENO_DISABLE_NODE_SHIM: '1', DENO_V8_FLAGS: '--max-old-space-size=128,--random-seed=123',

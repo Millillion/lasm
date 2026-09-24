@@ -438,3 +438,14 @@ the unchanged Lean benchmark five times. Installed-candidate and native macOS
 checks remain pending. Windows needs a different implementation. Imported or
 preloaded mains keep their caller's engine configuration to avoid replaying user
 effects; those embedding cases remain a deep-stack acceptance gap.
+
+Installed candidate `0.1.0-experimental.13` now passes thirty unchanged
+`const_fold` repetitions in stock Deno 2.9.7 on Linux x64 with ordinary
+`deno run -A`, plus a relocated run with its source hidden and PATH empty.
+The original 4 GiB stack setting and native compiled/interpreted controls are
+preserved. Packaging, installation and execution peaked at 4.20 GiB without
+resource events. See the [installed evidence](evidence/deno-stack-installed-2026-09-24.json).
+Seven startup controls also pass on each native macOS architecture. The first
+Linux CI jobs were green but skipped four Deno checks because their engine path
+was not forwarded through systemd; their logs are preserved and the corrected
+workflow requires that engine rather than accepting an implicit skip.

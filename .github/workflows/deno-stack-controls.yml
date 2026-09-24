@@ -54,12 +54,12 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           ulimit -c 0
-          node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/deno-stack-controls-resources.json -- node --max-old-space-size=128 --test --test-concurrency=1 test/deno-stack.test.mjs test/application-output.test.mjs
+          node scripts/full-lean/run-bounded.mjs --memory-mib 512 --report .work/deno-stack-controls-resources.json -- /usr/bin/env LASM_TEST_DENO="$LASM_TEST_DENO" LASM_REQUIRE_DENO_TESTS=1 node --max-old-space-size=128 --test --test-concurrency=1 test/deno-stack.test.mjs test/application-output.test.mjs
       - name: Small macOS startup controls
         if: runner.os == 'macOS'
         run: |
           ulimit -c 0
-          node --max-old-space-size=128 --test --test-concurrency=1 test/deno-stack.test.mjs test/application-output.test.mjs
+          LASM_REQUIRE_DENO_TESTS=1 node --max-old-space-size=128 --test --test-concurrency=1 test/deno-stack.test.mjs test/application-output.test.mjs
       - name: Preserve Linux guard receipt
         if: always() && runner.os == 'Linux'
         run: node -e "const f=require('node:fs');const p='.work/deno-stack-controls-resources.json';if(f.existsSync(p))console.log(f.readFileSync(p,'utf8'))"
