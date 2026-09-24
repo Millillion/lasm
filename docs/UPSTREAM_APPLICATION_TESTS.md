@@ -183,8 +183,18 @@ its disk-headroom preflight before creating the interactive campaign. After
 verified lossless archival, the 150 interactive cases passed in a fresh guarded
 run. That safety stop remains separate from test results. Completed source trees,
 including generated files, are now retained as archives verified against every
-file, symlink and permission; restoration manifests accompany them. Bun and the
-other native platforms remain pending for this category.
+file, symlink and permission; restoration manifests accompany them. The other
+native platforms remain pending for this category.
+
+The [installed `.18` Bun campaign](evidence/upstream-lsp-bun-2026-09-24.json)
+also passes **all 155 registrations in stock Bun 1.4.2** on Linux x64. All three
+engines now have complete results for this client category, with their exact
+package versions retained above. The Bun run preserved all 7,669 source entries
+and active harness hashes, took 25 minutes 4 seconds including preparation,
+and peaked at 4.16 GiB without resource events. Native Lean/Lake subprocesses
+remain separately recorded. Completed source trees and shared driver binaries
+were losslessly archived only after the workload released its guard. These
+client passes do not close other application, API or native-platform gates.
 
 The reviewed native-only mixed campaign now finishes **78 passed and one
 upstream-disabled** registration on Linux x64 with managed Lean 4.34.0. Each
