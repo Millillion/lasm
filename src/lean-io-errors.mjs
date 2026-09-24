@@ -3,7 +3,8 @@
 // The native-library oracle verifies classification separately: that release
 // was compiled against newer headers (ENOEXEC is classified but has no message
 // in its linked libuv). Do not infer this policy from the JavaScript engine.
-// Native acceptance on each other release platform remains required.
+// The official Windows x64 release links libuv 1.52.1 and additionally supplies
+// ENOEXEC's message. Both policies are checked against the native Lean library.
 // libuv header SHA256: 67b062ea0de8a660a8907553a20acf918bfd02ba289e2f0a28f6c55a0a935795
 /*
 Copyright (c) 2015-present libuv project contributors.
@@ -26,6 +27,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 */
+import { getSystemErrorMap } from 'node:util';
+
 const messages = {
   "E2BIG": "argument list too long",
   "EACCES": "permission denied",
@@ -121,6 +124,21 @@ const crtAliases = {
   ETIME: 'ETIMEDOUT', ENOMSG: 'ENODATA', EWOULDBLOCK: 'EAGAIN', EOPNOTSUPP: 'ENOTSUP',
 };
 
+// Exact cases of Lean 4.34's lean_crt_to_uv_err. Windows CRT errno values are
+// distinct from libuv values: an unlisted errno is negated, not translated by
+// its name. In particular ENOTSUP != EOPNOTSUPP and EWOULDBLOCK != EAGAIN there.
+// EDEADLOCK is the CRT spelling alias of the handled EDEADLK value.
+const windowsCrtCases = new Set(`
+  E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT EAGAIN EBADF EBUSY
+  ECONNABORTED ECONNREFUSED ECONNRESET EDESTADDRREQ EEXIST EFAULT EFBIG
+  EHOSTUNREACH EILSEQ EINTR EINVAL EIO EISCONN EISDIR ELOOP EMFILE EMLINK
+  EMSGSIZE ENAMETOOLONG ENETDOWN ENETUNREACH ENFILE ENOBUFS ENODEV ENOENT
+  ENOMEM ENOPROTOOPT ENOSPC ENOSYS ENOTCONN ENOTDIR ENOTEMPTY ENOTSOCK ENOTTY
+  ENXIO EOPNOTSUPP EPERM EPIPE EPROTO EPROTONOSUPPORT EPROTOTYPE ERANGE EROFS
+  ESPIPE ESRCH ETIMEDOUT ETXTBSY EXDEV ENODATA ENOMSG ENOEXEC EBADMSG ECHILD
+  EDEADLK EDEADLOCK EDOM EIDRM EINPROGRESS ENETRESET ENOLCK ENOLINK ENOSR ENOSTR ETIME
+`.trim().split(/\s+/));
+
 export function checkLeanIOVersion(version) {
   if (version !== '4.32.0' && version !== '4.34.0')
     throw new Error('No verified IO error policy for Lean ' + version);
@@ -130,11 +148,14 @@ export function leanIOError(error, version) {
   if (version === '4.32.0' || error.leanUserError) return error;
   const uv = typeof error.errno === 'number' && error.errno < 0;
   if (!uv && error.errorOrigin !== 'crt') return error;
-  const code = uv ? error.code : crtAliases[error.code] ?? error.code;
+  let code = uv ? error.code : crtAliases[error.code] ?? error.code;
+  if (!uv && process.platform === 'win32' && !windowsCrtCases.has(error.code))
+    code = getSystemErrorMap().get(-error.errno)?.[0] ?? 'UNKNOWN';
   const uvNumber = uv ? error.errno : -error.errno;
   // UNKNOWN names the real UV_UNKNOWN sentinel only at -4094. Unknown errno
   // values instead include their signed number in libuv's diagnostic.
-  const message = (code !== 'UNKNOWN' || uvNumber === -4094 ? messages[code] : undefined)
+  const message = (process.platform === 'win32' && code === 'ENOEXEC' ? 'exec format error' : undefined)
+    ?? (code !== 'UNKNOWN' || uvNumber === -4094 ? messages[code] : undefined)
     ?? `Unknown system error ${uvNumber}`;
   return { ...error, code, errno: uv ? -error.errno : error.errno, message, nativeMessage: true };
 }

@@ -1,0 +1,223 @@
+{
+  "scope": "Windows x64 native Lean 4.34 error ABI investigation; native repair acceptance pending the next CI run",
+  "baselineRun": "https://github.com/Millillion/lasm/actions/runs/35944252844",
+  "baselinePlatform": "win32-x64",
+  "nativeLeanIdentity": "c3927f8838754733f7dd3047a1f62becf629ce48522777e28b21069e20049636",
+  "uvVersion": 78849,
+  "sourceHashes": {
+    "Main.lean": "7600200f65040edf29a3e2d1692f4dd29e593073eb2c0d8f489500b211844f37",
+    "probe.c": "e8403566a16714b1851aebffbd53289a9c08ce328b700b308c467991e15d98df",
+    "lean-toolchain": "744874093261c1854638246b978f088eae15414b0f636ac08481a088a7aaa867"
+  },
+  "comparisons": [
+    {
+      "engine": "node",
+      "checked": 168,
+      "failures": [
+        {
+          "key": "crt_EALREADY_6",
+          "expected": {
+            "constructor": "otherError",
+            "code": 103,
+            "message": "Unknown system error -103"
+          },
+          "actual": {
+            "constructor": "otherError",
+            "code": 103,
+            "message": "connection already in progress"
+          }
+        },
+        {
+          "key": "crt_ECANCELED_10",
+          "expected": {
+            "constructor": "otherError",
+            "code": 105,
+            "message": "Unknown system error -105"
+          },
+          "actual": {
+            "constructor": "otherError",
+            "code": 105,
+            "message": "operation canceled"
+          }
+        },
+        {
+          "key": "crt_ENOEXEC_44",
+          "expected": {
+            "constructor": "invalidArgument",
+            "code": 8,
+            "message": "exec format error"
+          },
+          "actual": {
+            "constructor": "invalidArgument",
+            "code": 8,
+            "message": "Unknown system error -8"
+          }
+        },
+        {
+          "key": "crt_ENOTSUP_59",
+          "expected": {
+            "constructor": "otherError",
+            "code": 129,
+            "message": "Unknown system error -129"
+          },
+          "actual": {
+            "constructor": "unsupportedOperation",
+            "code": 129,
+            "message": "operation not supported on socket"
+          }
+        },
+        {
+          "key": "crt_EOVERFLOW_64",
+          "expected": {
+            "constructor": "otherError",
+            "code": 132,
+            "message": "Unknown system error -132"
+          },
+          "actual": {
+            "constructor": "otherError",
+            "code": 132,
+            "message": "value too large for defined data type"
+          }
+        },
+        {
+          "key": "crt_EWOULDBLOCK_78",
+          "expected": {
+            "constructor": "otherError",
+            "code": 140,
+            "message": "Unknown system error -140"
+          },
+          "actual": {
+            "constructor": "resourceExhausted",
+            "code": 140,
+            "message": "resource temporarily unavailable"
+          }
+        },
+        {
+          "key": "uv_ENOEXEC_165",
+          "expected": {
+            "constructor": "invalidArgument",
+            "code": 4022,
+            "message": "exec format error"
+          },
+          "actual": {
+            "constructor": "invalidArgument",
+            "code": 4022,
+            "message": "Unknown system error -4022"
+          }
+        }
+      ]
+    }
+  ],
+  "baselineReportSha256": "267eb18690f59bcd8904dccd32f5cabc54d92fef4ada144f8f1dc7b76a7d4481",
+  "fix": "Mirror Lean CRT switch default behavior on Windows instead of treating every CRT name as a UV name; use ENOEXEC message from the linked Windows libuv 1.52.1. Preserve Linux 1.48 messages.",
+  "sourceHashesAfter": {
+    "src/lean-io-errors.mjs": "a717ac725bc897ee1b6acd0589616eb2466399d90a65f968bddb991ee0fa9ef6",
+    "test/lean-io-errors.test.mjs": "ecc30d9264c5cb1b4116db0ab9d7ca3db1f96a875c6dd8eb9535acdf1890f56a"
+  },
+  "localRegressions": {
+    "focusedTests": {
+      "passed": 17,
+      "skippedWindowsOnly": 1
+    },
+    "preservedLinuxNativeOracle": {
+      "casesPerEngine": 221,
+      "engines": [
+        "Node 26.10.0",
+        "Deno 2.9.7",
+        "Bun 1.4.2"
+      ],
+      "failures": 0
+    },
+    "logSha256": "66194b8dd94bbb56fbdb56ef55dba0be0ea98c76a3c7160d34031f2678a2e0e0",
+    "resource": {
+      "startedAt": "2026-09-24T02:00:00.326Z",
+      "command": [
+        "/bin/bash",
+        ".work/check-windows-io-policy-r1.sh"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "94d1be05-7700-4335-a376-c459a57bc780",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25532153856
+      },
+      "minimumHostAvailable": 25506533376,
+      "peakMemoryBytes": 42242048,
+      "peakTasks": 14,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/windows-io-policy-local-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T02:00:01.133Z",
+        "memoryBytes": 13082624,
+        "peakMemoryBytes": 42242048,
+        "swapBytes": 0,
+        "tasks": 3,
+        "memoryBreakdown": {
+          "anon": 10592256,
+          "file": 327680,
+          "kernel": 733184,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 188416,
+          "slab": 233832
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T02:00:01.195Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 14790656,
+        "peakMemoryBytes": 42242048,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11661312,
+          "file": 327680,
+          "kernel": 1101824,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 188416,
+          "slab": 151048
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T02:00:01.222Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  }
+}

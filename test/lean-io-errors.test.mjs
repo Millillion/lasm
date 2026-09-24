@@ -32,6 +32,19 @@ test('libuv errno signs follow the selected Lean release, including node:os erro
     { kind: 4, code: 22, message: 'invalid argument' });
 });
 
+test('Windows CRT aliases and default cases match the observed native Lean decoder',
+  { skip: process.platform !== 'win32' }, () => {
+    // Independent expected results from the native Lean 4.34 Windows x64 oracle.
+    // These errno values are not aliases on Windows, unlike their Unix names.
+    for (const [code, errno] of [['EALREADY', 103], ['ECANCELED', 105],
+      ['ENOTSUP', 129], ['EOVERFLOW', 132], ['EWOULDBLOCK', 140]])
+      assert.deepEqual(fields(encodeError({ code, errno, errorOrigin: 'crt' }, '4.34.0')),
+        { kind: 0, code: errno, message: `Unknown system error ${-errno}` });
+    for (const [errno, origin] of [[8, 'crt'], [-4022, 'uv']])
+      assert.deepEqual(fields(encodeError({ code: 'ENOEXEC', errno, errorOrigin: origin }, '4.34.0')),
+        { kind: 4, code: Math.abs(errno), message: 'exec format error' });
+  });
+
 test('CRT provenance survives the native file worker, with instance-local Lean versions', async () => {
   const cwd = mkdtempSync(join(tmpdir(), 'lasm-io-error-'));
   const legacy = createNodeRuntimeHost({ cwd, leanVersion: '4.32.0' });
