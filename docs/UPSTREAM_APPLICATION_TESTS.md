@@ -169,8 +169,22 @@ separate release-pinned directory. This verifies deployed client behavior, not a
 Wasm-hosted Lean compiler. All 7,669 original entries and active harness hashes
 remain unchanged. The sequential preparation/execution run took 25 minutes
 49 seconds and peaked at 3.95 GiB with no resource events. See the
-[per-case evidence](evidence/upstream-lsp-node-2026-09-24.json); other engines
-and native platforms remain pending for this category.
+[per-case evidence](evidence/upstream-lsp-node-2026-09-24.json).
+
+The [installed `.18` Deno campaign](evidence/upstream-lsp-deno-2026-09-24.json)
+now passes **all 155 registrations in stock Deno 2.9.7** on Linux x64, using
+the same unchanged native and deployed-client drivers. Each selection verifies
+all 7,669 original source entries and its active harness before and after.
+Native Lean/Lake server commands remain recorded separately from compiled-client
+behavior. The maximum guarded peak was 3.56 GiB without resource events.
+
+The first wrapper completed the four clients and project case, then stopped at
+its disk-headroom preflight before creating the interactive campaign. After
+verified lossless archival, the 150 interactive cases passed in a fresh guarded
+run. That safety stop remains separate from test results. Completed source trees,
+including generated files, are now retained as archives verified against every
+file, symlink and permission; restoration manifests accompany them. Bun and the
+other native platforms remain pending for this category.
 
 The reviewed native-only mixed campaign now finishes **78 passed and one
 upstream-disabled** registration on Linux x64 with managed Lean 4.34.0. Each
