@@ -1,0 +1,563 @@
+{
+  "scope": "Native Bun 1.4.2 source startup controls on Linux x64 and ARM64; not complete deployed Lean or shipped-binary platform acceptance",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35989789846",
+  "commit": "438677d79f853abe029250028e630a4c5cda638f",
+  "previousFailureEvidence": "bun-stack-native-ci-build-failure-2026-09-24.json",
+  "logSha256": "65f8567424388d96353dc2d837c4ee5fbe6fa55cd145383c28fdc0adbec47a32",
+  "passedPerPlatform": 11,
+  "skippedPerPlatform": 0,
+  "jobs": [
+    {
+      "job": {
+        "completed_at": "2026-09-24T10:53:18Z",
+        "conclusion": "success",
+        "id": 107600871734,
+        "name": "Bun startup linux-arm64",
+        "status": "completed"
+      },
+      "buildResources": {
+        "startedAt": "2026-09-24T10:53:13.039Z",
+        "command": [
+          "node",
+          "scripts/build-bun-stack.mjs",
+          "--native"
+        ],
+        "cwd": "/home/runner/work/lasm/lasm",
+        "unit": "lasm-heavy-0539ccf52500.service",
+        "id": "6461645c-5adb-4c7b-bbe9-0e0849a006b9",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 16722010112,
+          "available": 15226535936
+        },
+        "minimumHostAvailable": 15223869440,
+        "peakMemoryBytes": 45527040,
+        "peakTasks": 10,
+        "report": "/home/runner/work/lasm/lasm/.work/bun-stack-build-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "lastSample": {
+          "at": "2026-09-24T10:53:15.462Z",
+          "memoryBytes": 39907328,
+          "peakMemoryBytes": 44621824,
+          "swapBytes": 0,
+          "tasks": 10,
+          "memoryBreakdown": {
+            "anon": 12546048,
+            "file": 25198592,
+            "kernel": 1572864,
+            "shmem": 0,
+            "file_mapped": 1708032,
+            "inactive_file": 1249280,
+            "slab": 552136
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:53:15.604Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "memoryBytes": 39219200,
+          "peakMemoryBytes": 45527040,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11718656,
+            "file": 25837568,
+            "kernel": 1241088,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1441792,
+            "slab": 466016
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:53:15.622Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "startupResources": {
+        "startedAt": "2026-09-24T10:53:15.668Z",
+        "command": [
+          "/usr/bin/env",
+          "LASM_TEST_BUN=/home/runner/.bun/bin/bun",
+          "LASM_REQUIRE_BUN_TESTS=1",
+          "node",
+          "--max-old-space-size=128",
+          "--test",
+          "--test-concurrency=1",
+          "test/bun-stack.test.mjs",
+          "test/application-output.test.mjs"
+        ],
+        "cwd": "/home/runner/work/lasm/lasm",
+        "unit": "lasm-heavy-0539ccf52500.service",
+        "id": "1721d175-98fa-4267-b28f-18af183556f6",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 16722010112,
+          "available": 15248859136
+        },
+        "minimumHostAvailable": 15212580864,
+        "peakMemoryBytes": 69107712,
+        "peakTasks": 27,
+        "report": "/home/runner/work/lasm/lasm/.work/bun-stack-controls-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "lastSample": {
+          "at": "2026-09-24T10:53:16.273Z",
+          "memoryBytes": 30576640,
+          "peakMemoryBytes": 69107712,
+          "swapBytes": 0,
+          "tasks": 14,
+          "memoryBreakdown": {
+            "anon": 27582464,
+            "file": 28672,
+            "kernel": 2215936,
+            "shmem": 0,
+            "file_mapped": 200704,
+            "inactive_file": 28672,
+            "slab": 378240
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:53:16.368Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "memoryBytes": 13426688,
+          "peakMemoryBytes": 69107712,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11710464,
+            "file": 28672,
+            "kernel": 925696,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 28672,
+            "slab": 148512
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:53:16.386Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "helperManifest": {
+        "protocol": 1,
+        "source": "native/bun-stack-reservation.c",
+        "sourceSha256": "e0f937f671a59f8859234bc25ec5d0c0a05eb7e76e2039f67fe644d3da6dfcef",
+        "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "files": {
+          "linux-arm64-gnu.so": {
+            "target": "aarch64-linux-gnu.2.17",
+            "sha256": "f1c12abaa3021c48e4b2be808b840ebd562a8e41bc156b194c722705f2f87e21",
+            "bytes": 70576
+          }
+        },
+        "validation": "Native source-control helper; separate from shipped cross-compiled binaries."
+      },
+      "startupLog": "##[group]Run ulimit -c 0\n\u001b[36;1mulimit -c 0\u001b[0m\n\u001b[36;1mnode scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/bun-stack-controls-resources.json -- /usr/bin/env LASM_TEST_BUN=\"$LASM_TEST_BUN\" LASM_REQUIRE_BUN_TESTS=1 node --max-old-space-size=128 --test --test-concurrency=1 test/bun-stack.test.mjs test/application-output.test.mjs\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n##[endgroup]\n[lasm] One workload, 1.00 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/bun-stack-controls-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service; invocation ID: 6fe48766476c402da4eef8872ffd575d\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (26.698578ms)\n\u2714 wrong engines fail before executing the application payload (22.445544ms)\n\u2714 all full-runtime host support files exist and target validation is strict (2.040107ms)\n\u2714 Bun automatic stack setup fixes deep Wasm calls with no caller flags (114.61735ms)\n\u2714 Bun restart preserves PID, environment, arguments, cwd and stdio (58.425351ms)\n\u2714 Bun restarted process receives signals at its original PID (52.067121ms)\n\u2714 Bun initialization never repeats explicit preload or embedding effects (69.481206ms)\n\u2714 Bun initialization preserves configured preload effects (23.336269ms)\n\u2714 Bun startup retains caller-owned descriptor 3 (59.084548ms)\n\u2714 Bun startup retains native environment bytes and removes private transport (88.864267ms)\n\u2714 Bun helper rejects malformed private reservations before executing user code (7.59639ms)\n\u2139 tests 11\n\u2139 suites 0\n\u2139 pass 11\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 613.394945\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 680ms\nCPU time consumed: 762ms\nMemory peak: 65.9M\nMemory swap peak: 0B\n[lasm] Peak 0.06 GiB; success"
+    },
+    {
+      "job": {
+        "completed_at": "2026-09-24T10:53:19Z",
+        "conclusion": "success",
+        "id": 107600872028,
+        "name": "Bun startup linux-x64",
+        "status": "completed"
+      },
+      "buildResources": {
+        "startedAt": "2026-09-24T10:53:13.507Z",
+        "command": [
+          "node",
+          "scripts/build-bun-stack.mjs",
+          "--native"
+        ],
+        "cwd": "/home/runner/work/lasm/lasm",
+        "unit": "lasm-heavy-0539ccf52500.service",
+        "id": "9c25189e-7632-43be-bae3-027f8c79384e",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 16766414848,
+          "available": 15434657792
+        },
+        "minimumHostAvailable": 15430606848,
+        "peakMemoryBytes": 47132672,
+        "peakTasks": 9,
+        "report": "/home/runner/work/lasm/lasm/.work/bun-stack-build-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "lastSample": {
+          "at": "2026-09-24T10:53:14.913Z",
+          "memoryBytes": 44777472,
+          "peakMemoryBytes": 44781568,
+          "swapBytes": 0,
+          "tasks": 9,
+          "memoryBreakdown": {
+            "anon": 21499904,
+            "file": 21426176,
+            "kernel": 1654784,
+            "shmem": 0,
+            "file_mapped": 16232448,
+            "inactive_file": 1150976,
+            "slab": 512088
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:53:15.093Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "memoryBytes": 41009152,
+          "peakMemoryBytes": 47132672,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 13664256,
+            "file": 25280512,
+            "kernel": 1388544,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1384448,
+            "slab": 480512
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:53:15.113Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "startupResources": {
+        "startedAt": "2026-09-24T10:53:15.175Z",
+        "command": [
+          "/usr/bin/env",
+          "LASM_TEST_BUN=/home/runner/.bun/bin/bun",
+          "LASM_REQUIRE_BUN_TESTS=1",
+          "node",
+          "--max-old-space-size=128",
+          "--test",
+          "--test-concurrency=1",
+          "test/bun-stack.test.mjs",
+          "test/application-output.test.mjs"
+        ],
+        "cwd": "/home/runner/work/lasm/lasm",
+        "unit": "lasm-heavy-0539ccf52500.service",
+        "id": "1ab8e725-8837-4d91-81e1-3120cbbeaa89",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 16766414848,
+          "available": 15441551360
+        },
+        "minimumHostAvailable": 15389745152,
+        "peakMemoryBytes": 60063744,
+        "peakTasks": 18,
+        "report": "/home/runner/work/lasm/lasm/.work/bun-stack-controls-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "lastSample": {
+          "at": "2026-09-24T10:53:15.781Z",
+          "memoryBytes": 34246656,
+          "peakMemoryBytes": 60063744,
+          "swapBytes": 0,
+          "tasks": 14,
+          "memoryBreakdown": {
+            "anon": 30912512,
+            "file": 28672,
+            "kernel": 2916352,
+            "shmem": 0,
+            "file_mapped": 200704,
+            "inactive_file": 28672,
+            "slab": 457064
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T10:53:15.958Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "memoryBytes": 15425536,
+          "peakMemoryBytes": 60063744,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 13676544,
+            "file": 24576,
+            "kernel": 1069056,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 24576,
+            "slab": 159272
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T10:53:15.980Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "helperManifest": {
+        "protocol": 1,
+        "source": "native/bun-stack-reservation.c",
+        "sourceSha256": "e0f937f671a59f8859234bc25ec5d0c0a05eb7e76e2039f67fe644d3da6dfcef",
+        "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "files": {
+          "linux-x64-gnu.so": {
+            "target": "x86_64-linux-gnu.2.17",
+            "sha256": "ba02d3820c35574c93b501004e50978bf45ec948a1e3e25cbcdcafea4540dff0",
+            "bytes": 16352
+          }
+        },
+        "validation": "Native source-control helper; separate from shipped cross-compiled binaries."
+      },
+      "startupLog": "##[group]Run ulimit -c 0\n\u001b[36;1mulimit -c 0\u001b[0m\n\u001b[36;1mnode scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/bun-stack-controls-resources.json -- /usr/bin/env LASM_TEST_BUN=\"$LASM_TEST_BUN\" LASM_REQUIRE_BUN_TESTS=1 node --max-old-space-size=128 --test --test-concurrency=1 test/bun-stack.test.mjs test/application-output.test.mjs\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n##[endgroup]\n[lasm] One workload, 1.00 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/bun-stack-controls-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service; invocation ID: e6cf7df55ae14f3a8a3bbe3e9b1ac8c5\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (34.369667ms)\n\u2714 wrong engines fail before executing the application payload (27.124353ms)\n\u2714 all full-runtime host support files exist and target validation is strict (1.985363ms)\n\u2714 Bun automatic stack setup fixes deep Wasm calls with no caller flags (124.373187ms)\n\u2714 Bun restart preserves PID, environment, arguments, cwd and stdio (65.471976ms)\n\u2714 Bun restarted process receives signals at its original PID (53.099828ms)\n\u2714 Bun initialization never repeats explicit preload or embedding effects (76.483161ms)\n\u2714 Bun initialization preserves configured preload effects (26.136796ms)\n\u2714 Bun startup retains caller-owned descriptor 3 (70.997141ms)\n\u2714 Bun startup retains native environment bytes and removes private transport (100.287947ms)\n\u2714 Bun helper rejects malformed private reservations before executing user code (7.613586ms)\n\u2139 tests 11\n\u2139 suites 0\n\u2139 pass 11\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 693.767554\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 767ms\nCPU time consumed: 871ms\nMemory peak: 57.2M\nMemory swap peak: 0B\n[lasm] Peak 0.06 GiB; success"
+    }
+  ],
+  "limits": [
+    "Each runner compiles its own native helper with GCC. Installed candidate .20 contains the separately built Zig helpers.",
+    "macOS, Windows, Linux musl, whole Lean application acceptance and transparent deep-stack embedding remain open."
+  ],
+  "recordedAt": "2026-09-24T10:57:50.888531+00:00",
+  "localFollowup": {
+    "scope": "Rebuilt all four Zig helpers, compiled the source with GCC and FORTIFY_SOURCE=3, and passed fifteen Bun/Deno/output controls",
+    "resources": {
+      "startedAt": "2026-09-24T10:57:02.437Z",
+      "command": [
+        "/bin/bash",
+        ".work/bun-stack-gcc-repair-r1.sh"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "31af060f-0178-48b4-b716-a714aa1dd240",
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24925868032
+      },
+      "minimumHostAvailable": 24831799296,
+      "peakMemoryBytes": 70852608,
+      "peakTasks": 41,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-stack-gcc-repair-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T10:57:04.645Z",
+        "memoryBytes": 53211136,
+        "peakMemoryBytes": 70852608,
+        "swapBytes": 0,
+        "tasks": 22,
+        "memoryBreakdown": {
+          "anon": 38977536,
+          "file": 10031104,
+          "kernel": 3571712,
+          "shmem": 0,
+          "file_mapped": 286720,
+          "inactive_file": 6815744,
+          "slab": 733056
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T10:57:04.728Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 24104960,
+        "peakMemoryBytes": 70852608,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11657216,
+          "file": 10018816,
+          "kernel": 1269760,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 6803456,
+          "slab": 339584
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T10:57:04.753Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "log": "[lasm] One workload, 10.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-stack-gcc-repair-r1-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: 42bfa31cb8a64a83b4c6edada9883496\nBuilt linux-x64-gnu.so: 9192 bytes\nBuilt linux-x64-musl.so: 8704 bytes\nBuilt linux-arm64-gnu.so: 9512 bytes\nBuilt linux-arm64-musl.so: 9024 bytes\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (41.88626ms)\n\u2714 wrong engines fail before executing the application payload (38.061848ms)\n\u2714 all full-runtime host support files exist and target validation is strict (2.11236ms)\n\u2714 Bun automatic stack setup fixes deep Wasm calls with no caller flags (142.676031ms)\n\u2714 Bun restart preserves PID, environment, arguments, cwd and stdio (77.684648ms)\n\u2714 Bun restarted process receives signals at its original PID (52.909488ms)\n\u2714 Bun initialization never repeats explicit preload or embedding effects (83.469731ms)\n\u2714 Bun initialization preserves configured preload effects (39.717578ms)\n\u2714 Bun startup retains caller-owned descriptor 3 (72.256285ms)\n\u2714 Bun startup retains native environment bytes and removes private transport (108.618668ms)\n\u2714 Bun helper rejects malformed private reservations before executing user code (10.362349ms)\n\u2714 Deno automatic stack setup fixes deep Wasm calls with no caller flags (325.72294ms)\n\u2714 Deno restart preserves PID, restricted permissions, environment, arguments and stdio (228.274524ms)\n\u2714 Deno restarted process receives signals at its original PID (176.258256ms)\n\u2714 Deno initialization never repeats preload or embedding side effects (158.352555ms)\n\u2139 tests 15\n\u2139 suites 0\n\u2139 pass 15\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 1763.286273\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 2.272s\nCPU time consumed: 2.488s\nMemory peak: 67.5M\nMemory swap peak: 0B\n[lasm] Peak 0.07 GiB; success\n",
+    "helperManifest": {
+      "protocol": 1,
+      "source": "native/bun-stack-reservation.c",
+      "sourceSha256": "e0f937f671a59f8859234bc25ec5d0c0a05eb7e76e2039f67fe644d3da6dfcef",
+      "compiler": "Zig 0.16.0",
+      "files": {
+        "linux-x64-gnu.so": {
+          "target": "x86_64-linux-gnu.2.17",
+          "sha256": "6f561123c51c72ef1de53df75257641cc1e5117fca1a2205fe8dba6ad02f2aa3",
+          "bytes": 9192
+        },
+        "linux-x64-musl.so": {
+          "target": "x86_64-linux-musl",
+          "sha256": "ea0efcebdb4606891aafd221f7ca38fc36590435cc25f6c1da8c58d529eb55d4",
+          "bytes": 8704
+        },
+        "linux-arm64-gnu.so": {
+          "target": "aarch64-linux-gnu.2.17",
+          "sha256": "6296129b9e7c9a626f74992c7a09d614b734717cc6a46b9e834b75f18573e42d",
+          "bytes": 9512
+        },
+        "linux-arm64-musl.so": {
+          "target": "aarch64-linux-musl",
+          "sha256": "b6dd17e9f969947c846d4fdb516c38d180ee9c0381717a586c17e4ecb0f4055e",
+          "bytes": 9024
+        }
+      },
+      "validation": "Cross-compilation is not native execution validation."
+    }
+  }
+}

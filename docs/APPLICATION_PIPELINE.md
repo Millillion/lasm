@@ -500,3 +500,11 @@ failed before runtime checks: GCC rejects an ignored diagnostic `write` result
 under the retained strict warnings. The source now handles short writes and
 interruption explicitly; a new malformed-reservation control exercises that
 diagnostic. Native follow-up validation remains pending.
+
+The [corrected native run](evidence/bun-stack-native-ci-2026-09-24.json) passes
+all **eleven checks with zero skips on Linux x64 and ARM64**. Both source-built
+GCC helpers execute the recursion, environment-byte, descriptor, signal and
+preload controls. The maximum guarded peak is 65.9 MiB, with no resource events.
+Local strict-GCC compilation, rebuilt Zig helpers and fifteen startup/output
+controls also pass. These results retain the earlier failed run and do not
+establish complete installed application acceptance on ARM64.

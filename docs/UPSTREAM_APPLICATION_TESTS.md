@@ -79,6 +79,14 @@ language-server launches in the completion benchmark. The 3.50 GiB peak caused
 no resource events. Deno/Bun and other native platforms remain pending; these
 extra runs do not alter upstream's default compilation-disabled status.
 
+The [Deno and Bun follow-ups](evidence/upstream-compile-disabled-all-engines-2026-09-24.json)
+also pass all four extra AOT controls, giving twelve passes across the three
+engines on Linux x64. Node used `.19`; Deno and Bun used `.20`. All 7,669
+originals and harness hashes remain intact in every campaign. Each completion
+benchmark records its three native language-server invocations separately.
+The largest peak is 3.89 GiB without resource events. Default markers, broader
+repaired-package campaigns and other native platform obligations are unchanged.
+
 The new [application harness](../scripts/application-tests/README.md) now drives
 the installed npm candidate. The first five Node cases exercised filesystem read
 bounds, Unicode paths, dedicated tasks, exception reporting and cross-process

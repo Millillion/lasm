@@ -83,6 +83,11 @@ failures are recorded in their own phase. These additional experiments do not
 relabel the original upstream-disabled registrations as upstream compilation
 passes.
 
+The four extra AOT controls also record every intercepted native Lean invocation,
+including the completion benchmark's actual native language-server processes.
+The separately recorded [three-engine result](../../docs/evidence/upstream-compile-disabled-all-engines-2026-09-24.json)
+does not change the default compilation-disabled markers.
+
 Each case has a 900-second deadline and CTest runs with one job. The resource
 report distinguishes memory/pressure aborts from behavior failures. Case reports
 record the native/build/runtime phase, package build inputs and Wasm hash.

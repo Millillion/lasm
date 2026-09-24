@@ -75,6 +75,9 @@ separately from the earlier runtime evidence below.
   and passes all three unchanged repetitions on stock Bun/Linux x64, plus
   fourteen startup/deployment controls. Other native platforms, imported or
   preloaded entry points and Bun-configured launches remain open.
+  The subsequent [native Linux x64/ARM64 startup CI](docs/evidence/bun-stack-native-ci-2026-09-24.json)
+  passes eleven controls per platform with zero skips. Those source-built
+  helper checks are separate from installed application acceptance on ARM64.
   The latest installed Node candidate now preserves the original upstream
   4 GiB thread-stack setting for `const_fold`; allocation, reclamation and
   unchanged SDK regression checks pass. See the
