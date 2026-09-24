@@ -224,6 +224,35 @@ likewise must not block local progress. Never request or expose private keys.
 Git pushes are authorized; npm publication is not. Use a local tarball until
 package publication is explicitly authorized.
 
+### Progress snapshot at every commit
+
+Before every commit, create or update `docs/PROGRESS.md` and include the update
+in that same commit. Keep the snapshot under 150 words using this format; the
+numbers below illustrate the initial provisional assessment, not fixed scores:
+
+> **Completion:** ~50% — unchanged since previous commit.
+>
+> **Estimated finish:** [date and time, Eastern] — [low/medium/high confidence]; likely window: [date range].
+>
+> **Changed:** One sentence describing newly completed and verified work, with an evidence link.
+>
+> **Remaining:** The three biggest unfinished items.
+>
+> **Score basis:** Workflow 80%; Wasm execution 45%; API parity 25%; platform acceptance 40%.
+
+Calculate completion using these weights: **workflow 25%, Wasm execution 30%,
+API parity 25%, platform acceptance 20%**. Round the overall result to the nearest
+five percentage points; reserve 100% for completed acceptance.
+
+Estimate the finish from remaining milestones and observed delivery pace, not by
+extrapolating the completion percentage. State any major assumption affecting the
+forecast. If a date cannot be supported, say "not yet estimable" and identify the
+blocker.
+
+Scores may rise or fall with evidence. Native compiler passes do not count as
+Wasm execution passes. Refine the heuristic when needed, briefly distinguishing
+scoring changes from actual progress.
+
 ---
 
 # Historical implementation plan — 2026-09-17
