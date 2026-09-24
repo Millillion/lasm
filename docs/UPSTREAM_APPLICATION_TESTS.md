@@ -324,3 +324,23 @@ reported data descriptors. Ordinary assignment preserves those hooks. Reading a
 Wasm callee through `getFunction` causes the separate tiny crash; the adapter
 avoids that operation. Full symbolization, private runtime controls and native
 platform acceptance remain open.
+
+The unchanged `pkg/path with spaces` and `pkg/def_clash` projects now pass
+[six installed `.18` engine/project comparisons](evidence/upstream-projects-2026-09-24.json)
+on Linux x64. Each original native shell driver runs first. The separate AOT
+checks cover three cache reuses, nine relocated executions, and six expected
+build rejections with the original duplicate-definition diagnostic assertions.
+Cross-package private imports retain their distinct definitions. The spaced
+deployment also runs after a file appears at its path prefix. All build-source
+copies are hidden and deployment PATH is empty; exit status, stdout and stderr
+match native exactly. All 7,669 reference entries remain unchanged.
+
+Maximum test memory was 3.45 GiB without resource events. A disk preflight
+stopped before the final Bun case began; its separate continuation passed after
+verified archival restored headroom. The receipts retain that stop and archives
+of completed binaries, parser-source trees and all 2,516 audited standard-library
+C/object inputs. The current runtime bundles and installed package remain
+intact. Archived maintainer C/object inputs can be restored from
+`generated-c.tar.gz` into their recorded build directory before rebuilding the
+standard libraries or symbol registry. Broader Lake projects, runtime module
+data and the other native platforms remain open.

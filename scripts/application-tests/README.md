@@ -45,6 +45,27 @@ The target and engine arguments accept Node, Deno or Bun. The harness itself
 requires Linux, Bash, GNU tar, CTest, Perl and diff, as used by the upstream
 drivers. End-user tool provisioning is tested separately.
 
+`integration/application-upstream-projects.mjs` handles the reviewed upstream
+`path with spaces` and `def_clash` Lake projects. Run each engine/project pair
+in a fresh directory:
+
+```sh
+node scripts/full-lean/run-bounded.mjs -- \
+  env LASM_TOOLCHAIN_CACHE=/absolute/managed-cache \
+  python3 scripts/full-lean/base-pages.py \
+  node integration/application-upstream-projects.mjs \
+  .work/project-comparison node /absolute/node \
+  /absolute/project/node_modules/@lasm/compiler \
+  /absolute/pristine-upstream-source 'path with spaces'
+```
+
+The original native shell driver runs unchanged. Independent installed builds
+then test cache reuse, paths with a prefix-shadowing file, or the original
+duplicate-definition error conditions. Successful applications run after
+relocation with all build-source copies hidden and PATH empty. Native driver
+checks and deployed comparisons are recorded separately; this adapter does not
+claim to map the other mixed-project registrations.
+
 For an application, the original native compile/interpreter driver executes
 first. The parallel driver then uses the installed Lasm CLI and selected engine
 with the original source, argument sidecars, before/after scripts, output
