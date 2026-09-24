@@ -546,3 +546,12 @@ workflow's shell limit was outside the systemd service. The guard now applies
 the zero core-file limit inside that service, and timeout diagnostics retain
 child signal masks and process state. This is a pending investigation, not a
 verified repair or a completed native signal gate.
+
+The [diagnostic follow-up](evidence/signal-policy-core-collector-2026-09-24.json)
+confirms that both Bun children are already core-dumping at the deadline despite
+zero soft and hard core-file limits. The CI runner's piped systemd collector
+ignores those limits; ARM64 records a wait in `anon_pipe_write`. The workflow
+now temporarily selects a plain core filename on its disposable dedicated
+runner so the zero limit is effective, then restores the original pattern.
+Application expectations and deadlines are unchanged, and no desktop setting
+is modified. Follow-up execution remains pending.

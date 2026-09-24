@@ -52,6 +52,14 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Disable core collection on this disposable CI runner
+        run: |
+          mkdir -p .work
+          cat /proc/sys/kernel/core_pattern > .work/original-core-pattern
+          # A piped systemd collector ignores RLIMIT_CORE and delayed Bun's
+          # deliberate SIGABRT cases beyond their existing ten-second deadline.
+          # A plain pattern respects the service's zero limit; no dump is made.
+          sudo sysctl --write kernel.core_pattern=core
       - name: Build native control helper
         run: |
           ulimit -c 0
@@ -64,3 +72,9 @@ jobs:
         if: always()
         run: |
           node -e "const f=require('node:fs');for(const p of ['.work/signal-helper-build-resources.json','.work/signal-controls-resources.json','.cache/native-host/signals/manifest.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+      - name: Restore this runner's core collection policy
+        if: always()
+        run: |
+          if test -f .work/original-core-pattern; then
+            sudo tee /proc/sys/kernel/core_pattern < .work/original-core-pattern
+          fi
