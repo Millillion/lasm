@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [SDK child-launch isolation](evidence/application-runtime-source-python-nesting-2026-09-24.json) now preserves the protected Python launcher through configure/make. Five local controls pass, including reproduction of the original bytecode mutation; all nine pinned SDK repairs verify. The third failed CI run is preserved; fresh runtime build validation remains pending.
+**Changed:** [Installed module-data checks](evidence/application-module-data-split-preflight-2026-09-24.json) can now run one application per guard, retaining every original, missing-data and attribute assertion across two required selections. Syntax checks pass; execution remains queued behind Bun and verified disk archival. This is safety preparation, not a compatibility pass.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

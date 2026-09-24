@@ -12,9 +12,15 @@ import { verifyMixedSources } from '../scripts/application-tests/mixed-sources.m
 
 await ensureResourceGuard();
 const [outputArg, target, engineArg, compilerArg, referenceArg, ...extra] = process.argv.slice(2);
-const bundled = extra.length === 1 && extra[0] === '--bundled-metadata';
-assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg && (!extra.length || bundled),
-  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE [--bundled-metadata]');
+const bundled = extra.includes('--bundled-metadata');
+const selected = extra.filter(option => option.startsWith('--case=')).map(option => option.slice('--case='.length));
+assert.ok(outputArg && ['node', 'deno', 'bun'].includes(target) && engineArg && compilerArg && referenceArg
+  && selected.length <= 1 && selected.every(name => ['original', 'attributes'].includes(name))
+  && new Set(extra).size === extra.length
+  && extra.every(option => option === '--bundled-metadata' || option.startsWith('--case=')),
+  'Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE [--bundled-metadata] [--case=original|attributes]');
+const originalCase = !selected.length || selected[0] === 'original';
+const attributeCase = !selected.length || selected[0] === 'attributes';
 assert.equal(process.platform, 'linux');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const output = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg), reference = resolve(referenceArg);
@@ -30,7 +36,7 @@ const originals = Object.fromEntries(Object.entries(sources).filter(([path]) => 
   .map(([path, identity]) => [path.slice(prefix.length), identity]));
 const report = { scope: bundled ? 'Original user-attribute application with automatically packaged module data; installed AOT executes the relocated imports without Lean path environment inputs'
   : 'Original user-attribute application with explicit runtime module metadata inputs; installed AOT executes the imports',
-  bundledMetadata: bundled,
+  bundledMetadata: bundled, selectedCases: selected.length ? selected : ['original', 'attributes'],
   name: registration.name, target, engine, compiler, reference, commands: [], passed: false,
   sourceArchiveSha256: inventory.sourceArchiveSha256, sourceManifestSha256: await hashFile(sourcesFile),
   harnessSha256: await hashFile(fileURLToPath(import.meta.url)), resourceReport: process.env.LASM_RESOURCE_REPORT,
@@ -43,6 +49,7 @@ const report = { scope: bundled ? 'Original user-attribute application with auto
       : 'Both executables run with empty PATH and hidden source copies. No native Lean/Lake process is needed during the deployed import; the retained metadata dependency prevents a self-contained deployment claim.',
     'A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.',
     'A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks.',
+    'The optional case selection separates complete original/missing-data and supplementary-attribute controls into independent guarded runs. Aggregate acceptance still requires both selections; it does not omit any assertion.',
   ] };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 async function verify(directory, expected) {
@@ -119,38 +126,45 @@ try {
   report.nativeDriver = run('original native shell driver', '/bin/bash',
     [join(root, 'scripts/application-tests/mixed-native.sh'), 'ordinary', join(native, 'run_test.sh')], native, env);
   const dist = join(output, 'dist');
-  run('installed application build', process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', join(project, 'Main.lean'), '--target', target, '--output', dist], project, env);
-  report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
+  if (originalCase) {
+    run('installed application build', process.execPath,
+      [join(compiler, 'bin/lasm.mjs'), 'build', join(project, 'Main.lean'), '--target', target, '--output', dist], project, env);
+    report.build = JSON.parse(readFileSync(join(dist, 'build-info.json')));
+  }
   const fixture = join(root, 'integration/fixtures/RuntimeAttributeImport.lean');
   const fixtureName = 'RuntimeAttributeImport.lean', fixtureSource = join(project, fixtureName);
-  assert.ok(!existsSync(fixtureSource)); cpSync(fixture, fixtureSource);
-  report.supplementaryFixture = { path: relative(root, fixture), sha256: await hashFile(fixture),
-    copiedSha256: await hashFile(fixtureSource) };
-  assert.equal(report.supplementaryFixture.copiedSha256, report.supplementaryFixture.sha256);
-  const oracle = join(output, 'attribute oracle'); mkdirSync(oracle);
-  report.phase = 'generate native runtime-attribute control'; save();
-  const generated = applicationSources(fixtureSource, lean, oracle, { log: () => {} });
-  report.nativeAttributeInputs = await Promise.all(generated.sources.map(async (file, index) => ({
-    module: generated.inputs[index].module,
-    sourceSha256: await hashFile(generated.inputs[index].source), cSha256: await hashFile(file),
-  })));
   const nativeAttributeBinary = join(output, 'native runtime attribute check');
-  run('compile native runtime-attribute control', join(lean.prefix, 'bin/leanc'),
-    ['-O2', '-rdynamic', ...generated.sources, '-o', nativeAttributeBinary], project, env);
   const attributeDist = join(output, 'attribute dist');
-  run('build installed runtime-attribute control', process.execPath,
-    [join(compiler, 'bin/lasm.mjs'), 'build', fixtureSource, '--target', target, '--output', attributeDist], project, env);
-  report.attributeBuild = JSON.parse(readFileSync(join(attributeDist, 'build-info.json')));
+  if (attributeCase) {
+    assert.ok(!existsSync(fixtureSource)); cpSync(fixture, fixtureSource);
+    report.supplementaryFixture = { path: relative(root, fixture), sha256: await hashFile(fixture),
+      copiedSha256: await hashFile(fixtureSource) };
+    assert.equal(report.supplementaryFixture.copiedSha256, report.supplementaryFixture.sha256);
+    const oracle = join(output, 'attribute oracle'); mkdirSync(oracle);
+    report.phase = 'generate native runtime-attribute control'; save();
+    const generated = applicationSources(fixtureSource, lean, oracle, { log: () => {} });
+    report.nativeAttributeInputs = await Promise.all(generated.sources.map(async (file, index) => ({
+      module: generated.inputs[index].module,
+      sourceSha256: await hashFile(generated.inputs[index].source), cSha256: await hashFile(file),
+    })));
+    run('compile native runtime-attribute control', join(lean.prefix, 'bin/leanc'),
+      ['-O2', '-rdynamic', ...generated.sources, '-o', nativeAttributeBinary], project, env);
+    run('build installed runtime-attribute control', process.execPath,
+      [join(compiler, 'bin/lasm.mjs'), 'build', fixtureSource, '--target', target, '--output', attributeDist], project, env);
+    report.attributeBuild = JSON.parse(readFileSync(join(attributeDist, 'build-info.json')));
+  }
   report.nativeSourceAfter = await verify(native, originals);
   report.applicationAfter = await verify(project, buildSources);
   report.originalApplicationAfter = await verify(original, originals);
-  const deployment = join(output, 'relocated deployment'); renameSync(dist, deployment);
-  const attributeDeployment = join(output, 'relocated attribute deployment'); renameSync(attributeDist, attributeDeployment);
-  const data = join(deployment, 'module data');
+  const deployment = join(output, 'relocated deployment');
+  if (originalCase) renameSync(dist, deployment);
+  const attributeDeployment = join(output, 'relocated attribute deployment');
+  if (attributeCase) renameSync(attributeDist, attributeDeployment);
+  const runtimeCwd = originalCase ? deployment : attributeDeployment;
+  const data = join(runtimeCwd, 'module data');
   if (bundled) {
-    report.bundled = await bundledMetadata(deployment);
-    report.attributeBundled = await bundledMetadata(attributeDeployment);
+    if (originalCase) report.bundled = await bundledMetadata(deployment);
+    if (attributeCase) report.attributeBundled = await bundledMetadata(attributeDeployment);
   } else {
     report.moduleData = await metadata(join(native, '.lake/build/lib/lean'), data);
     report.standardModuleData = { directory: join(lean.prefix, 'lib/lean'), nativeArtifactIdentity: lean.identity,
@@ -160,44 +174,48 @@ try {
   const runtimeEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:LEAN_|LAKE_|ELAN_|LASM_)/.test(key)));
   Object.assign(runtimeEnv, { PATH: '', DENO_DISABLE_NODE_SHIM: '1', LEAN_NUM_THREADS: '2' });
   if (!bundled) Object.assign(runtimeEnv, { LEAN_SYSROOT: lean.prefix, LEAN_PATH: data });
-  const nativeRuntimeEnv = bundled
+  const nativeRuntimeEnv = bundled && originalCase
     ? { ...runtimeEnv, LEAN_SYSROOT: report.bundled.sysroot, LEAN_PATH: report.bundled.projectPath } : runtimeEnv;
-  const nativeAttributeEnv = bundled
+  const nativeAttributeEnv = bundled && attributeCase
     ? { ...runtimeEnv, LEAN_SYSROOT: report.attributeBundled.sysroot, LEAN_PATH: report.attributeBundled.projectPath } : runtimeEnv;
   const nativeBinary = join(native + '.hidden', '.lake/build/bin/user_attr');
   const invocation = [...(target === 'deno' ? ['run', '-A'] : []), join(deployment, 'main.mjs')];
-  report.deployment = { directory: deployment, sourceHidden: true, path: '', buildProcessesUsedAtRuntime: false,
-    selfContained: bundled, suppliedLeanPaths: !bundled, wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
-  report.native = run('native compiled runtime import with selected metadata', nativeBinary, [], deployment, nativeRuntimeEnv);
-  report.actual = run(bundled ? 'deployed runtime import with automatic metadata' : 'deployed runtime import with explicit metadata', engine, invocation, deployment, runtimeEnv);
-  assert.deepEqual(report.actual, report.native);
-  report.attributeDeployment = { directory: attributeDeployment, sourceHidden: true, path: '', selfContained: bundled, suppliedLeanPaths: !bundled,
-    wasmSha256: await hashFile(join(attributeDeployment, 'program.wasm')) };
-  report.runtimeAttributes = {
-    native: run('native runtime-attribute assertions', nativeAttributeBinary, [], deployment, nativeAttributeEnv),
-    actual: run('deployed runtime-attribute assertions', engine,
-      [...(target === 'deno' ? ['run', '-A'] : []), join(attributeDeployment, 'main.mjs')], deployment, runtimeEnv),
-  };
-  assert.deepEqual(report.runtimeAttributes.actual, report.runtimeAttributes.native);
-  const missing = join(output, 'missing standard data'); mkdirSync(missing);
-  const missingEnv = { ...runtimeEnv, LEAN_SYSROOT: missing, ...(bundled ? { LEAN_PATH: report.bundled.projectPath } : {}) };
-  report.missingDataControl = {
-    native: run('native missing-standard-metadata control', nativeBinary, [], deployment, missingEnv, false),
-    actual: run('deployed missing-standard-metadata control', engine, invocation, deployment, missingEnv, false),
-  };
-  assert.equal(report.missingDataControl.native.signal, null);
-  assert.notEqual(report.missingDataControl.native.code, 0, 'Missing standard module data must not silently succeed');
-  assert.deepEqual(report.missingDataControl.actual, report.missingDataControl.native);
+  if (originalCase) {
+    report.deployment = { directory: deployment, sourceHidden: true, path: '', buildProcessesUsedAtRuntime: false,
+      selfContained: bundled, suppliedLeanPaths: !bundled, wasmSha256: await hashFile(join(deployment, 'program.wasm')) };
+    report.native = run('native compiled runtime import with selected metadata', nativeBinary, [], runtimeCwd, nativeRuntimeEnv);
+    report.actual = run(bundled ? 'deployed runtime import with automatic metadata' : 'deployed runtime import with explicit metadata', engine, invocation, runtimeCwd, runtimeEnv);
+    assert.deepEqual(report.actual, report.native);
+    const missing = join(output, 'missing standard data'); mkdirSync(missing);
+    const missingEnv = { ...runtimeEnv, LEAN_SYSROOT: missing, ...(bundled ? { LEAN_PATH: report.bundled.projectPath } : {}) };
+    report.missingDataControl = {
+      native: run('native missing-standard-metadata control', nativeBinary, [], runtimeCwd, missingEnv, false),
+      actual: run('deployed missing-standard-metadata control', engine, invocation, runtimeCwd, missingEnv, false),
+    };
+    assert.equal(report.missingDataControl.native.signal, null);
+    assert.notEqual(report.missingDataControl.native.code, 0, 'Missing standard module data must not silently succeed');
+    assert.deepEqual(report.missingDataControl.actual, report.missingDataControl.native);
+  }
+  if (attributeCase) {
+    report.attributeDeployment = { directory: attributeDeployment, sourceHidden: true, path: '', selfContained: bundled, suppliedLeanPaths: !bundled,
+      wasmSha256: await hashFile(join(attributeDeployment, 'program.wasm')) };
+    report.runtimeAttributes = {
+      native: run('native runtime-attribute assertions', nativeAttributeBinary, [], runtimeCwd, nativeAttributeEnv),
+      actual: run('deployed runtime-attribute assertions', engine,
+        [...(target === 'deno' ? ['run', '-A'] : []), join(attributeDeployment, 'main.mjs')], runtimeCwd, runtimeEnv),
+    };
+    assert.deepEqual(report.runtimeAttributes.actual, report.runtimeAttributes.native);
+  }
   if (bundled) {
-    assert.deepEqual(await bundledMetadata(deployment), report.bundled);
-    assert.deepEqual(await bundledMetadata(attributeDeployment), report.attributeBundled);
+    if (originalCase) assert.deepEqual(await bundledMetadata(deployment), report.bundled);
+    if (attributeCase) assert.deepEqual(await bundledMetadata(attributeDeployment), report.attributeBundled);
   } else for (const row of report.moduleData) assert.equal(await hashFile(join(data, row.path)), row.sha256);
   report.nativeSourceAfter = await verify(native + '.hidden', originals);
   report.applicationAfter = await verify(project + '.hidden', buildSources);
   report.originalApplicationAfter = await verify(original + '.hidden', originals);
-  assert.equal(await hashFile(join(project + '.hidden', fixtureName)), report.supplementaryFixture.sha256);
+  if (attributeCase) assert.equal(await hashFile(join(project + '.hidden', fixtureName)), report.supplementaryFixture.sha256);
   report.referenceAfter = await verify(reference, sources);
-  assert.equal(await hashFile(fixture), report.supplementaryFixture.sha256, 'Runtime fixture changed during execution');
+  if (attributeCase) assert.equal(await hashFile(fixture), report.supplementaryFixture.sha256, 'Runtime fixture changed during execution');
   assert.equal(await hashFile(fileURLToPath(import.meta.url)), report.harnessSha256, 'Harness changed during execution');
   report.passed = true; report.phase = 'complete';
 } catch (error) {

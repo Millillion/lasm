@@ -599,6 +599,14 @@ native copying/import validation peaks at 2.63 GiB. The metadata payload is
 pending, and native shared-library dependencies are outside this data-layout
 control's claim.
 
+The installed import harness now supports
+[separate original and attribute selections](evidence/application-module-data-split-preflight-2026-09-24.json).
+Each builds one application per guard; original imports and missing-data errors
+remain together, while the supplementary runtime assertions run separately.
+Both selections in every engine are still required. This allows verified
+archival of completed generated data between checks without raising resource
+limits. Syntax checks pass; these selections have not yet executed.
+
 The [cold runtime-source workflow](../.github/workflows/application-runtime-source.yml)
 now prepares the application libraries from committed patches and pinned public
 Lean, GMP, SDK and host-helper inputs on a standard Linux x64 runner. Native

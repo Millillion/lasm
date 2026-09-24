@@ -1,0 +1,21 @@
+{
+  "scope": "Prepared split execution for installed module-data acceptance; not a runtime pass",
+  "harness": "integration/application-upstream-runtime-imports.mjs",
+  "sha256": "bc537d61ce2fb1b9a534d166a0ab4becfa306e9c0e17f178fbfd6172371f93dc",
+  "selections": {
+    "original": [
+      "Unchanged native shell driver",
+      "Installed original main with automatic module data",
+      "Native/deployed missing-standard-data error"
+    ],
+    "attributes": [
+      "Unchanged native shell driver",
+      "Ordinary runtime attribute fixture with all three assertions",
+      "Native/deployed exact output comparison"
+    ]
+  },
+  "resourceProfile": "Each selection builds one application and output copy under its own existing guard. Completed generated data can be losslessly archived before the next selection. Both selections are required in each of Node, Deno and Bun.",
+  "preservation": "Original suite sources and assertions are unchanged. Earlier default-both campaigns and their hashes remain valid evidence of their exact prior harness.",
+  "validation": "JavaScript syntax and diff whitespace checks pass; execution awaits the active Bun workload and disk archival.",
+  "recordedAt": "2026-09-24T13:34:30.217491+00:00"
+}
