@@ -69,6 +69,11 @@ separately from the earlier runtime evidence below.
   in all three engines, peaking at 139 MiB under the 1 GiB guard. This remains
   feasibility evidence: full Lean integration, dense-memory capacity and the
   other native platforms are unvalidated.
+  A [tiny Binaryen conversion control](docs/evidence/wasmtime-helper-exception-conversion-2026-09-24.json)
+  now preserves the original legacy-exception result after translation to
+  standardized exceptions in every helper/engine profile. Converting and running
+  real generated Lean applications, with all imports and scheduler behavior,
+  remains separate unfinished work.
 
 ## Earlier runtime evidence and remaining compatibility work
 

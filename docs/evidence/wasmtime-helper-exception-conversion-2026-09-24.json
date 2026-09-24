@@ -1,0 +1,508 @@
+{
+  "scope": "Tiny legacy exception conversion in private helper, including prior sparse/concurrency controls; no full Lean compatibility claim",
+  "recordedAt": "2026-09-24T03:57:21.628186+00:00",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35953314994",
+  "commit": "26544e97170d3b954351d51dda4a33e8257d2f67",
+  "logSha256": "1111d053b3b34766911c374e03a8e324607223a2c7371fa094f3d0c9fa0c4167",
+  "sourceSha256": "8998b4d9e695ecae451f2b61945d3ff0622ea173ba085f20962179e034c6b4ac",
+  "harnessSha256": "34a96d14c47c6f95ca33a4a052424d2c818194a26462c41de02be5644e187093",
+  "helpers": {
+    "small": "8584e2b4335189fc6b839340f6706210a54a80838820883b1e349aa094f5e5e1",
+    "sparse-high": "bfd83e57eefa2237d6853c7df6d43f7fecb4e99361de44ebc3ebdb3b955d4a82"
+  },
+  "conversion": {
+    "tool": "wasm-opt version 132 (version_132)",
+    "toolSha256": "608c021fa3f2c68cdc26f06a1454341089a0e689abb71cbe5a23ef7300e7f3e3",
+    "originalSha256": "adc795ce4bdf156345b997e39f71aab60a32c2da47da64ca1923af591cc5c227",
+    "convertedSha256": "5beeabd67e21972ffa35fa553dec907ebdb5fbbbc06342ab0603d50505f6b51a",
+    "controlSourceSha256": "ce9a48c4e97febc495b15d8240562cf6bcc705fbbb6487f281ecf74c400ce517"
+  },
+  "results": [
+    {
+      "engine": "node",
+      "version": "26.10.0",
+      "before": [
+        1,
+        1,
+        131072,
+        65536
+      ],
+      "after": [
+        1,
+        1,
+        131072,
+        131072
+      ],
+      "first": {
+        "value": 11,
+        "result": 24,
+        "callbacks": [
+          11
+        ]
+      },
+      "second": {
+        "phase": "ready",
+        "value": 41,
+        "result": 84,
+        "callbacks": [
+          41
+        ],
+        "memory": [
+          1,
+          1,
+          131072,
+          65536
+        ],
+        "threadPeek": 42
+      },
+      "third": {
+        "value": 99,
+        "result": 200,
+        "callbacks": [
+          99
+        ]
+      },
+      "concurrentWait": {
+        "notified": 1,
+        "attempts": 1,
+        "waitResult": 0
+      },
+      "legacyException": {
+        "stockEngineResult": 7,
+        "accepted": false,
+        "diagnostic": "failed to compile: wasm[0]::function[0]\n\nCaused by:\n    0: WebAssembly translation error\n    1: Invalid input WebAssembly code at offset 42: legacy_exceptions feature required for try instruction\n"
+      },
+      "convertedException": {
+        "helperResult": 7,
+        "stockEngineValid": true
+      },
+      "profile": "small",
+      "dataAddress": 0,
+      "accessibleGuestBytes": 131072,
+      "memoryAccessPattern": "One 8-byte data cell plus a 4-byte wait cell at offset 8; no bulk fill",
+      "scope": "Private helper executes synthetic memory64/atomic/exception/host-callback module across JS isolates; no Lean or dense-memory acceptance claim"
+    },
+    {
+      "engine": "deno",
+      "version": "2.9.7",
+      "before": [
+        1,
+        1,
+        131072,
+        65536
+      ],
+      "after": [
+        1,
+        1,
+        131072,
+        131072
+      ],
+      "first": {
+        "value": 11,
+        "result": 24,
+        "callbacks": [
+          11
+        ]
+      },
+      "second": {
+        "phase": "ready",
+        "value": 41,
+        "result": 84,
+        "callbacks": [
+          41
+        ],
+        "memory": [
+          1,
+          1,
+          131072,
+          65536
+        ],
+        "threadPeek": 42
+      },
+      "third": {
+        "value": 99,
+        "result": 200,
+        "callbacks": [
+          99
+        ]
+      },
+      "concurrentWait": {
+        "notified": 1,
+        "attempts": 1,
+        "waitResult": 0
+      },
+      "legacyException": {
+        "stockEngineResult": 7,
+        "accepted": false,
+        "diagnostic": "failed to compile: wasm[0]::function[0]\n\nCaused by:\n    0: WebAssembly translation error\n    1: Invalid input WebAssembly code at offset 42: legacy_exceptions feature required for try instruction\n"
+      },
+      "convertedException": {
+        "helperResult": 7,
+        "stockEngineValid": true
+      },
+      "profile": "small",
+      "dataAddress": 0,
+      "accessibleGuestBytes": 131072,
+      "memoryAccessPattern": "One 8-byte data cell plus a 4-byte wait cell at offset 8; no bulk fill",
+      "scope": "Private helper executes synthetic memory64/atomic/exception/host-callback module across JS isolates; no Lean or dense-memory acceptance claim"
+    },
+    {
+      "engine": "bun",
+      "version": "1.4.2",
+      "before": [
+        1,
+        1,
+        131072,
+        65536
+      ],
+      "after": [
+        1,
+        1,
+        131072,
+        131072
+      ],
+      "first": {
+        "value": 11,
+        "result": 24,
+        "callbacks": [
+          11
+        ]
+      },
+      "second": {
+        "phase": "ready",
+        "value": 41,
+        "result": 84,
+        "callbacks": [
+          41
+        ],
+        "memory": [
+          1,
+          1,
+          131072,
+          65536
+        ],
+        "threadPeek": 42
+      },
+      "third": {
+        "value": 99,
+        "result": 200,
+        "callbacks": [
+          99
+        ]
+      },
+      "concurrentWait": {
+        "notified": 1,
+        "attempts": 1,
+        "waitResult": 0
+      },
+      "legacyException": {
+        "stockEngineResult": 7,
+        "accepted": false,
+        "diagnostic": "failed to compile: wasm[0]::function[0]\n\nCaused by:\n    0: WebAssembly translation error\n    1: Invalid input WebAssembly code at offset 42: legacy_exceptions feature required for try instruction\n"
+      },
+      "convertedException": {
+        "helperResult": 7,
+        "stockEngineValid": true
+      },
+      "profile": "small",
+      "dataAddress": 0,
+      "accessibleGuestBytes": 131072,
+      "memoryAccessPattern": "One 8-byte data cell plus a 4-byte wait cell at offset 8; no bulk fill",
+      "scope": "Private helper executes synthetic memory64/atomic/exception/host-callback module across JS isolates; no Lean or dense-memory acceptance claim"
+    },
+    {
+      "engine": "node",
+      "version": "26.10.0",
+      "before": [
+        1,
+        1,
+        131072,
+        4295098368
+      ],
+      "after": [
+        1,
+        1,
+        131072,
+        4295163904
+      ],
+      "first": {
+        "value": 11,
+        "result": 24,
+        "callbacks": [
+          11
+        ]
+      },
+      "second": {
+        "phase": "ready",
+        "value": 41,
+        "result": 84,
+        "callbacks": [
+          41
+        ],
+        "memory": [
+          1,
+          1,
+          131072,
+          4295098368
+        ],
+        "threadPeek": 42
+      },
+      "third": {
+        "value": 99,
+        "result": 200,
+        "callbacks": [
+          99
+        ]
+      },
+      "concurrentWait": {
+        "notified": 1,
+        "attempts": 1,
+        "waitResult": 0
+      },
+      "legacyException": {
+        "stockEngineResult": 7,
+        "accepted": false,
+        "diagnostic": "failed to compile: wasm[0]::function[0]\n\nCaused by:\n    0: WebAssembly translation error\n    1: Invalid input WebAssembly code at offset 42: legacy_exceptions feature required for try instruction\n"
+      },
+      "convertedException": {
+        "helperResult": 7,
+        "stockEngineValid": true
+      },
+      "profile": "sparse-high",
+      "dataAddress": 4294967296,
+      "accessibleGuestBytes": 4295163904,
+      "memoryAccessPattern": "One 8-byte data cell plus a 4-byte wait cell at offset 8; no bulk fill",
+      "scope": "Private helper executes synthetic memory64/atomic/exception/host-callback module across JS isolates; no Lean or dense-memory acceptance claim"
+    },
+    {
+      "engine": "deno",
+      "version": "2.9.7",
+      "before": [
+        1,
+        1,
+        131072,
+        4295098368
+      ],
+      "after": [
+        1,
+        1,
+        131072,
+        4295163904
+      ],
+      "first": {
+        "value": 11,
+        "result": 24,
+        "callbacks": [
+          11
+        ]
+      },
+      "second": {
+        "phase": "ready",
+        "value": 41,
+        "result": 84,
+        "callbacks": [
+          41
+        ],
+        "memory": [
+          1,
+          1,
+          131072,
+          4295098368
+        ],
+        "threadPeek": 42
+      },
+      "third": {
+        "value": 99,
+        "result": 200,
+        "callbacks": [
+          99
+        ]
+      },
+      "concurrentWait": {
+        "notified": 1,
+        "attempts": 1,
+        "waitResult": 0
+      },
+      "legacyException": {
+        "stockEngineResult": 7,
+        "accepted": false,
+        "diagnostic": "failed to compile: wasm[0]::function[0]\n\nCaused by:\n    0: WebAssembly translation error\n    1: Invalid input WebAssembly code at offset 42: legacy_exceptions feature required for try instruction\n"
+      },
+      "convertedException": {
+        "helperResult": 7,
+        "stockEngineValid": true
+      },
+      "profile": "sparse-high",
+      "dataAddress": 4294967296,
+      "accessibleGuestBytes": 4295163904,
+      "memoryAccessPattern": "One 8-byte data cell plus a 4-byte wait cell at offset 8; no bulk fill",
+      "scope": "Private helper executes synthetic memory64/atomic/exception/host-callback module across JS isolates; no Lean or dense-memory acceptance claim"
+    },
+    {
+      "engine": "bun",
+      "version": "1.4.2",
+      "before": [
+        1,
+        1,
+        131072,
+        4295098368
+      ],
+      "after": [
+        1,
+        1,
+        131072,
+        4295163904
+      ],
+      "first": {
+        "value": 11,
+        "result": 24,
+        "callbacks": [
+          11
+        ]
+      },
+      "second": {
+        "phase": "ready",
+        "value": 41,
+        "result": 84,
+        "callbacks": [
+          41
+        ],
+        "memory": [
+          1,
+          1,
+          131072,
+          4295098368
+        ],
+        "threadPeek": 42
+      },
+      "third": {
+        "value": 99,
+        "result": 200,
+        "callbacks": [
+          99
+        ]
+      },
+      "concurrentWait": {
+        "notified": 1,
+        "attempts": 1,
+        "waitResult": 0
+      },
+      "legacyException": {
+        "stockEngineResult": 7,
+        "accepted": false,
+        "diagnostic": "failed to compile: wasm[0]::function[0]\n\nCaused by:\n    0: WebAssembly translation error\n    1: Invalid input WebAssembly code at offset 42: legacy_exceptions feature required for try instruction\n"
+      },
+      "convertedException": {
+        "helperResult": 7,
+        "stockEngineValid": true
+      },
+      "profile": "sparse-high",
+      "dataAddress": 4294967296,
+      "accessibleGuestBytes": 4295163904,
+      "memoryAccessPattern": "One 8-byte data cell plus a 4-byte wait cell at offset 8; no bulk fill",
+      "scope": "Private helper executes synthetic memory64/atomic/exception/host-callback module across JS isolates; no Lean or dense-memory acceptance claim"
+    }
+  ],
+  "resources": {
+    "startedAt": "2026-09-24T03:53:36.045Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "node",
+      "--max-old-space-size=128",
+      "scripts/full-lean/probe-wasmtime-helper.mjs",
+      ".work/wasmtime-helper",
+      "node",
+      "deno",
+      "bun"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "ffb8a7c5-4670-4b03-b877-f476542ee2ee",
+    "limits": {
+      "memoryMax": 1073741824,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 858993459,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 16766414848,
+      "available": 15373463552
+    },
+    "minimumHostAvailable": 15321956352,
+    "peakMemoryBytes": 163713024,
+    "peakTasks": 19,
+    "report": "/home/runner/work/lasm/lasm/.work/wasmtime-helper-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-24T03:53:39.054Z",
+      "memoryBytes": 92536832,
+      "peakMemoryBytes": 163713024,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 10948608,
+        "file": 78176256,
+        "kernel": 2916352,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 53481472,
+        "slab": 2120328
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T03:53:39.064Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 95158272,
+      "peakMemoryBytes": 163713024,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13705216,
+        "file": 78176256,
+        "kernel": 3035136,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 53481472,
+        "slab": 2126456
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T03:53:39.085Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "remaining": [
+    "Apply conversion to a real generated Lean module and inspect imports",
+    "Full host adapter, scheduler, callable libraries and lifecycle semantics",
+    "All standard APIs and six native platforms"
+  ]
+}

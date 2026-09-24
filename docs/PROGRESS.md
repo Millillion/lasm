@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Unresolved Deno/Bun runtime behavior and incomplete API auditing prevent a defensible milestone forecast.
 
-**Changed:** [Sparse helper accesses at 4 GiB pass](evidence/wasmtime-helper-sparse-2026-09-24.json) in stock Node/Deno/Bun, including worker sharing and concurrent waits; peak 139 MiB. Prepared a pending Binaryen exception-conversion comparison. These synthetic checks leave full Lean integration and platform acceptance open.
+**Changed:** [Binaryen conversion preserves the tiny legacy-exception result](evidence/wasmtime-helper-exception-conversion-2026-09-24.json) in all six helper/engine profiles. Sparse addresses and concurrent waits still pass. Real Lean module conversion and full integration remain open; the separate unchanged Deno application suite continues.
 
 **Remaining:** Shipping pipeline and engine parity, including callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
