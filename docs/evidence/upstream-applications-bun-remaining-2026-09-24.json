@@ -1,0 +1,331 @@
+{
+  "scope": "The nineteen unfinished tests from the preserved disk-stopped Bun compiled-application campaign, run unchanged in a fresh output directory with the same installed .22 candidate",
+  "continuation": {
+    "startedAt": "2026-09-24T14:21:14.983Z",
+    "finishedAt": "2026-09-24T14:52:59.315Z",
+    "scope": "Unchanged native driver followed by installed-CLI AOT execution with original arguments and assertions",
+    "lean": "4.34.0",
+    "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "category": "compiled-application",
+    "target": "bun",
+    "execution": {
+      "code": 0,
+      "signal": null
+    },
+    "counts": {
+      "passed": 19
+    },
+    "registered": 19,
+    "originalSources": {
+      "before": {
+        "checked": 7669,
+        "modified": []
+      },
+      "after": {
+        "checked": 7669,
+        "modified": []
+      }
+    },
+    "harness": {
+      "before": {
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/run.mjs": "ddd191826eff2938eb644b798c69c7a32e59bcabca69feae1af3ca2ce6fbcedf",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/case.mjs": "7e526222e060e3e40f02955187ab5dba76904f8291e0188ce8e203938209a8d3",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh": "3020f0107f5fe50c8ea84bfd7d0ceac35d105b861ad273927ca4f4ea9eaf2453",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-bun-remaining-r1/native-environment.sh": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6"
+      },
+      "changed": []
+    },
+    "diskAtStart": 16430907392,
+    "diskAtEnd": 16174952448,
+    "minimumFreeDisk": 4294967296,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-applications-bun-remaining-r1-resources.json",
+    "cases": [
+      {
+        "name": "compile_bench/incr_header_save.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "8c4b9d6368acb859a17867bfc9b5c5c5d17d62090eb571c88e7763f3a6e28692",
+        "sourceUnchanged": true,
+        "wasmSha256": "4af258d21e0a6d3288bd4e83709134162138a9a59968415d4582be1b145cb744"
+      },
+      {
+        "name": "compile_bench/io_compute.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "25a397d6ba3bc422f79278ae07c92d2ad631d3f2808225ffd0be30ca421f163a",
+        "sourceUnchanged": true,
+        "wasmSha256": "26bf558a9a16df68a2673179579b3729d3195b1ccc9726d1fce209a77fa2d878"
+      },
+      {
+        "name": "compile_bench/iterators.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "133ad6d9d1de5056ef4ae7eb21106277d2b825b9bc11f50222a1a7db38c1ea71",
+        "sourceUnchanged": true,
+        "wasmSha256": "970598794266418a2ac7acbe7e4f75518b0fcf73b48baf0757a625f55bd382ba"
+      },
+      {
+        "name": "compile_bench/liasolver.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "0fcc697b8c3275c945ce04e7eb1c53858dd2bc3c6a7cc1c93b30eaa160b06480",
+        "sourceUnchanged": true,
+        "wasmSha256": "dbfd18c99ec73af6f32b16f3940a1b7ea6409b4d5d0215059fe0d41ec7940968"
+      },
+      {
+        "name": "compile_bench/nat_repr.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "a826adc11a024c522253bf82e905d0ef389a657f50031b1de5cf381bc6d99a83",
+        "sourceUnchanged": true,
+        "wasmSha256": "df6c750e307d1db2c13ed3a61bc43da2c2318984d81bc89005175d73e12b735e"
+      },
+      {
+        "name": "compile_bench/parser.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "d0b2f81f33efa19da2ef190897318ee174b4a63180f1ef93f1626c88d721b8e9",
+        "sourceUnchanged": true,
+        "wasmSha256": "6e89c86f61b6ed8f1fd2f0cac4fe7cc34249dafdd4bfb67cbcb730b5ced37146"
+      },
+      {
+        "name": "compile_bench/phashmap.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "eea26c9fbacecdf774140d725c9f50a738b3a1822c77e2f6e591f610f11b8949",
+        "sourceUnchanged": true,
+        "wasmSha256": "3918bd6b92f89152cdab7ec5eaa8f37e2e74059e6f62af3a10df7cfcb2d52425"
+      },
+      {
+        "name": "compile_bench/qsort.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "31c4bcb0d73af1efbaca137e792eed05202bad52408f5d19fb8fb374eb6a4475",
+        "sourceUnchanged": true,
+        "wasmSha256": "4f32604f23cd3c780a8916be43d06a1e20dfb8e7353809ea493a45c845e7669e"
+      },
+      {
+        "name": "compile_bench/rbmap.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "ff867cb17ca3a9a871e2439eade038799d66ebdaa9c24e9d0d9a5f73a938ab29",
+        "sourceUnchanged": true,
+        "wasmSha256": "a28d8027d5f2ceffa5a9c01ba2695a32830588313747006647639f002e958aa4"
+      },
+      {
+        "name": "compile_bench/rbmap_checkpoint.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "43288ac1bbc94bf28424a5a00966eb6dc140eb495122473794d218feb6a04627",
+        "sourceUnchanged": true,
+        "wasmSha256": "aff5d86fa28ae289dff8954137553f8af5c4d30aac30b3fafaba2739c6db5645"
+      },
+      {
+        "name": "compile_bench/rbmap_fbip.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "f57e98047ed64497d89c98cf2e9fcfd85c0c45b54c3d4c6c983fce60b38a63d8",
+        "sourceUnchanged": true,
+        "wasmSha256": "aab7570d4a88e4af3dfe19b8363eb8a5aa36b12376d1eb3349a165e033f7d216"
+      },
+      {
+        "name": "compile_bench/rbmap_library.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "0b74d74682d0139c2743deebcf1a35c08eaaa28f1646572433b507a3de24b1bc",
+        "sourceUnchanged": true,
+        "wasmSha256": "e71a16d1b15fc38756a8679c8b5c225e3c611805e2fcd2063c20083758fdd3bc"
+      },
+      {
+        "name": "compile_bench/select.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "d46972b027a146a75a76b799af56e71db10886aa0501068cf5a19916dbfacb12",
+        "sourceUnchanged": true,
+        "wasmSha256": "7564b2a5baebbc4a920c040a96014aa3d9ef78240c47373ed2466cb3eacbe8e1"
+      },
+      {
+        "name": "compile_bench/server_startup.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "4e039c08da1f09b01ba7688251854bd64e5c3b39cdb4d89c03c4cd0c1075a70d",
+        "sourceUnchanged": true,
+        "wasmSha256": "42597c5353cf35e5b18b91089cc5bbc5cb638dfe6d26703770203ec4e3a5e105"
+      },
+      {
+        "name": "compile_bench/sigmaIterator.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "1ca2e86197d0aa30e3cb1c9db7cedcab5debb455c4f7a769268d724ad1cf7541",
+        "sourceUnchanged": true,
+        "wasmSha256": "149e41b7890b7845ce2912137f71806be2487736660d6fa81b2a49774e98e2ff"
+      },
+      {
+        "name": "compile_bench/treemap.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "053e0e49d5ca057b6681e94bb988e55fe2b1ae6bad12462f39b4e3e6aeb960b1",
+        "sourceUnchanged": true,
+        "wasmSha256": "7e4094b52718233de39fc6a63fb8c4e418e1202effc092f7410161ad6595a85f"
+      },
+      {
+        "name": "compile_bench/unionfind.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "ebcaba6b9a76478b377320eab1a54ce6004d1d18df71335161838d66e234ceeb",
+        "sourceUnchanged": true,
+        "wasmSha256": "f9b813395536a74c90afdcdaf1c87ad2c8444fa6816613d29e814be7ac3cf5f9"
+      },
+      {
+        "name": "compile_bench/watchdogRss.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "df4d5f68f66f885231afef3574a7140f629ec0103477a2ef77cc5d8e6aee8bc0",
+        "sourceUnchanged": true,
+        "wasmSha256": "6aaad836da1ac1f6bf46f0e94ed3309197ac711f42ea08ac6a5e691b70835dd6"
+      },
+      {
+        "name": "compile_bench/workspaceSymbolsNewRanges.lean",
+        "status": "passed",
+        "exitCode": 0,
+        "phase": "complete",
+        "sourceSha256": "82b4e6a78cd649cf37e82e9e8924b9edd52b642fc8e33e2c4b8d2f073d539663",
+        "sourceUnchanged": true,
+        "wasmSha256": "93e8750e647ac249982c68781126f03708a81aaa9c13b3a8b323bd6a367a8a2d"
+      }
+    ]
+  },
+  "resources": {
+    "startedAt": "2026-09-24T14:20:54.816Z",
+    "command": [
+      "/bin/bash",
+      ".work/run-bun-remaining-applications-r1.sh"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "2ed44bfe-2ad5-48a6-ab87-128dc1a95ddc",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 24085073920
+    },
+    "minimumHostAvailable": 20148772864,
+    "peakMemoryBytes": 4164907008,
+    "peakTasks": 76,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-applications-bun-remaining-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-24T14:52:59.224Z",
+      "memoryBytes": 478572544,
+      "peakMemoryBytes": 4164907008,
+      "swapBytes": 0,
+      "tasks": 11,
+      "memoryBreakdown": {
+        "anon": 55488512,
+        "file": 393560064,
+        "kernel": 28528640,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 386801664,
+        "slab": 27137816
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T14:52:59.394Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 434159616,
+      "peakMemoryBytes": 4164907008,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11653120,
+        "file": 393641984,
+        "kernel": 28024832,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 386883584,
+        "slab": 27078328
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T14:52:59.422Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "earlierCampaign": {
+    "directory": ".work/upstream-applications-bun-r1",
+    "evidence": "docs/evidence/upstream-applications-bun-disk-stop-2026-09-24.json",
+    "counts": {
+      "passed": 77,
+      "upstream-compile-disabled": 4,
+      "failed": 1,
+      "not-completed": 19
+    },
+    "executionSha256": "672037a2ce7d03bb3f575697aedf74bba8eb4e10297b2761167257e8c3a69552"
+  },
+  "combinedCoverage": {
+    "registrations": 101,
+    "passed": 96,
+    "upstream-compile-disabled": 4,
+    "failed": 1,
+    "not-completed": 0,
+    "failedTest": "compile_bench/const_fold.lean",
+    "scope": "Combined coverage from two distinct campaigns; not a new uninterrupted 101-test pass"
+  },
+  "remainingFailureEvidence": "docs/evidence/bun-large-stack-allocation-gap-2026-09-24.json",
+  "executionSha256": "43f93f68b07556c83712516ab505170de5157d18ea420c45bd2bb2ea3afbef36",
+  "logSha256": "f4cb61c733df9600d36afafb4c692290d25628d284b9fd86e95fd57976b293a6",
+  "notFundamental": true
+}

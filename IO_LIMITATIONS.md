@@ -145,6 +145,11 @@ separately from the earlier runtime evidence below.
   `DataCloneError` masks that exception when crossing the worker boundary.
   Omitting the setting succeeds; doubling the JavaScript execution stack does
   not. These controls diagnose the gap; they neither weaken the suite nor fix it.
+  The [nineteen remaining Bun tests](docs/evidence/upstream-applications-bun-remaining-2026-09-24.json)
+  now all pass in a fresh guarded continuation. Combined with the preserved
+  disk-stopped run, coverage is 96 passes, four upstream compilation-disabled
+  registrations and the one `const_fold` failure; no registration remains
+  unexecuted. This is combined evidence from two runs, not a full-suite pass.
   A [small Wasmtime helper probe](docs/evidence/wasmtime-helper-smoke-2026-09-24.json)
   now executes memory64, shared-memory loads/stores, standardized exceptions and
   JavaScript callbacks across worker isolates in all three stock engines on
