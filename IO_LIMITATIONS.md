@@ -46,7 +46,11 @@ separately from the earlier runtime evidence below.
   interoperability with independently registered `Deno.addSignalListener`
   observers remain unresolved. The latter
   uses a different observer path from the supported Node-compatible process
-  listeners. None of these gaps is demonstrated fundamental.
+  listeners. [Four small source-host controls](docs/evidence/deno-native-listener-gap-2026-09-24.json)
+  now isolate this to the inspector-avoiding SIGUSR1 route: a Deno listener
+  registered before or after Lean is not notified, although Lean and process
+  listeners are. Both SIGUSR2 controls notify all three. These are diagnostics,
+  not installed application passes. None of these gaps is demonstrated fundamental.
   [Native Linux x64/ARM64 source-helper CI](docs/evidence/signal-native-ci-2026-09-24.json)
   now passes nine checks per platform with zero skips. Separate Linux x64 host
   probes cover all 22 signal names in each engine.

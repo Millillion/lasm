@@ -1,0 +1,95 @@
+{
+  "scope": "Small source-host interoperability diagnostic, not installed Lean acceptance",
+  "probe": ".work/deno-observer-interoperability-r1.mjs",
+  "probeSha256": "ef6ead460b2b07502f5b82cc32ae17e22de4309e9dc32f465516691fe99d9fa4",
+  "rows": [
+    {
+      "name": "SIGUSR1",
+      "order": "before",
+      "code": 0,
+      "stdout": "{\"name\":\"SIGUSR1\",\"order\":\"before\",\"leanSignal\":true,\"denoNotifications\":0,\"processNotifications\":1,\"expected\":{\"leanSignal\":true,\"denoNotifications\":1,\"processNotifications\":1}}\n",
+      "stderr": "",
+      "observation": {
+        "name": "SIGUSR1",
+        "order": "before",
+        "leanSignal": true,
+        "denoNotifications": 0,
+        "processNotifications": 1,
+        "expected": {
+          "leanSignal": true,
+          "denoNotifications": 1,
+          "processNotifications": 1
+        }
+      },
+      "matchesExpected": false
+    },
+    {
+      "name": "SIGUSR1",
+      "order": "after",
+      "code": 0,
+      "stdout": "{\"name\":\"SIGUSR1\",\"order\":\"after\",\"leanSignal\":true,\"denoNotifications\":0,\"processNotifications\":1,\"expected\":{\"leanSignal\":true,\"denoNotifications\":1,\"processNotifications\":1}}\n",
+      "stderr": "",
+      "observation": {
+        "name": "SIGUSR1",
+        "order": "after",
+        "leanSignal": true,
+        "denoNotifications": 0,
+        "processNotifications": 1,
+        "expected": {
+          "leanSignal": true,
+          "denoNotifications": 1,
+          "processNotifications": 1
+        }
+      },
+      "matchesExpected": false
+    },
+    {
+      "name": "SIGUSR2",
+      "order": "before",
+      "code": 0,
+      "stdout": "{\"name\":\"SIGUSR2\",\"order\":\"before\",\"leanSignal\":true,\"denoNotifications\":1,\"processNotifications\":1,\"expected\":{\"leanSignal\":true,\"denoNotifications\":1,\"processNotifications\":1}}\n",
+      "stderr": "",
+      "observation": {
+        "name": "SIGUSR2",
+        "order": "before",
+        "leanSignal": true,
+        "denoNotifications": 1,
+        "processNotifications": 1,
+        "expected": {
+          "leanSignal": true,
+          "denoNotifications": 1,
+          "processNotifications": 1
+        }
+      },
+      "matchesExpected": true
+    },
+    {
+      "name": "SIGUSR2",
+      "order": "after",
+      "code": 0,
+      "stdout": "{\"name\":\"SIGUSR2\",\"order\":\"after\",\"leanSignal\":true,\"denoNotifications\":1,\"processNotifications\":1,\"expected\":{\"leanSignal\":true,\"denoNotifications\":1,\"processNotifications\":1}}\n",
+      "stderr": "",
+      "observation": {
+        "name": "SIGUSR2",
+        "order": "after",
+        "leanSignal": true,
+        "denoNotifications": 1,
+        "processNotifications": 1,
+        "expected": {
+          "leanSignal": true,
+          "denoNotifications": 1,
+          "processNotifications": 1
+        }
+      },
+      "matchesExpected": true
+    }
+  ],
+  "recordedAt": "2026-09-24T13:41:02.455841+00:00",
+  "interpretation": "Both SIGUSR1 orderings lose the independently registered Deno callback while delivering to Lean and process listeners. Both SIGUSR2 orderings deliver to all three. The special inspector-avoiding SIGUSR1 route is an interoperability gap, not a fundamental limit.",
+  "sourceHashes": {
+    "src/deno-signals.mjs": "245ba8b999b053eaccef39adeb62cd10eefce78ebf4812ad669be3cb8b79b8fb",
+    "src/node-signal.mjs": "4ef1e74af9dc7c687152a50d1adf620e281fd8ae7abdf1e21500fcb4726a78fa",
+    "native/posix-signal.c": "bedfba1f14c8d3f57d086bc1b691da39648ef1ccbb4c945dbb33c8216806e1d7"
+  },
+  "validationScope": "Stock Deno 2.9.7, Linux x64; small source-host controls, not compiled Lean or native platform acceptance. No probe edits a Lean upstream test."
+}

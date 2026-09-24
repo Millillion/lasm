@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Installed module-data checks](evidence/application-module-data-split-preflight-2026-09-24.json) can now run one application per guard, retaining every original, missing-data and attribute assertion across two required selections. Syntax checks pass; execution remains queued behind Bun and verified disk archival. This is safety preparation, not a compatibility pass.
+**Changed:** [Deno listener controls](evidence/deno-native-listener-gap-2026-09-24.json) reproduce the SIGUSR1 interoperability gap for listeners registered before or after Lean; paired SIGUSR2 controls pass. This narrows an existing open issue without closing it. The repaired source CI build has passed dependency verification and reached runtime compilation.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
