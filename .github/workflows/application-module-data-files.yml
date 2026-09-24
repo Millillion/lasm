@@ -1,0 +1,42 @@
+name: Module data file controls
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: application-module-data-files-${{ github.ref }}
+  cancel-in-progress: false
+
+# Tiny filesystem and loader controls only, on standard public runners.
+# No Lean/SDK downloads, compiler builds, cache or artifact storage.
+jobs:
+  files:
+    if: github.event.repository.visibility == 'public'
+    name: Module files ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
+          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
+          - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
+          - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
+          - { platform: win32-x64, runner: windows-2022, arch: x64 }
+          - { platform: win32-arm64, runner: windows-11-arm, arch: arm64 }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.10.0
+          architecture: ${{ matrix.arch }}
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Record the native host and exact Node version
+        run: node -e "const a=require('node:assert/strict');a.equal(process.platform+'-'+process.arch,'${{ matrix.platform }}');a.equal(process.versions.node,'26.10.0');console.log(JSON.stringify({platform:process.platform,architecture:process.arch,node:process.versions.node}))"
+      - name: Module copying, linked paths, relocation and loader controls
+        run: node --max-old-space-size=128 --test --test-isolation=none test/application-metadata.test.mjs test/application-output.test.mjs
+      # Loader child fixtures each have a 64 MiB JS heap. This is not a complete
+      # process-tree guard and does not authorize heavy workloads on macOS.

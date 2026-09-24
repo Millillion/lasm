@@ -620,3 +620,11 @@ the commit archive's pinned size and checksum. The URL now selects the exact
 commit that is recorded in the original archive's PAX header. Neither checksum
 nor size verification is relaxed. All guards released without resource events;
 this is a preparation failure, and the runtime build remains unvalidated in CI.
+
+The [module-data file matrix](../.github/workflows/application-module-data-files.yml)
+prepares the nine small copying, search-order, linked-path and loader controls
+on all six native platforms, including Windows ARM64. The
+[local preparation run](evidence/application-module-data-matrix-preflight-2026-09-24.json)
+passes all nine without skips after limiting child fixture heaps. This workflow
+does not build Lean or the runtime, and its results will not replace installed
+Wasm import tests or the missing macOS guard for heavy workloads.

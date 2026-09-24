@@ -20,7 +20,7 @@ test('entrypoint resolves host/glue relative to deployment, independent of build
     app: process.env.LASM_FULL_APP_PATH, cwd: process.cwd(), threads: process.env.LEAN_NUM_THREADS
   }));`);
   renameSync(original, moved);
-  const out = execFileSync(process.execPath, [join(moved, 'main.mjs'), 'hello', '--target', 'application-value'],
+  const out = execFileSync(process.execPath, ['--max-old-space-size=64', join(moved, 'main.mjs'), 'hello', '--target', 'application-value'],
     { cwd: base, env: { ...process.env, LEAN_NUM_THREADS: '7' }, encoding: 'utf8' });
   const record = JSON.parse(out);
   assert.equal(record.cwd, base);
@@ -36,7 +36,7 @@ test('wrong engines fail before executing the application payload', t => {
   t.after(() => rmSync(base, { recursive: true, force: true }));
   writeApplicationEntrypoint(base, 'bun');
   writeFileSync(join(base, 'program.cjs'), 'throw new Error("PAYLOAD EXECUTED");');
-  const result = spawnSync(process.execPath, [join(base, 'main.mjs')], { encoding: 'utf8' });
+  const result = spawnSync(process.execPath, ['--max-old-space-size=64', join(base, 'main.mjs')], { encoding: 'utf8' });
   assert.equal(result.status, 1);
   assert.match(result.stderr, /built for bun.*running in node/);
   assert.doesNotMatch(result.stderr, /PAYLOAD EXECUTED/);

@@ -1,0 +1,17 @@
+{
+  "scope": "Small module-data file/loader controls prepared for six native platforms; real installed Wasm imports remain separate",
+  "local": {
+    "platform": "linux-x64",
+    "node": "26.10.0",
+    "tests": 9,
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "log": ".work/product-acceptance/application-metadata-unit-r7.log",
+    "logSha256": "3c49f4a0371f5e0695962a8abf84eba11478d9012a57dab28710ea9d5405f84b"
+  },
+  "workflow": ".github/workflows/application-module-data-files.yml",
+  "ciStatus": "pending",
+  "safety": "Only tiny file fixtures and JS loader subprocesses; parent heap 128 MiB, child heap 64 MiB. No compiler or toolchain downloads, cache/artifact uploads, or publication. These heap settings are not a process-tree guard for heavy workloads.",
+  "recordedAt": "2026-09-24T13:02:43.749521+00:00"
+}
