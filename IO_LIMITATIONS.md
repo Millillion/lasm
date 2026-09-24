@@ -184,7 +184,8 @@ separately from the earlier runtime evidence below.
   retaining 139 imports and 27,181 exports. Peak memory is 5.16 GiB without
   resource events. Actual compilation required ordinary import encoding even
   though the validator accepted compact imports; earlier configuration and
-  output-bound failures remain recorded. No Lean instance has run in the helper.
+  output-bound failures remain recorded. That compilation probe did not run a
+  Lean instance; the later startup probe below does.
   The [memory-view probe](docs/evidence/wasmtime-memory-views-2026-09-24.json)
   also passes eight-byte external views at address 4 GiB in all three engines,
   including ordered worker/native/Wasm access. Bun aborts the separate whole-view
@@ -214,6 +215,19 @@ separately from the earlier runtime evidence below.
   Async waits remain unimplemented. The prototype wait transport also rejects
   finite durations above signed 64-bit nanoseconds instead of silently reducing
   them; that engineering gap must close before full compatibility is claimed.
+  The [real-module startup probe](docs/evidence/wasmtime-real-lean-instantiation-2026-09-24.json)
+  now initializes the compiled Lean module in all three stock engines and matches
+  23 arithmetic results per engine against interpreted and compiled native Lean.
+  Nine startup imports provide actual thread/TLS initialization, clock, memory
+  metadata, environment, secure randomness, program name and mailbox support.
+  Emscripten's existing main-thread postmessage path delivers four real Wasm
+  proxy tasks asynchronously with coalescing and re-notification; all fifteen
+  guest environment lookups match the host snapshot, including Unicode.
+  The successful guard peaks at 226 MiB. Earlier failures and a proactively
+  stopped duplicate-toolchain installation remain recorded, with no OOM events.
+  Other imports still trap, six dynamic function globals remain unresolved,
+  and workers, the original application main/4 GiB stack case, installed-package
+  integration and other platforms remain unfinished. This is component evidence.
 
 ## Earlier runtime evidence and remaining compatibility work
 

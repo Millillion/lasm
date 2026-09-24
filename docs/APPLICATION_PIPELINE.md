@@ -765,3 +765,17 @@ counts; mixed 32/64-bit waiters and notifications in both directions pass.
 The guard releases at a 63 MiB peak. Async scheduling, general heap access,
 finite durations beyond the prototype's signed-nanosecond transport, and real
 Lean application integration remain open. No shipping backend selection changes.
+
+The [real-module startup probe](evidence/wasmtime-real-lean-instantiation-2026-09-24.json)
+now runs ordinary stack, main-thread/TLS and constructor initialization through
+the verified native cache in all three stock engines. Twenty-three GCD/log2
+results per engine match native interpreted and compiled Lean. Host environment
+round trips and four asynchronous tasks through the actual Wasm proxy/mailbox
+queues also pass. The mailbox uses Emscripten's existing message fallback;
+coalesced delivery, a subsequent notification and guest queue cleanup are checked.
+The successful guard releases at a 226 MiB peak. Twelve earlier attempts remain
+recorded, including the proactive resource stop caused by a duplicate toolchain
+installation; verified cache reuse fixes that setup error without raising limits.
+No OOM event occurred. Full application main execution, the original large-stack
+case, worker routing, dynamic linking and installed-package integration remain
+open; unimplemented imports still trap rather than claiming unsupported behavior.

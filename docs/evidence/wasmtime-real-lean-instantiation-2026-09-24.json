@@ -1,0 +1,2938 @@
+{
+  "scope": "Component probe: real Lean 4.34 compiled module initialization and selected runtime exports inside stock Node, Deno and Bun on Linux x64; not main, upstream const_fold, installed-package or complete API acceptance",
+  "recordedAt": "2026-09-24T17:20:15.366645+00:00",
+  "versionCheck": {
+    "path": ".work/product-acceptance/lean-instantiation-versions-2026-09-24-r1.json",
+    "sha256": "9ce9aeafce9cd219004a2fb23846ce5d32d99bedf861d4b1d11283cd3b5abe85",
+    "content": {
+      "lean": {
+        "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+        "expected": "v4.34.0",
+        "tag": "v4.34.0",
+        "publishedAt": "2026-09-14T14:04:36Z",
+        "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+        "draft": false,
+        "prerelease": false
+      },
+      "deno": {
+        "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+        "expected": "v2.9.7",
+        "tag": "v2.9.7",
+        "publishedAt": "2026-09-17T09:04:55Z",
+        "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+        "draft": false,
+        "prerelease": false
+      },
+      "bun": {
+        "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+        "expected": "bun-v1.4.2",
+        "tag": "bun-v1.4.2",
+        "publishedAt": "2026-09-05T05:55:48Z",
+        "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+        "draft": false,
+        "prerelease": false
+      },
+      "node": {
+        "source": "https://nodejs.org/dist/index.json",
+        "expected": "v26.10.0",
+        "tag": "v26.10.0",
+        "date": "2026-09-21",
+        "lts": false
+      },
+      "checkedAt": "2026-09-24T16:39:01.561Z"
+    }
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "outcome": "resource-aborted",
+      "explanation": "Resource abort during duplicate toolchain provisioning: guard did not forward external LASM_TOOLCHAIN_CACHE; fixed with an explicit verified cache argument.",
+      "result": {
+        "path": ".work/lean-instantiation-r1/result.json",
+        "sha256": "340bfb223b5b6a9a98aec2a5b7bba684c28efb94c8d4c43738f7fe35c36f40a9"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r1-resources.json",
+        "sha256": "2132811a31f275ccc4bb3f04a9ea66c31a37b00917ed2824d0658ded1d1ed509",
+        "content": {
+          "startedAt": "2026-09-24T16:39:20.009Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r1"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "34fbfb6b-ded8-4f88-91a1-7d51d462f4f2",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23821385728
+          },
+          "minimumHostAvailable": 23650930688,
+          "peakMemoryBytes": 2589392896,
+          "peakTasks": 12,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r1-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T16:42:53.399Z",
+            "memoryBytes": 2585468928,
+            "peakMemoryBytes": 2585468928,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 80646144,
+              "file": 2426847232,
+              "kernel": 76378112,
+              "shmem": 0,
+              "file_mapped": 315392,
+              "inactive_file": 2426413056,
+              "slab": 74249600
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "highWaterProcesses": {
+            "at": "2026-09-24T16:42:49.395Z",
+            "processes": [
+              {
+                "pid": 4060573,
+                "name": "node-MainThread",
+                "residentBytes": 134496256,
+                "threads": 11
+              }
+            ]
+          },
+          "stoppedBecause": "Workload reached its proactive memory budget",
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "killed",
+            "exitStatus": "TERM",
+            "capturedAt": "2026-09-24T16:42:53.496Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 2517745664,
+            "peakMemoryBytes": 2589392896,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11649024,
+              "file": 2429726720,
+              "kernel": 75239424,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 2429366272,
+              "slab": 74298656
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T16:42:53.523Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": true,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 2,
+      "outcome": "failed",
+      "explanation": "Fixture source was outside native Lean root; fixed by copying the supplementary source into the isolated output.",
+      "result": {
+        "path": ".work/lean-instantiation-r2/result.json",
+        "sha256": "60cfdedda89018e96809f125d5663ed62d7115d16031b847d5e7b9dbd55cb77f"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r2-resources.json",
+        "sha256": "892009f4013ec02254f20010af1d8782b11459666768c0b300040447cf6c0b9e",
+        "content": {
+          "startedAt": "2026-09-24T16:46:24.189Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r2",
+            ".work/application-installed-r3/workspace/toolchains"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "5dd49e1c-df50-425f-ba42-67bfb210e4c8",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23871713280
+          },
+          "minimumHostAvailable": 23734755328,
+          "peakMemoryBytes": 800956416,
+          "peakTasks": 16,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r2-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T16:46:47.035Z",
+            "memoryBytes": 636444672,
+            "peakMemoryBytes": 800956416,
+            "swapBytes": 0,
+            "tasks": 6,
+            "memoryBreakdown": {
+              "anon": 6262784,
+              "file": 610734080,
+              "kernel": 18837504,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 610734080,
+              "slab": 18224520
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T16:46:47.054Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 642514944,
+            "peakMemoryBytes": 800956416,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11644928,
+              "file": 610734080,
+              "kernel": 19165184,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 610734080,
+              "slab": 18248832
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T16:46:47.083Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 3,
+      "outcome": "failed",
+      "explanation": "Missing ordinary stack initialization reached the compiled stack-overflow handler.",
+      "result": {
+        "path": ".work/lean-instantiation-r3/result.json",
+        "sha256": "2913fe5b09d25ab4056e605ec103b04f2943abca15c6c05b4fa5845014a43da2"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r3-resources.json",
+        "sha256": "2129caa9aaef8c347ae519c696345feb456872fa51e709ee5c36395e3b0589fc",
+        "content": {
+          "startedAt": "2026-09-24T16:47:48.634Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r3",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "799a634f-f6fe-444a-93dd-8dc48175a382",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 24093552640
+          },
+          "minimumHostAvailable": 23472332800,
+          "peakMemoryBytes": 242245632,
+          "peakTasks": 26,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r3-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T16:48:16.274Z",
+            "memoryBytes": 19881984,
+            "peakMemoryBytes": 242245632,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 10465280,
+              "file": 6955008,
+              "kernel": 1200128,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1101824,
+              "slab": 315272
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T16:48:16.278Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 20930560,
+            "peakMemoryBytes": 242245632,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11649024,
+              "file": 6955008,
+              "kernel": 1269760,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1101824,
+              "slab": 316648
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T16:48:16.303Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 4,
+      "outcome": "failed",
+      "explanation": "Allocator required the real wall clock.",
+      "result": {
+        "path": ".work/lean-instantiation-r4/result.json",
+        "sha256": "2bf4e01632986c702d63340815b59893a5b48a565441b504f151143866f57bc1"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r4-resources.json",
+        "sha256": "4b08462d0c5a4ec2a79c122a4677c77bccca47ef1e0f695b9b32082964d74204",
+        "content": {
+          "startedAt": "2026-09-24T16:50:40.529Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r4",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "4efc44f4-cfb8-4e84-a99a-5a18a9c0cc48",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23886413824
+          },
+          "minimumHostAvailable": 23651926016,
+          "peakMemoryBytes": 269201408,
+          "peakTasks": 29,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r4-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T16:51:06.360Z",
+            "memoryBytes": 16637952,
+            "peakMemoryBytes": 269201408,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 9277440,
+              "file": 4685824,
+              "kernel": 1118208,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 200704,
+              "slab": 296048
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T16:51:06.372Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 19259392,
+            "peakMemoryBytes": 269201408,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11657216,
+              "file": 4685824,
+              "kernel": 1212416,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 200704,
+              "slab": 298336
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T16:51:06.397Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 5,
+      "outcome": "failed",
+      "explanation": "Allocator required the actual shared-memory maximum.",
+      "result": {
+        "path": ".work/lean-instantiation-r5/result.json",
+        "sha256": "57013310b52f073bc6966703f31736ccc145e576ac66158947d138caf995bea0"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r5-resources.json",
+        "sha256": "b2ce23329e6138ef9d1699d0be3b1eacc010a46b6635bfd18639d1c4f764c29b",
+        "content": {
+          "startedAt": "2026-09-24T16:53:51.127Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r5",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "1e5b70b2-4d26-408f-a1b9-6416653ef68c",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23984885760
+          },
+          "minimumHostAvailable": 23478910976,
+          "peakMemoryBytes": 254259200,
+          "peakTasks": 26,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r5-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T16:54:18.360Z",
+            "memoryBytes": 195977216,
+            "peakMemoryBytes": 254259200,
+            "swapBytes": 0,
+            "tasks": 26,
+            "memoryBreakdown": {
+              "anon": 187682816,
+              "file": 4681728,
+              "kernel": 3342336,
+              "shmem": 0,
+              "file_mapped": 135168,
+              "inactive_file": 196608,
+              "slab": 631984
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T16:54:18.479Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 18558976,
+            "peakMemoryBytes": 254259200,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11644928,
+              "file": 4685824,
+              "kernel": 1216512,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 200704,
+              "slab": 298888
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T16:54:18.503Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 6,
+      "outcome": "failed",
+      "explanation": "Allocator called before ordinary Wasm constructors; out-of-bounds trap.",
+      "result": {
+        "path": ".work/lean-instantiation-r6/result.json",
+        "sha256": "29b8e753272b03b1440052100c88be2e4a29ead41b24082b60cb11ff89e7cfbd"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r6-resources.json",
+        "sha256": "be4fca6390e4c1b2d6cc4776738587920953182ec9190f30e2bc98ac229be34f",
+        "content": {
+          "startedAt": "2026-09-24T16:56:02.880Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r6",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "2227ffb2-b586-44e6-97a1-08ea279bcd86",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23821905920
+          },
+          "minimumHostAvailable": 23596150784,
+          "peakMemoryBytes": 249950208,
+          "peakTasks": 26,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r6-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T16:56:29.115Z",
+            "memoryBytes": 5599232,
+            "peakMemoryBytes": 249950208,
+            "swapBytes": 0,
+            "tasks": 1,
+            "memoryBreakdown": {
+              "anon": 221184,
+              "file": 4706304,
+              "kernel": 294912,
+              "shmem": 0,
+              "file_mapped": 0,
+              "inactive_file": 221184,
+              "slab": 196072
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T16:56:29.150Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 18984960,
+            "peakMemoryBytes": 249950208,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11653120,
+              "file": 4706304,
+              "kernel": 1245184,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 221184,
+              "slab": 300648
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T16:56:29.176Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 7,
+      "outcome": "failed",
+      "explanation": "Constructors required main-thread and TLS initialization.",
+      "result": {
+        "path": ".work/lean-instantiation-r7/result.json",
+        "sha256": "ddb596fd13e2905c3cd3b1c545bc86a6066442928325379337d18fab0bc3aaeb"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r7-resources.json",
+        "sha256": "873d1d16e6cffcce0dfc57a791b58e6381581db086f35d7d69792ec611e4ad3f",
+        "content": {
+          "startedAt": "2026-09-24T16:59:29.358Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r7",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "0c39a9ab-1c34-40d1-91bf-f9aa9183b0a2",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23982800896
+          },
+          "minimumHostAvailable": 23600627712,
+          "peakMemoryBytes": 248053760,
+          "peakTasks": 26,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r7-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T16:59:55.986Z",
+            "memoryBytes": 209424384,
+            "peakMemoryBytes": 248053760,
+            "swapBytes": 0,
+            "tasks": 26,
+            "memoryBreakdown": {
+              "anon": 178839552,
+              "file": 4698112,
+              "kernel": 3502080,
+              "shmem": 0,
+              "file_mapped": 135168,
+              "inactive_file": 212992,
+              "slab": 634416
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T16:59:56.072Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 18690048,
+            "peakMemoryBytes": 248053760,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11649024,
+              "file": 4702208,
+              "kernel": 1232896,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 217088,
+              "slab": 302672
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T16:59:56.096Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 8,
+      "outcome": "failed",
+      "explanation": "Main-thread bootstrap stack-size ABI is i32, not i64; corrected from pinned Emscripten source.",
+      "result": {
+        "path": ".work/lean-instantiation-r8/result.json",
+        "sha256": "ac8ac7ae0f84957fceedb2835afe92efa778cb24361ff8c09169ffaed2c633ac"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r8-resources.json",
+        "sha256": "7921e689206759b2ed53fae9a2aea660c851d8fda864dae0144cd748c5350d6d",
+        "content": {
+          "startedAt": "2026-09-24T17:02:00.562Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r8",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "a7ad207a-99d9-42bd-b7e1-ba158afd8380",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23847096320
+          },
+          "minimumHostAvailable": 23557816320,
+          "peakMemoryBytes": 224051200,
+          "peakTasks": 29,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r8-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T17:02:27.994Z",
+            "memoryBytes": 161816576,
+            "peakMemoryBytes": 224051200,
+            "swapBytes": 0,
+            "tasks": 26,
+            "memoryBreakdown": {
+              "anon": 153681920,
+              "file": 4710400,
+              "kernel": 3198976,
+              "shmem": 0,
+              "file_mapped": 131072,
+              "inactive_file": 225280,
+              "slab": 633232
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T17:02:28.136Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 18874368,
+            "peakMemoryBytes": 224051200,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11657216,
+              "file": 4714496,
+              "kernel": 1232896,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 229376,
+              "slab": 298488
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T17:02:28.160Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 9,
+      "outcome": "failed",
+      "explanation": "Constructors required mailbox notification setup.",
+      "result": {
+        "path": ".work/lean-instantiation-r9/result.json",
+        "sha256": "b2a9e8aeff8e44fd1f3fba947da65b746b8d8a6ef93aecc7a01ae25ace79d7d5"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r9-resources.json",
+        "sha256": "45f9db82734c32ab8bf64606ba5fcb43e00ff7e98f5e15b677828103247cea97",
+        "content": {
+          "startedAt": "2026-09-24T17:03:17.541Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r9",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "fa4ae924-3b62-4752-965b-8c93587018f3",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23864893440
+          },
+          "minimumHostAvailable": 23562608640,
+          "peakMemoryBytes": 250851328,
+          "peakTasks": 26,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r9-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T17:03:44.174Z",
+            "memoryBytes": 169603072,
+            "peakMemoryBytes": 250851328,
+            "swapBytes": 0,
+            "tasks": 26,
+            "memoryBreakdown": {
+              "anon": 161288192,
+              "file": 4689920,
+              "kernel": 3272704,
+              "shmem": 0,
+              "file_mapped": 131072,
+              "inactive_file": 204800,
+              "slab": 631928
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T17:03:44.309Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 18821120,
+            "peakMemoryBytes": 250851328,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11644928,
+              "file": 4694016,
+              "kernel": 1245184,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 208896,
+              "slab": 303392
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T17:03:44.337Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 10,
+      "outcome": "failed",
+      "explanation": "Constructors required environment initialization.",
+      "result": {
+        "path": ".work/lean-instantiation-r10/result.json",
+        "sha256": "0655481d67746e72d2613cbe0a574b53b8ff998578ed27461ef93169a4c7a8c4"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r10-resources.json",
+        "sha256": "ae1569059ff20deff3c6e7e5bb6de0ac6d06bd6517576deb4209caeaa4305165",
+        "content": {
+          "startedAt": "2026-09-24T17:12:13.868Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r10",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "b44b13cf-8744-484c-83a2-4e3ff479b081",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23803621376
+          },
+          "minimumHostAvailable": 23384707072,
+          "peakMemoryBytes": 253857792,
+          "peakTasks": 26,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r10-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T17:12:41.302Z",
+            "memoryBytes": 194105344,
+            "peakMemoryBytes": 253857792,
+            "swapBytes": 0,
+            "tasks": 26,
+            "memoryBreakdown": {
+              "anon": 185516032,
+              "file": 4931584,
+              "kernel": 3371008,
+              "shmem": 0,
+              "file_mapped": 139264,
+              "inactive_file": 352256,
+              "slab": 638656
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T17:12:41.431Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 18489344,
+            "peakMemoryBytes": 253857792,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11644928,
+              "file": 4935680,
+              "kernel": 1228800,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 356352,
+              "slab": 312256
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T17:12:41.462Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 11,
+      "outcome": "failed",
+      "explanation": "Allocator initialization required operating-system secure randomness.",
+      "result": {
+        "path": ".work/lean-instantiation-r11/result.json",
+        "sha256": "34cb1ff5047cdc459c7399ef8cfef0722ca1579992e06aff11385432bddc5a60"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r11-resources.json",
+        "sha256": "a74453b6e71c6f57a315dca5123f286addd51a71a87c34077805cf46037053e2",
+        "content": {
+          "startedAt": "2026-09-24T17:14:50.830Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r11",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "72ebe3cc-0408-45aa-a338-f6b79c1453e2",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23746494464
+          },
+          "minimumHostAvailable": 23215853568,
+          "peakMemoryBytes": 236064768,
+          "peakTasks": 29,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r11-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T17:15:18.661Z",
+            "memoryBytes": 9654272,
+            "peakMemoryBytes": 236064768,
+            "swapBytes": 0,
+            "tasks": 6,
+            "memoryBreakdown": {
+              "anon": 3018752,
+              "file": 4796416,
+              "kernel": 765952,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 225280,
+              "slab": 268048
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T17:15:18.698Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 18440192,
+            "peakMemoryBytes": 236064768,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11657216,
+              "file": 4796416,
+              "kernel": 1232896,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 225280,
+              "slab": 309592
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T17:15:18.723Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 12,
+      "outcome": "failed",
+      "explanation": "Constructors required the executable name.",
+      "result": {
+        "path": ".work/lean-instantiation-r12/result.json",
+        "sha256": "da93f01bce6be7ff0deaa4c71c9cc31b83cfec933112787840f16d2ba36e8924"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r12-resources.json",
+        "sha256": "05db3cbf23bee7ebd3fb075098f2a09b322a45eb909cbc403afedbac3e902beb",
+        "content": {
+          "startedAt": "2026-09-24T17:16:10.913Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r12",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "9d67a14b-3e5c-4902-a40a-5b656f1735d0",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23774515200
+          },
+          "minimumHostAvailable": 23618838528,
+          "peakMemoryBytes": 248381440,
+          "peakTasks": 29,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r12-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T17:16:38.345Z",
+            "memoryBytes": 9465856,
+            "peakMemoryBytes": 248381440,
+            "swapBytes": 0,
+            "tasks": 6,
+            "memoryBreakdown": {
+              "anon": 2859008,
+              "file": 4898816,
+              "kernel": 786432,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 413696,
+              "slab": 279832
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T17:16:38.379Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 18583552,
+            "peakMemoryBytes": 248381440,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11661312,
+              "file": 4898816,
+              "kernel": 1236992,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 413696,
+              "slab": 300728
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T17:16:38.409Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    },
+    {
+      "attempt": 13,
+      "outcome": "passed",
+      "explanation": "Passed actual constructors, native-differential pure exports, environment round trips, and real asynchronous Wasm mailbox delivery in all three engines.",
+      "result": {
+        "path": ".work/lean-instantiation-r13/result.json",
+        "sha256": "047903b84a467f176c7633e38e978154b74a1b5b0c5430b3170383797ca10ec5",
+        "content": {
+          "scope": "Instantiate the actual compiled const_fold module and compare pure runtime exports; actual startup/clock/memory metadata, other function imports reject, no application-main/API acceptance",
+          "inputs": {
+            "scripts/full-lean/probes/wasmtime-instantiate-lean.c": "5c922c5dcba030248357248fce2fece95fbc7efb3f63981c413a39bfe6cf5513",
+            "scripts/full-lean/probes/wasmtime-instantiate-lean.mjs": "c66f831e38b663b7f081b2b1436cd821729e9c198f6dc3a684e701ae17703e0b",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs": "8d2c203dc39e062354d794647272b96e057feaa60667a5c0004d9d81b9cec3d1",
+            "integration/fixtures/LeanPureExports.lean": "c305e28b9f478c8ec50a84bd469f03789ad6cfe33f691e47e2a5d83cff23fc3a"
+          },
+          "build": {
+            "schema": 1,
+            "lean": "4.34.0",
+            "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+            "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+            "emscripten": "6.0.9",
+            "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+            "runtimeIdentity": "4a41c52a68e540163699dea326b364eb0ae4726efe2976c5342378af2fac3fdb",
+            "buildDriverIdentity": "c1e6d5c818e905b19033d4de2d810cd36eb750f6c54df97e6bbae56fcead403e",
+            "target": "deno",
+            "memoryMode": 1,
+            "modules": [
+              {
+                "module": "const_fold",
+                "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+                "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+              }
+            ],
+            "signature": "540f068c463b058f625049dbf7af467c6f715efa7020654fd3e1464e5a8b84d8",
+            "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+            "sdkDriverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509"
+          },
+          "trustedCache": {
+            "file": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r4/compiled.cwasm",
+            "sha256": "ce4a5bf674a239ae6346deb5fd8a7f89cf7e916b236bb8d429e3242bc604eed4",
+            "bytes": 610719320,
+            "trust": "Produced and reloaded only within this guarded experiment; never an untrusted compiled-code input"
+          },
+          "archive": {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r4/compiled.cwasm",
+            "originalBytes": 610719320,
+            "originalSha256": "ce4a5bf674a239ae6346deb5fd8a7f89cf7e916b236bb8d429e3242bc604eed4",
+            "mode": 436,
+            "mtimeNs": 1790229570222892500,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r4/compiled.cwasm.gz",
+            "archiveBytes": 182686045,
+            "archiveSha256": "7b05baa9b6bb6ef641dfc6ce49e02d0ed3a22c40078a1d21e8c8852a59548038",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/wasmtime-real-lean-compilation-2026-09-24.json",
+              "receiptSha256": "a20585034dc6726a4056fbdcdbebe88ea507a9cf75416dc47fb2d9ad410ce402"
+            },
+            "phase": "archived"
+          },
+          "toolchainCache": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+          "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r13-resources.json",
+          "commands": [
+            {
+              "label": "verify Wasmtime SDK",
+              "program": "python3",
+              "args": [
+                "-I",
+                "-B",
+                "/home/lastmjs/development/lasm/compiler/scripts/full-lean/prepare-wasmtime-probe.py"
+              ],
+              "code": 0,
+              "signal": null,
+              "stdout": "{\"version\": \"49.0.0\", \"archiveSha256\": \"8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131\", \"files\": 115, \"selectedBytes\": 32341429}\n",
+              "stderr": ""
+            },
+            {
+              "label": "native interpreted oracle",
+              "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+              "args": [
+                "-Dlinter.all=false",
+                "--run",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/LeanPureExports.lean"
+              ],
+              "code": 0,
+              "signal": null,
+              "stdout": "gcd 0 0 0\ngcd 0 7 7\ngcd 9 0 9\ngcd 48 18 6\ngcd 17 19 1\ngcd 65536 256 256\ngcd 4294967296 2147483648 2147483648\ngcd 1152921504606846976 576460752303423488 576460752303423488\ngcd 123456789 987654321 9\nlog2 0 0\nlog2 1 0\nlog2 2 1\nlog2 3 1\nlog2 7 2\nlog2 8 3\nlog2 255 7\nlog2 256 8\nlog2 65535 15\nlog2 65536 16\nlog2 4294967295 31\nlog2 4294967296 32\nlog2 1152921504606846975 59\nlog2 1152921504606846976 60\n",
+              "stderr": ""
+            },
+            {
+              "label": "generate native oracle",
+              "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/lean",
+              "args": [
+                "-j1",
+                "-Dlinter.all=false",
+                "-Dcompiler.postponeCompile=false",
+                "-c",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/oracle.c",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/LeanPureExports.lean"
+              ],
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            },
+            {
+              "label": "compile native oracle",
+              "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1/bin/leanc",
+              "args": [
+                "-O2",
+                "-DNDEBUG",
+                "-o",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/oracle-native",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/oracle.c"
+              ],
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            },
+            {
+              "label": "native compiled oracle",
+              "program": "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/oracle-native",
+              "args": [],
+              "code": 0,
+              "signal": null,
+              "stdout": "gcd 0 0 0\ngcd 0 7 7\ngcd 9 0 9\ngcd 48 18 6\ngcd 17 19 1\ngcd 65536 256 256\ngcd 4294967296 2147483648 2147483648\ngcd 1152921504606846976 576460752303423488 576460752303423488\ngcd 123456789 987654321 9\nlog2 0 0\nlog2 1 0\nlog2 2 1\nlog2 3 1\nlog2 7 2\nlog2 8 3\nlog2 255 7\nlog2 256 8\nlog2 65535 15\nlog2 65536 16\nlog2 4294967295 31\nlog2 4294967296 32\nlog2 1152921504606846975 59\nlog2 1152921504606846976 60\n",
+              "stderr": ""
+            },
+            {
+              "label": "compile instantiation bridge",
+              "program": "cc",
+              "args": [
+                "-std=c11",
+                "-O2",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-shared",
+                "-fPIC",
+                "-I/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/include",
+                "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-instantiate-lean.c",
+                "-L/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+                "-lwasmtime",
+                "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/lib",
+                "-o",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/instance.so"
+              ],
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            },
+            {
+              "label": "pure runtime exports",
+              "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+              "args": [
+                "--max-old-space-size=128",
+                "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-instantiate-lean.mjs",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/instance.so",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/trusted.cwasm",
+                "ce4a5bf674a239ae6346deb5fd8a7f89cf7e916b236bb8d429e3242bc604eed4",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/oracle.txt"
+              ],
+              "code": 0,
+              "signal": null,
+              "stdout": "{\"scope\":\"Real compiled Lean module instantiated; pure runtime exports with actual startup, clock and memory metadata, other function imports reject, no main/API acceptance\",\"engine\":\"node\",\"version\":\"26.10.0\",\"imports\":139,\"exports\":27181,\"accessibleMemoryBytes\":134217728,\"stack\":{\"base\":\"103534288\",\"end\":\"36425424\",\"compiledBoundsCheckRetained\":true},\"implementedImports\":{\"emscripten_date_now\":{\"source\":\"Date.now()\",\"calls\":3},\"emscripten_get_heap_max\":{\"source\":\"Actual Wasmtime memory type maximum\",\"calls\":7},\"_emscripten_init_main_thread_js\":{\"source\":\"Generated loader flags, real Wasm thread/TLS initialization\",\"calls\":1,\"tlsBase\":35573992},\"_emscripten_thread_mailbox_await\":{\"source\":\"Upstream postmessage fallback; waiting_async remains zero\",\"registrations\":1,\"pthread\":35641408},\"_emscripten_notify_mailbox_postmessage\":{\"source\":\"setTimeout runs real Wasm mailbox on the JS main thread\",\"notifications\":2,\"mailboxChecks\":2,\"asynchronousTasks\":4,\"deliveredSum\":26,\"queueDestroyed\":true},\"environ_sizes_get\":{\"source\":\"Actual JS process.env snapshot encoded as UTF-8\",\"calls\":1},\"environ_get\":{\"calls\":1,\"getenvComparisons\":15,\"unicodeAndEqualsControl\":true,\"environmentValuesRecorded\":false},\"random_get\":{\"source\":\"Linux getrandom with EINTR and partial-read handling\",\"calls\":1,\"bytes\":32},\"_emscripten_get_progname\":{\"source\":\"Actual JS entry point encoded as UTF-8\",\"calls\":1}},\"unimplementedImportCallsDuringPureOperations\":0,\"rejectionControl\":\"UNIMPLEMENTED IMPORT env.lasm_host_platform\",\"results\":[{\"operation\":\"gcd\",\"inputs\":[\"0\",\"0\"],\"result\":\"0\"},{\"operation\":\"gcd\",\"inputs\":[\"0\",\"7\"],\"result\":\"7\"},{\"operation\":\"gcd\",\"inputs\":[\"9\",\"0\"],\"result\":\"9\"},{\"operation\":\"gcd\",\"inputs\":[\"48\",\"18\"],\"result\":\"6\"},{\"operation\":\"gcd\",\"inputs\":[\"17\",\"19\"],\"result\":\"1\"},{\"operation\":\"gcd\",\"inputs\":[\"65536\",\"256\"],\"result\":\"256\"},{\"operation\":\"gcd\",\"inputs\":[\"4294967296\",\"2147483648\"],\"result\":\"2147483648\"},{\"operation\":\"gcd\",\"inputs\":[\"1152921504606846976\",\"576460752303423488\"],\"result\":\"576460752303423488\"},{\"operation\":\"gcd\",\"inputs\":[\"123456789\",\"987654321\"],\"result\":\"9\"},{\"operation\":\"log2\",\"inputs\":[\"0\"],\"result\":\"0\"},{\"operation\":\"log2\",\"inputs\":[\"1\"],\"result\":\"0\"},{\"operation\":\"log2\",\"inputs\":[\"2\"],\"result\":\"1\"},{\"operation\":\"log2\",\"inputs\":[\"3\"],\"result\":\"1\"},{\"operation\":\"log2\",\"inputs\":[\"7\"],\"result\":\"2\"},{\"operation\":\"log2\",\"inputs\":[\"8\"],\"result\":\"3\"},{\"operation\":\"log2\",\"inputs\":[\"255\"],\"result\":\"7\"},{\"operation\":\"log2\",\"inputs\":[\"256\"],\"result\":\"8\"},{\"operation\":\"log2\",\"inputs\":[\"65535\"],\"result\":\"15\"},{\"operation\":\"log2\",\"inputs\":[\"65536\"],\"result\":\"16\"},{\"operation\":\"log2\",\"inputs\":[\"4294967295\"],\"result\":\"31\"},{\"operation\":\"log2\",\"inputs\":[\"4294967296\"],\"result\":\"32\"},{\"operation\":\"log2\",\"inputs\":[\"1152921504606846975\"],\"result\":\"59\"},{\"operation\":\"log2\",\"inputs\":[\"1152921504606846976\"],\"result\":\"60\"}]}\n",
+              "stderr": ""
+            },
+            {
+              "label": "pure runtime exports",
+              "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+              "args": [
+                "run",
+                "-A",
+                "--v8-flags=--max-old-space-size=128",
+                "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-instantiate-lean.mjs",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/instance.so",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/trusted.cwasm",
+                "ce4a5bf674a239ae6346deb5fd8a7f89cf7e916b236bb8d429e3242bc604eed4",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/oracle.txt"
+              ],
+              "code": 0,
+              "signal": null,
+              "stdout": "{\"scope\":\"Real compiled Lean module instantiated; pure runtime exports with actual startup, clock and memory metadata, other function imports reject, no main/API acceptance\",\"engine\":\"deno\",\"version\":\"2.9.7\",\"imports\":139,\"exports\":27181,\"accessibleMemoryBytes\":134217728,\"stack\":{\"base\":\"103534288\",\"end\":\"36425424\",\"compiledBoundsCheckRetained\":true},\"implementedImports\":{\"emscripten_date_now\":{\"source\":\"Date.now()\",\"calls\":3},\"emscripten_get_heap_max\":{\"source\":\"Actual Wasmtime memory type maximum\",\"calls\":7},\"_emscripten_init_main_thread_js\":{\"source\":\"Generated loader flags, real Wasm thread/TLS initialization\",\"calls\":1,\"tlsBase\":35573992},\"_emscripten_thread_mailbox_await\":{\"source\":\"Upstream postmessage fallback; waiting_async remains zero\",\"registrations\":1,\"pthread\":35641408},\"_emscripten_notify_mailbox_postmessage\":{\"source\":\"setTimeout runs real Wasm mailbox on the JS main thread\",\"notifications\":2,\"mailboxChecks\":2,\"asynchronousTasks\":4,\"deliveredSum\":26,\"queueDestroyed\":true},\"environ_sizes_get\":{\"source\":\"Actual JS process.env snapshot encoded as UTF-8\",\"calls\":1},\"environ_get\":{\"calls\":1,\"getenvComparisons\":15,\"unicodeAndEqualsControl\":true,\"environmentValuesRecorded\":false},\"random_get\":{\"source\":\"Linux getrandom with EINTR and partial-read handling\",\"calls\":1,\"bytes\":32},\"_emscripten_get_progname\":{\"source\":\"Actual JS entry point encoded as UTF-8\",\"calls\":1}},\"unimplementedImportCallsDuringPureOperations\":0,\"rejectionControl\":\"UNIMPLEMENTED IMPORT env.lasm_host_platform\",\"results\":[{\"operation\":\"gcd\",\"inputs\":[\"0\",\"0\"],\"result\":\"0\"},{\"operation\":\"gcd\",\"inputs\":[\"0\",\"7\"],\"result\":\"7\"},{\"operation\":\"gcd\",\"inputs\":[\"9\",\"0\"],\"result\":\"9\"},{\"operation\":\"gcd\",\"inputs\":[\"48\",\"18\"],\"result\":\"6\"},{\"operation\":\"gcd\",\"inputs\":[\"17\",\"19\"],\"result\":\"1\"},{\"operation\":\"gcd\",\"inputs\":[\"65536\",\"256\"],\"result\":\"256\"},{\"operation\":\"gcd\",\"inputs\":[\"4294967296\",\"2147483648\"],\"result\":\"2147483648\"},{\"operation\":\"gcd\",\"inputs\":[\"1152921504606846976\",\"576460752303423488\"],\"result\":\"576460752303423488\"},{\"operation\":\"gcd\",\"inputs\":[\"123456789\",\"987654321\"],\"result\":\"9\"},{\"operation\":\"log2\",\"inputs\":[\"0\"],\"result\":\"0\"},{\"operation\":\"log2\",\"inputs\":[\"1\"],\"result\":\"0\"},{\"operation\":\"log2\",\"inputs\":[\"2\"],\"result\":\"1\"},{\"operation\":\"log2\",\"inputs\":[\"3\"],\"result\":\"1\"},{\"operation\":\"log2\",\"inputs\":[\"7\"],\"result\":\"2\"},{\"operation\":\"log2\",\"inputs\":[\"8\"],\"result\":\"3\"},{\"operation\":\"log2\",\"inputs\":[\"255\"],\"result\":\"7\"},{\"operation\":\"log2\",\"inputs\":[\"256\"],\"result\":\"8\"},{\"operation\":\"log2\",\"inputs\":[\"65535\"],\"result\":\"15\"},{\"operation\":\"log2\",\"inputs\":[\"65536\"],\"result\":\"16\"},{\"operation\":\"log2\",\"inputs\":[\"4294967295\"],\"result\":\"31\"},{\"operation\":\"log2\",\"inputs\":[\"4294967296\"],\"result\":\"32\"},{\"operation\":\"log2\",\"inputs\":[\"1152921504606846975\"],\"result\":\"59\"},{\"operation\":\"log2\",\"inputs\":[\"1152921504606846976\"],\"result\":\"60\"}]}\n",
+              "stderr": ""
+            },
+            {
+              "label": "pure runtime exports",
+              "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+              "args": [
+                "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-instantiate-lean.mjs",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/instance.so",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/trusted.cwasm",
+                "ce4a5bf674a239ae6346deb5fd8a7f89cf7e916b236bb8d429e3242bc604eed4",
+                "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/oracle.txt"
+              ],
+              "code": 0,
+              "signal": null,
+              "stdout": "{\"scope\":\"Real compiled Lean module instantiated; pure runtime exports with actual startup, clock and memory metadata, other function imports reject, no main/API acceptance\",\"engine\":\"bun\",\"version\":\"1.4.2\",\"imports\":139,\"exports\":27181,\"accessibleMemoryBytes\":134217728,\"stack\":{\"base\":\"103534288\",\"end\":\"36425424\",\"compiledBoundsCheckRetained\":true},\"implementedImports\":{\"emscripten_date_now\":{\"source\":\"Date.now()\",\"calls\":3},\"emscripten_get_heap_max\":{\"source\":\"Actual Wasmtime memory type maximum\",\"calls\":7},\"_emscripten_init_main_thread_js\":{\"source\":\"Generated loader flags, real Wasm thread/TLS initialization\",\"calls\":1,\"tlsBase\":35573992},\"_emscripten_thread_mailbox_await\":{\"source\":\"Upstream postmessage fallback; waiting_async remains zero\",\"registrations\":1,\"pthread\":35641408},\"_emscripten_notify_mailbox_postmessage\":{\"source\":\"setTimeout runs real Wasm mailbox on the JS main thread\",\"notifications\":2,\"mailboxChecks\":2,\"asynchronousTasks\":4,\"deliveredSum\":26,\"queueDestroyed\":true},\"environ_sizes_get\":{\"source\":\"Actual JS process.env snapshot encoded as UTF-8\",\"calls\":1},\"environ_get\":{\"calls\":1,\"getenvComparisons\":15,\"unicodeAndEqualsControl\":true,\"environmentValuesRecorded\":false},\"random_get\":{\"source\":\"Linux getrandom with EINTR and partial-read handling\",\"calls\":1,\"bytes\":32},\"_emscripten_get_progname\":{\"source\":\"Actual JS entry point encoded as UTF-8\",\"calls\":1}},\"unimplementedImportCallsDuringPureOperations\":0,\"rejectionControl\":\"UNIMPLEMENTED IMPORT env.lasm_host_platform\",\"results\":[{\"operation\":\"gcd\",\"inputs\":[\"0\",\"0\"],\"result\":\"0\"},{\"operation\":\"gcd\",\"inputs\":[\"0\",\"7\"],\"result\":\"7\"},{\"operation\":\"gcd\",\"inputs\":[\"9\",\"0\"],\"result\":\"9\"},{\"operation\":\"gcd\",\"inputs\":[\"48\",\"18\"],\"result\":\"6\"},{\"operation\":\"gcd\",\"inputs\":[\"17\",\"19\"],\"result\":\"1\"},{\"operation\":\"gcd\",\"inputs\":[\"65536\",\"256\"],\"result\":\"256\"},{\"operation\":\"gcd\",\"inputs\":[\"4294967296\",\"2147483648\"],\"result\":\"2147483648\"},{\"operation\":\"gcd\",\"inputs\":[\"1152921504606846976\",\"576460752303423488\"],\"result\":\"576460752303423488\"},{\"operation\":\"gcd\",\"inputs\":[\"123456789\",\"987654321\"],\"result\":\"9\"},{\"operation\":\"log2\",\"inputs\":[\"0\"],\"result\":\"0\"},{\"operation\":\"log2\",\"inputs\":[\"1\"],\"result\":\"0\"},{\"operation\":\"log2\",\"inputs\":[\"2\"],\"result\":\"1\"},{\"operation\":\"log2\",\"inputs\":[\"3\"],\"result\":\"1\"},{\"operation\":\"log2\",\"inputs\":[\"7\"],\"result\":\"2\"},{\"operation\":\"log2\",\"inputs\":[\"8\"],\"result\":\"3\"},{\"operation\":\"log2\",\"inputs\":[\"255\"],\"result\":\"7\"},{\"operation\":\"log2\",\"inputs\":[\"256\"],\"result\":\"8\"},{\"operation\":\"log2\",\"inputs\":[\"65535\"],\"result\":\"15\"},{\"operation\":\"log2\",\"inputs\":[\"65536\"],\"result\":\"16\"},{\"operation\":\"log2\",\"inputs\":[\"4294967295\"],\"result\":\"31\"},{\"operation\":\"log2\",\"inputs\":[\"4294967296\"],\"result\":\"32\"},{\"operation\":\"log2\",\"inputs\":[\"1152921504606846975\"],\"result\":\"59\"},{\"operation\":\"log2\",\"inputs\":[\"1152921504606846976\"],\"result\":\"60\"}]}\n",
+              "stderr": ""
+            }
+          ],
+          "results": [
+            {
+              "scope": "Real compiled Lean module instantiated; pure runtime exports with actual startup, clock and memory metadata, other function imports reject, no main/API acceptance",
+              "engine": "node",
+              "version": "26.10.0",
+              "imports": 139,
+              "exports": 27181,
+              "accessibleMemoryBytes": 134217728,
+              "stack": {
+                "base": "103534288",
+                "end": "36425424",
+                "compiledBoundsCheckRetained": true
+              },
+              "implementedImports": {
+                "emscripten_date_now": {
+                  "source": "Date.now()",
+                  "calls": 3
+                },
+                "emscripten_get_heap_max": {
+                  "source": "Actual Wasmtime memory type maximum",
+                  "calls": 7
+                },
+                "_emscripten_init_main_thread_js": {
+                  "source": "Generated loader flags, real Wasm thread/TLS initialization",
+                  "calls": 1,
+                  "tlsBase": 35573992
+                },
+                "_emscripten_thread_mailbox_await": {
+                  "source": "Upstream postmessage fallback; waiting_async remains zero",
+                  "registrations": 1,
+                  "pthread": 35641408
+                },
+                "_emscripten_notify_mailbox_postmessage": {
+                  "source": "setTimeout runs real Wasm mailbox on the JS main thread",
+                  "notifications": 2,
+                  "mailboxChecks": 2,
+                  "asynchronousTasks": 4,
+                  "deliveredSum": 26,
+                  "queueDestroyed": true
+                },
+                "environ_sizes_get": {
+                  "source": "Actual JS process.env snapshot encoded as UTF-8",
+                  "calls": 1
+                },
+                "environ_get": {
+                  "calls": 1,
+                  "getenvComparisons": 15,
+                  "unicodeAndEqualsControl": true,
+                  "environmentValuesRecorded": false
+                },
+                "random_get": {
+                  "source": "Linux getrandom with EINTR and partial-read handling",
+                  "calls": 1,
+                  "bytes": 32
+                },
+                "_emscripten_get_progname": {
+                  "source": "Actual JS entry point encoded as UTF-8",
+                  "calls": 1
+                }
+              },
+              "unimplementedImportCallsDuringPureOperations": 0,
+              "rejectionControl": "UNIMPLEMENTED IMPORT env.lasm_host_platform",
+              "results": [
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "0",
+                    "0"
+                  ],
+                  "result": "0"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "0",
+                    "7"
+                  ],
+                  "result": "7"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "9",
+                    "0"
+                  ],
+                  "result": "9"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "48",
+                    "18"
+                  ],
+                  "result": "6"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "17",
+                    "19"
+                  ],
+                  "result": "1"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "65536",
+                    "256"
+                  ],
+                  "result": "256"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "4294967296",
+                    "2147483648"
+                  ],
+                  "result": "2147483648"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "1152921504606846976",
+                    "576460752303423488"
+                  ],
+                  "result": "576460752303423488"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "123456789",
+                    "987654321"
+                  ],
+                  "result": "9"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "0"
+                  ],
+                  "result": "0"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "1"
+                  ],
+                  "result": "0"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "2"
+                  ],
+                  "result": "1"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "3"
+                  ],
+                  "result": "1"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "7"
+                  ],
+                  "result": "2"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "8"
+                  ],
+                  "result": "3"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "255"
+                  ],
+                  "result": "7"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "256"
+                  ],
+                  "result": "8"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "65535"
+                  ],
+                  "result": "15"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "65536"
+                  ],
+                  "result": "16"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "4294967295"
+                  ],
+                  "result": "31"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "4294967296"
+                  ],
+                  "result": "32"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "1152921504606846975"
+                  ],
+                  "result": "59"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "1152921504606846976"
+                  ],
+                  "result": "60"
+                }
+              ]
+            },
+            {
+              "scope": "Real compiled Lean module instantiated; pure runtime exports with actual startup, clock and memory metadata, other function imports reject, no main/API acceptance",
+              "engine": "deno",
+              "version": "2.9.7",
+              "imports": 139,
+              "exports": 27181,
+              "accessibleMemoryBytes": 134217728,
+              "stack": {
+                "base": "103534288",
+                "end": "36425424",
+                "compiledBoundsCheckRetained": true
+              },
+              "implementedImports": {
+                "emscripten_date_now": {
+                  "source": "Date.now()",
+                  "calls": 3
+                },
+                "emscripten_get_heap_max": {
+                  "source": "Actual Wasmtime memory type maximum",
+                  "calls": 7
+                },
+                "_emscripten_init_main_thread_js": {
+                  "source": "Generated loader flags, real Wasm thread/TLS initialization",
+                  "calls": 1,
+                  "tlsBase": 35573992
+                },
+                "_emscripten_thread_mailbox_await": {
+                  "source": "Upstream postmessage fallback; waiting_async remains zero",
+                  "registrations": 1,
+                  "pthread": 35641408
+                },
+                "_emscripten_notify_mailbox_postmessage": {
+                  "source": "setTimeout runs real Wasm mailbox on the JS main thread",
+                  "notifications": 2,
+                  "mailboxChecks": 2,
+                  "asynchronousTasks": 4,
+                  "deliveredSum": 26,
+                  "queueDestroyed": true
+                },
+                "environ_sizes_get": {
+                  "source": "Actual JS process.env snapshot encoded as UTF-8",
+                  "calls": 1
+                },
+                "environ_get": {
+                  "calls": 1,
+                  "getenvComparisons": 15,
+                  "unicodeAndEqualsControl": true,
+                  "environmentValuesRecorded": false
+                },
+                "random_get": {
+                  "source": "Linux getrandom with EINTR and partial-read handling",
+                  "calls": 1,
+                  "bytes": 32
+                },
+                "_emscripten_get_progname": {
+                  "source": "Actual JS entry point encoded as UTF-8",
+                  "calls": 1
+                }
+              },
+              "unimplementedImportCallsDuringPureOperations": 0,
+              "rejectionControl": "UNIMPLEMENTED IMPORT env.lasm_host_platform",
+              "results": [
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "0",
+                    "0"
+                  ],
+                  "result": "0"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "0",
+                    "7"
+                  ],
+                  "result": "7"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "9",
+                    "0"
+                  ],
+                  "result": "9"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "48",
+                    "18"
+                  ],
+                  "result": "6"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "17",
+                    "19"
+                  ],
+                  "result": "1"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "65536",
+                    "256"
+                  ],
+                  "result": "256"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "4294967296",
+                    "2147483648"
+                  ],
+                  "result": "2147483648"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "1152921504606846976",
+                    "576460752303423488"
+                  ],
+                  "result": "576460752303423488"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "123456789",
+                    "987654321"
+                  ],
+                  "result": "9"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "0"
+                  ],
+                  "result": "0"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "1"
+                  ],
+                  "result": "0"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "2"
+                  ],
+                  "result": "1"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "3"
+                  ],
+                  "result": "1"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "7"
+                  ],
+                  "result": "2"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "8"
+                  ],
+                  "result": "3"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "255"
+                  ],
+                  "result": "7"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "256"
+                  ],
+                  "result": "8"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "65535"
+                  ],
+                  "result": "15"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "65536"
+                  ],
+                  "result": "16"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "4294967295"
+                  ],
+                  "result": "31"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "4294967296"
+                  ],
+                  "result": "32"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "1152921504606846975"
+                  ],
+                  "result": "59"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "1152921504606846976"
+                  ],
+                  "result": "60"
+                }
+              ]
+            },
+            {
+              "scope": "Real compiled Lean module instantiated; pure runtime exports with actual startup, clock and memory metadata, other function imports reject, no main/API acceptance",
+              "engine": "bun",
+              "version": "1.4.2",
+              "imports": 139,
+              "exports": 27181,
+              "accessibleMemoryBytes": 134217728,
+              "stack": {
+                "base": "103534288",
+                "end": "36425424",
+                "compiledBoundsCheckRetained": true
+              },
+              "implementedImports": {
+                "emscripten_date_now": {
+                  "source": "Date.now()",
+                  "calls": 3
+                },
+                "emscripten_get_heap_max": {
+                  "source": "Actual Wasmtime memory type maximum",
+                  "calls": 7
+                },
+                "_emscripten_init_main_thread_js": {
+                  "source": "Generated loader flags, real Wasm thread/TLS initialization",
+                  "calls": 1,
+                  "tlsBase": 35573992
+                },
+                "_emscripten_thread_mailbox_await": {
+                  "source": "Upstream postmessage fallback; waiting_async remains zero",
+                  "registrations": 1,
+                  "pthread": 35641408
+                },
+                "_emscripten_notify_mailbox_postmessage": {
+                  "source": "setTimeout runs real Wasm mailbox on the JS main thread",
+                  "notifications": 2,
+                  "mailboxChecks": 2,
+                  "asynchronousTasks": 4,
+                  "deliveredSum": 26,
+                  "queueDestroyed": true
+                },
+                "environ_sizes_get": {
+                  "source": "Actual JS process.env snapshot encoded as UTF-8",
+                  "calls": 1
+                },
+                "environ_get": {
+                  "calls": 1,
+                  "getenvComparisons": 15,
+                  "unicodeAndEqualsControl": true,
+                  "environmentValuesRecorded": false
+                },
+                "random_get": {
+                  "source": "Linux getrandom with EINTR and partial-read handling",
+                  "calls": 1,
+                  "bytes": 32
+                },
+                "_emscripten_get_progname": {
+                  "source": "Actual JS entry point encoded as UTF-8",
+                  "calls": 1
+                }
+              },
+              "unimplementedImportCallsDuringPureOperations": 0,
+              "rejectionControl": "UNIMPLEMENTED IMPORT env.lasm_host_platform",
+              "results": [
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "0",
+                    "0"
+                  ],
+                  "result": "0"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "0",
+                    "7"
+                  ],
+                  "result": "7"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "9",
+                    "0"
+                  ],
+                  "result": "9"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "48",
+                    "18"
+                  ],
+                  "result": "6"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "17",
+                    "19"
+                  ],
+                  "result": "1"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "65536",
+                    "256"
+                  ],
+                  "result": "256"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "4294967296",
+                    "2147483648"
+                  ],
+                  "result": "2147483648"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "1152921504606846976",
+                    "576460752303423488"
+                  ],
+                  "result": "576460752303423488"
+                },
+                {
+                  "operation": "gcd",
+                  "inputs": [
+                    "123456789",
+                    "987654321"
+                  ],
+                  "result": "9"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "0"
+                  ],
+                  "result": "0"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "1"
+                  ],
+                  "result": "0"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "2"
+                  ],
+                  "result": "1"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "3"
+                  ],
+                  "result": "1"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "7"
+                  ],
+                  "result": "2"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "8"
+                  ],
+                  "result": "3"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "255"
+                  ],
+                  "result": "7"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "256"
+                  ],
+                  "result": "8"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "65535"
+                  ],
+                  "result": "15"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "65536"
+                  ],
+                  "result": "16"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "4294967295"
+                  ],
+                  "result": "31"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "4294967296"
+                  ],
+                  "result": "32"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "1152921504606846975"
+                  ],
+                  "result": "59"
+                },
+                {
+                  "operation": "log2",
+                  "inputs": [
+                    "1152921504606846976"
+                  ],
+                  "result": "60"
+                }
+              ]
+            }
+          ],
+          "failures": [],
+          "passed": true,
+          "reusedCache": "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r1/trusted.cwasm",
+          "restoredCache": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/lean-instantiation-r13/trusted.cwasm",
+            "sha256": "ce4a5bf674a239ae6346deb5fd8a7f89cf7e916b236bb8d429e3242bc604eed4",
+            "bytes": 610719320
+          },
+          "nativeLean": {
+            "version": "4.34.0",
+            "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+            "identity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1"
+          },
+          "oracle": {
+            "cases": 23,
+            "stdout": "gcd 0 0 0\ngcd 0 7 7\ngcd 9 0 9\ngcd 48 18 6\ngcd 17 19 1\ngcd 65536 256 256\ngcd 4294967296 2147483648 2147483648\ngcd 1152921504606846976 576460752303423488 576460752303423488\ngcd 123456789 987654321 9\nlog2 0 0\nlog2 1 0\nlog2 2 1\nlog2 3 1\nlog2 7 2\nlog2 8 3\nlog2 255 7\nlog2 256 8\nlog2 65535 15\nlog2 65536 16\nlog2 4294967295 31\nlog2 4294967296 32\nlog2 1152921504606846975 59\nlog2 1152921504606846976 60\n",
+            "nativeCompiledMatches": true
+          },
+          "helperInput": {
+            "version": "49.0.0",
+            "archiveSha256": "8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131",
+            "archiveBytes": 16115964,
+            "url": "https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.0/wasmtime-v49.0.0-x86_64-linux-c-api.tar.xz",
+            "selectedFiles": {
+              "lib/libwasmtime.so": {
+                "bytes": 31590960,
+                "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+              },
+              "include/wasmtime.h": {
+                "bytes": 10101,
+                "sha256": "a7497ea0048c0cb8a598c35ca05d1611a31725a88809ed9d51a8b1aebfc6b0c7"
+              },
+              "include/wasm.hh": {
+                "bytes": 19096,
+                "sha256": "ff657786aa259af466fd3ea8cb23646e8ada2b5741362c632d9cdad4be6e9c67"
+              },
+              "include/wasm.h": {
+                "bytes": 23796,
+                "sha256": "c8c2ab4be578bf618512e0720f939d1c8b9b0121f007091dd3746e60290977d9"
+              },
+              "include/wasmtime/error.hh": {
+                "bytes": 3674,
+                "sha256": "689e0143742323bc707243b7cfc404ce966964dc32f76d884580224ea52472f5"
+              },
+              "include/wasmtime/linker.hh": {
+                "bytes": 7459,
+                "sha256": "82f5c95ae9b370ddd8d70190cedce68055cb95c190d02b8e925de7b34640e8bc"
+              },
+              "include/wasmtime/tag.hh": {
+                "bytes": 1724,
+                "sha256": "5c7b05e7d25028c4b9b8a2d3a948acad8c6ff273bf97cecc81df02296f44eb58"
+              },
+              "include/wasmtime/eqref.hh": {
+                "bytes": 927,
+                "sha256": "f2c7adc27741bf18545c0bf72a49c8e22538ba3b97380ac621c01455c2c36851"
+              },
+              "include/wasmtime/wat.hh": {
+                "bytes": 1265,
+                "sha256": "0b190e5defe09c91c448c0a6853afc237148a29c34c7972333166388e4a00abe"
+              },
+              "include/wasmtime/trap.hh": {
+                "bytes": 5505,
+                "sha256": "0ff60c6d5b707966e9388e7dc9e313f0363b7003d615ca5f4cbc03247b77ca9f"
+              },
+              "include/wasmtime/arrayref.hh": {
+                "bytes": 1691,
+                "sha256": "a0059e769dd5bfcc75e743fd6b66d1069e98534ef6f937989cf33657871751bd"
+              },
+              "include/wasmtime/sharedmemory.h": {
+                "bytes": 3027,
+                "sha256": "521d632a5f5ee3e28125b22fdf4f517edb2965a49ebd838278d620368377a1fe"
+              },
+              "include/wasmtime/profiling.h": {
+                "bytes": 4400,
+                "sha256": "92ac5516a561bd062aaf302051373512970a0ea9641836a47993d32b1ab8b205"
+              },
+              "include/wasmtime/_structref_class.hh": {
+                "bytes": 1938,
+                "sha256": "8d0473ee26eb96035000146ba17079feec1a70e2968e64faa472d6610dac6fdf"
+              },
+              "include/wasmtime/conf.h": {
+                "bytes": 1272,
+                "sha256": "025c75489f406c4f3097c57944c01e5fa13840c23c28fe124c748e942f5cdaaa"
+              },
+              "include/wasmtime/instance.hh": {
+                "bytes": 4085,
+                "sha256": "3c84c9ae9be96947637fba645769d0de51fea1d21c2a7915fbe36ed205091f83"
+              },
+              "include/wasmtime/helpers.hh": {
+                "bytes": 11810,
+                "sha256": "da70524f69df90a18c80387ea084c57a8219a5286f8005c770002aa34f768f6d"
+              },
+              "include/wasmtime/externref.h": {
+                "bytes": 4643,
+                "sha256": "37f55067f7227ba6dabc3d933812e0f757e711b6b927a89b47460956bf17d8a5"
+              },
+              "include/wasmtime/error.h": {
+                "bytes": 2420,
+                "sha256": "6905acdfe81f5a7d31c49ac1af8221b3d98b61d5341b91a4a8232f2466dce8f0"
+              },
+              "include/wasmtime/table.h": {
+                "bytes": 3924,
+                "sha256": "1d4313d41a85989ae00c8c744c2e2415ac0694ea3bc3fb15d51cddf5fd74d1ba"
+              },
+              "include/wasmtime/_store_class.hh": {
+                "bytes": 10374,
+                "sha256": "c5563b6d8d70c60ba81356cb9f46a68553ec0017b93943c78486f8aa11761b5e"
+              },
+              "include/wasmtime/extern.h": {
+                "bytes": 6263,
+                "sha256": "7486bc71ec8172152cc6d3d0e827946b4d0778f0b1495a1e377130c031d02031"
+              },
+              "include/wasmtime/async.h": {
+                "bytes": 13952,
+                "sha256": "eea9b04b8c59244fc555a713eeefc88d442baade7506f5355b909fac4c5d3a41"
+              },
+              "include/wasmtime/linker.h": {
+                "bytes": 12848,
+                "sha256": "3ccb42d67c0724b7ce20302c45313f0a056b47a3d0754ce83e0c408f8994576d"
+              },
+              "include/wasmtime/config.h": {
+                "bytes": 32567,
+                "sha256": "3840f8ab5abf1a77d93b728cbe99e04d49ad2e91ed88d2b27387a07753ac540c"
+              },
+              "include/wasmtime/_anyref_class.hh": {
+                "bytes": 2442,
+                "sha256": "8d7ee57b683c3fa4b9278ef56b9727fd33c584a402eea642642ed222954610d5"
+              },
+              "include/wasmtime/component.hh": {
+                "bytes": 401,
+                "sha256": "e77c24d71108d85cdb96fd5716fcc74ff22d2feafdb87dfac2602559eb833fd9"
+              },
+              "include/wasmtime/component.h": {
+                "bytes": 324,
+                "sha256": "7230a0a2ef79976c079225a193006289d5538b2d6cb7e6180649c4526b9dd898"
+              },
+              "include/wasmtime/_exnref_class.hh": {
+                "bytes": 1894,
+                "sha256": "94510c65aa8510b68f1449256d88e2e7ce71ed4944fe336ab5b82bee4ffbf167"
+              },
+              "include/wasmtime/engine.hh": {
+                "bytes": 1399,
+                "sha256": "51c8731580795fbbb214e9fa8a33f73f65d7b465b774b9667096a440f487c7b4"
+              },
+              "include/wasmtime/anyref.h": {
+                "bytes": 7419,
+                "sha256": "90cca7935d268d9ae17032a143bc7fa5d5287edf8254a8c49ac69ca0277c900e"
+              },
+              "include/wasmtime/memory.hh": {
+                "bytes": 4012,
+                "sha256": "15d70af6435ff1cdd61c09689e9507dcac32212f24f87a2e41a65158c1fb4d97"
+              },
+              "include/wasmtime/structref.h": {
+                "bytes": 4451,
+                "sha256": "6db53ade4d6ff78404c55d4e096acef881f435a6d5f76cca7dddb5859f8b1a12"
+              },
+              "include/wasmtime/exnref.hh": {
+                "bytes": 982,
+                "sha256": "48afdcb5b04cf01c9299df1ba9c994790db7a353b04658daaf0ba0e844429021"
+              },
+              "include/wasmtime/val.hh": {
+                "bytes": 3136,
+                "sha256": "23d0a1a258bcff223146e4007e68eabd40be41a04010e66df0596e6a51c047e1"
+              },
+              "include/wasmtime/_arrayref_class.hh": {
+                "bytes": 2189,
+                "sha256": "0069d2ccba2e007e868d7822d47aa6c541aa455b9073d592a9b0d785154fd2df"
+              },
+              "include/wasmtime/component/linker.hh": {
+                "bytes": 9391,
+                "sha256": "30f210fab1447396165845b29987b9d060cabfc91a65780e6915a72e38611337"
+              },
+              "include/wasmtime/component/instance.hh": {
+                "bytes": 2354,
+                "sha256": "a38a2fe8dfdc1cdc9cb89572f5c6924f8919a6ccc479afe52be2da6f66ff9ab1"
+              },
+              "include/wasmtime/component/linker.h": {
+                "bytes": 11133,
+                "sha256": "caa8228d65eec38ae44f7605d20a930daff8cbcafb038465d1fc8e99459f22d9"
+              },
+              "include/wasmtime/component/component.hh": {
+                "bytes": 5797,
+                "sha256": "044c6b8c9fc6d5eafe90f256cbe465077c66c3469e4916f7163d7427864d796a"
+              },
+              "include/wasmtime/component/component.h": {
+                "bytes": 5710,
+                "sha256": "c70c86787fe9a684ef5cd09858d7084944690f4c8779df40422be4bd02bcf30f"
+              },
+              "include/wasmtime/component/val.hh": {
+                "bytes": 31889,
+                "sha256": "a501863591fa10dc41d7779542bde7733d19ed117b10669ae5c0202d5893f1b4"
+              },
+              "include/wasmtime/component/types.h": {
+                "bytes": 419,
+                "sha256": "178795777a58f5ec7138a5932498904ed37fd37a1935b58f739fbd9e48a16614"
+              },
+              "include/wasmtime/component/types/instance.hh": {
+                "bytes": 2660,
+                "sha256": "df1aacf584b0b06c089ba78fc926fca79d91911e51e8a75f9902e5b83d22426b"
+              },
+              "include/wasmtime/component/types/resource.h": {
+                "bytes": 2363,
+                "sha256": "29e8ea2ef512969f9bf82700d932d89cd78437c31c2a9c4b9919f2b0581fcdd9"
+              },
+              "include/wasmtime/component/types/component.hh": {
+                "bytes": 11690,
+                "sha256": "52cf1e12e93838772da08f7bd09eba90ad3c5290fae10bb41a9ae82ac66ef856"
+              },
+              "include/wasmtime/component/types/component.h": {
+                "bytes": 9070,
+                "sha256": "9ff90206171ebdc06182c628382790f72d8e11d0d6e2acdc9074c4ec63d5be64"
+              },
+              "include/wasmtime/component/types/val.hh": {
+                "bytes": 20028,
+                "sha256": "f4869c2174bb6c63e4a4ee9ef9713c87dc27920a5fb38266b69aa6682c75b211"
+              },
+              "include/wasmtime/component/types/instance.h": {
+                "bytes": 2080,
+                "sha256": "525d7f53408a04f33f26389bd7a29e52a88fd9a0484a8697d66a2d6282fbb272"
+              },
+              "include/wasmtime/component/types/func.hh": {
+                "bytes": 1758,
+                "sha256": "001f88580a09bbdb866ba583086576f6b4a6f4a738006a7cfb5aa4feef2ad2e7"
+              },
+              "include/wasmtime/component/types/module.h": {
+                "bytes": 1918,
+                "sha256": "04afb394852aa2d22e2dcf0ece8ee4e4a6ae436c7f979ca361d939baf3023592"
+              },
+              "include/wasmtime/component/types/module.hh": {
+                "bytes": 1716,
+                "sha256": "a7d16678120376e97222c691dff5a92a7acee22a04c9d26a90ac74efb2f65f85"
+              },
+              "include/wasmtime/component/types/func.h": {
+                "bytes": 2021,
+                "sha256": "89d65916a8e599cf2abe3fe5734648b2a84ac0701be196d07533a2cef1e1a280"
+              },
+              "include/wasmtime/component/types/val.h": {
+                "bytes": 22894,
+                "sha256": "08d3b8fc7b78a4ccb9cc809d3200911a745d7593d9323a2db7d994f742b9c726"
+              },
+              "include/wasmtime/component/instance.h": {
+                "bytes": 2428,
+                "sha256": "5f2928c0fa8a5b016560d2582b489ddeca28a1200227a7cd351ab4b16d2c8c3f"
+              },
+              "include/wasmtime/component/func.hh": {
+                "bytes": 1991,
+                "sha256": "72aa729643bbf44562121875de26769b4fbbf9a37978dec1935ce81e763b64e1"
+              },
+              "include/wasmtime/component/types.hh": {
+                "bytes": 381,
+                "sha256": "a7b184e68345d1785e9daddd43b9891337d855825034399f0b248116fb18d7a9"
+              },
+              "include/wasmtime/component/func.h": {
+                "bytes": 3866,
+                "sha256": "7a277a0277cc5910f2650b84861d78c36ffc9d2729cfb06833aff9794f663663"
+              },
+              "include/wasmtime/component/val.h": {
+                "bytes": 20576,
+                "sha256": "db3a426f729b16706a3e7b48560a5288b7323efd3faea5b49ea49e31ad44ccd9"
+              },
+              "include/wasmtime/trap.h": {
+                "bytes": 8935,
+                "sha256": "66865a8eaa35eb7d95cdf7c359a8b16a049d16a61e77c619b955d29d61dd3662"
+              },
+              "include/wasmtime/engine.h": {
+                "bytes": 1241,
+                "sha256": "c1a02904ef0d4c660d2baa70477994bbc4cfe291aeebe7143bc1c8b316f77788"
+              },
+              "include/wasmtime/_func_class.hh": {
+                "bytes": 13795,
+                "sha256": "5c80bf9d72abd749cc9d63e386628c8bad2580d690d2c4c7dc12f6a13a0a2d44"
+              },
+              "include/wasmtime/extern_declare.hh": {
+                "bytes": 517,
+                "sha256": "c54d82840a4554f5ea0fc6fe94520fd2b24fb017c73405028e10b8916c61fd62"
+              },
+              "include/wasmtime/types.h": {
+                "bytes": 221,
+                "sha256": "47facddf2717b2ff9b13bc9bdae50cf0cd421c3299622248820f3c4f154fb464"
+              },
+              "include/wasmtime/config.hh": {
+                "bytes": 28665,
+                "sha256": "452ea4a26062cb65cfefcdcee70bbc1fba06cef4fbe0411265d74bba9989df43"
+              },
+              "include/wasmtime/types/tag.hh": {
+                "bytes": 2610,
+                "sha256": "0afd806de505b73b1d562f64dbd995c79d53c8d601c1f6dbd71799a056aa8d20"
+              },
+              "include/wasmtime/types/arrayref.hh": {
+                "bytes": 950,
+                "sha256": "372e35a259ff7a5f5e7465bb8165e6eee044c454ef3dec1d53ec9242f27a8b39"
+              },
+              "include/wasmtime/types/_structref_class.hh": {
+                "bytes": 5428,
+                "sha256": "f158b4b3e8c1b74256a95c1f56e40abf7f9cceeeaa29cec558e246f01bf116f3"
+              },
+              "include/wasmtime/types/memory.hh": {
+                "bytes": 6764,
+                "sha256": "bb22cd0b8b05fa0d088abe445de6a6280640ea6320914389364756af56eb819b"
+              },
+              "include/wasmtime/types/structref.h": {
+                "bytes": 3784,
+                "sha256": "16c0dd4a06bce1efbddefb720dd09dc9ebf166ebaf5a654130f5b7be6ab71b19"
+              },
+              "include/wasmtime/types/exnref.hh": {
+                "bytes": 1625,
+                "sha256": "ad6b76ceaef18ff81e6d5986174c22177927c2bc1db1e8c33889b3c564a31803"
+              },
+              "include/wasmtime/types/val.hh": {
+                "bytes": 13554,
+                "sha256": "29d3ec7490f785394db21f5476069151199aea96c94d7ff3c347379fe3cfd074"
+              },
+              "include/wasmtime/types/export.hh": {
+                "bytes": 2467,
+                "sha256": "cd0621e8659a45a4f3ca3ae5094ab80a86badfc0786aa27c968616a5a2bc4bf0"
+              },
+              "include/wasmtime/types/import.hh": {
+                "bytes": 2727,
+                "sha256": "b94bc37d543ff7d32098128b2acdca89c0cb76e9b1665733e6f004759770e702"
+              },
+              "include/wasmtime/types/table.hh": {
+                "bytes": 3303,
+                "sha256": "00559bb04924a26ddbf0120c73671a0366b2e359312b354742792bfaea33d4a8"
+              },
+              "include/wasmtime/types/structref.hh": {
+                "bytes": 452,
+                "sha256": "2dba4391088a03810e6d248b8b7e50a471003ff729377793c293a22aa524538b"
+              },
+              "include/wasmtime/types/func.hh": {
+                "bytes": 3363,
+                "sha256": "d8c640f7d586d9ad6186b4fae31587c66a075f08fbc89eafd47680567f65f48d"
+              },
+              "include/wasmtime/types/_val_class.hh": {
+                "bytes": 6454,
+                "sha256": "4fcbcd5ac4d435159c90100e781bc77ed6172d95bc55f0f3f57a3fc15d4b9bc4"
+              },
+              "include/wasmtime/types/arrayref.h": {
+                "bytes": 1504,
+                "sha256": "8b978b9ca57092c9b14c846efcb0f80515a1792e87af2e74169d3f2a7a7c8fe3"
+              },
+              "include/wasmtime/types/val.h": {
+                "bytes": 6133,
+                "sha256": "fbc78a085d0ac76a85f63f66986a2b77d0813146a7b715cf269c56115f84b3d3"
+              },
+              "include/wasmtime/types/extern.hh": {
+                "bytes": 2067,
+                "sha256": "fb3ec6f92fedf173c5f1cdf6fc7ea2cd7c9fe1697f02dc69cdf889b7470178a2"
+              },
+              "include/wasmtime/types/global.hh": {
+                "bytes": 2586,
+                "sha256": "d6189adc25faad4d4237c231808629628ed091c13b8a24846eab3e354e18a206"
+              },
+              "include/wasmtime/types/exnref.h": {
+                "bytes": 1214,
+                "sha256": "ff720e11ebec7936f9a439c66fd0de336176d4cecee01198dca936e2ca13383d"
+              },
+              "include/wasmtime/table.hh": {
+                "bytes": 3583,
+                "sha256": "718cf580417e3885dd6450c5734bb71ca3b736e52f5c6134ed04d242ef12427d"
+              },
+              "include/wasmtime/structref.hh": {
+                "bytes": 1715,
+                "sha256": "f56fe6b322ca4b66f36212f3ba7c413f6ef171b1344b5e34ae6807bc89c157c4"
+              },
+              "include/wasmtime/_eqref_class.hh": {
+                "bytes": 2730,
+                "sha256": "de249e5f5b53eec9544d4222e01e17cb45fec28eb60aa6db0b1cc348aa2a5703"
+              },
+              "include/wasmtime/store.hh": {
+                "bytes": 930,
+                "sha256": "f68ddbba240cab6631510d92cfa9d91eb3464b23a35668edf48dbe531c1d12fb"
+              },
+              "include/wasmtime/tag.h": {
+                "bytes": 2268,
+                "sha256": "0e6261f2f061b2c900b129b12de12e72e2bc37c32380ee95ef6f15e14baa395f"
+              },
+              "include/wasmtime/instance.h": {
+                "bytes": 6362,
+                "sha256": "4abeaef7a3942aa986d29e58b1ad169307d4ffd10e11a796e0f903933bec67b7"
+              },
+              "include/wasmtime/func.hh": {
+                "bytes": 9697,
+                "sha256": "68328055a4b42cbcdc7135a171209e39a41d1b7738b99d8201b4a4dbfa44580d"
+              },
+              "include/wasmtime/module.h": {
+                "bytes": 5768,
+                "sha256": "8c0b889e5235a1017a4844d03628a7dd67090a5088ae289f87f699f6bd6be88e"
+              },
+              "include/wasmtime/externref.hh": {
+                "bytes": 1325,
+                "sha256": "03a2f196f91f680347fd12eddda6aeed5063aa2bf69561fe5570b7446d5b69eb"
+              },
+              "include/wasmtime/module.hh": {
+                "bytes": 5580,
+                "sha256": "106774b8810482e4b70223eeb3768db626fe3580b9e41fcca969ead3d500a25f"
+              },
+              "include/wasmtime/types.hh": {
+                "bytes": 433,
+                "sha256": "568988261b07753fbae59c2649d168119ebb087ffcac79e7e2d393c4cdcf61c5"
+              },
+              "include/wasmtime/eqref.h": {
+                "bytes": 5263,
+                "sha256": "de21b013eac94b2d43eba4bbac34d565c649e2573814868dbbe50e64622ca7be"
+              },
+              "include/wasmtime/func.h": {
+                "bytes": 12787,
+                "sha256": "9a4fee4a295a2b19a141cf84be4ceb9355bfc25394ae761d7f780ac49f2d65ad"
+              },
+              "include/wasmtime/memory.h": {
+                "bytes": 5999,
+                "sha256": "95c0c3b189ea7b0e8c5b523a18de0a19a1bef7db8c5702275a3a2d9e6cea9642"
+              },
+              "include/wasmtime/_val_class.hh": {
+                "bytes": 6987,
+                "sha256": "9dcae719115fc13181fbfca22ddbb19910fc2ebf56f0b2a174971012e307b036"
+              },
+              "include/wasmtime/arrayref.h": {
+                "bytes": 4703,
+                "sha256": "a93ec80b4849edbd6c7bb2c8268b9f41ed4d97b5e0ad537e7521b4551d005521"
+              },
+              "include/wasmtime/val.h": {
+                "bytes": 14826,
+                "sha256": "33ea4fc9b9288f536dc12b15130b25b88b59144c85d1e34c30a8ff8514170148"
+              },
+              "include/wasmtime/_externref_class.hh": {
+                "bytes": 1949,
+                "sha256": "0f39147fd6bff3d781235ca4d2731e67597edb77e924c223208abfb04e54bdfc"
+              },
+              "include/wasmtime/extern.hh": {
+                "bytes": 1901,
+                "sha256": "2608bb08136598b81c0847515aa3dbe665e8ef77802a04c0683a628bf4d39fd9"
+              },
+              "include/wasmtime/wat.h": {
+                "bytes": 1153,
+                "sha256": "7533f9c25ee267c88ea64e21a7550bf28585183184a29c575ceb419eb711fe9f"
+              },
+              "include/wasmtime/span.hh": {
+                "bytes": 2716,
+                "sha256": "da563fddd6e110c419c8ba579de15496a03d1e1e44fde29a7d1744348996ca51"
+              },
+              "include/wasmtime/wasi.hh": {
+                "bytes": 3701,
+                "sha256": "f9318dccdccafe821b1e8ae4173a2444ac88cd87412252eeea06aa1658fd0149"
+              },
+              "include/wasmtime/store.h": {
+                "bytes": 10060,
+                "sha256": "ff307ac99c7e9fa58bd40b518b9e737663c5741abd4e756bbe8452f340f30386"
+              },
+              "include/wasmtime/global.h": {
+                "bytes": 2521,
+                "sha256": "5e51effa5185ec774e47bb53323fbf5f0d0b621158f0a578b5528711d2f18129"
+              },
+              "include/wasmtime/global.hh": {
+                "bytes": 2469,
+                "sha256": "a74e041c6e9c4a48af597896a77b7748a289656f7fad4fe7c2eb226f12fa4666"
+              },
+              "include/wasmtime/exnref.h": {
+                "bytes": 6109,
+                "sha256": "0f03df665b9a8b7ca9405ad638d4068c0ce7d5024165132acea94430bbc626d0"
+              },
+              "include/wasmtime/anyref.hh": {
+                "bytes": 1393,
+                "sha256": "7f7c57d3dc5381ab01d280633827b784e1cb545199bef98943bf056b9379f11b"
+              },
+              "include/wasi.h": {
+                "bytes": 8513,
+                "sha256": "37d15447efe4c47b445996c4bd9d879dfe02402bd96e36a9de5ca195670ce5ea"
+              },
+              "include/wasmtime.hh": {
+                "bytes": 1876,
+                "sha256": "402b06783af1f689b1646d3d2b69c5e4ab8a7ae71f3f87dab09e62a7a51f0db1"
+              },
+              "include/doc-wasm.h": {
+                "bytes": 83333,
+                "sha256": "33c6bca76dbc9ebcfd785798d8d7837ad4f34ca0df9beb1108408edf63a8d195"
+              },
+              "README.md": {
+                "bytes": 7674,
+                "sha256": "61b003ff4ddfbe6123ae3a1123e39e379f1559edc44634e6c14ba3f2671f9fd8"
+              },
+              "LICENSE": {
+                "bytes": 12243,
+                "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+              }
+            }
+          },
+          "helperSha256": "5c53ceb728be8c189ecadabca8cbf21e9bde81499ce8c9094910227083a36d39",
+          "cacheUnchanged": true,
+          "inputsUnchanged": true,
+          "finishedAt": "2026-09-24T17:18:32.125Z"
+        }
+      },
+      "resource": {
+        "path": ".work/product-acceptance/lean-instantiation-r13-resources.json",
+        "sha256": "de3470bdb98920c90e832225bd7ec7fdb81259c290701d5b996cfd261f581b4a",
+        "content": {
+          "startedAt": "2026-09-24T17:18:01.949Z",
+          "command": [
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            ".cache/js-runtimes/node-26.10.0/bin/node",
+            "--max-old-space-size=128",
+            "scripts/full-lean/probe-wasmtime-lean-instantiation.mjs",
+            ".work/lean-instantiation-r13",
+            ".work/application-installed-r3/workspace/toolchains",
+            ".work/lean-instantiation-r1/trusted.cwasm"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler",
+          "unit": "lasm-heavy-a79a4e3ab9f2.service",
+          "id": "62243afb-1169-40bc-b738-64aaf6daa690",
+          "limits": {
+            "memoryMax": 3221225472,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 2576980377,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 33456926720,
+            "available": 23899140096
+          },
+          "minimumHostAvailable": 23395536896,
+          "peakMemoryBytes": 236695552,
+          "peakTasks": 26,
+          "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-instantiation-r13-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "lastSample": {
+            "at": "2026-09-24T17:18:32.188Z",
+            "memoryBytes": 15937536,
+            "peakMemoryBytes": 236695552,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 9265152,
+              "file": 4857856,
+              "kernel": 1122304,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 249856,
+              "slab": 305368
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T17:18:32.202Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+            "memoryBytes": 18354176,
+            "peakMemoryBytes": 236695552,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11657216,
+              "file": 4857856,
+              "kernel": 1220608,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 249856,
+              "slab": 302536
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T17:18:32.229Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        }
+      }
+    }
+  ],
+  "referenceInputs": [
+    {
+      "path": ".work/application-large-stack-deno-r2/relocated deployment/program.cjs",
+      "sha256": "be81948b5e1e9239278e992c99eb40071e302e55d7ccf05cf8bd3ad4a16ef76d"
+    },
+    {
+      "path": ".work/application-installed-r3/workspace/toolchains/artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6/emscripten/src/lib/libpthread.js",
+      "sha256": "9b762d32a9473f720fe75f64a5bd56108a91654b9833cc8842553c631288d6a9"
+    },
+    {
+      "path": ".work/application-installed-r3/workspace/toolchains/artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6/emscripten/src/lib/libwasi.js",
+      "sha256": "b9a37514b016c1d2ffcd5994dcab319f89259984d57df77706c2923ff0cb2e84"
+    },
+    {
+      "path": ".work/application-installed-r3/workspace/toolchains/artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6/emscripten/system/lib/pthread/thread_mailbox.c",
+      "sha256": "f38adb258e51e5ca91ced4e87d804676e0a59870665491a82c00fbfdc4bb4957"
+    },
+    {
+      "path": ".work/application-installed-r3/workspace/toolchains/artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6/emscripten/system/lib/pthread/proxying.c",
+      "sha256": "5f34e8638fa4b38a26437e5d0663c856282d7ee9829e077ee0d0c661022146f4"
+    },
+    {
+      "path": ".work/application-installed-r3/workspace/toolchains/artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6/emscripten/system/lib/pthread/emscripten_thread_init.c",
+      "sha256": "bc22d00df973ea641fe1059337013efffeb0b980c90482c38287b34f3da040d3"
+    }
+  ],
+  "reclamation": {
+    "receipt": {
+      "path": ".work/product-acceptance/interrupted-lean-provision-r1-reclamation.json",
+      "sha256": "c44291534a31ba7843583be94c9939ea33ee518506aa5fdb226d18384aed804f"
+    },
+    "scope": "Remove only the interrupted duplicate managed-toolchain staging directory created by the resource-aborted probe; preserve original campaign and existing toolchain",
+    "bytesVerifiedAndReclaimed": 1624962719,
+    "existingVerifiedToolchainPreserved": true
+  },
+  "validated": {
+    "arithmeticComparisonsPerEngine": 23,
+    "nativeInterpretedAndCompiledMatch": true,
+    "hostEnvironmentEntriesPerEngine": 15,
+    "unicodeEnvironmentControl": true,
+    "mailboxTasksPerEngine": 4,
+    "mailboxNotificationsPerEngine": 2,
+    "mailboxDeliveryDeferred": true,
+    "guestQueueDestroyed": true,
+    "unimplementedImportRejectionPerEngine": 1,
+    "startupImportsImplemented": 9,
+    "guestMemoryBytes": 134217728,
+    "maximumGuestMemoryBytes": 8589934592,
+    "successfulGuardPeakBytes": 236695552,
+    "allGuardsReleased": true,
+    "oomEvents": 0
+  },
+  "limitations": [
+    "Only selected scalar-result GCD and log2 exports were compared; the complete upstream test main was not run.",
+    "This Linux x64 diagnostic explicitly opts into Emscripten existing main-thread postmessage mailbox path. Cross-worker routing, shared-instance workers and native waitAsync remain open.",
+    "The original 4 GiB Lean stack test setting was not modified or claimed passed.",
+    "All other function imports trap. Six unresolved GOT.func imports retain explicit invalid table indices; dynamic linking is incomplete.",
+    "The frozen module predates installed candidate .24. This does not validate its latest runtime package.",
+    "Deserializing native code requires the recorded trusted local cache and matching verified SDK; this is not an external-cache trust policy.",
+    "OS secure randomness, environment snapshot and startup hooks are component implementations, not a complete WASI, Emscripten or Lean API port.",
+    "The first provisioning attempt was proactively resource-aborted, not a test failure or pass. Later toolchain use is explicit and reuses verified inputs."
+  ]
+}
