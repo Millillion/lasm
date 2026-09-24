@@ -22,7 +22,13 @@ __attribute__((constructor)) static void initialize_reservation(void) {
     if (errno || (value && (!*value || *end || *value == '-')) ||
         bytes > SIZE_MAX || bytes < 4ULL * 1024 * 1024) {
         static const char message[] = "Invalid private Bun stack reservation\n";
-        (void)write(2, message, sizeof(message) - 1);
+        size_t offset = 0;
+        while (offset < sizeof(message) - 1) {
+            ssize_t written = write(2, message + offset, sizeof(message) - 1 - offset);
+            if (written < 0 && errno == EINTR) continue;
+            if (written <= 0) break;
+            offset += (size_t)written;
+        }
         _exit(125);
     }
     reservation = (size_t)bytes;

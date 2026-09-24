@@ -117,3 +117,17 @@ test('Bun startup retains native environment bytes and removes private transport
   assert.deepEqual(results[1], results[0]);
   assert.ok(results[0].includes(Buffer.from([82,65,87,95,86,65,76,85,69,61,97,255,98]).toString('base64')));
 });
+
+test('Bun helper rejects malformed private reservations before executing user code', options, () => {
+  const abi = process.report.getReport().header.glibcVersionRuntime ? 'gnu' : 'musl';
+  const helper = resolve(`.cache/native-host/bun-stack/linux-${process.arch}-${abi}.so`);
+  for (const value of ['invalid', '-1', '0']) {
+    const child = spawnSync(engine, ['-e', 'throw new Error("PAYLOAD EXECUTED")'], {
+      env: { PATH: '', LD_PRELOAD: helper, LASM_BUN_STACK_BYTES: value },
+      encoding: 'utf8', timeout: 10_000, killSignal: 'SIGKILL',
+    });
+    assert.ifError(child.error); assert.equal(child.status, 125);
+    assert.equal(child.stdout, '');
+    assert.equal(child.stderr, 'Invalid private Bun stack reservation\n');
+  }
+});

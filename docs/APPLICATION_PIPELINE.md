@@ -494,3 +494,9 @@ application failure and initial startup-loop defect remain recorded. Native
 ARM64/musl acceptance, macOS/Windows implementation and deep-stack embedding or
 preload/configuration support remain open. The prepared Linux x64/ARM64 CI
 workflow tests a natively compiled helper, separately from shipped-binary checks.
+
+That workflow's [first native attempt](evidence/bun-stack-native-ci-build-failure-2026-09-24.json)
+failed before runtime checks: GCC rejects an ignored diagnostic `write` result
+under the retained strict warnings. The source now handles short writes and
+interruption explicitly; a new malformed-reservation control exercises that
+diagnostic. Native follow-up validation remains pending.

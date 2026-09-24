@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** Installed `.20` [repairs Linux Bun stack startup](evidence/bun-stack-startup-installed-2026-09-24.json). The unchanged concurrency application passes three relocated repetitions; fourteen startup/deployment controls preserve environment bytes, descriptors and signals. Peak memory was 3.45 GiB without resource events. Native Linux ARM64 source controls are prepared; broader platform and embedding support remain open.
+**Changed:** Native Linux x64/ARM64 CI [identified a strict-GCC helper build failure](evidence/bun-stack-native-ci-build-failure-2026-09-24.json) before runtime tests. The diagnostic now handles write results and interruptions; follow-up validation is pending. Installed `.20` retains its separately verified Bun concurrency passes. Deno also passed all four extra AOT checks; Bun follow-ups continue.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
