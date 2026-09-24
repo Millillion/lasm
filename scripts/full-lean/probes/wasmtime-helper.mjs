@@ -18,7 +18,7 @@ const memory = library.func('int lasm_probe_memory(void *probe, void *fields)');
 const grow = library.func('int lasm_probe_grow_one_page(void *probe, char *error, size_t size)');
 const wait = library.func('int lasm_probe_wait(void *probe, _Out_ int64_t *result, char *error, size_t size)');
 const notify = library.func('int lasm_probe_notify(void *probe, _Out_ int64_t *result, char *error, size_t size)');
-const legacy = library.func('int lasm_probe_legacy_exception(void *probe, char *error, size_t size)');
+const legacy = library.func('int lasm_probe_legacy_exception(void *probe, const uint8_t *bytes, size_t length, char *error, size_t size)');
 const error = Buffer.alloc(4096);
 const message = () => error.toString('utf8').split('\0')[0];
 function run(probe, value) {
@@ -86,10 +86,24 @@ if (!isMainThread) {
     assert.deepEqual(after, [1, 1, 131072, 131072]);
     const third = run(probe, 99);
     assert.equal(Number(peek(probe)), 100);
+    // A 52-byte legacy try/catch control, independently instantiated by the
+    // stock JS engine before assessing the helper. Avoid a WAT parser's syntax
+    // rejection being mistaken for rejection of valid compiled bytecode.
+    const legacyBytes = Uint8Array.of(
+      0, 97, 115, 109, 1, 0, 0, 0,
+      1, 9, 2, 0x60, 0, 1, 0x7e, 0x60, 1, 0x7e, 0,
+      3, 2, 1, 0,
+      13, 3, 1, 0, 1,
+      7, 7, 1, 3, 114, 117, 110, 0, 0,
+      10, 13, 1, 11, 0, 0x06, 0x7e, 0x42, 7, 0x08, 0, 0x07, 0, 0x0b, 0x0b,
+    );
+    assert.ok(WebAssembly.validate(legacyBytes), 'Independent stock-engine legacy-bytecode validation');
+    const legacyNative = (await WebAssembly.instantiate(legacyBytes)).instance.exports.run();
+    assert.equal(legacyNative, 7n);
     error.fill(0);
-    const legacyStatus = legacy(probe, error, error.length);
-    assert.notEqual(legacyStatus, 2, 'The legacy WAT must parse before its compatibility is assessed: ' + message());
-    const legacyException = { accepted: legacyStatus === 0, diagnostic: message() };
+    const legacyStatus = legacy(probe, legacyBytes, legacyBytes.length, error, error.length);
+    assert.notEqual(legacyStatus, 2);
+    const legacyException = { stockEngineResult: Number(legacyNative), accepted: legacyStatus === 0, diagnostic: message() };
     console.log(JSON.stringify({ engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
       version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
       before, after, first, second, third, concurrentWait: { notified, attempts, waitResult: waiting.result },

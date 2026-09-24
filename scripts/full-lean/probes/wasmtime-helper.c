@@ -144,15 +144,10 @@ int lasm_probe_notify(probe_t *probe, int64_t *result, char *error, size_t size)
     return execute(probe, "notify", 0, NULL, result, error, size);
 }
 
-int lasm_probe_legacy_exception(probe_t *probe, char *error, size_t size) {
-    const char *wat = "(module (tag $error (param i64))"
-        " (func (export \"run\") (result i64)"
-        "  (try (result i64) (do (i64.const 7) (throw $error)) (catch $error))))";
-    wasm_byte_vec_t bytes;
-    if (error_text(wasmtime_wat2wasm(wat, strlen(wat), &bytes), NULL, error, size)) return 2;
+int lasm_probe_legacy_exception(probe_t *probe, const uint8_t *bytes, size_t length, char *error, size_t size) {
+    if (length > 1024) { snprintf(error, size, "legacy control exceeds tiny probe bound"); return 2; }
     wasmtime_module_t *module = NULL;
-    wasmtime_error_t *validation = wasmtime_module_new(probe->engine, (uint8_t *)bytes.data, bytes.size, &module);
-    wasm_byte_vec_delete(&bytes);
+    wasmtime_error_t *validation = wasmtime_module_new(probe->engine, bytes, length, &module);
     int status = error_text(validation, NULL, error, size);
     if (module) wasmtime_module_delete(module);
     return status;

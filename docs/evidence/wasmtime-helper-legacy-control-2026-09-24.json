@@ -1,0 +1,164 @@
+{
+  "scope": "Preserved follow-up harness failure at legacy text parsing; no conclusion about valid legacy bytecode",
+  "recordedAt": "2026-09-24T03:43:01.959932+00:00",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35952311692",
+  "commit": "fd88cdef2e1b4694916a617a8d8f901e24fe3df8",
+  "logSha256": "50feb6d9940f8f2388eba7c5c8fe86961362f07f985a9af4f132056fc8e337de",
+  "commands": [
+    {
+      "program": "cc",
+      "args": [
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-shared",
+        "-fPIC",
+        "-I/home/runner/work/lasm/lasm/.cache/wasmtime-49.0.0/include",
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.c",
+        "-L/home/runner/work/lasm/lasm/.cache/wasmtime-49.0.0/lib",
+        "-lwasmtime",
+        "-Wl,-rpath,/home/runner/work/lasm/lasm/.cache/wasmtime-49.0.0/lib",
+        "-o",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "program": "node",
+      "args": [
+        "--max-old-space-size=128",
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "node:internal/modules/run_main:111\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The legacy WAT must parse before its compatibility is assessed: unknown operator or unexpected token\n     --> <anon>:1:88\n      |\n    1 | (module (tag $error (param i64)) (func (export \"run\") (result i64)  (try (result i64) (do (i64.const 7) (throw $error)) (catch $error))))\n      |                                                                                        ^\n    at file:///home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs:91:12\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: 2,\n  expected: 2,\n  operator: 'notStrictEqual',\n  diff: 'simple'\n}\n\nNode.js v26.10.0\n"
+    },
+    {
+      "program": "deno",
+      "args": [
+        "run",
+        "-A",
+        "--v8-flags=--max-old-space-size=128",
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Uncaught (in promise) AssertionError: The legacy WAT must parse before its compatibility is assessed: unknown operator or unexpected token\n     --> <anon>:1:88\n      |\n    1 | (module (tag $error (param i64)) (func (export \"run\") (result i64)  (try (result i64) (do (i64.const 7) (throw $error)) (catch $error))))\n      |                                                                                        ^\n    assert.notEqual(legacyStatus, 2, 'The legacy WAT must parse before its compatibility is assessed: ' + message());\n\u001b[0m\u001b[31m           ^\u001b[0m\n    at \u001b[0m\u001b[2m\u001b[38;5;245mfile:///home/runner/work/lasm/lasm/\u001b[0m\u001b[0m\u001b[36mscripts/full-lean/probes/wasmtime-helper.mjs\u001b[0m:\u001b[0m\u001b[33m91\u001b[0m:\u001b[0m\u001b[33m12\u001b[0m\n"
+    },
+    {
+      "program": "bun",
+      "args": [
+        "/home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs",
+        "/home/runner/work/lasm/lasm/.work/wasmtime-helper/probe.so"
+      ],
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "86 |     assert.deepEqual(after, [1, 1, 131072, 131072]);\n87 |     const third = run(probe, 99);\n88 |     assert.equal(Number(peek(probe)), 100);\n89 |     error.fill(0);\n90 |     const legacyStatus = legacy(probe, error, error.length);\n91 |     assert.notEqual(legacyStatus, 2, 'The legacy WAT must parse before its compatibility is assessed: ' + message());\n                ^\nAssertionError: The legacy WAT must parse before its compatibility is assessed: unknown operator or unexpected token\n     --> <anon>:1:88\n      |\n    1 | (module (tag $error (param i64)) (func (export \"run\") (result i64)  (try (result i64) (do (i64.const 7) (throw $error)) (catch $error))))\n      |                                                                                        ^\n generatedMessage: false,\n     actual: 2,\n   expected: 2,\n   operator: \"notStrictEqual\",\n       diff: \"simple\",\n       code: \"ERR_ASSERTION\"\n\n      at /home/runner/work/lasm/lasm/scripts/full-lean/probes/wasmtime-helper.mjs:91:12\n\nBun v1.4.2 (Linux x64)\n"
+    }
+  ],
+  "resources": {
+    "startedAt": "2026-09-24T03:39:01.397Z",
+    "command": [
+      "node",
+      "--max-old-space-size=128",
+      "scripts/full-lean/probe-wasmtime-helper.mjs",
+      ".work/wasmtime-helper",
+      "node",
+      "deno",
+      "bun"
+    ],
+    "cwd": "/home/runner/work/lasm/lasm",
+    "unit": "lasm-heavy-0539ccf52500.service",
+    "id": "a22f2122-7c92-4ba9-872c-7444c26b2123",
+    "limits": {
+      "memoryMax": 1073741824,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 858993459,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0
+    },
+    "hostAtStart": {
+      "total": 16766414848,
+      "available": 15515500544
+    },
+    "minimumHostAvailable": 15478829056,
+    "peakMemoryBytes": 155836416,
+    "peakTasks": 13,
+    "report": "/home/runner/work/lasm/lasm/.work/wasmtime-helper-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+    "lastSample": {
+      "at": "2026-09-24T03:39:03.404Z",
+      "memoryBytes": 145752064,
+      "peakMemoryBytes": 155836416,
+      "swapBytes": 0,
+      "tasks": 13,
+      "memoryBreakdown": {
+        "anon": 63164416,
+        "file": 77647872,
+        "kernel": 4542464,
+        "shmem": 0,
+        "file_mapped": 13742080,
+        "inactive_file": 53080064,
+        "slab": 2346920
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "exit-code",
+      "exitCode": "exited",
+      "exitStatus": "1",
+      "capturedAt": "2026-09-24T03:39:03.483Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 95072256,
+      "peakMemoryBytes": 155836416,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13676544,
+        "file": 77697024,
+        "kernel": 2981888,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 53129216,
+        "slab": 2082416
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-24T03:39:03.498Z",
+    "result": {
+      "code": 1,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "repair": "Replace the legacy WAT control with tiny legacy bytecode validated and executed independently by each stock JavaScript engine before passing the identical bytes to the helper validator. Original failed text remains in git and this receipt."
+}
