@@ -47,3 +47,19 @@ The Windows guard's optional deadline has also passed on native x64 and ARM64:
 it stops both parent and child before checkpoint collection, with a separate
 time-limit status. It does not change the existing memory limits. See the
 [deadline controls](evidence/windows-guard-deadline-2026-09-24.json).
+
+The Lean ARM64 bootstrap now uses these controls for bounded resumptions. Its
+compiler phase stops after 260 minutes, leaving time inside the 330-minute job
+for ccache cleanup, hashing and upload. A fresh source/build tree is created on
+every runner. Only completed compiler-cache entries are carried forward; no
+interrupted object, olean or CMake build tree is restored. The recipe identity
+includes source commit, build/patch scripts, tool/package versions and workspace
+path. Ccache checks compiler content and is capped at 1 GiB. Checkpoint archives
+also retain the 1.5 GiB expanded-data and 2 GiB upload limits.
+
+Restoration selects the newest exact recipe on `main`, verifies its archive hash,
+recipe and every file, then allows compilation. After a verified save, pruning
+keeps that checkpoint and one fallback, touching only this workflow's recognized
+keys on `main`. Other caches remain part of the repository-wide budget check.
+Selection/pruning controls pass locally. The full resumable bootstrap still needs
+native CI evidence; saving a checkpoint never counts as completing Lean.

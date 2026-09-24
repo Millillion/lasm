@@ -1,0 +1,38 @@
+{
+  "scope": "Incomplete native Windows ARM64 Lean 4.34 bootstrap; job deadline is not a compatibility failure or fundamental limit",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35906728931",
+  "commit": "b17ad33",
+  "runner": "windows-11-arm",
+  "jobStartedAt": "2026-09-23T19:03:32Z",
+  "jobCompletedAt": "2026-09-24T00:34:27Z",
+  "jobDeadlineMinutes": 330,
+  "conclusion": "cancelled",
+  "lastBuildPhase": "Stage1 libleanshared DLL splitting/linking after generated standard-library C compilation",
+  "lastResourceSample": {
+    "status": "running",
+    "command": [
+      "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+      "--login",
+      "scripts/full-lean/bootstrap-windows-arm64.sh"
+    ],
+    "hostAtStart": {
+      "total": 17169387520,
+      "available": 12627648512
+    },
+    "limits": {
+      "jobCommittedBytes": 8584693760,
+      "stopCommittedBytes": 6867755008,
+      "hostReserveBytes": 2147483648
+    },
+    "peakCommittedBytes": 2029355008,
+    "minimumHostAvailable": 11950694400,
+    "startedAt": 1790190432.8779857,
+    "pid": 10948,
+    "lastSampleAt": 1790210051.120023
+  },
+  "resourceCaveat": "The runner cancelled the supervisor; this is its last running sample, not a completed guard report. It records no proactive stop and does not prove the final peak.",
+  "originalLog": ".work/product-acceptance/windows-lean-bootstrap-35906728931.log",
+  "logSha256": "92b844eca45fd9a321aead0833333fd1a89db4226467166a0fb86cec84ec45dd",
+  "compilerCheckpointSaved": false,
+  "nextStep": "Use a guarded earlier deadline and checksum-verified completed ccache entries between fresh build trees."
+}

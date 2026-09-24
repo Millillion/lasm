@@ -322,8 +322,15 @@ cap no larger than half the runner's RAM, and a proactive stop at 80% of that ca
 MSYS2's Clang tools target native ARM64; its POSIX shell/make utilities are x64
 helpers. This experiment is **not** an all-native managed distribution pass.
 The native Lean compiler, its generated executable, dependencies and missing
-ARM64 `leantar` packaging still need verification. No CI artifacts or caches are
-uploaded by this workflow.
+ARM64 `leantar` packaging still need verification. The first long run reached
+stage1 shared-library linking and was cancelled at the 330-minute job deadline.
+Its last resource sample was 1.89 GiB; it has no completed guard receipt. See the
+[preserved deadline evidence](evidence/windows-arm64-lean-deadline-2026-09-24.json).
+The workflow now uses an earlier guarded deadline and a checksum-verified cache
+of completed C/C++ compilations, within the [included storage policy](CI_STORAGE.md).
+Fresh source/build trees avoid reusing partially written compiler outputs.
+Successful small native cache/deadline controls do not yet prove the full
+resumable Lean bootstrap or end-user packaging.
 
 The separate [Windows ARM64 SDK bootstrap](evidence/windows-arm64-sdk-bootstrap-2026-09-23.json)
 now passes on that native runner. Clang/LLD 24 and Binaryen 132 have verified
@@ -338,9 +345,11 @@ or Actions caches.
 The repository was verified public and runner eligibility was checked against
 [GitHub's standard-runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)
 and [billing rules](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
-on 2026-09-23. This workflow uses no paid runners, artifact uploads or Actions
-caches; reports stay in logs and job summaries. Actions are pinned to immutable
-commits and the acceptance Node version is fixed at 26.10.0.
+on 2026-09-23, with cache billing rechecked on 2026-09-24. These workflows use
+standard public runners and no Actions artifact uploads. Only the Lean
+bootstrap uses the separately budgeted included compiler cache; reports stay in
+logs and job summaries. Actions are pinned to immutable commits and the
+acceptance Node version is fixed at 26.10.0.
 
 ## Outstanding product work
 

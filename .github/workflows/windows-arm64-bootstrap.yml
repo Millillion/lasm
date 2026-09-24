@@ -3,15 +3,17 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: write
 concurrency:
-  group: windows-arm64-bootstrap
+  group: lasm-cache-writer
   cancel-in-progress: false
 jobs:
   bootstrap:
-    if: github.event.repository.visibility == 'public'
+    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
     runs-on: windows-11-arm
     timeout-minutes: 330
     env:
+      LASM_CACHE_WRITER_GROUP: lasm-cache-writer
       LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/managed-tools
       MSYSTEM: CLANGARM64
       CHERE_INVOKING: '1'
@@ -39,19 +41,79 @@ jobs:
             make git tar diffutils binutils
             mingw-w64-clang-aarch64-cmake
             mingw-w64-clang-aarch64-clang
+            mingw-w64-clang-aarch64-ccache
             mingw-w64-clang-aarch64-llvm-tools
             mingw-w64-clang-aarch64-gmp
             mingw-w64-clang-aarch64-libuv
             mingw-w64-clang-aarch64-openssl
-      - name: Build with one worker in a capped Windows Job Object
+      - name: Record the exact native compiler-cache recipe
         env:
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
           $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
           $env:LASM_BOOTSTRAP_NODE = (Get-Command node).Source
-          node scripts/full-lean/run-bounded.mjs --report .work/windows-arm64-bootstrap-resources.json -- $bash --login scripts/full-lean/bootstrap-windows-arm64.sh
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/windows-cache-prepare-resources.json -- $bash --login scripts/ci/windows-lean-cache.sh prepare
+      - name: Find a checksum-addressed checkpoint for this exact recipe
+        id: checkpoint
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/compiler-cache-index.mjs select .work/windows-arm64-bootstrap-cache/identity.json .work/windows-arm64-bootstrap-cache/selection.json
+      - name: Restore the selected compiler cache
+        if: steps.checkpoint.outputs.found == 'true'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/windows-arm64-compiler-cache.tgz
+          key: ${{ steps.checkpoint.outputs.key }}
+          fail-on-cache-miss: true
+      - name: Verify the restored archive, recipe and every file before use
+        if: steps.checkpoint.outputs.found == 'true'
+        env:
+          LASM_CHECKPOINT_SHA256: ${{ steps.checkpoint.outputs.sha256 }}
+        run: |
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/windows-cache-restore-resources.json -- node scripts/ci/compiler-cache.mjs unpack .work/windows-arm64-bootstrap-cache/cache .work/windows-arm64-compiler-cache.tgz .work/windows-arm64-bootstrap-cache/identity.json
+          Remove-Item .work/windows-arm64-compiler-cache.tgz
+      - name: Build one worker with a 260-minute guarded deadline
+        id: build
+        continue-on-error: true
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
+          $env:LASM_BOOTSTRAP_NODE = (Get-Command node).Source
+          node scripts/full-lean/run-bounded.mjs --timeout-seconds 15600 --report .work/windows-arm64-bootstrap-resources.json -- $bash --login scripts/ci/windows-lean-cache.sh build
+      - name: Collect completed compiler results after the build guard closes
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          $bash = Join-Path $env:MSYS2_LOCATION 'usr/bin/bash.exe'
+          $env:LASM_BOOTSTRAP_NODE = (Get-Command node).Source
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/windows-cache-collect-resources.json -- $bash --login scripts/ci/windows-lean-cache.sh finish
+      - name: Package only the completed compiler cache
+        id: package
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/windows-cache-pack-resources.json -- node scripts/ci/compiler-cache.mjs pack .work/windows-arm64-bootstrap-cache/cache .work/windows-arm64-compiler-cache.tgz .work/windows-arm64-bootstrap-cache/identity.json
+      - name: Verify included storage budget before saving
+        id: budget
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci/cache-budget.mjs .work/windows-arm64-compiler-cache.tgz .work/windows-arm64-bootstrap-cache/budget.json
+      - name: Save checksum-addressed completed compiler results
+        id: save
+        if: steps.budget.outputs.allowed == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .work/windows-arm64-compiler-cache.tgz
+          key: lasm-win-arm64-lean-ccache-v1-${{ steps.package.outputs.identity }}-${{ steps.package.outputs.sha256 }}
+      - name: Retain this checkpoint and one previous fallback
+        if: steps.save.outcome == 'success' && steps.budget.outputs.allowed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SAVED_KEY: lasm-win-arm64-lean-ccache-v1-${{ steps.package.outputs.identity }}-${{ steps.package.outputs.sha256 }}
+        run: node scripts/ci/compiler-cache-index.mjs prune .work/windows-arm64-bootstrap-cache/identity.json .work/windows-arm64-bootstrap-cache/pruning.json $env:SAVED_KEY
       - name: Preserve bounded bootstrap results in logs
         if: always()
         run: |
-          node -e "const f=require('node:fs');for(const p of ['.work/windows-guard-control.json','.work/windows-arm64-bootstrap-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
-      # No artifact upload, Actions cache, paid runner or publication.
+          node -e "const f=require('node:fs');for(const d of ['.work','.work/windows-arm64-bootstrap-cache'])if(f.existsSync(d))for(const n of f.readdirSync(d).filter(n=>n.endsWith('.json')))if(f.statSync(d+'/'+n).isFile())console.log(d+'/'+n+'\n'+f.readFileSync(d+'/'+n,'utf8'))"
+      - name: Require a complete native Lean bootstrap
+        if: always()
+        run: node -e "const a=require('node:assert/strict');a.equal(require('./.work/windows-arm64-bootstrap-resources.json').status,'passed','A preserved checkpoint is not a completed Lean build')"
+      # Included, bounded compiler cache only; no artifact upload or publication.
