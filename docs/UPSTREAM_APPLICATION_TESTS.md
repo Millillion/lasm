@@ -202,3 +202,12 @@ binary before replaying its historical probe. This affects only the listed
 completed experiment binaries, including older standalone test drivers; original
 upstream sources, expected outputs, result receipts and failure deployments
 remain in place. It does not add or remove compatibility passes.
+
+The [latest IO campaign receipts](evidence/application-io-surface-2026-09-24.json)
+also record verified archival of 25 generated symbol-registry C files in the
+paused Lean 4.32 compiler research, recovering 2.31 GiB. Their original bytes,
+modes and modification times are recoverable. Restore them before rebuilding
+those historical snapshots; executable compiler artifacts, original upstream
+tests and their result receipts were not changed. Two archive-selection
+preflights exited before making changes and are retained separately. Neither
+archival nor the safe disk stop counts as an application test failure.

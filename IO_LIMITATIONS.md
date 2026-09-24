@@ -13,6 +13,13 @@ separately from the earlier runtime evidence below.
   x64. Installed ordinary filesystem probes also match native after correcting
   Deno's POSIX unlink behavior. These checks leave broader API and native
   platform coverage open; Windows removal behavior is not covered by this fix.
+  The [installed `.14` IO campaign](docs/evidence/application-io-surface-2026-09-24.json)
+  now passes all six supplementary fixtures in each stock engine on Linux x64:
+  filesystem surface, filesystem errors, standard IO, line-reading state,
+  truncation errors and console buffering. Native interpreted, native compiled
+  and relocated deployed outputs match exactly. Each engine completes the 50
+  filesystem assertions and 28 error observations; cleanup checks also pass.
+  This does not close the full API audit or other native platform obligations.
 - [ ] Complete the latest-release declaration/API audit and native differential
   coverage in all three stock engines and all six OS/architecture combinations.
   The [Lean 4.34 surface inventory](docs/compatibility/API_SURFACE_4_34.md) now

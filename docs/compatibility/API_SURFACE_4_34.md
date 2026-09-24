@@ -65,8 +65,8 @@ The filesystem-surface fixture completes 50 labeled assertions, including
 handle modes and cursors, buffering, lock lifetime, and temporary-resource
 cleanup. The two unchanged POSIX process fixtures remain inapplicable to Windows;
 parallel portable coverage is still needed. These controls establish expected
-behavior only. Installed Wasm comparisons and the other three native platforms
-remain pending.
+behavior only; installed Linux comparisons are recorded below. The other three
+native platforms remain pending for these controls.
 
 The [filesystem-error controls](../evidence/filesystem-errors-native-2026-09-24.json)
 add 28 observed results on Linux x64/ARM64 and Windows x64, including actual
@@ -74,7 +74,17 @@ path/handle failures, invalid UTF-8 and embedded NUL paths. Interpreted and nati
 C-compiled outputs match exactly on each host. The first attempt exposed two
 missing display instances in the supplementary fixture; that failure and the
 repair are retained separately. The rerun passes all six native cases on Linux
-and all four portable cases on Windows. Deployed Wasm comparison is still pending.
+and all four portable cases on Windows.
+
+The [installed `.14` IO comparison](../evidence/application-io-surface-2026-09-24.json)
+now passes all six cases in stock Node, Deno and Bun on Linux x64. Each of the
+18 comparisons has independently matching interpreted-native, compiled-native
+and source-hidden deployed outputs, with an empty deployment PATH. Temporary
+and fixture cleanup checks pass. The peak is 3.47 GiB without memory or pressure
+events. A disk-headroom stop after the first nine cases launched no further
+build; verified lossless archival restored headroom before the remaining nine.
+These tests exercise the stated operations and inputs, not every possible
+behavior of the 163 filesystem declarations or other standard APIs.
 
 The [installed Linux-query repair](../evidence/application-platform-linux-2026-09-24.json)
 now makes `System.Platform.isLinux` match native Linux in all three stock engines.
