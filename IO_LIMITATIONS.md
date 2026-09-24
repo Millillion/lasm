@@ -56,6 +56,13 @@ separately from the earlier runtime evidence below.
   Bun's lowered-memory backend still has a 4 GiB capacity ceiling; replacing
   that backend or resolving its stock-engine integration is open engineering
   work, not a demonstrated fundamental limitation.
+  A [small Wasmtime helper probe](docs/evidence/wasmtime-helper-smoke-2026-09-24.json)
+  now executes memory64, shared-memory loads/stores, standardized exceptions and
+  JavaScript callbacks across worker isolates in all three stock engines on
+  Linux x64. It allocates only 128 KiB of guest memory with an 8 GiB declared
+  maximum. This is feasibility evidence only: actual high-address allocations,
+  concurrent wait/notify, Emscripten's legacy exceptions, full Lean integration
+  and the other native platforms remain unvalidated.
 
 ## Earlier runtime evidence and remaining compatibility work
 

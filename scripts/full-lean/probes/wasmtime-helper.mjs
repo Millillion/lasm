@@ -16,6 +16,9 @@ const peek = library.func('uint64_t lasm_probe_peek(void *probe)');
 // length, and Koffi correctly rejects array syntax in a function prototype.
 const memory = library.func('int lasm_probe_memory(void *probe, void *fields)');
 const grow = library.func('int lasm_probe_grow_one_page(void *probe, char *error, size_t size)');
+const wait = library.func('int lasm_probe_wait(void *probe, _Out_ int64_t *result, char *error, size_t size)');
+const notify = library.func('int lasm_probe_notify(void *probe, _Out_ int64_t *result, char *error, size_t size)');
+const legacy = library.func('int lasm_probe_legacy_exception(void *probe, char *error, size_t size)');
 const error = Buffer.alloc(4096);
 const message = () => error.toString('utf8').split('\0')[0];
 function run(probe, value) {
@@ -31,9 +34,16 @@ function describe(probe) {
   assert.equal(memory(probe, values), 0);
   return Array.from({ length: 4 }, (_, index) => Number(values.readBigUInt64LE(index * 8)));
 }
+function atomic(action, probe) {
+  const result = [0];
+  assert.equal(action(probe, result, error, error.length), 0, message());
+  return Number(result[0]);
+}
 if (!isMainThread) {
   const result = run(workerData.probe, 41);
-  parentPort.postMessage({ ...result, memory: describe(workerData.probe), threadPeek: Number(peek(workerData.probe)) });
+  parentPort.postMessage({ phase: 'ready', ...result, memory: describe(workerData.probe), threadPeek: Number(peek(workerData.probe)) });
+  // Block in an actual Wasm atomic wait on this worker's independent Store.
+  parentPort.postMessage({ phase: 'waited', result: atomic(wait, workerData.probe) });
 } else {
   let worker;
   const probe = create(error, error.length);
@@ -44,24 +54,46 @@ if (!isMainThread) {
     const first = run(probe, 11);
     const address = ffi.address(probe);
     worker = new Worker(fileURLToPath(import.meta.url), { workerData: { libraryPath, probe: address } });
-    const second = await new Promise((resolve, reject) => {
-      let received = false;
-      worker.once('message', value => { received = true; resolve(value); });
-      worker.once('error', reject);
-      worker.once('exit', code => { if (!received) reject(new Error('Worker exited before response: ' + code)); });
+    let readyResolve, readyReject, waitResolve, waitReject, messages = 0;
+    const ready = new Promise((resolve, reject) => { readyResolve = resolve; readyReject = reject; });
+    const waited = new Promise((resolve, reject) => { waitResolve = resolve; waitReject = reject; });
+    // Waited is consumed below after the initial message, including errors.
+    waited.catch(() => {});
+    const fail = error => { readyReject(error); waitReject(error); };
+    worker.on('message', value => {
+      if (value.phase === 'ready' && messages++ === 0) readyResolve(value);
+      else if (value.phase === 'waited' && messages++ === 1) waitResolve(value);
+      else fail(new Error('Unexpected probe worker message'));
     });
+    worker.once('error', fail);
+    worker.once('exit', code => { if (messages !== 2) fail(new Error('Worker exited before response: ' + code)); });
+    const second = await ready;
     assert.equal(second.result, 84); assert.equal(second.threadPeek, 42);
     assert.deepEqual(second.memory, before);
     assert.equal(Number(peek(probe)), 42, 'Native shared memory survives JavaScript isolate boundary');
+    let notified = 0, attempts = 0;
+    const deadline = performance.now() + 3000;
+    while (!notified && performance.now() < deadline) {
+      notified = atomic(notify, probe); attempts++;
+      if (!notified) await new Promise(resolve => setTimeout(resolve, 1));
+    }
+    assert.equal(notified, 1, 'Wake one real Wasm waiter from a different JavaScript isolate');
+    const waiting = await waited;
+    assert.equal(waiting.result, 0, 'Wasm wait must wake normally, rather than time out');
     await worker.terminate(); worker = undefined;
     assert.equal(grow(probe, error, error.length), 0, message());
     const after = describe(probe);
     assert.deepEqual(after, [1, 1, 131072, 131072]);
     const third = run(probe, 99);
     assert.equal(Number(peek(probe)), 100);
+    error.fill(0);
+    const legacyStatus = legacy(probe, error, error.length);
+    assert.notEqual(legacyStatus, 2, 'The legacy WAT must parse before its compatibility is assessed: ' + message());
+    const legacyException = { accepted: legacyStatus === 0, diagnostic: message() };
     console.log(JSON.stringify({ engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
       version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
-      before, after, first, second, third, peakGuestBytes: 131072,
+      before, after, first, second, third, concurrentWait: { notified, attempts, waitResult: waiting.result },
+      legacyException, peakGuestBytes: 131072,
       scope: 'Private helper executes tiny memory64/atomic/exception/host-callback module across JS isolates; no Lean or large-memory acceptance claim' }));
   } finally {
     if (worker) await worker.terminate();
