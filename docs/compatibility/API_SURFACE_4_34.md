@@ -110,3 +110,11 @@ Node and Deno. The original debug/release project and environment controls
 establish the recorded panic/exit behavior; Bun still lacks identifiable Wasm
 frames. This is partial panic coverage, with symbolization, other termination
 modes and native platform validation still open.
+
+Installed `.16` adds [seven exact native panic comparisons per engine](../evidence/panic-semantics-2026-09-24.json)
+on Linux x64. Ordinary panic fallback, actual redirected stderr, IO failure and
+process abort now match, including empty/zero environment values and bypassing
+redirected stderr during abort. The supplementary fixture uses public ordinary
+Lean APIs. The private abort adapter is part of the relocated deployment; it
+does not introduce Lean syntax or public APIs. This leaves private Shell panic
+controls, full symbolization and other native platforms unverified.

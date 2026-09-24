@@ -44,9 +44,12 @@ separately from the earlier runtime evidence below.
   still fails because its Wasm frames are labeled `unknown`. Retaining Wasm
   names does not fix the tiny independent control; accessing structured
   CallSite data crashes the Bun child without an OOM event. This is unresolved
-  engineering work, not a proven fundamental limitation. Redirected stderr,
-  panic fallback/exit/abort behavior, symbolization and other platforms need
-  their own native differential controls.
+  engineering work, not a proven fundamental limitation. Installed `.16`
+  [matches seven supplementary panic controls per engine](docs/evidence/panic-semantics-2026-09-24.json)
+  on Linux x64: fallback, real stderr redirection, IO panic failure, and native
+  abort signals/output, including empty/zero environment values and redirection
+  during abort. The internal adapter adds no Lean API. Private Shell panic
+  controls, enabled-trace symbolization and other native platforms remain open.
 - [ ] Finish managed application packaging, native Windows ARM64 tools and
   deployment validation without source or build tools.
 - [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and

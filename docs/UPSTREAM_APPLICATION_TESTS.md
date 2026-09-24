@@ -280,3 +280,17 @@ archives, and remove only npm cache copies matching retained package tarballs.
 A stale-cache preflight and a release-campaign disk stop remain separately
 recorded; neither changed test results. Restoring archived bytes or reinstalling
 the recorded tarball recovers each experiment without modifying its inputs.
+
+Supplementary [ordinary Lean panic controls](../integration/fixtures/PanicSemantics.lean)
+exposed another difference: installed `.15` exited through a JavaScript error
+instead of native `SIGABRT`. Installed `.16` now routes C abort through the host
+CRT. Bun's own crash reporter is removed only immediately before intentional
+abort, with a separate native-handler preservation control. All seven cases
+match native exactly in each stock engine on Linux x64: fallback values, real
+stderr redirection, IO panic failure, and abort with ordinary, zero, empty and
+redirected settings. Sources are hidden and deployments relocated with empty
+PATH. The [21 comparisons](evidence/panic-semantics-2026-09-24.json) and nine focused
+unit checks pass; maximum build memory was 3.42 GiB without resource events.
+These are additional controls, not unchanged upstream test passes. Private
+Shell panic controls, Bun backtrace identities and native platform parity remain
+open. Earlier failing attempts and verified archival receipts are retained.

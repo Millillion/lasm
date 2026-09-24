@@ -1,6 +1,14 @@
 // Emscripten JavaScript library. A Lean pthread waits while the JavaScript main
 // thread continues serving asynchronous filesystem, process, and network calls.
 addToLibrary({
+  // Emscripten's libc abort otherwise throws a JavaScript RuntimeError. Proxy
+  // synchronously so the main thread terminates the complete native process.
+  _abort_js__sig: 'v',
+  _abort_js__proxy: 'sync',
+  _abort_js: function () {
+    var path = require('node:url').fileURLToPath(new URL('./native-abort.cjs', process.env.LASM_FULL_HOST_MODULE));
+    require(path)();
+  },
   lasm_host_platform__sig: 'i',
   lasm_host_platform: function () {
     return process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0;

@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** Installed `.15` [restores panic backtraces](evidence/upstream-debug-2026-09-24.json) in Node and Deno; all three release variants pass. Bun still fails frame identification, with two independent probes retained. Builds peaked at 3.46 GiB without resource events.
+**Changed:** Installed `.16` [matches 21 native panic comparisons](evidence/panic-semantics-2026-09-24.json) across Node, Deno and Bun, including real stderr redirection and abort signals/output. Nine focused unit checks pass. Builds peaked at 3.42 GiB without resource events; failed attempts and recoverable artifacts remain preserved.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
