@@ -1,0 +1,406 @@
+{
+  "scope": "Retained cold source-build setup failure; no application runtime was compiled",
+  "run": {
+    "status": "completed",
+    "conclusion": "failure",
+    "headSha": "8b84a83b32d894abdd7c053b0fa81b3214352460",
+    "url": "https://github.com/Millillion/lasm/actions/runs/36001810158"
+  },
+  "log": ".work/product-acceptance/runtime-source-ci-36001810158.log",
+  "logSha256": "244a00ac17f319382b450f05cf32274eac075ca5e42da2852657ade555a12e76",
+  "classification": "Incorrect download URL for a pinned source archive, not a Lean API failure or resource abort",
+  "observedBytes": 87761947,
+  "expectedBytes": 87810307,
+  "originalArchiveHeader": {
+    "root": "lean4-293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "pax": {
+      "comment": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b"
+    }
+  },
+  "repair": "Request the full immutable commit archive, matching the original checksum and root name. Keep byte count and SHA-256 checks unchanged and record observed download identities before validation.",
+  "reports": {
+    "units-resources": {
+      "startedAt": "2026-09-24T12:52:20.969Z",
+      "command": [
+        "node",
+        "--max-old-space-size=128",
+        "--test",
+        "--test-concurrency=1",
+        "test/sdk-repairs.test.mjs",
+        "test/runtime-abi-cache.test.mjs"
+      ],
+      "cwd": "/home/runner/work/lasm/lasm",
+      "unit": "lasm-heavy-0539ccf52500.service",
+      "id": "9169e824-f2c3-41aa-b78d-23c56f852e90",
+      "limits": {
+        "memoryMax": 536870912,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 429496729,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 16770748416,
+        "available": 14989852672
+      },
+      "minimumHostAvailable": 14985326592,
+      "peakMemoryBytes": 34676736,
+      "peakTasks": 1,
+      "report": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/units-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "lastSample": {
+        "at": "2026-09-24T12:52:21.196Z",
+        "memoryBytes": 1671168,
+        "peakMemoryBytes": 34676736,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 0,
+          "file": 57344,
+          "kernel": 917504,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 57344,
+          "slab": 94400
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T12:52:21.241Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "memoryBytes": 15388672,
+        "peakMemoryBytes": 34676736,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13656064,
+          "file": 57344,
+          "kernel": 1052672,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 57344,
+          "slab": 154080
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T12:52:21.264Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "lean-resources": {
+      "startedAt": "2026-09-24T12:52:21.322Z",
+      "command": [
+        "node",
+        "scripts/ci/application-runtime-source.mjs",
+        "lean"
+      ],
+      "cwd": "/home/runner/work/lasm/lasm",
+      "unit": "lasm-heavy-0539ccf52500.service",
+      "id": "423eba82-5428-455c-b85b-f627b4fb3dda",
+      "limits": {
+        "memoryMax": 6407847936,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5126278348,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 16770748416,
+        "available": 14998319104
+      },
+      "minimumHostAvailable": 14994481152,
+      "peakMemoryBytes": 4063039488,
+      "peakTasks": 14,
+      "report": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/lean-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "lastSample": {
+        "at": "2026-09-24T12:53:02.847Z",
+        "memoryBytes": 3436089344,
+        "peakMemoryBytes": 4063039488,
+        "swapBytes": 0,
+        "tasks": 14,
+        "memoryBreakdown": {
+          "anon": 184745984,
+          "file": 3121426432,
+          "kernel": 127483904,
+          "shmem": 0,
+          "file_mapped": 40214528,
+          "inactive_file": 3121426432,
+          "slab": 123534208
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "highWaterProcesses": {
+        "at": "2026-09-24T12:52:51.828Z",
+        "processes": [
+          {
+            "pid": 2383,
+            "name": "node-MainThread",
+            "residentBytes": 268623872,
+            "threads": 11
+          }
+        ]
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T12:53:02.924Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "memoryBytes": 3259858944,
+        "peakMemoryBytes": 4063039488,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13664256,
+          "file": 3121426432,
+          "kernel": 124219392,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 3121426432,
+          "slab": 123289608
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T12:53:02.946Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "sdk-resources": {
+      "startedAt": "2026-09-24T12:53:03.010Z",
+      "command": [
+        "node",
+        "scripts/ci/application-runtime-source.mjs",
+        "sdk"
+      ],
+      "cwd": "/home/runner/work/lasm/lasm",
+      "unit": "lasm-heavy-0539ccf52500.service",
+      "id": "4f83d498-f728-4f7b-ba4c-24a455ec5683",
+      "limits": {
+        "memoryMax": 6814695424,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5451756339,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 16770748416,
+        "available": 15405637632
+      },
+      "minimumHostAvailable": 15051538432,
+      "peakMemoryBytes": 2816446464,
+      "peakTasks": 12,
+      "report": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/sdk-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "lastSample": {
+        "at": "2026-09-24T12:53:44.792Z",
+        "memoryBytes": 2606288896,
+        "peakMemoryBytes": 2816446464,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 0,
+          "file": 2485055488,
+          "kernel": 120315904,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 2485055488,
+          "slab": 119837048
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T12:53:44.831Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "memoryBytes": 2619944960,
+        "peakMemoryBytes": 2816446464,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13668352,
+          "file": 2485055488,
+          "kernel": 120791040,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2485055488,
+          "slab": 119857408
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T12:53:44.851Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "sources-resources": {
+      "startedAt": "2026-09-24T12:53:44.909Z",
+      "command": [
+        "node",
+        "scripts/ci/application-runtime-source.mjs",
+        "sources"
+      ],
+      "cwd": "/home/runner/work/lasm/lasm",
+      "unit": "lasm-heavy-0539ccf52500.service",
+      "id": "4ee959fe-4324-4bfa-a676-e71c49c3c016",
+      "limits": {
+        "memoryMax": 6794772480,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5435817984,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 16770748416,
+        "available": 15385681920
+      },
+      "minimumHostAvailable": 15363469312,
+      "peakMemoryBytes": 129634304,
+      "peakTasks": 11,
+      "report": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/sources-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "lastSample": {
+        "at": "2026-09-24T12:54:05.221Z",
+        "memoryBytes": 91049984,
+        "peakMemoryBytes": 129634304,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 4096,
+          "file": 87777280,
+          "kernel": 2707456,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 87760896,
+          "slab": 2686144
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T12:54:05.256Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "memoryBytes": 105627648,
+        "peakMemoryBytes": 129634304,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13680640,
+          "file": 87777280,
+          "kernel": 3674112,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 87777280,
+          "slab": 2750800
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T12:54:05.278Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "recordedAt": "2026-09-24T12:56:57.723842+00:00"
+}

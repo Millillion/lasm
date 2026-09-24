@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Cold runtime CI preparation](evidence/application-runtime-source-preflight-2026-09-24.json) passes three SDK/cache controls and syntax checks. The workflow builds pinned public inputs with the managed SDK and compares a relocated Node deployment with native Lean; full execution remains pending. No package upload is configured.
+**Changed:** [Cold runtime CI](evidence/application-runtime-source-download-2026-09-24.json) passes unit controls and managed tool provisioning, then rejects a mismatched source archive before extraction. The corrected URL selects the recorded immutable commit; size and checksum checks remain strict. All guards released without resource events; compilation is pending.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

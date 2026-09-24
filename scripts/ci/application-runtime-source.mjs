@@ -44,7 +44,7 @@ try {
   } else if (phase === 'sources') {
     const zig = JSON.parse(readFileSync('experiments/feasibility/toolchains.json')).zig;
     const inputs = [
-      { name: 'lean4-v4.34.0.tar.gz', url: 'https://codeload.github.com/leanprover/lean4/tar.gz/refs/tags/v4.34.0',
+      { name: 'lean4-v4.34.0.tar.gz', url: 'https://codeload.github.com/leanprover/lean4/tar.gz/293d5d0c0c3f3dded4688b3ccd6a33939ac5102b',
         bytes: 87810307, sha256: '09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b' },
       { name: 'gmp-6.3.0.tar.xz', url: 'https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz', bytes: 2094196,
         sha256: 'a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898', directory: 'gmp-6.3.0' },
@@ -63,7 +63,10 @@ try {
         callback(bytes > input.bytes ? new Error('Source download exceeds its pinned size') : null, chunk);
       } });
       await pipeline(Readable.fromWeb(response.body), check, createWriteStream(file + '.partial', { flags: 'wx' }));
-      assert.equal(bytes, input.bytes); assert.equal(hash.digest('hex'), input.sha256);
+      const observed = { ...input, observedBytes: bytes, observedSha256: hash.digest('hex') };
+      (result.downloads ??= []).push(observed); record();
+      assert.equal(bytes, input.bytes, input.name + ': pinned source size');
+      assert.equal(observed.observedSha256, input.sha256, input.name + ': pinned source checksum');
       renameSync(file + '.partial', file);
       if (input.directory) {
         const directory = resolve('.cache', input.directory);

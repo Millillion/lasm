@@ -612,3 +612,11 @@ pass three SDK/cache controls and syntax checks; full CI execution is pending.
 This source-build control preserves reports in logs and uploads no package,
 release, cache or artifact. It is separate from clean installed-package and
 six-platform acceptance.
+
+The [first cold source-build attempt](evidence/application-runtime-source-download-2026-09-24.json)
+passes the three unit controls and both managed tool provisioning phases, then
+rejects the source download before extraction: a tag archive was requested with
+the commit archive's pinned size and checksum. The URL now selects the exact
+commit that is recorded in the original archive's PAX header. Neither checksum
+nor size verification is relaxed. All guards released without resource events;
+this is a preparation failure, and the runtime build remains unvalidated in CI.
