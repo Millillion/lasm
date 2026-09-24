@@ -1,0 +1,903 @@
+{
+  "scope": "Static execution classification of all 110 mixed shell registrations; no test pass implied",
+  "lean": "4.34.0",
+  "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+  "sourceArchiveSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+  "counts": {
+    "native-and-compiled-application": 27,
+    "native-and-foreign-application": 4,
+    "native-build-time": 78,
+    "upstream-disabled": 1
+  },
+  "tests": [
+    {
+      "name": "tests/lake/examples/deps/test.sh",
+      "source": "tests/lake/examples/deps/test.sh",
+      "sourceSha256": "6613c5b2503284191bb2ebe52cbf34ed0ef4fa6430bd28bd07bc8a3ea22570b1",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run foo and bar under both Lean and TOML configurations, preserving dependency and cleanup checks.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/examples/ffi/test.sh",
+      "source": "tests/lake/examples/ffi/test.sh",
+      "sourceSha256": "fac7d25946648f67f04b7d915a96044da3209f96dac2b65c31efd48e6b78777e",
+      "phase": "native-and-foreign-application",
+      "rationale": "Cross-compile or adapt the example foreign library and run app, test and standalone with the unchanged Lean/C sources.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/examples/hello/test.sh",
+      "source": "tests/lake/examples/hello/test.sh",
+      "sourceSha256": "66624386f50c28a6005eea2881e467cd61f387ac3e645fa36335a8e7152ceb38",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run lake exe and direct/packed/unpacked hello executables with their original arguments.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/examples/precompile/test.sh",
+      "source": "tests/lake/examples/precompile/test.sh",
+      "sourceSha256": "60377318ecb44713ab1b8fd8d64ca37fc69d7b6f53e2ab0b58933f466e2acb48",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/examples/reverse-ffi/test.sh",
+      "source": "tests/lake/examples/reverse-ffi/test.sh",
+      "sourceSha256": "8afae861ccc6b7037afc42273726edd85aa80dedf3dfa6721aba67428b852970",
+      "phase": "native-and-foreign-application",
+      "rationale": "Provide the callable Lean library path for both original C-driven examples; native linking alone does not validate deployment.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/examples/scripts/test.sh",
+      "source": "tests/lake/examples/scripts/test.sh",
+      "sourceSha256": "3a7ad12c298aeac5d39e8274fd745c007fdc401b8098fb7a7004d28c08b15c5e",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/13013/test.sh",
+      "source": "tests/lake/tests/13013/test.sh",
+      "sourceSha256": "06d7d3dbf4d70765ebd2cbd5b23e3487296d46a80b3ea175193d7bfc5b4b863f",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run the distinct foo and bar executables after the original configuration error controls.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/14619/test.sh",
+      "source": "tests/lake/tests/14619/test.sh",
+      "sourceSha256": "3b4136efa3ecb3e62d9efd555ffc5ba8408ed66b77aebbad44e7a5fa816a7c01",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/8448/test.sh",
+      "source": "tests/lake/tests/8448/test.sh",
+      "sourceSha256": "dd86c7668f60c500dd4a7c7ce49a0bb98681211fd47116fa01e416626bb42e92",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/api/test.sh",
+      "source": "tests/lake/tests/api/test.sh",
+      "sourceSha256": "1cf989835c6076a8e99e5c207b9c79708fc709a67035ff91bfa97d36e290c8e7",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/badImport/test.sh",
+      "source": "tests/lake/tests/badImport/test.sh",
+      "sourceSha256": "127bed7bfb417e577919f3eeaccdcf4b6a5df7ce5895a9eeaeaafcfbb952ea67",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/buildArgs/test.sh",
+      "source": "tests/lake/tests/buildArgs/test.sh",
+      "sourceSha256": "473b8e81784b9deb62050b2dfa02c4f9e7e9bc17ff850ad839680ee44b71b8c3",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/builtin-lint-code-quality/test.sh",
+      "source": "tests/lake/tests/builtin-lint-code-quality/test.sh",
+      "sourceSha256": "267b55c4b089cd003378b4eabaa4cd75d22d28986e4959298c3b9f748912ef25",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/builtin-lint-module/test.sh",
+      "source": "tests/lake/tests/builtin-lint-module/test.sh",
+      "sourceSha256": "2eb44a35b7d142673d5071c1d085eae4ed112ecbb2918a51334f3e780330d9a1",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/builtin-lint-record-deferred/test.sh",
+      "source": "tests/lake/tests/builtin-lint-record-deferred/test.sh",
+      "sourceSha256": "d170e28031b2f737e2b6eccf20ab89718c1e2bf5aac034da3467da9049448efd",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/builtin-lint-record/test.sh",
+      "source": "tests/lake/tests/builtin-lint-record/test.sh",
+      "sourceSha256": "2ce6b8651db34a36b11eb0b5b38e2634081f58041bbc46fa5ca63721c5abf286",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/builtin-lint/test.sh",
+      "source": "tests/lake/tests/builtin-lint/test.sh",
+      "sourceSha256": "c301cd57f6bfaa99e6e48abe89f3267615db69a063f7dc69af1edab571dab753",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/cache/test.sh",
+      "source": "tests/lake/tests/cache/test.sh",
+      "sourceSha256": "7c0f1ac065e9eab363e99647a1574894befd186c91bb22b9a98ac8972f99c948",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run the cached and restored test executable, retaining hard-link and permission assertions.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/cacheTransfer/test.sh",
+      "source": "tests/lake/tests/cacheTransfer/test.sh",
+      "sourceSha256": "cbb105a7113f72f259152ff66bb4766f2e06acad3e0c8869009a742e700f57d8",
+      "phase": "native-and-compiled-application",
+      "rationale": "Compile the BadCurl mock executable used by native Lake against the original local Python server; keep every transfer assertion.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/clone/test.sh",
+      "source": "tests/lake/tests/clone/test.sh",
+      "sourceSha256": "c5326d93bcb34be36de86f08cce6017e5ef595fa12b0002d133d73a911aa5ff0",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run the executable before and after editing its cloned dependency.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/depRenaming/test.sh",
+      "source": "tests/lake/tests/depRenaming/test.sh",
+      "sourceSha256": "c093fd0ca39a8cbad4652a93bd0b62802f67ee1c55bbf37d1c8e80d753dff409",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/depTree/test.sh",
+      "source": "tests/lake/tests/depTree/test.sh",
+      "sourceSha256": "3d850eb71faddfa94983f2997b0122360bc89e653ab40e6738a06859231b2967",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/driver/test.sh",
+      "source": "tests/lake/tests/driver/test.sh",
+      "sourceSha256": "f856d31db6fb87d25b845fc5e5fd0e4660fe26869325dc698cf1c3d7033dfac8",
+      "phase": "native-and-compiled-application",
+      "rationale": "Compile executable test/lint drivers; Lake DSL script and library drivers remain native build-time checks.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/emptyBuild/test.sh",
+      "source": "tests/lake/tests/emptyBuild/test.sh",
+      "sourceSha256": "cae609c7450fb8d0e6e2a8bd7e75585380c4206212d9a540f63c2c1bf4caef34",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/env/test.sh",
+      "source": "tests/lake/tests/env/test.sh",
+      "sourceSha256": "86a16c7f585142bbcd89400c645ae3391543dbef3e21fd6b43ef1001f054385e",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/externLib/test.sh",
+      "source": "tests/lake/tests/externLib/test.sh",
+      "sourceSha256": "7576d7b413f222f7307c70422125af13a8b504ca0cd12382cc56254792890ef0",
+      "phase": "native-and-foreign-application",
+      "rationale": "Compile/adapt the foreign library and run both root and dependency test executables.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/globs/test.sh",
+      "source": "tests/lake/tests/globs/test.sh",
+      "sourceSha256": "93a10d2f3fc735909c9795d435b719277e0a72f6f448b2d063379f5842591048",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/init/test.sh",
+      "source": "tests/lake/tests/init/test.sh",
+      "sourceSha256": "92f7fe8d7f7a8c391e91f5554ca8149d3134532c59f59c8e0602d9de8089b2d1",
+      "phase": "native-and-compiled-application",
+      "rationale": "Compile/run each generated std and exe template before the original script removes it.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/inputFile/test.sh",
+      "source": "tests/lake/tests/inputFile/test.sh",
+      "sourceSha256": "0c35f794c30d15ed2e8ebd63181d3fd564da79d0a0e78a2fe70c03a866a3c255",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run the main after each traced/untraced input change with the original arguments and file assertions.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/kinds/test.sh",
+      "source": "tests/lake/tests/kinds/test.sh",
+      "sourceSha256": "1e5b68dccde788efae8c1e2bfeb142adff81fe67d1bd1b405fc95260a87faeeb",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/lean/test.sh",
+      "source": "tests/lake/tests/lean/test.sh",
+      "sourceSha256": "da80ba72885e6410507bb6242b081b2b625e5c5832386ea221ec21464abc2f9d",
+      "phase": "native-and-compiled-application",
+      "rationale": "Compile Test.lean for the --run invocation; other elaboration and setup checks remain native.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/leanExit/test.sh",
+      "source": "tests/lake/tests/leanExit/test.sh",
+      "sourceSha256": "d2385d804fb2797d5f1ea8e15c73dd91ec102e8f81b0c6c489868f9ce22bff0f",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/llvm-bitcode-gen/test.sh",
+      "source": "tests/lake/tests/llvm-bitcode-gen/test.sh",
+      "sourceSha256": "80d4089ebf129b443d4f93a26452ec6efcf48df1343ce23022621462e896b7ce",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run the application only when the original LLVM-feature gate enables the test; retain bitcode build checks.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/lock/test.sh",
+      "source": "tests/lake/tests/lock/test.sh",
+      "sourceSha256": "21ebd9c49675b91174646a11fb69a9d736e60e14d6435585cbcf8e4331dbdef8",
+      "phase": "upstream-disabled",
+      "rationale": "The unchanged script exits zero before its disabled lock tests; record a skip, never lock-behavior coverage.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/logLevel/test.sh",
+      "source": "tests/lake/tests/logLevel/test.sh",
+      "sourceSha256": "594b89480fbafab91a2bab374119e33fb43ccc9100c461613af6c303bc787ba4",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/ltar/test.sh",
+      "source": "tests/lake/tests/ltar/test.sh",
+      "sourceSha256": "c9ab68efa20b32753fbd513329ff9ba8b5445bb76b433a2846926801c38cb71a",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/ltarStable/test.sh",
+      "source": "tests/lake/tests/ltarStable/test.sh",
+      "sourceSha256": "3d88618615ae1b0e60db77bcd35d65985501fd104342080054b50666c28ee3c4",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/manifest/test.sh",
+      "source": "tests/lake/tests/manifest/test.sh",
+      "sourceSha256": "54f56362759b03feb1ed0a67081d19c5a49931a51dbb551bfa322981db04af82",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/meta/test.sh",
+      "source": "tests/lake/tests/meta/test.sh",
+      "sourceSha256": "762e893d22ff011b32976c54aeaed1745c369917a2d4796c0a42a17b3087fcfe",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/module/test.sh",
+      "source": "tests/lake/tests/module/test.sh",
+      "sourceSha256": "a1e2540d1227613899fbaff39df38b58209cf18c54f4e7e769b35d6bd7ba15a8",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/needs/test.sh",
+      "source": "tests/lake/tests/needs/test.sh",
+      "sourceSha256": "ebf4e925acc5a00fed0481cb2e44fe122a73ef4585ecad7d163f9e8e3f4d5605",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/noBuild/test.sh",
+      "source": "tests/lake/tests/noBuild/test.sh",
+      "sourceSha256": "ad4f813fac4593f524733aa73ce212014f992e6d679de2cf5ce9b8427409d772",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/noRelease/test.sh",
+      "source": "tests/lake/tests/noRelease/test.sh",
+      "sourceSha256": "1bf4ece0274c1cfb7dbc8b8725853d271d69a20e8074b19d31858cf5dc0a134a",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/old/test.sh",
+      "source": "tests/lake/tests/old/test.sh",
+      "sourceSha256": "86084eb463eba59d71a6baa7ed1d1f95689e6d771571885457e6360a316a32a7",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/order/test.sh",
+      "source": "tests/lake/tests/order/test.sh",
+      "sourceSha256": "81b35ed7bbcb77ca72c423ce6eeb1ad8f52e9b709bc5892f3d0586f3f33fab0b",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run executable Y with the configured dependency order.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/packageOverrides/test.sh",
+      "source": "tests/lake/tests/packageOverrides/test.sh",
+      "sourceSha256": "dadfc1420efc75ffeeab1508af1da0c54222571884016ed2c077c01eeb294e74",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run bar and foo with each original package override configuration.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/postUpdate/test.sh",
+      "source": "tests/lake/tests/postUpdate/test.sh",
+      "sourceSha256": "38cd91f36c3a0533276b60f3426f3fc5e851d803901f8b03df62460806dd4715",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/precompileLink/test.sh",
+      "source": "tests/lake/tests/precompileLink/test.sh",
+      "sourceSha256": "c48a9d274df38e70ef953dff34a5513468cde30bc55feed81d92b6ab8b98c67b",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run orderTest; preserve the native plugin/precompilation and trace controls.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/precompileModules-importLake/test.sh",
+      "source": "tests/lake/tests/precompileModules-importLake/test.sh",
+      "sourceSha256": "8157b3b3e71731e59820eef19a2302a78ffee82cc2a4d2a67b2c477045f948fd",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/query/test.sh",
+      "source": "tests/lake/tests/query/test.sh",
+      "sourceSha256": "5d22c76340c1aa981a9a92820f4d871f9a3c20886380a171ce37015b7a615dfa",
+      "phase": "native-and-compiled-application",
+      "rationale": "Compile the pretty.lean stdin driver and the queried executable a; preserve query assertions.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/rebuild/test.sh",
+      "source": "tests/lake/tests/rebuild/test.sh",
+      "sourceSha256": "6802ac16c1ea1b6ecd5d3089bc86a76000d597b25ea81ca736c64015ee4414f5",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run foo before and after editing its source dependency.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/requiresModule/test.sh",
+      "source": "tests/lake/tests/requiresModule/test.sh",
+      "sourceSha256": "b5c596bb2527640ad3e365805eafb855ffd054219e689efbd42290634f8fe6ae",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/reservoirConfig/test.sh",
+      "source": "tests/lake/tests/reservoirConfig/test.sh",
+      "sourceSha256": "a80f30cd6c1f84b538612e3139b82f81c97e5988b401d33dfe5d219d09f1af42",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/reversion/test.sh",
+      "source": "tests/lake/tests/reversion/test.sh",
+      "sourceSha256": "8d4e844dc9baef8cdcd86860cb8483f397ac1373d17a1cd04040cc6ed8430386",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/serve/test.sh",
+      "source": "tests/lake/tests/serve/test.sh",
+      "sourceSha256": "5193368c4a26c0607b9f0002d46a4c19720b1abd6a31e1ad89453649470109be",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/setupFile/test.sh",
+      "source": "tests/lake/tests/setupFile/test.sh",
+      "sourceSha256": "e8fa88a6589c234c48a224912d01c8d147beb1a8eb79ba41a9f7105be1c48346",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/shake/test.sh",
+      "source": "tests/lake/tests/shake/test.sh",
+      "sourceSha256": "e98bbb1890aac1f5051566259074405cf014b81f2ce71abe82773069b3a716c8",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/srcHash/test.sh",
+      "source": "tests/lake/tests/srcHash/test.sh",
+      "sourceSha256": "3edc2743a056312e77f9abd24b6e0e616f61a8c1dad684914c014393281cfb18",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/targets/test.sh",
+      "source": "tests/lake/tests/targets/test.sh",
+      "sourceSha256": "cf01a874b9f56f0c3938f2ff48d501cf2522ca93549eabd332126398ca8f87a2",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run all direct and lake exe invocations of a, b and c, preserving target/facet assertions.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/toml/test.sh",
+      "source": "tests/lake/tests/toml/test.sh",
+      "sourceSha256": "3d3cd21adf7090d75710cfdab7921ed53ec459c160380163505eaa9d263fa7d0",
+      "phase": "native-and-compiled-application",
+      "rationale": "Compile Test.lean and retain its unchanged runtime TOML parser assertions.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/trace/test.sh",
+      "source": "tests/lake/tests/trace/test.sh",
+      "sourceSha256": "05501f3a91c60acb78378646a0d2c60400cf478fef75b449b114e0b884d03702",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/translateConfig/test.sh",
+      "source": "tests/lake/tests/translateConfig/test.sh",
+      "sourceSha256": "1120d83eddb9497a0c2d26c915708b352acf334f0bb488424fe66a39403068bd",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/updateToolchain/test.sh",
+      "source": "tests/lake/tests/updateToolchain/test.sh",
+      "sourceSha256": "deac9a7ac9ff66ef0db789541bc923f1a297032ed8a364da58e26029687a2a67",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/updateUnknown/test.sh",
+      "source": "tests/lake/tests/updateUnknown/test.sh",
+      "sourceSha256": "91e690953898f324c1b704529d2ba6b194fbb0abed8ab4bbdc3cd8e727234a39",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "tests/lake/tests/versionTags/test.sh",
+      "source": "tests/lake/tests/versionTags/test.sh",
+      "sourceSha256": "a4f0469c6cdbd73a708fea32cac4e4967d61813799f429fcceefc6dc6ee207c8",
+      "phase": "native-build-time",
+      "rationale": "Original Lake configuration, dependency, compiler, plugin, script, server or artifact behavior executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "misc/lean_ghash.sh",
+      "source": "tests/misc/lean_ghash.sh",
+      "sourceSha256": "027d744eeb2484a5c6d96c8576f4599ab286b3040b55eee41b942fb26b89fd90",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "misc/lean_help.sh",
+      "source": "tests/misc/lean_help.sh",
+      "sourceSha256": "2a72e0437d54b12a32944765f8922a6ceccb867905c3e622ef5476ce1e796df5",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "misc/lean_unknown_file.sh",
+      "source": "tests/misc/lean_unknown_file.sh",
+      "sourceSha256": "7cda7598e48f92cb81dc549f2dc3197744aa98ffa47c7628dfd376cd35f029cc",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "misc/lean_unknown_option.sh",
+      "source": "tests/misc/lean_unknown_option.sh",
+      "sourceSha256": "4b3b66aa71e4e188bc28ecd82f2056e456eeb06f7c73134d1db97af936c43ebb",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "misc/lean_version.sh",
+      "source": "tests/misc/lean_version.sh",
+      "sourceSha256": "8242367596f2bb70a08c5ae6b1c4256b24fa36c4b04b3bf41e62ae9ae62341a6",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "../doc/examples/compiler",
+      "source": "doc/examples/compiler/run_test.sh",
+      "sourceSha256": "698383356b5db9947a2c0c6b18953ab6f0105f999e29e377d621bb3378d9e3ae",
+      "phase": "native-and-compiled-application",
+      "rationale": "Compile the example main and retain the hello/world output assertion.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "bench/vcgen",
+      "source": "tests/bench/vcgen/run_test.sh",
+      "sourceSha256": "310870be0598574be19969f3f2c61c9dfb5ca49e3b6c9a12710c2d60a4a7e7e9",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "misc_dir/plugin",
+      "source": "tests/misc_dir/plugin/run_test.sh",
+      "sourceSha256": "c1e3333ec4fbcc845b8152e2b1e5879e84c4324ecbbd26072da563baec66809c",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/builtin_attr",
+      "source": "tests/pkg/builtin_attr/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/cbv_attr",
+      "source": "tests/pkg/cbv_attr/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/collectAxioms",
+      "source": "tests/pkg/collectAxioms/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/debug",
+      "source": "tests/pkg/debug/run_test.sh",
+      "sourceSha256": "d416710d88017e4898207678f6fc07c23de0fa8eae2971ae4dfc3ae649eac077",
+      "phase": "native-and-compiled-application",
+      "rationale": "Preserve distinct release/debug compiler settings and their original success/failure assertions.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/def_clash",
+      "source": "tests/pkg/def_clash/run_test.sh",
+      "sourceSha256": "5d84374a219616df267d6b42f8ef1d18893f1162b274e4225ceee818d70c00d9",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run TestUse with both packages; retain the original expected compile/link failures.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/deprecated_arg",
+      "source": "tests/pkg/deprecated_arg/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/deprecated_module",
+      "source": "tests/pkg/deprecated_module/run_test.sh",
+      "sourceSha256": "0dcc89862f406771a39e36298ac2ae80812be57a04cfd510915995035bc32d56",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/deprecated_option",
+      "source": "tests/pkg/deprecated_option/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/deriving",
+      "source": "tests/pkg/deriving/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/exe_private_lean_import",
+      "source": "tests/pkg/exe_private_lean_import/run_test.sh",
+      "sourceSha256": "b3a4f056ba66dd60b811e26aafecf49de6c6820022e060462b5d558d79f49caa",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run main with full Lean initialization and its original empty-environment assertion.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/float",
+      "source": "tests/pkg/float/run_test.sh",
+      "sourceSha256": "96a9f35d1e2da58c2f3b343b7c48d51eb3d1108a503a95dea5c2455e0a4a9796",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run testfloat-check.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/frontend",
+      "source": "tests/pkg/frontend/run_test.sh",
+      "sourceSha256": "5d310c7c4bd011f9f2791bed171aebda19490a0b1e8cb1808018eceb48cc28c2",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run both frontend executables with original module arguments and imported initializer state.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/homo",
+      "source": "tests/pkg/homo/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/initialize",
+      "source": "tests/pkg/initialize/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/internal_module_linter",
+      "source": "tests/pkg/internal_module_linter/run_test.sh",
+      "sourceSha256": "ac195e1cfdf6eb6f1f33619b33293cd2b7657ec908469289f2d5d0f6daba73ab",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/issue12825",
+      "source": "tests/pkg/issue12825/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/leanchecker",
+      "source": "tests/pkg/leanchecker/run_test.sh",
+      "sourceSha256": "b14eb68f16759170a3f6f59682bf0d8d8f73b7f03c3c3de8ccb705ec3b09d9f0",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/linter_set",
+      "source": "tests/pkg/linter_set/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/misc",
+      "source": "tests/pkg/misc/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/mod_clash",
+      "source": "tests/pkg/mod_clash/run_test.sh",
+      "sourceSha256": "3f35c86ac70eff907590206dce44e4fbae058ca5758122e0f86e6cb85294f5e0",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/module",
+      "source": "tests/pkg/module/run_test.sh",
+      "sourceSha256": "51338e40c18670ae17a5233998d6805bc5755e2870d5f52dd554627797601e77",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/module_linter",
+      "source": "tests/pkg/module_linter/run_test.sh",
+      "sourceSha256": "61e0815bcf67cc5c6ee42911464f4a81102dbd21a9c9b4f2f222eefc78f8c398",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/ofScientific",
+      "source": "tests/pkg/ofScientific/run_test.sh",
+      "sourceSha256": "be9ddc486ab784cd9bcf4a072e8e035df77d50bd1a9692a994e0e9648475f41b",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run parse-number-check.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/path with spaces",
+      "source": "tests/pkg/path with spaces/run_test.sh",
+      "sourceSha256": "15b567439e2663987fb9f2ce33bb0a9cb4b2d449ad8c49beacaa3c0386136956",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run the executable twice around creation of the shadowing path file.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/prv",
+      "source": "tests/pkg/prv/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/rebuild",
+      "source": "tests/pkg/rebuild/run_test.sh",
+      "sourceSha256": "f88f5ebb160e196f73402a9c254a6d4252c2b33dffcaa33a889ce41d6212527b",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/setup",
+      "source": "tests/pkg/setup/run_test.sh",
+      "sourceSha256": "616cce43d2b4bc24059d002518e5fea01e00934e161030b439522a7db81bee9c",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/stateful_linter",
+      "source": "tests/pkg/stateful_linter/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/structure_docstrings",
+      "source": "tests/pkg/structure_docstrings/run_test.sh",
+      "sourceSha256": "bff8846445197d4b713e7d53580f156442309bb5800dcf354eb89c87b5e886f7",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/sym_ext",
+      "source": "tests/pkg/sym_ext/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/sym_simp_attr",
+      "source": "tests/pkg/sym_simp_attr/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/user_attr",
+      "source": "tests/pkg/user_attr/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/user_attr_app",
+      "source": "tests/pkg/user_attr_app/run_test.sh",
+      "sourceSha256": "f39953823c649091be1085639f54af91629d2b6f560fe581e534f29549530fd6",
+      "phase": "native-and-compiled-application",
+      "rationale": "Run user_attr with its original runtime environment/attribute assertions.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/user_opt",
+      "source": "tests/pkg/user_opt/run_test.sh",
+      "sourceSha256": "9ded59b9f4021aa38eb48960e9cdaa7b9de7d3adfef242a552e00728c58178c8",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/user_plugin",
+      "source": "tests/pkg/user_plugin/run_test.sh",
+      "sourceSha256": "d1a1fa5bd6f7384851fddfc13aabf05f018be487335e2c6a3e9cea72972e3cc6",
+      "phase": "native-and-foreign-application",
+      "rationale": "Retain native --plugin controls; run the unchanged Lean.loadPlugin clients with compatible deployed dynamic libraries and initialization symbols.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/ver_clash",
+      "source": "tests/pkg/ver_clash/run_test.sh",
+      "sourceSha256": "4f90b1cb15cf04bc9c70545f4e447547e29cad9c9d4083b570fa7c01b82d0092",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    },
+    {
+      "name": "pkg/verso_doc_md",
+      "source": "tests/pkg/verso_doc_md/run_test.sh",
+      "sourceSha256": "bff8846445197d4b713e7d53580f156442309bb5800dcf354eb89c87b5e886f7",
+      "phase": "native-build-time",
+      "rationale": "Original compiler, elaboration, plugin, library test driver or tool command executes in the managed native build toolchain.",
+      "execution": "not-run-in-current-product-campaign"
+    }
+  ],
+  "requirements": [
+    "Verify a pristine reference tree against the original archive; run scripts from independent byte-identical copies because the tests themselves mutate fixtures.",
+    "Run every original shell driver with its unchanged assertions before any deployed application adaptation.",
+    "Record native build-time and deployed application phases separately; never treat native-only success as a deployed runtime pass.",
+    "Map every exact runtime invocation, including transient generated executables, to the installed CLI. Reject unmapped commands explicitly.",
+    "Keep original feature/disabled gates visible and record skipped bodies separately.",
+    "The cache transfer test uses its original local mock server and credentials; do not send it to a real service.",
+    "Retain failure workspaces, logs and hashes; remove only successful generated copies when needed for disk headroom."
+  ]
+}

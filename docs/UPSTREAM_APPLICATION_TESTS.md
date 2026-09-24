@@ -137,3 +137,14 @@ and the active harness hashes are unchanged before and after execution. The test
 phase took 663.02 seconds; preparation and execution peaked at 3.40 GiB with no
 resource events. The [per-case evidence](evidence/upstream-docparse-node-2026-09-23.json)
 does not imply Deno, Bun or other-platform passes for this category.
+
+The [mixed-driver review](evidence/lean-4.34-mixed-driver-classification.json)
+now assigns execution obligations to all 110 shell registrations: 78 native
+build-time checks, 27 with additional ordinary compiled-application phases,
+four with foreign-library/runtime-loading phases, and one upstream-disabled
+lock test. This is source review, not execution evidence. Every shell file is
+checked against the original inventory checksum. Lake DSL scripts, compiler
+plugins and library test drivers remain native build-time coverage; executable
+test drivers and `lean --run` clients require deployed application checks too.
+Some original scripts intentionally edit fixtures, so their future harness must
+retain a pristine reference tree and run byte-identical independent copies.

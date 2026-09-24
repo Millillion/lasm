@@ -14,6 +14,8 @@ below retain their original, narrower scope.
 - [x] Build the matching full runtime and all 2,516 shipped Lean library modules.
 - [x] Verify the first ordinary compiled Lean main in all three stock engines.
 - [x] Inventory all 4,066 unchanged upstream test registrations and exclusions.
+- [x] Classify the execution obligations of all 110 mixed shell registrations;
+  their native and deployed phases still need execution evidence.
 - [x] Inventory the declaration and extern surface of all 2,516 compiled latest
   standard modules; implementation and behavioral coverage remain separate work.
 - [x] Connect the primary application CLI to verified runtime bundles and managed
@@ -34,7 +36,7 @@ below retain their original, narrower scope.
   through that shipping pipeline.
 - [ ] Supply and validate native Windows ARM64 Lean and compiler SDK bundles.
 - [ ] Run unchanged upstream tests through their appropriate native build-time
-  and compiled-application paths; finish mixed-driver classification.
+  and compiled-application paths, including the reviewed mixed drivers.
 - [ ] Audit and differentially test all standard APIs, including IO.FS and Std.Http.
 - [ ] Complete source-free deployment and native six-platform acceptance for
   stock Node, Deno and Bun.
