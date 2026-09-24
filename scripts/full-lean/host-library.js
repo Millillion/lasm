@@ -5,6 +5,28 @@ addToLibrary({
   lasm_host_platform: function () {
     return process.platform === 'win32' ? 1 : process.platform === 'darwin' ? 2 : 0;
   },
+  // Capture on the calling Lean pthread, before returning through Wasm. V8 and
+  // JavaScriptCore expose actual Wasm frames here. Keep the engine's property
+  // descriptor intact after allowing the same 100-frame budget as native Lean.
+  lasm_host_backtrace__deps: ['$stringToNewUTF8'],
+  lasm_host_backtrace__sig: 'p',
+  lasm_host_backtrace: function () {
+    var descriptor = Object.getOwnPropertyDescriptor(Error, 'stackTraceLimit');
+    var changed = !descriptor || descriptor.configurable;
+    try {
+      if (changed) Object.defineProperty(Error, 'stackTraceLimit', {
+        value: 100, configurable: true, writable: true,
+      });
+      var stack = new Error().stack;
+      return stringToNewUTF8(typeof stack === 'string'
+        ? stack.replace(/^Error\n/, '').trimEnd() : '(stack trace unavailable)');
+    } finally {
+      if (changed) {
+        if (descriptor) Object.defineProperty(Error, 'stackTraceLimit', descriptor);
+        else delete Error.stackTraceLimit;
+      }
+    }
+  },
   lasm_collect_loaded_libraries__deps: ['$LDSO', '$dynCall', '$stringToNewUTF8', 'free'],
   lasm_collect_loaded_libraries__sig: 'vpp',
   lasm_collect_loaded_libraries: function (context, callback) {

@@ -1,0 +1,58 @@
+--- a/src/runtime/object.cpp
++++ b/src/runtime/object.cpp
+@@ -23,13 +23,16 @@
+ #include "runtime/io.h"
+ #include "runtime/hash.h"
+ 
+-#if defined(__GLIBC__) || defined(__APPLE__)
++#if defined(__GLIBC__) || defined(__APPLE__) || defined(__EMSCRIPTEN__)
+     #define LEAN_SUPPORTS_BACKTRACE 1
+ #else
+     #define LEAN_SUPPORTS_BACKTRACE 0
+ #endif
+ 
+-#if LEAN_SUPPORTS_BACKTRACE
++#if defined(__EMSCRIPTEN__)
++extern "C" char * lasm_host_backtrace();
++extern "C" unsigned lasm_host_platform();
++#elif LEAN_SUPPORTS_BACKTRACE
+ #include <execinfo.h>
+ #include <unistd.h>
+ // Lean-exported demangler from Lean.Compiler.NameDemangling.
+@@ -138,7 +141,21 @@
+ }
+ 
+ static void print_backtrace(bool force_stderr) {
+-#if LEAN_SUPPORTS_BACKTRACE
++#if defined(__EMSCRIPTEN__)
++    // Engine frames are captured synchronously on this Lean pthread. Send them
++    // through the same stderr path as native Lean, including redirected streams.
++    char * stack = lasm_host_backtrace();
++    if (!stack) return;
++    char * line = stack;
++    while (*line) {
++        char * end = strchr(line, '\n');
++        if (end) *end = '\0';
++        panic_eprintln(line, force_stderr);
++        if (!end) break;
++        line = end + 1;
++    }
++    free(stack);
++#elif LEAN_SUPPORTS_BACKTRACE
+     void * bt_buf[100];
+     int nptrs = backtrace(bt_buf, sizeof(bt_buf) / sizeof(void *));
+     if (char ** symbols = backtrace_symbols(bt_buf, nptrs)) {
+@@ -174,7 +191,12 @@
+         panic_eprintln(msg, size, force_stderr);
+ #if LEAN_SUPPORTS_BACKTRACE
+         char * bt_env = getenv("LEAN_BACKTRACE");
+-        if (!bt_env || strcmp(bt_env, "0") != 0) {
++        if ((!bt_env || strcmp(bt_env, "0") != 0)
++#if defined(__EMSCRIPTEN__)
++            // Upstream Windows builds do not emit a panic backtrace.
++            && lasm_host_platform() != 1
++#endif
++        ) {
+             panic_eprintln("backtrace:", force_stderr);
+             print_backtrace(force_stderr);
+         }

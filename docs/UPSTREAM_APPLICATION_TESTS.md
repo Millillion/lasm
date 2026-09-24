@@ -256,3 +256,27 @@ remain unchanged. The [floating-point receipts](evidence/upstream-float-2026-09-
 record a 4.97 GiB maximum peak without resource events. Original NaN-class and
 exception-flag policies remain unchanged; this is not proof of every possible
 floating-point input or other native platforms.
+
+The original `pkg/debug` project exposed missing panic backtraces. Installed
+`.15` now captures the actual calling-thread stack: the debug executable and
+four environment controls pass in Node and Deno, and the release executable
+passes in all three engines. Panic location/message, termination, stdout and
+uncaught exceptions match native. `LEAN_BACKTRACE=0` matches complete output;
+enabled traces require real backend frames while preserving their raw output.
+Native ASLR addresses and native/Wasm frame formats differ between executions.
+
+**Bun debug diagnostics remain a failure.** Its stack contains `unknown` Wasm
+frames. A tiny independent probe confirms that retaining Wasm names does not
+repair this; a structured CallSite probe crashes the isolated Bun child at
+about 27 MiB RSS, without pressure or OOM events. These are open engineering
+issues, not fundamental limitations. The [debug receipts](evidence/upstream-debug-2026-09-24.json)
+retain both failures and all five passing executable variants, with unchanged
+original drivers and all 7,669 reference entries. Maximum build memory was
+3.46 GiB. Broader panic semantics and native platform coverage remain open.
+
+The [storage receipts](evidence/panic-storage-2026-09-24.json) retain the completed
+Wasmtime compilation artifact as verified gzip, share six duplicate float
+archives, and remove only npm cache copies matching retained package tarballs.
+A stale-cache preflight and a release-campaign disk stop remain separately
+recorded; neither changed test results. Restoring archived bytes or reinstalling
+the recorded tarball recovers each experiment without modifying its inputs.

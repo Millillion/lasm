@@ -1,0 +1,688 @@
+{
+  "scope": "Lossless storage preservation and removal of byte-verified disposable npm cache copies; no compatibility passes added",
+  "recordedAt": "2026-09-24T07:03:37.627158+00:00",
+  "operations": [
+    {
+      "record": {
+        "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-wasmtime-archive-r1-resources.json",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r4/compiled.cwasm",
+            "originalBytes": 610719320,
+            "originalSha256": "ce4a5bf674a239ae6346deb5fd8a7f89cf7e916b236bb8d429e3242bc604eed4",
+            "mode": 436,
+            "mtimeNs": 1790229570222892434,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-compilation-r4/compiled.cwasm.gz",
+            "archiveBytes": 182686045,
+            "archiveSha256": "7b05baa9b6bb6ef641dfc6ce49e02d0ed3a22c40078a1d21e8c8852a59548038",
+            "verifiedDecompression": true,
+            "provenance": {
+              "committedEvidence": "docs/evidence/wasmtime-real-lean-compilation-2026-09-24.json",
+              "receiptSha256": "a20585034dc6726a4056fbdcdbebe88ea507a9cf75416dc47fb2d9ad410ce402"
+            },
+            "phase": "archived"
+          }
+        ],
+        "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+        "savedBytes": 428033275,
+        "finishedAt": "2026-09-24T06:38:01.579054+00:00"
+      },
+      "sha256": "89d98f078f6ee32737f4e37f3a957e2b46fb7f35fc1063afc4e5d857b86a5929",
+      "resources": {
+        "startedAt": "2026-09-24T06:37:46.783Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/archive-completed-wasmtime-r1.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "93b033dd-a2c7-44af-9e46-cd9942588934",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25459744768
+        },
+        "minimumHostAvailable": 25160572928,
+        "peakMemoryBytes": 810938368,
+        "peakTasks": 6,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-wasmtime-archive-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T06:38:01.613Z",
+          "memoryBytes": 5464064,
+          "peakMemoryBytes": 810938368,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 3784704,
+            "file": 4096,
+            "kernel": 630784,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 4096,
+            "slab": 114072
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-24T06:37:55.603Z",
+          "processes": [
+            {
+              "pid": 3730180,
+              "name": "python3",
+              "residentBytes": 19927040,
+              "threads": 1
+            }
+          ]
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T06:38:01.637Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 13500416,
+          "peakMemoryBytes": 810938368,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 4096,
+            "kernel": 1089536,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 4096,
+            "slab": 139192
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T06:38:01.664Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "script": "\"\"\"Losslessly archive completed experiment binaries after byte verification.\"\"\"\nimport datetime\nimport gzip\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport resource\nimport shutil\n\nresource.setrlimit(resource.RLIMIT_AS, (256 * 1024**2, 256 * 1024**2))\nroot = Path.cwd()\ngroup = Path('/sys/fs/cgroup') / Path('/proc/self/cgroup').read_text().strip().split('::', 1)[1].lstrip('/')\nassert group.name == os.environ['LASM_RESOURCE_UNIT']\nassert 0 < int((group / 'memory.max').read_text()) <= 10 * 1024**3\nassert (group / 'memory.high').read_text().strip() == 'max'\nrecord_file = root / '.work/product-acceptance/completed-wasmtime-archive-r1.json'\nassert not record_file.exists()\ndef sha(path):\n    with path.open('rb') as stream:\n        digest = hashlib.file_digest(stream, 'sha256').hexdigest()\n        os.posix_fadvise(stream.fileno(), 0, 0, os.POSIX_FADV_DONTNEED)\n        return digest\nevidence = root / 'docs/evidence/wasmtime-real-lean-compilation-2026-09-24.json'\nresult = root / '.work/wasmtime-lean-compilation-r4/result.json'\nr = json.loads(result.read_text())\nguard = json.loads(Path(r['resourceReport']).read_text())\nassert guard['unitReleased'] and guard['result']['code'] == 0 and not guard['resourceLimited']\ncompiled = root / '.work/wasmtime-lean-compilation-r4/compiled.cwasm'\nexpected = r['cache']['sha256']\nassert sha(compiled) == expected\nassert expected in evidence.read_text()\ninputs = [(compiled, expected, {'committedEvidence': str(evidence.relative_to(root)), 'receiptSha256': sha(evidence)})]\n\n# Establish every input before changing any completed artifact.\nfor path, expected, _ in inputs:\n    assert path.is_relative_to(root / '.work') and path.is_file() and not path.is_symlink()\n    assert sha(path) == expected\n    assert not Path(str(path) + '.gz').exists()\n\nreport = {'scope': 'Lossless archival of completed generated evidence only; originals recoverable byte-for-byte',\n          'resourceReport': os.environ.get('LASM_RESOURCE_REPORT'), 'files': [],\n          'restore': 'Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.'}\ndef save():\n    record_file.write_text(json.dumps(report, indent=2) + '\\n')\n\nfor path, expected, provenance in inputs:\n    stat = path.stat()\n    archive = Path(str(path) + '.gz')\n    partial = Path(str(archive) + '.partial')\n    with path.open('rb') as source, partial.open('xb') as raw:\n        with gzip.GzipFile(filename='', mode='wb', fileobj=raw, compresslevel=1, mtime=0) as dest:\n            shutil.copyfileobj(source, dest, 1024 * 1024)\n        raw.flush()\n        os.fsync(raw.fileno())\n    with gzip.open(partial, 'rb') as stream:\n        digest = hashlib.sha256()\n        length = 0\n        while block := stream.read(1024 * 1024):\n            length += len(block)\n            digest.update(block)\n    assert length == stat.st_size and digest.hexdigest() == expected\n    assert sha(path) == expected and partial.stat().st_size < stat.st_size\n    partial.rename(archive)\n    row = {'original': str(path), 'originalBytes': stat.st_size, 'originalSha256': expected,\n           'mode': stat.st_mode & 0o7777, 'mtimeNs': stat.st_mtime_ns, 'archive': str(archive),\n           'archiveBytes': archive.stat().st_size, 'archiveSha256': sha(archive),\n           'verifiedDecompression': True, 'provenance': provenance, 'phase': 'verified'}\n    report['files'].append(row)\n    save()\n    path.unlink()\n    row['phase'] = 'archived'\n    save()\n    print(json.dumps({'file': str(path.relative_to(root)), 'savedBytes': stat.st_size - archive.stat().st_size}), flush=True)\nreport['savedBytes'] = sum(row['originalBytes'] - row['archiveBytes'] for row in report['files'])\nreport['finishedAt'] = datetime.datetime.now(datetime.timezone.utc).isoformat()\nsave()\n"
+    },
+    {
+      "record": {
+        "scope": "Deduplication of byte-identical completed gzip archives only; all original archive paths and decoded bytes remain recoverable",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-float-archive-deduplication-r1-resources.json",
+        "sourceEvidence": [
+          {
+            "file": "docs/evidence/upstream-float-2026-09-24.json",
+            "sha256": "1578bc9b01d35d8094b3d05d251e673307b3116b1a633f69f042c924a721d7ec"
+          }
+        ],
+        "files": [
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-float-r3/application source.hidden/.lake/lasm/applications/bdd52ceecb605e52/02d8910a3fe36c142e584d62487ba26a64410da8eae274842a7e168ca45888da/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-float-r3/relocated deployment/program.wasm.gz",
+            "sha256": "44c7e5efc1413d871faa73f9a3b19b738e6ac4be3006817a587998b029fa5e13",
+            "bytes": 37299395,
+            "releasedAllocatedBytes": 37302272
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-float-r3/relocated deployment/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-float-r3/relocated deployment/program.wasm.gz",
+            "sha256": "44c7e5efc1413d871faa73f9a3b19b738e6ac4be3006817a587998b029fa5e13",
+            "bytes": 37299395,
+            "releasedAllocatedBytes": 37302272
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-float-r3/application source.hidden/.lake/lasm/applications/b5a160c30bd8f707/16870e53a53ade75a0228af43d7fcc6fc794a4c89709d53dbf022b26d46a206b/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-float-r3/relocated deployment/program.wasm.gz",
+            "sha256": "44c7e5efc1413d871faa73f9a3b19b738e6ac4be3006817a587998b029fa5e13",
+            "bytes": 37299395,
+            "releasedAllocatedBytes": 37302272
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-deno-float-r3/native source.hidden/.lake/build/bin/testfloat-check.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-float-r3/native source.hidden/.lake/build/bin/testfloat-check.gz",
+            "sha256": "d637ee86225d9bb2c6b33fd36c6ab59809e69894d4e9bbcf6e71e21850074929",
+            "bytes": 1025521,
+            "releasedAllocatedBytes": 1028096
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-float-r3/native source.hidden/.lake/build/bin/testfloat-check.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-node-float-r3/native source.hidden/.lake/build/bin/testfloat-check.gz",
+            "sha256": "d637ee86225d9bb2c6b33fd36c6ab59809e69894d4e9bbcf6e71e21850074929",
+            "bytes": 1025521,
+            "releasedAllocatedBytes": 1028096
+          },
+          {
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-float-r3/application source.hidden/.lake/lasm/applications/5da4cd0d314aaa57/f62b28023317b9ab1847ad9fbcc1622f59a5304619928f88b9e2fb8f4e859ca0/dist/program.wasm.gz",
+            "sharedWith": "/home/lastmjs/development/lasm/compiler/.work/upstream-numeric-bun-float-r3/relocated deployment/program.wasm.gz",
+            "sha256": "76657c21ed401e65d677948e2aa4ea2ec96da04f8c36d2614798b9f443fcec00",
+            "bytes": 38447065,
+            "releasedAllocatedBytes": 38449152
+          }
+        ],
+        "restore": "Archives share immutable storage. Use gzip -dc ARCHIVE > ORIGINAL; verify the original hash and restore mode/mtime from the source evidence. Never rewrite an archive in place.",
+        "savedAllocatedBytes": 152412160,
+        "finishedAt": "2026-09-24T06:44:07.749103+00:00"
+      },
+      "sha256": "e916a36a7ccd4d123ac72643e54c5a8ecd06c4e8f0af5ce77c9e32f0a9479251",
+      "resources": {
+        "startedAt": "2026-09-24T06:44:05.517Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/dedupe-float-archives-r1.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "203a741c-fdbd-4c9c-934b-11791d85fcac",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25325543424
+        },
+        "minimumHostAvailable": 25292148736,
+        "peakMemoryBytes": 45875200,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/completed-float-archive-deduplication-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T06:44:07.723Z",
+          "memoryBytes": 36691968,
+          "peakMemoryBytes": 45875200,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 6893568,
+            "file": 29548544,
+            "kernel": 204800,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 29548544,
+            "slab": 98712
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T06:44:07.817Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 13766656,
+          "peakMemoryBytes": 45875200,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11661312,
+            "file": 57344,
+            "kernel": 1052672,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 57344,
+            "slab": 139976
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T06:44:07.841Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "script": "\"\"\"Share identical completed gzip files, preserving every archive path and byte.\"\"\"\nfrom pathlib import Path\nimport collections\nimport datetime\nimport hashlib\nimport json\nimport os\nimport resource\nimport stat\n\nresource.setrlimit(resource.RLIMIT_AS, (256 * 1024**2, 256 * 1024**2))\nroot = Path.cwd()\ngroup = Path('/sys/fs/cgroup') / Path('/proc/self/cgroup').read_text().strip().split('::', 1)[1].lstrip('/')\nassert group.name == os.environ['LASM_RESOURCE_UNIT']\nassert 0 < int((group / 'memory.max').read_text()) <= 2 * 1024**3\nassert (group / 'memory.high').read_text().strip() == 'max'\noutput = root / '.work/product-acceptance/completed-float-archive-deduplication-r1.json'\nassert not output.exists()\n\ndef sha(path):\n    with path.open('rb') as stream:\n        digest = hashlib.file_digest(stream, 'sha256').hexdigest()\n        os.posix_fadvise(stream.fileno(), 0, 0, os.POSIX_FADV_DONTNEED)\n        return digest\n\ngroups = collections.defaultdict(list)\nprovenance = []\nfor name in ['upstream-float-2026-09-24']:\n    evidence = root / 'docs/evidence' / (name + '.json')\n    receipt = json.loads(evidence.read_text())\n    provenance.append({'file': str(evidence.relative_to(root)), 'sha256': sha(evidence)})\n    for case in receipt['results']:\n        assert case.get('passed', case.get('result', {}).get('passed')) is True\n        for key in ['resources', 'archiveResources']:\n            guard = case[key]\n            assert guard['unitReleased'] and not guard['resourceLimited'] and guard['result']['code'] == 0\n        for row in case['archive']['files']:\n            assert row['phase'] == 'archived' and row['verifiedDecompression']\n            path = Path(row['archive'])\n            assert path.is_relative_to(root / '.work') and not path.is_symlink()\n            metadata = path.stat()\n            assert stat.S_ISREG(metadata.st_mode) and metadata.st_nlink == 1\n            assert metadata.st_size == row['archiveBytes'] and sha(path) == row['archiveSha256']\n            groups[(row['archiveSha256'], row['archiveBytes'])].append(path)\n\nassert sum(len(paths) for paths in groups.values()) == 9\nreport = {'scope': 'Deduplication of byte-identical completed gzip archives only; all original archive paths and decoded bytes remain recoverable',\n          'resourceReport': os.environ['LASM_RESOURCE_REPORT'], 'sourceEvidence': provenance, 'files': [],\n          'restore': 'Archives share immutable storage. Use gzip -dc ARCHIVE > ORIGINAL; verify the original hash and restore mode/mtime from the source evidence. Never rewrite an archive in place.'}\n\ndef save():\n    output.write_text(json.dumps(report, indent=2) + '\\n')\n\nsave()\nfor (digest, size), paths in groups.items():\n    canonical = paths[0]\n    for path in paths[1:]:\n        assert sha(canonical) == sha(path) == digest\n        original = path.stat()\n        temporary = Path(str(path) + '.deduplicating')\n        assert not temporary.exists() and canonical.stat().st_dev == original.st_dev\n        os.link(canonical, temporary)\n        assert os.path.samefile(canonical, temporary) and sha(temporary) == digest\n        os.replace(temporary, path)\n        assert os.path.samefile(canonical, path) and path.stat().st_size == size and sha(path) == digest\n        report['files'].append({'archive': str(path), 'sharedWith': str(canonical), 'sha256': digest,\n                                'bytes': size, 'releasedAllocatedBytes': original.st_blocks * 512})\n        save()\nreport['savedAllocatedBytes'] = sum(row['releasedAllocatedBytes'] for row in report['files'])\nreport['finishedAt'] = datetime.datetime.now(datetime.timezone.utc).isoformat()\nsave()\nprint(json.dumps({'pathsPreserved': 9, 'duplicatesShared': len(report['files']), 'savedAllocatedBytes': report['savedAllocatedBytes']}))\n"
+    },
+    {
+      "record": {
+        "scope": "Remove only disposable npm cache copies whose complete bytes match retained local package tarballs",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/verified-npm-tarball-reclamation-r2-resources.json",
+        "restore": "Reinstall from the recorded local tarball; npm repopulates its cache. No retained tarball or application evidence is removed.",
+        "files": [
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r2/lasm-compiler-0.1.0-experimental.5.tgz",
+            "sha256": "74016a9c13a5b14d1fef93e8e7ece301d932732b56068855400d02e4385e7644",
+            "integrity": "sha512-oiFfVuW3rlrLBWJ0WRFrZTcIDsJiQit+H2t8+4Knm3WrttpTNmNnwDBYXpqM7On7n50SK7ydNk5AWvQVxtPUoQ==",
+            "bytes": 124724784,
+            "entries": [
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r2/lasm-compiler-0.1.0-experimental.5.tgz",
+                "integrity": "sha512-oiFfVuW3rlrLBWJ0WRFrZTcIDsJiQit+H2t8+4Knm3WrttpTNmNnwDBYXpqM7On7n50SK7ydNk5AWvQVxtPUoQ==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/a2/21/5f56e5b7ae5acb05627459116b6537080ec262422b7e1f6b7cfb82a79b75abb6da53366367c030585e9a8cece9fb9f9d122bbc9d364e405af415c6d3d4a1",
+                "size": 124724784,
+                "time": 1790192226359
+              },
+              {
+                "key": "pacote:tarball:file:../../../application-package-r2/lasm-compiler-0.1.0-experimental.5.tgz",
+                "integrity": "sha512-oiFfVuW3rlrLBWJ0WRFrZTcIDsJiQit+H2t8+4Knm3WrttpTNmNnwDBYXpqM7On7n50SK7ydNk5AWvQVxtPUoQ==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/a2/21/5f56e5b7ae5acb05627459116b6537080ec262422b7e1f6b7cfb82a79b75abb6da53366367c030585e9a8cece9fb9f9d122bbc9d364e405af415c6d3d4a1",
+                "size": 124724784,
+                "time": 1790192230653
+              },
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r2/compiler",
+                "integrity": "sha512-oiFfVuW3rlrLBWJ0WRFrZTcIDsJiQit+H2t8+4Knm3WrttpTNmNnwDBYXpqM7On7n50SK7ydNk5AWvQVxtPUoQ==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/a2/21/5f56e5b7ae5acb05627459116b6537080ec262422b7e1f6b7cfb82a79b75abb6da53366367c030585e9a8cece9fb9f9d122bbc9d364e405af415c6d3d4a1",
+                "size": 124724784,
+                "time": 1790192102380
+              }
+            ],
+            "phase": "cache copies removed"
+          },
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r3/lasm-compiler-0.1.0-experimental.6.tgz",
+            "sha256": "0aa102756020efadfb9f48b23d691a81bcffd62538839ff9ac47acbabc11f9c8",
+            "integrity": "sha512-0uokDX1Y9Xm9vUue7rYrgbfn3g9JzYZrq1pTnaOS4eyxMPvm7EUlKTeR8QJV/IObQUK1eNGIeZSnIwrBp/UQvw==",
+            "bytes": 124791134,
+            "entries": [
+              {
+                "key": "pacote:tarball:file:../../../application-package-r3/lasm-compiler-0.1.0-experimental.6.tgz",
+                "integrity": "sha512-0uokDX1Y9Xm9vUue7rYrgbfn3g9JzYZrq1pTnaOS4eyxMPvm7EUlKTeR8QJV/IObQUK1eNGIeZSnIwrBp/UQvw==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/d2/ea/240d7d58f579bdbd4b9eeeb62b81b7e7de0f49cd866bab5a539da392e1ecb130fbe6ec4525293791f10255fc839b4142b578d1887994a7230ac1a7f510bf",
+                "size": 124791134,
+                "time": 1790201295299
+              },
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r3/compiler",
+                "integrity": "sha512-0uokDX1Y9Xm9vUue7rYrgbfn3g9JzYZrq1pTnaOS4eyxMPvm7EUlKTeR8QJV/IObQUK1eNGIeZSnIwrBp/UQvw==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/d2/ea/240d7d58f579bdbd4b9eeeb62b81b7e7de0f49cd866bab5a539da392e1ecb130fbe6ec4525293791f10255fc839b4142b578d1887994a7230ac1a7f510bf",
+                "size": 124791134,
+                "time": 1790201166819
+              },
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r3/lasm-compiler-0.1.0-experimental.6.tgz",
+                "integrity": "sha512-0uokDX1Y9Xm9vUue7rYrgbfn3g9JzYZrq1pTnaOS4eyxMPvm7EUlKTeR8QJV/IObQUK1eNGIeZSnIwrBp/UQvw==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/d2/ea/240d7d58f579bdbd4b9eeeb62b81b7e7de0f49cd866bab5a539da392e1ecb130fbe6ec4525293791f10255fc839b4142b578d1887994a7230ac1a7f510bf",
+                "size": 124791134,
+                "time": 1790201291705
+              }
+            ],
+            "phase": "cache copies removed"
+          },
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r4/lasm-compiler-0.1.0-experimental.7.tgz",
+            "sha256": "62a904842407c2d8b92ad2434d4018c50fbaa21097990d1bd872b4aa1412cd20",
+            "integrity": "sha512-cH7zxPVJY4gMHpf7+vyPC40v6HB8eZ6Fcz2oCwzXwPG9n2uG0q0uO7WdcyjqaFvITrZVQO/K0iRNW66QRUR4zg==",
+            "bytes": 124832963,
+            "entries": [
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r4/compiler",
+                "integrity": "sha512-cH7zxPVJY4gMHpf7+vyPC40v6HB8eZ6Fcz2oCwzXwPG9n2uG0q0uO7WdcyjqaFvITrZVQO/K0iRNW66QRUR4zg==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/70/7e/f3c4f54963880c1e97fbfafc8f0b8d2fe8707c799e85733da80b0cd7c0f1bd9f6b86d2ad2e3bb59d7328ea685bc84eb65540efcad2244d5bae90454478ce",
+                "size": 124832963,
+                "time": 1790202578715
+              },
+              {
+                "key": "pacote:tarball:file:../../../application-package-r4/lasm-compiler-0.1.0-experimental.7.tgz",
+                "integrity": "sha512-cH7zxPVJY4gMHpf7+vyPC40v6HB8eZ6Fcz2oCwzXwPG9n2uG0q0uO7WdcyjqaFvITrZVQO/K0iRNW66QRUR4zg==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/70/7e/f3c4f54963880c1e97fbfafc8f0b8d2fe8707c799e85733da80b0cd7c0f1bd9f6b86d2ad2e3bb59d7328ea685bc84eb65540efcad2244d5bae90454478ce",
+                "size": 124832963,
+                "time": 1790202612813
+              },
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r4/lasm-compiler-0.1.0-experimental.7.tgz",
+                "integrity": "sha512-cH7zxPVJY4gMHpf7+vyPC40v6HB8eZ6Fcz2oCwzXwPG9n2uG0q0uO7WdcyjqaFvITrZVQO/K0iRNW66QRUR4zg==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/70/7e/f3c4f54963880c1e97fbfafc8f0b8d2fe8707c799e85733da80b0cd7c0f1bd9f6b86d2ad2e3bb59d7328ea685bc84eb65540efcad2244d5bae90454478ce",
+                "size": 124832963,
+                "time": 1790202609409
+              }
+            ],
+            "phase": "cache copies removed"
+          },
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r10/lasm-compiler-0.1.0-experimental.13.tgz",
+            "sha256": "0cf9ca92448363c0f1b2310b0e279692a851fe67433cab6eb5a446b4d901350f",
+            "integrity": "sha512-XPhtfuQgNjpjelmQiRZFgmTpArGZZ7x07KMhR12/VdpKCEAn2i0tdcpCK3LP2mEh94nSkHwhHFBWYvpm1KvRUQ==",
+            "bytes": 125087662,
+            "entries": [
+              {
+                "key": "pacote:tarball:file:../../../application-package-r10/lasm-compiler-0.1.0-experimental.13.tgz",
+                "integrity": "sha512-XPhtfuQgNjpjelmQiRZFgmTpArGZZ7x07KMhR12/VdpKCEAn2i0tdcpCK3LP2mEh94nSkHwhHFBWYvpm1KvRUQ==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/5c/f8/6d7ee420363a637a59908916458264e902b19967bc74eca321475dbf55da4a084027da2d2d75ca422b72cfda6121f789d2907c211c505662fa66d4abd151",
+                "size": 125087662,
+                "time": 1790216399971
+              },
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r10/compiler",
+                "integrity": "sha512-XPhtfuQgNjpjelmQiRZFgmTpArGZZ7x07KMhR12/VdpKCEAn2i0tdcpCK3LP2mEh94nSkHwhHFBWYvpm1KvRUQ==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/5c/f8/6d7ee420363a637a59908916458264e902b19967bc74eca321475dbf55da4a084027da2d2d75ca422b72cfda6121f789d2907c211c505662fa66d4abd151",
+                "size": 125087662,
+                "time": 1790216384262
+              },
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r10/lasm-compiler-0.1.0-experimental.13.tgz",
+                "integrity": "sha512-XPhtfuQgNjpjelmQiRZFgmTpArGZZ7x07KMhR12/VdpKCEAn2i0tdcpCK3LP2mEh94nSkHwhHFBWYvpm1KvRUQ==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/5c/f8/6d7ee420363a637a59908916458264e902b19967bc74eca321475dbf55da4a084027da2d2d75ca422b72cfda6121f789d2907c211c505662fa66d4abd151",
+                "size": 125087662,
+                "time": 1790216396419
+              }
+            ],
+            "phase": "cache copies removed"
+          },
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r11/lasm-compiler-0.1.0-experimental.14.tgz",
+            "sha256": "fc656ee164ce5831e4e6a91266d3757db9ab92ed5dcf7b54a4a4168c7fffa571",
+            "integrity": "sha512-7rt84V4OXSCyTy8XPVPFzt+qX+fHaxtK1K8AEyMukwehSXE/RpitWVq6pRloBujDWCUfNcfJ1qB3YBQpu/EJmw==",
+            "bytes": 125161765,
+            "entries": [
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r11/compiler",
+                "integrity": "sha512-7rt84V4OXSCyTy8XPVPFzt+qX+fHaxtK1K8AEyMukwehSXE/RpitWVq6pRloBujDWCUfNcfJ1qB3YBQpu/EJmw==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/ee/bb/7ce15e0e5d20b24f2f173d53c5cedfaa5fe7c76b1b4ad4af0013232e9307a149713f4698ad595abaa5196806e8c358251f35c7c9d6a077601429bbf1099b",
+                "size": 125161765,
+                "time": 1790224062405
+              },
+              {
+                "key": "pacote:tarball:file:../../../application-package-r11/lasm-compiler-0.1.0-experimental.14.tgz",
+                "integrity": "sha512-7rt84V4OXSCyTy8XPVPFzt+qX+fHaxtK1K8AEyMukwehSXE/RpitWVq6pRloBujDWCUfNcfJ1qB3YBQpu/EJmw==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/ee/bb/7ce15e0e5d20b24f2f173d53c5cedfaa5fe7c76b1b4ad4af0013232e9307a149713f4698ad595abaa5196806e8c358251f35c7c9d6a077601429bbf1099b",
+                "size": 125161765,
+                "time": 1790224082281
+              },
+              {
+                "key": "pacote:tarball:file:/home/lastmjs/development/lasm/compiler/.work/application-package-r11/lasm-compiler-0.1.0-experimental.14.tgz",
+                "integrity": "sha512-7rt84V4OXSCyTy8XPVPFzt+qX+fHaxtK1K8AEyMukwehSXE/RpitWVq6pRloBujDWCUfNcfJ1qB3YBQpu/EJmw==",
+                "path": "/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/ee/bb/7ce15e0e5d20b24f2f173d53c5cedfaa5fe7c76b1b4ad4af0013232e9307a149713f4698ad595abaa5196806e8c358251f35c7c9d6a077601429bbf1099b",
+                "size": 125161765,
+                "time": 1790224077980
+              }
+            ],
+            "phase": "cache copies removed"
+          }
+        ],
+        "alreadyAbsent": [
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r5/lasm-compiler-0.1.0-experimental.8.tgz",
+            "integrity": "sha512-cszqAZwHMXUoOPjxBNnYG+1byuh5XDCxxZ1JXdj5ODraH7CI+y+w26TJUq5BCIF2H5ckdpPPOOUWWNqeNBzFog==",
+            "scope": "Stale npm index; no content removed"
+          },
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r6/lasm-compiler-0.1.0-experimental.9.tgz",
+            "integrity": "sha512-LhwvoQ7jXVZFHtzWdqP11iJFhbZO7PErIjNlmwVrAmVL9otFhH/2QSY6MFSYrwKYe7D92RB7cXvVdsc26zZItA==",
+            "scope": "Stale npm index; no content removed"
+          },
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r7/lasm-compiler-0.1.0-experimental.10.tgz",
+            "integrity": "sha512-9DPzkcKc3u9oK85K7vUwGD8s3OKN2+Vd0oR7ecU7Hhgptkf5C4k1ObPmNKpm0eKgjZqqFEQeHPgeJV8B/QgWqw==",
+            "scope": "Stale npm index; no content removed"
+          },
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r8/lasm-compiler-0.1.0-experimental.11.tgz",
+            "integrity": "sha512-ZHNXwm5HMv5TsDe0rktiab6WUIcbIX/dI1ul6a+JefOEbkXhILDZw16rcS+9t6CBhZwQo+QZ6YUnroOq8nWqzw==",
+            "scope": "Stale npm index; no content removed"
+          },
+          {
+            "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r9/lasm-compiler-0.1.0-experimental.12.tgz",
+            "integrity": "sha512-ia6cw2LekcS+QF+ZFDRt3fVFjGJHg7yA9epD/G2vwZUxeU+0Ldn4zaEXqxUQ70DQXZCR4/+t6pQ0W0tCHVxSHA==",
+            "scope": "Stale npm index; no content removed"
+          }
+        ],
+        "savedBytes": 624598308,
+        "finishedAt": "2026-09-24T06:57:29.314Z"
+      },
+      "sha256": "b13489652cc057dfa00cb5df0af298fbd2f2344d9d810467558ecb992b5cd342",
+      "resources": {
+        "startedAt": "2026-09-24T06:57:19.135Z",
+        "command": [
+          ".cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=128",
+          ".work/reclaim-verified-npm-tarballs-r2.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "5d93acb3-f431-47f2-90dd-7e55969c545f",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 25309679616
+        },
+        "minimumHostAvailable": 25135976448,
+        "peakMemoryBytes": 789938176,
+        "peakTasks": 11,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/verified-npm-tarball-reclamation-r2-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T06:57:29.351Z",
+          "memoryBytes": 464543744,
+          "peakMemoryBytes": 789938176,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 5246976,
+            "file": 457728000,
+            "kernel": 729088,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 457728000,
+            "slab": 129640
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T06:57:29.371Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 471535616,
+          "peakMemoryBytes": 789938176,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 457728000,
+            "kernel": 1093632,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 457728000,
+            "slab": 153608
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T06:57:29.393Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "script": "import assert from 'node:assert/strict';\nimport { createRequire } from 'node:module';\nimport { createReadStream, existsSync, readFileSync, writeFileSync } from 'node:fs';\nimport { createHash } from 'node:crypto';\nimport { resolve } from 'node:path';\nimport { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';\nawait ensureResourceGuard();\nconst require = createRequire(import.meta.url);\nconst cache = require('../.cache/js-runtimes/node-26.10.0/lib/node_modules/npm/node_modules/cacache');\nconst directory = resolve('.cache/npm/_cacache'), output = '.work/product-acceptance/verified-npm-tarball-reclamation-r2.json';\nassert.ok(!existsSync(output));\nasync function hash(path, algorithm, encoding='hex') {\n const h=createHash(algorithm); for await(const bytes of createReadStream(path)) h.update(bytes); return h.digest(encoding);\n}\nconst all=await cache.ls(directory), candidates=[], absent=[];\nfor(let n=2;n<=11;n++) {\n const receipt=JSON.parse(readFileSync(`.work/application-package-r${n}/result.json`));\n assert.equal(await hash(receipt.tarball,'sha256'),receipt.sha256);\n const integrity='sha512-'+await hash(receipt.tarball,'sha512','base64');\n const entries=Object.values(all).filter(e=>e.integrity===integrity);\n assert.ok(entries.length>0);\n for(const e of entries) {\n  assert.ok(e.key.startsWith('pacote:tarball:file:') && e.key.includes('application-package-r'+n+'/'));\n  assert.equal(e.size,receipt.compressedBytes);\n }\n if(!existsSync(entries[0].path)) { absent.push({retainedArchive:receipt.tarball,integrity,scope:'Stale npm index; no content removed'}); continue; }\n assert.equal(await hash(entries[0].path,'sha256'),receipt.sha256);\n candidates.push({retainedArchive:receipt.tarball,sha256:receipt.sha256,integrity,bytes:receipt.compressedBytes,\n  entries,phase:'verified'});\n}\nconst report={scope:'Remove only disposable npm cache copies whose complete bytes match retained local package tarballs',\n resourceReport:process.env.LASM_RESOURCE_REPORT,restore:'Reinstall from the recorded local tarball; npm repopulates its cache. No retained tarball or application evidence is removed.',files:candidates,alreadyAbsent:absent};\nconst save=()=>writeFileSync(output,JSON.stringify(report,null,2)+'\\n');save();\nfor(const row of candidates) {\n for(const e of row.entries) assert.equal((await cache.get.info(directory,e.key)).integrity,row.integrity);\n assert.equal(await hash(row.retainedArchive,'sha256'),row.sha256);\n for(const e of row.entries) await cache.rm.entry(directory,e.key);\n await cache.rm.content(directory,row.integrity);\n assert.equal(await cache.get.hasContent(directory,row.integrity),false);\n row.phase='cache copies removed';save();\n}\nreport.savedBytes=candidates.reduce((n,r)=>n+r.bytes,0);report.finishedAt=new Date().toISOString();save();\nconsole.log(JSON.stringify({verifiedArchives:candidates.length,savedBytes:report.savedBytes}));\n"
+    }
+  ],
+  "initialCachePreflight": {
+    "resources": {
+      "startedAt": "2026-09-24T06:55:16.579Z",
+      "command": [
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=128",
+        ".work/reclaim-verified-npm-tarballs-r1.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "86d679ae-9651-484f-bab8-037a7fe861c3",
+      "limits": {
+        "memoryMax": 2147483648,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1717986918,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 25392664576
+      },
+      "minimumHostAvailable": 25289101312,
+      "peakMemoryBytes": 956497920,
+      "peakTasks": 11,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/verified-npm-tarball-reclamation-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T06:55:20.388Z",
+        "memoryBytes": 940122112,
+        "peakMemoryBytes": 956497920,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 64249856,
+          "file": 873103360,
+          "kernel": 2605056,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 873103360,
+          "slab": 1334992
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T06:55:20.522Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 887861248,
+        "peakMemoryBytes": 956497920,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11644928,
+          "file": 873103360,
+          "kernel": 2215936,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 873103360,
+          "slab": 1278624
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T06:55:20.550Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    "log": "[lasm] One workload, 2.00 GiB memory cap; resource log: /home/lastmjs/development/lasm/compiler/.work/product-acceptance/verified-npm-tarball-reclamation-r1-resources.json\nRunning as unit: lasm-heavy-a79a4e3ab9f2.service; invocation ID: ead59b2227d8430f905626ec99384001\nnode:internal/modules/run_main:111\n    triggerUncaughtException(\n    ^\n\n[Error: ENOENT: no such file or directory, open '/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/72/cc/ea019c0731752838f8f104d9d81bed5bcae8795c30b1c59d495dd8f9383ada1fb088fb2fb0dba4c952ae410881761f97247693cf38e51658da9e341cc5a2'] {\n  errno: -2,\n  code: 'ENOENT',\n  syscall: 'open',\n  path: '/home/lastmjs/development/lasm/compiler/.cache/npm/_cacache/content-v2/sha512/72/cc/ea019c0731752838f8f104d9d81bed5bcae8795c30b1c59d495dd8f9383ada1fb088fb2fb0dba4c952ae410881761f97247693cf38e51658da9e341cc5a2'\n}\n\nNode.js v26.10.0\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 3.920s\nCPU time consumed: 4.915s\nMemory peak: 912.1M\nMemory swap peak: 0B\n[lasm] Peak 0.89 GiB; exit-code\n",
+    "outcome": "Stale npm index referred to missing content; all verification preceded mutation, so no cache entries were changed."
+  },
+  "verifiedPackageCopies": [
+    [
+      {
+        "removedOnlyVerifiedDuplicate": "/home/lastmjs/development/lasm/compiler/.work/application-package-r12/compiler",
+        "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r12/lasm-compiler-0.1.0-experimental.15.tgz",
+        "sha256": "63e9cc05da4a444ca8e70e509481033ff33ef1a4f6b580e1a99aac52c99f9311",
+        "verifiedFiles": 2672,
+        "bytes": 629141171
+      }
+    ],
+    [
+      {
+        "removedOnlyVerifiedDuplicate": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r13/workspace/project/node_modules/@lasm/compiler",
+        "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r11/lasm-compiler-0.1.0-experimental.14.tgz",
+        "sha256": "fc656ee164ce5831e4e6a91266d3757db9ab92ed5dcf7b54a4a4168c7fffa571",
+        "verifiedFiles": 2672,
+        "bytes": 628948726
+      }
+    ]
+  ],
+  "restore": "Original npm tarballs are retained. Reinstall the recorded archive to reconstruct an installation/cache. Decompress archived experiment binaries and verify original hashes/mode/time. Hardlinked gzip files are immutable."
+}

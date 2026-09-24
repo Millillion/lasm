@@ -42,6 +42,7 @@ const patchInputs = ['wasm-build', 'compact-alignment', 'thread-runtime', 'sdk-m
 // getIsLinux was added after the original host-platform patch. Keep the older
 // version's patch applicable to its own sources.
 patchInputs.push({ name: 'host-linux', file: 'lean-4.34.0-host-linux.patch' });
+patchInputs.push({ name: 'host-backtrace', file: 'lean-4.34.0-host-backtrace.patch' });
 for (const { name, file } of patchInputs) {
   // These reviewed runtime changes still apply to 4.34. Record the actual patch
   // bytes and source commit; never treat old 4.32 tests as validation of 4.34.

@@ -102,3 +102,11 @@ The original NaN-class comparison and ignored exception flags are preserved;
 timings are the only output excluded from differential comparison. This adds
 substantial arithmetic/conversion evidence without establishing complete
 floating-point, libm, other-API or native-platform parity.
+
+The [panic runtime repair](../evidence/upstream-debug-2026-09-24.json) replaces
+only `object.cpp.o`, preserving the other 33 runtime archive members and 17
+bundle files. Installed `.15` now captures actual Lean-thread backtraces in
+Node and Deno. The original debug/release project and environment controls
+establish the recorded panic/exit behavior; Bun still lacks identifiable Wasm
+frames. This is partial panic coverage, with symbolization, other termination
+modes and native platform validation still open.

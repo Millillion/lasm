@@ -37,6 +37,16 @@ separately from the earlier runtime evidence below.
   Their current Emscripten implementations return zero. Record actual deployed
   dependencies and native differences without substituting invented version
   values; runtime comparisons and any required implementation are still open.
+- [ ] Complete panic diagnostics, symbolization and termination parity.
+  Installed `.15` [restores real panic backtraces](docs/evidence/upstream-debug-2026-09-24.json)
+  in Node and Deno on Linux x64, including exact output with `LEAN_BACKTRACE=0`.
+  Original upstream debug/release settings work, but Bun's debug comparison
+  still fails because its Wasm frames are labeled `unknown`. Retaining Wasm
+  names does not fix the tiny independent control; accessing structured
+  CallSite data crashes the Bun child without an OOM event. This is unresolved
+  engineering work, not a proven fundamental limitation. Redirected stderr,
+  panic fallback/exit/abort behavior, symbolization and other platforms need
+  their own native differential controls.
 - [ ] Finish managed application packaging, native Windows ARM64 tools and
   deployment validation without source or build tools.
 - [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and
