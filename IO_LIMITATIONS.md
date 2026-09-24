@@ -102,8 +102,10 @@ separately from the earlier runtime evidence below.
   using installed `.23` with automatic data copying and no Lean path inputs.
   The 12,600 metadata files are verified and archived after execution. The
   [original and supplementary attribute selections now both pass on Node and Deno](docs/evidence/application-module-data-node-deno-2026-09-24.json),
-  with identical native results and no changed source assertions. The Bun
-  selections, complete dynamic-module handling and other platforms stay open.
+  with identical native results and no changed source assertions. The
+  [Bun selections also pass](docs/evidence/application-module-data-bun-2026-09-24.json)
+  in the same installed candidate. Complete dynamic-module handling and other
+  platforms stay open.
 - [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and
   `Std.Internal.UV.Loop.alive`. The compiled library declarations are present,
   but their Emscripten C implementations still reject the operation or abort;

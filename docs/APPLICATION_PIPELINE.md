@@ -633,7 +633,14 @@ run peaked at 7.59 GiB; Deno's original and attribute runs peaked at 6.20 and
 Removing duplicate metadata after the build reduces retained data, but these
 results do not show a lower overall build peak. Every completed deployment's
 metadata and generated binaries have verified archives and restore receipts.
-Bun and other native platforms remain separate acceptance work.
+The [same two selections also pass in Bun](evidence/application-module-data-bun-2026-09-24.json),
+with exact native observations and unchanged sources. Its original and attribute
+runs peaked at 5.86 and 6.85 GiB. The first Bun attempt was stopped before
+completion to protect the disk reserve; its incomplete result remains separate.
+Verified binary archives restored headroom, and subsequent cases required at
+least 9 GiB available disk before starting. All six successful cases use the
+same installed `.23` candidate, in separate sequential guards. Other native
+platforms and complete dynamic-module handling remain open.
 
 The [cold runtime-source workflow](../.github/workflows/application-runtime-source.yml)
 now prepares the application libraries from committed patches and pinned public

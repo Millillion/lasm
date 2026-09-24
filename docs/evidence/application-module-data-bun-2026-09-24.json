@@ -1,0 +1,884 @@
+{
+  "scope": "Installed .23 automatic module data on stock Bun 1.4.2 Linux x64: original imports, missing-data failures, and supplementary runtime attributes. Combined with the separate Node/Deno evidence, both cases now pass in all three engines.",
+  "recordedAt": "2026-09-24T15:53:37.508607+00:00",
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-r20/lasm-compiler-0.1.0-experimental.23.tgz",
+    "sha256": "7f5beec9feadda1302f8d6d65b324eda00eb4c2d2c5f2824a95c733f6705dc8a",
+    "compressedBytes": 125592670,
+    "installedBytes": 630848139,
+    "files": 2696,
+    "runtime": {
+      "name": "lean-4.34.0-wasm64",
+      "identity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/package-install-module-data-r1-resources.json",
+    "recordedAt": "2026-09-24T15:00:03.143Z"
+  },
+  "nodeDenoEvidence": {
+    "file": "docs/evidence/application-module-data-node-deno-2026-09-24.json",
+    "sha256": "a912e4e6b68d2341b8a5b1727c62eb9ba3124e9254500897e4d61b2180a7b6fc"
+  },
+  "cases": [
+    {
+      "resultFile": ".work/bundled-module-data-bun-original-r2/result.json",
+      "resultSha256": "9aba4e664b91d03a9959604228b46bfe5f6488e1060167dc3eb29ee3180a808f",
+      "observations": {
+        "target": "bun",
+        "engineVersion": "1.4.2",
+        "packageVersion": "0.1.0-experimental.23",
+        "build": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "01be8862dbe04da5df61295ff7ac6fa1da1c1a2f2d71991215285e76891635ea",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "moduleDataIdentity": "acee9ee7d9ccfe460a9d6cb2655360dac8f1cdb851d62e749a6d32e8663874e2",
+          "moduleDataBytes": 2212604382,
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "/+Main",
+              "sourceSha256": "dc8f9b46f5f81a225f7727e0b0cbda00cd44664c02ff84075c1199daf2ae8f0e",
+              "cSha256": "a00205a554514dad6d9658a13ff24fe19de456686daed936410d297f81ab7349"
+            }
+          ],
+          "signature": "47d1bcd0db9c42378f89c119bb834410edb115d615105dc97508ff0adb7d5ebd",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "native": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "actual": {
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        "missingDataControl": {
+          "native": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/relocated deployment/lean/packages/0\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/missing standard data/lib/lean\n"
+          },
+          "actual": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/relocated deployment/lean/packages/0\n/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/missing standard data/lib/lean\n"
+          }
+        },
+        "deployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/relocated deployment",
+          "sourceHidden": true,
+          "path": "",
+          "buildProcessesUsedAtRuntime": false,
+          "selfContained": true,
+          "suppliedLeanPaths": false,
+          "wasmSha256": "79d87a96b59b57c1c01498c16f46f34a0cd4960df355d3b191376e4c3bb1fa25"
+        },
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "nativeSourceAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "applicationAfter": {
+          "checked": 5,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "adaptations": [
+          "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+          "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+          "The original main intentionally imports compiled Lean modules at runtime. All module data must be supplied automatically by the installed Lasm build. Native controls explicitly select the same deployed data; deployed processes receive neither LEAN_SYSROOT nor LEAN_PATH.",
+          "Both executables run with empty PATH and hidden source copies. All module data paths used by the deployed import are inside the relocated dist; no native Lean/Lake process is needed at runtime.",
+          "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+          "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks.",
+          "The optional case selection separates complete original/missing-data and supplementary-attribute controls into independent guarded runs. Aggregate acceptance still requires both selections; it does not omit any assertion.",
+          "After each completed build, every generated cache/deployment metadata member is hashed and compared. Only the redundant generated cache copy is removed before execution; sources and deployed data are retained. This lowers memory/disk use without changing any test input or assertion."
+        ],
+        "harnessSha256": "b7528e0df991f8c2b80fbedcf03855df24b9fb261bf80306eba90b41728e43a4",
+        "reclamationHelperSha256": "1b75c74ae91df123a280a80a633b5d40da210b3d22f141fd094bfe87d1efa58a"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T15:40:02.320Z",
+        "command": [
+          "bash",
+          ".work/run-bundled-module-data-case-r1.sh",
+          "bun",
+          "original",
+          ".work/bundled-module-data-bun-original-r2"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "f53156c2-fbe3-4b90-988c-ed6298c23d1b",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24015749120
+        },
+        "minimumHostAvailable": 20406996992,
+        "peakMemoryBytes": 6296674304,
+        "peakTasks": 51,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-bun-original-r2-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T15:43:43.195Z",
+          "memoryBytes": 3171348480,
+          "peakMemoryBytes": 6296674304,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 162082816,
+            "file": 2895745024,
+            "kernel": 112427008,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 2564947968,
+            "slab": 109692320
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T15:43:43.273Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 3019497472,
+          "peakMemoryBytes": 6296674304,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11661312,
+            "file": 2895745024,
+            "kernel": 110522368,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 2564947968,
+            "slab": 109581824
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T15:43:43.299Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archives": [
+        {
+          "file": ".work/bundled-module-data-bun-original-r2/module-data-archive.json",
+          "sha256": "5a7769bec9609c6eef381a23181a664e0c9d6f371110ba43a4a573e1ca377c75",
+          "receipt": {
+            "resultSha256": "9aba4e664b91d03a9959604228b46bfe5f6488e1060167dc3eb29ee3180a808f",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-bun-original-r2-archive-resources.json",
+            "copies": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/relocated deployment/lean",
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/original-module-data.tgz",
+                "sha256": "955ed6ffca0bdb1d654d7332b570abb3cb6b14b1d185234ea133ce6586b3bee8",
+                "bytes": 688707989,
+                "identitySha256": "45b1312fba9567547aa2c510319bb80a9310dfac159c936824b1e7dd5ec94d9f",
+                "files": 12601,
+                "contentBytes": 2214446488,
+                "verifiedDecompression": true,
+                "removedVerifiedDuplicate": true,
+                "restore": "Use restoreCompletedTree from scripts/ci/tree-archive.mjs with the recorded checksum, ceilings and a fresh destination."
+              }
+            ],
+            "passed": true
+          }
+        },
+        {
+          "file": ".work/bundled-module-data-bun-original-r2/archive.json",
+          "sha256": "8a06c118bc7b46099540df0f7686ce229cec29246a8edb2c864f7d9b8c549b83",
+          "receipt": {
+            "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-bun-original-r2-archive-resources.json",
+            "files": [
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/relocated deployment/program.wasm",
+                "originalBytes": 166007504,
+                "originalSha256": "79d87a96b59b57c1c01498c16f46f34a0cd4960df355d3b191376e4c3bb1fa25",
+                "mode": 509,
+                "mtimeNs": 1790264565600354237,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/relocated deployment/program.wasm.gz",
+                "archiveBytes": 38389055,
+                "archiveSha256": "bd6846ab1b98f31db94a2fa0791a52fd126ea73446203f8504c26759e5f31ab7",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2",
+                  "receiptSha256": "9aba4e664b91d03a9959604228b46bfe5f6488e1060167dc3eb29ee3180a808f"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/release-pinned application source.hidden/.lake/lasm/applications/73dcade38bae0d1d/47d1bcd0db9c42378f89c119bb834410edb115d615105dc97508ff0adb7d5ebd/dist/program.wasm",
+                "originalBytes": 166007504,
+                "originalSha256": "79d87a96b59b57c1c01498c16f46f34a0cd4960df355d3b191376e4c3bb1fa25",
+                "mode": 509,
+                "mtimeNs": 1790264523263961649,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/release-pinned application source.hidden/.lake/lasm/applications/73dcade38bae0d1d/47d1bcd0db9c42378f89c119bb834410edb115d615105dc97508ff0adb7d5ebd/dist/program.wasm.gz",
+                "archiveBytes": 38389055,
+                "archiveSha256": "bd6846ab1b98f31db94a2fa0791a52fd126ea73446203f8504c26759e5f31ab7",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2",
+                  "receiptSha256": "9aba4e664b91d03a9959604228b46bfe5f6488e1060167dc3eb29ee3180a808f"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/native source.hidden/.lake/build/bin/user_attr",
+                "originalBytes": 233669232,
+                "originalSha256": "056f8ca5c4b52e85e1205fc5e17acb1de08d84c3ee4627f7d0b925ac1a8d7e0a",
+                "mode": 509,
+                "mtimeNs": 1790264421386016799,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/native source.hidden/.lake/build/bin/user_attr.gz",
+                "archiveBytes": 66712611,
+                "archiveSha256": "de9ee9756918546c24dadae601cfb7337d5eac65af7f39760e13244f09091332",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2",
+                  "receiptSha256": "9aba4e664b91d03a9959604228b46bfe5f6488e1060167dc3eb29ee3180a808f"
+                },
+                "phase": "archived"
+              }
+            ],
+            "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+            "savedBytes": 422193519,
+            "finishedAt": "2026-09-24T15:46:01.691165+00:00"
+          }
+        }
+      ],
+      "bundled": {
+        "bytes": 2212604382,
+        "files": 12600,
+        "roots": [
+          "packages/0"
+        ],
+        "manifestSha256": "dee7ebb3e4c32b69b7dcb0a8a9a3590888e85c1c43345dcff39c2b11c1ae4e88"
+      },
+      "reclaimedOriginalCache": {
+        "removed": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/release-pinned application source/.lake/lasm/applications/73dcade38bae0d1d/47d1bcd0db9c42378f89c119bb834410edb115d615105dc97508ff0adb7d5ebd/dist/lean",
+        "retained": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-original-r2/dist/lean",
+        "files": 12601,
+        "metadataBytes": 2212604382,
+        "metadataSha256": "dee7ebb3e4c32b69b7dcb0a8a9a3590888e85c1c43345dcff39c2b11c1ae4e88",
+        "reason": "Avoid charging a second generated module-data copy during execution"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T15:44:46.527Z",
+        "command": [
+          "bash",
+          "-c",
+          "set -e; .cache/js-runtimes/node-26.10.0/bin/node --max-old-space-size=256 .work/archive-module-data-r1.mjs .work/bundled-module-data-bun-original-r2; python3 -I -B .work/archive-bundled-module-case-binaries-r1.py .work/bundled-module-data-bun-original-r2; .cache/js-runtimes/node-26.10.0/bin/node --max-old-space-size=256 .work/reclaim-old-installation-r21.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "a3826830-3720-4a99-b4c4-a0495508c3d7",
+        "limits": {
+          "memoryMax": 4294967296,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 3435973836,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24084852736
+        },
+        "minimumHostAvailable": 23562895360,
+        "peakMemoryBytes": 1787138048,
+        "peakTasks": 12,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-bun-original-r2-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T15:46:06.830Z",
+          "memoryBytes": 1543409664,
+          "peakMemoryBytes": 1787138048,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 225992704,
+            "file": 1290387456,
+            "kernel": 25550848,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1290436608,
+            "slab": 23780160
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T15:46:07.013Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 959049728,
+          "peakMemoryBytes": 1787138048,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 921559040,
+            "kernel": 24674304,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 921559040,
+            "slab": 23738376
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T15:46:07.039Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "resultFile": ".work/bundled-module-data-bun-attributes-r1/result.json",
+      "resultSha256": "facbf5bf139f743df3e83cd626ac63e8045ad1e525f1704c3688211fc4538a68",
+      "observations": {
+        "target": "bun",
+        "engineVersion": "1.4.2",
+        "packageVersion": "0.1.0-experimental.23",
+        "attributeBuild": {
+          "schema": 1,
+          "lean": "4.34.0",
+          "leanCommit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "nativeLeanIdentity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "c2590cdb7e949e7e1375586336cb6f9305c14e6a57854715b6c4e79a52ede9ee",
+          "buildDriverIdentity": "01be8862dbe04da5df61295ff7ac6fa1da1c1a2f2d71991215285e76891635ea",
+          "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+          "gitVersion": "git version 2.53.0",
+          "moduleDataIdentity": "6784faf1e253f39e52e997092de342d7e9f1f68986af2de32d607184be1f6c36",
+          "moduleDataBytes": 2212526757,
+          "target": "bun",
+          "memoryMode": 2,
+          "modules": [
+            {
+              "module": "+UserAttr.BlaAttr",
+              "sourceSha256": "6ebf49472af018f774ee27d3c50be5b2ff44fa07e0c0eb11984c4559434275e1",
+              "cSha256": "43b1d54b7bf8d3dc8858639452de9fdc75e7e6cf65c1d5b91e94c415d0323a53"
+            },
+            {
+              "module": "+UserAttr.Tst",
+              "sourceSha256": "0065c6b529db791446376904f39ec78643ea67efbfb8a704dc2a519c80497543",
+              "cSha256": "36efaf7d97d6a0b11468441caeda191a60a80374347de9d41b8dfbef06e4f830"
+            },
+            {
+              "module": "RuntimeAttributeImport.lean",
+              "sourceSha256": "ab39f7bbef2d6e66d08c8cb3f423a4a754a0555150b36e4df50e37265caf3929",
+              "cSha256": "f54a61f46d39f9e9c4a8558e4dcb35cf2e31539290727f2c60481f9af0fd81f0"
+            }
+          ],
+          "signature": "53a13652cf13c4c028d3f30a7a5726c53c71616b0597cea481cde54b49896b7f",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "runtimeAttributes": {
+          "native": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          },
+          "actual": {
+            "code": 0,
+            "signal": null,
+            "stdout": "Imported attribute tags: [true, true, false]\n",
+            "stderr": ""
+          }
+        },
+        "attributeDeployment": {
+          "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/relocated attribute deployment",
+          "sourceHidden": true,
+          "path": "",
+          "selfContained": true,
+          "suppliedLeanPaths": false,
+          "wasmSha256": "98dbc9b8072a902bbe93047af3b9b9835ea46eed8c21f59b09313e75f9e7eb9b"
+        },
+        "referenceBefore": {
+          "checked": 7669,
+          "modified": []
+        },
+        "referenceAfter": {
+          "checked": 7669,
+          "modified": []
+        },
+        "nativeSourceAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "applicationAfter": {
+          "checked": 5,
+          "modified": []
+        },
+        "originalApplicationAfter": {
+          "checked": 6,
+          "modified": []
+        },
+        "parallelPin": {
+          "original": "../../../build/release/stage1\n",
+          "release": "leanprover/lean4:v4.34.0\n"
+        },
+        "adaptations": [
+          "The complete original native shell driver and compile-time attribute assertions run unchanged.",
+          "A separate build copy preserves every original source byte except its explicitly replaced upstream stage pin; both original copies retain that pin.",
+          "The original main intentionally imports compiled Lean modules at runtime. All module data must be supplied automatically by the installed Lasm build. Native controls explicitly select the same deployed data; deployed processes receive neither LEAN_SYSROOT nor LEAN_PATH.",
+          "Both executables run with empty PATH and hidden source copies. All module data paths used by the deployed import are inside the relocated dist; no native Lean/Lake process is needed at runtime.",
+          "A separately recorded missing-standard-metadata control must fail natively and in the target. No original test or assertion is edited.",
+          "A separate ordinary Lean fixture repeats the three original compile-time tag assertions after importing module data at runtime. Its native control uses -rdynamic, matching the original Lake supportInterpreter setting on Linux. Both native and installed AOT controls must pass; these are supplementary runtime checks.",
+          "The optional case selection separates complete original/missing-data and supplementary-attribute controls into independent guarded runs. Aggregate acceptance still requires both selections; it does not omit any assertion.",
+          "After each completed build, every generated cache/deployment metadata member is hashed and compared. Only the redundant generated cache copy is removed before execution; sources and deployed data are retained. This lowers memory/disk use without changing any test input or assertion."
+        ],
+        "harnessSha256": "b7528e0df991f8c2b80fbedcf03855df24b9fb261bf80306eba90b41728e43a4",
+        "reclamationHelperSha256": "1b75c74ae91df123a280a80a633b5d40da210b3d22f141fd094bfe87d1efa58a"
+      },
+      "resources": {
+        "startedAt": "2026-09-24T15:46:41.788Z",
+        "command": [
+          "bash",
+          ".work/run-bundled-module-data-case-r1.sh",
+          "bun",
+          "attributes",
+          ".work/bundled-module-data-bun-attributes-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "0dd95294-0b88-4328-9a52-52be3f763548",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 24106192896
+        },
+        "minimumHostAvailable": 20485791744,
+        "peakMemoryBytes": 7356989440,
+        "peakTasks": 52,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-bun-attributes-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T15:50:27.470Z",
+          "memoryBytes": 4200902656,
+          "peakMemoryBytes": 7356989440,
+          "swapBytes": 0,
+          "tasks": 11,
+          "memoryBreakdown": {
+            "anon": 142086144,
+            "file": 3938480128,
+            "kernel": 118812672,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 3471130624,
+            "slab": 116618840
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-24T15:49:35.215Z",
+          "processes": [
+            {
+              "pid": 4046683,
+              "name": "node-MainThread",
+              "residentBytes": 246497280,
+              "threads": 11
+            },
+            {
+              "pid": 4046387,
+              "name": "node-MainThread",
+              "residentBytes": 187338752,
+              "threads": 11
+            }
+          ]
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T15:50:27.632Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 4068974592,
+          "peakMemoryBytes": 7356989440,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11661312,
+            "file": 3938578432,
+            "kernel": 117481472,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 3471233024,
+            "slab": 116525528
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T15:50:27.657Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      },
+      "archives": [
+        {
+          "file": ".work/bundled-module-data-bun-attributes-r1/module-data-archive.json",
+          "sha256": "01c752fe325b17c5281f67ad8be868357ec4217f70332395f56fdfc96a8172ec",
+          "receipt": {
+            "resultSha256": "facbf5bf139f743df3e83cd626ac63e8045ad1e525f1704c3688211fc4538a68",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-bun-attributes-r1-archive-resources.json",
+            "copies": [
+              {
+                "directory": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/relocated attribute deployment/lean",
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/attributes-module-data.tgz",
+                "sha256": "4a129058f83d3a2a45ee69b5224fc69e75bcbb1e9d1eeae09bc3f42c138d5dda",
+                "bytes": 688685131,
+                "identitySha256": "a718213abbc32a68952f3acecf46e11cc761170e07003ad2bd259b640adf4ebe",
+                "files": 12599,
+                "contentBytes": 2214368618,
+                "verifiedDecompression": true,
+                "removedVerifiedDuplicate": true,
+                "restore": "Use restoreCompletedTree from scripts/ci/tree-archive.mjs with the recorded checksum, ceilings and a fresh destination."
+              }
+            ],
+            "passed": true
+          }
+        },
+        {
+          "file": ".work/bundled-module-data-bun-attributes-r1/archive.json",
+          "sha256": "026223b3dcb20cc95fe42ce08246a8bca4e13e02dd72ffa529b87126697c2b1b",
+          "receipt": {
+            "scope": "Lossless archival of completed generated evidence only; originals recoverable byte-for-byte",
+            "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-bun-attributes-r1-archive-resources.json",
+            "files": [
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/relocated attribute deployment/program.wasm",
+                "originalBytes": 166009079,
+                "originalSha256": "98dbc9b8072a902bbe93047af3b9b9835ea46eed8c21f59b09313e75f9e7eb9b",
+                "mode": 509,
+                "mtimeNs": 1790264973570136203,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/relocated attribute deployment/program.wasm.gz",
+                "archiveBytes": 38387190,
+                "archiveSha256": "50808b9428ff846a4035b4bdacb911dc626185374b9f80e595a9f152e707fcbb",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1",
+                  "receiptSha256": "facbf5bf139f743df3e83cd626ac63e8045ad1e525f1704c3688211fc4538a68"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/release-pinned application source.hidden/.lake/lasm/applications/0a2b28742257cf48/53a13652cf13c4c028d3f30a7a5726c53c71616b0597cea481cde54b49896b7f/dist/program.wasm",
+                "originalBytes": 166009079,
+                "originalSha256": "98dbc9b8072a902bbe93047af3b9b9835ea46eed8c21f59b09313e75f9e7eb9b",
+                "mode": 509,
+                "mtimeNs": 1790264931606747267,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/release-pinned application source.hidden/.lake/lasm/applications/0a2b28742257cf48/53a13652cf13c4c028d3f30a7a5726c53c71616b0597cea481cde54b49896b7f/dist/program.wasm.gz",
+                "archiveBytes": 38387190,
+                "archiveSha256": "50808b9428ff846a4035b4bdacb911dc626185374b9f80e595a9f152e707fcbb",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1",
+                  "receiptSha256": "facbf5bf139f743df3e83cd626ac63e8045ad1e525f1704c3688211fc4538a68"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/native source.hidden/.lake/build/bin/user_attr",
+                "originalBytes": 233669232,
+                "originalSha256": "056f8ca5c4b52e85e1205fc5e17acb1de08d84c3ee4627f7d0b925ac1a8d7e0a",
+                "mode": 509,
+                "mtimeNs": 1790264820634718665,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/native source.hidden/.lake/build/bin/user_attr.gz",
+                "archiveBytes": 66712611,
+                "archiveSha256": "de9ee9756918546c24dadae601cfb7337d5eac65af7f39760e13244f09091332",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1",
+                  "receiptSha256": "facbf5bf139f743df3e83cd626ac63e8045ad1e525f1704c3688211fc4538a68"
+                },
+                "phase": "archived"
+              },
+              {
+                "original": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/native runtime attribute check",
+                "originalBytes": 233668392,
+                "originalSha256": "41afa6ef371dd1dc622c13f68bf2f81efe205767b694f35e5fef31d51e63b554",
+                "mode": 509,
+                "mtimeNs": 1790264829514800978,
+                "archive": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/native runtime attribute check.gz",
+                "archiveBytes": 66714753,
+                "archiveSha256": "fceeecf6038486db8132037d1e256b2e39a9594a801251a835daf8b3187b6d59",
+                "verifiedDecompression": true,
+                "provenance": {
+                  "completedProbe": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1",
+                  "receiptSha256": "facbf5bf139f743df3e83cd626ac63e8045ad1e525f1704c3688211fc4538a68"
+                },
+                "phase": "archived"
+              }
+            ],
+            "restore": "Decompress each archive to its original path, verify originalSha256, then restore mode and mtimeNs from this receipt.",
+            "savedBytes": 589154038,
+            "finishedAt": "2026-09-24T15:52:22.338707+00:00"
+          }
+        }
+      ],
+      "attributeBundled": {
+        "bytes": 2212526757,
+        "files": 12598,
+        "roots": [
+          "packages/0"
+        ],
+        "manifestSha256": "722d19ef37f784d88754363620b32c1ec25da0512421e6e5bce5f402d2d2f027"
+      },
+      "reclaimedAttributeCache": {
+        "removed": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/release-pinned application source/.lake/lasm/applications/0a2b28742257cf48/53a13652cf13c4c028d3f30a7a5726c53c71616b0597cea481cde54b49896b7f/dist/lean",
+        "retained": "/home/lastmjs/development/lasm/compiler/.work/bundled-module-data-bun-attributes-r1/attribute dist/lean",
+        "files": 12599,
+        "metadataBytes": 2212526757,
+        "metadataSha256": "722d19ef37f784d88754363620b32c1ec25da0512421e6e5bce5f402d2d2f027",
+        "reason": "Avoid charging a second generated module-data copy during execution"
+      },
+      "archiveResources": {
+        "startedAt": "2026-09-24T15:51:01.305Z",
+        "command": [
+          "bash",
+          "-c",
+          "set -e; .cache/js-runtimes/node-26.10.0/bin/node --max-old-space-size=256 .work/archive-module-data-r1.mjs .work/bundled-module-data-bun-attributes-r1; python3 -I -B .work/archive-bundled-module-case-binaries-r1.py .work/bundled-module-data-bun-attributes-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "c105130c-21ba-431d-ae8f-3c78ccc60f91",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23979098112
+        },
+        "minimumHostAvailable": 23723028480,
+        "peakMemoryBytes": 906825728,
+        "peakTasks": 12,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bundled-module-data-bun-attributes-r1-archive-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-24T15:52:22.210Z",
+          "memoryBytes": 906792960,
+          "peakMemoryBytes": 906792960,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 20246528,
+            "file": 860622848,
+            "kernel": 25686016,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 860622848,
+            "slab": 25554504
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-24T15:52:22.399Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 899813376,
+          "peakMemoryBytes": 906825728,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11644928,
+            "file": 860626944,
+            "kernel": 26591232,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 860626944,
+            "slab": 25671888
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-24T15:52:22.426Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "passed": true,
+  "limitations": [
+    "Only Linux x64 installed applications are claimed. Other native platforms, complete dynamic-module handling and native shared-library dependencies remain open.",
+    "Completed metadata and binaries have verified archives and restore receipts; unpacked deployments are no longer immediately runnable.",
+    "All six cases are separate sequential guards using the same installed candidate; no claim of a complete Lean suite or one uninterrupted campaign."
+  ],
+  "preservedIncompleteAttempt": {
+    "recordedAt": "2026-09-24T15:37:33.954139+00:00",
+    "scope": "Incomplete guarded campaign; proactive disk-reserve stop, not a test failure",
+    "command": "systemctl --user stop lasm-heavy-a79a4e3ab9f2.service",
+    "reason": "Projected two 2.21 GB metadata copies plus Wasm build could reduce free disk below 4 GiB. Preflight was 7 GiB; require 9 GiB for subsequent cases.",
+    "result": ".work/bundled-module-data-bun-original-r1/result.json",
+    "guard": ".work/product-acceptance/bundled-module-data-bun-original-r1-resources.json",
+    "guardExitCodeNote": "Manual systemd stop returned guard code 0; application report is incomplete and passed=false. It must not count as a pass.",
+    "applicationCompleted": false,
+    "resultSha256": "bb70e4878e726de9c66dde13f9fa0b70b622cbd219417afbb6972a96f375b457"
+  },
+  "parallelWrapper": {
+    "file": ".work/run-bundled-module-data-case-r1.sh",
+    "sha256": "3e3ac5d0a9d46af5979a0cb41d247dc45b4630a684de5423d0717d8ede4b73aa",
+    "contents": "#!/usr/bin/env bash\nset -euo pipefail\nulimit -c 0\ntarget=\"$1\"\nselection=\"$2\"\noutput=\"$3\"\nnode_binary=\"$PWD/.cache/js-runtimes/node-26.10.0/bin/node\"\nexport PATH=\"$PWD/.cache/js-runtimes/node-26.10.0/bin:/usr/bin:/bin\"\nexport LASM_TOOLCHAIN_CACHE=\"$PWD/.work/application-installed-r3/workspace/toolchains\"\nexport LEAN_NUM_THREADS=1 CMAKE_BUILD_PARALLEL_LEVEL=1 EMCC_CORES=1 BINARYEN_CORES=1 MAKEFLAGS=-j1\ncase \"$target\" in\n  node) engine=\"$node_binary\" ;;\n  deno) engine=\"$PWD/.cache/js-runtimes/deno-2.9.7/deno\" ;;\n  bun) engine=\"$PWD/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun\" ;;\n  *) exit 2 ;;\nesac\npython3 -I -B - <<'CHECK'\nimport os,json\ns=os.statvfs('.');assert s.f_bavail*s.f_frsize>=9*1024**3, 'Reserve headroom for generated module data'\nr=json.load(open('.work/product-acceptance/package-install-module-data-r1-resources.json'))\nassert r.get('unitReleased') is True and r['result']['code']==0\nCHECK\nexec python3 scripts/full-lean/base-pages.py \"$node_binary\" --max-old-space-size=256 \\\n integration/application-upstream-runtime-imports.mjs \"$output\" \"$target\" \"$engine\" \\\n \"$PWD/.work/application-installed-r22/workspace/project/node_modules/@lasm/compiler\" \\\n \"$PWD/.work/upstream-mixed-native-r1/source\" --bundled-metadata \"--case=$selection\"\n"
+  },
+  "verifiedOldInstallationReclamation": [
+    {
+      "removedOnlyVerifiedDuplicate": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r21/workspace/project/node_modules/@lasm/compiler",
+      "retainedArchive": "/home/lastmjs/development/lasm/compiler/.work/application-package-r19/lasm-compiler-0.1.0-experimental.22.tgz",
+      "sha256": "8112779da143a3e46efd166e6a5ae90f77f7c1c42127bb90679874f294508682",
+      "verifiedFiles": 2694,
+      "bytes": 630643653
+    }
+  ]
+}

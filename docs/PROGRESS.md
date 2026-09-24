@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Installed Node and Deno imports](evidence/application-module-data-node-deno-2026-09-24.json) now pass both original and supplementary attribute checks with automatically bundled metadata and correct missing-data errors. Unchanged sources, released guards and verified archives are recorded. Bun and other platforms remain pending. Pushes await restored SSH credentials.
+**Changed:** [Installed automatic module imports now pass in all three engines](evidence/application-module-data-bun-2026-09-24.json) on Linux x64: original imports, missing-data errors and supplementary attribute checks. The incomplete disk-stop attempt is preserved separately. Verified archives and a stricter disk preflight preserve headroom. Pushes await restored SSH credentials.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
