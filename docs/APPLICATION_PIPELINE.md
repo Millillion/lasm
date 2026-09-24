@@ -537,3 +537,12 @@ earlier differences remain recorded. Deno-native observer coexistence, inherited
 state altered before JavaScript entry, cancellation races, callable embedding
 and other native platforms remain unverified. The native Linux workflow now
 includes the expanded controls; its new run is pending.
+
+The [expanded native Linux CI attempt](evidence/signal-policy-native-ci-failure-2026-09-24.json)
+passes 43 of 45 controls on each architecture. Bun's two default SIGABRT
+termination cases reach the unchanged ten-second deadline; neither guard records
+a resource event. A core-collection difference is under investigation: the
+workflow's shell limit was outside the systemd service. The guard now applies
+the zero core-file limit inside that service, and timeout diagnostics retain
+child signal masks and process state. This is a pending investigation, not a
+verified repair or a completed native signal gate.

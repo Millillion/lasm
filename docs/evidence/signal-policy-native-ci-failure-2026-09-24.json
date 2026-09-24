@@ -1,0 +1,660 @@
+{
+  "scope": "Expanded source helper controls on native Linux x64 and ARM64; failing CI evidence retained",
+  "status": {
+    "conclusion": "failure",
+    "databaseId": 35996495143,
+    "headSha": "0f86dce6a1244c4a05cdf9641d08ea9aa711d618",
+    "jobs": [
+      {
+        "completedAt": "2026-09-24T12:03:01Z",
+        "conclusion": "failure",
+        "databaseId": 107622570961,
+        "name": "Signal routing linux-x64",
+        "startedAt": "2026-09-24T12:01:47Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Check native engines and retain exact paths",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Enable process-tree guard",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build native control helper",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "failure",
+            "name": "Guarded signal controls",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Preserve guard and helper receipts in logs",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 19,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Post Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 20,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 21,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 22,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 23,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Millillion/lasm/actions/runs/35996495143/job/107622570961"
+      },
+      {
+        "completedAt": "2026-09-24T12:02:58Z",
+        "conclusion": "failure",
+        "databaseId": 107622571366,
+        "name": "Signal routing linux-arm64",
+        "startedAt": "2026-09-24T12:01:50Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run npm ci --omit=dev --ignore-scripts --no-audit --no-fund",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Check native engines and retain exact paths",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Enable process-tree guard",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Build native control helper",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "failure",
+            "name": "Guarded signal controls",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Preserve guard and helper receipts in logs",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed",
+            "number": 19,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Post Run oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
+            "number": 20,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+            "number": 21,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "number": 22,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 23,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/Millillion/lasm/actions/runs/35996495143/job/107622571366"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/Millillion/lasm/actions/runs/35996495143"
+  },
+  "logFile": ".work/product-acceptance/signal-policy-ci-35996495143.log",
+  "logSha256": "e8f411e30ba37b68186d9c79764ca911348a7322ec8585f4da3c555a53d63290",
+  "platforms": [
+    {
+      "platform": "linux-x64",
+      "passed": 43,
+      "failed": 2,
+      "skipped": 0,
+      "reports": {
+        ".work/signal-helper-build-resources.json": {
+          "startedAt": "2026-09-24T12:02:02.515Z",
+          "command": [
+            "node",
+            "scripts/build-signal-helper.mjs",
+            "--native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "ea7310eb-b146-4e0b-b4c3-34bd7415ee96",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 15396773888
+          },
+          "minimumHostAvailable": 15384952832,
+          "peakMemoryBytes": 50147328,
+          "peakTasks": 9,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:02:04.528Z",
+            "memoryBytes": 40882176,
+            "peakMemoryBytes": 50147328,
+            "swapBytes": 0,
+            "tasks": 9,
+            "memoryBreakdown": {
+              "anon": 14430208,
+              "file": 24272896,
+              "kernel": 1642496,
+              "shmem": 0,
+              "file_mapped": 1609728,
+              "inactive_file": 1273856,
+              "slab": 566208
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:02:04.656Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 42119168,
+            "peakMemoryBytes": 50147328,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13656064,
+              "file": 26451968,
+              "kernel": 1441792,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1482752,
+              "slab": 514536
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:02:04.671Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/signal-controls-resources.json": {
+          "startedAt": "2026-09-24T12:02:04.947Z",
+          "command": [
+            "/usr/bin/env",
+            "LASM_TEST_BUN=/home/runner/.bun/bin/bun",
+            "LASM_TEST_DENO=/opt/hostedtoolcache/deno/2.9.7/x64/deno",
+            "LASM_REQUIRE_SIGNAL_ENGINES=1",
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/node-signal.test.mjs",
+            "test/application-signals.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "7e7503c0-37ce-4097-b384-54fbdd66823f",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 15396319232
+          },
+          "minimumHostAvailable": 14448136192,
+          "peakMemoryBytes": 66236416,
+          "peakTasks": 27,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-controls-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:02:57.940Z",
+            "memoryBytes": 47595520,
+            "peakMemoryBytes": 66236416,
+            "swapBytes": 0,
+            "tasks": 21,
+            "memoryBreakdown": {
+              "anon": 39870464,
+              "file": 4214784,
+              "kernel": 3047424,
+              "shmem": 0,
+              "file_mapped": 200704,
+              "inactive_file": 4214784,
+              "slab": 673432
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T12:02:58.015Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 19726336,
+            "peakMemoryBytes": 66236416,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13660160,
+              "file": 4214784,
+              "kernel": 1253376,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4214784,
+              "slab": 327520
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:02:58.029Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".cache/native-host/signals/manifest.json": {
+          "protocol": 1,
+          "source": "native/posix-signal.c",
+          "sourceSha256": "bedfba1f14c8d3f57d086bc1b691da39648ef1ccbb4c945dbb33c8216806e1d7",
+          "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+          "files": {
+            "linux-x64-gnu.so": {
+              "target": "native",
+              "sha256": "f17f8444a27c72db71c7f4b0e4e050796602a5515a47886654f1de7e400822af",
+              "bytes": 16464
+            }
+          },
+          "validation": "Native source control, separate from shipped cross-compiled helper acceptance."
+        }
+      },
+      "controlsLog": "Current runner version: '2.337.0'\nHosted Compute Agent\nVersion: 20260828.587\nCommit: abac92662cab4cc7352de4f9f9d2e2419aad9c29\nBuild Date: 2026-08-28T16:44:25Z\nWorker ID: {2495d4be-21a6-4679-99e4-34ee1043493f}\nAzure Region: westus2\nUbuntu\n24.04.5\nLTS\nImage: ubuntu-24.04\nVersion: 20260920.314.1\nIncluded Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md\nImage Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314\nContents: read\nMetadata: read\nSecret source: Actions\nCache mode: write\nPrepare workflow directory\nPrepare all required actions\nGetting action download info\nDownload action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)\nDownload action repository 'actions/setup-node@820762786026740c76f36085b0efc47a31fe5020' (SHA:820762786026740c76f36085b0efc47a31fe5020)\nDownload action repository 'oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6' (SHA:0c5077e51419868618aeaa5fe8019c62421857d6)\nDownload action repository 'denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed' (SHA:22d081ff2d3a40755e97629de92e3bcbfa7cf2ed)\nComplete job name: Signal routing linux-x64\nwith:\n  repository: Millillion/lasm\n  token: ***\n  ssh-strict: true\n  ssh-user: git\n  persist-credentials: true\n  clean: true\n  sparse-checkout-cone-mode: true\n  fetch-depth: 1\n  fetch-tags: false\n  show-progress: true\n  lfs: false\n  submodules: false\n  set-safe-directory: true\n  allow-unsafe-pr-checkout: false\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\nSyncing repository: Millillion/lasm\nWorking directory is '/home/runner/work/lasm/lasm'\n[command]/usr/bin/git version\ngit version 2.55.0\nTemporarily overriding HOME='/home/runner/work/_temp/d27c33a8-1600-4aed-b2f2-67247174c908' before making global git config changes\nAdding repository directory to the temporary git global config as a safe directory\n[command]/usr/bin/git config --global --add safe.directory /home/runner/work/lasm/lasm\nDeleting the contents of '/home/runner/work/lasm/lasm'\n[command]/usr/bin/git init /home/runner/work/lasm/lasm\nhint: Using 'master' as the name for the initial branch. This default branch name\nhint: will change to \"main\" in Git 3.0. To configure the initial branch name\nhint: to use in all of your new repositories, which will suppress this warning,\nhint: call:\nhint:\nhint: \tgit config --global init.defaultBranch <name>\nhint:\nhint: Names commonly chosen instead of 'master' are 'main', 'trunk' and\nhint: 'development'. The just-created branch can be renamed via this command:\nhint:\nhint: \tgit branch -m <name>\nhint:\nhint: Disable this message with \"git config set advice.defaultBranchName false\"\nInitialized empty Git repository in /home/runner/work/lasm/lasm/.git/\n[command]/usr/bin/git remote add origin https://github.com/Millillion/lasm\n[command]/usr/bin/git config --local gc.auto 0\nRemoving SSH command configuration\n[command]/usr/bin/git config --local --name-only --get-regexp core\\.sshCommand\n[command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'core\\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\"\nRemoving HTTP extra header\n[command]/usr/bin/git config --local --name-only --get-regexp http\\.https\\:\\/\\/github\\.com\\/\\.extraheader\n[command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'http\\.https\\:\\/\\/github\\.com\\/\\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\"\nRemoving includeIf entries pointing to credentials config files\n[command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\\.gitdir:\n[command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url\n[command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config http.https://github.com/.extraheader AUTHORIZATION: basic ***\n[command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/lasm/lasm/.git.path /home/runner/work/_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config\n[command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/lasm/lasm/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config\n[command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config\n[command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config\n[command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0f86dce6a1244c4a05cdf9641d08ea9aa711d618:refs/remotes/origin/main\nFrom https://github.com/Millillion/lasm\n * [new ref]         0f86dce6a1244c4a05cdf9641d08ea9aa711d618 -> origin/main\n[command]/usr/bin/git branch --list --remote origin/main\n  origin/main\n[command]/usr/bin/git rev-parse refs/remotes/origin/main\n0f86dce6a1244c4a05cdf9641d08ea9aa711d618\n[command]/usr/bin/git sparse-checkout disable\n[command]/usr/bin/git config --local --unset-all extensions.worktreeConfig\n[command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main\nSwitched to a new branch 'main'\nbranch 'main' set up to track 'origin/main'.\n[command]/usr/bin/git log -1 --format=%H\n0f86dce6a1244c4a05cdf9641d08ea9aa711d618\nwith:\n  node-version: 26.10.0\n  architecture: x64\n  package-manager-cache: false\n  check-latest: false\n  token: ***\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\nAttempting to download 26.10.0...\nAcquiring 26.10.0 - x64 from https://github.com/actions/node-versions/releases/download/26.10.0-35737674515/node-26.10.0-linux-x64.tar.gz\nExtracting ...\n[command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/19a9ba90-69ff-4c99-96f5-4b41a27f98cb -f /home/runner/work/_temp/5a899a9d-c423-48b7-8eb3-eb9b0b03b563\nAdding to the cache ...\nnode: v26.10.0\nnpm: 11.19.1\nyarn: 1.22.22\nwith:\n  bun-version: 1.4.2\n  no-cache: true\n  token: ***\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\nDownloading a new version of Bun: https://github.com/oven-sh/bun/releases/download/bun-v1.4.2/bun-linux-x64.zip\n[command]/usr/bin/unzip -o -q /home/runner/work/_temp/b1bf94bf-e94b-456b-bef0-e083b4bf2fca.zip\n[command]/home/runner/.bun/bin/bun --revision\n1.4.2+744846f84\nwith:\n  deno-version: 2.9.7\n  cache: false\n  deno-binary-name: deno\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\nGoing to install stable version 2.9.7.\nDownloading Deno from https://github.com/denoland/deno/releases/download/v2.9.7/deno-x86_64-unknown-linux-gnu.zip.\n[command]/usr/bin/unzip -o -q /home/runner/work/_temp/41c689e6-7c53-4e26-95eb-7c4f0aa40e29\nCached Deno to /opt/hostedtoolcache/deno/2.9.7/x64.\nInstallation complete.\n\u001b[36;1mnpm ci --omit=dev --ignore-scripts --no-audit --no-fund\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\n\nadded 78 packages in 1s\n\u001b[36;1mnode -e \"require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)\"\u001b[0m\n\u001b[36;1mdeno eval \"if(Deno.version.deno!=='2.9.7'||process.platform+'-'+process.arch!==process.env.LASM_EXPECT_PLATFORM)throw Error('Incorrect engine'); console.log(Deno.version)\"\u001b[0m\n\u001b[36;1mbun -e \"if(Bun.version!=='1.4.2'||process.platform+'-'+process.arch!==process.env.LASM_EXPECT_PLATFORM)throw Error('Incorrect engine'); console.log(process.versions)\"\u001b[0m\n\u001b[36;1mprintf 'LASM_TEST_DENO=%s\\n' \"$(command -v deno)\" >> \"$GITHUB_ENV\"\u001b[0m\n\u001b[36;1mprintf 'LASM_TEST_BUN=%s\\n' \"$(command -v bun)\" >> \"$GITHUB_ENV\"\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\n{ deno: \"2.9.7\", v8: \"15.0.245.2-rusty\", typescript: \"6.0.3\" }\n{\n  node: \"26.3.0\",\n  bun: \"1.4.2\",\n  boringssl: \"41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f\",\n  openssl: \"1.1.0\",\n  llhttp: \"9.3.0\",\n  libarchive: \"ded82291ab41d5e355831b96b0e1ff49e24d8939\",\n  mimalloc: \"6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a\",\n  picohttpparser: \"066d2b1e9ab820703db0837a7255d92d30f0c9f5\",\n  uwebsockets: \"744846f844374847c902b5e7fd59b4342a51ef99\",\n  webkit: \"2e2aa2290fac856d6f451ceacb58f7f5b44dd057\",\n  zig: \"04e7f6ac1e009525bc00934f20199c68f04e0a24\",\n  zlib: \"12731092979c6d07f42da27da673a9f6c7b13586\",\n  tinycc: \"05f0fafaa3be31e31d7b4b5c17dc60f62c991171\",\n  lolhtml: \"725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e\",\n  ares: \"c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab\",\n  libdeflate: \"c8c56a20f8f621e6a966b716b31f1dedab6a41e3\",\n  usockets: \"744846f844374847c902b5e7fd59b4342a51ef99\",\n  lshpack: \"8905c024b6d052f083a3d11d0a169b3c2735c8a1\",\n  zstd: \"f8745da6ff1ad1e7bab384bd1f9d742439278e99\",\n  v8: \"14.6.202.34-node.20\",\n  uv: \"1.48.0\",\n  napi: \"10\",\n  icu: \"78.3\",\n  unicode: \"17.0\",\n  sqlite: \"3.53.2\",\n  modules: \"147\",\n}\n\u001b[36;1msudo loginctl enable-linger \"$(id -un)\"\u001b[0m\n\u001b[36;1mprintf 'XDG_RUNTIME_DIR=/run/user/%s\\n' \"$(id -u)\" >> \"$GITHUB_ENV\"\u001b[0m\n\u001b[36;1mprintf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\\n' \"$(id -u)\" >> \"$GITHUB_ENV\"\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/x64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n\u001b[36;1mulimit -c 0\u001b[0m\n\u001b[36;1mnode scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-helper-build-resources.json -- node scripts/build-signal-helper.mjs --native\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/x64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n[lasm] One workload, 1.00 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service; invocation ID: 0204c8479f6d4e63aed96050f71154ca\nBuilt linux-x64-gnu.so: 16464 bytes\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 2.066s\nCPU time consumed: 131ms\nMemory peak: 47.8M\nMemory swap peak: 0B\n[lasm] Peak 0.05 GiB; success\n\u001b[36;1mulimit -c 0\u001b[0m\n\u001b[36;1mnode scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-controls-resources.json -- /usr/bin/env LASM_TEST_BUN=\"$LASM_TEST_BUN\" LASM_TEST_DENO=\"$LASM_TEST_DENO\" LASM_REQUIRE_SIGNAL_ENGINES=1 node --max-old-space-size=128 --test --test-concurrency=1 test/node-signal.test.mjs test/application-signals.test.mjs test/application-output.test.mjs\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/x64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n[lasm] One workload, 1.00 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/signal-controls-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (24.996453ms)\n\u2714 wrong engines fail before executing the application payload (21.757041ms)\n\u2714 all full-runtime host support files exist and target validation is strict (1.29734ms)\n\u2714 node application SIGUSR1 policy preserves default behavior (747.212593ms)\n\u2714 node application SIGUSR1 policy preserves stopped behavior (742.554282ms)\n\u2714 node application SIGUSR1 policy preserves watch behavior (745.485722ms)\n\u2714 node application SIGUSR1 policy preserves ignored behavior (895.18862ms)\n\u2714 node application SIGUSR1 policy preserves native behavior (743.430256ms)\n\u2714 node application SIGUSR1 policy preserves javascript behavior (734.55326ms)\n\u2714 node application SIGABRT policy preserves default behavior (1521.362229ms)\n\u2714 node application SIGABRT policy preserves stopped behavior (1710.261335ms)\n\u2714 node application SIGABRT policy preserves watch behavior (754.177488ms)\n\u2714 node application SIGABRT policy preserves ignored behavior (893.320886ms)\n\u2714 node application SIGABRT policy preserves native behavior (740.043231ms)\n\u2714 node application SIGABRT policy preserves javascript behavior (742.008625ms)\n\u2714 deno application SIGUSR1 policy preserves default behavior (1128.443005ms)\n\u2714 deno application SIGUSR1 policy preserves stopped behavior (747.703966ms)\n\u2714 deno application SIGUSR1 policy preserves watch behavior (769.031442ms)\n\u2714 deno application SIGUSR1 policy preserves ignored behavior (904.979871ms)\n\u2714 deno application SIGUSR1 policy preserves native behavior (746.504451ms)\n\u2714 deno application SIGUSR1 policy preserves javascript behavior (739.478392ms)\n\u2714 deno application SIGABRT policy preserves default behavior (1370.77678ms)\n\u2714 deno application SIGABRT policy preserves stopped behavior (1395.459166ms)\n\u2714 deno application SIGABRT policy preserves watch behavior (786.471322ms)\n\u2714 deno application SIGABRT policy preserves ignored behavior (905.521377ms)\n\u2714 deno application SIGABRT policy preserves native behavior (746.291684ms)\n\u2714 deno application SIGABRT policy preserves javascript behavior (757.656022ms)\n\u2714 bun application SIGUSR1 policy preserves default behavior (725.630699ms)\n\u2714 bun application SIGUSR1 policy preserves stopped behavior (725.489856ms)\n\u2714 bun application SIGUSR1 policy preserves watch behavior (725.741718ms)\n\u2714 bun application SIGUSR1 policy preserves ignored behavior (874.76992ms)\n\u2714 bun application SIGUSR1 policy preserves native behavior (724.959791ms)\n\u2714 bun application SIGUSR1 policy preserves javascript behavior (725.068603ms)\n\u2716 bun application SIGABRT policy preserves default behavior (10027.522469ms)\n\u2716 bun application SIGABRT policy preserves stopped behavior (10019.260583ms)\n\u2714 bun application SIGABRT policy preserves watch behavior (727.38465ms)\n\u2714 bun application SIGABRT policy preserves ignored behavior (875.972867ms)\n\u2714 bun application SIGABRT policy preserves native behavior (724.786581ms)\n\u2714 bun application SIGABRT policy preserves javascript behavior (720.457548ms)\n\u2714 node signals preserve waiter lifecycle after 0 ms (43.767403ms)\n\u2714 node signals preserve waiter lifecycle after 1000 ms (1041.531436ms)\n\u2714 deno signals preserve waiter lifecycle after 0 ms (58.165391ms)\n\u2714 deno signals preserve waiter lifecycle after 1000 ms (1095.289448ms)\n\u2714 bun signals preserve waiter lifecycle after 0 ms (25.634645ms)\n\u2714 bun signals preserve waiter lifecycle after 1000 ms (1026.226715ms)\n\u2139 tests 45\n\u2139 suites 0\n\u2139 pass 43\n\u2139 fail 2\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 53007.200382\n\n\u2716 failing tests:\n\ntest at test/application-signals.test.mjs:16:5\n\u2716 bun application SIGABRT policy preserves default behavior (10027.522469ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n      code: null,\n  +   signal: 'SIGKILL'\n  -   signal: 'SIGABRT'\n    }\n  \n      at TestContext.<anonymous> (file:///home/runner/work/lasm/lasm/test/application-signals.test.mjs:33:18)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { code: null, signal: 'SIGKILL' },\n    expected: { code: null, signal: 'SIGABRT' },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n\ntest at test/application-signals.test.mjs:16:5\n\u2716 bun application SIGABRT policy preserves stopped behavior (10019.260583ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n      code: null,\n  +   signal: 'SIGKILL'\n  -   signal: 'SIGABRT'\n    }\n  \n      at TestContext.<anonymous> (file:///home/runner/work/lasm/lasm/test/application-signals.test.mjs:33:18)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { code: null, signal: 'SIGKILL' },\n    expected: { code: null, signal: 'SIGABRT' },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 53.061s\nCPU time consumed: 7.704s\nMemory peak: 63.1M\nMemory swap peak: 0B\n[lasm] Peak 0.06 GiB; exit-code\n\u001b[36;1mnode -e \"const f=require('node:fs');for(const p of ['.work/signal-helper-build-resources.json','.work/signal-controls-resources.json','.cache/native-host/signals/manifest.json'])if(f.existsSync(p))console.log(p+'\\n'+f.readFileSync(p,'utf8'))\"\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-x64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/x64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n.work/signal-helper-build-resources.json\n{\n  \"startedAt\": \"2026-09-24T12:02:02.515Z\",\n  \"command\": [\n    \"node\",\n    \"scripts/build-signal-helper.mjs\",\n    \"--native\"\n  ],\n  \"cwd\": \"/home/runner/work/lasm/lasm\",\n  \"unit\": \"lasm-heavy-0539ccf52500.service\",\n  \"id\": \"ea7310eb-b146-4e0b-b4c3-34bd7415ee96\",\n  \"limits\": {\n    \"memoryMax\": 1073741824,\n    \"memoryHigh\": \"infinity\",\n    \"stopMemoryBytes\": 858993459,\n    \"memorySwapMax\": 0,\n    \"tasksMax\": 1024,\n    \"nice\": 0\n  },\n  \"hostAtStart\": {\n    \"total\": 16766414848,\n    \"available\": 15396773888\n  },\n  \"minimumHostAvailable\": 15384952832,\n  \"peakMemoryBytes\": 50147328,\n  \"peakTasks\": 9,\n  \"report\": \"/home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json\",\n  \"status\": \"finished\",\n  \"cgroup\": \"/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service\",\n  \"lastSample\": {\n    \"at\": \"2026-09-24T12:02:04.528Z\",\n    \"memoryBytes\": 40882176,\n    \"peakMemoryBytes\": 50147328,\n    \"swapBytes\": 0,\n    \"tasks\": 9,\n    \"memoryBreakdown\": {\n      \"anon\": 14430208,\n      \"file\": 24272896,\n      \"kernel\": 1642496,\n      \"shmem\": 0,\n      \"file_mapped\": 1609728,\n      \"inactive_file\": 1273856,\n      \"slab\": 566208\n    },\n    \"pressureSomeAvg10\": 0,\n    \"memoryEvents\": {\n      \"low\": 0,\n      \"high\": 0,\n      \"max\": 0,\n      \"oom\": 0,\n      \"oom_kill\": 0,\n      \"oom_group_kill\": 0\n    }\n  },\n  \"unitReleased\": true,\n  \"service\": {\n    \"serviceResult\": \"success\",\n    \"exitCode\": \"exited\",\n    \"exitStatus\": \"0\",\n    \"capturedAt\": \"2026-09-24T12:02:04.656Z\",\n    \"cgroup\": \"/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service\",\n    \"memoryBytes\": 42119168,\n    \"peakMemoryBytes\": 50147328,\n    \"swapBytes\": 0,\n    \"tasks\": 7,\n    \"memoryBreakdown\": {\n      \"anon\": 13656064,\n      \"file\": 26451968,\n      \"kernel\": 1441792,\n      \"shmem\": 0,\n      \"file_mapped\": 86016,\n      \"inactive_file\": 1482752,\n      \"slab\": 514536\n    },\n    \"pressureSomeAvg10\": 0,\n    \"memoryEvents\": {\n      \"low\": 0,\n      \"high\": 0,\n      \"max\": 0,\n      \"oom\": 0,\n      \"oom_kill\": 0,\n      \"oom_group_kill\": 0\n    }\n  },\n  \"finishedAt\": \"2026-09-24T12:02:04.671Z\",\n  \"result\": {\n    \"code\": 0,\n    \"signal\": null\n  },\n  \"resourceLimited\": false,\n  \"memoryThrottled\": false\n}\n\n.work/signal-controls-resources.json\n{\n  \"startedAt\": \"2026-09-24T12:02:04.947Z\",\n  \"command\": [\n    \"/usr/bin/env\",\n    \"LASM_TEST_BUN=/home/runner/.bun/bin/bun\",\n    \"LASM_TEST_DENO=/opt/hostedtoolcache/deno/2.9.7/x64/deno\",\n    \"LASM_REQUIRE_SIGNAL_ENGINES=1\",\n    \"node\",\n    \"--max-old-space-size=128\",\n    \"--test\",\n    \"--test-concurrency=1\",\n    \"test/node-signal.test.mjs\",\n    \"test/application-signals.test.mjs\",\n    \"test/application-output.test.mjs\"\n  ],\n  \"cwd\": \"/home/runner/work/lasm/lasm\",\n  \"unit\": \"lasm-heavy-0539ccf52500.service\",\n  \"id\": \"7e7503c0-37ce-4097-b384-54fbdd66823f\",\n  \"limits\": {\n    \"memoryMax\": 1073741824,\n    \"memoryHigh\": \"infinity\",\n    \"stopMemoryBytes\": 858993459,\n    \"memorySwapMax\": 0,\n    \"tasksMax\": 1024,\n    \"nice\": 0\n  },\n  \"hostAtStart\": {\n    \"total\": 16766414848,\n    \"available\": 15396319232\n  },\n  \"minimumHostAvailable\": 14448136192,\n  \"peakMemoryBytes\": 66236416,\n  \"peakTasks\": 27,\n  \"report\": \"/home/runner/work/lasm/lasm/.work/signal-controls-resources.json\",\n  \"status\": \"finished\",\n  \"cgroup\": \"/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service\",\n  \"lastSample\": {\n    \"at\": \"2026-09-24T12:02:57.940Z\",\n    \"memoryBytes\": 47595520,\n    \"peakMemoryBytes\": 66236416,\n    \"swapBytes\": 0,\n    \"tasks\": 21,\n    \"memoryBreakdown\": {\n      \"anon\": 39870464,\n      \"file\": 4214784,\n      \"kernel\": 3047424,\n      \"shmem\": 0,\n      \"file_mapped\": 200704,\n      \"inactive_file\": 4214784,\n      \"slab\": 673432\n    },\n    \"pressureSomeAvg10\": 0,\n    \"memoryEvents\": {\n      \"low\": 0,\n      \"high\": 0,\n      \"max\": 0,\n      \"oom\": 0,\n      \"oom_kill\": 0,\n      \"oom_group_kill\": 0\n    }\n  },\n  \"unitReleased\": true,\n  \"service\": {\n    \"serviceResult\": \"exit-code\",\n    \"exitCode\": \"exited\",\n    \"exitStatus\": \"1\",\n    \"capturedAt\": \"2026-09-24T12:02:58.015Z\",\n    \"cgroup\": \"/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service\",\n    \"memoryBytes\": 19726336,\n    \"peakMemoryBytes\": 66236416,\n    \"swapBytes\": 0,\n    \"tasks\": 7,\n    \"memoryBreakdown\": {\n      \"anon\": 13660160,\n      \"file\": 4214784,\n      \"kernel\": 1253376,\n      \"shmem\": 0,\n      \"file_mapped\": 86016,\n      \"inactive_file\": 4214784,\n      \"slab\": 327520\n    },\n    \"pressureSomeAvg10\": 0,\n    \"memoryEvents\": {\n      \"low\": 0,\n      \"high\": 0,\n      \"max\": 0,\n      \"oom\": 0,\n      \"oom_kill\": 0,\n      \"oom_group_kill\": 0\n    }\n  },\n  \"finishedAt\": \"2026-09-24T12:02:58.029Z\",\n  \"result\": {\n    \"code\": 1,\n    \"signal\": null\n  },\n  \"resourceLimited\": false,\n  \"memoryThrottled\": false\n}\n\n.cache/native-host/signals/manifest.json\n{\n  \"protocol\": 1,\n  \"source\": \"native/posix-signal.c\",\n  \"sourceSha256\": \"bedfba1f14c8d3f57d086bc1b691da39648ef1ccbb4c945dbb33c8216806e1d7\",\n  \"compiler\": \"cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\",\n  \"files\": {\n    \"linux-x64-gnu.so\": {\n      \"target\": \"native\",\n      \"sha256\": \"f17f8444a27c72db71c7f4b0e4e050796602a5515a47886654f1de7e400822af\",\n      \"bytes\": 16464\n    }\n  },\n  \"validation\": \"Native source control, separate from shipped cross-compiled helper acceptance.\"\n}\n\nPost job cleanup.\nCaching is not enabled. Caching is skipped.\nPost job cleanup.\n[command]/usr/bin/git version\ngit version 2.55.0\nTemporarily overriding HOME='/home/runner/work/_temp/14b77d9d-188b-4bfb-9e7b-f2b3298a4ba3' before making global git config changes\nAdding repository directory to the temporary git global config as a safe directory\n[command]/usr/bin/git config --global --add safe.directory /home/runner/work/lasm/lasm\nRemoving SSH command configuration\n[command]/usr/bin/git config --local --name-only --get-regexp core\\.sshCommand\n[command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'core\\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\"\nRemoving HTTP extra header\n[command]/usr/bin/git config --local --name-only --get-regexp http\\.https\\:\\/\\/github\\.com\\/\\.extraheader\n[command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'http\\.https\\:\\/\\/github\\.com\\/\\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\"\nRemoving includeIf entries pointing to credentials config files\n[command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\\.gitdir:\nincludeif.gitdir:/home/runner/work/lasm/lasm/.git.path\nincludeif.gitdir:/home/runner/work/lasm/lasm/.git/worktrees/*.path\nincludeif.gitdir:/github/workspace/.git.path\nincludeif.gitdir:/github/workspace/.git/worktrees/*.path\n[command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/lasm/lasm/.git.path\n/home/runner/work/_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config\n[command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/lasm/lasm/.git.path \\/home\\/runner\\/work\\/_temp\\/git\\-credentials\\-1e002970\\-7cf1\\-4f83\\-9f0a\\-ab69c9c7515f\\.config\n[command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/lasm/lasm/.git/worktrees/*.path\n/home/runner/work/_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config\n[command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/lasm/lasm/.git/worktrees/*.path \\/home\\/runner\\/work\\/_temp\\/git\\-credentials\\-1e002970\\-7cf1\\-4f83\\-9f0a\\-ab69c9c7515f\\.config\n[command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path\n/github/runner_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config\n[command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \\/github\\/runner_temp\\/git\\-credentials\\-1e002970\\-7cf1\\-4f83\\-9f0a\\-ab69c9c7515f\\.config\n[command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path\n/github/runner_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config\n[command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \\/github\\/runner_temp\\/git\\-credentials\\-1e002970\\-7cf1\\-4f83\\-9f0a\\-ab69c9c7515f\\.config\n[command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url\nRemoving credentials config '/home/runner/work/_temp/git-credentials-1e002970-7cf1-4f83-9f0a-ab69c9c7515f.config'\nCleaning up orphan processes"
+    },
+    {
+      "platform": "linux-arm64",
+      "passed": 43,
+      "failed": 2,
+      "skipped": 0,
+      "reports": {
+        ".work/signal-helper-build-resources.json": {
+          "startedAt": "2026-09-24T12:02:02.165Z",
+          "command": [
+            "node",
+            "scripts/build-signal-helper.mjs",
+            "--native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "22fd2cc1-4167-42a0-8550-5c29018180f8",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 16722010112,
+            "available": 15318310912
+          },
+          "minimumHostAvailable": 15304458240,
+          "peakMemoryBytes": 47144960,
+          "peakTasks": 10,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:02:02.570Z",
+            "memoryBytes": 41271296,
+            "peakMemoryBytes": 47144960,
+            "swapBytes": 0,
+            "tasks": 10,
+            "memoryBreakdown": {
+              "anon": 12562432,
+              "file": 26578944,
+              "kernel": 1642496,
+              "shmem": 0,
+              "file_mapped": 2043904,
+              "inactive_file": 1593344,
+              "slab": 617032
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:02:02.631Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 40251392,
+            "peakMemoryBytes": 47144960,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11710464,
+              "file": 26972160,
+              "kernel": 1286144,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 1789952,
+              "slab": 517016
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:02:02.648Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/signal-controls-resources.json": {
+          "startedAt": "2026-09-24T12:02:02.691Z",
+          "command": [
+            "/usr/bin/env",
+            "LASM_TEST_BUN=/home/runner/.bun/bin/bun",
+            "LASM_TEST_DENO=/opt/hostedtoolcache/deno/2.9.7/arm64/deno",
+            "LASM_REQUIRE_SIGNAL_ENGINES=1",
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/node-signal.test.mjs",
+            "test/application-signals.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "2f938e4b-f988-42b8-b4ab-0875db2b4472",
+          "limits": {
+            "memoryMax": 1073741824,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 858993459,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0
+          },
+          "hostAtStart": {
+            "total": 16722010112,
+            "available": 15291633664
+          },
+          "minimumHostAvailable": 14176096256,
+          "peakMemoryBytes": 58109952,
+          "peakTasks": 28,
+          "report": "/home/runner/work/lasm/lasm/.work/signal-controls-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:02:56.176Z",
+            "memoryBytes": 5439488,
+            "peakMemoryBytes": 58109952,
+            "swapBytes": 0,
+            "tasks": 1,
+            "memoryBreakdown": {
+              "anon": 0,
+              "file": 4227072,
+              "kernel": 544768,
+              "shmem": 0,
+              "file_mapped": 0,
+              "inactive_file": 4227072,
+              "slab": 240784
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "exit-code",
+            "exitCode": "exited",
+            "exitStatus": "1",
+            "capturedAt": "2026-09-24T12:02:56.213Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 17354752,
+            "peakMemoryBytes": 58109952,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11702272,
+              "file": 4227072,
+              "kernel": 1081344,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 4227072,
+              "slab": 300000
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:02:56.232Z",
+          "result": {
+            "code": 1,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".cache/native-host/signals/manifest.json": {
+          "protocol": 1,
+          "source": "native/posix-signal.c",
+          "sourceSha256": "bedfba1f14c8d3f57d086bc1b691da39648ef1ccbb4c945dbb33c8216806e1d7",
+          "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+          "files": {
+            "linux-arm64-gnu.so": {
+              "target": "native",
+              "sha256": "fc496957bf35f505ca330994ca7e0d2cfd109e282a239ac7da334dbb3fb2b888",
+              "bytes": 70976
+            }
+          },
+          "validation": "Native source control, separate from shipped cross-compiled helper acceptance."
+        }
+      },
+      "controlsLog": "Current runner version: '2.337.0'\nHosted Compute Agent\nVersion: 20260828.587\nCommit: abac92662cab4cc7352de4f9f9d2e2419aad9c29\nBuild Date: 2026-08-28T16:44:25Z\nWorker ID: {466d76ba-04ba-4280-91bd-b2a17114cbb1}\nAzure Region: northcentralus\nUbuntu\n24.04.5\nLTS\nImage: ubuntu-24.04-arm\nVersion: 20260920.129.1\nIncluded Software: https://github.com/actions/runner-images/blob/ubuntu24-arm64/20260920.129/images/ubuntu/Ubuntu2404-Arm64-Readme.md\nImage Release: https://github.com/actions/runner-images/releases/tag/ubuntu24-arm64%2F20260920.129\nContents: read\nMetadata: read\nSecret source: Actions\nCache mode: write\nPrepare workflow directory\nPrepare all required actions\nGetting action download info\nDownload action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)\nDownload action repository 'actions/setup-node@820762786026740c76f36085b0efc47a31fe5020' (SHA:820762786026740c76f36085b0efc47a31fe5020)\nDownload action repository 'oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6' (SHA:0c5077e51419868618aeaa5fe8019c62421857d6)\nDownload action repository 'denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed' (SHA:22d081ff2d3a40755e97629de92e3bcbfa7cf2ed)\nComplete job name: Signal routing linux-arm64\nwith:\n  repository: Millillion/lasm\n  token: ***\n  ssh-strict: true\n  ssh-user: git\n  persist-credentials: true\n  clean: true\n  sparse-checkout-cone-mode: true\n  fetch-depth: 1\n  fetch-tags: false\n  show-progress: true\n  lfs: false\n  submodules: false\n  set-safe-directory: true\n  allow-unsafe-pr-checkout: false\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\nSyncing repository: Millillion/lasm\nWorking directory is '/home/runner/work/lasm/lasm'\n[command]/usr/bin/git version\ngit version 2.55.0\nTemporarily overriding HOME='/home/runner/work/_temp/a5cd6a67-b8a3-49fe-958d-31a9c9f20767' before making global git config changes\nAdding repository directory to the temporary git global config as a safe directory\n[command]/usr/bin/git config --global --add safe.directory /home/runner/work/lasm/lasm\nDeleting the contents of '/home/runner/work/lasm/lasm'\n[command]/usr/bin/git init /home/runner/work/lasm/lasm\nhint: Using 'master' as the name for the initial branch. This default branch name\nhint: will change to \"main\" in Git 3.0. To configure the initial branch name\nhint: to use in all of your new repositories, which will suppress this warning,\nhint: call:\nhint:\nhint: \tgit config --global init.defaultBranch <name>\nhint:\nhint: Names commonly chosen instead of 'master' are 'main', 'trunk' and\nhint: 'development'. The just-created branch can be renamed via this command:\nhint:\nhint: \tgit branch -m <name>\nhint:\nhint: Disable this message with \"git config set advice.defaultBranchName false\"\nInitialized empty Git repository in /home/runner/work/lasm/lasm/.git/\n[command]/usr/bin/git remote add origin https://github.com/Millillion/lasm\n[command]/usr/bin/git config --local gc.auto 0\nRemoving SSH command configuration\n[command]/usr/bin/git config --local --name-only --get-regexp core\\.sshCommand\n[command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'core\\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\"\nRemoving HTTP extra header\n[command]/usr/bin/git config --local --name-only --get-regexp http\\.https\\:\\/\\/github\\.com\\/\\.extraheader\n[command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'http\\.https\\:\\/\\/github\\.com\\/\\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\"\nRemoving includeIf entries pointing to credentials config files\n[command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\\.gitdir:\n[command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url\n[command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config http.https://github.com/.extraheader AUTHORIZATION: basic ***\n[command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/lasm/lasm/.git.path /home/runner/work/_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config\n[command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/lasm/lasm/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config\n[command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config\n[command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config\n[command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0f86dce6a1244c4a05cdf9641d08ea9aa711d618:refs/remotes/origin/main\nFrom https://github.com/Millillion/lasm\n * [new ref]         0f86dce6a1244c4a05cdf9641d08ea9aa711d618 -> origin/main\n[command]/usr/bin/git branch --list --remote origin/main\n  origin/main\n[command]/usr/bin/git rev-parse refs/remotes/origin/main\n0f86dce6a1244c4a05cdf9641d08ea9aa711d618\n[command]/usr/bin/git sparse-checkout disable\n[command]/usr/bin/git config --local --unset-all extensions.worktreeConfig\n[command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main\nSwitched to a new branch 'main'\nbranch 'main' set up to track 'origin/main'.\n[command]/usr/bin/git log -1 --format=%H\n0f86dce6a1244c4a05cdf9641d08ea9aa711d618\nwith:\n  node-version: 26.10.0\n  architecture: arm64\n  package-manager-cache: false\n  check-latest: false\n  token: ***\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\nAttempting to download 26.10.0...\nAcquiring 26.10.0 - arm64 from https://github.com/actions/node-versions/releases/download/26.10.0-35737674515/node-26.10.0-linux-arm64.tar.gz\nExtracting ...\n[command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/b6e1a471-9ead-4682-b289-b4fb0ec5e66f -f /home/runner/work/_temp/6da1a9d8-a72d-42f2-880d-2fba53a446b3\nAdding to the cache ...\nnode: v26.10.0\nnpm: 11.19.1\nyarn: 1.22.22\nwith:\n  bun-version: 1.4.2\n  no-cache: true\n  token: ***\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\nDownloading a new version of Bun: https://github.com/oven-sh/bun/releases/download/bun-v1.4.2/bun-linux-aarch64.zip\n[command]/usr/bin/unzip -o -q /home/runner/work/_temp/9e71d434-4eda-470f-87d9-b51caa571b39.zip\n[command]/home/runner/.bun/bin/bun --revision\n1.4.2+744846f84\nwith:\n  deno-version: 2.9.7\n  cache: false\n  deno-binary-name: deno\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\nGoing to install stable version 2.9.7.\nDownloading Deno from https://github.com/denoland/deno/releases/download/v2.9.7/deno-aarch64-unknown-linux-gnu.zip.\n[command]/usr/bin/unzip -o -q /home/runner/work/_temp/791722b8-4d8d-41c7-b310-c87835398c49\nCached Deno to /opt/hostedtoolcache/deno/2.9.7/arm64.\nInstallation complete.\n\u001b[36;1mnpm ci --omit=dev --ignore-scripts --no-audit --no-fund\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\n\nadded 78 packages in 2s\n\u001b[36;1mnode -e \"require('node:assert/strict').equal(process.platform+'-'+process.arch,process.env.LASM_EXPECT_PLATFORM)\"\u001b[0m\n\u001b[36;1mdeno eval \"if(Deno.version.deno!=='2.9.7'||process.platform+'-'+process.arch!==process.env.LASM_EXPECT_PLATFORM)throw Error('Incorrect engine'); console.log(Deno.version)\"\u001b[0m\n\u001b[36;1mbun -e \"if(Bun.version!=='1.4.2'||process.platform+'-'+process.arch!==process.env.LASM_EXPECT_PLATFORM)throw Error('Incorrect engine'); console.log(process.versions)\"\u001b[0m\n\u001b[36;1mprintf 'LASM_TEST_DENO=%s\\n' \"$(command -v deno)\" >> \"$GITHUB_ENV\"\u001b[0m\n\u001b[36;1mprintf 'LASM_TEST_BUN=%s\\n' \"$(command -v bun)\" >> \"$GITHUB_ENV\"\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\n{ deno: \"2.9.7\", v8: \"15.0.245.2-rusty\", typescript: \"6.0.3\" }\n{\n  node: \"26.3.0\",\n  bun: \"1.4.2\",\n  boringssl: \"41bf9b59c2ebf277a7aa427e1ecad5cc80dd4d4f\",\n  openssl: \"1.1.0\",\n  llhttp: \"9.3.0\",\n  libarchive: \"ded82291ab41d5e355831b96b0e1ff49e24d8939\",\n  mimalloc: \"6a64e1ba7f5b2130d4efccb67ec87fd0003f0f6a\",\n  picohttpparser: \"066d2b1e9ab820703db0837a7255d92d30f0c9f5\",\n  uwebsockets: \"744846f844374847c902b5e7fd59b4342a51ef99\",\n  webkit: \"2e2aa2290fac856d6f451ceacb58f7f5b44dd057\",\n  zig: \"04e7f6ac1e009525bc00934f20199c68f04e0a24\",\n  zlib: \"12731092979c6d07f42da27da673a9f6c7b13586\",\n  tinycc: \"05f0fafaa3be31e31d7b4b5c17dc60f62c991171\",\n  lolhtml: \"725ce499aa9b71e38b7a2d0a9fbb6d7294a4079e\",\n  ares: \"c7a3138dcfe3bb0eaaf10c0c24c36dc66dc790ab\",\n  libdeflate: \"c8c56a20f8f621e6a966b716b31f1dedab6a41e3\",\n  usockets: \"744846f844374847c902b5e7fd59b4342a51ef99\",\n  lshpack: \"8905c024b6d052f083a3d11d0a169b3c2735c8a1\",\n  zstd: \"f8745da6ff1ad1e7bab384bd1f9d742439278e99\",\n  v8: \"14.6.202.34-node.20\",\n  uv: \"1.48.0\",\n  napi: \"10\",\n  icu: \"78.3\",\n  unicode: \"17.0\",\n  sqlite: \"3.53.2\",\n  modules: \"147\",\n}\n\u001b[36;1msudo loginctl enable-linger \"$(id -un)\"\u001b[0m\n\u001b[36;1mprintf 'XDG_RUNTIME_DIR=/run/user/%s\\n' \"$(id -u)\" >> \"$GITHUB_ENV\"\u001b[0m\n\u001b[36;1mprintf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\\n' \"$(id -u)\" >> \"$GITHUB_ENV\"\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/arm64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n\u001b[36;1mulimit -c 0\u001b[0m\n\u001b[36;1mnode scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-helper-build-resources.json -- node scripts/build-signal-helper.mjs --native\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/arm64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n[lasm] One workload, 1.00 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service; invocation ID: c36ccc3ed89f4ac9b2e2bd49d1d95f75\nBuilt linux-arm64-gnu.so: 70976 bytes\nFinished with result: success\nMain processes terminated with: code=exited/status=0\nService runtime: 439ms\nCPU time consumed: 173ms\nMemory peak: 44.9M\nMemory swap peak: 0B\n[lasm] Peak 0.04 GiB; success\n\u001b[36;1mulimit -c 0\u001b[0m\n\u001b[36;1mnode scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-controls-resources.json -- /usr/bin/env LASM_TEST_BUN=\"$LASM_TEST_BUN\" LASM_TEST_DENO=\"$LASM_TEST_DENO\" LASM_REQUIRE_SIGNAL_ENGINES=1 node --max-old-space-size=128 --test --test-concurrency=1 test/node-signal.test.mjs test/application-signals.test.mjs test/application-output.test.mjs\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/arm64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n[lasm] One workload, 1.00 GiB memory cap; resource log: /home/runner/work/lasm/lasm/.work/signal-controls-resources.json\nRunning as unit: lasm-heavy-0539ccf52500.service; invocation ID: a8e7778089bc40ebb7a7963f1b5c3e0c\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (28.755184ms)\n\u2714 wrong engines fail before executing the application payload (22.6874ms)\n\u2714 all full-runtime host support files exist and target validation is strict (2.170705ms)\n\u2714 node application SIGUSR1 policy preserves default behavior (758.015512ms)\n\u2714 node application SIGUSR1 policy preserves stopped behavior (755.028817ms)\n\u2714 node application SIGUSR1 policy preserves watch behavior (763.14105ms)\n\u2714 node application SIGUSR1 policy preserves ignored behavior (902.762315ms)\n\u2714 node application SIGUSR1 policy preserves native behavior (753.099123ms)\n\u2714 node application SIGUSR1 policy preserves javascript behavior (744.828226ms)\n\u2714 node application SIGABRT policy preserves default behavior (1740.926022ms)\n\u2714 node application SIGABRT policy preserves stopped behavior (1756.871602ms)\n\u2714 node application SIGABRT policy preserves watch behavior (778.031049ms)\n\u2714 node application SIGABRT policy preserves ignored behavior (906.710677ms)\n\u2714 node application SIGABRT policy preserves native behavior (758.397153ms)\n\u2714 node application SIGABRT policy preserves javascript behavior (756.558939ms)\n\u2714 deno application SIGUSR1 policy preserves default behavior (822.117291ms)\n\u2714 deno application SIGUSR1 policy preserves stopped behavior (765.561809ms)\n\u2714 deno application SIGUSR1 policy preserves watch behavior (782.685517ms)\n\u2714 deno application SIGUSR1 policy preserves ignored behavior (918.236327ms)\n\u2714 deno application SIGUSR1 policy preserves native behavior (767.485754ms)\n\u2714 deno application SIGUSR1 policy preserves javascript behavior (757.080279ms)\n\u2714 deno application SIGABRT policy preserves default behavior (1624.293383ms)\n\u2714 deno application SIGABRT policy preserves stopped behavior (1246.230558ms)\n\u2714 deno application SIGABRT policy preserves watch behavior (772.561248ms)\n\u2714 deno application SIGABRT policy preserves ignored behavior (917.822351ms)\n\u2714 deno application SIGABRT policy preserves native behavior (764.853484ms)\n\u2714 deno application SIGABRT policy preserves javascript behavior (764.247706ms)\n\u2714 bun application SIGUSR1 policy preserves default behavior (734.257783ms)\n\u2714 bun application SIGUSR1 policy preserves stopped behavior (740.605161ms)\n\u2714 bun application SIGUSR1 policy preserves watch behavior (734.979712ms)\n\u2714 bun application SIGUSR1 policy preserves ignored behavior (882.953255ms)\n\u2714 bun application SIGUSR1 policy preserves native behavior (732.377798ms)\n\u2714 bun application SIGUSR1 policy preserves javascript behavior (734.03509ms)\n\u2716 bun application SIGABRT policy preserves default behavior (10011.726075ms)\n\u2716 bun application SIGABRT policy preserves stopped behavior (10003.808099ms)\n\u2714 bun application SIGABRT policy preserves watch behavior (734.721261ms)\n\u2714 bun application SIGABRT policy preserves ignored behavior (884.959998ms)\n\u2714 bun application SIGABRT policy preserves native behavior (732.371053ms)\n\u2714 bun application SIGABRT policy preserves javascript behavior (728.100117ms)\n\u2714 node signals preserve waiter lifecycle after 0 ms (55.320802ms)\n\u2714 node signals preserve waiter lifecycle after 1000 ms (1053.859465ms)\n\u2714 deno signals preserve waiter lifecycle after 0 ms (69.882646ms)\n\u2714 deno signals preserve waiter lifecycle after 1000 ms (1070.73188ms)\n\u2714 bun signals preserve waiter lifecycle after 0 ms (34.948801ms)\n\u2714 bun signals preserve waiter lifecycle after 1000 ms (1036.783445ms)\n\u2139 tests 45\n\u2139 suites 0\n\u2139 pass 43\n\u2139 fail 2\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 53441.439848\n\n\u2716 failing tests:\n\ntest at test/application-signals.test.mjs:16:5\n\u2716 bun application SIGABRT policy preserves default behavior (10011.726075ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n      code: null,\n  +   signal: 'SIGKILL'\n  -   signal: 'SIGABRT'\n    }\n  \n      at TestContext.<anonymous> (file:///home/runner/work/lasm/lasm/test/application-signals.test.mjs:33:18)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { code: null, signal: 'SIGKILL' },\n    expected: { code: null, signal: 'SIGABRT' },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\n\ntest at test/application-signals.test.mjs:16:5\n\u2716 bun application SIGABRT policy preserves stopped behavior (10003.808099ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n  + actual - expected\n  \n    {\n      code: null,\n  +   signal: 'SIGKILL'\n  -   signal: 'SIGABRT'\n    }\n  \n      at TestContext.<anonymous> (file:///home/runner/work/lasm/lasm/test/application-signals.test.mjs:33:18)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: { code: null, signal: 'SIGKILL' },\n    expected: { code: null, signal: 'SIGABRT' },\n    operator: 'deepStrictEqual',\n    diff: 'simple'\n  }\nFinished with result: exit-code\nMain processes terminated with: code=exited/status=1\nService runtime: 53.513s\nCPU time consumed: 5.251s\nMemory peak: 55.4M\nMemory swap peak: 0B\n[lasm] Peak 0.05 GiB; exit-code\n\u001b[36;1mnode -e \"const f=require('node:fs');for(const p of ['.work/signal-helper-build-resources.json','.work/signal-controls-resources.json','.cache/native-host/signals/manifest.json'])if(f.existsSync(p))console.log(p+'\\n'+f.readFileSync(p,'utf8'))\"\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  LASM_EXPECT_PLATFORM: linux-arm64\n  LASM_TEST_DENO: /opt/hostedtoolcache/deno/2.9.7/arm64/deno\n  LASM_TEST_BUN: /home/runner/.bun/bin/bun\n  XDG_RUNTIME_DIR: /run/user/1001\n  DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1001/bus\n.work/signal-helper-build-resources.json\n{\n  \"startedAt\": \"2026-09-24T12:02:02.165Z\",\n  \"command\": [\n    \"node\",\n    \"scripts/build-signal-helper.mjs\",\n    \"--native\"\n  ],\n  \"cwd\": \"/home/runner/work/lasm/lasm\",\n  \"unit\": \"lasm-heavy-0539ccf52500.service\",\n  \"id\": \"22fd2cc1-4167-42a0-8550-5c29018180f8\",\n  \"limits\": {\n    \"memoryMax\": 1073741824,\n    \"memoryHigh\": \"infinity\",\n    \"stopMemoryBytes\": 858993459,\n    \"memorySwapMax\": 0,\n    \"tasksMax\": 1024,\n    \"nice\": 0\n  },\n  \"hostAtStart\": {\n    \"total\": 16722010112,\n    \"available\": 15318310912\n  },\n  \"minimumHostAvailable\": 15304458240,\n  \"peakMemoryBytes\": 47144960,\n  \"peakTasks\": 10,\n  \"report\": \"/home/runner/work/lasm/lasm/.work/signal-helper-build-resources.json\",\n  \"status\": \"finished\",\n  \"cgroup\": \"/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service\",\n  \"lastSample\": {\n    \"at\": \"2026-09-24T12:02:02.570Z\",\n    \"memoryBytes\": 41271296,\n    \"peakMemoryBytes\": 47144960,\n    \"swapBytes\": 0,\n    \"tasks\": 10,\n    \"memoryBreakdown\": {\n      \"anon\": 12562432,\n      \"file\": 26578944,\n      \"kernel\": 1642496,\n      \"shmem\": 0,\n      \"file_mapped\": 2043904,\n      \"inactive_file\": 1593344,\n      \"slab\": 617032\n    },\n    \"pressureSomeAvg10\": 0,\n    \"memoryEvents\": {\n      \"low\": 0,\n      \"high\": 0,\n      \"max\": 0,\n      \"oom\": 0,\n      \"oom_kill\": 0,\n      \"oom_group_kill\": 0\n    }\n  },\n  \"unitReleased\": true,\n  \"service\": {\n    \"serviceResult\": \"success\",\n    \"exitCode\": \"exited\",\n    \"exitStatus\": \"0\",\n    \"capturedAt\": \"2026-09-24T12:02:02.631Z\",\n    \"cgroup\": \"/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service\",\n    \"memoryBytes\": 40251392,\n    \"peakMemoryBytes\": 47144960,\n    \"swapBytes\": 0,\n    \"tasks\": 7,\n    \"memoryBreakdown\": {\n      \"anon\": 11710464,\n      \"file\": 26972160,\n      \"kernel\": 1286144,\n      \"shmem\": 0,\n      \"file_mapped\": 86016,\n      \"inactive_file\": 1789952,\n      \"slab\": 517016\n    },\n    \"pressureSomeAvg10\": 0,\n    \"memoryEvents\": {\n      \"low\": 0,\n      \"high\": 0,\n      \"max\": 0,\n      \"oom\": 0,\n      \"oom_kill\": 0,\n      \"oom_group_kill\": 0\n    }\n  },\n  \"finishedAt\": \"2026-09-24T12:02:02.648Z\",\n  \"result\": {\n    \"code\": 0,\n    \"signal\": null\n  },\n  \"resourceLimited\": false,\n  \"memoryThrottled\": false\n}\n\n.work/signal-controls-resources.json\n{\n  \"startedAt\": \"2026-09-24T12:02:02.691Z\",\n  \"command\": [\n    \"/usr/bin/env\",\n    \"LASM_TEST_BUN=/home/runner/.bun/bin/bun\",\n    \"LASM_TEST_DENO=/opt/hostedtoolcache/deno/2.9.7/arm64/deno\",\n    \"LASM_REQUIRE_SIGNAL_ENGINES=1\",\n    \"node\",\n    \"--max-old-space-size=128\",\n    \"--test\",\n    \"--test-concurrency=1\",\n    \"test/node-signal.test.mjs\",\n    \"test/application-signals.test.mjs\",\n    \"test/application-output.test.mjs\"\n  ],\n  \"cwd\": \"/home/runner/work/lasm/lasm\",\n  \"unit\": \"lasm-heavy-0539ccf52500.service\",\n  \"id\": \"2f938e4b-f988-42b8-b4ab-0875db2b4472\",\n  \"limits\": {\n    \"memoryMax\": 1073741824,\n    \"memoryHigh\": \"infinity\",\n    \"stopMemoryBytes\": 858993459,\n    \"memorySwapMax\": 0,\n    \"tasksMax\": 1024,\n    \"nice\": 0\n  },\n  \"hostAtStart\": {\n    \"total\": 16722010112,\n    \"available\": 15291633664\n  },\n  \"minimumHostAvailable\": 14176096256,\n  \"peakMemoryBytes\": 58109952,\n  \"peakTasks\": 28,\n  \"report\": \"/home/runner/work/lasm/lasm/.work/signal-controls-resources.json\",\n  \"status\": \"finished\",\n  \"cgroup\": \"/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service\",\n  \"lastSample\": {\n    \"at\": \"2026-09-24T12:02:56.176Z\",\n    \"memoryBytes\": 5439488,\n    \"peakMemoryBytes\": 58109952,\n    \"swapBytes\": 0,\n    \"tasks\": 1,\n    \"memoryBreakdown\": {\n      \"anon\": 0,\n      \"file\": 4227072,\n      \"kernel\": 544768,\n      \"shmem\": 0,\n      \"file_mapped\": 0,\n      \"inactive_file\": 4227072,\n      \"slab\": 240784\n    },\n    \"pressureSomeAvg10\": 0,\n    \"memoryEvents\": {\n      \"low\": 0,\n      \"high\": 0,\n      \"max\": 0,\n      \"oom\": 0,\n      \"oom_kill\": 0,\n      \"oom_group_kill\": 0\n    }\n  },\n  \"unitReleased\": true,\n  \"service\": {\n    \"serviceResult\": \"exit-code\",\n    \"exitCode\": \"exited\",\n    \"exitStatus\": \"1\",\n    \"capturedAt\": \"2026-09-24T12:02:56.213Z\",\n    \"cgroup\": \"/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service\",\n    \"memoryBytes\": 17354752,\n    \"peakMemoryBytes\": 58109952,\n    \"swapBytes\": 0,\n    \"tasks\": 7,\n    \"memoryBreakdown\": {\n      \"anon\": 11702272,\n      \"file\": 4227072,\n      \"kernel\": 1081344,\n      \"shmem\": 0,\n      \"file_mapped\": 86016,\n      \"inactive_file\": 4227072,\n      \"slab\": 300000\n    },\n    \"pressureSomeAvg10\": 0,\n    \"memoryEvents\": {\n      \"low\": 0,\n      \"high\": 0,\n      \"max\": 0,\n      \"oom\": 0,\n      \"oom_kill\": 0,\n      \"oom_group_kill\": 0\n    }\n  },\n  \"finishedAt\": \"2026-09-24T12:02:56.232Z\",\n  \"result\": {\n    \"code\": 1,\n    \"signal\": null\n  },\n  \"resourceLimited\": false,\n  \"memoryThrottled\": false\n}\n\n.cache/native-host/signals/manifest.json\n{\n  \"protocol\": 1,\n  \"source\": \"native/posix-signal.c\",\n  \"sourceSha256\": \"bedfba1f14c8d3f57d086bc1b691da39648ef1ccbb4c945dbb33c8216806e1d7\",\n  \"compiler\": \"cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\",\n  \"files\": {\n    \"linux-arm64-gnu.so\": {\n      \"target\": \"native\",\n      \"sha256\": \"fc496957bf35f505ca330994ca7e0d2cfd109e282a239ac7da334dbb3fb2b888\",\n      \"bytes\": 70976\n    }\n  },\n  \"validation\": \"Native source control, separate from shipped cross-compiled helper acceptance.\"\n}\n\nPost job cleanup.\nCaching is not enabled. Caching is skipped.\nPost job cleanup.\n[command]/usr/bin/git version\ngit version 2.55.0\nTemporarily overriding HOME='/home/runner/work/_temp/ac4a26c5-a001-4ecb-ae50-a2c323116e78' before making global git config changes\nAdding repository directory to the temporary git global config as a safe directory\n[command]/usr/bin/git config --global --add safe.directory /home/runner/work/lasm/lasm\nRemoving SSH command configuration\n[command]/usr/bin/git config --local --name-only --get-regexp core\\.sshCommand\n[command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'core\\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\"\nRemoving HTTP extra header\n[command]/usr/bin/git config --local --name-only --get-regexp http\\.https\\:\\/\\/github\\.com\\/\\.extraheader\n[command]/usr/bin/git submodule foreach --recursive sh -c \"git config --local --name-only --get-regexp 'http\\.https\\:\\/\\/github\\.com\\/\\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\"\nRemoving includeIf entries pointing to credentials config files\n[command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\\.gitdir:\nincludeif.gitdir:/home/runner/work/lasm/lasm/.git.path\nincludeif.gitdir:/home/runner/work/lasm/lasm/.git/worktrees/*.path\nincludeif.gitdir:/github/workspace/.git.path\nincludeif.gitdir:/github/workspace/.git/worktrees/*.path\n[command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/lasm/lasm/.git.path\n/home/runner/work/_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config\n[command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/lasm/lasm/.git.path \\/home\\/runner\\/work\\/_temp\\/git\\-credentials\\-86d60dd9\\-ed96\\-408c\\-a8b3\\-6f1ff322853e\\.config\n[command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/lasm/lasm/.git/worktrees/*.path\n/home/runner/work/_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config\n[command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/lasm/lasm/.git/worktrees/*.path \\/home\\/runner\\/work\\/_temp\\/git\\-credentials\\-86d60dd9\\-ed96\\-408c\\-a8b3\\-6f1ff322853e\\.config\n[command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path\n/github/runner_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config\n[command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \\/github\\/runner_temp\\/git\\-credentials\\-86d60dd9\\-ed96\\-408c\\-a8b3\\-6f1ff322853e\\.config\n[command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path\n/github/runner_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config\n[command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \\/github\\/runner_temp\\/git\\-credentials\\-86d60dd9\\-ed96\\-408c\\-a8b3\\-6f1ff322853e\\.config\n[command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url\nRemoving credentials config '/home/runner/work/_temp/git-credentials-86d60dd9-ed96-408c-a8b3-6f1ff322853e.config'\nCleaning up orphan processes"
+    }
+  ],
+  "failure": "Bun SIGABRT default and stopped cases reach the retained 10-second deadline; the parent kills them with SIGKILL. All other 43 controls per platform pass. This is not a resource abort.",
+  "hypothesis": "The shell core-file limit is outside the transient systemd service, unlike the local wrapper. Core-dump handling is one hypothesis; the failed run did not capture child process state.",
+  "next": "Apply a zero core-file limit inside the resource guard, record it and preserve timeout process diagnostics without changing expectations or the deadline.",
+  "recordedAt": "2026-09-24T12:07:04.204054+00:00"
+}

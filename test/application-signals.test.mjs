@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const engines = [
@@ -9,21 +9,39 @@ const engines = [
   ['deno', resolve(process.env.LASM_TEST_DENO ?? '.cache/js-runtimes/deno-2.9.7/deno'), ['run','-A']],
   ['bun', resolve(process.env.LASM_TEST_BUN ?? '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
 ];
+function processState(pid) {
+  if (process.platform !== 'linux') return {};
+  const result = {};
+  for (const [name, path] of Object.entries({ status: `/proc/${pid}/status`,
+    limits: `/proc/${pid}/limits`, wait: `/proc/${pid}/wchan`, corePattern: '/proc/sys/kernel/core_pattern' })) {
+    try {
+      const value = readFileSync(path, 'utf8');
+      result[name] = name === 'status' ? value.split('\n').filter(line => /^(State|CoreDumping|Sig|VmRSS|Threads):?/.test(line)).join('\n') : value;
+    } catch (error) { result[name] = error.code; }
+  }
+  return result;
+}
 for (const [name, engine, flags] of engines) {
   const available = process.platform !== 'win32' && existsSync(engine);
   if (process.env.LASM_REQUIRE_SIGNAL_ENGINES === '1' && !available) throw new Error('Required signal engine missing: ' + engine);
   for (const signal of ['SIGUSR1','SIGABRT']) for (const mode of ['default', 'stopped', 'watch', 'ignored', 'native', 'javascript']) {
-    test(`${name} application ${signal} policy preserves ${mode} behavior`, { skip: !available, timeout: 15_000 }, async () => {
+    test(`${name} application ${signal} policy preserves ${mode} behavior`, { skip: !available, timeout: 15_000 }, async t => {
       const child = spawn(engine, [...flags, resolve('test/fixtures/application-signals.mjs'), mode, signal],
         { stdio: ['ignore','pipe','pipe'], env: { ...process.env, PATH: '', DENO_DISABLE_NODE_SHIM: '1' } });
-      let stdout = '', stderr = '', sent = false;
-      const timer = setTimeout(() => child.kill('SIGKILL'), 10_000);
+      let stdout = '', stderr = '', sent = false, readyState;
+      const timer = setTimeout(() => {
+        t.diagnostic(JSON.stringify({ readyState, deadlineState: processState(child.pid) }));
+        child.kill('SIGKILL');
+      }, 10_000);
       try {
         const actual = await new Promise((resolve, reject) => {
           child.on('error', reject);
           child.stdout.on('data', bytes => {
             stdout += bytes;
-            if (!sent && stdout.includes('ready\n')) { sent = true; child.kill(signal); }
+            if (!sent && stdout.includes('ready\n')) {
+              readyState = processState(child.pid); sent = true; child.kill(signal);
+              if (mode === 'default') t.diagnostic(JSON.stringify({ engine: name, signal, readyState }));
+            }
           });
           child.stderr.on('data', bytes => { stderr += bytes; if (stderr.length > 1024 * 1024) child.kill('SIGKILL'); });
           child.on('close', (code, signal) => resolve({ code, signal }));

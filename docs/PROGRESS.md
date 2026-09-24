@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Installed signal comparisons](evidence/application-signal-policy-2026-09-24.json) now pass all 48 native/compiled comparisons across three engines on Linux x64, plus 45 focused controls. Four retained differences are repaired; peak memory was 3.45 GiB with no resource events. The full Bun application campaign has started.
+**Changed:** [Expanded Linux signal CI](evidence/signal-policy-native-ci-failure-2026-09-24.json) passes 43/45 controls per architecture; two Bun termination deadlines remain under investigation. The guard now applies its core-file limit inside systemd and records timeout process state. The full Bun application campaign continues.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 
