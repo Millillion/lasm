@@ -13,6 +13,7 @@ import { readApplicationSymbols } from './application-symbols.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint } from './application-output.mjs';
 import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
 import { withApplicationLock } from './application-lock.mjs';
+import { applicationMetadata, copyApplicationMetadata } from './application-metadata.mjs';
 import { executableName, responseFile, insideDirectory } from './platform.mjs';
 import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
@@ -56,6 +57,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   const work = join(directory, '.lake/lasm/applications', digest(source).slice(0, 16));
   await mkdir(work, { recursive: true });
   const generated = applicationSources(source, lean, work, { log: verbose ? log : () => {}, git });
+  const metadata = await applicationMetadata(generated, lean);
   const modules = [];
   for (let i = 0; i < generated.sources.length; i++) modules.push({
     module: generated.inputs[i].module, sourceSha256: await hashFile(generated.inputs[i].source),
@@ -65,7 +67,9 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   const recipe = { schema: 1, lean: lean.version, leanCommit: lean.commit, nativeLeanIdentity: lean.identity,
     emscripten: sdkCatalog.version, sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
-    ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}), target, memoryMode, modules };
+    ...(git ? { gitIdentity: git.identity, gitVersion: git.version } : {}),
+    ...(metadata ? { moduleDataIdentity: metadata.identity, moduleDataBytes: metadata.manifest.bytes } : {}),
+    target, memoryMode, modules };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
   if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
@@ -121,6 +125,7 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   await indexFunctionTable(join(dist, 'program.wasm'), glue);
   writeFileSync(glue, optimizeMainTableGrowth(readFileSync(glue, 'utf8'))); preserveWebWorker(glue);
   copyApplicationHost(dist); writeApplicationEntrypoint(dist, target);
+  await copyApplicationMetadata(metadata, dist);
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));
   const buildInfo = { ...recipe, signature, sdkIdentity: sdk.identity, sdkDriverIdentity: sdk.driverIdentity };
   await writeFile(join(dist, 'build-info.json'), JSON.stringify(buildInfo, null, 2) + '\n');

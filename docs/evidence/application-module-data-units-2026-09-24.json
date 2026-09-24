@@ -1,0 +1,76 @@
+{
+  "scope": "Small JavaScript file/loader unit controls and implementation checkpoint; no native helper, installed application or platform acceptance implied",
+  "versions": {
+    "lean": {
+      "tag_name": "v4.34.0",
+      "published_at": "2026-09-14T14:04:36Z",
+      "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest"
+    },
+    "deno": {
+      "tag_name": "v2.9.7",
+      "published_at": "2026-09-17T09:04:55Z",
+      "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest"
+    },
+    "bun": {
+      "tag_name": "bun-v1.4.2",
+      "published_at": "2026-09-05T05:55:48Z",
+      "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest"
+    },
+    "node": {
+      "version": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "v8": "14.6.202.34",
+      "npm": "11.19.1",
+      "source": "https://nodejs.org/dist/index.json"
+    },
+    "checkedAt": "2026-09-24T12:18:16.814675+00:00"
+  },
+  "tests": {
+    "count": 8,
+    "passed": 8,
+    "skipped": 0,
+    "log": "\u2714 runtime module data preserves search precedence and relocates without original files (37.513107ms)\n\u2714 metadata content changes invalidate the recipe and copies reject concurrent changes (22.511535ms)\n\u2714 linked module data is materialized, duplicate roots removed and cycles rejected (24.044765ms)\n\u2714 ordinary Init/Std-only applications do not acquire unused metaprogramming assets (6.139911ms)\n\u2714 explicit Lean paths, including empty overrides, are preserved (21.22127ms)\n\u2714 entrypoint resolves host/glue relative to deployment, independent of build and working directory (58.887698ms)\n\u2714 wrong engines fail before executing the application payload (56.000763ms)\n\u2714 all full-runtime host support files exist and target validation is strict (4.582547ms)\n\u2139 tests 8\n\u2139 suites 0\n\u2139 pass 8\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 437.333813\n",
+    "command": [
+      "node",
+      "--max-old-space-size=128",
+      "--test",
+      "--test-concurrency=1",
+      "test/application-metadata.test.mjs",
+      "test/application-output.test.mjs"
+    ]
+  },
+  "sourceSha256": {
+    "src/application-metadata.mjs": "be6537d5a393c1f950057ffd4e53e5e00c77857c1f4185621bc79bb66e828e6b",
+    "src/application-metadata-runtime.mjs": "0ceba94d8d72da464feddc7b259cea008130aea65ccef15b56767d5688f6f72f",
+    "src/application-build.mjs": "9e6a8faa93b4307af6986cc83a9e479097e3836b52506fdb62b94452e829d2d5",
+    "src/application-output.mjs": "d16de2edf64d530f266c345524a50b2fd42fa4e5badcd788c0269a50a1133744",
+    "src/application-sources.mjs": "95db09652413e1b570e787fcf03bd7db6388a979066f6f7cdeaeadfd29976e00",
+    "src/lake-module.lean": "ee7e34b843dd63c0282b231d7e2d25837b07cb932d6cb74a889a013f7d5b6080",
+    "test/application-metadata.test.mjs": "c9079fedfbe8231761cc39e9c421f307753136fa1eb67b6fb1915ad0d75932b7",
+    "test/application-output.test.mjs": "b71cf324ece925450f98a55ddece825e8de6e8d3461e0925b975300865db6458",
+    "integration/application-module-data.mjs": "cb1dfd35e63bcf97e6e1227ba45e25cece5e7d4b1c711f8f93687ba3f5f274bc",
+    ".github/workflows/application-module-data.yml": "1f2dbd7bb2a02ca01f0a01cc2602efdf11b664737d6a9ddd1d5dd2f9c62c05d5"
+  },
+  "implementation": "Use generated module initializers to recognize Lean/Lake runtime users, materialize full standard module data and built project/dependency module roots in Lake search order, include their content identities in build reuse, and derive standard Lean environment defaults from the relocated deployment. Explicit environment values are preserved.",
+  "priorSandboxAttempt": {
+    "log": "\u2714 test/application-metadata.test.mjs (262.924585ms)\n\u2716 test/application-output.test.mjs (250.166296ms)\n\u2139 tests 2\n\u2139 suites 0\n\u2139 pass 1\n\u2139 fail 1\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 532.979914\n\n\u2716 failing tests:\n\ntest at test/application-output.test.mjs:1:1\n\u2716 test/application-output.test.mjs (250.166296ms)\n  'test failed'\n",
+    "diagnosis": "Direct rerun exposed spawnSync EPERM inside the tool sandbox. The eight small tests passed outside that sandbox; no compiler workload was overlapped."
+  },
+  "remaining": [
+    "Execute the revised private Lake helper and real metadata import controls in native CI.",
+    "Package and test source-hidden, empty-PATH installed Wasm runtime imports in all three engines.",
+    "Measure deployment size and validate the declared-module/data policy, dynamic assets and all six native platforms.",
+    "This recognizes generated Lean/Lake initializer dependencies; custom foreign runtime consumers and unbuilt dynamically selected modules need separate coverage."
+  ],
+  "recordedAt": "2026-09-24T12:19:07.446319+00:00"
+}

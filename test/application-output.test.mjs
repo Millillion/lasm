@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync, renameSync, readFileSync, realpathSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync, renameSync, readFileSync, realpathSync, copyFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -14,6 +14,7 @@ test('entrypoint resolves host/glue relative to deployment, independent of build
   writeApplicationEntrypoint(original, 'node');
   mkdirSync(join(original, 'host'));
   writeFileSync(join(original, 'host/application-signals.mjs'), 'export function prepareApplicationSignals() {}');
+  copyFileSync(new URL('../src/application-metadata-runtime.mjs', import.meta.url), join(original, 'host/application-metadata-runtime.mjs'));
   writeFileSync(join(original, 'program.cjs'), `console.log(JSON.stringify({
     args: process.argv.slice(2), host: process.env.LASM_FULL_HOST_MODULE,
     app: process.env.LASM_FULL_APP_PATH, cwd: process.cwd(), threads: process.env.LEAN_NUM_THREADS

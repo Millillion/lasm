@@ -46,11 +46,13 @@ export function applicationSources(source, lean, work, { log = console.error, gi
       : join(lean.prefix, 'lib/lean', `libLake_shared.${platform === 'darwin' ? 'dylib' : 'so'}`);
     const entry = JSON.parse(run(lean.lean, ['-j1', '-s8192', '--plugin=' + lakePlugin, '--run',
       fileURLToPath(new URL('./lake-module.lean', import.meta.url)), configuredSource], project));
-    const configured = typeof entry === 'string' && entry.startsWith('/+');
+    const configured = typeof entry?.module === 'string' && entry.module.startsWith('/+');
     if (!configured && (!entry || !Array.isArray(entry.imports) || entry.imports.some(name => typeof name !== 'string')))
       throw new Error('Unexpected Lake module identity');
+    if (!Array.isArray(entry.metadataRoots) || entry.metadataRoots.some(name => typeof name !== 'string'))
+      throw new Error('Unexpected Lake module-data paths');
     const targets = [];
-    for (const target of configured ? [entry] : entry.imports.map(name => '+' + name)) {
+    for (const target of configured ? [entry.module] : entry.imports.map(name => '+' + name)) {
       const modules = query(target + ':transImports');
       if (!Array.isArray(modules) || modules.some(module => typeof module !== 'string'))
         throw new Error('Unexpected Lake transitive module inventory');
@@ -74,7 +76,7 @@ export function applicationSources(source, lean, work, { log = console.error, gi
         '--', '-j1', '-s8192', '-Dcompiler.postponeCompile=false', '-c', file], project);
       sources.push(file); inputs.push({ module: relative(project, source).replaceAll('\\', '/'), source });
     }
-    return { project, sources, inputs, env };
+    return { project, sources, inputs, env, metadataRoots: entry.metadataRoots.map(path => resolve(project, path)) };
   }
   // Standalone source trees use Lean's own import parser. Standard libraries
   // are already in the versioned bundle; local imports are compiled in order.
@@ -117,5 +119,5 @@ export function applicationSources(source, lean, work, { log = console.error, gi
     return signature;
   }
   visit(source);
-  return { project: null, sources, inputs, env };
+  return { project: null, sources, inputs, env, metadataRoots: [output] };
 }

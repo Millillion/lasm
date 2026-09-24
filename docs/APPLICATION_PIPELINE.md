@@ -555,3 +555,16 @@ now temporarily selects a plain core filename on its disposable dedicated
 runner so the zero limit is effective, then restores the original pattern.
 Application expectations and deadlines are unchanged, and no desktop setting
 is modified. Follow-up execution remains pending.
+
+Automatic module-data packaging is now wired into the application builder,
+with [eight passing file/loader unit controls](evidence/application-module-data-units-2026-09-24.json).
+Generated Lean/Lake initializer dependencies select applications that need
+metaprogramming data. Their output carries the full standard module-data tree
+and built project/dependency roots in Lake search order, with hashes included
+in cache identity. The entry point derives `LEAN_SYSROOT` and `LEAN_PATH`
+defaults from its relocated deployment while preserving explicit values.
+Linked build artifacts are copied as files, not deployment links. Real native
+Lake/import controls and installed Wasm acceptance are still pending; this
+unit-tested implementation is not a completed deployment gate. Unbuilt dynamic
+modules and custom foreign consumers need separate coverage, and the full
+metadata payload's size is an outstanding deployment tradeoff.

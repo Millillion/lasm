@@ -83,6 +83,10 @@ separately from the earlier runtime evidence below.
   across all three engines on Linux x64, including imported attribute tags and
   missing-data errors. These probes supply explicit data inputs; their results
   are not self-contained deployment acceptance.
+  Automatic deployment copying and relocation defaults now have
+  [eight passing unit controls](docs/evidence/application-module-data-units-2026-09-24.json).
+  Real native helper/import and installed Wasm validation remain pending;
+  complete dynamic-module handling and native platform coverage stay open.
 - [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and
   `Std.Internal.UV.Loop.alive`. The compiled library declarations are present,
   but their Emscripten C implementations still reject the operation or abort;

@@ -20,12 +20,14 @@ def main (args : List String) : IO UInt32 := do
   if let some mod := ws.root.findModuleBySrc? path <|> ws.root.findModuleBySrc? realPath then
     unless (← IO.FS.realPath mod.leanFile) == realPath do
       throw <| IO.userError s!"Lake module does not resolve to the requested source: {source}"
-    IO.println <| (toJson s!"/+{mod.name}").compress
+    IO.println <| (Json.mkObj [("module", toJson s!"/+{mod.name}"),
+      ("metadataRoots", toJson (ws.leanPath.map (·.toString)))]).compress
   else
     -- `lake lean` also accepts scripts which are not declared as library or
     -- executable roots. Lake builds their imports and supplies its full setup.
     let header ← Lean.parseImports' (← IO.FS.readFile path) source
     let imports := header.imports.filterMap fun imp =>
       ws.findModule? imp.module |>.map fun mod => mod.name.toString
-    IO.println <| (Json.mkObj [("imports", toJson imports)]).compress
+    IO.println <| (Json.mkObj [("imports", toJson imports),
+      ("metadataRoots", toJson (ws.leanPath.map (·.toString)))]).compress
   return 0
