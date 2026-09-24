@@ -1,0 +1,55 @@
+{
+  "scope": "Source review and prepared sparse-address experiment only; runtime execution pending",
+  "recordedAt": "2026-09-24T03:48:27.084123+00:00",
+  "reviewedAllocatorSources": {
+    "crates/wasmtime/src/runtime/vm/memory/shared_memory.rs": {
+      "url": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/v49.0.0/crates/wasmtime/src/runtime/vm/memory/shared_memory.rs",
+      "bytes": 9585,
+      "sha256": "8c489279e14a66e04da315e8d21fa8405809184bed753ee6da301e981f7f73f0"
+    },
+    "crates/wasmtime/src/runtime/vm/memory/mmap.rs": {
+      "url": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/v49.0.0/crates/wasmtime/src/runtime/vm/memory/mmap.rs",
+      "bytes": 10470,
+      "sha256": "a51b808edf6758f29601c815a8c9339e32905800ba000469fd6c62ee81bc7d2d"
+    },
+    "crates/wasmtime/src/runtime/vm/memory.rs": {
+      "url": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/v49.0.0/crates/wasmtime/src/runtime/vm/memory.rs",
+      "bytes": 30649,
+      "sha256": "90b8bd49d3dbe21ae6e4060e0ec21815039a2fbe52db0ceb7c4712cb93a3c8b9"
+    },
+    "crates/wasmtime/src/runtime/vm/sys/unix/mmap.rs": {
+      "url": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/v49.0.0/crates/wasmtime/src/runtime/vm/sys/unix/mmap.rs",
+      "bytes": 8632,
+      "sha256": "bc866accf65810187208c7474b67051fccb09e8191de73cc5a9b915415c01af9"
+    },
+    "crates/c-api/src/sharedmemory.rs": {
+      "url": "https://raw.githubusercontent.com/bytecodealliance/wasmtime/v49.0.0/crates/c-api/src/sharedmemory.rs",
+      "bytes": 1649,
+      "sha256": "eeea110c2826abb1741422bc8e7a28add5b271a9fe5db7c2858c91fd5ce9d778"
+    }
+  },
+  "allocationPath": [
+    "SharedMemory::new constructs MmapMemory and passes no initial memory image to LocalMemory::new.",
+    "MmapMemory reserves anonymous address space; the reviewed Linux implementation uses MAP_PRIVATE and MAP_NORESERVE.",
+    "Accessible initial pages and growth inside the reservation use mprotect rather than a bulk clear or copy.",
+    "The helper explicitly reserves 8 GiB of virtual address space, and the module imports that memory without data segments.",
+    "The sparse profile makes 4 GiB plus 128 KiB accessible and touches one 8-byte cell at address 4294967296 and one 4-byte wait cell at offset 8.",
+    "One-page growth is permitted exactly once. No dense fill, stress allocation, or guard-limit challenge is performed."
+  ],
+  "bounds": {
+    "kernelMemoryMiB": 1024,
+    "proactiveStopMiB": 819.2,
+    "compilerWorkers": 1,
+    "perChildSeconds": 60,
+    "hugePages": "disabled per process and checked before sparse mapping",
+    "maximumVirtualGuestBytes": 8589934592,
+    "sparseDataAddress": 4294967296
+  },
+  "files": {
+    "scripts/full-lean/probes/wasmtime-helper.c": "ddf4afae1791349cc07f8e831a17720bb0478f2b9af32964cec5ef54270f1f9d",
+    "scripts/full-lean/probes/wasmtime-helper.mjs": "1ce7ef8e363baf4aeeb8cf861a494e17753b139c1df032a8b3b4e013630c55d4",
+    "scripts/full-lean/probe-wasmtime-helper.mjs": "1c0d17897a73cd0366dd967b5c357b39fba4c434ce2ae17dbeb5331532ff7ded",
+    ".github/workflows/wasmtime-helper-probe.yml": "9c3ba7ea92f5a46e267885e25592f082c8ccfb0e2c1fc051e8ab5b775f60b4a3"
+  },
+  "claimLimit": "This can establish sparse pointer-width, cross-isolate memory identity, callback and wait/notify correctness. It cannot establish dense allocation capacity, full Lean integration, other platforms or complete API behavior."
+}

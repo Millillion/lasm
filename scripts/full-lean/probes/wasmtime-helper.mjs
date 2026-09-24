@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 const ffi = createRequire(import.meta.url)('koffi');
 const libraryPath = isMainThread ? process.argv[2] : workerData.libraryPath;
+const sparseHigh = isMainThread ? process.argv[3] === 'sparse-high' : workerData.sparseHigh;
+const initialPages = sparseHigh ? 65538 : 1;
 const library = ffi.load(libraryPath);
 const callbackType = ffi.proto('int64_t ProbeCallback(int64_t value)');
 const create = library.func('void *lasm_probe_new(char *error, size_t size)');
@@ -50,10 +52,10 @@ if (!isMainThread) {
   assert.ok(probe, message());
   try {
     const before = describe(probe);
-    assert.deepEqual(before, [1, 1, 131072, 65536]);
+    assert.deepEqual(before, [1, 1, 131072, initialPages * 65536]);
     const first = run(probe, 11);
     const address = ffi.address(probe);
-    worker = new Worker(fileURLToPath(import.meta.url), { workerData: { libraryPath, probe: address } });
+    worker = new Worker(fileURLToPath(import.meta.url), { workerData: { libraryPath, probe: address, sparseHigh } });
     let readyResolve, readyReject, waitResolve, waitReject, messages = 0;
     const ready = new Promise((resolve, reject) => { readyResolve = resolve; readyReject = reject; });
     const waited = new Promise((resolve, reject) => { waitResolve = resolve; waitReject = reject; });
@@ -83,7 +85,7 @@ if (!isMainThread) {
     await worker.terminate(); worker = undefined;
     assert.equal(grow(probe, error, error.length), 0, message());
     const after = describe(probe);
-    assert.deepEqual(after, [1, 1, 131072, 131072]);
+    assert.deepEqual(after, [1, 1, 131072, (initialPages + 1) * 65536]);
     const third = run(probe, 99);
     assert.equal(Number(peek(probe)), 100);
     // A 52-byte legacy try/catch control, independently instantiated by the
@@ -107,8 +109,9 @@ if (!isMainThread) {
     console.log(JSON.stringify({ engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
       version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
       before, after, first, second, third, concurrentWait: { notified, attempts, waitResult: waiting.result },
-      legacyException, peakGuestBytes: 131072,
-      scope: 'Private helper executes tiny memory64/atomic/exception/host-callback module across JS isolates; no Lean or large-memory acceptance claim' }));
+      legacyException, profile: sparseHigh ? 'sparse-high' : 'small', dataAddress: sparseHigh ? 4294967296 : 0,
+      accessibleGuestBytes: after[3], memoryAccessPattern: 'One 8-byte data cell plus a 4-byte wait cell at offset 8; no bulk fill',
+      scope: 'Private helper executes synthetic memory64/atomic/exception/host-callback module across JS isolates; no Lean or dense-memory acceptance claim' }));
   } finally {
     if (worker) await worker.terminate();
     destroy(probe);

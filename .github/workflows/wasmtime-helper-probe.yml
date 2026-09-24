@@ -7,7 +7,8 @@ concurrency:
   group: wasmtime-helper-probe-${{ github.ref }}
   cancel-in-progress: false
 
-# Tiny synthetic module only, with at most 128 KiB of guest allocation.
+# Synthetic module only. A small mapping and a reviewed sparse mapping above
+# 4 GiB each touch individual cells, never bulk-fill the virtual address range.
 # No shipping backend or Lean acceptance claim. Public standard runner;
 # no Actions cache, artifact uploads, or chargeable larger runners.
 jobs:
@@ -39,6 +40,7 @@ jobs:
         run: >-
           node scripts/full-lean/run-bounded.mjs --memory-mib 1024
           --report .work/wasmtime-helper-resources.json --
+          python3 scripts/full-lean/base-pages.py
           node --max-old-space-size=128 scripts/full-lean/probe-wasmtime-helper.mjs
           .work/wasmtime-helper node deno bun
       - name: Preserve bounded experiment receipts

@@ -5,6 +5,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/prctl.h>
+
+#ifdef LASM_PROBE_SPARSE_HIGH_MEMORY
+#define PROBE_INITIAL_PAGES 65538
+#define PROBE_OFFSET UINT64_C(4294967296)
+#define PROBE_OFFSET_TEXT "4294967296"
+#else
+#define PROBE_INITIAL_PAGES 1
+#define PROBE_OFFSET UINT64_C(0)
+#define PROBE_OFFSET_TEXT "0"
+#endif
 
 typedef struct {
     wasm_engine_t *engine;
@@ -34,35 +45,45 @@ void lasm_probe_delete(probe_t *probe) {
 }
 
 probe_t *lasm_probe_new(char *error, size_t size) {
+#ifdef LASM_PROBE_SPARSE_HIGH_MEMORY
+    if (prctl(PR_GET_THP_DISABLE, 0, 0, 0, 0) != 1) {
+        snprintf(error, size, "sparse probe requires the guarded base-pages wrapper"); return NULL;
+    }
+#endif
     probe_t *probe = calloc(1, sizeof(*probe));
     if (!probe) { snprintf(error, size, "probe allocation failed"); return NULL; }
     wasm_config_t *config = wasm_config_new();
     wasmtime_config_wasm_memory64_set(config, true);
     wasmtime_config_wasm_threads_set(config, true);
     wasmtime_config_shared_memory_set(config, true);
+    // Reserve address space once. The reviewed Linux mmap implementation uses
+    // NORESERVE/mprotect, without clearing the entire accessible range. Only
+    // the few explicit loads/stores below touch pages; this is not a pressure test.
+    wasmtime_config_memory_reservation_set(config, UINT64_C(8589934592));
     wasmtime_config_wasm_exceptions_set(config, true);
     wasmtime_config_parallel_compilation_set(config, false);
     wasmtime_config_max_wasm_stack_set(config, 1024 * 1024);
     probe->engine = wasm_engine_new_with_config(config);
     if (!probe->engine) { snprintf(error, size, "engine creation failed"); goto fail; }
     wasm_memorytype_t *type = NULL;
-    if (error_text(wasmtime_memorytype_new(1, true, 131072, true, true, 16, &type), NULL, error, size)) goto fail;
+    if (error_text(wasmtime_memorytype_new(PROBE_INITIAL_PAGES, true, 131072, true, true, 16, &type), NULL, error, size)) goto fail;
     wasmtime_error_t *memory_error = wasmtime_sharedmemory_new(probe->engine, type, &probe->memory);
     wasm_memorytype_delete(type);
     if (error_text(memory_error, NULL, error, size)) goto fail;
     // A standardized exception and a host callback execute on actual memory64.
-    // The declared maximum is 8 GiB; only one page is initially allocated.
+    // The sparse profile addresses a cell above 4 GiB while touching only a
+    // few base pages. The ordinary profile keeps one accessible Wasm page.
     const char *wat =
         "(module (import \"env\" \"memory\" (memory i64 1 131072 shared))"
         " (import \"env\" \"next\" (func $next (param i64) (result i64)))"
         " (tag $error (param i64))"
         " (func (export \"run\") (param $value i64) (result i64)"
         "  local.get $value call $next local.set $value"
-        "  i64.const 0 local.get $value i64.atomic.store"
+        "  i64.const " PROBE_OFFSET_TEXT " local.get $value i64.atomic.store"
         "  (block $caught (result i64)"
         "   (try_table (result i64) (catch $error $caught)"
         "    local.get $value throw $error))"
-        "  i64.const 0 i64.atomic.load i64.add)"
+        "  i64.const " PROBE_OFFSET_TEXT " i64.atomic.load i64.add)"
         " (func (export \"wait\") (result i64)"
         "  i64.const 8 i32.const 0 i64.const 5000000000 memory.atomic.wait32 i64.extend_i32_u)"
         " (func (export \"notify\") (result i64)"
@@ -154,7 +175,7 @@ int lasm_probe_legacy_exception(probe_t *probe, const uint8_t *bytes, size_t len
 }
 
 uint64_t lasm_probe_peek(probe_t *probe) {
-    return atomic_load((_Atomic uint64_t *)wasmtime_sharedmemory_data(probe->memory));
+    return atomic_load((_Atomic uint64_t *)(wasmtime_sharedmemory_data(probe->memory) + PROBE_OFFSET));
 }
 
 int lasm_probe_memory(probe_t *probe, uint64_t *fields) {
@@ -169,9 +190,9 @@ int lasm_probe_memory(probe_t *probe, uint64_t *fields) {
 }
 
 int lasm_probe_grow_one_page(probe_t *probe, char *error, size_t size) {
-    // Explicitly cap this experiment at two pages. It must never allocate the
-    // declared maximum just to check that the engine accepts its address range.
-    if (wasmtime_sharedmemory_size(probe->memory) != 1) {
+    // Permit exactly one additional accessible page. No bulk fill, copy, or
+    // pressure allocation is permitted in either profile.
+    if (wasmtime_sharedmemory_size(probe->memory) != PROBE_INITIAL_PAGES) {
         snprintf(error, size, "probe growth is restricted to exactly one page"); return 1;
     }
     uint64_t previous;

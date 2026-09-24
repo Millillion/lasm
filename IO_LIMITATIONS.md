@@ -60,9 +60,12 @@ separately from the earlier runtime evidence below.
   now executes memory64, shared-memory loads/stores, standardized exceptions and
   JavaScript callbacks across worker isolates in all three stock engines on
   Linux x64. It allocates only 128 KiB of guest memory with an 8 GiB declared
-  maximum. This is feasibility evidence only: actual high-address allocations,
-  concurrent wait/notify, Emscripten's legacy exceptions, full Lean integration
-  and the other native platforms remain unvalidated.
+  maximum. A [follow-up](docs/evidence/wasmtime-helper-concurrency-2026-09-24.json)
+  also passes concurrent Wasm wait/notify across isolates in all three engines.
+  Identical legacy exception bytecode executes in the stock engines but is
+  rejected by the helper; conversion remains required. This is feasibility
+  evidence only: actual high-address accesses, full Lean integration and the
+  other native platforms remain unvalidated.
 
 ## Earlier runtime evidence and remaining compatibility work
 

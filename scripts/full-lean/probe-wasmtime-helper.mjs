@@ -25,10 +25,10 @@ for (const [name, record] of Object.entries(input.selectedFiles))
   assert.equal(await hashFile(join(sdk, name)), record.sha256, name);
 const source = join(root, 'scripts/full-lean/probes/wasmtime-helper.c');
 const harness = join(root, 'scripts/full-lean/probes/wasmtime-helper.mjs');
-const helper = join(output, 'probe.so');
 const report = { scope: 'Bounded private-helper feasibility probe only; no shipping backend change', input,
   sourceSha256: await hashFile(source), harnessSha256: await hashFile(harness),
-  maxGuestPages: 2, compilerWorkers: 1, resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], passed: false };
+  memoryProfile: 'Small mapping and reviewed sparse mapping above 4 GiB; only individual cells touched; no pressure test',
+  compilerWorkers: 1, resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(program, args) {
   const execution = spawnSync(program, args, { cwd: root, encoding: 'utf8', timeout: 60_000,
@@ -40,19 +40,24 @@ function run(program, args) {
   return record;
 }
 try {
-  run('cc', ['-std=c11', '-O2', '-Wall', '-Wextra', '-shared', '-fPIC', '-I' + join(sdk, 'include'), source,
-    '-L' + join(sdk, 'lib'), '-lwasmtime', '-Wl,-rpath,' + join(sdk, 'lib'), '-o', helper]);
-  report.helperSha256 = await hashFile(helper); report.results = []; report.failures = [];
+  report.helpers = {}; report.results = []; report.failures = [];
+  for (const [profile, flags] of [['small', []], ['sparse-high', ['-DLASM_PROBE_SPARSE_HIGH_MEMORY=1']]]) {
+    const helper = join(output, profile + '.so');
+    run('cc', ['-std=c11', '-O2', '-Wall', '-Wextra', '-shared', '-fPIC', ...flags,
+      '-I' + join(sdk, 'include'), source, '-L' + join(sdk, 'lib'), '-lwasmtime', '-Wl,-rpath,' + join(sdk, 'lib'), '-o', helper]);
+    report.helpers[profile] = await hashFile(helper);
   for (const [engine, args] of [
     [nodeArg ?? join(root, '.cache/js-runtimes/node-26.10.0/bin/node'), ['--max-old-space-size=128']],
     [denoArg ?? join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
     [bunArg ?? join(root, '.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun'), []],
   ]) {
-    try { report.results.push(JSON.parse(run(engine, [...args, harness, helper]).stdout)); }
-    catch (error) { report.failures.push({ engine, error: error.message }); save(); }
+    try { report.results.push(JSON.parse(run(engine, [...args, harness, helper, profile]).stdout)); }
+    catch (error) { report.failures.push({ profile, engine, error: error.message }); save(); }
+  }
   }
   assert.equal(report.failures.length, 0, 'One or more stock engine probes failed; see result.json');
   assert.deepEqual(report.results.map(row => [row.engine, row.version]),
-    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
+    [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2'],
+     ['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
   report.passed = true;
 } finally { report.finishedAt = new Date().toISOString(); save(); }
