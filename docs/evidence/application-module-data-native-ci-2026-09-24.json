@@ -1,0 +1,795 @@
+{
+  "scope": "Native Linux Lake helper and relocated module-data imports; installed Wasm acceptance is separate",
+  "run": {
+    "databaseId": 35999203269,
+    "headSha": "909094a18b8705e868c92e041697c435e458d78e",
+    "conclusion": "success",
+    "url": "https://github.com/Millillion/lasm/actions/runs/35999203269"
+  },
+  "logFile": ".work/product-acceptance/module-data-ci-35999203269.log",
+  "logSha256": "7fc1ba7856453f3eec540a5cfaa33efd13a59d40b8563b0a3b04e6ac2d5e7700",
+  "platforms": [
+    {
+      "platform": "linux-x64",
+      "unitControls": {
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      },
+      "reports": {
+        ".work/module-data-units-resources.json": {
+          "startedAt": "2026-09-24T12:28:02.470Z",
+          "command": [
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/application-metadata.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "97f39e08-e1ec-404b-bb25-bf18de60a925",
+          "limits": {
+            "memoryMax": 536870912,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 429496729,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 14994759680
+          },
+          "minimumHostAvailable": 14991167488,
+          "peakMemoryBytes": 43622400,
+          "peakTasks": 17,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-units-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:28:02.875Z",
+            "memoryBytes": 17625088,
+            "peakMemoryBytes": 43622400,
+            "swapBytes": 0,
+            "tasks": 6,
+            "memoryBreakdown": {
+              "anon": 14516224,
+              "file": 368640,
+              "kernel": 1990656,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 368640,
+              "slab": 248320
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:28:02.917Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 15671296,
+            "peakMemoryBytes": 43622400,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13668352,
+              "file": 368640,
+              "kernel": 1077248,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 368640,
+              "slab": 162232
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:28:02.937Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/module-data-provision-resources.json": {
+          "startedAt": "2026-09-24T12:28:02.996Z",
+          "command": [
+            "node",
+            "integration/application-module-data-provision.mjs",
+            ".work/module-data-provision"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "affd5f30-c095-404d-b789-dc9c582d9c8c",
+          "limits": {
+            "memoryMax": 6403653632,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 5122922905,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 14994448384
+          },
+          "minimumHostAvailable": 14967627776,
+          "peakMemoryBytes": 4060348416,
+          "peakTasks": 11,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-provision-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:28:45.060Z",
+            "memoryBytes": 3677188096,
+            "peakMemoryBytes": 4060348416,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 170713088,
+              "file": 3368837120,
+              "kernel": 135131136,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 3368841216,
+              "slab": 131526184
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "highWaterProcesses": {
+            "at": "2026-09-24T12:28:33.845Z",
+            "processes": [
+              {
+                "pid": 2379,
+                "name": "node-MainThread",
+                "residentBytes": 265203712,
+                "threads": 11
+              }
+            ]
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:28:45.194Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 3259842560,
+            "peakMemoryBytes": 4060348416,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13668352,
+              "file": 3121324032,
+              "kernel": 124207104,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 3121324032,
+              "slab": 123287432
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:28:45.215Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/module-data-provision/result.json": {
+          "scope": "Managed native toolchain preparation only",
+          "lean": "4.34.0",
+          "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "identity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1",
+          "platform": "linux-x64",
+          "resourceReport": "/home/runner/work/lasm/lasm/.work/module-data-provision-resources.json",
+          "passed": true
+        },
+        ".work/module-data-native-resources.json": {
+          "startedAt": "2026-09-24T12:28:45.267Z",
+          "command": [
+            "node",
+            "integration/application-module-data.mjs",
+            ".work/module-data-native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "561e53f1-0506-4c71-a746-d18232d6ed53",
+          "limits": {
+            "memoryMax": 6796869632,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 5437495705,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16766414848,
+            "available": 15387389952
+          },
+          "minimumHostAvailable": 15148396544,
+          "peakMemoryBytes": 2799673344,
+          "peakTasks": 23,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-native-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:29:13.322Z",
+            "memoryBytes": 2580127744,
+            "peakMemoryBytes": 2799673344,
+            "swapBytes": 0,
+            "tasks": 6,
+            "memoryBreakdown": {
+              "anon": 2244608,
+              "file": 2480156672,
+              "kernel": 97214464,
+              "shmem": 0,
+              "file_mapped": 57344,
+              "inactive_file": 2246500352,
+              "slab": 96839520
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:29:13.347Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 2592346112,
+            "peakMemoryBytes": 2799673344,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 13697024,
+              "file": 2480156672,
+              "kernel": 97705984,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 2246500352,
+              "slab": 96778872
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:29:13.371Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/module-data-native/result.json": {
+          "scope": "Native Lake helper and relocated module-data import control; no installed Wasm acceptance implied",
+          "platform": "linux-x64",
+          "commands": [
+            {
+              "label": "native AOT control build",
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            },
+            {
+              "label": "native import from automatically deployed module data",
+              "code": 0,
+              "signal": null,
+              "stdout": "project, dependency and standard module data imported\n",
+              "stderr": ""
+            },
+            {
+              "label": "missing deployed standard data is a real import failure",
+              "code": 1,
+              "signal": null,
+              "stdout": "",
+              "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/0\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/1\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean\n"
+            }
+          ],
+          "passed": true,
+          "resourceReport": "/home/runner/work/lasm/lasm/.work/module-data-native-resources.json",
+          "toolchain": {
+            "version": "4.34.0",
+            "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+            "identity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1"
+          },
+          "generated": {
+            "modules": [
+              "+Imported",
+              "+Example.Data",
+              "/+Main"
+            ],
+            "metadataRoots": [
+              "/home/runner/work/lasm/lasm/.work/module-data-native/project/dependency/.lake/build/lib/lean",
+              "/home/runner/work/lasm/lasm/.work/module-data-native/project/.lake/build/lib/lean"
+            ]
+          },
+          "phase": "complete",
+          "metadata": {
+            "identity": "00283fb7a1b1f83cd6b8cf97f1608218acda1342834b9aa5f40e3e8b9cb75c7b",
+            "bytes": 2212444672,
+            "files": 12600,
+            "roots": [
+              "packages/0",
+              "packages/1"
+            ],
+            "manifestSha256": "d0447ea385dc5b5825a57c735b334fc26b7fe3d547a975f42fc194dd8b35db24"
+          },
+          "deployment": {
+            "directory": "/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces",
+            "path": "",
+            "sourceHidden": true,
+            "sysroot": "/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean",
+            "searchPath": "/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/0:/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/1:/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean",
+            "scope": "The native executable may retain native shared-library dependencies; all import data resolves inside this relocated deployment."
+          },
+          "actual": {
+            "code": 0,
+            "signal": null,
+            "stdout": "project, dependency and standard module data imported\n",
+            "stderr": ""
+          },
+          "missingData": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/0\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/1\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean\n"
+          },
+          "finishedAt": "2026-09-24T12:29:13.297Z"
+        }
+      }
+    },
+    {
+      "platform": "linux-arm64",
+      "unitControls": {
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0
+      },
+      "reports": {
+        ".work/module-data-units-resources.json": {
+          "startedAt": "2026-09-24T12:28:02.850Z",
+          "command": [
+            "node",
+            "--max-old-space-size=128",
+            "--test",
+            "--test-concurrency=1",
+            "test/application-metadata.test.mjs",
+            "test/application-output.test.mjs"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "5c814511-56c0-4923-adc4-18447cc2e58e",
+          "limits": {
+            "memoryMax": 536870912,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 429496729,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16722042880,
+            "available": 15245246464
+          },
+          "minimumHostAvailable": 15230119936,
+          "peakMemoryBytes": 37224448,
+          "peakTasks": 19,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-units-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:28:03.068Z",
+            "memoryBytes": 30203904,
+            "peakMemoryBytes": 34623488,
+            "swapBytes": 0,
+            "tasks": 19,
+            "memoryBreakdown": {
+              "anon": 27123712,
+              "file": 385024,
+              "kernel": 2555904,
+              "shmem": 0,
+              "file_mapped": 286720,
+              "inactive_file": 385024,
+              "slab": 443952
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:28:03.158Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 13209600,
+            "peakMemoryBytes": 37224448,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11698176,
+              "file": 368640,
+              "kernel": 913408,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 368640,
+              "slab": 150288
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:28:03.176Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/module-data-provision-resources.json": {
+          "startedAt": "2026-09-24T12:28:03.220Z",
+          "command": [
+            "node",
+            "integration/application-module-data-provision.mjs",
+            ".work/module-data-provision"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "17d0ca65-956b-45b7-b0db-73afc897b783",
+          "limits": {
+            "memoryMax": 6641680384,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 5313344307,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16722042880,
+            "available": 15232180224
+          },
+          "minimumHostAvailable": 15139016704,
+          "peakMemoryBytes": 4128976896,
+          "peakTasks": 11,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-provision-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:28:36.368Z",
+            "memoryBytes": 4115607552,
+            "peakMemoryBytes": 4115607552,
+            "swapBytes": 0,
+            "tasks": 11,
+            "memoryBreakdown": {
+              "anon": 214700032,
+              "file": 3754569728,
+              "kernel": 145907712,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 3754569728,
+              "slab": 142230264
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "highWaterProcesses": {
+            "at": "2026-09-24T12:28:28.283Z",
+            "processes": [
+              {
+                "pid": 2329,
+                "name": "node-MainThread",
+                "residentBytes": 257605632,
+                "threads": 11
+              }
+            ]
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:28:36.514Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 3313643520,
+            "peakMemoryBytes": 4128976896,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11730944,
+              "file": 3175669760,
+              "kernel": 125624320,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 3175669760,
+              "slab": 124855136
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:28:36.530Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/module-data-provision/result.json": {
+          "scope": "Managed native toolchain preparation only",
+          "lean": "4.34.0",
+          "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "identity": "0d20aeca378cf75675cc8057649bc81f2a6794c14f0989c0876081a90d0669f7",
+          "platform": "linux-arm64",
+          "resourceReport": "/home/runner/work/lasm/lasm/.work/module-data-provision-resources.json",
+          "passed": true
+        },
+        ".work/module-data-native-resources.json": {
+          "startedAt": "2026-09-24T12:28:36.573Z",
+          "command": [
+            "node",
+            "integration/application-module-data.mjs",
+            ".work/module-data-native"
+          ],
+          "cwd": "/home/runner/work/lasm/lasm",
+          "unit": "lasm-heavy-0539ccf52500.service",
+          "id": "88f2d960-86c5-4143-9d8b-20bd92a97266",
+          "limits": {
+            "memoryMax": 6584008704,
+            "memoryHigh": "infinity",
+            "stopMemoryBytes": 5267206963,
+            "memorySwapMax": 0,
+            "tasksMax": 1024,
+            "nice": 0,
+            "coreFileBytes": 0
+          },
+          "hostAtStart": {
+            "total": 16722042880,
+            "available": 15174332416
+          },
+          "minimumHostAvailable": 14849052672,
+          "peakMemoryBytes": 2820198400,
+          "peakTasks": 23,
+          "report": "/home/runner/work/lasm/lasm/.work/module-data-native-resources.json",
+          "status": "finished",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+          "lastSample": {
+            "at": "2026-09-24T12:29:03.231Z",
+            "memoryBytes": 2820198400,
+            "peakMemoryBytes": 2820198400,
+            "swapBytes": 0,
+            "tasks": 15,
+            "memoryBreakdown": {
+              "anon": 191688704,
+              "file": 2501558272,
+              "kernel": 126435328,
+              "shmem": 0,
+              "file_mapped": 1189412864,
+              "inactive_file": 2246500352,
+              "slab": 100411480
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "unitReleased": true,
+          "service": {
+            "serviceResult": "success",
+            "exitCode": "exited",
+            "exitStatus": "0",
+            "capturedAt": "2026-09-24T12:29:03.357Z",
+            "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+            "memoryBytes": 2612219904,
+            "peakMemoryBytes": 2820198400,
+            "swapBytes": 0,
+            "tasks": 7,
+            "memoryBreakdown": {
+              "anon": 11726848,
+              "file": 2501558272,
+              "kernel": 98201600,
+              "shmem": 0,
+              "file_mapped": 86016,
+              "inactive_file": 2246500352,
+              "slab": 97427736
+            },
+            "pressureSomeAvg10": 0,
+            "memoryEvents": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          },
+          "finishedAt": "2026-09-24T12:29:03.373Z",
+          "result": {
+            "code": 0,
+            "signal": null
+          },
+          "resourceLimited": false,
+          "memoryThrottled": false
+        },
+        ".work/module-data-native/result.json": {
+          "scope": "Native Lake helper and relocated module-data import control; no installed Wasm acceptance implied",
+          "platform": "linux-arm64",
+          "commands": [
+            {
+              "label": "native AOT control build",
+              "code": 0,
+              "signal": null,
+              "stdout": "",
+              "stderr": ""
+            },
+            {
+              "label": "native import from automatically deployed module data",
+              "code": 0,
+              "signal": null,
+              "stdout": "project, dependency and standard module data imported\n",
+              "stderr": ""
+            },
+            {
+              "label": "missing deployed standard data is a real import failure",
+              "code": 1,
+              "signal": null,
+              "stdout": "",
+              "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/0\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/1\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean\n"
+            }
+          ],
+          "passed": true,
+          "resourceReport": "/home/runner/work/lasm/lasm/.work/module-data-native-resources.json",
+          "toolchain": {
+            "version": "4.34.0",
+            "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+            "identity": "0d20aeca378cf75675cc8057649bc81f2a6794c14f0989c0876081a90d0669f7"
+          },
+          "generated": {
+            "modules": [
+              "+Imported",
+              "+Example.Data",
+              "/+Main"
+            ],
+            "metadataRoots": [
+              "/home/runner/work/lasm/lasm/.work/module-data-native/project/dependency/.lake/build/lib/lean",
+              "/home/runner/work/lasm/lasm/.work/module-data-native/project/.lake/build/lib/lean"
+            ]
+          },
+          "phase": "complete",
+          "metadata": {
+            "identity": "00283fb7a1b1f83cd6b8cf97f1608218acda1342834b9aa5f40e3e8b9cb75c7b",
+            "bytes": 2212444672,
+            "files": 12600,
+            "roots": [
+              "packages/0",
+              "packages/1"
+            ],
+            "manifestSha256": "d0447ea385dc5b5825a57c735b334fc26b7fe3d547a975f42fc194dd8b35db24"
+          },
+          "deployment": {
+            "directory": "/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces",
+            "path": "",
+            "sourceHidden": true,
+            "sysroot": "/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean",
+            "searchPath": "/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/0:/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/1:/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean",
+            "scope": "The native executable may retain native shared-library dependencies; all import data resolves inside this relocated deployment."
+          },
+          "actual": {
+            "code": 0,
+            "signal": null,
+            "stdout": "project, dependency and standard module data imported\n",
+            "stderr": ""
+          },
+          "missingData": {
+            "code": 1,
+            "signal": null,
+            "stdout": "",
+            "stderr": "uncaught exception: unknown module prefix 'Init'\n\nNo directory 'Init' or file 'Init.olean' in the search path entries:\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/0\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/packages/1\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean\n/home/runner/work/lasm/lasm/.work/module-data-native/deployment with spaces/lean/lib/lean\n"
+          },
+          "finishedAt": "2026-09-24T12:29:03.319Z"
+        }
+      }
+    }
+  ],
+  "retainedResourceStop": "application-module-data-resource-stop-2026-09-24.json",
+  "interpretation": "Separating cold native-tool provisioning from copying and import validation succeeds under unchanged process-tree limits; no memory-pressure, throttle or OOM events. The initial resource stops remain intact.",
+  "limitations": [
+    "Installed Node/Deno/Bun compiled-Wasm deployment validation remains pending.",
+    "Native executables may retain shared-library dependencies; this proves relocation of module data, not complete native executable portability.",
+    "The full standard metadata payload is 2212444672 bytes across 12600 files in this fixture. Unbuilt dynamic modules, foreign consumers, and non-Linux platforms require more coverage."
+  ],
+  "recordedAt": "2026-09-24T12:41:56.135098+00:00"
+}

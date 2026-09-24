@@ -587,3 +587,14 @@ guarded phases with unchanged limits. Nine local unit controls pass, including
 an explicit sysroot with default project search paths. The installed import
 harness has a separate bundled-data mode that supplies no Lean path variables
 to deployed processes; that campaign remains pending.
+
+The [second native module-data campaign](evidence/application-module-data-native-ci-2026-09-24.json)
+passes all nine unit controls and the real Lake/import checks on Linux x64 and
+ARM64. Sources are hidden, `PATH` is empty, and the deployment is relocated to a
+path containing spaces. Standard, project and dependency modules import
+successfully; removing standard data gives the expected import error. All six
+guards release without resource events. Cold provisioning peaks at 3.85 GiB;
+native copying/import validation peaks at 2.63 GiB. The metadata payload is
+2.06 GiB across 12,600 files. Installed Wasm deployment acceptance is still
+pending, and native shared-library dependencies are outside this data-layout
+control's claim.

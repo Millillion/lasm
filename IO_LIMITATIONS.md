@@ -89,9 +89,10 @@ separately from the earlier runtime evidence below.
   missing-data errors. These probes supply explicit data inputs; their results
   are not self-contained deployment acceptance.
   Automatic deployment copying and relocation defaults now have
-  [eight passing unit controls](docs/evidence/application-module-data-units-2026-09-24.json).
-  Real native helper/import and installed Wasm validation remain pending;
-  complete dynamic-module handling and native platform coverage stay open.
+  [nine unit controls and native Linux x64/ARM64 import passes](docs/evidence/application-module-data-native-ci-2026-09-24.json).
+  Relocated project, dependency and standard module data works with sources
+  hidden; missing standard data produces a real import failure. Installed Wasm
+  validation, complete dynamic-module handling and other platforms stay open.
 - [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and
   `Std.Internal.UV.Loop.alive`. The compiled library declarations are present,
   but their Emscripten C implementations still reject the operation or abort;
