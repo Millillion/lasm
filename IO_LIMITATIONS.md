@@ -138,6 +138,13 @@ separately from the earlier runtime evidence below.
   Bun's lowered-memory backend still has a 4 GiB capacity ceiling; replacing
   that backend or resolving its stock-engine integration is open engineering
   work, not a demonstrated fundamental limitation.
+  The installed `.22` campaign now reproduces this in the unchanged
+  `const_fold` benchmark. A [separate diagnostic copy](docs/evidence/bun-large-stack-allocation-gap-2026-09-24.json)
+  exposes `lean::exception: failed to create thread: Resource temporarily
+  unavailable` with the original 4 GiB thread-stack setting. Its secondary
+  `DataCloneError` masks that exception when crossing the worker boundary.
+  Omitting the setting succeeds; doubling the JavaScript execution stack does
+  not. These controls diagnose the gap; they neither weaken the suite nor fix it.
   A [small Wasmtime helper probe](docs/evidence/wasmtime-helper-smoke-2026-09-24.json)
   now executes memory64, shared-memory loads/stores, standardized exceptions and
   JavaScript callbacks across worker isolates in all three stock engines on

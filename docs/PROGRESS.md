@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Verified lossless archival](evidence/historical-generated-wasm-archive-2026-09-24.json) reclaimed 11.46 GiB from 113 historical generated binaries, peaking at 0.57 GiB without OOM. [Windows leantar shell setup](evidence/windows-arm64-leantar-shell-repair-2026-09-24.json) now uses the supported ARM64 target with explicitly recorded x64 C compiler helpers; the native test rerun remains pending.
+**Changed:** [Bun's unchanged large-stack failure](evidence/bun-large-stack-allocation-gap-2026-09-24.json) is isolated: the 4 GiB reservation fails thread creation, then worker cloning hides the C++ exception. Omitting the setting passes; increasing the JavaScript stack does not. Original tests remain unchanged. The 19 disk-interrupted cases are running separately after verified archival reclaimed space.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

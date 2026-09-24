@@ -1,0 +1,282 @@
+{
+  "scope": "Installed Bun const_fold failure diagnosed with preserved upstream stack settings; no repair or fundamental-limit claim",
+  "campaign": ".work/upstream-applications-bun-r1",
+  "nativeControl": "The unchanged native compiled and interpreted driver both print 93011 93011 with LEAN_STACK_SIZE_KB=4194304",
+  "diagnostic": {
+    "cmd": 8,
+    "keys": [
+      "cmd",
+      "error"
+    ],
+    "type": "object",
+    "string": "[object WebAssembly.Exception]",
+    "constructor": "Exception",
+    "own": [],
+    "clone": "DataCloneError: The object can not be cloned.",
+    "cloneStack": "postMessage@[native code]\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r2/program.cjs:399:40\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r2/program.cjs:446:18\nprocessTicksAndRejections@",
+    "wasmException": true,
+    "cppException": true,
+    "cppPayload": "115058144",
+    "cppType": "lean::exception",
+    "cppMessage": "failed to create thread: Resource temporarily unavailable"
+  },
+  "comparisons": {
+    "scope": "Diagnostic variants, not repaired installed-package acceptance",
+    "originalGlueSha256": "62b04e967a531f0d7aff3b2f96d7e2b674dd01179e8acdb15cc875dcf28d7f7e",
+    "diagnosticGlueSha256": "e15e77cf8bf1645cc09be135a4a2cf998defcaaa2af10bc7c8d39b8087ffffdf",
+    "wasmSha256": "065978d1eb603f012cbada31b02b161877aa0ede71dc91bc2028f35c33c65a34",
+    "adaptation": {
+      "scope": "Separate generated-glue diagnostic copy; original upstream source, expected output, installed package and application output unchanged",
+      "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-bun-r1/cases/compile_bench__const_fold.lean/dist",
+      "needle": "globalThis.postMessage = msg => parentPort.postMessage(msg);",
+      "replacement": "globalThis.postMessage = msg => {\n      try { return parentPort.postMessage(msg); }\n      catch (cloneError) {\n        const e = msg?.error;\n        const fields = { cmd: msg?.cmd, keys: Object.keys(msg ?? {}), type: typeof e,\n          name: e?.name, message: e?.message, string: String(e), stack: e?.stack,\n          constructor: e?.constructor?.name, own: e && Object.getOwnPropertyNames(e),\n          clone: String(cloneError), cloneStack: cloneError.stack };\n        try { if (e instanceof WebAssembly.Exception) {\n          fields.wasmException = true;\n          fields.cppException = e.is(wasmExports.__cpp_exception);\n          if (fields.cppException) fields.cppPayload = String(e.getArg(wasmExports.__cpp_exception, 0));\n        } } catch (diagnosticError) { fields.diagnosticError = String(diagnosticError); }\n        require('node:fs').writeSync(2, 'LASM_CLONE_DIAGNOSTIC ' + JSON.stringify(fields) + '\\n');\n        throw cloneError;\n      }\n    };"
+    },
+    "checks": [
+      {
+        "name": "installed-unchanged",
+        "env": {
+          "LEAN_STACK_SIZE_KB": "4194304"
+        },
+        "code": 1,
+        "signal": null,
+        "stdout": "",
+        "stderr": "worker sent an error! undefined:undefined: The object can not be cloned.\n1349 |       }\n1350 |     };\n1351 |     worker.onerror = e => {\n1352 |       var message = \"worker sent an error!\";\n1353 |       err(`${message} ${e.filename}:${e.lineno}: ${e.message}`);\n1354 |       throw e;\n                   ^\nDataCloneError: The object can not be cloned.\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/upstream-applications-bun-r1/cases/compile_bench__const_fold.lean/dist/program.cjs:1354:13)\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/upstream-applications-bun-r1/cases/compile_bench__const_fold.lean/dist/program.cjs:1360:38)\n      at applyHandlers (node:events:64:20)\n      at emitError (node:events:44:27)\n      at #onError (node:worker_threads:724:14)\n\nBun v1.4.2 (Linux x64)\n"
+      },
+      {
+        "name": "diagnostic-same-settings",
+        "env": {
+          "LEAN_STACK_SIZE_KB": "4194304"
+        },
+        "code": 1,
+        "signal": null,
+        "stdout": "",
+        "stderr": "LASM_CLONE_DIAGNOSTIC {\"cmd\":8,\"keys\":[\"cmd\",\"error\"],\"type\":\"object\",\"string\":\"[object WebAssembly.Exception]\",\"constructor\":\"Exception\",\"own\":[],\"clone\":\"DataCloneError: The object can not be cloned.\",\"cloneStack\":\"postMessage@[native code]\\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r1/program.cjs:399:40\\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r1/program.cjs:431:18\\nprocessTicksAndRejections@\",\"wasmException\":true,\"cppException\":true,\"cppPayload\":\"115058144\"}\nworker sent an error! undefined:undefined: The object can not be cloned.\n1365 |       }\n1366 |     };\n1367 |     worker.onerror = e => {\n1368 |       var message = \"worker sent an error!\";\n1369 |       err(`${message} ${e.filename}:${e.lineno}: ${e.message}`);\n1370 |       throw e;\n                   ^\nDataCloneError: The object can not be cloned.\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r1/program.cjs:1370:13)\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r1/program.cjs:1376:38)\n      at applyHandlers (node:events:64:20)\n      at emitError (node:events:44:27)\n      at #onError (node:worker_threads:724:14)\n\nBun v1.4.2 (Linux x64)\n"
+      },
+      {
+        "name": "diagnostic-default-lean-stack",
+        "env": {},
+        "code": 0,
+        "signal": null,
+        "stdout": "93011 93011\n",
+        "stderr": ""
+      },
+      {
+        "name": "diagnostic-larger-vm-stack",
+        "env": {
+          "LEAN_STACK_SIZE_KB": "4194304",
+          "LASM_VM_STACK_MB": "128"
+        },
+        "code": 1,
+        "signal": null,
+        "stdout": "",
+        "stderr": "LASM_CLONE_DIAGNOSTIC {\"cmd\":8,\"keys\":[\"cmd\",\"error\"],\"type\":\"object\",\"string\":\"[object WebAssembly.Exception]\",\"constructor\":\"Exception\",\"own\":[],\"clone\":\"DataCloneError: The object can not be cloned.\",\"cloneStack\":\"postMessage@[native code]\\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r1/program.cjs:399:40\\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r1/program.cjs:431:18\\nprocessTicksAndRejections@\",\"wasmException\":true,\"cppException\":true,\"cppPayload\":\"115058144\"}\nworker sent an error! undefined:undefined: The object can not be cloned.\n1365 |       }\n1366 |     };\n1367 |     worker.onerror = e => {\n1368 |       var message = \"worker sent an error!\";\n1369 |       err(`${message} ${e.filename}:${e.lineno}: ${e.message}`);\n1370 |       throw e;\n                   ^\nDataCloneError: The object can not be cloned.\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r1/program.cjs:1370:13)\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r1/program.cjs:1376:38)\n      at applyHandlers (node:events:64:20)\n      at emitError (node:events:44:27)\n      at #onError (node:worker_threads:724:14)\n\nBun v1.4.2 (Linux x64)\n"
+      }
+    ]
+  },
+  "adaptation": {
+    "scope": "Extract the native C++ exception message from the diagnostic-only generated glue copy; unchanged upstream tests and Wasm",
+    "prior": "/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-diagnostic-r1",
+    "needle": "if (fields.cppException) fields.cppPayload = String(e.getArg(wasmExports.__cpp_exception, 0));",
+    "replacement": "if (fields.cppException) {\n            const payload = e.getArg(wasmExports.__cpp_exception, 0);\n            fields.cppPayload = String(payload);\n            const sp = stackSave();\n            try {\n              const type = stackAlloc(8), message = stackAlloc(8);\n              wasmExports.__get_exception_message(wasmExports.__thrown_object_from_unwind_exception(payload), BigInt(type), BigInt(message));\n              const typePtr = HEAPU64[type / 8], messagePtr = HEAPU64[message / 8];\n              fields.cppType = UTF8ToString(Number(typePtr));\n              fields.cppMessage = messagePtr ? UTF8ToString(Number(messagePtr)) : null;\n              wasmExports.free(typePtr); if (messagePtr) wasmExports.free(messagePtr);\n            } finally { stackRestore(sp); }\n          }"
+  },
+  "resources": [
+    {
+      "startedAt": "2026-09-24T14:15:52.064Z",
+      "command": [
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=128",
+        ".work/probe-bun-const-fold-r1.mjs"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "8618405e-7aa9-4b62-9184-c114c061c8a2",
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24289447936
+      },
+      "minimumHostAvailable": 22581141504,
+      "peakMemoryBytes": 1348751360,
+      "peakTasks": 50,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-const-fold-diagnostic-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T14:16:01.488Z",
+        "memoryBytes": 41521152,
+        "peakMemoryBytes": 1348751360,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 32321536,
+          "file": 7331840,
+          "kernel": 1568768,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 7331840,
+          "slab": 418872
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T14:16:01.617Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 21061632,
+        "peakMemoryBytes": 1348751360,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11665408,
+          "file": 7331840,
+          "kernel": 1306624,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 7331840,
+          "slab": 365096
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T14:16:01.647Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    {
+      "startedAt": "2026-09-24T14:19:16.812Z",
+      "command": [
+        "/usr/bin/timeout",
+        "--signal=KILL",
+        "30",
+        "/usr/bin/env",
+        "LEAN_NUM_THREADS=1",
+        "LEAN_STACK_SIZE_KB=4194304",
+        ".cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        ".work/bun-const-fold-diagnostic-r2/main.mjs",
+        "15"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "097ca0fa-e6b3-4597-8bc6-0f46c87001cd",
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 24175034368
+      },
+      "minimumHostAvailable": 22636294144,
+      "peakMemoryBytes": 1304338432,
+      "peakTasks": 35,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/bun-const-fold-diagnostic-r2-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-24T14:19:19.020Z",
+        "memoryBytes": 1263980544,
+        "peakMemoryBytes": 1304338432,
+        "swapBytes": 0,
+        "tasks": 3,
+        "memoryBreakdown": {
+          "anon": 1225293824,
+          "file": 7352320,
+          "kernel": 4653056,
+          "shmem": 0,
+          "file_mapped": 28672,
+          "inactive_file": 7327744,
+          "slab": 770184
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T14:19:19.150Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 21495808,
+        "peakMemoryBytes": 1304338432,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11661312,
+          "file": 7352320,
+          "kernel": 1294336,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 7327744,
+          "slab": 358352
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T14:19:19.177Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  ],
+  "logFile": ".work/product-acceptance/bun-const-fold-diagnostic-r2.log",
+  "logSha256": "7104b8ca43d9ed5b9a85a8d24904fb5f1f068fa96cacf674c4f64fde782317be",
+  "finding": "The unchanged 4 GiB thread-stack reservation exceeds the lowered-memory backend capacity once allocator/thread bookkeeping is included. pthread_create reports EAGAIN; the escaping lean::exception then fails worker structured cloning. Omitting the setting succeeds; increasing only the JavaScript stack does not.",
+  "remaining": [
+    "Integrate an execution backend that supports the full reservation in stock Bun without changing upstream tests or visible Lean configuration",
+    "Preserve uncaught Wasm exception diagnostics across the private worker channel"
+  ],
+  "fundamental": false
+}
