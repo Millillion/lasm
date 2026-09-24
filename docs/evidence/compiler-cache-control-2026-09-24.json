@@ -1,0 +1,296 @@
+{
+  "scope": "Native Windows ARM64 compiler cache save/restore and C object reuse; not a full Lean checkpoint",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35938603487",
+  "commit": "560fc83",
+  "conclusion": "success",
+  "runner": "windows-11-arm",
+  "node": "26.10.0",
+  "records": [
+    {
+      "scope": "Native Windows ARM64 compiler cache control",
+      "operation": "create",
+      "status": "passed",
+      "expectedOutput": "42",
+      "objectSha256": "ac730247b16c562303dac910b4391d36c725469ce81f82ceffd0636ecd0f0162",
+      "stats": {
+        "autoconf_test": 0,
+        "bad_compiler_arguments": 0,
+        "bad_input_file": 0,
+        "bad_output_file": 0,
+        "cache_miss": 1,
+        "cache_size_kibibyte": 8,
+        "called_for_link": 0,
+        "called_for_preprocessing": 0,
+        "cleanups_performed": 0,
+        "compile_failed": 0,
+        "compiler_check_failed": 0,
+        "compiler_produced_empty_output": 0,
+        "compiler_produced_no_output": 0,
+        "compiler_produced_stdout": 0,
+        "could_not_find_compiler": 0,
+        "could_not_use_modules": 0,
+        "could_not_use_precompiled_header": 0,
+        "direct_cache_hit": 1,
+        "direct_cache_miss": 1,
+        "disabled": 0,
+        "error_hashing_extra_file": 0,
+        "files_in_cache": 2,
+        "internal_error": 0,
+        "local_storage_hit": 1,
+        "local_storage_miss": 1,
+        "local_storage_read_hit": 2,
+        "local_storage_read_miss": 2,
+        "local_storage_write": 2,
+        "max_cache_size_kibibyte": 65536,
+        "max_files_in_cache": 0,
+        "missing_cache_file": 0,
+        "modified_input_file": 0,
+        "multiple_source_files": 0,
+        "no_input_file": 0,
+        "output_to_stdout": 0,
+        "preprocessed_cache_hit": 0,
+        "preprocessed_cache_miss": 1,
+        "preprocessor_error": 0,
+        "recache": 0,
+        "remote_storage_error": 0,
+        "remote_storage_hit": 0,
+        "remote_storage_miss": 0,
+        "remote_storage_read_hit": 0,
+        "remote_storage_read_miss": 0,
+        "remote_storage_timeout": 0,
+        "remote_storage_write": 0,
+        "stats_updated_timestamp": 1790209948,
+        "stats_zeroed_timestamp": 1790209947,
+        "unsupported_code_directive": 0,
+        "unsupported_compiler_option": 0,
+        "unsupported_environment_variable": 0,
+        "unsupported_source_encoding": 0,
+        "unsupported_source_language": 0
+      }
+    },
+    {
+      "status": "passed",
+      "command": [
+        "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+        "--login",
+        "scripts/ci/compiler-cache-control.sh",
+        "create"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 13191856128
+      },
+      "limits": {
+        "jobCommittedBytes": 2147483648,
+        "stopCommittedBytes": 1717986918,
+        "hostReserveBytes": 2147483648
+      },
+      "peakCommittedBytes": 117256192,
+      "minimumHostAvailable": 13118996480,
+      "startedAt": 1790209944.9880524,
+      "unit": "Local\\LasmResource-935c2750-ee71-4164-b710-ace031472cdd",
+      "pid": 4992,
+      "lastSampleAt": 1790209949.7240067,
+      "exitCode": 0,
+      "finishedAt": 1790209949.8006196
+    },
+    {
+      "operation": "pack",
+      "identitySha256": "baa2a22debd14aa7fc2adcc2d56ed3e9593e14a95eb4fbcdee25382cb68a3d43",
+      "sha256": "053c4830634f7bc7edc1ce789af056830e9b8776ad7834887d61c2c4fce533b0",
+      "bytes": 10371,
+      "files": 276,
+      "contentBytes": 49582
+    },
+    {
+      "status": "passed",
+      "command": [
+        "node",
+        "scripts/ci/compiler-cache.mjs",
+        "pack",
+        ".work/compiler-cache-control/cache",
+        ".work/compiler-cache-control.tgz",
+        ".work/compiler-cache-control/identity.json"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 13192232960
+      },
+      "limits": {
+        "jobCommittedBytes": 2147483648,
+        "stopCommittedBytes": 1717986918,
+        "hostReserveBytes": 2147483648
+      },
+      "peakCommittedBytes": 79241216,
+      "minimumHostAvailable": 13159993344,
+      "startedAt": 1790209952.9183912,
+      "unit": "Local\\LasmResource-d8c55cfc-c92f-4629-aac2-0d5f58590a95",
+      "pid": 7648,
+      "lastSampleAt": 1790209953.5409544,
+      "exitCode": 0,
+      "finishedAt": 1790209953.6217182
+    },
+    {
+      "status": "passed",
+      "command": [
+        "node",
+        "scripts/ci/compiler-cache-control.mjs",
+        "remove"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 13190709248
+      },
+      "limits": {
+        "jobCommittedBytes": 536870912,
+        "stopCommittedBytes": 429496729,
+        "hostReserveBytes": 2147483648
+      },
+      "peakCommittedBytes": 46039040,
+      "minimumHostAvailable": 13158932480,
+      "startedAt": 1790209958.8429086,
+      "unit": "Local\\LasmResource-c9fc2f72-e093-426c-a5ea-d366ce54d87c",
+      "pid": 7952,
+      "lastSampleAt": 1790209959.2640092,
+      "exitCode": 0,
+      "finishedAt": 1790209959.270823
+    },
+    {
+      "operation": "unpack",
+      "status": "verified",
+      "identitySha256": "baa2a22debd14aa7fc2adcc2d56ed3e9593e14a95eb4fbcdee25382cb68a3d43",
+      "sha256": "053c4830634f7bc7edc1ce789af056830e9b8776ad7834887d61c2c4fce533b0",
+      "files": 276,
+      "contentBytes": 49582
+    },
+    {
+      "status": "passed",
+      "command": [
+        "node",
+        "scripts/ci/compiler-cache.mjs",
+        "unpack",
+        ".work/compiler-cache-control/cache",
+        ".work/compiler-cache-control.tgz",
+        ".work/compiler-cache-control/identity.json"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 13187387392
+      },
+      "limits": {
+        "jobCommittedBytes": 2147483648,
+        "stopCommittedBytes": 1717986918,
+        "hostReserveBytes": 2147483648
+      },
+      "peakCommittedBytes": 88256512,
+      "minimumHostAvailable": 13152206848,
+      "startedAt": 1790209963.2281947,
+      "unit": "Local\\LasmResource-93c36a1c-f0c9-4d1e-951c-39c6e162adcb",
+      "pid": 5244,
+      "lastSampleAt": 1790209964.6796913,
+      "exitCode": 0,
+      "finishedAt": 1790209964.680923
+    },
+    {
+      "scope": "Native Windows ARM64 compiler cache control",
+      "operation": "verify",
+      "status": "passed",
+      "expectedOutput": "42",
+      "objectSha256": "ac730247b16c562303dac910b4391d36c725469ce81f82ceffd0636ecd0f0162",
+      "stats": {
+        "autoconf_test": 0,
+        "bad_compiler_arguments": 0,
+        "bad_input_file": 0,
+        "bad_output_file": 0,
+        "cache_miss": 1,
+        "cache_size_kibibyte": 8,
+        "called_for_link": 0,
+        "called_for_preprocessing": 0,
+        "cleanups_performed": 0,
+        "compile_failed": 0,
+        "compiler_check_failed": 0,
+        "compiler_produced_empty_output": 0,
+        "compiler_produced_no_output": 0,
+        "compiler_produced_stdout": 0,
+        "could_not_find_compiler": 0,
+        "could_not_use_modules": 0,
+        "could_not_use_precompiled_header": 0,
+        "direct_cache_hit": 2,
+        "direct_cache_miss": 1,
+        "disabled": 0,
+        "error_hashing_extra_file": 0,
+        "files_in_cache": 2,
+        "internal_error": 0,
+        "local_storage_hit": 2,
+        "local_storage_miss": 1,
+        "local_storage_read_hit": 4,
+        "local_storage_read_miss": 2,
+        "local_storage_write": 2,
+        "max_cache_size_kibibyte": 65536,
+        "max_files_in_cache": 0,
+        "missing_cache_file": 0,
+        "modified_input_file": 0,
+        "multiple_source_files": 0,
+        "no_input_file": 0,
+        "output_to_stdout": 0,
+        "preprocessed_cache_hit": 0,
+        "preprocessed_cache_miss": 1,
+        "preprocessor_error": 0,
+        "recache": 0,
+        "remote_storage_error": 0,
+        "remote_storage_hit": 0,
+        "remote_storage_miss": 0,
+        "remote_storage_read_hit": 0,
+        "remote_storage_read_miss": 0,
+        "remote_storage_timeout": 0,
+        "remote_storage_write": 0,
+        "stats_updated_timestamp": 1790209968,
+        "stats_zeroed_timestamp": 1790209947,
+        "unsupported_code_directive": 0,
+        "unsupported_compiler_option": 0,
+        "unsupported_environment_variable": 0,
+        "unsupported_source_encoding": 0,
+        "unsupported_source_language": 0
+      }
+    },
+    {
+      "status": "passed",
+      "command": [
+        "C:\\a\\_temp\\msys64\\usr\\bin\\bash.exe",
+        "--login",
+        "scripts/ci/compiler-cache-control.sh",
+        "verify"
+      ],
+      "hostAtStart": {
+        "total": 17169428480,
+        "available": 13173641216
+      },
+      "limits": {
+        "jobCommittedBytes": 2147483648,
+        "stopCommittedBytes": 1717986918,
+        "hostReserveBytes": 2147483648
+      },
+      "peakCommittedBytes": 117190656,
+      "minimumHostAvailable": 13138587648,
+      "startedAt": 1790209967.880868,
+      "unit": "Local\\LasmResource-eb787c83-be7c-4821-9400-aa873e686cf1",
+      "pid": 5968,
+      "lastSampleAt": 1790209969.7484617,
+      "exitCode": 0,
+      "finishedAt": 1790209969.7581239
+    }
+  ],
+  "cache": {
+    "key": "lasm-ccache-control-35938603487-1-053c4830634f7bc7edc1ce789af056830e9b8776ad7834887d61c2c4fce533b0",
+    "id": 8048551635,
+    "sizeInBytes": 7552,
+    "deletion": "passed; subsequent paginated cache inventory was empty",
+    "usageMetricAfterDeletion": {
+      "active_caches_size_in_bytes": 7552,
+      "active_caches_count": 1
+    },
+    "usageMetricNote": "The usage metric still reflected the deleted cache. Budget checks conservatively use the larger of the metric and live inventory."
+  },
+  "logSha256": "0719e4b26c03b353576dea166777d4d0420eedd3de55d23daf3ad243aaa852c2",
+  "localLog": ".work/product-acceptance/compiler-cache-control-35938603487.log"
+}

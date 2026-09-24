@@ -1,0 +1,154 @@
+{
+  "scope": "Native Windows x64 and ARM64 guard controls; no intentional memory pressure or OOM",
+  "run": "https://github.com/Millillion/lasm/actions/runs/35938869572",
+  "commit": "d1c88f3",
+  "conclusion": "success",
+  "node": "26.10.0",
+  "records": [
+    {
+      "job": "control (windows-2025, x64)",
+      "result": {
+        "status": "time-limit",
+        "command": [
+          "C:\\hostedtoolcache\\windows\\node\\26.10.0\\x64\\node.exe",
+          "test/fixtures/windows-guard-deadline.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14149763072
+        },
+        "limits": {
+          "jobCommittedBytes": 536870912,
+          "stopCommittedBytes": 429496729,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 3
+        },
+        "peakCommittedBytes": 42430464,
+        "minimumHostAvailable": 14119575552,
+        "startedAt": 1790209990.5118635,
+        "unit": "Local\\LasmResource-38e7d040-8800-49e7-9155-5b9ce93e17ce",
+        "pid": 8096,
+        "lastSampleAt": 1790209993.5965016,
+        "stoppedBecause": "time-limit",
+        "exitCode": 124,
+        "finishedAt": 1790209993.6024013
+      }
+    },
+    {
+      "job": "control (windows-2025, x64)",
+      "result": {
+        "scope": "Native Windows guarded deadline, no memory-pressure test",
+        "status": "passed",
+        "stoppedProcesses": [
+          8096,
+          6928
+        ],
+        "report": ".work/windows-guard-deadline-resources.json"
+      }
+    },
+    {
+      "job": "control (windows-2025, x64)",
+      "result": {
+        "status": "passed",
+        "command": [
+          "node",
+          "test/fixtures/windows-guard.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17174360064,
+          "available": 14169448448
+        },
+        "limits": {
+          "jobCommittedBytes": 536870912,
+          "stopCommittedBytes": 429496729,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": null
+        },
+        "peakCommittedBytes": 109465600,
+        "minimumHostAvailable": 14076235776,
+        "startedAt": 1790209997.4628832,
+        "unit": "Local\\LasmResource-ba7e5d14-a777-4df0-99c6-68eb547ccc07",
+        "pid": 8684,
+        "lastSampleAt": 1790209998.4953787,
+        "exitCode": 0,
+        "finishedAt": 1790209998.6044507
+      }
+    },
+    {
+      "job": "control (windows-11-arm, arm64)",
+      "result": {
+        "status": "time-limit",
+        "command": [
+          "C:\\hostedtoolcache\\windows\\node\\26.10.0\\arm64\\node.exe",
+          "test/fixtures/windows-guard-deadline.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13455618048
+        },
+        "limits": {
+          "jobCommittedBytes": 536870912,
+          "stopCommittedBytes": 429496729,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": 3
+        },
+        "peakCommittedBytes": 45121536,
+        "minimumHostAvailable": 13423005696,
+        "startedAt": 1790210020.0855436,
+        "unit": "Local\\LasmResource-fb3c1ebc-a801-44a5-96cd-319285b50806",
+        "pid": 3412,
+        "lastSampleAt": 1790210023.197291,
+        "stoppedBecause": "time-limit",
+        "exitCode": 124,
+        "finishedAt": 1790210023.203897
+      }
+    },
+    {
+      "job": "control (windows-11-arm, arm64)",
+      "result": {
+        "scope": "Native Windows guarded deadline, no memory-pressure test",
+        "status": "passed",
+        "stoppedProcesses": [
+          3412,
+          6656
+        ],
+        "report": ".work/windows-guard-deadline-resources.json"
+      }
+    },
+    {
+      "job": "control (windows-11-arm, arm64)",
+      "result": {
+        "status": "passed",
+        "command": [
+          "node",
+          "test/fixtures/windows-guard.mjs"
+        ],
+        "hostAtStart": {
+          "total": 17169387520,
+          "available": 13484838912
+        },
+        "limits": {
+          "jobCommittedBytes": 536870912,
+          "stopCommittedBytes": 429496729,
+          "hostReserveBytes": 2147483648,
+          "timeoutSeconds": null
+        },
+        "peakCommittedBytes": 111812608,
+        "minimumHostAvailable": 13389443072,
+        "startedAt": 1790210026.093119,
+        "unit": "Local\\LasmResource-437f2cfa-0266-435d-9e33-7bd06fad90af",
+        "pid": 7756,
+        "lastSampleAt": 1790210027.133386,
+        "exitCode": 0,
+        "finishedAt": 1790210027.3184104
+      }
+    }
+  ],
+  "checks": [
+    "Three-second deadline removes both idle parent and child with exit 124 and time-limit classification",
+    "Ordinary parent/child completion succeeds below a 512 MiB cap",
+    "Deadline and normal-completion accounting remain below proactive memory limits"
+  ],
+  "localLog": ".work/product-acceptance/windows-guard-controls-35938869572.log",
+  "logSha256": "fb248238e53b6fe9463206efd9d85addca2bed4ed2575489e11517865f52ba2e"
+}

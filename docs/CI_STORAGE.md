@@ -31,3 +31,19 @@ produced a 296-byte cache, restored with the expected checksum, and was deleted.
 A fresh repository API check confirmed zero active caches afterward. See the
 [control evidence](evidence/ci-cache-control-2026-09-24.json). This control does
 not establish that a full compiler checkpoint or end-user distribution is ready.
+
+The next [native compiler-cache control](evidence/compiler-cache-control-2026-09-24.json)
+also passes on Windows ARM64. It compiles and executes an ARM64 C program,
+checks a cache hit, packages only completed ccache entries, then deletes the
+local cache and restores it through Actions. Archive, identity and individual
+file checksums are verified before reuse. Recompilation produces another cache
+hit and the identical object; the executable again prints `42`. The 10,371-byte
+archive occupied 7,552 bytes in Actions and was deleted after verification.
+The live cache inventory was empty afterward; the usage metric briefly retained
+the old entry, which the budget check handles conservatively. This establishes
+small native-object reuse, not completion or restoration of a full Lean build.
+
+The Windows guard's optional deadline has also passed on native x64 and ARM64:
+it stops both parent and child before checkpoint collection, with a separate
+time-limit status. It does not change the existing memory limits. See the
+[deadline controls](evidence/windows-guard-deadline-2026-09-24.json).

@@ -305,3 +305,13 @@ resume and rejection controls pass too, peaking at about 26 MiB. No pressure
 or allocation stress is used. Full-suite profiles still explicitly record
 `--base-pages --build-jobs 1`. See
 [the settings correction and retained attempts](evidence/standalone-link-optimization-2026-09-22.json).
+
+On 2026-09-24, the optional Windows guard deadline passed on native x64 and
+ARM64 standard runners. A three-second idle parent/child control exits with
+code 124 and `time-limit`, and both PIDs are absent afterward. Ordinary
+parent/child completion still passes below the 512 MiB cap. Maximum observed
+committed memory was 111,812,608 bytes; no pressure or intentional OOM test was
+used. The [native receipts](evidence/windows-guard-deadline-2026-09-24.json)
+support stopping a long build before the runner's hard deadline so completed
+compiler-cache entries can be collected. They do not establish full compiler
+checkpoint correctness.
