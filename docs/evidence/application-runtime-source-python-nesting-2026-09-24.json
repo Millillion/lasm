@@ -1,0 +1,787 @@
+{
+  "scope": "Third cold source CI failure retained; SDK launcher normalization repair has local controls but awaits fresh CI",
+  "run": {
+    "databaseId": 36004233361,
+    "headSha": "bade26f75739d90ac6030801c6b8844bd37fd519",
+    "conclusion": "failure",
+    "url": "https://github.com/Millillion/lasm/actions/runs/36004233361"
+  },
+  "logFile": ".work/product-acceptance/runtime-source-ci-36004233361.log",
+  "logSha256": "67620de3fdd6fef844b8a5826f869ef478f4f214108d23791f20164fe693e8c0",
+  "reports": {
+    ".work/ci-application-runtime/gmp-resources.json": {
+      "startedAt": "2026-09-24T13:16:11.433Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "node",
+        "scripts/ci/application-runtime-source.mjs",
+        "gmp"
+      ],
+      "cwd": "/home/runner/work/lasm/lasm",
+      "unit": "lasm-heavy-0539ccf52500.service",
+      "id": "0e6724b8-11bf-4352-83c2-7ee2da38acda",
+      "limits": {
+        "memoryMax": 6942621696,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5554097356,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 16766414848,
+        "available": 15533027328
+      },
+      "minimumHostAvailable": 15317114880,
+      "peakMemoryBytes": 315871232,
+      "peakTasks": 22,
+      "report": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/gmp-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "lastSample": {
+        "at": "2026-09-24T13:18:42.978Z",
+        "memoryBytes": 181194752,
+        "peakMemoryBytes": 315871232,
+        "swapBytes": 0,
+        "tasks": 11,
+        "memoryBreakdown": {
+          "anon": 108683264,
+          "file": 61767680,
+          "kernel": 10022912,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 58200064,
+          "slab": 8461968
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "exit-code",
+        "exitCode": "exited",
+        "exitStatus": "1",
+        "capturedAt": "2026-09-24T13:18:43.054Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "memoryBytes": 85114880,
+        "peakMemoryBytes": 315871232,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13668352,
+          "file": 61767680,
+          "kernel": 9142272,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 58200064,
+          "slab": 8399688
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T13:18:43.071Z",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    ".work/ci-application-runtime/gmp-resources.json.service.json": {
+      "serviceResult": "exit-code",
+      "exitCode": "exited",
+      "exitStatus": "1",
+      "capturedAt": "2026-09-24T13:18:43.054Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 85114880,
+      "peakMemoryBytes": 315871232,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13668352,
+        "file": 61767680,
+        "kernel": 9142272,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 58200064,
+        "slab": 8399688
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    ".work/ci-application-runtime/gmp.json": {
+      "phase": "gmp",
+      "scope": "Source-built AOT runtime control, not installed-package acceptance",
+      "passed": false,
+      "resourceReport": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/gmp-resources.json",
+      "startedAt": "2026-09-24T13:16:11.545Z",
+      "gmp": {
+        "flags": "-O2 -sMEMORY64=2 -pthread",
+        "archiveSha256": "cb631f9489ceb906eead0a7edd60c75b67483d97cbd1d4fe49af5472b6693c22",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6"
+      },
+      "error": "Error: Managed cache contents changed: /home/runner/work/lasm/lasm/.cache/ci-application-tools/artifacts/fbb538cb832673bb66912d8b9df971453edf0503312cadc16037617f9779a47c. Remove this toolchain directory to download a verified replacement.\n    at verify (file:///home/runner/work/lasm/lasm/src/managed-artifacts.mjs:186:11)\n    at async file:///home/runner/work/lasm/lasm/src/managed-artifacts.mjs:204:23\n    at async provisionArtifact (file:///home/runner/work/lasm/lasm/src/managed-artifacts.mjs:242:16)\n    at async provisionPython (file:///home/runner/work/lasm/lasm/src/managed-python.mjs:15:21)\n    at async provisionSdk (file:///home/runner/work/lasm/lasm/src/managed-sdk.mjs:20:18)\n    at async maintainerSdk (file:///home/runner/work/lasm/lasm/scripts/full-lean/maintainer-sdk.mjs:30:15)\n    at async file:///home/runner/work/lasm/lasm/scripts/ci/application-runtime-source.mjs:89:22",
+      "finishedAt": "2026-09-24T13:18:43.014Z"
+    },
+    ".work/ci-application-runtime/lean-resources.json": {
+      "startedAt": "2026-09-24T13:14:09.642Z",
+      "command": [
+        "node",
+        "scripts/ci/application-runtime-source.mjs",
+        "lean"
+      ],
+      "cwd": "/home/runner/work/lasm/lasm",
+      "unit": "lasm-heavy-0539ccf52500.service",
+      "id": "7f1b928e-16d6-463f-b949-0570ba48671b",
+      "limits": {
+        "memoryMax": 6517948416,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5214358732,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 16766414848,
+        "available": 15108825088
+      },
+      "minimumHostAvailable": 15099027456,
+      "peakMemoryBytes": 4080660480,
+      "peakTasks": 11,
+      "report": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/lean-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "lastSample": {
+        "at": "2026-09-24T13:14:52.531Z",
+        "memoryBytes": 3258019840,
+        "peakMemoryBytes": 4080660480,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11841536,
+          "file": 3121405952,
+          "kernel": 124133376,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 3121405952,
+          "slab": 123284992
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "highWaterProcesses": {
+        "at": "2026-09-24T13:14:45.923Z",
+        "processes": [
+          {
+            "pid": 2170,
+            "name": "node-MainThread",
+            "residentBytes": 259059712,
+            "threads": 11
+          }
+        ]
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T13:14:52.535Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "memoryBytes": 3259854848,
+        "peakMemoryBytes": 4080660480,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13692928,
+          "file": 3121405952,
+          "kernel": 124215296,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 3121405952,
+          "slab": 123293864
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T13:14:52.553Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    ".work/ci-application-runtime/lean-resources.json.service.json": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T13:14:52.535Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 3259854848,
+      "peakMemoryBytes": 4080660480,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13692928,
+        "file": 3121405952,
+        "kernel": 124215296,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 3121405952,
+        "slab": 123293864
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    ".work/ci-application-runtime/lean.json": {
+      "phase": "lean",
+      "scope": "Source-built AOT runtime control, not installed-package acceptance",
+      "passed": true,
+      "resourceReport": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/lean-resources.json",
+      "startedAt": "2026-09-24T13:14:09.696Z",
+      "tool": {
+        "version": "4.34.0",
+        "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+        "identity": "02c08f3cdf73ec241ce9ad49e942b2dbea128646b23cb2872983d452437a9ba1"
+      },
+      "finishedAt": "2026-09-24T13:14:52.485Z"
+    },
+    ".work/ci-application-runtime/sdk-resources.json": {
+      "startedAt": "2026-09-24T13:14:52.599Z",
+      "command": [
+        "node",
+        "scripts/ci/application-runtime-source.mjs",
+        "sdk"
+      ],
+      "cwd": "/home/runner/work/lasm/lasm",
+      "unit": "lasm-heavy-0539ccf52500.service",
+      "id": "ef58f3d2-c766-462a-b464-ed767cab4b3b",
+      "limits": {
+        "memoryMax": 6559891456,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5247913164,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 16766414848,
+        "available": 15150645248
+      },
+      "minimumHostAvailable": 15061876736,
+      "peakMemoryBytes": 2825375744,
+      "peakTasks": 12,
+      "report": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/sdk-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "lastSample": {
+        "at": "2026-09-24T13:15:33.881Z",
+        "memoryBytes": 2620215296,
+        "peakMemoryBytes": 2825375744,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13668352,
+          "file": 2485084160,
+          "kernel": 120782848,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2485084160,
+          "slab": 119870464
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T13:15:33.880Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "memoryBytes": 2619953152,
+        "peakMemoryBytes": 2825375744,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13668352,
+          "file": 2485084160,
+          "kernel": 120782848,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 2485084160,
+          "slab": 119870464
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T13:15:33.962Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    ".work/ci-application-runtime/sdk-resources.json.service.json": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T13:15:33.880Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 2619953152,
+      "peakMemoryBytes": 2825375744,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13668352,
+        "file": 2485084160,
+        "kernel": 120782848,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 2485084160,
+        "slab": 119870464
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    ".work/ci-application-runtime/sdk.json": {
+      "phase": "sdk",
+      "scope": "Source-built AOT runtime control, not installed-package acceptance",
+      "passed": true,
+      "resourceReport": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/sdk-resources.json",
+      "startedAt": "2026-09-24T13:14:52.678Z",
+      "tool": {
+        "identity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "driverIdentity": "7610c6777c7c1b39a8550f88dc63fdab6dae1548ef387f22409372a5199d8509",
+        "patchSha256": "60ea09f4d915423899c2497f257e108601b35fbbc12041b3aa21833ff6334a1e"
+      },
+      "finishedAt": "2026-09-24T13:15:33.745Z"
+    },
+    ".work/ci-application-runtime/sources-resources.json": {
+      "startedAt": "2026-09-24T13:15:34.326Z",
+      "command": [
+        "node",
+        "scripts/ci/application-runtime-source.mjs",
+        "sources"
+      ],
+      "cwd": "/home/runner/work/lasm/lasm",
+      "unit": "lasm-heavy-0539ccf52500.service",
+      "id": "53a70c23-64aa-4464-99fa-0e203c388947",
+      "limits": {
+        "memoryMax": 6782189568,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5425751654,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 16766414848,
+        "available": 15372197888
+      },
+      "minimumHostAvailable": 15352438784,
+      "peakMemoryBytes": 759693312,
+      "peakTasks": 13,
+      "report": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/sources-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "lastSample": {
+        "at": "2026-09-24T13:16:11.245Z",
+        "memoryBytes": 749432832,
+        "peakMemoryBytes": 749432832,
+        "swapBytes": 0,
+        "tasks": 13,
+        "memoryBreakdown": {
+          "anon": 115384320,
+          "file": 578666496,
+          "kernel": 53850112,
+          "shmem": 0,
+          "file_mapped": 196608,
+          "inactive_file": 578547712,
+          "slab": 51945008
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T13:16:11.374Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "memoryBytes": 655933440,
+        "peakMemoryBytes": 759693312,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13672448,
+          "file": 588570624,
+          "kernel": 53014528,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 588496896,
+          "slab": 52089216
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T13:16:11.391Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    ".work/ci-application-runtime/sources-resources.json.service.json": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T13:16:11.374Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 655933440,
+      "peakMemoryBytes": 759693312,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13672448,
+        "file": 588570624,
+        "kernel": 53014528,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 588496896,
+        "slab": 52089216
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    ".work/ci-application-runtime/sources.json": {
+      "phase": "sources",
+      "scope": "Source-built AOT runtime control, not installed-package acceptance",
+      "passed": true,
+      "resourceReport": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/sources-resources.json",
+      "startedAt": "2026-09-24T13:15:34.382Z",
+      "downloads": [
+        {
+          "name": "lean4-v4.34.0.tar.gz",
+          "url": "https://codeload.github.com/leanprover/lean4/tar.gz/293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "bytes": 87810307,
+          "sha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b",
+          "observedBytes": 87810307,
+          "observedSha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b"
+        },
+        {
+          "name": "gmp-6.3.0.tar.xz",
+          "url": "https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz",
+          "bytes": 2094196,
+          "sha256": "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898",
+          "directory": "gmp-6.3.0",
+          "observedBytes": 2094196,
+          "observedSha256": "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898"
+        },
+        {
+          "name": "zig-x86_64-linux-0.16.0.tar.xz",
+          "url": "https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz",
+          "bytes": 55478392,
+          "sha256": "70e49664a74374b48b51e6f3fdfbf437f6395d42509050588bd49abe52ba3d00",
+          "directory": "zig-x86_64-linux-0.16.0",
+          "observedBytes": 55478392,
+          "observedSha256": "70e49664a74374b48b51e6f3fdfbf437f6395d42509050588bd49abe52ba3d00"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "lean4-v4.34.0.tar.gz",
+          "url": "https://codeload.github.com/leanprover/lean4/tar.gz/293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "bytes": 87810307,
+          "sha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b"
+        },
+        {
+          "name": "gmp-6.3.0.tar.xz",
+          "url": "https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz",
+          "bytes": 2094196,
+          "sha256": "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898",
+          "directory": "gmp-6.3.0"
+        },
+        {
+          "name": "zig-x86_64-linux-0.16.0.tar.xz",
+          "url": "https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz",
+          "bytes": 55478392,
+          "sha256": "70e49664a74374b48b51e6f3fdfbf437f6395d42509050588bd49abe52ba3d00",
+          "directory": "zig-x86_64-linux-0.16.0"
+        }
+      ],
+      "finishedAt": "2026-09-24T13:16:11.332Z"
+    },
+    ".work/ci-application-runtime/units-resources.json": {
+      "startedAt": "2026-09-24T13:14:09.249Z",
+      "command": [
+        "node",
+        "--max-old-space-size=128",
+        "--test",
+        "--test-concurrency=1",
+        "test/sdk-repairs.test.mjs",
+        "test/runtime-abi-cache.test.mjs",
+        "test/maintainer-python.test.mjs"
+      ],
+      "cwd": "/home/runner/work/lasm/lasm",
+      "unit": "lasm-heavy-0539ccf52500.service",
+      "id": "937200e8-9f59-4164-8f3f-a348d845a283",
+      "limits": {
+        "memoryMax": 536870912,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 429496729,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 16766414848,
+        "available": 15127040000
+      },
+      "minimumHostAvailable": 15103004672,
+      "peakMemoryBytes": 37015552,
+      "peakTasks": 13,
+      "report": "/home/runner/work/lasm/lasm/.work/ci-application-runtime/units-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "lastSample": {
+        "at": "2026-09-24T13:14:09.471Z",
+        "memoryBytes": 29204480,
+        "peakMemoryBytes": 37015552,
+        "swapBytes": 0,
+        "tasks": 13,
+        "memoryBreakdown": {
+          "anon": 26497024,
+          "file": 16384,
+          "kernel": 2101248,
+          "shmem": 0,
+          "file_mapped": 172032,
+          "inactive_file": 16384,
+          "slab": 319488
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-24T13:14:09.579Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+        "memoryBytes": 15462400,
+        "peakMemoryBytes": 37015552,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 13676544,
+          "file": 73728,
+          "kernel": 1060864,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 73728,
+          "slab": 159000
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-24T13:14:09.598Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    },
+    ".work/ci-application-runtime/units-resources.json.service.json": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-24T13:14:09.579Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1001.slice/user@1001.service/app.slice/lasm-heavy-0539ccf52500.service",
+      "memoryBytes": 15462400,
+      "peakMemoryBytes": 37015552,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 13676544,
+        "file": 73728,
+        "kernel": 1060864,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 73728,
+        "slab": 159000
+      },
+      "pressureSomeAvg10": 0,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    ".work/ci-application-runtime/versions.json": {
+      "lean": {
+        "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+        "expected": "v4.34.0",
+        "tag": "v4.34.0",
+        "publishedAt": "2026-09-14T14:04:36Z",
+        "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.0",
+        "draft": false,
+        "prerelease": false
+      },
+      "deno": {
+        "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+        "expected": "v2.9.7",
+        "tag": "v2.9.7",
+        "publishedAt": "2026-09-17T09:04:55Z",
+        "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+        "draft": false,
+        "prerelease": false
+      },
+      "bun": {
+        "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+        "expected": "bun-v1.4.2",
+        "tag": "bun-v1.4.2",
+        "publishedAt": "2026-09-05T05:55:48Z",
+        "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+        "draft": false,
+        "prerelease": false
+      },
+      "node": {
+        "source": "https://nodejs.org/dist/index.json",
+        "expected": "v26.10.0",
+        "tag": "v26.10.0",
+        "date": "2026-09-21",
+        "lts": false
+      },
+      "checkedAt": "2026-09-24T13:14:09.153Z"
+    }
+  },
+  "observedFailure": "GMP builds, but immediate tool verification rejects changed managed Python contents. Previous -B launcher did not survive child environment normalization. No runtime compilation starts.",
+  "sourceFinding": {
+    "file": "tools/config.py",
+    "function": "normalize_relative_python_path",
+    "behavior": "Upstream replaces EMSDK_PYTHON with sys.executable, discarding the wrapper before configure/make children invoke -E without -B. The repair normalizes the configured launcher to an absolute path instead.",
+    "limitation": "The failed CI logs did not contain individual changed entries; new integrity diagnostics include a bounded changed-path list."
+  },
+  "localValidation": {
+    "log": ".work/product-acceptance/runtime-source-sdk-units-r4.log",
+    "tests": 5,
+    "pass": 5,
+    "fail": 0,
+    "skipped": 0,
+    "regression": "The original normalization creates child bytecode; repaired normalization preserves -B across a cwd change and creates none.",
+    "sdkSourceChecks": "All nine original and repaired SDK source checksums, plus the complete patch checksum, match."
+  },
+  "recordedAt": "2026-09-24T13:26:59.060286+00:00"
+}

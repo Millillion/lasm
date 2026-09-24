@@ -644,6 +644,17 @@ trees. Four local controls pass. This is the likely cause of the CI mutation;
 the failed run did not record individual changed entries, and fresh CI remains
 necessary. All seven previous guards released without resource events.
 
+The [third source attempt](evidence/application-runtime-source-python-nesting-2026-09-24.json)
+still rejects Python inventory drift immediately after GMP. Inspection found
+that Emscripten replaces `EMSDK_PYTHON` with the raw interpreter before starting
+configure/make children, losing the launcher's `-B` option. The reviewed SDK
+repair now makes the configured launcher absolute without replacing it. A new
+control reproduces the original child bytecode writes and verifies their absence
+after a working-directory change with the repair. All five local SDK controls
+pass, and all nine exact SDK source repairs verify against untouched inputs.
+Integrity failures now report a bounded list of changed paths. The failed CI
+reports remain intact; another cold build must validate the fix in production.
+
 The [filesystem-device fixture](evidence/filesystem-devices-preflight-2026-09-24.json)
 adds ordinary Lean coverage for Linux character devices and procfs: bounded
 reads, kernel write failures, buffering/flush state, truncation, and readable

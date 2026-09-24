@@ -1,6 +1,6 @@
 {
   "version": "6.0.9",
-  "patchSha256": "60ea09f4d915423899c2497f257e108601b35fbbc12041b3aa21833ff6334a1e",
+  "patchSha256": "f8b31335a97fc2dfd11cfc94ee1787d0b1aff6435ffd765a5613a9553f2e60dc",
   "files": [
     {
       "path": "tools/link.py",
@@ -153,6 +153,17 @@
           "after": "  unsigned char* block = emscripten_builtin_malloc(size);\n  if (!block) return EAGAIN;\n  memset(block, 0, zero_size);"
         }
       ]
+    },
+    {
+      "path": "tools/config.py",
+      "originalSha256": "c2614f51eb78480eb206651c15388d0977ec90576c0cef87fe0a753949d54954",
+      "patchedSha256": "592a97b529c6f30131348723ce89f1652dc6019ef1ee3bec522ba2b5257ac7af",
+      "replacements": [
+        {
+          "before": "  if os.environ.get('EMSDK_PYTHON'):\n    os.environ['EMSDK_PYTHON'] = sys.executable\n",
+          "after": "  if os.environ.get('EMSDK_PYTHON'):\n    # Keep a private launcher (including its Python isolation flags) when\n    # normalizing paths for configure/make and other recursive tool calls.\n    os.environ['EMSDK_PYTHON'] = os.path.abspath(os.environ['EMSDK_PYTHON'])\n"
+        }
+      ]
     }
   ],
   "archiveVersion": "6.0.9-git",
@@ -161,5 +172,6 @@
   "windowsCommandLines": "Convert expanded native compiler commands above 24000 UTF-16 code units into the SDK's ordinary LLVM response files before CreateProcess.",
   "memory64Allocator": "Use pointer-width allocator metadata, masks and size bounds; clamp bucket lookup before 32-bit leading-zero operations and reject overflowing aligned/calloc requests.",
   "pthreadAllocation": "Return EAGAIN for overflowing or failed stack allocations before writing thread metadata; preserve requested stack sizes.",
-  "joinedThreadCleanup": "Synchronously reclaim joined-thread storage before returning; detached self-cleanup remains asynchronous after pthread_self is cleared."
+  "joinedThreadCleanup": "Synchronously reclaim joined-thread storage before returning; detached self-cleanup remains asynchronous after pthread_self is cleared.",
+  "pythonLauncherNormalization": "Resolve the configured Python launcher to an absolute path without discarding its isolation flags during configure/make child launches."
 }

@@ -182,8 +182,14 @@ async function verify(directory, identity) {
   const receipt = JSON.parse(await readFile(join(directory, receiptName), 'utf8'));
   if (receipt.schema !== 1 || receipt.identity !== identity || !receipt.files || !Object.keys(receipt.files).length)
     throw new Error('Managed artifact receipt does not match the requested toolchain');
-  if (JSON.stringify(await inventory(directory)) !== JSON.stringify(receipt.files))
-    throw new Error(`Managed cache contents changed: ${directory}. Remove this toolchain directory to download a verified replacement.`);
+  const observed = await inventory(directory);
+  if (JSON.stringify(observed) !== JSON.stringify(receipt.files)) {
+    const changed = [...new Set([...Object.keys(receipt.files), ...Object.keys(observed)])]
+      .filter(name => JSON.stringify(observed[name]) !== JSON.stringify(receipt.files[name]));
+    throw new Error(`Managed cache contents changed: ${directory}. Changed entries (${changed.length}): ` +
+      changed.slice(0, 10).map(name => JSON.stringify(name)).join(', ') +
+      (changed.length > 10 ? ', ...' : '') + '. Remove this toolchain directory to download a verified replacement.');
+  }
   return receipt;
 }
 

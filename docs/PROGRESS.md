@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Filesystem-device oracles](evidence/filesystem-devices-native-ci-2026-09-24.json) pass on native Linux x64/ARM64, including real kernel errors, buffered flush behavior and zero-size procfs reads. Interpreted and compiled Lean agree; installed Wasm comparisons remain pending. Both guards released without resource events.
+**Changed:** [SDK child-launch isolation](evidence/application-runtime-source-python-nesting-2026-09-24.json) now preserves the protected Python launcher through configure/make. Five local controls pass, including reproduction of the original bytecode mutation; all nine pinned SDK repairs verify. The third failed CI run is preserved; fresh runtime build validation remains pending.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

@@ -27,7 +27,7 @@ test('derived SDK trees publish atomically, verify reuse and reject cache drift'
   assert.equal(await readFile(join(first.directory, 'driver.py'), 'utf8'), 'repaired');
   assert.equal((await deriveArtifact(identity, produce, { cache })).cacheHit, true);
   await writeFile(join(first.directory, 'driver.py'), 'tampered');
-  await assert.rejects(deriveArtifact(identity, produce, { cache }), /contents changed/);
+  await assert.rejects(deriveArtifact(identity, produce, { cache }), /contents changed:.*Changed entries \(1\): "driver\.py"/);
   await assert.rejects(deriveArtifact({ ...identity, patch: 'failed' }, async directory => {
     await writeFile(join(directory, 'partial'), 'partial'); throw new Error('fixture failure');
   }, { cache }), /fixture failure/);
