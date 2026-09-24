@@ -598,3 +598,17 @@ native copying/import validation peaks at 2.63 GiB. The metadata payload is
 2.06 GiB across 12,600 files. Installed Wasm deployment acceptance is still
 pending, and native shared-library dependencies are outside this data-layout
 control's claim.
+
+The [cold runtime-source workflow](../.github/workflows/application-runtime-source.yml)
+now prepares the application libraries from committed patches and pinned public
+Lean, GMP, SDK and host-helper inputs on a standard Linux x64 runner. Native
+Lean and SDK provisioning, GMP, host helpers, archive groups, bundling and the
+relocated Node differential check use sequential resource guards. It uses the
+same immutable managed SDK as the product, with generated ABI archives in its
+separate mutable cache. Packaging requires a complete Init/Std/Lean/Lake audit.
+The libuv source is pinned to its exact existing v1.48.0 commit.
+[Local preparation checks](evidence/application-runtime-source-preflight-2026-09-24.json)
+pass three SDK/cache controls and syntax checks; full CI execution is pending.
+This source-build control preserves reports in logs and uploads no package,
+release, cache or artifact. It is separate from clean installed-package and
+six-platform acceptance.

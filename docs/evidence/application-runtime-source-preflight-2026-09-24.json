@@ -1,0 +1,19 @@
+{
+  "scope": "Cold source-runtime CI preparation; full build and deployment execution remain pending",
+  "unitControls": {
+    "tests": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "log": ".work/product-acceptance/runtime-source-sdk-units-r2.log",
+    "sha256": "3ef76a23396e54b518aebd996db563240806f2adf4558a48f151935d014e6abe"
+  },
+  "staticChecks": [
+    "All five changed entrypoints parse with node --check",
+    "Workflow YAML parses with one ubuntu-24.04 job and 17 sequential steps",
+    "Pinned libuv source patch dry-run succeeds against the existing Lean 4.34 source"
+  ],
+  "resourcePolicy": "Independent cold provisioning and build guards; base-page Wasm builds with one build/Binaryen worker; at most two Lean workers. No local heavy workload was started.",
+  "delivery": "Only source and reports are committed. No release, npm publication, artifact or cache upload is configured.",
+  "recordedAt": "2026-09-24T12:51:23.724833+00:00"
+}

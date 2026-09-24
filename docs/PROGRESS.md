@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Native module-data CI](evidence/application-module-data-native-ci-2026-09-24.json) passes nine unit controls and relocated standard/project/dependency imports on Linux x64 and ARM64, including missing-data errors. Separate guarded phases complete without resource events; earlier resource stops remain recorded. Installed Wasm validation is pending.
+**Changed:** [Cold runtime CI preparation](evidence/application-runtime-source-preflight-2026-09-24.json) passes three SDK/cache controls and syntax checks. The workflow builds pinned public inputs with the managed SDK and compares a relocated Node deployment with native Lean; full execution remains pending. No package upload is configured.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

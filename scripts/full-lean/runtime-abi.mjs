@@ -3,12 +3,12 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-export function runtimeAbiArchives(sdk, memory64, mimalloc = false) {
+export function runtimeAbiArchives(sdk, memory64, mimalloc = false, cache = join(sdk, 'upstream/emscripten/cache')) {
   const target = memory64 ? 'wasm64' : 'wasm32';
   const archives = ['libc-mt.a', 'libc++-mt-legacyexcept.a',
     'libc++abi-mt-legacyexcept.a', 'libunwind-mt-legacyexcept.a',
     'libclang_rt.builtins-legacysjlj-mt.a', ...(mimalloc ? ['libmimalloc-mt.a'] : [])]
-    .map(name => join(sdk, `upstream/emscripten/cache/sysroot/lib/${target}-emscripten/pic`, name));
+    .map(name => join(cache, `sysroot/lib/${target}-emscripten/pic`, name));
   for (const path of archives) if (!existsSync(path)) throw new Error(`Missing runtime ABI archive: ${path}`);
   return archives;
 }

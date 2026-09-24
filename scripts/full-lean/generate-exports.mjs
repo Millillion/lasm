@@ -36,7 +36,7 @@ const memory64 = /^LASM_MEMORY64:STRING=[12]$/m.test(readFileSync(join(build, 'C
 // in-Wasm registry to stay within engine export-count limits. MAIN_MODULE=2
 // otherwise drops C++ exception/typeinfo and libc symbols needed by later DSOs.
 const mimalloc = /^USE_MIMALLOC:BOOL=ON$/m.test(readFileSync(join(build, 'CMakeCache.txt'), 'utf8'));
-archives.push(...runtimeAbiArchives(sdk, memory64, mimalloc));
+archives.push(...runtimeAbiArchives(sdk, memory64, mimalloc, process.env.LASM_EMSCRIPTEN_CACHE));
 const symbols = new Set();
 const dataSymbols = new Set();
 // Lean 4.34 also uses lp_<package>_... for declarations from Lake packages.

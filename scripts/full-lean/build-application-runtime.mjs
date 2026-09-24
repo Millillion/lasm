@@ -7,7 +7,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { ensureResourceGuard } from './resource-guard.mjs';
-import { patchSdk } from './patch-sdk.mjs';
+import { maintainerSdk } from './maintainer-sdk.mjs';
 import { provisionLean } from '../../src/managed-lean.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 
@@ -16,8 +16,9 @@ const root = fileURLToPath(new URL('../..', import.meta.url));
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const output = resolve(option('--output', '.work/application-runtime-4.34.0'));
-const sdk = resolve(option('--sdk', '.cache/emsdk-6.0.9-dev'));
 const cache = resolve(option('--tool-cache', '.cache/product-baseline/managed-lean-linux-x64/cache'));
+if (args.includes('--managed-sdk') && args.includes('--sdk')) throw new Error('Choose managed SDK or an explicit emsdk tree');
+const sdk = await maintainerSdk({ managed: args.includes('--managed-sdk'), directory: option('--sdk'), cache });
 const archive = resolve(option('--source-archive', '.cache/downloads/lean4-v4.34.0.tar.gz'));
 const groups = option('--libraries', 'Init,Std,Lean,Lake').split(',');
 if (!groups.length || groups.some(group => !['Init', 'Std', 'Lean', 'Lake'].includes(group))) throw new Error('Invalid library selection');
@@ -31,7 +32,7 @@ const native = await provisionLean(selection, { cache });
 if (native.commit !== expectedCommit) throw new Error('Wrong native bootstrap version');
 const source = join(output, 'source'), build = join(output, 'build');
 const run = (command, argv, options = {}) => execFileSync(command, argv, { cwd: root, stdio: 'inherit',
-  env: { ...process.env, BINARYEN_CORES: '1', EMCC_CORES: '1', LEAN_NUM_THREADS: '2', LEAN_STACK_SIZE_KB: '8192' }, ...options });
+  env: { ...sdk.env, BINARYEN_CORES: '1', EMCC_CORES: '1', LEAN_NUM_THREADS: '2', LEAN_STACK_SIZE_KB: '8192' }, ...options });
 if (!existsSync(source)) {
   mkdirSync(source); run('tar', ['-xzf', archive, '-C', source, '--strip-components=1']);
 }
@@ -43,6 +44,7 @@ const patchInputs = ['wasm-build', 'compact-alignment', 'thread-runtime', 'sdk-m
 // version's patch applicable to its own sources.
 patchInputs.push({ name: 'host-linux', file: 'lean-4.34.0-host-linux.patch' });
 patchInputs.push({ name: 'host-backtrace', file: 'lean-4.34.0-host-backtrace.patch' });
+patchInputs.push({ name: 'libuv-source', file: 'lean-4.34.0-libuv-source.patch' });
 for (const { name, file } of patchInputs) {
   // These reviewed runtime changes still apply to 4.34. Record the actual patch
   // bytes and source commit; never treat old 4.32 tests as validation of 4.34.
@@ -55,16 +57,16 @@ for (const { name, file } of patchInputs) {
   if (checked.status !== 0) throw new Error(`Runtime patch drift (${name}): ${checked.stdout}\n${checked.stderr}`);
   run('patch', ['--batch', '--forward', '-p1'], { cwd: source, input: patch, stdio: ['pipe', 'inherit', 'inherit'] });
 }
-const sdkPatch = patchSdk(sdk);
+const sdkPatch = sdk.patchSha256;
 copyFileSync(join(root, 'scripts/full-lean/emscripten-pre.js'), join(source, 'src/lasm-emscripten-pre.js'));
 run(process.execPath, [join(root, 'scripts/full-lean/configure-host.mjs'), join(source, 'src')]);
 const gmp = resolve('.cache/gmp-wasm64');
 const gmpHash = await hashFile(join(gmp, 'lib/libgmp.a'));
-run(join(sdk, 'upstream/emscripten/emcmake'), ['cmake', '-S', join(source, 'src'), '-B', build,
+run(sdk.tool('emcmake'), ['cmake', '-S', join(source, 'src'), '-B', build,
   '-G', 'Unix Makefiles', '-DSTAGE=1', `-DPREV_STAGE=${native.prefix}`, '-DCMAKE_BUILD_TYPE=Release',
   '-DLEAN_PLATFORM_TARGET=wasm64-unknown-emscripten', '-DUSE_LAKE=OFF', '-DMMAP=OFF',
   '-DUSE_GMP=ON', `-DGMP_INSTALL_PREFIX=${gmp}`, '-DUSE_MIMALLOC=ON', '-DLASM_SDK_MIMALLOC=ON',
-  `-DLASM_MIMALLOC_INCLUDE=${join(sdk, 'upstream/emscripten/system/lib/mimalloc/include')}`,
+  `-DLASM_MIMALLOC_INCLUDE=${join(sdk.driver, 'system/lib/mimalloc/include')}`,
   '-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG', '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',
   '-DCMAKE_C_FLAGS=-sMEMORY64=1', '-DLASM_MEMORY64=1', '-DLASM_HOST_BRIDGE=ON',
   '-DLASM_LINK_LAKE=OFF', '-DLASM_LINK_TOOLS=OFF', '-DLEAN_EXTRA_OPTS=-j2 -s8192',
@@ -72,7 +74,9 @@ run(join(sdk, 'upstream/emscripten/emcmake'), ['cmake', '-S', join(source, 'src'
 const provenance = { schema: 1, lean: '4.34.0', leanCommit: expectedCommit, sourceArchiveSha256: sourceHash,
   nativeArtifactIdentity: native.identity, patches, sdkPatchSha256: sdkPatch, emscripten: '6.0.9',
   gmpSha256: gmpHash, memoryLayout: 'wasm64', threading: 'pthreads', allocator: 'mimalloc',
-  purpose: 'AOT application libraries; no Wasm compiler executable', sdk, nativePrefix: native.prefix,
+  purpose: 'AOT application libraries; no Wasm compiler executable', sdk: sdk.directory,
+  ...(sdk.mode === 'managed' ? { sdkMode: sdk.mode, sdkIdentity: sdk.identity,
+    sdkDriverIdentity: sdk.driverIdentity, sdkToolCache: sdk.toolCache } : {}), nativePrefix: native.prefix,
   source, build, resourceReport: process.env.LASM_RESOURCE_REPORT };
 writeFileSync(join(output, 'build-inputs.json'), JSON.stringify(provenance, null, 2) + '\n');
 run('cmake', ['--build', build, '--target', 'leanrt', 'leancpp', 'lasmhost', '-j1']);
@@ -82,9 +86,9 @@ const headers = readdirSync(join(build, 'include/lean')).filter(name => name.end
   .map(name => [name, hash(readFileSync(join(build, 'include/lean', name)))]);
 const compileFlags = ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-pthread', '-fwasm-exceptions',
   '-sMEMORY64=1', '-ffp-contract=off', '-fPIC', '-ffunction-sections', '-fdata-sections', '-I', join(build, 'include')];
-const compiler = join(sdk, 'upstream/emscripten/emcc');
+const compiler = sdk.tool('emcc');
 const compileIdentity = hash(JSON.stringify({ ...provenance, resourceReport: undefined, headers, compileFlags,
-  compilerVersion: execFileSync(compiler, ['--version'], { encoding: 'utf8' }) }));
+  compilerVersion: execFileSync(compiler, ['--version'], { encoding: 'utf8', env: sdk.env }) }));
 const generated = join(build, 'generated-c');
 const files = directory => readdirSync(directory, { withFileTypes: true }).flatMap(entry => entry.isDirectory()
   ? files(join(directory, entry.name)) : [join(directory, entry.name)]);
@@ -113,7 +117,7 @@ for (const group of groups) {
   const response = join(build, `${group}.archive.rsp`);
   writeFileSync(response, objects.map(file => JSON.stringify(file)).join('\n') + '\n');
   const library = join(build, `lib/lean/lib${group}.a`);
-  run(join(sdk, 'upstream/emscripten/emar'), ['rcs', library + '.partial', '@' + response]);
+  run(sdk.tool('emar'), ['rcs', library + '.partial', '@' + response]);
   renameSync(library + '.partial', library);
 }
 writeFileSync(join(output, 'standard-library-audit.json'), JSON.stringify({ ...provenance, compileIdentity, modules: audit }, null, 2) + '\n');
