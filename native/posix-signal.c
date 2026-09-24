@@ -144,3 +144,16 @@ void lasm_signal_free(void *pointer) {
     close(s->read_fd);
     free(s);
 }
+
+int lasm_signal_default(int number) {
+    if (number <= 0 || number >= NSIG) { errno = EINVAL; return -1; }
+    sigset_t saved;
+    if (enter(&saved)) return -1;
+    if (subscribers[number]) { errno = EBUSY; leave(&saved); return -1; }
+    struct sigaction action = {0};
+    action.sa_handler = SIG_DFL;
+    sigemptyset(&action.sa_mask);
+    int result = sigaction(number, &action, NULL);
+    leave(&saved);
+    return result;
+}

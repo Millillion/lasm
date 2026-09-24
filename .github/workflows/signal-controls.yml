@@ -59,7 +59,7 @@ jobs:
       - name: Guarded signal controls
         run: |
           ulimit -c 0
-          node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-controls-resources.json -- /usr/bin/env LASM_TEST_BUN="$LASM_TEST_BUN" LASM_TEST_DENO="$LASM_TEST_DENO" LASM_REQUIRE_SIGNAL_ENGINES=1 node --max-old-space-size=128 --test --test-concurrency=1 test/node-signal.test.mjs test/application-output.test.mjs
+          node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/signal-controls-resources.json -- /usr/bin/env LASM_TEST_BUN="$LASM_TEST_BUN" LASM_TEST_DENO="$LASM_TEST_DENO" LASM_REQUIRE_SIGNAL_ENGINES=1 node --max-old-space-size=128 --test --test-concurrency=1 test/node-signal.test.mjs test/application-signals.test.mjs test/application-output.test.mjs
       - name: Preserve guard and helper receipts in logs
         if: always()
         run: |

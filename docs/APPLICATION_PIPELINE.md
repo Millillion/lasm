@@ -524,3 +524,16 @@ native GCC helpers and all three stock engines. Maximum guarded memory is
 59.9 MiB without resource events. Separate Linux x64 host-adapter probes also
 pass all 22 signal names per engine. These are source-helper controls, not
 complete installed Lean ARM64 or default-signal-behavior acceptance.
+
+Installed `.22` [matches 48 supplementary native Lean signal comparisons](evidence/application-signal-policy-2026-09-24.json)
+on Linux x64. Every engine completes one-shot and repeated delivery for all 22
+signal names, then matches seven default actions both before and after stopping
+a waiter. The generated standalone entry removes the engine-owned SIGUSR1
+debugger hooks in Node/Deno and the SIGABRT crash reporter in Bun. Existing
+JavaScript listeners, external native handlers and observed ignored dispositions
+retain their caller policy. Forty-five focused controls pass without skips;
+the installed comparisons peak at 3.45 GiB with no resource events. All four
+earlier differences remain recorded. Deno-native observer coexistence, inherited
+state altered before JavaScript entry, cancellation races, callable embedding
+and other native platforms remain unverified. The native Linux workflow now
+includes the expanded controls; its new run is pending.

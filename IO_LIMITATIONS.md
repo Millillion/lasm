@@ -42,15 +42,22 @@ separately from the earlier runtime evidence below.
   [passes in all three installed `.21` engines](docs/evidence/upstream-signal-2026-09-24.json)
   on Linux x64, including exact native output and termination. A bundled private
   pipe adapter fixes Deno's extra SIGUSR1 debugger activation; nine focused
-  controls pass with zero skips. The full signal set, restored default behavior,
-  native ARM64/musl/macOS acceptance and interoperability with independently
-  registered `Deno.addSignalListener` observers remain unresolved. The latter
+  controls pass with zero skips. Native ARM64/musl/macOS acceptance and
+  interoperability with independently registered `Deno.addSignalListener`
+  observers remain unresolved. The latter
   uses a different observer path from the supported Node-compatible process
   listeners. None of these gaps is demonstrated fundamental.
   [Native Linux x64/ARM64 source-helper CI](docs/evidence/signal-native-ci-2026-09-24.json)
   now passes nine checks per platform with zero skips. Separate Linux x64 host
-  probes cover all 22 signal names in each engine. Full installed Lean signal
-  and default-action comparisons remain distinct unfinished requirements.
+  probes cover all 22 signal names in each engine.
+  [Installed `.22` differential checks](docs/evidence/application-signal-policy-2026-09-24.json)
+  now pass 48 comparisons on Linux x64: all 22 names in one-shot and repeated
+  modes, plus seven default actions before and after stopping a waiter. They
+  preserve four earlier failures involving Node/Deno debugger hooks and Bun's
+  crash reporter. Generated standalone mains remove the engine-owned hooks;
+  45 focused controls preserve observed ignored states and caller-owned handlers.
+  Full cancellation/race coverage, inherited state altered before JavaScript
+  entry, callable embedding and other native platforms remain open.
 - [ ] Complete panic diagnostics, symbolization and termination parity.
   Installed `.15` [restores real panic backtraces](docs/evidence/upstream-debug-2026-09-24.json)
   in Node and Deno on Linux x64, including exact output with `LEAN_BACKTRACE=0`.

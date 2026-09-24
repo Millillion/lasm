@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Real helper integration, API repair and native platform acceptance still lack defensible durations.
 
-**Changed:** [Native signal CI](evidence/signal-native-ci-2026-09-24.json) passes all nine checks with zero skips on Linux x64 and ARM64, peaking at 59.9 MiB without resource events. Separate Linux x64 host probes pass all 22 signal names in each engine. Compiled Lean delivery and default-action comparisons are underway.
+**Changed:** [Installed signal comparisons](evidence/application-signal-policy-2026-09-24.json) now pass all 48 native/compiled comparisons across three engines on Linux x64, plus 45 focused controls. Four retained differences are repaired; peak memory was 3.45 GiB with no resource events. The full Bun application campaign has started.
 
 **Remaining:** Shipping engine parity and callable bindings; complete standard API audit and repairs; native acceptance across all six platforms.
 

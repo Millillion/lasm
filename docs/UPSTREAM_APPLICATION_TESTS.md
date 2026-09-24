@@ -438,3 +438,15 @@ Nine focused controls pass with zero skips. Native ARM64/musl/macOS acceptance,
 the full signal set, default-handler behavior and interoperability with Deno's
 own `addSignalListener` observers remain open; Node-compatible process listeners
 receive the routed event. This separate experiment retains upstream's exclusion.
+
+The subsequent [supplementary signal API campaign](evidence/application-signal-policy-2026-09-24.json)
+passes 16 native/deployed comparisons per engine through installed `.22`, after
+retaining four original `.21` differences. It covers all 22 names with one-shot
+and repeated delivery, plus seven default actions before and after stopping a
+waiter. Node/Deno debugger activation and Bun's extra crash report are repaired
+at standalone application startup. The same ordinary Lean fixture and assertions
+are retained across both attempts; these are 48 supplementary comparisons, not
+new upstream suite passes. Sources are hidden, deployment paths contain spaces,
+and PATH is empty. Maximum memory is 3.45 GiB without resource events. Forty-five
+focused host/startup controls pass; complete signal and platform parity remain
+open as detailed in the evidence.
