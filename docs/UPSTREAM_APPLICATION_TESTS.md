@@ -113,6 +113,16 @@ native Lean children; those compiler actions remain native evidence. This is one
 category on Linux x64. Other latest-release engine/category/platform campaigns
 and full API parity remain unfinished.
 
+The [complete fresh Deno campaign](evidence/lean-4.34.1-upstream-applications-deno-2026-09-25.json)
+also covers all 101 registrations through installed `.28` on Deno 2.9.7:
+97 deployed passes and the same four original compilation-disabled exclusions.
+All 7,673 original entries and the frozen harness remain unchanged, including
+assertions, arguments, sidecars and original driver behavior. Peak guarded memory
+is 5.51 GiB, with no OOM, swap, pressure or disk stops; minimum free disk is
+4.15 GiB. The six compiler-child fixtures retain their native classification.
+This completes this application category on Linux x64 for Deno; the latest Bun
+campaign, other suite categories, full API parity and other platforms remain open.
+
 The [four compilation-disabled inputs now pass separate AOT controls in all
 three installed engines](evidence/lean-4.34.1-compile-disabled-2026-09-25.json):
 twelve deployed comparisons, each following the unchanged original driver and

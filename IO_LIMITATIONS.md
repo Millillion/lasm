@@ -57,8 +57,12 @@ separately from the earlier runtime evidence below.
   markers and assertions intact. The language-server benchmark initially inherited
   deployed metadata paths in its native compiler child; the parallel harness now
   restores that child's original native search environment. Its earlier failure
-  remains recorded. Peak memory is 5.17 GiB without resource events. Other full
-  engine campaigns remain pending.
+  remains recorded. Peak memory is 5.17 GiB without resource events.
+  The [complete installed `.28` Deno application category](docs/evidence/lean-4.34.1-upstream-applications-deno-2026-09-25.json)
+  now also passes all 97 deployed cases, retaining the four original exclusions,
+  all 7,673 source entries, the unchanged harness and native compiler-child
+  classification. Peak memory is 5.51 GiB with no resource events and at least
+  4.15 GiB free disk. The latest complete Bun campaign remains pending.
   These are partial Linux x64 observations. Other upstream contexts, complete
   API/language coverage and the other five native platforms remain open.
   Earlier results retain their stated release scope.
