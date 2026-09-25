@@ -8,6 +8,13 @@ The versioned declaration and source indexes preserve all behavioral fields as
 unverified. The earlier measurements below retain their 4.34.0 scope; matching
 counts do not carry behavioral passes to a new release.
 
+Eight unchanged supplementary filesystem and console fixtures have fresh
+[native interpreted and C-compiled controls](../evidence/lean-4.34.1-native-io-ci-2026-09-25.json)
+on Linux x64. Their outputs match exactly and cleanup checks pass. A retained
+pressure-aborted attempt precedes the successful base-page retry. Installed
+comparisons and native validation on the other five platforms remain separate
+acceptance work; these controls do not establish complete API parity.
+
 ## Lean 4.34.0 application API inventory
 
 The [recorded audit](../evidence/application-api-inventory-2026-09-23.json) imports

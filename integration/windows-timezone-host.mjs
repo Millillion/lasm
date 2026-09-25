@@ -12,11 +12,12 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
 assert.equal(process.platform, 'win32');
-const [outputArg, node, deno, bun, ...extra] = process.argv.slice(2);
+const [outputArg, node, deno, bun, version = '4.34.0', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && node && deno && bun && !extra.length);
+assert.match(version, /^\d+\.\d+\.\d+$/);
 const output = resolve(outputArg), root = fileURLToPath(new URL('..', import.meta.url));
 assert.ok(!existsSync(output)); mkdirSync(output, { recursive: true });
-writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
 const lean = await provisionLean(output), env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '1' };
 const inputs = ['integration/windows-timezone-host.mjs', 'integration/fixtures/WindowsTimezoneIcu.lean',
   'integration/fixtures/windows-timezone-native-host.mjs', 'src/native-windows-timezone.mjs'];

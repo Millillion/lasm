@@ -106,7 +106,10 @@ not the primary getting-started workflow.
   the latest-release acceptance target. The three engine versions are unchanged.
   [Native bootstrap and patch regressions pass](evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
   on Linux x64. The [complete runtime rebuild](evidence/lean-4.34.1-runtime-build-2026-09-25.json)
-  now passes; fresh installed Wasm acceptance remains pending;
+  now passes. Fresh [installed main comparisons](evidence/lean-4.34.1-installed-main-2026-09-25.json)
+  pass in all three engines, and a Linux x64 [cold installation and isolated
+  deployment](evidence/lean-4.34.1-cold-install-2026-09-25.json) pass in Node.
+  Broader suite, API and platform acceptance remains pending;
   existing 4.34.0 evidence and the validated default retain their original scope.
 - Select Lean through the standard `lean-toolchain` file, for example
   `leanprover/lean4:v4.34.0`. Preserve the ability to change Lean versions and

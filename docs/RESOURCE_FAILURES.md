@@ -328,3 +328,13 @@ at 303 MB. This was a guarded resource abort, not a compatibility failure or
 an OOM stress test. Separate hash/metadata-verified cache deduplication and
 lossless archival restored disk headroom without deleting test evidence.
 See the [retained archival and cache receipts](evidence/resource-headroom-2026-09-25.json).
+
+The fresh Lean 4.34.1 native IO controls first stopped at 5.08% workload memory
+pressure, with a 596 MiB peak and more than 23 GiB of host memory available.
+The run had omitted the process-local base-page wrapper. All OOM, hard-limit,
+throttling and swap counters were zero, and the guard released the service.
+An unchanged-fixture retry through `base-pages.py` passed all eight interpreted
+and C-compiled controls at 304 MiB, without resource events. Caps and pressure
+thresholds were unchanged. The first attempt remains a resource abort, including
+its partial observations; the successful retry supports the mitigation without
+establishing a unique cause. See the [two preserved attempts](evidence/lean-4.34.1-native-io-ci-2026-09-25.json).

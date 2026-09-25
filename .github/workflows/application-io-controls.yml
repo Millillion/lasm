@@ -46,8 +46,8 @@ jobs:
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
-      - name: Native Lean 4.34 fixture oracles
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/application-io-controls-resources.json -- node integration/application-io-regressions.mjs .work/application-io-controls native ${{ inputs.scope == 'filesystem-devices' && 'filesystem-devices' || '' }}
+      - name: Native Lean 4.34.1 fixture oracles
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib ${{ matrix.memory }} --report .work/application-io-controls-resources.json -- node integration/application-io-regressions.mjs .work/application-io-controls native ${{ inputs.scope == 'filesystem-devices' && 'filesystem-devices' || '' }} --lean-version 4.34.1
       - name: Preserve bounded native receipts
         if: always()
         run: node -e "const f=require('node:fs');for(const p of ['.work/application-io-controls/result.json','.work/application-io-controls-resources.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

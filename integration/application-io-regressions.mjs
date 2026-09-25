@@ -12,12 +12,20 @@ import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('..', import.meta.url));
-const [outputArg, target, ...remaining] = process.argv.slice(2);
+const arguments_ = process.argv.slice(2);
+let version = '4.34.0';
+const versionIndex = arguments_.indexOf('--lean-version');
+if (versionIndex >= 0) {
+  version = arguments_[versionIndex + 1];
+  assert.match(version ?? '', /^\d+\.\d+\.\d+$/, 'Supply an exact --lean-version');
+  arguments_.splice(versionIndex, 2);
+}
+const [outputArg, target, ...remaining] = arguments_;
 const nativeOnly = target === 'native';
 const [engineArg, compilerArg] = nativeOnly ? [] : remaining;
 const selection = nativeOnly ? remaining : remaining.slice(2);
 if (!outputArg || (!nativeOnly && (!['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)))
-  throw new Error('Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER [CASE ...], or NEW_OUTPUT native [CASE ...]');
+  throw new Error('Supply NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER [CASE ...] [--lean-version VERSION], or NEW_OUTPUT native [CASE ...] [--lean-version VERSION]');
 const cases = [
   { name: 'filesystem-surface', source: 'integration/fixtures/FilesystemSurface.lean',
     marker: 'filesystem surface checks passed\n', removesData: true },
@@ -41,7 +49,7 @@ const chosen = cases.filter(row => !selection.length || selection.includes(row.n
 const output = resolve(outputArg), engine = nativeOnly ? undefined : resolve(engineArg), compiler = nativeOnly ? undefined : resolve(compilerArg);
 assert.ok(!existsSync(output), 'Preserve previous acceptance evidence');
 mkdirSync(output, { recursive: true });
-writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
 const lean = await provisionLean(output);
 const env = { ...nativeLeanEnvironment(lean), LEAN_NUM_THREADS: '2' };
 const report = { scope: nativeOnly ? 'Native interpreted/compiled fixture controls only; no Wasm application executed'
@@ -86,7 +94,7 @@ try {
     const base = join(output, fixture.name), project = join(base, 'source');
     mkdirSync(project, { recursive: true });
     const source = join(project, 'Main.lean'); copyFileSync(sourceFile, source);
-    writeFileSync(join(project, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+    writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
     row.interpreted = execute('native-interpreted', [lean.lean, '-Dlinter.all=false', '--run', source], base, row, env);
     run(fixture.name + '/generate native C', lean.lean,
       ['-j1', '-Dlinter.all=false', '-Dcompiler.postponeCompile=false', '-c', source + '.c', source], project);

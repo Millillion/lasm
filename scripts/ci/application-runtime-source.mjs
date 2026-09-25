@@ -21,22 +21,27 @@ assert.ok(['lean', 'sdk', 'sources', 'gmp', 'hosts', 'smoke'].includes(phase));
 const output = resolve('.work/ci-application-runtime');
 const cache = resolve('.cache/ci-application-tools');
 const sourceBuild = resolve('.work/ci-application-libraries');
+const version = JSON.parse(readFileSync(new URL('./acceptance-versions.json', import.meta.url))).lean;
+const sourceRelease = JSON.parse(readFileSync(new URL('../full-lean/lean-sources.json', import.meta.url)))[version];
+assert.ok(sourceRelease, 'The acceptance release needs an authenticated source pin');
 mkdirSync(output, { recursive: true });
 const reportFile = join(output, phase + '.json');
 assert.ok(!existsSync(reportFile), 'Use a fresh CI workspace; preserve phase reports');
 const space = statfsSync('.');
 assert.ok(space.bavail * space.bsize >= 5 * 1024 ** 3, 'Keep build headroom and a four-GiB disk reserve');
-const result = { phase, scope: 'Source-built AOT runtime control, not installed-package acceptance',
+const result = { phase, lean: version, leanCommit: sourceRelease.commit,
+  scope: 'Source-built AOT runtime control, not installed-package acceptance',
   passed: false, resourceReport: process.env.LASM_RESOURCE_REPORT, startedAt: new Date().toISOString() };
 const record = () => writeFileSync(reportFile, JSON.stringify(result, null, 2) + '\n');
 record();
 const run = (program, args, options = {}) => execFileSync(program, args, { stdio: 'inherit', ...options });
 const selection = join(output, 'selection');
 mkdirSync(selection, { recursive: true });
-writeFileSync(join(selection, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+writeFileSync(join(selection, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
 try {
   if (phase === 'lean') {
     const lean = await provisionLean(selection, { cache });
+    assert.equal(lean.commit, sourceRelease.commit);
     result.tool = { version: lean.version, commit: lean.commit, identity: lean.identity };
   } else if (phase === 'sdk') {
     const sdk = await maintainerSdk({ managed: true, cache });
@@ -44,8 +49,8 @@ try {
   } else if (phase === 'sources') {
     const zig = JSON.parse(readFileSync('experiments/feasibility/toolchains.json')).zig;
     const inputs = [
-      { name: 'lean4-v4.34.0.tar.gz', url: 'https://codeload.github.com/leanprover/lean4/tar.gz/293d5d0c0c3f3dded4688b3ccd6a33939ac5102b',
-        bytes: 87810307, sha256: '09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b' },
+      { name: `lean4-v${version}.tar.gz`, url: sourceRelease.url,
+        bytes: sourceRelease.bytes, sha256: sourceRelease.sha256 },
       { name: 'gmp-6.3.0.tar.xz', url: 'https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz', bytes: 2094196,
         sha256: 'a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898', directory: 'gmp-6.3.0' },
       { name: 'zig-x86_64-linux-0.16.0.tar.xz', url: zig.url, bytes: zig.compressedBytes,
@@ -94,16 +99,17 @@ try {
     result.manifests = Object.fromEntries(await Promise.all(['manifest.json', 'process/manifest.json', 'bun-stack/manifest.json', 'signals/manifest.json']
       .map(async path => [path, await hashFile(join('.cache/native-host', path))])));
   } else {
-    const target = resolve('.work/ci-application-bundle/lean-4.34.0-wasm64');
-    const expected = { name: 'lean-4.34.0-wasm64', manifestSha256: await hashFile(join(target, 'target.json')) };
+    const target = resolve(`.work/ci-application-bundle/lean-${version}-wasm64`);
+    const expected = { name: `lean-${version}-wasm64`, manifestSha256: await hashFile(join(target, 'target.json')) };
     const runtime = await verifyApplicationRuntime(target, expected);
     // Select this newly built maintainer candidate in memory, without modifying
     // the product's committed release catalog or relabeling previous acceptance.
     result.committedCatalog = structuredClone(applicationRuntimeCatalog);
-    applicationRuntimeCatalog.lean['4.34.0'] = expected;
+    assert.equal(runtime.manifest.lean, version); assert.equal(runtime.manifest.leanCommit, sourceRelease.commit);
+    applicationRuntimeCatalog.lean[version] = expected;
     result.candidate = { identity: runtime.identity, modules: runtime.manifest.standardModules };
     const project = join(output, 'smoke source'), deployed = join(output, 'relocated smoke deployment');
-    mkdirSync(project); writeFileSync(join(project, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+    mkdirSync(project); writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
     const file = join(project, 'Main.lean');
     writeFileSync(file, 'def main : IO Unit := do\n  IO.FS.writeFile "value.txt" "ordinary Lean IO\\n"\n  IO.print (← IO.FS.readFile "value.txt")\n  IO.println ((2 : Nat)^130 + 17)\n');
     const built = await buildApplication(file, { target: 'node', output: deployed, cache, runtimeDirectory: target });

@@ -1,0 +1,1380 @@
+{
+  "recordedAt": "2026-09-25T05:16:24.875397+00:00",
+  "scope": "Native Linux x64 Lean 4.34.1 IO fixture controls and local CI release-pin validation only; installed comparisons recorded separately",
+  "versions": {
+    "lean": "4.34.1",
+    "node": "26.10.0",
+    "deno": "2.9.7",
+    "bun": "1.4.2"
+  },
+  "nativeControls": {
+    "path": ".work/application-io-native-4.34.1-r2/result.json",
+    "sha256": "d665e44610ecdcd7ca570545e9bae67484537dd0aee2f07fd22d33d1e842d9bc",
+    "data": {
+      "scope": "Native interpreted/compiled fixture controls only; no Wasm application executed",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "host": "linux-x64",
+      "target": "native",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-native-4.34.1-r2-resources.json",
+      "cases": [
+        {
+          "name": "filesystem-surface",
+          "source": "integration/fixtures/FilesystemSurface.lean",
+          "marker": "filesystem surface checks passed\n",
+          "removesData": true,
+          "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+          "passed": true,
+          "interpreted": {
+            "code": 0,
+            "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+            "stderr": ""
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+            "stderr": ""
+          },
+          "sourceUnchanged": true,
+          "status": "native controls passed"
+        },
+        {
+          "name": "filesystem-errors",
+          "source": "integration/fixtures/FilesystemErrors.lean",
+          "marker": "filesystem error observations completed\n",
+          "removesData": true,
+          "sourceSha256": "484d9860c5361ce70c97d0325517c6302939f93a76657c751fa315a08f21e88d",
+          "passed": true,
+          "interpreted": {
+            "code": 0,
+            "stdout": "read missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nread directory: error IO.Error.inappropriateType none 21 \"illegal operation on a directory\"\nread invalid UTF8: error IO.Error.userError \"Tried to read file 'data/invalid-utf8' containing non UTF-8 data.\"\nread through regular file: error IO.Error.inappropriateType (some \"data/regular/child\") 20 \"not a directory\"\nread empty path: error IO.Error.noFileOrDirectory \"\" 2 \"no such file or directory\"\nwrite missing parent: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nwrite directory: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nwriteNew existing file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nwriteNew existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\nreadWrite absent file: error IO.Error.noFileOrDirectory \"data/readwrite-absent\" 2 \"no such file or directory\"\nwrite on read-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\ntruncate read-only handle: error IO.Error.invalidArgument none 22 \"invalid argument\"\nread on write-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nmetadata missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\ndirectory listing on file: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\ncreate existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\ncreate directory through file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nremove missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nremove directory as file: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nremove file as directory: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\nremove nonempty directory: error IO.Error.unsatisfiedConstraints 39 \"directory not empty\"\nrename missing source: error IO.Error.noFileOrDirectory \"data/absent/entry and/or data/renamed\" 2 \"no such file or directory\"\nrename file over directory: error IO.Error.inappropriateType (some \"data/regular and/or data/directory\") 21 \"illegal operation on a directory\"\nhard link missing source: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nhard link existing destination: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nrealPath missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"\"\nread path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nrename path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nfilesystem error observations completed\n",
+            "stderr": ""
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdout": "read missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nread directory: error IO.Error.inappropriateType none 21 \"illegal operation on a directory\"\nread invalid UTF8: error IO.Error.userError \"Tried to read file 'data/invalid-utf8' containing non UTF-8 data.\"\nread through regular file: error IO.Error.inappropriateType (some \"data/regular/child\") 20 \"not a directory\"\nread empty path: error IO.Error.noFileOrDirectory \"\" 2 \"no such file or directory\"\nwrite missing parent: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nwrite directory: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nwriteNew existing file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nwriteNew existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\nreadWrite absent file: error IO.Error.noFileOrDirectory \"data/readwrite-absent\" 2 \"no such file or directory\"\nwrite on read-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\ntruncate read-only handle: error IO.Error.invalidArgument none 22 \"invalid argument\"\nread on write-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nmetadata missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\ndirectory listing on file: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\ncreate existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\ncreate directory through file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nremove missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nremove directory as file: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nremove file as directory: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\nremove nonempty directory: error IO.Error.unsatisfiedConstraints 39 \"directory not empty\"\nrename missing source: error IO.Error.noFileOrDirectory \"data/absent/entry and/or data/renamed\" 2 \"no such file or directory\"\nrename file over directory: error IO.Error.inappropriateType (some \"data/regular and/or data/directory\") 21 \"illegal operation on a directory\"\nhard link missing source: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nhard link existing destination: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nrealPath missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"\"\nread path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nrename path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nfilesystem error observations completed\n",
+            "stderr": ""
+          },
+          "sourceUnchanged": true,
+          "status": "native controls passed"
+        },
+        {
+          "name": "filesystem-devices",
+          "source": "integration/fixtures/FilesystemDevices.lean",
+          "marker": "filesystem device observations completed\n",
+          "linux": true,
+          "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+          "passed": true,
+          "interpreted": {
+            "code": 0,
+            "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+            "stderr": ""
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+            "stderr": ""
+          },
+          "sourceUnchanged": true,
+          "status": "native controls passed"
+        },
+        {
+          "name": "windows-timezone",
+          "source": "integration/fixtures/WindowsTimezone.lean",
+          "marker": "windows timezone observations completed\n",
+          "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+          "passed": true,
+          "interpreted": {
+            "code": 0,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          },
+          "sourceUnchanged": true,
+          "status": "native controls passed"
+        },
+        {
+          "name": "standard-io",
+          "source": "test/fixtures/standard-io/Main.lean",
+          "marker": "standard IO checks passed\n",
+          "removesData": true,
+          "sourceSha256": "25b04269fd564ff77eee30473de2a04efaf8f1d428b60974a273de5898577249",
+          "passed": true,
+          "interpreted": {
+            "code": 0,
+            "stdout": "standard IO checks passed\n",
+            "stderr": "stderr \u03bb\n"
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdout": "standard IO checks passed\n",
+            "stderr": "stderr \u03bb\n"
+          },
+          "sourceUnchanged": true,
+          "status": "native controls passed"
+        },
+        {
+          "name": "getline-state",
+          "source": "test/fixtures/getline-state/Main.lean",
+          "marker": "getLine stream-state comparison completed\n",
+          "sourceSha256": "7bc6293b979c3df900e803f0514d6b40fe4aefa8799a185ce5d88934d60b586a",
+          "passed": true,
+          "interpreted": {
+            "code": 0,
+            "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+            "stderr": ""
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+            "stderr": ""
+          },
+          "sourceUnchanged": true,
+          "status": "native controls passed"
+        },
+        {
+          "name": "truncate-errors",
+          "source": "test/fixtures/truncate-errors/Main.lean",
+          "marker": "truncate error comparison completed\n",
+          "posix": true,
+          "sourceSha256": "2eab6468a7672fb95078590d8c1f1d27328c2829937ed518c6c3a2bef0638928",
+          "passed": true,
+          "interpreted": {
+            "code": 0,
+            "stdout": "read-only regular truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nregular truncate at read cursor: ok\nregular contents: \"ab\"\npipe reader truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\npipe writer truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nchild exit: 0\ntruncate error comparison completed\n",
+            "stderr": ""
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdout": "read-only regular truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nregular truncate at read cursor: ok\nregular contents: \"ab\"\npipe reader truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\npipe writer truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nchild exit: 0\ntruncate error comparison completed\n",
+            "stderr": ""
+          },
+          "sourceUnchanged": true,
+          "status": "native controls passed"
+        },
+        {
+          "name": "console-buffering",
+          "source": "test/fixtures/console-buffering/Main.lean",
+          "marker": "normal shutdown flush\n",
+          "posix": true,
+          "sourceSha256": "a57406c4f3e7529485538c002364986ea7a70954bf8273175570da11db61aef4",
+          "passed": true,
+          "interpreted": {
+            "code": 0,
+            "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+            "stderr": "stderr parent before|stderr child|stderr parent after\n"
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+            "stderr": "stderr parent before|stderr child|stderr parent after\n"
+          },
+          "sourceUnchanged": true,
+          "status": "native controls passed"
+        }
+      ],
+      "commands": [
+        {
+          "label": "filesystem-surface/native-interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/source/Main.lean",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/native-interpreted",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.5067836250000001,
+          "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-surface/generate native C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.6101113129999994,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-surface/compile native",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.9998515559999996,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-surface/native-compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/source/native",
+          "args": [
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-surface/native-compiled",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.008006666000001132,
+          "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-errors/native-interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/source/Main.lean",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/native-interpreted",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.42426221600000097,
+          "stdout": "read missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nread directory: error IO.Error.inappropriateType none 21 \"illegal operation on a directory\"\nread invalid UTF8: error IO.Error.userError \"Tried to read file 'data/invalid-utf8' containing non UTF-8 data.\"\nread through regular file: error IO.Error.inappropriateType (some \"data/regular/child\") 20 \"not a directory\"\nread empty path: error IO.Error.noFileOrDirectory \"\" 2 \"no such file or directory\"\nwrite missing parent: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nwrite directory: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nwriteNew existing file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nwriteNew existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\nreadWrite absent file: error IO.Error.noFileOrDirectory \"data/readwrite-absent\" 2 \"no such file or directory\"\nwrite on read-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\ntruncate read-only handle: error IO.Error.invalidArgument none 22 \"invalid argument\"\nread on write-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nmetadata missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\ndirectory listing on file: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\ncreate existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\ncreate directory through file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nremove missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nremove directory as file: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nremove file as directory: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\nremove nonempty directory: error IO.Error.unsatisfiedConstraints 39 \"directory not empty\"\nrename missing source: error IO.Error.noFileOrDirectory \"data/absent/entry and/or data/renamed\" 2 \"no such file or directory\"\nrename file over directory: error IO.Error.inappropriateType (some \"data/regular and/or data/directory\") 21 \"illegal operation on a directory\"\nhard link missing source: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nhard link existing destination: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nrealPath missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"\"\nread path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nrename path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nfilesystem error observations completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-errors/generate native C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.46912243599999964,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-errors/compile native",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.7157048350000005,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-errors/native-compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/source/native",
+          "args": [
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-errors/native-compiled",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.006653922999998031,
+          "stdout": "read missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nread directory: error IO.Error.inappropriateType none 21 \"illegal operation on a directory\"\nread invalid UTF8: error IO.Error.userError \"Tried to read file 'data/invalid-utf8' containing non UTF-8 data.\"\nread through regular file: error IO.Error.inappropriateType (some \"data/regular/child\") 20 \"not a directory\"\nread empty path: error IO.Error.noFileOrDirectory \"\" 2 \"no such file or directory\"\nwrite missing parent: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nwrite directory: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nwriteNew existing file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nwriteNew existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\nreadWrite absent file: error IO.Error.noFileOrDirectory \"data/readwrite-absent\" 2 \"no such file or directory\"\nwrite on read-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\ntruncate read-only handle: error IO.Error.invalidArgument none 22 \"invalid argument\"\nread on write-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nmetadata missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\ndirectory listing on file: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\ncreate existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\ncreate directory through file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nremove missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nremove directory as file: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nremove file as directory: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\nremove nonempty directory: error IO.Error.unsatisfiedConstraints 39 \"directory not empty\"\nrename missing source: error IO.Error.noFileOrDirectory \"data/absent/entry and/or data/renamed\" 2 \"no such file or directory\"\nrename file over directory: error IO.Error.inappropriateType (some \"data/regular and/or data/directory\") 21 \"illegal operation on a directory\"\nhard link missing source: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nhard link existing destination: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nrealPath missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"\"\nread path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nrename path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nfilesystem error observations completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-devices/native-interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/source/Main.lean",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/native-interpreted",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.396621608999998,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-devices/generate native C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.4181261130000021,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-devices/compile native",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.6352921940000015,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "filesystem-devices/native-compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/source/native",
+          "args": [
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/filesystem-devices/native-compiled",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.008634947999998985,
+          "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "windows-timezone/native-interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/source/Main.lean",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/native-interpreted",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.36083392699999967,
+          "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "windows-timezone/generate native C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.3863600540000007,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "windows-timezone/compile native",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.5648352860000013,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "windows-timezone/native-compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/source/native",
+          "args": [
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/windows-timezone/native-compiled",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.005856061999998928,
+          "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "standard-io/native-interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/source/Main.lean",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/native-interpreted",
+          "code": 0,
+          "signal": null,
+          "seconds": 1.5784271879999978,
+          "stdout": "standard IO checks passed\n",
+          "stderr": "stderr \u03bb\n"
+        },
+        {
+          "label": "standard-io/generate native C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 1.5072588980000001,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "standard-io/compile native",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 1.2829496639999998,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "standard-io/native-compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/source/native",
+          "args": [
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/standard-io/native-compiled",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.07553427000000011,
+          "stdout": "standard IO checks passed\n",
+          "stderr": "stderr \u03bb\n"
+        },
+        {
+          "label": "getline-state/native-interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/source/Main.lean",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/native-interpreted",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.331089433000001,
+          "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "getline-state/generate native C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.3453415610000011,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "getline-state/compile native",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.4169685050000007,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "getline-state/native-compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/source/native",
+          "args": [
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/getline-state/native-compiled",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.010809762999997474,
+          "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "truncate-errors/native-interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/source/Main.lean",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/native-interpreted",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.36414400599999863,
+          "stdout": "read-only regular truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nregular truncate at read cursor: ok\nregular contents: \"ab\"\npipe reader truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\npipe writer truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nchild exit: 0\ntruncate error comparison completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "truncate-errors/generate native C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.36992609699999957,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "truncate-errors/compile native",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.5267895630000021,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "truncate-errors/native-compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/source/native",
+          "args": [
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/truncate-errors/native-compiled",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.007475780999997369,
+          "stdout": "read-only regular truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nregular truncate at read cursor: ok\nregular contents: \"ab\"\npipe reader truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\npipe writer truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nchild exit: 0\ntruncate error comparison completed\n",
+          "stderr": ""
+        },
+        {
+          "label": "console-buffering/native-interpreted",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/source/Main.lean",
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/native-interpreted",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.28724620200000206,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n"
+        },
+        {
+          "label": "console-buffering/generate native C",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.27237076700000035,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "console-buffering/compile native",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/source",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.35542553999999654,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "console-buffering/native-compiled",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/source/native",
+          "args": [
+            "data"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r2/console-buffering/native-compiled",
+          "code": 0,
+          "signal": null,
+          "seconds": 0.010097638999999617,
+          "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+          "stderr": "stderr parent before|stderr child|stderr parent after\n"
+        }
+      ],
+      "passed": true,
+      "finishedAt": "2026-09-25T05:08:42.313Z"
+    }
+  },
+  "successfulGuard": {
+    "path": ".work/product-acceptance/application-io-native-4.34.1-r2-resources.json",
+    "sha256": "f5e56223fe3a60baa0375c799cb168ad5f00739dfdba1700770c37a474bf5db2",
+    "data": {
+      "startedAt": "2026-09-25T05:08:14.725Z",
+      "command": [
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "env",
+        "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+        ".cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=512",
+        "integration/application-io-regressions.mjs",
+        ".work/application-io-native-4.34.1-r2",
+        "native",
+        "--lean-version",
+        "4.34.1"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "a3576315-2d56-43e8-9b27-1725c7d1b0fd",
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 23469789184
+      },
+      "minimumHostAvailable": 23125377024,
+      "peakMemoryBytes": 318398464,
+      "peakTasks": 29,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-native-4.34.1-r2-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-25T05:08:42.358Z",
+        "memoryBytes": 81281024,
+        "peakMemoryBytes": 318398464,
+        "swapBytes": 0,
+        "tasks": 6,
+        "memoryBreakdown": {
+          "anon": 3014656,
+          "file": 75296768,
+          "kernel": 1900544,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 40181760,
+          "slab": 1387392
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "exited",
+        "exitStatus": "0",
+        "capturedAt": "2026-09-25T05:08:42.389Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 90619904,
+        "peakMemoryBytes": 318398464,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11657216,
+          "file": 75296768,
+          "kernel": 2338816,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 40181760,
+          "slab": 1414312
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-25T05:08:42.415Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryThrottled": false
+    }
+  },
+  "retainedPressureAbort": {
+    "result": {
+      "path": ".work/application-io-native-4.34.1-r1/result.json",
+      "sha256": "c1005e5f1277041d8d400ff3e0bcd5227c27ce87636a414c991f79191003fa51",
+      "data": {
+        "scope": "Native interpreted/compiled fixture controls only; no Wasm application executed",
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "host": "linux-x64",
+        "target": "native",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-native-4.34.1-r1-resources.json",
+        "cases": [
+          {
+            "name": "filesystem-surface",
+            "source": "integration/fixtures/FilesystemSurface.lean",
+            "marker": "filesystem surface checks passed\n",
+            "removesData": true,
+            "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+            "passed": true,
+            "interpreted": {
+              "code": 0,
+              "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+              "stderr": ""
+            },
+            "nativeCompiled": {
+              "code": 0,
+              "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+              "stderr": ""
+            },
+            "sourceUnchanged": true,
+            "status": "native controls passed"
+          },
+          {
+            "name": "filesystem-errors",
+            "source": "integration/fixtures/FilesystemErrors.lean",
+            "marker": "filesystem error observations completed\n",
+            "removesData": true,
+            "sourceSha256": "484d9860c5361ce70c97d0325517c6302939f93a76657c751fa315a08f21e88d",
+            "passed": true,
+            "interpreted": {
+              "code": 0,
+              "stdout": "read missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nread directory: error IO.Error.inappropriateType none 21 \"illegal operation on a directory\"\nread invalid UTF8: error IO.Error.userError \"Tried to read file 'data/invalid-utf8' containing non UTF-8 data.\"\nread through regular file: error IO.Error.inappropriateType (some \"data/regular/child\") 20 \"not a directory\"\nread empty path: error IO.Error.noFileOrDirectory \"\" 2 \"no such file or directory\"\nwrite missing parent: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nwrite directory: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nwriteNew existing file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nwriteNew existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\nreadWrite absent file: error IO.Error.noFileOrDirectory \"data/readwrite-absent\" 2 \"no such file or directory\"\nwrite on read-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\ntruncate read-only handle: error IO.Error.invalidArgument none 22 \"invalid argument\"\nread on write-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nmetadata missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\ndirectory listing on file: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\ncreate existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\ncreate directory through file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nremove missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nremove directory as file: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nremove file as directory: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\nremove nonempty directory: error IO.Error.unsatisfiedConstraints 39 \"directory not empty\"\nrename missing source: error IO.Error.noFileOrDirectory \"data/absent/entry and/or data/renamed\" 2 \"no such file or directory\"\nrename file over directory: error IO.Error.inappropriateType (some \"data/regular and/or data/directory\") 21 \"illegal operation on a directory\"\nhard link missing source: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nhard link existing destination: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nrealPath missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"\"\nread path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nrename path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nfilesystem error observations completed\n",
+              "stderr": ""
+            },
+            "nativeCompiled": {
+              "code": 0,
+              "stdout": "read missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nread directory: error IO.Error.inappropriateType none 21 \"illegal operation on a directory\"\nread invalid UTF8: error IO.Error.userError \"Tried to read file 'data/invalid-utf8' containing non UTF-8 data.\"\nread through regular file: error IO.Error.inappropriateType (some \"data/regular/child\") 20 \"not a directory\"\nread empty path: error IO.Error.noFileOrDirectory \"\" 2 \"no such file or directory\"\nwrite missing parent: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nwrite directory: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nwriteNew existing file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nwriteNew existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\nreadWrite absent file: error IO.Error.noFileOrDirectory \"data/readwrite-absent\" 2 \"no such file or directory\"\nwrite on read-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\ntruncate read-only handle: error IO.Error.invalidArgument none 22 \"invalid argument\"\nread on write-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nmetadata missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\ndirectory listing on file: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\ncreate existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\ncreate directory through file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nremove missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nremove directory as file: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nremove file as directory: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\nremove nonempty directory: error IO.Error.unsatisfiedConstraints 39 \"directory not empty\"\nrename missing source: error IO.Error.noFileOrDirectory \"data/absent/entry and/or data/renamed\" 2 \"no such file or directory\"\nrename file over directory: error IO.Error.inappropriateType (some \"data/regular and/or data/directory\") 21 \"illegal operation on a directory\"\nhard link missing source: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nhard link existing destination: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nrealPath missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"\"\nread path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nrename path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nfilesystem error observations completed\n",
+              "stderr": ""
+            },
+            "sourceUnchanged": true,
+            "status": "native controls passed"
+          },
+          {
+            "name": "filesystem-devices",
+            "source": "integration/fixtures/FilesystemDevices.lean",
+            "marker": "filesystem device observations completed\n",
+            "linux": true,
+            "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+            "passed": true,
+            "interpreted": {
+              "code": 0,
+              "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+              "stderr": ""
+            },
+            "nativeCompiled": {
+              "code": 0,
+              "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+              "stderr": ""
+            },
+            "sourceUnchanged": true,
+            "status": "native controls passed"
+          },
+          {
+            "name": "windows-timezone",
+            "source": "integration/fixtures/WindowsTimezone.lean",
+            "marker": "windows timezone observations completed\n",
+            "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+            "passed": false
+          }
+        ],
+        "commands": [
+          {
+            "label": "filesystem-surface/native-interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "args": [
+              "-Dlinter.all=false",
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/source/Main.lean",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/native-interpreted",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.5339146469999996,
+            "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-surface/generate native C",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "args": [
+              "-j1",
+              "-Dlinter.all=false",
+              "-Dcompiler.postponeCompile=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/source/Main.lean.c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/source/Main.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.7970430930000002,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-surface/compile native",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "args": [
+              "-O2",
+              "-DNDEBUG",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/source/native",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/source/Main.lean.c"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 1.095348943000001,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-surface/native-compiled",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/source/native",
+            "args": [
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-surface/native-compiled",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.011325441000000864,
+            "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-errors/native-interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "args": [
+              "-Dlinter.all=false",
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/source/Main.lean",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/native-interpreted",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.508944888,
+            "stdout": "read missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nread directory: error IO.Error.inappropriateType none 21 \"illegal operation on a directory\"\nread invalid UTF8: error IO.Error.userError \"Tried to read file 'data/invalid-utf8' containing non UTF-8 data.\"\nread through regular file: error IO.Error.inappropriateType (some \"data/regular/child\") 20 \"not a directory\"\nread empty path: error IO.Error.noFileOrDirectory \"\" 2 \"no such file or directory\"\nwrite missing parent: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nwrite directory: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nwriteNew existing file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nwriteNew existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\nreadWrite absent file: error IO.Error.noFileOrDirectory \"data/readwrite-absent\" 2 \"no such file or directory\"\nwrite on read-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\ntruncate read-only handle: error IO.Error.invalidArgument none 22 \"invalid argument\"\nread on write-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nmetadata missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\ndirectory listing on file: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\ncreate existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\ncreate directory through file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nremove missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nremove directory as file: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nremove file as directory: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\nremove nonempty directory: error IO.Error.unsatisfiedConstraints 39 \"directory not empty\"\nrename missing source: error IO.Error.noFileOrDirectory \"data/absent/entry and/or data/renamed\" 2 \"no such file or directory\"\nrename file over directory: error IO.Error.inappropriateType (some \"data/regular and/or data/directory\") 21 \"illegal operation on a directory\"\nhard link missing source: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nhard link existing destination: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nrealPath missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"\"\nread path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nrename path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nfilesystem error observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-errors/generate native C",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "args": [
+              "-j1",
+              "-Dlinter.all=false",
+              "-Dcompiler.postponeCompile=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/source/Main.lean.c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/source/Main.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.5486185320000022,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-errors/compile native",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "args": [
+              "-O2",
+              "-DNDEBUG",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/source/native",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/source/Main.lean.c"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.8175816090000008,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-errors/native-compiled",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/source/native",
+            "args": [
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-errors/native-compiled",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.008561078999999154,
+            "stdout": "read missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nread directory: error IO.Error.inappropriateType none 21 \"illegal operation on a directory\"\nread invalid UTF8: error IO.Error.userError \"Tried to read file 'data/invalid-utf8' containing non UTF-8 data.\"\nread through regular file: error IO.Error.inappropriateType (some \"data/regular/child\") 20 \"not a directory\"\nread empty path: error IO.Error.noFileOrDirectory \"\" 2 \"no such file or directory\"\nwrite missing parent: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nwrite directory: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nwriteNew existing file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nwriteNew existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\nreadWrite absent file: error IO.Error.noFileOrDirectory \"data/readwrite-absent\" 2 \"no such file or directory\"\nwrite on read-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\ntruncate read-only handle: error IO.Error.invalidArgument none 22 \"invalid argument\"\nread on write-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nmetadata missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\ndirectory listing on file: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\ncreate existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\ncreate directory through file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nremove missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nremove directory as file: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nremove file as directory: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\nremove nonempty directory: error IO.Error.unsatisfiedConstraints 39 \"directory not empty\"\nrename missing source: error IO.Error.noFileOrDirectory \"data/absent/entry and/or data/renamed\" 2 \"no such file or directory\"\nrename file over directory: error IO.Error.inappropriateType (some \"data/regular and/or data/directory\") 21 \"illegal operation on a directory\"\nhard link missing source: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nhard link existing destination: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nrealPath missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"\"\nread path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nrename path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nfilesystem error observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-devices/native-interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "args": [
+              "-Dlinter.all=false",
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/source/Main.lean",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/native-interpreted",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.4754718739999989,
+            "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-devices/generate native C",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "args": [
+              "-j1",
+              "-Dlinter.all=false",
+              "-Dcompiler.postponeCompile=false",
+              "-c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/source/Main.lean.c",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/source/Main.lean"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.5267276519999977,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-devices/compile native",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "args": [
+              "-O2",
+              "-DNDEBUG",
+              "-o",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/source/native",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/source/Main.lean.c"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/source",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.8502460319999992,
+            "stdout": "",
+            "stderr": ""
+          },
+          {
+            "label": "filesystem-devices/native-compiled",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/source/native",
+            "args": [
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/filesystem-devices/native-compiled",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.013359467999998742,
+            "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+            "stderr": ""
+          },
+          {
+            "label": "windows-timezone/native-interpreted",
+            "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "args": [
+              "-Dlinter.all=false",
+              "--run",
+              "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/windows-timezone/source/Main.lean",
+              "data"
+            ],
+            "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-io-native-4.34.1-r1/windows-timezone/native-interpreted",
+            "code": 0,
+            "signal": null,
+            "seconds": 0.46355977399999754,
+            "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+            "stderr": ""
+          }
+        ],
+        "passed": false
+      }
+    },
+    "guard": {
+      "path": ".work/product-acceptance/application-io-native-4.34.1-r1-resources.json",
+      "sha256": "0dc10867bf56694ed511a1015658471b468b3f251222dfa879e0200c74889221",
+      "data": {
+        "startedAt": "2026-09-25T05:06:27.148Z",
+        "command": [
+          "env",
+          "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+          ".cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=512",
+          "integration/application-io-regressions.mjs",
+          ".work/application-io-native-4.34.1-r1",
+          "native",
+          "--lean-version",
+          "4.34.1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "1bea16da-a43d-405e-b4c5-8dafdd826317",
+        "limits": {
+          "memoryMax": 4294967296,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 3435973836,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23374053376
+        },
+        "minimumHostAvailable": 23203508224,
+        "peakMemoryBytes": 624984064,
+        "peakTasks": 29,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-native-4.34.1-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-25T05:06:47.169Z",
+          "memoryBytes": 513687552,
+          "peakMemoryBytes": 624984064,
+          "swapBytes": 0,
+          "tasks": 12,
+          "memoryBreakdown": {
+            "anon": 125165568,
+            "file": 384548864,
+            "kernel": 3227648,
+            "shmem": 0,
+            "file_mapped": 114688,
+            "inactive_file": 370061312,
+            "slab": 858240
+          },
+          "pressureSomeAvg10": 5.08,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "stoppedBecause": "Workload memory pressure reached 5 percent",
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "killed",
+          "exitStatus": "TERM",
+          "capturedAt": "2026-09-25T05:06:47.262Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 398843904,
+          "peakMemoryBytes": 624984064,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 384024576,
+            "kernel": 1609728,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 369475584,
+            "slab": 655576
+          },
+          "pressureSomeAvg10": 5.08,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-25T05:06:47.288Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": true,
+        "memoryThrottled": false
+      }
+    },
+    "classification": "resource-aborted; not a conformance result",
+    "difference": "Retry uses process-local base-pages.py; tests, timeout policy and memory/pressure guard thresholds unchanged. This supports the mitigation, not a proven exclusive cause."
+  },
+  "ciValidation": {
+    "path": ".work/product-acceptance/acceptance-ci-pins-4.34.1-r1.json",
+    "sha256": "b7984636976ab6927defff4092b53d77d995e9cd3d66beb5d52df2f38885a1ff",
+    "data": {
+      "scope": "Local syntax and actual shell argv forwarding only; no GitHub or native Windows jobs dispatched",
+      "versions": {
+        "lean": "4.34.1",
+        "node": "26.10.0",
+        "deno": "2.9.7",
+        "bun": "1.4.2"
+      },
+      "checks": [
+        {
+          "file": ".github/workflows/application-runtime-source.yml",
+          "yaml": "passed"
+        },
+        {
+          "step": "Build runtime and Init Std application archives",
+          "argv": [
+            "scripts/full-lean/run-bounded.mjs",
+            "--report",
+            ".work/ci-application-runtime/init-std-resources.json",
+            "--",
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/build-application-runtime.mjs",
+            "--lean-version",
+            "4.34.1",
+            "--archive-generated-c",
+            "--managed-sdk",
+            "--tool-cache",
+            ".cache/ci-application-tools",
+            "--output",
+            ".work/ci-application-libraries",
+            "--libraries",
+            "Init,Std"
+          ],
+          "releaseForwarding": "passed"
+        },
+        {
+          "step": "Build Lean application archives",
+          "argv": [
+            "scripts/full-lean/run-bounded.mjs",
+            "--report",
+            ".work/ci-application-runtime/lean-library-resources.json",
+            "--",
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/build-application-runtime.mjs",
+            "--lean-version",
+            "4.34.1",
+            "--archive-generated-c",
+            "--managed-sdk",
+            "--tool-cache",
+            ".cache/ci-application-tools",
+            "--output",
+            ".work/ci-application-libraries",
+            "--libraries",
+            "Lean"
+          ],
+          "releaseForwarding": "passed"
+        },
+        {
+          "step": "Build Lake and verify all cached modules",
+          "argv": [
+            "scripts/full-lean/run-bounded.mjs",
+            "--report",
+            ".work/ci-application-runtime/all-libraries-resources.json",
+            "--",
+            "python3",
+            "scripts/full-lean/base-pages.py",
+            "node",
+            "scripts/full-lean/build-application-runtime.mjs",
+            "--lean-version",
+            "4.34.1",
+            "--archive-generated-c",
+            "--managed-sdk",
+            "--tool-cache",
+            ".cache/ci-application-tools",
+            "--output",
+            ".work/ci-application-libraries"
+          ],
+          "releaseForwarding": "passed"
+        },
+        {
+          "file": ".github/workflows/application-io-controls.yml",
+          "yaml": "passed"
+        },
+        {
+          "nativeIOReleaseForwarding": "passed"
+        },
+        {
+          "file": ".github/workflows/windows-timezone-host.yml",
+          "yaml": "passed"
+        },
+        {
+          "windowsTimezoneReleaseForwarding": "statically checked; native PowerShell execution pending"
+        },
+        {
+          "file": "scripts/ci/check-acceptance-versions.mjs",
+          "syntax": "passed"
+        },
+        {
+          "file": "scripts/ci/application-runtime-source.mjs",
+          "syntax": "passed"
+        },
+        {
+          "file": "integration/windows-timezone-host.mjs",
+          "syntax": "passed"
+        },
+        {
+          "file": "integration/managed-http.mjs",
+          "syntax": "passed"
+        }
+      ],
+      "inputs": {
+        ".github/workflows/application-runtime-source.yml": "04bc9c03fa5fdaa9202e66e4baa375a0f704fe1fcc3f56c37ce1f1241aff17ec",
+        ".github/workflows/application-io-controls.yml": "6b2d7fc321a384cf3fa68765e3b697853cb3f943658a5cb4b2d489a297349b97",
+        ".github/workflows/windows-timezone-host.yml": "718464c47c5a1b91cb0a55e3c8f1677f556eec7ebf30e7ea0501cd65b1f3f2c7",
+        "scripts/ci/acceptance-versions.json": "cc6f1ffa5348d55ae6a6d28080dfbd355d97a8087445977571060675a78bb201",
+        "scripts/ci/check-acceptance-versions.mjs": "3fbdd775cf333fbd7b8ed9350c343500f15ead0cdef279ce24d94d314672799e",
+        "scripts/ci/application-runtime-source.mjs": "edf5230806ab3c76e703d5bab870ce2ea95cd1d9107e5a5e07309094f95dcecf",
+        "integration/windows-timezone-host.mjs": "2c02d8b0c6a4e609e6f4b1307b69c8935302b407bd8eb040f33c90377d26d813"
+      }
+    }
+  },
+  "officialReleaseObservation": {
+    "path": ".work/product-acceptance/acceptance-ci-live-versions-2026-09-25-r1.json",
+    "sha256": "d55d813890090cb291061eec2361a5464b22521c303efe5482ab7c1d28d5ad12",
+    "data": {
+      "lean": {
+        "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+        "expected": "v4.34.1",
+        "tag": "v4.34.1",
+        "publishedAt": "2026-09-24T20:24:21Z",
+        "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+        "draft": false,
+        "prerelease": false
+      },
+      "deno": {
+        "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+        "expected": "v2.9.7",
+        "tag": "v2.9.7",
+        "publishedAt": "2026-09-17T09:04:55Z",
+        "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+        "draft": false,
+        "prerelease": false
+      },
+      "bun": {
+        "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+        "expected": "bun-v1.4.2",
+        "tag": "bun-v1.4.2",
+        "publishedAt": "2026-09-05T05:55:48Z",
+        "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+        "draft": false,
+        "prerelease": false
+      },
+      "node": {
+        "source": "https://nodejs.org/dist/index.json",
+        "expected": "v26.10.0",
+        "tag": "v26.10.0",
+        "date": "2026-09-21",
+        "lts": false
+      },
+      "checkedAt": "2026-09-25T05:02:43.174Z"
+    }
+  },
+  "harnessSha256": "7fd3d2bf8a8a031257adee5c4bd096b0af4ce78c6919a6f35b52f5b9f429aef6",
+  "limits": [
+    "Native interpreted and C-compiled Linux x64 controls only.",
+    "The Windows-timezone fixture here executes its Linux branch; native Windows testing remains pending.",
+    "CI configuration is locally parsed and shell-checked; no new GitHub workflows or native PowerShell checks were run.",
+    "Eight supplementary fixtures are not complete IO.FS or standard-library coverage.",
+    "SSH authentication remains expired; no push was attempted."
+  ]
+}

@@ -40,7 +40,7 @@ jobs:
           $nodeBinary = (Get-Command node.exe).Source
           $denoBinary = (Get-Command deno.exe).Source
           $bunBinary = (Get-Command bun.exe).Source
-          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/windows-timezone-resources.json -- node --max-old-space-size=256 integration/windows-timezone-host.mjs .work/windows-timezone $nodeBinary $denoBinary $bunBinary
+          node scripts/full-lean/run-bounded.mjs --memory-mib 2048 --report .work/windows-timezone-resources.json -- node --max-old-space-size=256 integration/windows-timezone-host.mjs .work/windows-timezone $nodeBinary $denoBinary $bunBinary 4.34.1
       - name: Preserve native observations and guard receipt in the job log
         if: always()
         run: node -e "const f=require('node:fs');for(const p of ['.work/windows-timezone/result.json','.work/windows-timezone-resources.json','.work/windows-timezone-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
