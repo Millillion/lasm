@@ -1,0 +1,382 @@
+{
+  "scope": "Fresh Node/npm-only Linux x64 installation of local .25, Lean 4.34.1 managed compilation, cache reuse and independent kernel-isolated deployment; other engines/platforms and full API behavior remain separate gates",
+  "recordedAt": "2026-09-25T05:06:28.355457+00:00",
+  "versions": {
+    "checkedAt": "2026-09-25T04:28:45.499195+00:00",
+    "scope": "Official stable versions for the fresh Lean 4.34.1 application acceptance campaign",
+    "sources": {
+      "lean": {
+        "url": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+        "tag_name": "v4.34.1",
+        "published_at": "2026-09-24T20:24:21Z",
+        "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+        "prerelease": false,
+        "draft": false,
+        "target_commitish": "master"
+      },
+      "node": {
+        "url": "https://nodejs.org/dist/index.json",
+        "version": "v26.10.0",
+        "date": "2026-09-21",
+        "lts": false
+      },
+      "deno": {
+        "url": "https://api.github.com/repos/denoland/deno/releases/latest",
+        "tag_name": "v2.9.7",
+        "published_at": "2026-09-17T09:04:55Z",
+        "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+        "prerelease": false,
+        "draft": false,
+        "target_commitish": "main"
+      },
+      "bun": {
+        "url": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+        "tag_name": "bun-v1.4.2",
+        "published_at": "2026-09-05T05:55:48Z",
+        "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+        "prerelease": false,
+        "draft": false,
+        "target_commitish": "744846f844374847c902b5e7fd59b4342a51ef99"
+      }
+    }
+  },
+  "result": {
+    "path": ".work/application-cold-4.34.1-r1/result.json",
+    "sha256": "4fda9111ebc11363fc9df468e2e24be4eb74fe0fa0cbacd2c42f1fb75bf3f434",
+    "installation": {
+      "scope": "Cold npm installation and managed compilation in an isolated filesystem containing only Node/npm and standard OS shared libraries",
+      "node": "v26.10.0",
+      "platform": "linux-x64",
+      "package": "0.1.0-experimental.25",
+      "firstBuildSeconds": 441.61913824100003,
+      "cachedDirectRunSeconds": 20.657097368999967,
+      "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+            "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+          }
+        ],
+        "signature": "becb697495ff33d0613414243a83db53e3c08294f52c61209624d794a6528a17",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "checks": [
+        {
+          "args": [
+            "hello \u03bb",
+            "",
+            "space argument"
+          ],
+          "expected": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          },
+          "actual": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          }
+        },
+        {
+          "args": [
+            "fail"
+          ],
+          "expected": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          },
+          "actual": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          }
+        }
+      ],
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/project/node_modules/@lasm/compiler",
+      "output": "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/dist",
+      "toolchains": "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/toolchains",
+      "recordedAt": "2026-09-25T05:04:37.780Z"
+    },
+    "archive": "/home/lastmjs/development/lasm/compiler/.work/application-package-4.34.1-r1/lasm-compiler-0.1.0-experimental.25.tgz",
+    "archiveSha256": "ac8dcef8b95fb91cd760fa6f1b332c4c783901b7ca6b73b4f5eeadb559be0c6a",
+    "deployment": {
+      "scope": "Separate copied deployment and Node executable outside the checkout; Landlock denies source, build tools and original output contents. OS libraries and writable data/temp are allowed. Metadata-only stat and network access are not restricted.",
+      "installationFile": "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/result.json",
+      "installationSha256": "778ec6496b8a2f9f7388814e999f0a7cbc92439543de3f6c75578022af65da36",
+      "node": "v26.10.0",
+      "platform": "linux-x64",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+            "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+          }
+        ],
+        "signature": "becb697495ff33d0613414243a83db53e3c08294f52c61209624d794a6528a17",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "de24114234218bf4b01ecf06be13a694b88ad79a07ff41075b85e7910ce155eb",
+      "deniedFiles": [
+        "/home/lastmjs/development/lasm/compiler/package.json",
+        "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/project/Main.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+        "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+        "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/dist/program.wasm"
+      ],
+      "denialControl": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "checks": [
+        {
+          "args": [
+            "hello \u03bb",
+            "",
+            "space argument"
+          ],
+          "expected": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          },
+          "actual": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          }
+        },
+        {
+          "args": [
+            "fail"
+          ],
+          "expected": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          },
+          "actual": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          }
+        }
+      ],
+      "rules": "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/deployment/deployment-rules.json",
+      "isolated": "/tmp/lasm-deployment-QIr9IM",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-cold-4.34.1-r1-resources.json",
+      "recordedAt": "2026-09-25T05:04:42.630Z"
+    },
+    "leanVersion": "4.34.1",
+    "nativeControls": {
+      "path": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-node-r1/controls.json",
+      "sha256": "997ffb045dcd656f8d0bad8eca8cfe5505acfe15c2e729ea552e0d2b50f7b536"
+    },
+    "installationRules": "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/installation-rules.json",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-cold-4.34.1-r1-resources.json",
+    "recordedAt": "2026-09-25T05:04:43.060Z"
+  },
+  "resourceReport": {
+    "startedAt": "2026-09-25T04:56:37.081Z",
+    "command": [
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "--max-old-space-size=512",
+      "scripts/check-installed-application.mjs",
+      ".work/application-cold-4.34.1-r1",
+      ".work/application-package-4.34.1-r1/lasm-compiler-0.1.0-experimental.25.tgz",
+      "4.34.1",
+      ".work/managed-application-4.34.1-node-r1/controls.json"
+    ],
+    "cwd": "/home/lastmjs/development/lasm/compiler",
+    "unit": "lasm-heavy-a79a4e3ab9f2.service",
+    "id": "9a8ede21-b75a-4a24-80c8-2001657517f2",
+    "limits": {
+      "memoryMax": 8589934592,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 6871947673,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "hostAtStart": {
+      "total": 33456926720,
+      "available": 23284703232
+    },
+    "minimumHostAvailable": 20118831104,
+    "peakMemoryBytes": 6282387456,
+    "peakTasks": 42,
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-cold-4.34.1-r1-resources.json",
+    "status": "finished",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+    "lastSample": {
+      "at": "2026-09-25T05:04:43.084Z",
+      "memoryBytes": 4495462400,
+      "peakMemoryBytes": 6282387456,
+      "swapBytes": 0,
+      "tasks": 6,
+      "memoryBreakdown": {
+        "anon": 2396160,
+        "file": 4373196800,
+        "kernel": 118546432,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 3256717312,
+        "slab": 118117768
+      },
+      "pressureSomeAvg10": 0.05,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "highWaterProcesses": {
+      "at": "2026-09-25T05:01:41.844Z",
+      "processes": [
+        {
+          "pid": 4168140,
+          "name": "node-MainThread",
+          "residentBytes": 243105792,
+          "threads": 11
+        },
+        {
+          "pid": 4168068,
+          "name": "node-MainThread",
+          "residentBytes": 58671104,
+          "threads": 7
+        },
+        {
+          "pid": 4168075,
+          "name": "node-MainThread",
+          "residentBytes": 56320000,
+          "threads": 7
+        },
+        {
+          "pid": 4169075,
+          "name": "python3",
+          "residentBytes": 29777920,
+          "threads": 1
+        }
+      ]
+    },
+    "unitReleased": true,
+    "service": {
+      "serviceResult": "success",
+      "exitCode": "exited",
+      "exitStatus": "0",
+      "capturedAt": "2026-09-25T05:04:43.124Z",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "memoryBytes": 4505063424,
+      "peakMemoryBytes": 6282387456,
+      "swapBytes": 0,
+      "tasks": 7,
+      "memoryBreakdown": {
+        "anon": 11657216,
+        "file": 4373196800,
+        "kernel": 119070720,
+        "shmem": 0,
+        "file_mapped": 86016,
+        "inactive_file": 3256717312,
+        "slab": 118138152
+      },
+      "pressureSomeAvg10": 0.05,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      }
+    },
+    "finishedAt": "2026-09-25T05:04:43.152Z",
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryThrottled": false
+  },
+  "diskReserveMonitor": {
+    "scope": "Disk-reserve monitor outside the existing whole-process-tree memory guard; disk aborts are resource results, never compatibility failures",
+    "minimumFreeBytes": 5368709120,
+    "preflightRequiredBytes": 13958643712,
+    "status": "passed",
+    "updatedAt": "2026-09-25T05:04:43.354450+00:00",
+    "freeAtStart": 14158528512,
+    "command": [
+      "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "scripts/full-lean/run-bounded.mjs",
+      "--memory-mib",
+      "8192",
+      "--report",
+      "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-cold-4.34.1-r1-resources.json",
+      "--",
+      "python3",
+      "scripts/full-lean/base-pages.py",
+      "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "--max-old-space-size=512",
+      "scripts/check-installed-application.mjs",
+      ".work/application-cold-4.34.1-r1",
+      ".work/application-package-4.34.1-r1/lasm-compiler-0.1.0-experimental.25.tgz",
+      "4.34.1",
+      ".work/managed-application-4.34.1-node-r1/controls.json"
+    ],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-cold-4.34.1-r1-resources.json",
+    "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-cold-4.34.1-r1.log",
+    "minimumObservedFreeBytes": 7055704064,
+    "exitCode": 0,
+    "freeAtEnd": 7386329088
+  },
+  "harnesses": {
+    "scripts/check-installed-application.mjs": "8f81f1ee229f1138c16ce451b1c486bf96d332d134d06d5fd309586e57e9443f",
+    "integration/installed-application.mjs": "68a7f181f86ce81b03257d65042171553608c0267d9971277121ba0b5c7a5c1d",
+    "scripts/check-deployed-application.mjs": "93b81a950ace266568a9c14f99a8cfbef1bdf4ee24d140681fd78f0b23f6e795",
+    "scripts/full-lean/restrict-filesystem.py": "c5770b46b49fbeb0c2bb45244802fcb684eaa5315cc1942660b1441a688b6a93"
+  },
+  "nativeOracle": {
+    "path": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-node-r1/controls.json",
+    "sha256": "997ffb045dcd656f8d0bad8eca8cfe5505acfe15c2e729ea552e0d2b50f7b536",
+    "lean": "4.34.1",
+    "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3"
+  },
+  "limitations": [
+    "This fresh cold-install gate covers Linux x64 with Node 26.10.0.",
+    "Deno/Bun main and upstream reference-count passes use the separately recorded installed candidate and preprovisioned tools.",
+    "The local candidate is not published to npm.",
+    "Complete latest-release IO/HTTP, upstream suite and six-platform validation remain unfinished."
+  ]
+}

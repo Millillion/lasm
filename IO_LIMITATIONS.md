@@ -18,6 +18,9 @@ separately from the earlier runtime evidence below.
   now pass in all three stock engines on Linux x64, including exact native IO,
   argument and exit comparisons, cache reuse and direct-file execution. Broader
   filesystem, HTTP, suite and native platform acceptance remain open.
+  A [fresh Node/npm-only installation and isolated deployment](docs/evidence/lean-4.34.1-cold-install-2026-09-25.json)
+  also pass on Linux x64, with managed tools starting empty. That installation
+  gate does not add broader API or other-platform passes.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.

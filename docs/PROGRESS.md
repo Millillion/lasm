@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Shipping helper integration, full API parity and native platform acceptance lack defensible durations.
 
-**Changed:** [Installed `.25` passes fresh Lean 4.34.1 main and upstream reference-count checks](evidence/lean-4.34.1-installed-main-2026-09-25.json) in Node, Deno and Bun on Linux x64. Native output/errors/status, cache reuse and direct-file execution match. The original C regression uses the installed production linker and retains all assertions. Fourteen linker/output regressions pass; the six workloads peak at 3.81 GiB without resource events. Cold installation and broader IO/HTTP checks follow. Pushes await restored SSH credentials.
+**Changed:** [Fresh `.25` cold installation passes](evidence/lean-4.34.1-cold-install-2026-09-25.json) with only Node/npm and an empty tool cache on Linux x64. Managed Lean 4.34.1 compilation, cached direct execution and separately isolated deployment match native controls. Peak memory is 5.85 GiB without resource events. A separate archival resource abort was diagnosed and repaired under its unchanged cap; all evidence is retained. Broader IO/HTTP comparisons follow. Pushes await restored SSH credentials.
 
 **Remaining:** Complete latest-release suite/API coverage; shipping engine parity and callable bindings; six-platform native acceptance.
 

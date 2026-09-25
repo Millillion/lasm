@@ -1,0 +1,452 @@
+{
+  "scope": "Actual cache preservation work and a safely stopped file-cache-heavy attempt; no OOM stress test or compatibility pass implied",
+  "recordedAt": "2026-09-25T05:03:55.274489+00:00",
+  "phases": [
+    {
+      "name": "sdk-cache-dedup-r1",
+      "receipt": ".work/product-acceptance/sdk-cache-dedup-r1.json",
+      "receiptSha256": "c37dce260bc8b279b4fc9f64ca603a3feb96aeca7b7bba8371a42c4d5e3783cf",
+      "scope": "Deduplicate only identical immutable artifact-cache files; source bytes, timestamps, modes, artifact manifests and completed acceptance receipts remain unchanged",
+      "files": 3579,
+      "freeBefore": 4873347072,
+      "freeAfter": 9174880256,
+      "resources": {
+        "path": ".work/product-acceptance/sdk-cache-dedup-r1-resources.json",
+        "sha256": "e2c72e32df9f37aa67c3e2a11209287f8a411d69fd9c3103ede3d01cbf10ba37",
+        "startedAt": "2026-09-25T04:48:43.897Z",
+        "finishedAt": "2026-09-25T04:49:24.208Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "peakMemoryBytes": 42508288,
+        "lastSample": {
+          "at": "2026-09-25T04:49:24.152Z",
+          "memoryBytes": 18194432,
+          "peakMemoryBytes": 42508288,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 3014656,
+            "file": 12115968,
+            "kernel": 1601536,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 12115968,
+            "slab": 1105192
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-25T04:49:24.183Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 26562560,
+          "peakMemoryBytes": 42508288,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11644928,
+            "file": 12115968,
+            "kernel": 2043904,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 12115968,
+            "slab": 1132288
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "limits": {
+          "memoryMax": 1610612736,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1288490188,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        }
+      }
+    },
+    {
+      "name": "sdk-cache-dedup-r2",
+      "receipt": ".work/product-acceptance/sdk-cache-dedup-r2.json",
+      "receiptSha256": "99717d896224ceace75e0b802b2eabe0fc1de26f1dc5037b751f3df784969b22",
+      "scope": "Deduplicate only identical immutable artifact-cache files; source bytes, timestamps, modes, artifact manifests and completed acceptance receipts remain unchanged",
+      "files": 363,
+      "freeBefore": 11762180096,
+      "freeAfter": 13259870208,
+      "resources": {
+        "path": ".work/product-acceptance/sdk-cache-dedup-r2-resources.json",
+        "sha256": "f6fa6c52711a77c24a8e41c59e6c2c0182aba2aea6437331bf9f91f9023b1a67",
+        "startedAt": "2026-09-25T04:52:19.317Z",
+        "finishedAt": "2026-09-25T04:52:32.797Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "peakMemoryBytes": 15753216,
+        "lastSample": {
+          "at": "2026-09-25T04:52:32.738Z",
+          "memoryBytes": 6926336,
+          "peakMemoryBytes": 13266944,
+          "swapBytes": 0,
+          "tasks": 6,
+          "memoryBreakdown": {
+            "anon": 3018752,
+            "file": 1970176,
+            "kernel": 737280,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1970176,
+            "slab": 239936
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-25T04:52:32.770Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 15753216,
+          "peakMemoryBytes": 15753216,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11649024,
+            "file": 1970176,
+            "kernel": 1208320,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 1970176,
+            "slab": 264512
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "limits": {
+          "memoryMax": 1610612736,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1288490188,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        }
+      }
+    },
+    {
+      "name": "archive-webkit-research-libraries-r1",
+      "receipt": ".work/product-acceptance/archive-webkit-research-libraries-r1.json",
+      "receiptSha256": "2d2e6914e1c10af2810ed6672050d4f228b1ceef541da9e258e02630cb2f0300",
+      "scope": "Lossless archival of six cached WebKit research binaries and static libraries; unmodified stock engines, all source trees, completed Lean builds and evidence remain available",
+      "files": 6,
+      "freeBefore": 9174863872,
+      "freeAfter": 11763265536,
+      "resources": {
+        "path": ".work/product-acceptance/archive-webkit-research-libraries-r1-resources.json",
+        "sha256": "b82805e112ef227f06ec21b7585ca1babdf9565b4795234a6d7797274f634f1d",
+        "startedAt": "2026-09-25T04:49:24.268Z",
+        "finishedAt": "2026-09-25T04:50:40.399Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "peakMemoryBytes": 282214400,
+        "lastSample": {
+          "at": "2026-09-25T04:50:40.294Z",
+          "memoryBytes": 26038272,
+          "peakMemoryBytes": 282214400,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 12730368,
+            "file": 12607488,
+            "kernel": 204800,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 12627968,
+            "slab": 95408
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-25T04:50:40.372Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 14331904,
+          "peakMemoryBytes": 282214400,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11644928,
+            "file": 569344,
+            "kernel": 1110016,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 569344,
+            "slab": 160048
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        }
+      }
+    },
+    {
+      "name": "archive-bun-rust-debug-r1",
+      "receipt": ".work/product-acceptance/archive-bun-rust-debug-r1.json",
+      "receiptSha256": "a3228e527b2c92f5e10f12fdbcdac89587cdf5346ae7d9d23655861e38d7f38c",
+      "scope": "Lossless archival of the two hardlinked, unused Rust debug-library names from the Bun engine research build; sources and stock engines are unchanged",
+      "files": 0,
+      "freeBefore": 13259685888,
+      "freeAfter": null,
+      "resources": {
+        "path": ".work/product-acceptance/archive-bun-rust-debug-r1-resources.json",
+        "sha256": "b07b3481fb2cc3acf95261aeb63f8f287d16d7a508b1f077fbea37082dd6df72",
+        "startedAt": "2026-09-25T04:53:48.610Z",
+        "finishedAt": "2026-09-25T04:53:51.126Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": true,
+        "memoryThrottled": false,
+        "peakMemoryBytes": 944963584,
+        "lastSample": {
+          "at": "2026-09-25T04:53:51.019Z",
+          "memoryBytes": 935727104,
+          "peakMemoryBytes": 935727104,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 8482816,
+            "file": 924983296,
+            "kernel": 2256896,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 924942336,
+            "slab": 2158472
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "killed",
+          "exitStatus": "TERM",
+          "capturedAt": "2026-09-25T04:53:51.099Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 944963584,
+          "peakMemoryBytes": 944963584,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 929177600,
+            "kernel": 3198976,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 929177600,
+            "slab": 2273176
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        }
+      }
+    },
+    {
+      "name": "archive-bun-rust-debug-r2",
+      "receipt": ".work/product-acceptance/archive-bun-rust-debug-r2.json",
+      "receiptSha256": "03f757602cf249a572a1284327876bad2a4ba1ebd5863ed7f1017aa3b1c5ea25",
+      "scope": "Lossless archival of the two hardlinked, unused Rust debug-library names from the Bun engine research build; sources and stock engines are unchanged",
+      "files": 2,
+      "freeBefore": 13259427840,
+      "freeAfter": 14158675968,
+      "resources": {
+        "path": ".work/product-acceptance/archive-bun-rust-debug-r2-resources.json",
+        "sha256": "49e10738e7d40de92848ebcf3f58804d9f7bc6d7a20f1830ff17ecb4fb37358c",
+        "startedAt": "2026-09-25T04:55:29.203Z",
+        "finishedAt": "2026-09-25T04:56:10.869Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "peakMemoryBytes": 302702592,
+        "lastSample": {
+          "at": "2026-09-25T04:56:10.656Z",
+          "memoryBytes": 11489280,
+          "peakMemoryBytes": 302702592,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 10076160,
+            "file": 1183744,
+            "kernel": 159744,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 1179648,
+            "slab": 46560
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-25T04:56:10.840Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 13758464,
+          "peakMemoryBytes": 302702592,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11653120,
+            "file": 159744,
+            "kernel": 1085440,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 159744,
+            "slab": 145968
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        }
+      }
+    }
+  ],
+  "correctiveChange": "Discard consumed file-cache pages continuously during streaming hash and decompression rather than only at EOF. The 1 GiB memory cap and proactive threshold are unchanged.",
+  "retainedOutputs": "Each successful archive receipt records original SHA256, compressed SHA256, decompression verification, mode, mtime and restoration instructions. Immutable cache deduplication additionally preserves matching metadata and verifies bytes before and after hardlink replacement.",
+  "coldInstallPreflights": [
+    {
+      "path": ".work/product-acceptance/cold-install-4.34.1-after-main-r1.json",
+      "sha256": "de811d96b388469e9f5e8683ab9bf3a12cdbab8cd8a82714113a67e1c0c110fd",
+      "status": "stopped",
+      "error": "Preserve four GiB reserve and seven GiB of cold-install headroom"
+    },
+    {
+      "path": ".work/product-acceptance/application-cold-4.34.1-disk-guard-r1.json",
+      "sha256": "fdc71b342eff11f9e9924f96743b697d69510241f312a3d11f812f1f4522d7e4",
+      "status": "preflight-stopped",
+      "error": ""
+    }
+  ]
+}

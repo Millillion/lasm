@@ -315,3 +315,16 @@ used. The [native receipts](evidence/windows-guard-deadline-2026-09-24.json)
 support stopping a long build before the runner's hard deadline so completed
 compiler-cache entries can be collected. They do not establish full compiler
 checkpoint correctness.
+
+On 2026-09-25, lossless archival of an unused 1.18 GB Bun research library
+reached the 1 GiB guard's proactive threshold while hashing. The retained
+sample attributes 925 MB to file cache and 8.5 MB to anonymous memory. The
+guard terminated the workload at a 945 MB peak; all OOM, memory-limit,
+throttling and pressure counters stayed zero, and no original had been removed.
+The corrected streaming reader discards consumed cache pages during hashing
+and decompression, rather than only at EOF. Retrying under the same cap
+verifies both original hardlink names and their compressed bytes, then completes
+at 303 MB. This was a guarded resource abort, not a compatibility failure or
+an OOM stress test. Separate hash/metadata-verified cache deduplication and
+lossless archival restored disk headroom without deleting test evidence.
+See the [retained archival and cache receipts](evidence/resource-headroom-2026-09-25.json).

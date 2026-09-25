@@ -42,6 +42,17 @@ and preprovisioned build tools; cold installation, broader IO/HTTP and upstream
 acceptance are separate gates. All six workloads finish without resource events,
 with a maximum 3.81 GiB peak.
 
+The subsequent [fresh cold installation](evidence/lean-4.34.1-cold-install-2026-09-25.json)
+also passes on Linux x64/Node 26.10.0. Filesystem isolation exposes Node/npm,
+standard OS libraries and an initially empty workspace; it denies the checkout
+and existing tools. npm installs the local `.25` tarball and Lasm provisions
+matching Lean, Python and SDK inputs. First compilation takes 441.62 seconds;
+the cached direct run takes 20.66 seconds. A copied deployment and Node binary
+outside the checkout match both native controls, with five denied-file checks
+covering source, compiler, toolchain and original output. Peak memory is
+5.85 GiB with no resource events; disk space stays above 6.57 GiB. This does not
+extend cold-install acceptance to the other native hosts or close full API parity.
+
 Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
 downloads and extraction stream their data. Installation stages privately and
 publishes only a complete tree. Subsequent use hashes every recorded file and

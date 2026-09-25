@@ -6,7 +6,8 @@ import { createHash } from 'node:crypto';
 import { join, resolve, dirname } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-const [workspaceArg, archiveArg, sourceArg, oracleArg, hiddenCheckoutFile] = process.argv.slice(2);
+const [workspaceArg, archiveArg, sourceArg, oracleArg, hiddenCheckoutFile, version = '4.34.0'] = process.argv.slice(2);
+assert.match(version, /^\d+\.\d+\.\d+$/);
 const workspace = resolve(workspaceArg), archive = resolve(archiveArg);
 const project = join(workspace, 'project'), tools = join(workspace, 'toolchains'), output = join(workspace, 'dist');
 assert.equal(existsSync(tools), false, 'tool cache must begin empty');
@@ -25,16 +26,17 @@ execFileSync(process.execPath, [npm, 'install', '--ignore-scripts', '--no-audit'
   '--userconfig', join(workspace, 'npm-user-config'), '--globalconfig', join(workspace, 'npm-global-config'), archive],
   { cwd: project, env, stdio: 'inherit', timeout: 600_000 });
 const compiler = join(project, 'node_modules/@lasm/compiler');
-for (const file of ['bin/lasm.mjs', 'src/native/node_modules/koffi/index.cjs', 'targets/lean-4.34.0-wasm64/target.json'])
+for (const file of ['bin/lasm.mjs', 'src/native/node_modules/koffi/index.cjs', `targets/lean-${version}-wasm64/target.json`])
   assert.ok(existsSync(join(compiler, file)), `installed package needs ${file}`);
 const source = join(project, 'Main.lean');
 copyFileSync(sourceArg, source);
-writeFileSync(join(project, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
 const cli = join(compiler, 'bin/lasm.mjs'), started = performance.now();
 execFileSync(process.execPath, [cli, 'build', source, '--output', output], { cwd: project, env, stdio: 'inherit', timeout: 1800_000 });
 const firstBuildSeconds = (performance.now() - started) / 1000;
 const wasmMtime = statSync(join(output, 'program.wasm')).mtimeMs;
 const buildInfo = JSON.parse(readFileSync(join(output, 'build-info.json'), 'utf8'));
+assert.equal(buildInfo.lean, version);
 const controls = JSON.parse(readFileSync(oracleArg, 'utf8')), checks = [];
 for (const control of controls) {
   const execution = spawnSync(process.execPath, [join(output, 'main.mjs'), ...control.args],
