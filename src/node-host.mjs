@@ -51,7 +51,7 @@ export function encodeError(err, leanVersion = '4.32.0') {
 }
 
 /** Private Node implementation of Lean's runtime primitives, not a Lean API. */
-export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = {}, appPath = process.execPath,
+export function createNodeRuntimeHost({ cwd = process.platform === 'linux' ? '.' : process.cwd(), args = [], stdio = {}, appPath = process.execPath,
   applicationCommand, propagateCwd = false, processExit = false, leanVersion = '4.32.0' } = {}) {
   checkLeanIOVersion(leanVersion);
   if (!Array.isArray(args) || args.some(value => typeof value !== 'string' || !value.isWellFormed() || value.includes('\0')))

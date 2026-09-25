@@ -1,0 +1,2400 @@
+{
+  "scope": "Installed .31 ordinary Lean cwd APIs and relative filesystem operations in byte-valued Linux directories; not complete filesystem/process or platform acceptance. No upstream tests were modified.",
+  "platform": "linux-x64",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v4.34.1"
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "expected": "v26.10.0"
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v2.9.7"
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "expected": "bun-v1.4.2"
+    },
+    "checkedAt": "2026-09-25T18:36:14.394717+00:00"
+  },
+  "implementationInputs": {
+    "src/native-signals.mjs": "570dd2f18f6d3b9be79fa56baf55dfe3109a78fe61eb016a17043dafbd5bc525",
+    "src/node-host.mjs": "a685248eff26d6fd5220226d33cfa4444223cabda2c0b4380c22589f26ca7515",
+    "src/native-files.mjs": "041438d8df0f4e9653f11c36f0d5dba05cbb938c2f4c6269e71e71e5bc918993",
+    "src/working-directory.mjs": "087a37aec3a9b678847809848ec3f29c8f082673c3af7ace35ed4480f92c6349",
+    "src/native-file-worker.mjs": "e6fd65d90eb68d8a08e7f0240d7220685118c343054e4dbcf434bad14151fb13",
+    "src/native-file-worker-pool.mjs": "264027b58ffdbf8f323b5e169f5c3301b33423cf72ac0ee11217ed6be5ae6c8d",
+    "src/native-pthread-factory.cjs": "3615c8b9e73d51794d1cf4e1de49eb746fb45923f851634ddc51994dfa6bf478",
+    "src/native-pthread-factory-deno.mjs": "fc78704a3a73116bf3ccb7448f07762723bb2ea62fc747c2494e629e3aea1abc",
+    "src/application-output.mjs": "71cc2a0af83c0ba19301a4d7fe2494731bb54dd87748e6b95d71736e0d7b67d4",
+    "scripts/full-lean/freeze-build.mjs": "8d522fd5959ffd65d828484c72bd826e3a28388800586ba530b22712e9e38f31",
+    "scripts/full-lean/derive-host-files.mjs": "87346b1e001bf77aa671d03e64bdf7a832aad4dadbcbffee3f9a3cce9d5c3187",
+    "scripts/full-lean/host-pre.js": "a76a8317c78ff9f1562700b1534322efec2caa5af756cccedad76fcbad138057",
+    "scripts/full-lean/emscripten-pre.js": "69fe0345c42ccaa916bbae52a86803bd9b94c0cf2e8d68cf3f26af593358eac2",
+    "test/full-host-shutdown.test.mjs": "ece2cf10f8d3f46628b18f2579e605a8bdfa3836cbc1839abac85b6e62eaa747",
+    "test/application-output.test.mjs": "321f9e88d34de1cb82f0ea6dbb6737e33cbb5cd0aed8878b335f26bb210d9d53",
+    "test/pthread-raw-cwd.test.mjs": "e46278f31c669d57ee6afcf9b75d7f41e1701ed9e5cc679d3e97e85fef681973",
+    "test/fixtures/pthread-raw-cwd-host.mjs": "97e91672c3da5045acb63fec6276bdc8c49faababbb72c277574fe471570b692",
+    "test/fixtures/pthread-raw-cwd-failure.mjs": "e0617b5a75f1128ea7d32519c2fd0d2311bc668af3007701678c410cb28b4c96",
+    "test/fixtures/pthread-raw-cwd-child.mjs": "0fc06eeef3b842f4789381a2e421ebeff2b1a6736f051fb68d8fc6d05fcaeffb",
+    "test/working-directory.test.mjs": "dedb18f27b2155bbc29aa3c37d099a044fcf1ca75ba9ccfdc89a2ae8712b3c0a",
+    "test/pthread-cwd.test.mjs": "af1abb0e9be06c34c9df6d1df17c6a6d80b266ad6786c2c3ffdb492ea16d9a30",
+    "test/fixtures/cwd-tracking-host.mjs": "7f40d642ab9ad58a9ca78871d1b7438ee526fac9dc2baed26011654091fc359b",
+    "test/fixtures/pthread-cwd-host.cjs": "695090087ce392436a7ed23b392158d77d22e1c5b8eda6ad427c87119a1ee2e0",
+    "test/fixtures/pthread-cwd-child.cjs": "f072d43c36930cc9d35abb8b0db652f35504ede648ebaded919924e7c6c250df",
+    "integration/application-raw-cwd.mjs": "d63925da3b942a37fd518de042c5414d19471ef54e43b81bb59afb275aa83bfa",
+    "integration/fixtures/RawWorkingDirectory.lean": "ae2b82ad1b89ebe30702838fc8ea622c458234f9fd491f25ed0c1ded9d5bf783",
+    "integration/fixtures/raw-cwd-run.py": "453e5115b2bdbd2d8c98caa51cf42b014c6486e7cb68a0609f36a4bb3c80329c"
+  },
+  "focusedTests": {
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0,
+    "report": {
+      "path": ".work/product-acceptance/raw-cwd-focused-r2.json",
+      "sha256": "03d9b9ad3b9c336bac910fe27d0297c7e08858a8f5cb0e85038e4592528f27a3"
+    },
+    "coverage": [
+      "Existing directory rename/deletion, handle cleanup and instance isolation in all three engines.",
+      "Node/Deno worker messaging after cwd deletion.",
+      "Inherited non-UTF-8 Deno worker transfers, errors, clone failure and bootstrap/owner disposal.",
+      "Raw-cwd native signal initialization independent of engine reports.",
+      "Output-drain ordering, pure-main and failed-host-init cleanup.",
+      "Deployment dependency closure."
+    ]
+  },
+  "baselines": [
+    {
+      "result": {
+        "path": ".work/raw-cwd-4.34.1-node-baseline-r2/result.json",
+        "sha256": "92681255399e1faf0c89d826a3927928a481a266ccab2724221041399c3ca59d"
+      },
+      "packageVersion": "0.1.0-experimental.28",
+      "differingCases": 3,
+      "cases": [
+        {
+          "name": "valid-unicode/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvdmFsaWQtdW5pY29kZS9yYXctzrvwn5iA",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "valid-unicode/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvdmFsaWQtdW5pY29kZS9yYXctzrvwn5iA",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "invalid-byte-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvaW52YWxpZC1ieXRlLXNlcXVlbmNlL3Jhdy3/gA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 1,
+            "stdoutBase64": "",
+            "stderrBase64": "d29ya2VyIHNlbnQgYW4gZXJyb3IhIHVuZGVmaW5lZDp1bmRlZmluZWQ6IEVycm9yOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CiAgICBhdCBmYWlsdXJlIChmaWxlOi8vL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkJTIwZGVwbG95bWVudC9ob3N0L25hdGl2ZS1maWxlcy5tanM6ODk6MjYpCiAgICBhdCBPYmplY3Qub3BlbkRpcmVjdG9yeSAoZmlsZTovLy9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCUyMGRlcGxveW1lbnQvaG9zdC9uYXRpdmUtZmlsZXMubWpzOjI3NzoyNSkKICAgIGF0IHN0YXRlIChmaWxlOi8vL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkJTIwZGVwbG95bWVudC9ob3N0L3dvcmtpbmctZGlyZWN0b3J5Lm1qczoxMjo0MykKICAgIGF0IGNyZWF0ZVdvcmtpbmdEaXJlY3RvcnkgKGZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQlMjBkZXBsb3ltZW50L2hvc3Qvd29ya2luZy1kaXJlY3RvcnkubWpzOjEzOjE3KQogICAgYXQgTW9kdWxlLmNyZWF0ZU5vZGVSdW50aW1lSG9zdCAoZmlsZTovLy9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCUyMGRlcGxveW1lbnQvaG9zdC9ub2RlLWhvc3QubWpzOjU5OjIxKQogICAgYXQgL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MjE5OjQ5CiAgICBhdCBhc3luYyBNb2R1bGUubGFzbUZ1bGxIb3N0UmVxdWVzdCAoL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MjMxOjIwKQpub2RlOmludGVybmFsL2V2ZW50X3RhcmdldDoxMTUyCiAgcHJvY2Vzcy5uZXh0VGljaygoKSA9PiB7IHRocm93IGVycjsgfSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVycm9yOiBFcnJvcjogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAgYXQgZmFpbHVyZSAoZmlsZTovLy9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCUyMGRlcGxveW1lbnQvaG9zdC9uYXRpdmUtZmlsZXMubWpzOjg5OjI2KQogICAgYXQgT2JqZWN0Lm9wZW5EaXJlY3RvcnkgKGZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQlMjBkZXBsb3ltZW50L2hvc3QvbmF0aXZlLWZpbGVzLm1qczoyNzc6MjUpCiAgICBhdCBzdGF0ZSAoZmlsZTovLy9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCUyMGRlcGxveW1lbnQvaG9zdC93b3JraW5nLWRpcmVjdG9yeS5tanM6MTI6NDMpCiAgICBhdCBjcmVhdGVXb3JraW5nRGlyZWN0b3J5IChmaWxlOi8vL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkJTIwZGVwbG95bWVudC9ob3N0L3dvcmtpbmctZGlyZWN0b3J5Lm1qczoxMzoxNykKICAgIGF0IE1vZHVsZS5jcmVhdGVOb2RlUnVudGltZUhvc3QgKGZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQlMjBkZXBsb3ltZW50L2hvc3Qvbm9kZS1ob3N0Lm1qczo1OToyMSkKICAgIGF0IC9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCBkZXBsb3ltZW50L3Byb2dyYW0uY2pzOjIxOTo0OQogICAgYXQgYXN5bmMgTW9kdWxlLmxhc21GdWxsSG9zdFJlcXVlc3QgKC9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCBkZXBsb3ltZW50L3Byb2dyYW0uY2pzOjIzMToyMCkKICAgIGF0IE9iamVjdC5jYWxsICgvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQgZGVwbG95bWVudC9wcm9ncmFtLmNqczoxMDI3NzozOSkKICAgIGF0IF9sYXNtX25vZGVfY2FsbCAoL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MTAyODg6MjgpCiAgICBhdCB3YXNtOi8vd2FzbS8yNjQwM2Y3Mjp3YXNtLWZ1bmN0aW9uWzIzNzg2XToweDgxNDE2YQogICAgYXQgd2FzbTovL3dhc20vMjY0MDNmNzI6d2FzbS1mdW5jdGlvblsyMzkxM106MHg4MWVhNDIKICAgIGF0IHdhc206Ly93YXNtLzI2NDAzZjcyOndhc20tZnVuY3Rpb25bMjMxOThdOjB4N2UzMmVhCiAgICBhdCB3YXNtOi8vd2FzbS8yNjQwM2Y3Mjp3YXNtLWZ1bmN0aW9uWzIzMTY1XToweDdlMjAxZgogICAgYXQgL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MTY3ODo1MwogICAgYXQgaW52b2tlRW50cnlQb2ludCAoL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MTY3ODo3NykKICAgIGF0IGhhbmRsZU1lc3NhZ2UgKC9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCBkZXBsb3ltZW50L3Byb2dyYW0uY2pzOjY0OToxMSkKICAgIGF0IE1lc3NhZ2VQb3J0Ljxhbm9ueW1vdXM+ICgvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQgZGVwbG95bWVudC9wcm9ncmFtLmNqczo1NDQ6NTkpCgpOb2RlLmpzIHYyNi4xMC4wCg==",
+            "timedOut": false
+          },
+          "matchesNative": false
+        },
+        {
+          "name": "invalid-byte-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvaW52YWxpZC1ieXRlLXNlcXVlbmNlL3Jhdy3/gA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzMywgNjU1MzNdCmFmdGVyIHJlbGF0aXZlIGNoZGlyOiBbMTE0LCA5NywgMTE5LCA0NSwgNjU1MzMsIDY1NTMzXQpyYXcgd29ya2luZyBkaXJlY3RvcnkgY2hlY2tlZAo=",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": false
+        },
+        {
+          "name": "truncated-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvdHJ1bmNhdGVkLXNlcXVlbmNlL3Jhdy3igg==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 1,
+            "stdoutBase64": "",
+            "stderrBase64": "d29ya2VyIHNlbnQgYW4gZXJyb3IhIHVuZGVmaW5lZDp1bmRlZmluZWQ6IEVycm9yOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CiAgICBhdCBmYWlsdXJlIChmaWxlOi8vL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkJTIwZGVwbG95bWVudC9ob3N0L25hdGl2ZS1maWxlcy5tanM6ODk6MjYpCiAgICBhdCBPYmplY3Qub3BlbkRpcmVjdG9yeSAoZmlsZTovLy9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCUyMGRlcGxveW1lbnQvaG9zdC9uYXRpdmUtZmlsZXMubWpzOjI3NzoyNSkKICAgIGF0IHN0YXRlIChmaWxlOi8vL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkJTIwZGVwbG95bWVudC9ob3N0L3dvcmtpbmctZGlyZWN0b3J5Lm1qczoxMjo0MykKICAgIGF0IGNyZWF0ZVdvcmtpbmdEaXJlY3RvcnkgKGZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQlMjBkZXBsb3ltZW50L2hvc3Qvd29ya2luZy1kaXJlY3RvcnkubWpzOjEzOjE3KQogICAgYXQgTW9kdWxlLmNyZWF0ZU5vZGVSdW50aW1lSG9zdCAoZmlsZTovLy9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCUyMGRlcGxveW1lbnQvaG9zdC9ub2RlLWhvc3QubWpzOjU5OjIxKQogICAgYXQgL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MjE5OjQ5CiAgICBhdCBhc3luYyBNb2R1bGUubGFzbUZ1bGxIb3N0UmVxdWVzdCAoL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MjMxOjIwKQpub2RlOmludGVybmFsL2V2ZW50X3RhcmdldDoxMTUyCiAgcHJvY2Vzcy5uZXh0VGljaygoKSA9PiB7IHRocm93IGVycjsgfSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVycm9yOiBFcnJvcjogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAgYXQgZmFpbHVyZSAoZmlsZTovLy9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCUyMGRlcGxveW1lbnQvaG9zdC9uYXRpdmUtZmlsZXMubWpzOjg5OjI2KQogICAgYXQgT2JqZWN0Lm9wZW5EaXJlY3RvcnkgKGZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQlMjBkZXBsb3ltZW50L2hvc3QvbmF0aXZlLWZpbGVzLm1qczoyNzc6MjUpCiAgICBhdCBzdGF0ZSAoZmlsZTovLy9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCUyMGRlcGxveW1lbnQvaG9zdC93b3JraW5nLWRpcmVjdG9yeS5tanM6MTI6NDMpCiAgICBhdCBjcmVhdGVXb3JraW5nRGlyZWN0b3J5IChmaWxlOi8vL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkJTIwZGVwbG95bWVudC9ob3N0L3dvcmtpbmctZGlyZWN0b3J5Lm1qczoxMzoxNykKICAgIGF0IE1vZHVsZS5jcmVhdGVOb2RlUnVudGltZUhvc3QgKGZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQlMjBkZXBsb3ltZW50L2hvc3Qvbm9kZS1ob3N0Lm1qczo1OToyMSkKICAgIGF0IC9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCBkZXBsb3ltZW50L3Byb2dyYW0uY2pzOjIxOTo0OQogICAgYXQgYXN5bmMgTW9kdWxlLmxhc21GdWxsSG9zdFJlcXVlc3QgKC9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCBkZXBsb3ltZW50L3Byb2dyYW0uY2pzOjIzMToyMCkKICAgIGF0IE9iamVjdC5jYWxsICgvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQgZGVwbG95bWVudC9wcm9ncmFtLmNqczoxMDI3NzozOSkKICAgIGF0IF9sYXNtX25vZGVfY2FsbCAoL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MTAyODg6MjgpCiAgICBhdCB3YXNtOi8vd2FzbS8yNjQwM2Y3Mjp3YXNtLWZ1bmN0aW9uWzIzNzg2XToweDgxNDE2YQogICAgYXQgd2FzbTovL3dhc20vMjY0MDNmNzI6d2FzbS1mdW5jdGlvblsyMzkxM106MHg4MWVhNDIKICAgIGF0IHdhc206Ly93YXNtLzI2NDAzZjcyOndhc20tZnVuY3Rpb25bMjMxOThdOjB4N2UzMmVhCiAgICBhdCB3YXNtOi8vd2FzbS8yNjQwM2Y3Mjp3YXNtLWZ1bmN0aW9uWzIzMTY1XToweDdlMjAxZgogICAgYXQgL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MTY3ODo1MwogICAgYXQgaW52b2tlRW50cnlQb2ludCAoL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvcmVsb2NhdGVkIGRlcGxveW1lbnQvcHJvZ3JhbS5janM6MTY3ODo3NykKICAgIGF0IGhhbmRsZU1lc3NhZ2UgKC9ob21lL2xhc3RtanMvZGV2ZWxvcG1lbnQvbGFzbS9jb21waWxlci8ud29yay9yYXctY3dkLTQuMzQuMS1ub2RlLWJhc2VsaW5lLXIyL3JlbG9jYXRlZCBkZXBsb3ltZW50L3Byb2dyYW0uY2pzOjY0OToxMSkKICAgIGF0IE1lc3NhZ2VQb3J0Ljxhbm9ueW1vdXM+ICgvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtbm9kZS1iYXNlbGluZS1yMi9yZWxvY2F0ZWQgZGVwbG95bWVudC9wcm9ncmFtLmNqczo1NDQ6NTkpCgpOb2RlLmpzIHYyNi4xMC4wCg==",
+            "timedOut": false
+          },
+          "matchesNative": false
+        },
+        {
+          "name": "truncated-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtYmFzZWxpbmUtcjIvdHJ1bmNhdGVkLXNlcXVlbmNlL3Jhdy3igg==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        }
+      ],
+      "resourceReport": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-node-baseline-r2-resources.json",
+        "sha256": "0cbedc387a41b4aaeb36f9bd0dd2048d8a3de8488874b1e16dec45e12846e8a9"
+      }
+    },
+    {
+      "result": {
+        "path": ".work/raw-cwd-4.34.1-deno-repair-r1/result.json",
+        "sha256": "1b7c7e1ef572d53bafa337de1e3f7b6ac54bcbf8446a5b8e42bc11eee63a76dc"
+      },
+      "packageVersion": "0.1.0-experimental.30",
+      "differingCases": 2,
+      "cases": [
+        {
+          "name": "valid-unicode/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIxL3ZhbGlkLXVuaWNvZGUvcmF3Lc678J+YgA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "valid-unicode/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIxL3ZhbGlkLXVuaWNvZGUvcmF3Lc678J+YgA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "invalid-byte-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIxL2ludmFsaWQtYnl0ZS1zZXF1ZW5jZS9yYXct/4A=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 1,
+            "stdoutBase64": "",
+            "stderrBase64": "G1swbRtbMW0bWzMxbWVycm9yG1swbTogVW5jYXVnaHQgKGluIHByb21pc2UpIEludmFsaWREYXRhOiBGaWxlIG5hbWUgb3IgcGF0aCAiL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIxL2ludmFsaWQtYnl0ZS1zZXF1ZW5jZS9yYXctXHhGRlx4ODAiIGlzIG5vdCB2YWxpZCBVVEYtOAogIGNvbnN0IGFiaSA9IHByb2Nlc3MucGxhdGZvcm0gPT09ICdsaW51eCcgPyAnLScgKyAocHJvY2Vzcy5yZXBvcnQuZ2V0UmVwb3J0KCkuaGVhZGVyLmdsaWJjVmVyc2lvblJ1bnRpbWUgPyAnZ251JyA6ICdtdXNsJykgOiAnJzsKG1swbRtbMzFtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4bWzBtCiAgICAbWzBtG1sybRtbMzg7NTsyNDVtYXQgG1swbRtbMG0bWzJtG1szODs1OzI0NW1PYmplY3QuY3dkG1swbRtbMG0bWzJtG1szODs1OzI0NW0gKBtbMG0bWzBtG1sybRtbMzg7NTsyNDVtZXh0OmRlbm9fZnMvMzBfZnMuanMbWzBtG1swbRtbMm0bWzM4OzU7MjQ1bTobWzBtG1swbRtbMm0bWzM4OzU7MjQ1bTEbWzBtG1swbRtbMm0bWzM4OzU7MjQ1bTobWzBtG1swbRtbMm0bWzM4OzU7MjQ1bTI1NTUbWzBtG1swbRtbMm0bWzM4OzU7MjQ1bSkbWzBtCiAgICAbWzBtG1sybRtbMzg7NTsyNDVtYXQgG1swbRtbMG0bWzJtG1szODs1OzI0NW1PYmplY3QuZ2V0UmVwb3J0G1swbRtbMG0bWzJtG1szODs1OzI0NW0gKBtbMG0bWzBtG1sybRtbMzg7NTsyNDVtZXh0OmRlbm9fbm9kZS9pbnRlcm5hbC9wcm9jZXNzL3JlcG9ydC50cxtbMG0bWzBtG1sybRtbMzg7NTsyNDVtOhtbMG0bWzBtG1sybRtbMzg7NTsyNDVtMRtbMG0bWzBtG1sybRtbMzg7NTsyNDVtOhtbMG0bWzBtG1sybRtbMzg7NTsyNDVtNzE3G1swbRtbMG0bWzJtG1szODs1OzI0NW0pG1swbQogICAgYXQgG1swbRtbMW0bWzNtbmF0aXZlU2lnbmFscxtbMG0gKBtbMG0bWzM2bWZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtZGVuby1yZXBhaXItcjEvcmVsb2NhdGVkIGRlcGxveW1lbnQvaG9zdC9uYXRpdmUtc2lnbmFscy5tanMbWzBtOhtbMG0bWzMzbTE1G1swbTobWzBtG1szM202OBtbMG0pCiAgICBhdCAbWzBtG1sxbRtbM21Nb2R1bGUucHJlcGFyZUFwcGxpY2F0aW9uU2lnbmFscxtbMG0gKBtbMG0bWzM2bWZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtZGVuby1yZXBhaXItcjEvcmVsb2NhdGVkIGRlcGxveW1lbnQvaG9zdC9hcHBsaWNhdGlvbi1zaWduYWxzLm1qcxtbMG06G1swbRtbMzNtMTIbWzBtOhtbMG0bWzMzbTE4G1swbSkKICAgIGF0IBtbMG0bWzM2bWZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtZGVuby1yZXBhaXItcjEvcmVsb2NhdGVkIGRlcGxveW1lbnQvbWFpbi5tanMbWzBtOhtbMG0bWzMzbTIyG1swbTobWzBtG1szM201MhtbMG0K",
+            "timedOut": false
+          },
+          "matchesNative": false
+        },
+        {
+          "name": "invalid-byte-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIxL2ludmFsaWQtYnl0ZS1zZXF1ZW5jZS9yYXct/4A=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "truncated-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIxL3RydW5jYXRlZC1zZXF1ZW5jZS9yYXct4oI=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 1,
+            "stdoutBase64": "",
+            "stderrBase64": "G1swbRtbMW0bWzMxbWVycm9yG1swbTogVW5jYXVnaHQgKGluIHByb21pc2UpIEludmFsaWREYXRhOiBGaWxlIG5hbWUgb3IgcGF0aCAiL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIxL3RydW5jYXRlZC1zZXF1ZW5jZS9yYXctXHhFMlx4ODIiIGlzIG5vdCB2YWxpZCBVVEYtOAogIGNvbnN0IGFiaSA9IHByb2Nlc3MucGxhdGZvcm0gPT09ICdsaW51eCcgPyAnLScgKyAocHJvY2Vzcy5yZXBvcnQuZ2V0UmVwb3J0KCkuaGVhZGVyLmdsaWJjVmVyc2lvblJ1bnRpbWUgPyAnZ251JyA6ICdtdXNsJykgOiAnJzsKG1swbRtbMzFtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4bWzBtCiAgICAbWzBtG1sybRtbMzg7NTsyNDVtYXQgG1swbRtbMG0bWzJtG1szODs1OzI0NW1PYmplY3QuY3dkG1swbRtbMG0bWzJtG1szODs1OzI0NW0gKBtbMG0bWzBtG1sybRtbMzg7NTsyNDVtZXh0OmRlbm9fZnMvMzBfZnMuanMbWzBtG1swbRtbMm0bWzM4OzU7MjQ1bTobWzBtG1swbRtbMm0bWzM4OzU7MjQ1bTEbWzBtG1swbRtbMm0bWzM4OzU7MjQ1bTobWzBtG1swbRtbMm0bWzM4OzU7MjQ1bTI1NTUbWzBtG1swbRtbMm0bWzM4OzU7MjQ1bSkbWzBtCiAgICAbWzBtG1sybRtbMzg7NTsyNDVtYXQgG1swbRtbMG0bWzJtG1szODs1OzI0NW1PYmplY3QuZ2V0UmVwb3J0G1swbRtbMG0bWzJtG1szODs1OzI0NW0gKBtbMG0bWzBtG1sybRtbMzg7NTsyNDVtZXh0OmRlbm9fbm9kZS9pbnRlcm5hbC9wcm9jZXNzL3JlcG9ydC50cxtbMG0bWzBtG1sybRtbMzg7NTsyNDVtOhtbMG0bWzBtG1sybRtbMzg7NTsyNDVtMRtbMG0bWzBtG1sybRtbMzg7NTsyNDVtOhtbMG0bWzBtG1sybRtbMzg7NTsyNDVtNzE3G1swbRtbMG0bWzJtG1szODs1OzI0NW0pG1swbQogICAgYXQgG1swbRtbMW0bWzNtbmF0aXZlU2lnbmFscxtbMG0gKBtbMG0bWzM2bWZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtZGVuby1yZXBhaXItcjEvcmVsb2NhdGVkIGRlcGxveW1lbnQvaG9zdC9uYXRpdmUtc2lnbmFscy5tanMbWzBtOhtbMG0bWzMzbTE1G1swbTobWzBtG1szM202OBtbMG0pCiAgICBhdCAbWzBtG1sxbRtbM21Nb2R1bGUucHJlcGFyZUFwcGxpY2F0aW9uU2lnbmFscxtbMG0gKBtbMG0bWzM2bWZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtZGVuby1yZXBhaXItcjEvcmVsb2NhdGVkIGRlcGxveW1lbnQvaG9zdC9hcHBsaWNhdGlvbi1zaWduYWxzLm1qcxtbMG06G1swbRtbMzNtMTIbWzBtOhtbMG0bWzMzbTE4G1swbSkKICAgIGF0IBtbMG0bWzM2bWZpbGU6Ly8vaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvcmF3LWN3ZC00LjM0LjEtZGVuby1yZXBhaXItcjEvcmVsb2NhdGVkIGRlcGxveW1lbnQvbWFpbi5tanMbWzBtOhtbMG0bWzMzbTIyG1swbTobWzBtG1szM201MhtbMG0K",
+            "timedOut": false
+          },
+          "matchesNative": false
+        },
+        {
+          "name": "truncated-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIxL3RydW5jYXRlZC1zZXF1ZW5jZS9yYXct4oI=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        }
+      ],
+      "resourceReport": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-deno-repair-r1-resources.json",
+        "sha256": "2f4ee22332cd907a5ed214ac3ae783eea52c7d7d94218e177bb46d97f26c5f40"
+      }
+    }
+  ],
+  "precedingFocusedControls": {
+    "path": ".work/product-acceptance/raw-cwd-focused-r1.json",
+    "sha256": "85a62c635651654e4035ee579eb849fc3672b176a86b2451f7ccc3b1bdbc6f07"
+  },
+  "precedingFocusedInputSnapshot": ".work/raw-cwd-focused-r1-inputs",
+  "comparisons": [
+    {
+      "scope": "Supplementary ordinary Lean inherited and entered Linux byte-valued working-directory comparisons; original upstream tests are untouched.",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "target": "node",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.31",
+      "platform": "linux-x64",
+      "inputs": {
+        "integration/application-raw-cwd.mjs": "d63925da3b942a37fd518de042c5414d19471ef54e43b81bb59afb275aa83bfa",
+        "integration/fixtures/RawWorkingDirectory.lean": "ae2b82ad1b89ebe30702838fc8ea622c458234f9fd491f25ed0c1ded9d5bf783",
+        "integration/fixtures/raw-cwd-run.py": "453e5115b2bdbd2d8c98caa51cf42b014c6486e7cb68a0609f36a4bb3c80329c"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/raw-cwd-4.34.1-node-repair-r2-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "v26.10.0\n",
+          "stderr": "",
+          "stdoutBase64": "djI2LjEwLjAK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "generate native C",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "compile native application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/inherited/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-1.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/inherited/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-2.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/symlink/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-3.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/symlink/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-4.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/inherited/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-5.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/inherited/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-6.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/symlink/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-7.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/symlink/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-8.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/inherited/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-9.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/inherited/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-10.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/symlink/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-11.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/symlink/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-12.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "build installed application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/source/Main.lean",
+            "--target",
+            "node",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.1 for node: /home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/dist\n",
+          "stdoutBase64": "",
+          "stderrBase64": "UHJlcGFyaW5nIExlYW4gNC4zNC4xIGZvciBub2Rl4oCmCkJ1aWxkaW5nIE1haW4ubGVhbiBmb3Igbm9kZeKApgplbSsrOiB3YXJuaW5nOiBNRU1PUlk2NCBpcyBkZXByZWNhdGVkIChwcmVmZXIgdGhlIHN0YW5kYXJkIC1tNjQgb3IgLS10YXJnZXQ9d2FzbTY0IGZsYWdzKS4gUGxlYXNlIG9wZW4gYSBidWcgaWYgeW91IGhhdmUgYSBjb250aW51aW5nIG5lZWQgZm9yIHRoaXMgc2V0dGluZyBbLVdkZXByZWNhdGVkXQp3YXJuaW5nOiAvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvYXBwbGljYXRpb24taW5zdGFsbGVkLTQuMzQuMS1yOS9wcm9qZWN0L25vZGVfbW9kdWxlcy9AbGFzbS9jb21waWxlci9zY3JpcHRzL2Z1bGwtbGVhbi9ob3N0LWxpYnJhcnkuanM6IHNpZ25hdHVyZSByZWRlZmluaXRpb24gZm9yOiBfYWJvcnRfanNfX3NpZwp3YXJuaW5nOiAvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvYXBwbGljYXRpb24taW5zdGFsbGVkLTQuMzQuMS1yOS9wcm9qZWN0L25vZGVfbW9kdWxlcy9AbGFzbS9jb21waWxlci9zY3JpcHRzL2Z1bGwtbGVhbi9ob3N0LWxpYnJhcnkuanM6IHNpZ25hdHVyZSByZWRlZmluaXRpb24gZm9yOiBfYWJvcnRfanNfX3NpZwplbSsrOiB3YXJuaW5nOiB3YXJuaW5ncyBpbiBKUyBsaWJyYXJ5IGNvbXBpbGF0aW9uIFstV2pzLWNvbXBpbGVyXQpCdWlsdCBMZWFuIDQuMzQuMSBmb3Igbm9kZTogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtcmVwYWlyLXIyL2Rpc3QK",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/inherited/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-13.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/symlink/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-14.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/inherited/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-15.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/symlink/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-16.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/inherited/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-17.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/symlink/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/session-18.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        }
+      ],
+      "cases": [
+        {
+          "name": "valid-unicode/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtcmVwYWlyLXIyL3ZhbGlkLXVuaWNvZGUvcmF3Lc678J+YgA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "valid-unicode/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtcmVwYWlyLXIyL3ZhbGlkLXVuaWNvZGUvcmF3Lc678J+YgA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "invalid-byte-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtcmVwYWlyLXIyL2ludmFsaWQtYnl0ZS1zZXF1ZW5jZS9yYXct/4A=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "invalid-byte-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtcmVwYWlyLXIyL2ludmFsaWQtYnl0ZS1zZXF1ZW5jZS9yYXct/4A=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "truncated-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtcmVwYWlyLXIyL3RydW5jYXRlZC1zZXF1ZW5jZS9yYXct4oI=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "truncated-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLW5vZGUtcmVwYWlyLXIyL3RydW5jYXRlZC1zZXF1ZW5jZS9yYXct4oI=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        }
+      ],
+      "passed": true,
+      "engineVersion": "v26.10.0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "ae2b82ad1b89ebe30702838fc8ea622c458234f9fd491f25ed0c1ded9d5bf783",
+            "cSha256": "c87598df04ea0d7594072287cb97428ef874bb3dcbc5ac046406250ce1c977a5"
+          }
+        ],
+        "signature": "004fea4717b3d2832bb3f0cf7a1644f352bbc3937beba861d990143c8bd493c9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "c2ac5b7dd05aa0c86f8e33de0601e12d9b217ca2c86b27cc9c2eeb6712b4fd68",
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-node-repair-r2/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T18:38:52.240Z",
+      "result": {
+        "path": ".work/raw-cwd-4.34.1-node-repair-r2/result.json",
+        "sha256": "3a3df23a6c2ffc4b574f128a6a1b2fe2b50e577bf15f4423421c540603baaa9f"
+      }
+    },
+    {
+      "scope": "Supplementary ordinary Lean inherited and entered Linux byte-valued working-directory comparisons; original upstream tests are untouched.",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "target": "deno",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.31",
+      "platform": "linux-x64",
+      "inputs": {
+        "integration/application-raw-cwd.mjs": "d63925da3b942a37fd518de042c5414d19471ef54e43b81bb59afb275aa83bfa",
+        "integration/fixtures/RawWorkingDirectory.lean": "ae2b82ad1b89ebe30702838fc8ea622c458234f9fd491f25ed0c1ded9d5bf783",
+        "integration/fixtures/raw-cwd-run.py": "453e5115b2bdbd2d8c98caa51cf42b014c6486e7cb68a0609f36a4bb3c80329c"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/raw-cwd-4.34.1-deno-repair-r2-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+          "stderr": "",
+          "stdoutBase64": "ZGVubyAyLjkuNyAoc3RhYmxlLCByZWxlYXNlLCB4ODZfNjQtdW5rbm93bi1saW51eC1nbnUpCnY4IDE1LjAuMjQ1LjItcnVzdHkKdHlwZXNjcmlwdCA2LjAuMwo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "generate native C",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "compile native application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/inherited/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-1.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/inherited/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-2.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/symlink/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-3.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/symlink/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-4.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/inherited/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-5.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/inherited/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-6.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/symlink/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-7.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/symlink/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-8.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/inherited/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-9.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/inherited/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-10.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/symlink/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-11.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/symlink/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-12.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "build installed application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/source/Main.lean",
+            "--target",
+            "deno",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for deno\u2026\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.1 for deno: /home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/dist\n",
+          "stdoutBase64": "",
+          "stderrBase64": "UHJlcGFyaW5nIExlYW4gNC4zNC4xIGZvciBkZW5v4oCmCkJ1aWxkaW5nIE1haW4ubGVhbiBmb3IgZGVub+KApgplbSsrOiB3YXJuaW5nOiBNRU1PUlk2NCBpcyBkZXByZWNhdGVkIChwcmVmZXIgdGhlIHN0YW5kYXJkIC1tNjQgb3IgLS10YXJnZXQ9d2FzbTY0IGZsYWdzKS4gUGxlYXNlIG9wZW4gYSBidWcgaWYgeW91IGhhdmUgYSBjb250aW51aW5nIG5lZWQgZm9yIHRoaXMgc2V0dGluZyBbLVdkZXByZWNhdGVkXQp3YXJuaW5nOiAvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvYXBwbGljYXRpb24taW5zdGFsbGVkLTQuMzQuMS1yOS9wcm9qZWN0L25vZGVfbW9kdWxlcy9AbGFzbS9jb21waWxlci9zY3JpcHRzL2Z1bGwtbGVhbi9ob3N0LWxpYnJhcnkuanM6IHNpZ25hdHVyZSByZWRlZmluaXRpb24gZm9yOiBfYWJvcnRfanNfX3NpZwplbSsrOiB3YXJuaW5nOiB3YXJuaW5ncyBpbiBKUyBsaWJyYXJ5IGNvbXBpbGF0aW9uIFstV2pzLWNvbXBpbGVyXQpCdWlsdCBMZWFuIDQuMzQuMSBmb3IgZGVubzogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIyL2Rpc3QK",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/inherited/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-13.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/symlink/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-14.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/inherited/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-15.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/symlink/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-16.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/inherited/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-17.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/symlink/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/session-18.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        }
+      ],
+      "cases": [
+        {
+          "name": "valid-unicode/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIyL3ZhbGlkLXVuaWNvZGUvcmF3Lc678J+YgA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "valid-unicode/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIyL3ZhbGlkLXVuaWNvZGUvcmF3Lc678J+YgA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "invalid-byte-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIyL2ludmFsaWQtYnl0ZS1zZXF1ZW5jZS9yYXct/4A=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "invalid-byte-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIyL2ludmFsaWQtYnl0ZS1zZXF1ZW5jZS9yYXct/4A=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "truncated-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIyL3RydW5jYXRlZC1zZXF1ZW5jZS9yYXct4oI=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "truncated-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWRlbm8tcmVwYWlyLXIyL3RydW5jYXRlZC1zZXF1ZW5jZS9yYXct4oI=",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        }
+      ],
+      "passed": true,
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "ae2b82ad1b89ebe30702838fc8ea622c458234f9fd491f25ed0c1ded9d5bf783",
+            "cSha256": "c87598df04ea0d7594072287cb97428ef874bb3dcbc5ac046406250ce1c977a5"
+          }
+        ],
+        "signature": "095cde06fd07a8f47f3cc77c97447a2e602fe935883e771b1fcd23c8c202ca6b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "c2ac5b7dd05aa0c86f8e33de0601e12d9b217ca2c86b27cc9c2eeb6712b4fd68",
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-deno-repair-r2/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T18:40:24.950Z",
+      "result": {
+        "path": ".work/raw-cwd-4.34.1-deno-repair-r2/result.json",
+        "sha256": "1c7fd6cb115d3cf7eb85bd042f45feef96b3c275d8e0cd9dc6c3d0ec14b135d3"
+      }
+    },
+    {
+      "scope": "Supplementary ordinary Lean inherited and entered Linux byte-valued working-directory comparisons; original upstream tests are untouched.",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "target": "bun",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.31",
+      "platform": "linux-x64",
+      "inputs": {
+        "integration/application-raw-cwd.mjs": "d63925da3b942a37fd518de042c5414d19471ef54e43b81bb59afb275aa83bfa",
+        "integration/fixtures/RawWorkingDirectory.lean": "ae2b82ad1b89ebe30702838fc8ea622c458234f9fd491f25ed0c1ded9d5bf783",
+        "integration/fixtures/raw-cwd-run.py": "453e5115b2bdbd2d8c98caa51cf42b014c6486e7cb68a0609f36a4bb3c80329c"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/raw-cwd-4.34.1-bun-repair-r2-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "1.4.2\n",
+          "stderr": "",
+          "stdoutBase64": "MS40LjIK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "generate native C",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "compile native application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/inherited/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-1.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/inherited/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-2.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/symlink/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-3.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/symlink/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-4.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/inherited/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-5.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/inherited/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-6.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/symlink/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-7.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/symlink/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-8.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/inherited/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-9.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/inherited/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-10.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/symlink/native interpreted",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-11.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/symlink/native compiled",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-12.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "build installed application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/source/Main.lean",
+            "--target",
+            "bun",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for bun\u2026\nBuilding Main.lean for bun\u2026\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.1 for bun: /home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/dist\n",
+          "stdoutBase64": "",
+          "stderrBase64": "UHJlcGFyaW5nIExlYW4gNC4zNC4xIGZvciBidW7igKYKQnVpbGRpbmcgTWFpbi5sZWFuIGZvciBidW7igKYKd2FybmluZzogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL2FwcGxpY2F0aW9uLWluc3RhbGxlZC00LjM0LjEtcjkvcHJvamVjdC9ub2RlX21vZHVsZXMvQGxhc20vY29tcGlsZXIvc2NyaXB0cy9mdWxsLWxlYW4vaG9zdC1saWJyYXJ5LmpzOiBzaWduYXR1cmUgcmVkZWZpbml0aW9uIGZvcjogX2Fib3J0X2pzX19zaWcKd2FybmluZzogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL2FwcGxpY2F0aW9uLWluc3RhbGxlZC00LjM0LjEtcjkvcHJvamVjdC9ub2RlX21vZHVsZXMvQGxhc20vY29tcGlsZXIvc2NyaXB0cy9mdWxsLWxlYW4vaG9zdC1saWJyYXJ5LmpzOiBzaWduYXR1cmUgcmVkZWZpbml0aW9uIGZvcjogX2Fib3J0X2pzX19zaWcKZW0rKzogd2FybmluZzogd2FybmluZ3MgaW4gSlMgbGlicmFyeSBjb21waWxhdGlvbiBbLVdqcy1jb21waWxlcl0KQnVpbHQgTGVhbiA0LjM0LjEgZm9yIGJ1bjogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWJ1bi1yZXBhaXItcjIvZGlzdAo=",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/inherited/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-13.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "valid-unicode/symlink/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-14.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtZV1owWlhJZ2NtVnNZWFJwZG1VZ1kyaGthWEk2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBNU5UVXNJREV5T0RVeE1sMEtjbUYzSUhkdmNtdHBibWNnWkdseVpXTjBiM0o1SUdOb1pXTnJaV1FLIiwgInN0ZGVyckJhc2U2NCI6ICIiLCAidGltZWRPdXQiOiBmYWxzZX0K",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/inherited/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-15.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "invalid-byte-sequence/symlink/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-16.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/inherited/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-17.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "truncated-sequence/symlink/deployed",
+          "command": [
+            "/usr/bin/python3",
+            "-I",
+            "-B",
+            "/home/lastmjs/development/lasm/compiler/integration/fixtures/raw-cwd-run.py",
+            "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/session-18.json"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2",
+          "code": 0,
+          "stdout": "{\"code\": 0, \"stdoutBase64\": \"aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK\", \"stderrBase64\": \"\", \"timedOut\": false}\n",
+          "stderr": "",
+          "stdoutBase64": "eyJjb2RlIjogMCwgInN0ZG91dEJhc2U2NCI6ICJhVzVvWlhKcGRHVmtJRzl5SUdWdWRHVnlaV1E2SUZzeE1UUXNJRGszTENBeE1Ua3NJRFExTENBMk5UVXpNMTBLWVdaMFpYSWdjbVZzWVhScGRtVWdZMmhrYVhJNklGc3hNVFFzSURrM0xDQXhNVGtzSURRMUxDQTJOVFV6TTEwS2NtRjNJSGR2Y210cGJtY2daR2x5WldOMGIzSjVJR05vWldOclpXUUsiLCAic3RkZXJyQmFzZTY0IjogIiIsICJ0aW1lZE91dCI6IGZhbHNlfQo=",
+          "stderrBase64": "",
+          "signal": null
+        }
+      ],
+      "cases": [
+        {
+          "name": "valid-unicode/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWJ1bi1yZXBhaXItcjIvdmFsaWQtdW5pY29kZS9yYXctzrvwn5iA",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "valid-unicode/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWJ1bi1yZXBhaXItcjIvdmFsaWQtdW5pY29kZS9yYXctzrvwn5iA",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA5NTUsIDEyODUxMl0KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "invalid-byte-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWJ1bi1yZXBhaXItcjIvaW52YWxpZC1ieXRlLXNlcXVlbmNlL3Jhdy3/gA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "invalid-byte-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWJ1bi1yZXBhaXItcjIvaW52YWxpZC1ieXRlLXNlcXVlbmNlL3Jhdy3/gA==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "truncated-sequence/inherited",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWJ1bi1yZXBhaXItcjIvdHJ1bmNhdGVkLXNlcXVlbmNlL3Jhdy3igg==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        },
+        {
+          "name": "truncated-sequence/symlink",
+          "cwdBase64": "L2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3Jhdy1jd2QtNC4zNC4xLWJ1bi1yZXBhaXItcjIvdHJ1bmNhdGVkLXNlcXVlbmNlL3Jhdy3igg==",
+          "nativeInterpreted": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "nativeCompiled": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "actual": {
+            "code": 0,
+            "stdoutBase64": "aW5oZXJpdGVkIG9yIGVudGVyZWQ6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KYWZ0ZXIgcmVsYXRpdmUgY2hkaXI6IFsxMTQsIDk3LCAxMTksIDQ1LCA2NTUzM10KcmF3IHdvcmtpbmcgZGlyZWN0b3J5IGNoZWNrZWQK",
+            "stderrBase64": "",
+            "timedOut": false
+          },
+          "matchesNative": true
+        }
+      ],
+      "passed": true,
+      "engineVersion": "1.4.2",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "ae2b82ad1b89ebe30702838fc8ea622c458234f9fd491f25ed0c1ded9d5bf783",
+            "cSha256": "c87598df04ea0d7594072287cb97428ef874bb3dcbc5ac046406250ce1c977a5"
+          }
+        ],
+        "signature": "efeb05e47f3ec7071fecb44aa5de24d52e31b03e2549996404e2f2d61a1b55a1",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "52f9845de2b39a81a9b5ed1a5331d9fe108e640b6fa7a2a18fb98ef148d1d992",
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/raw-cwd-4.34.1-bun-repair-r2/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T18:42:26.357Z",
+      "result": {
+        "path": ".work/raw-cwd-4.34.1-bun-repair-r2/result.json",
+        "sha256": "9a40192f8081f3ce7203e227c0289a20d1f83b33a669bba50aa58e11dac94610"
+      }
+    }
+  ],
+  "deployedCases": 18,
+  "nativeControls": 36,
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-4.34.1-r9/lasm-compiler-0.1.0-experimental.31.tgz",
+    "sha256": "6fa91b29bc439e05f2370492a6719d53c325d2d8f2929add576de5045b8ae6dc",
+    "compressedBytes": 125996668,
+    "installedBytes": 633418641,
+    "files": 2703,
+    "candidateVersion": "0.1.0-experimental.31",
+    "defaultLean": "4.34.1",
+    "runtime": {
+      "name": "lean-4.34.1-wasm64",
+      "identity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/raw-cwd-4.34.1-package-r2-resources.json",
+    "recordedAt": "2026-09-25T18:36:59.387Z"
+  },
+  "installation": {
+    "receipt": {
+      "path": ".work/product-acceptance/install-candidate-4.34.1-r9.json",
+      "sha256": "7f3e9cd9a69655d1ff7bebc498239a8fb00d55f35e2a5204002efc42a9f8a0ef"
+    },
+    "filesVerified": 2703,
+    "toolCache": "preprovisioned; not a new cold-bootstrap claim"
+  },
+  "resources": [
+    {
+      "name": "raw-cwd-4.34.1-focused-r2",
+      "report": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-focused-r2-resources.json",
+        "sha256": "b2c4f2d8400270088796a4b6d0de0c564385e984bf9ce0f220017373404627fc"
+      },
+      "log": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-focused-r2.log",
+        "sha256": "49b7a7fe6550f42e704df5cf2cf83ddd463b374aaa2fd74436ff66ce664ccf08"
+      },
+      "startedAt": "2026-09-25T18:36:14.492Z",
+      "finishedAt": "2026-09-25T18:36:25.254Z",
+      "limits": {
+        "memoryMax": 2147483648,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1717986918,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 80703488,
+      "minimumHostAvailable": 26803535872,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 7873851392
+    },
+    {
+      "name": "raw-cwd-4.34.1-package-r2",
+      "report": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-package-r2-resources.json",
+        "sha256": "edefb6347294a0eb76aee408b7d016425d9091632f01a9c4bf8c2d53b7742b7e"
+      },
+      "log": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-package-r2.log",
+        "sha256": "dee94962432594a37cbaa1cba3f355b23cc6127347f6ef349970930feaaeaeac"
+      },
+      "startedAt": "2026-09-25T18:36:25.550Z",
+      "finishedAt": "2026-09-25T18:36:59.486Z",
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 2401656832,
+      "minimumHostAvailable": 25903738880,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 6979629056
+    },
+    {
+      "name": "raw-cwd-4.34.1-install-r2",
+      "report": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-install-r2-resources.json",
+        "sha256": "873ceb58931b51440dd84a172d6a38288e07279a1e205d3d32490a1d74594ff3"
+      },
+      "log": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-install-r2.log",
+        "sha256": "6618395b41f5b1f8b4aede087e68446d0bf7e626282607853af6d5d50d8661a4"
+      },
+      "startedAt": "2026-09-25T18:36:59.625Z",
+      "finishedAt": "2026-09-25T18:37:22.882Z",
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 1615245312,
+      "minimumHostAvailable": 25940357120,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 6939353088
+    },
+    {
+      "name": "raw-cwd-4.34.1-node-repair-r2",
+      "report": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-node-repair-r2-resources.json",
+        "sha256": "8f4ad9bc3c09a166cd086f9ed08649fecd86b05f5c4ca6ad33face59d49cf5a5"
+      },
+      "log": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-node-repair-r2.log",
+        "sha256": "dedd66f6661c109df7b00af30d00bc3ffef96919d7e1a15d65d81e9a9308e245"
+      },
+      "startedAt": "2026-09-25T18:37:23.721Z",
+      "finishedAt": "2026-09-25T18:38:52.349Z",
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 3838332928,
+      "minimumHostAvailable": 23309529088,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 6606839808
+    },
+    {
+      "name": "raw-cwd-4.34.1-deno-repair-r2",
+      "report": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-deno-repair-r2-resources.json",
+        "sha256": "1239a5c795a7953a8cb1113414d2a51c3fa6ae517371670ea884139124e3790a"
+      },
+      "log": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-deno-repair-r2.log",
+        "sha256": "80f6cef5dcdcefd349d9ddb5ccd396c5c4820300aaf597aad8b86fb82b36bb03"
+      },
+      "startedAt": "2026-09-25T18:38:52.817Z",
+      "finishedAt": "2026-09-25T18:40:25.039Z",
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 3602087936,
+      "minimumHostAvailable": 23485755392,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 6237495296
+    },
+    {
+      "name": "raw-cwd-4.34.1-bun-repair-r2",
+      "report": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-bun-repair-r2-resources.json",
+        "sha256": "1062875ba299da860d312ffb8ee9f1f4e768f508e0c92a18ca68c4e64b6f457d"
+      },
+      "log": {
+        "path": ".work/product-acceptance/raw-cwd-4.34.1-bun-repair-r2.log",
+        "sha256": "e9332be2bc659e486c6121a1f94db1d58250af3aa1ccc071b960eeeea7e24d28"
+      },
+      "startedAt": "2026-09-25T18:40:25.915Z",
+      "finishedAt": "2026-09-25T18:42:26.453Z",
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 3700252672,
+      "minimumHostAvailable": 23179112448,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 5820116992
+    }
+  ],
+  "peakMemoryBytes": 3838332928,
+  "minimumFreeDiskBytes": 5820116992,
+  "remaining": [
+    "Other native operating systems and ARM64.",
+    "Linux operation without /proc or where unshare(CLONE_FS) is unavailable.",
+    "Complete subprocess inheritance, path races, long paths and signal observer compatibility.",
+    "Legacy callable-main startup and complete latest-release suite/API coverage."
+  ],
+  "fundamentalLimitationDemonstrated": false,
+  "recordedAt": "2026-09-25T18:43:19.137192+00:00"
+}

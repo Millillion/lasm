@@ -1,9 +1,9 @@
 **Completion:** ~55% — unchanged since the previous commit.
 
-**Estimated finish:** Not yet estimable; full latest-release suite/API coverage and five native platform validations remain unfinished.
+**Estimated finish:** Not yet estimable; complete latest-release API/suite coverage and five native platform validations remain unfinished.
 
-**Changed:** [Installed `.29` TCP behavior matches native Lean](evidence/lean-4.34.1-tcp-error-phases-2026-09-25.json) for 66 observations across Node, Deno and Bun. All 21 focused checks and 60 unchanged HTTP checks pass. Peak memory is 5.19 GiB. Disk preflight refusals and a safely terminated archival attempt remain recorded; streaming archival succeeds under the same cap without OOM or swap.
+**Changed:** [Installed `.31` preserves Linux working-directory bytes](evidence/lean-4.34.1-raw-working-directory-2026-09-25.json): 18 relocated Node/Deno/Bun cases match 36 native controls, and 23 regression checks pass. The repair covers startup, both cwd APIs, relative filesystem operations, Deno worker cleanup and signal initialization. Earlier failures remain recorded. Peak memory is 3.57 GiB without resource events.
 
-**Remaining:** Complete language/API differentials; integrate the shipping helper where engines need it; finish all six native build/install platforms. Pushes await restored SSH credentials.
+**Remaining:** Complete language/API differentials; integrate and validate the shipping helper; finish all six native build/install platforms. Pushes await restored SSH credentials.
 
 **Score basis:** Workflow 80%; Wasm execution 65%; API parity 30%; platform acceptance 50%. Weighted result 57%, rounded to 55%. No remaining gap is demonstrated fundamental.

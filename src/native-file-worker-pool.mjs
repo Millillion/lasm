@@ -31,7 +31,7 @@ function create() {
   if (process.versions.deno) {
     try { Deno.cwd(); }
     catch (error) {
-      if (error.name !== 'NotFound' && error.code !== 'ENOENT') throw error;
+      if (error.name !== 'NotFound' && error.name !== 'InvalidData' && error.code !== 'ENOENT') throw error;
       removedDenoCwd = true;
     }
   }

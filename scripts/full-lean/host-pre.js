@@ -10,10 +10,12 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     // reachable from a background task. Emscripten lets the host loop drain;
     // leaving a TCP listener alive here can otherwise prevent Deno from exiting.
     // Flush first, without blocking pipe readers, then close remaining handles.
-    return lasmFullHost?.then(async host => {
+    var disposeWorkers = () => Module.lasmDisposeCwdWorkers?.();
+    if (!lasmFullHost) return disposeWorkers();
+    return lasmFullHost.then(async host => {
       try { await host.flushStdIO(); }
       finally { host.close(); }
-    }).catch(() => {});
+    }).catch(() => {}).finally(disposeWorkers);
   };
   Module.lasmFullHostRequest = async function (request) {
     const { port, signalPointer } = request;

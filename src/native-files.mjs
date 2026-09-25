@@ -51,6 +51,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const getpagesize = process.platform === 'linux' ? bind('getpagesize', 'int', []) : null;
   const free = bind('free', 'void', ['void *']);
   const realpath = windows ? null : bind('realpath', 'void *', ['str', 'void *']);
+  const readlink = process.platform === 'linux' ? bind('readlink', 'intptr_t', ['str', 'void *', 'size_t']) : null;
   const unlink = windows ? null : bind('unlink', 'int', ['str']);
   const mkdtemp = windows ? null : bind('mkdtemp', 'void *', ['void *']);
   const mkstemp = windows ? null : bind('mkstemp', 'int', ['void *']);
@@ -352,6 +353,16 @@ export function nativeFiles({ synchronous = false } = {}) {
       }
       return names;
     },
+    async readDirectoryName(path) {
+      if (!readlink) throw failure(ffi.os.errno.ENOSYS);
+      // Both native Lean cwd APIs use Linux PATH_MAX, including the terminator.
+      // Preserve bytes for Lean's decoder instead of using the engine's UTF-8 policy.
+      const bytes = Buffer.alloc(4096);
+      const { value, errno } = await call(readlink, path, bytes, bytes.length);
+      if (value < 0) throw failure(errno);
+      if (value >= bytes.length) throw failure(ffi.os.errno.ERANGE);
+      return bytes.subarray(0, Number(value));
+    },
     async realPath(path) {
       if (!realpath) throw new Error('Native realpath is POSIX-only');
       // Let libc traverse symlinks before dot segments. Some engine filesystem
@@ -547,6 +558,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     async getLine(file) { return buffer(await callNativeFile('getLine', [reference(file)])); },
     async readDirectory(path) { return (await callNativeFile('readDirectory', [path])).map(buffer); },
     async realPath(path) { return buffer(await callNativeFile('realPath', [path])); },
+    async readDirectoryName(path) { return buffer(await callNativeFile('readDirectoryName', [path])); },
     removeFile(path) { return callNativeFile('removeFile', [path]); },
     groupInfo(gid) { return callNativeFile('groupInfo', [gid]); },
     checkDirectorySearch(path) { return callNativeFile('checkDirectorySearch', [path]); },

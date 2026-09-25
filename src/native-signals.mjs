@@ -12,7 +12,14 @@ export function nativeSignals() {
   const base = [new URL('./native/signals/', import.meta.url), new URL('../.cache/native-host/signals/', import.meta.url)]
     .find(path => existsSync(new URL('manifest.json', path)));
   if (!base) throw new Error('The bundled native signal adapter is missing');
-  const abi = process.platform === 'linux' ? '-' + (process.report.getReport().header.glibcVersionRuntime ? 'gnu' : 'musl') : '';
+  const libc = ffi.load(process.platform === 'darwin' ? '/usr/lib/libSystem.B.dylib' : null);
+  // An engine diagnostic report may query cwd and fail after removal or on
+  // non-UTF-8 POSIX paths. Detect the loaded libc directly, without changing cwd.
+  let abi = '';
+  if (process.platform === 'linux') {
+    abi = '-musl';
+    try { libc.symbol('gnu_get_libc_version'); abi = '-gnu'; } catch { /* Linux musl */ }
+  }
   const name = `${process.platform}-${process.arch}${abi}.${process.platform === 'darwin' ? 'dylib' : 'so'}`;
   const manifest = JSON.parse(readFileSync(new URL('manifest.json', base)));
   const path = fileURLToPath(new URL(name, base)), bytes = readFileSync(path);
@@ -23,7 +30,6 @@ export function nativeSignals() {
   const wait = library.func('int lasm_signal_wait(void *subscription)');
   const stop = library.func('int lasm_signal_stop(void *subscription)');
   const free = library.func('void lasm_signal_free(void *subscription)');
-  const libc = ffi.load(process.platform === 'darwin' ? '/usr/lib/libSystem.B.dylib' : null);
   const strerror = libc.func('str strerror(int error)');
   const reset = library.func('int lasm_signal_default(int number)');
   const sigaction = libc.func('int sigaction(int number, const void *action, void *previous)');
@@ -59,4 +65,3 @@ export function nativeSignals() {
   };
   return implementation;
 }
-

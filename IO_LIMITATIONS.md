@@ -63,6 +63,14 @@ separately from the earlier runtime evidence below.
   all 7,673 source entries, the unchanged harness and native compiler-child
   classification. Peak memory is 5.51 GiB with no resource events and at least
   4.15 GiB free disk. The latest complete Bun campaign remains pending.
+  The [installed `.31` working-directory repair](docs/evidence/lean-4.34.1-raw-working-directory-2026-09-25.json)
+  also passes eighteen relocated deployments against 36 native controls. Both
+  cwd APIs, relative filesystem mutations and parent traversal match for Unicode,
+  invalid UTF-8 and truncated UTF-8 directory names, entered by inheritance or
+  an ASCII symlink. Twenty-three regression checks cover worker transfers,
+  failures and disposal, directory identity, signal initialization and packaged
+  dependencies. Earlier Node startup/decoding and Deno signal-initialization
+  failures remain recorded. Peak memory is 3.57 GiB with no resource events.
   These are partial Linux x64 observations. Other upstream contexts, complete
   API/language coverage and the other five native platforms remain open.
   Earlier results retain their stated release scope.
@@ -580,6 +588,14 @@ and do not establish full-suite conformance. See
   [earlier permission comparisons](docs/evidence/cwd-permissions-2026-09-21.json)
   retain the original Deno failure; later results are recorded in the
   [native launcher and worker evidence](docs/evidence/native-launcher-cwd-2026-09-21.json).
+  The latest installed application path now also preserves raw Linux cwd bytes
+  for Lean's own decoder, and Deno workers can start in inherited non-UTF-8
+  directories. Runtime shutdown disposes their private bootstrap after output
+  drains. Signal adapter initialization detects libc directly, avoiding an
+  engine diagnostic report that itself fails on these paths. See the
+  [Lean 4.34.1 directory comparisons](docs/evidence/lean-4.34.1-raw-working-directory-2026-09-25.json).
+  The `/proc` and `unshare(CLONE_FS)` requirements, legacy callable-main startup,
+  complete subprocess inheritance and other native platforms remain open.
 - [ ] Account for the pinned native Lean defect where
   `IO.Process.getCurrentDir` crashes after cwd deletion: its ENOENT decoder
   dereferences a null filename. Lasm returns a structured error safely; the

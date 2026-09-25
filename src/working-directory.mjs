@@ -52,10 +52,10 @@ export function createWorkingDirectory(cwd, propagate) {
       try {
         const target = location(directory);
         if ((await fs.stat(target)).nlink === 0) throw nativeFiles().fromNodeError({ code: 'ENOENT' });
-        const name = await fs.readlink(target);
+        const name = await nativeFiles().readDirectoryName(target);
         // A real filename can end in this suffix. Recheck the inode instead of
         // stripping text or misidentifying such a name as a removed directory.
-        if (name.endsWith(' (deleted)') && (await fs.stat(target)).nlink === 0)
+        if (name.subarray(-10).equals(Buffer.from(' (deleted)')) && (await fs.stat(target)).nlink === 0)
           throw nativeFiles().fromNodeError({ code: 'ENOENT' });
         if (Buffer.byteLength(name) >= 4096) throw nativeFiles().fromNodeError({ code: 'ERANGE' });
         return name;

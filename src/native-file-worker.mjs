@@ -11,7 +11,7 @@ const port = parentPort ?? {
   postMessage(value, transfer) { globalThis.postMessage(value, transfer); },
 };
 const operations = new Set(['open', 'read', 'write', 'flush', 'rewind', 'truncate', 'getLine',
-  'closeAsync', 'readDirectory', 'realPath', 'removeFile', 'groupInfo', 'checkDirectorySearch', 'createTemporary']);
+  'closeAsync', 'readDirectory', 'readDirectoryName', 'realPath', 'removeFile', 'groupInfo', 'checkDirectorySearch', 'createTemporary']);
 function respond(value) {
   const encoded = encodeFileMessage(value, { move: true });
   port.postMessage(encoded.message, encoded.transfer);

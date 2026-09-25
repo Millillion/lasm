@@ -122,6 +122,26 @@ budget without OOM or swap; a bounded streaming retry with file-cache eviction
 passes under the same cap. These results leave complete TCP/API and native
 platform acceptance open.
 
+The [installed `.31` working-directory comparisons](evidence/lean-4.34.1-raw-working-directory-2026-09-25.json)
+pass in all three stock engines on Linux x64. Six cases per engine cover valid
+Unicode, invalid UTF-8 and truncated UTF-8 directory names, each inherited at
+startup or entered through an ASCII symlink. Both ordinary Lean cwd APIs,
+relative reads/writes/rename/removal and parent traversal match 36 interpreted
+and C-compiled native controls. Deployments are relocated with source hidden
+and PATH empty; no Lean API or syntax is added.
+
+The host anchors the inherited directory without decoding its name and returns
+native filename bytes to Lean. Deno's exceptional worker bootstrap has a private
+filesystem context and is disposed after final output drains. Twenty-three
+regression checks cover messaging, transferred ports, shared memory, clone and
+worker failures, disposal, existing directory behavior and packaged dependencies.
+The first installed retry exposed a second failure in Deno's engine diagnostic
+report; signal initialization now detects libc from its loaded symbols. All
+earlier failures remain recorded. Successful workloads peak at 3.57 GiB, with
+no resource events and at least 5.42 GiB free disk. Other platforms, Linux hosts
+without the required `/proc`/unshare facilities and broader path/process behavior
+remain open.
+
 The [fresh Node HTTP comparison](evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
 now passes all twenty unchanged Vitest checks, ten each against deployed Wasm
 and native Lean. This includes concurrent mutations, persistence, binary and

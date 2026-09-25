@@ -46,6 +46,7 @@ test('all full-runtime host support files exist and target validation is strict'
   assert.throws(() => applicationEntrypoint('browser'), /Invalid/);
   const names = new Set(applicationHostFiles);
   assert.equal(names.size, applicationHostFiles.length);
+  assert.ok(names.has('native-pthread-factory-deno.mjs'), 'Exceptional Deno worker bootstrap must deploy');
   for (const file of names) {
     const source = readFileSync(new URL('../src/' + file, import.meta.url), 'utf8');
     for (const [, dependency] of source.matchAll(/(?:from\s*|import\s*\(|require\s*\()\s*['"]\.\/([^'"]+\.(?:mjs|cjs))['"]/g))
@@ -63,6 +64,10 @@ test('retained callable and frozen compiler outputs include transitive host depe
     const list = text.match(/(?:for \(const name of|const hostFiles =) \[('node-host\.mjs'[^\]]+)\]/)[1];
     return new Set([...list.matchAll(/'([^']+)'/g)].map(match => match[1]));
   })];
+  for (const names of inventories) {
+    if (names.has('native-pthread-factory.cjs'))
+      assert.ok(names.has('native-pthread-factory-deno.mjs'), 'Private factory needs its Deno bootstrap');
+  }
   for (const names of inventories) for (const file of names) {
     const source = readFileSync(new URL('../src/' + file, import.meta.url), 'utf8');
     for (const [, dependency] of source.matchAll(/(?:from\s*|import\s*\(|require\s*\()\s*['"]\.\/([^'"]+\.(?:mjs|cjs))['"]/g))

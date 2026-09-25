@@ -24,6 +24,7 @@ if (ENVIRONMENT_IS_NODE) {
       lasmCwdWorkerError = error;
     }
   }
+  Module.lasmDisposeCwdWorkers = () => LasmCwdWorker?.dispose();
   var lasmVmStackMb = Number(process.env.LASM_VM_STACK_MB ?? 64);
   if (!Number.isFinite(lasmVmStackMb) || lasmVmStackMb <= 0) throw new Error('Invalid LASM_VM_STACK_MB');
   var lasmStackOverflow = function() {
@@ -52,7 +53,7 @@ if (ENVIRONMENT_IS_NODE) {
       if (LasmCwdWorker || lasmCwdWorkerError) {
         var removed = false;
         try { Deno.cwd(); } catch (error) {
-          if (error.name !== 'NotFound' && error.code !== 'ENOENT') throw error;
+          if (error.name !== 'NotFound' && error.name !== 'InvalidData' && error.code !== 'ENOENT') throw error;
           removed = true;
         }
         if (removed) {
