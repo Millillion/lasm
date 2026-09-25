@@ -6,6 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { cleanupTestProcesses } from '../full-lean/cleanup-processes.mjs';
+import { campaignSourceEvidence } from './upstream-evidence.mjs';
 
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
@@ -20,9 +21,7 @@ const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'));
 const resultFile = join(manifest.output, 'execution.json');
 if (existsSync(resultFile) || existsSync(join(manifest.output, 'execution-started.json')))
   throw new Error('Use a new campaign; never overwrite previous execution evidence');
-const sourcesFile = join(root, 'docs/evidence/lean-4.34-upstream-source-files.json');
-if (await hashFile(sourcesFile) !== manifest.sourceManifestSha256) throw new Error('Upstream source manifest changed');
-const sources = JSON.parse(readFileSync(sourcesFile, 'utf8'));
+const { sources } = campaignSourceEvidence(manifest);
 async function verifySources() {
   const modified = [];
   for (const [name, expected] of Object.entries(sources)) {
@@ -37,6 +36,7 @@ async function verifySources() {
 const before = await verifySources();
 if (before.modified.length) throw new Error('Upstream originals changed before execution: ' + before.modified.join(', '));
 const harnessFiles = [fileURLToPath(import.meta.url), join(root, 'scripts/application-tests/case.mjs'),
+  join(root, 'scripts/application-tests/upstream-evidence.mjs'),
   manifest.compileDriver, manifest.nativeEnvironment, ...(manifest.additionalHarnessFiles ?? [])];
 const harnessBefore = Object.fromEntries(await Promise.all(harnessFiles.map(async file => [file, await hashFile(file)])));
 const runId = randomUUID(), startedAt = new Date().toISOString();

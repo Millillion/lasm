@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { verifyMixedSources } from './mixed-sources.mjs';
+import { campaignSourceEvidence } from './upstream-evidence.mjs';
 await ensureResourceGuard();
 const [manifestFile, name] = process.argv.slice(2);
 const manifest = JSON.parse(readFileSync(manifestFile));
@@ -14,9 +15,7 @@ assert.ok(test && ['native-build-time', 'upstream-disabled'].includes(test.phase
 const evidence = join(manifest.output, 'cases', name.replaceAll('/', '__'));
 assert.ok(!existsSync(evidence), 'Preserve earlier case evidence');
 mkdirSync(evidence, { recursive: true });
-const sourceManifest = new URL('../../docs/evidence/lean-4.34-upstream-source-files.json', import.meta.url);
-assert.equal(await hashFile(sourceManifest), manifest.sourceManifestSha256);
-const sources = JSON.parse(readFileSync(sourceManifest));
+const { sources } = campaignSourceEvidence(manifest);
 const workspace = join(evidence, 'workspace');
 cpSync(manifest.source, workspace, { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
 const before = await verifyMixedSources(workspace, sources);

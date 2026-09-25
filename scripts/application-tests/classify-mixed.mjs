@@ -1,9 +1,16 @@
 // Review ledger for the original shell registrations. This records execution
 // obligations; it never substitutes for running a test or its deployed phase.
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
+import { loadUpstreamEvidence } from './upstream-evidence.mjs';
+
+const [version = '4.34.0', sourceRoot = '.cache/lean4-' + version, outputArg] = process.argv.slice(2);
+assert.ok(process.argv.length <= 5, 'Supply [LEAN_VERSION [PRISTINE_SOURCE [NEW_OUTPUT]]]');
+const { inventory, ledgerFile } = loadUpstreamEvidence(version);
+const outputFile = outputArg ?? ledgerFile;
+assert.ok(!existsSync(outputFile), 'Preserve existing classification evidence; supply NEW_OUTPUT');
 
 const nativeLake = `precompile scripts 14619 8448 api badImport buildArgs
   builtin-lint-code-quality builtin-lint-module builtin-lint-record-deferred
@@ -76,20 +83,22 @@ for (const name of nativeOther) add(name, 'native-build-time',
 for (const [name, rationale] of Object.entries(runtimeOther)) add(name, 'native-and-compiled-application', rationale);
 add('pkg/user_plugin', 'native-and-foreign-application',
   'Retain native --plugin controls; run the unchanged Lean.loadPlugin clients with compatible deployed dynamic libraries and initialization symbols.');
+if (version === '4.34.1') add('misc_dir/rc_sticky', 'native-and-foreign-application',
+  'Run the unchanged C reference-count regression against the matching native and deployed Lean runtimes. Preserve every assertion and original leanc flags; native success alone does not cover the Wasm runtime.');
 
-const inventory = JSON.parse(readFileSync('docs/evidence/lean-4.34-upstream-application-inventory.json'));
 const tests = inventory.tests.filter(test => test.category === 'mixed-driver-review-required');
-assert.equal(tests.length, 110); assert.equal(decisions.size, tests.length);
+assert.equal(tests.length, inventory.categories['mixed-driver-review-required']);
+assert.equal(decisions.size, tests.length);
 const counts = {}, rows = tests.map(test => {
   const decision = decisions.get(test.name); assert.ok(decision, 'Missing decision: ' + test.name);
-  const content = readFileSync(join('.cache/lean4-4.34.0', test.source));
+  const content = readFileSync(join(sourceRoot, test.source));
   assert.equal(createHash('sha256').update(content).digest('hex'), test.sha256);
   counts[decision.phase] = (counts[decision.phase] ?? 0) + 1;
   return { name: test.name, source: test.source, sourceSha256: test.sha256, ...decision,
     execution: 'not-run-in-current-product-campaign' };
 });
 const output = {
-  scope: 'Static execution classification of all 110 mixed shell registrations; no test pass implied',
+  scope: `Static execution classification of all ${tests.length} mixed shell registrations; no test pass implied`,
   lean: inventory.lean, leanCommit: inventory.leanCommit, sourceArchiveSha256: inventory.sourceArchiveSha256,
   counts, tests: rows,
   requirements: [
@@ -102,5 +111,5 @@ const output = {
     'Retain failure workspaces, logs and hashes; remove only successful generated copies when needed for disk headroom.',
   ],
 };
-writeFileSync('docs/evidence/lean-4.34-mixed-driver-classification.json', JSON.stringify(output, null, 2) + '\n');
+writeFileSync(outputFile, JSON.stringify(output, null, 2) + '\n', { flag: 'wx' });
 console.log(JSON.stringify({ registered: rows.length, counts }));

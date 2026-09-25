@@ -2,6 +2,11 @@ name: Unchanged upstream native build-time checks
 on:
   workflow_dispatch:
     inputs:
+      lean_version:
+        type: choice
+        options: ['4.34.1', '4.34.0']
+        default: '4.34.1'
+        description: Exact release; historical remaining selections require 4.34.0
       selection:
         type: choice
         options: [all, remaining-2026-09-23, remaining-r3-2026-09-23]
@@ -29,6 +34,7 @@ jobs:
         shard: ${{ fromJSON(inputs.shards == '1' && '[0]' || inputs.shards == '2' && '[0,1]' || '[0,1,2,3]') }}
     name: Native shard ${{ matrix.shard }}
     env:
+      LASM_NATIVE_LEAN: ${{ inputs.lean_version }}
       LASM_NATIVE_SELECTION: ${{ inputs.selection }}
       LASM_NATIVE_SHARD: ${{ matrix.shard }}
       LASM_NATIVE_SHARDS: ${{ inputs.shards }}
@@ -43,21 +49,37 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          test "$(gh api repos/leanprover/lean4/releases/latest --jq .tag_name)" = v4.34.0
+          mkdir -p .work
+          gh api repos/leanprover/lean4/releases/latest > .work/upstream-native-official-release.json
+          node --input-type=module <<'JS'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const latest = JSON.parse(readFileSync('.work/upstream-native-official-release.json'));
+          const version = process.env.LASM_NATIVE_LEAN;
+          const pins = JSON.parse(readFileSync('scripts/full-lean/lean-sources.json'));
+          if (!Object.hasOwn(pins, version)) throw new Error('Unpinned Lean release');
+          if (process.env.LASM_NATIVE_SELECTION !== 'all' && version !== '4.34.0')
+            throw new Error('Historical remaining cases belong to Lean 4.34.0 only');
+          const scope = latest.tag_name === 'v' + version ? 'current release' : 'historical release regression';
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Lean ${version}: ${scope}; official latest ${latest.tag_name}.\n`);
+          console.log(JSON.stringify({ selected: version, scope, latest: latest.tag_name, publishedAt: latest.published_at }));
+          JS
           mkdir -p .cache/downloads
           # The recorded archive uses the full-commit directory prefix, not the
           # tag-based prefix. Preserve its original checksum and source manifest.
-          curl --fail --location --retry 3 --output .cache/downloads/lean4-v4.34.0.tar.gz https://github.com/leanprover/lean4/archive/293d5d0c0c3f3dded4688b3ccd6a33939ac5102b.tar.gz
-          printf '%s  %s\n' 09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b .cache/downloads/lean4-v4.34.0.tar.gz | sha256sum -c -
+          source_url="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_NATIVE_LEAN].url')"
+          source_sha="$(node -p 'JSON.parse(require("node:fs").readFileSync("scripts/full-lean/lean-sources.json"))[process.env.LASM_NATIVE_LEAN].sha256')"
+          archive=".cache/downloads/lean4-v${LASM_NATIVE_LEAN:?}.tar.gz"
+          curl --fail --location --retry 3 --output "$archive" "$source_url"
+          printf '%s  %s\n' "$source_sha" "$archive" | sha256sum -c -
       - name: Enable the per-user resource boundary on this disposable runner
         run: |
           sudo loginctl enable-linger "$(id -un)"
           printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
           printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
       - name: Prepare the exact shard within the resource boundary
-        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-prepare-resources.json -- /bin/bash scripts/application-tests/native-ci.sh prepare "${LASM_NATIVE_SELECTION:?}" "${LASM_NATIVE_SHARD:?}" "${LASM_NATIVE_SHARDS:?}"
+        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-prepare-resources.json -- /bin/bash scripts/application-tests/native-ci.sh prepare "${LASM_NATIVE_SELECTION:?}" "${LASM_NATIVE_SHARD:?}" "${LASM_NATIVE_SHARDS:?}" "${LASM_NATIVE_LEAN:?}"
       - name: Execute one bounded native campaign
-        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-resources.json -- /bin/bash scripts/application-tests/native-ci.sh run "${LASM_NATIVE_SELECTION:?}" "${LASM_NATIVE_SHARD:?}" "${LASM_NATIVE_SHARDS:?}"
+        run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-resources.json -- /bin/bash scripts/application-tests/native-ci.sh run "${LASM_NATIVE_SELECTION:?}" "${LASM_NATIVE_SHARD:?}" "${LASM_NATIVE_SHARDS:?}" "${LASM_NATIVE_LEAN:?}"
       - name: Preserve evidence in logs and a compact summary
         if: always()
         run: |

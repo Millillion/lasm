@@ -1,5 +1,22 @@
 # Lean 4.34 upstream application acceptance
 
+The latest-release target is now **4.34.1**. Its
+[fresh inventory](evidence/lean-4.34.1-upstream-inventory-2026-09-25.json) verifies
+7,673 original files and links and records 4,069 registrations. The two added
+BitVec cases are native build-time checks; the new `rc_sticky` C regression
+requires both native and deployed runtime execution. There are now 3,499 native
+build-time registrations and 111 reviewed mixed drivers; all other category
+counts and upstream exclusions are unchanged. The
+[full registrations](evidence/lean-4.34.1-upstream-application-inventory.json),
+[source manifest](evidence/lean-4.34.1-upstream-source-files.json) and
+[mixed-driver review](evidence/lean-4.34.1-mixed-driver-classification.json)
+remain separate from earlier evidence. Five focused checks verify release
+isolation, shard coverage and CI argument forwarding. Harness support and this
+inventory do not establish new suite passes. The runtime rebuild and shipping
+execution campaigns remain pending.
+
+The results and checked items below retain their original **4.34.0** scope.
+
 The [product plan](PLAN.md) calls for ordinary native compilation followed by
 execution in stock Node, Deno or Bun. This inventory records every default
 upstream CTest registration at Lean commit

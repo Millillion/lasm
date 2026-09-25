@@ -1,0 +1,67 @@
+{
+  "recordedAt": "2026-09-25T03:26:05.513715+00:00",
+  "scope": "Static unchanged upstream inventory and version-isolation harness checks; no new Wasm or full-suite passes implied",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "registrations": 4069,
+  "verifiedOriginalFilesAndLinks": 7673,
+  "addedRegistrations": [
+    "elab/bitvec_ofNatClamp.lean",
+    "elab/bv_decide_shift_symbolic.lean",
+    "misc_dir/rc_sticky"
+  ],
+  "removedRegistrations": [],
+  "classification": {
+    "native-and-compiled-application": 27,
+    "native-and-foreign-application": 5,
+    "native-build-time": 78,
+    "upstream-disabled": 1
+  },
+  "newRuntimeObligation": "The unchanged rc_sticky C regression must execute against both native and deployed runtimes; its prior native pass does not satisfy the deployed phase.",
+  "unitTests": {
+    "command": ".cache/js-runtimes/node-26.10.0/bin/node --max-old-space-size=128 --test --test-concurrency=1 --test-reporter=tap test/application-upstream-selection.test.mjs",
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "log": "TAP version 13\n# Subtest: release inventories retain every original case and isolate later-release acceptance\nok 1 - release inventories retain every original case and isolate later-release acceptance\n  ---\n  duration_ms: 95.668314\n  type: 'test'\n  ...\n# Subtest: a campaign cannot switch release identities or source manifests\nok 2 - a campaign cannot switch release identities or source manifests\n  ---\n  duration_ms: 435.667592\n  type: 'test'\n  ...\n# Subtest: original upstream aliases use their recorded target bytes and preserve link identity\nok 3 - original upstream aliases use their recorded target bytes and preserve link identity\n  ---\n  duration_ms: 1.407199\n  type: 'test'\n  ...\n# Subtest: shards cover all registrations and only the preserved uncompleted cases\nok 4 - shards cover all registrations and only the preserved uncompleted cases\n  ---\n  duration_ms: 78.728766\n  type: 'test'\n  ...\n# Subtest: native CI arguments survive an empty environment and missing selection fails closed\nok 5 - native CI arguments survive an empty environment and missing selection fails closed\n  ---\n  duration_ms: 25.544678\n  type: 'test'\n  ...\n1..5\n# tests 5\n# suites 0\n# pass 5\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 819.262037\n"
+  },
+  "inputs": {
+    "docs/evidence/lean-4.34.1-upstream-application-inventory.json": {
+      "bytes": 1489811,
+      "sha256": "d30e8154774322b4a7382fb871d5434c6bdb43ee9991e220cdf98cdfcfc3f072"
+    },
+    "docs/evidence/lean-4.34.1-upstream-source-files.json": {
+      "bytes": 1138911,
+      "sha256": "b7bdf84d1fbf8f32335220fbdc7e41eb84a728bed15b49315147c3080f7d3516"
+    },
+    "docs/evidence/lean-4.34.1-mixed-driver-classification.json": {
+      "bytes": 50367,
+      "sha256": "fc8d4b9a8cf17acf9a0379dcf3166f333ab215e62ecdfcbc2fc554c0ba7bca9a"
+    },
+    ".work/upstream-4.34.1-inventory-r1/ctest-registrations.json": {
+      "bytes": 3964747,
+      "sha256": "0f01ba941df673e44959dab7ed5efac470946516a434e8fc7284223dd2b1bb70"
+    },
+    "scripts/inventory-upstream-applications.py": {
+      "bytes": 9140,
+      "sha256": "01607cb303a5e953c325bb452e26e9990261ed757c982175ece5efdf4c4def74"
+    },
+    "scripts/application-tests/upstream-evidence.mjs": {
+      "bytes": 2340,
+      "sha256": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+    },
+    "test/application-upstream-selection.test.mjs": {
+      "bytes": 6720,
+      "sha256": "d85a22c5333fc174c6b0a63e0d4f62bc99422bc80b642609ff8bb1c0ea5d2dab"
+    },
+    ".github/workflows/upstream-native-build-time.yml": {
+      "bytes": 5208,
+      "sha256": "1fdebc55a5f19fe453f8e98f2abd2eaa5ed5af46d3bef922a059af3ad9f40961"
+    }
+  },
+  "remaining": [
+    "New full runtime rebuild and installed 4.34.1 execution",
+    "Run the selected 4.34.1 upstream campaigns through the shipping CLI",
+    "Native workflow update has not run; pushes await restored SSH credentials"
+  ]
+}

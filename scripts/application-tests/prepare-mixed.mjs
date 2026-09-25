@@ -9,21 +9,17 @@ import { hashFile } from '../../src/managed-artifacts.mjs';
 import { provisionLean } from '../../src/managed-lean.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { verifyMixedSources } from './mixed-sources.mjs';
+import { loadUpstreamEvidence } from './upstream-evidence.mjs';
 await ensureResourceGuard();
 assert.equal(process.platform, 'linux');
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
-const [outputArg, filter = '.*'] = process.argv.slice(2);
-assert.ok(outputArg, 'Supply NEW_OUTPUT [FILTER]');
+const [outputArg, filter = '.*', version = '4.34.0'] = process.argv.slice(2);
+assert.ok(outputArg && process.argv.length <= 5, 'Supply NEW_OUTPUT [FILTER [LEAN_VERSION]]');
 const output = resolve(outputArg);
 assert.ok(!existsSync(output), 'Use a fresh campaign');
-const inventoryFile = join(root, 'docs/evidence/lean-4.34-upstream-application-inventory.json');
-const sourcesFile = join(root, 'docs/evidence/lean-4.34-upstream-source-files.json');
-const ledgerFile = join(root, 'docs/evidence/lean-4.34-mixed-driver-classification.json');
-const inventory = JSON.parse(readFileSync(inventoryFile));
-const sources = JSON.parse(readFileSync(sourcesFile));
+const { inventory, sources, ledgerFile, archive, sourceManifestSha256 } = loadUpstreamEvidence(version);
 const ledger = JSON.parse(readFileSync(ledgerFile));
 assert.equal(ledger.leanCommit, inventory.leanCommit);
-const archive = join(root, '.cache/downloads/lean4-v4.34.0.tar.gz');
 assert.equal(await hashFile(archive), inventory.sourceArchiveSha256);
 const source = join(output, 'source'), execution = join(output, 'run');
 mkdirSync(source, { recursive: true }); mkdirSync(execution);
@@ -31,7 +27,7 @@ execFileSync('tar', ['-xzf', archive, '-C', source, '--strip-components=1', '--w
   '*/tests/*', '*/script/*', '*/doc/examples/*', '*/src/*'], { stdio: 'inherit' });
 const verified = await verifyMixedSources(source, sources);
 assert.deepEqual(verified.modified, []);
-writeFileSync(join(source, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+writeFileSync(join(source, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
 const lean = await provisionLean(source);
 assert.equal(lean.commit, inventory.leanCommit);
 const selected = ledger.tests.filter(test => ['native-build-time', 'upstream-disabled'].includes(test.phase)
@@ -46,17 +42,18 @@ const tests = selected.map(row => {
 const nativeEnvironment = join(root, 'scripts/application-tests/mixed-native.sh');
 const compileDriver = join(root, 'scripts/application-tests/mixed-case.mjs');
 const manifest = { schema: 1, lean: inventory.lean, leanCommit: inventory.leanCommit,
-  sourceArchiveSha256: inventory.sourceArchiveSha256, sourceManifestSha256: await hashFile(sourcesFile),
+  sourceArchiveSha256: inventory.sourceArchiveSha256, sourceManifestSha256,
   classificationSha256: await hashFile(ledgerFile), verifiedOriginalFilesAndLinks: verified.checked,
   output, source, execution, category: 'mixed-native-build-time', target: 'native',
   tests, timeoutSeconds: 900, nativeEnvironment, compileDriver, nativeArtifactIdentity: lean.identity,
-  additionalHarnessFiles: [fileURLToPath(import.meta.url), join(root, 'scripts/application-tests/mixed-sources.mjs')],
+  additionalHarnessFiles: [fileURLToPath(import.meta.url), join(root, 'scripts/application-tests/mixed-sources.mjs'),
+    join(root, 'scripts/application-tests/upstream-evidence.mjs')],
   environment: { BUILD_DIR: lean.prefix, STAGE: '1', TEST_CTEST: '1', LEANC_OPTS: '',
     PATH: [join(lean.prefix, 'bin'), dirname(process.execPath), process.env.PATH].filter(Boolean).join(':'),
     LASM_NATIVE_LEAN: lean.lean, LASM_NATIVE_LAKE: lean.lake, CXX: join(lean.prefix, 'bin/clang++') },
   scope: 'Reviewed native-build-time shell registrations only; no deployed application or API pass implied',
   adaptations: [
-    'A pristine extracted reference is checked against all 7,669 original entries before and after the campaign.',
+    `A pristine extracted reference is checked against all ${verified.checked} original entries before and after the campaign.`,
     'Every case starts with an independently copied and verified source tree. Only the unchanged upstream driver mutates its fixtures; these changes are recorded.',
     'Native Lean/Lake are selected by the original CTest environment contract; original stage-directory pins remain unchanged.',
     'One CTest job, one requested Lean worker, one build worker and the existing memory/base-page guards apply.',

@@ -6,10 +6,50 @@ import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { sourceIdentity } from '../scripts/application-tests/source-identity.mjs';
 import { selectNativeTests } from '../scripts/application-tests/native-selection.mjs';
+import { loadUpstreamEvidence, campaignSourceEvidence } from '../scripts/application-tests/upstream-evidence.mjs';
 
 const read = name => JSON.parse(readFileSync(new URL('../docs/evidence/' + name, import.meta.url)));
 const inventory = read('lean-4.34-upstream-application-inventory.json');
 const sources = read('lean-4.34-upstream-source-files.json');
+
+test('release inventories retain every original case and isolate later-release acceptance', () => {
+  const old = loadUpstreamEvidence('4.34.0'), current = loadUpstreamEvidence('4.34.1');
+  assert.deepEqual(old.inventory, inventory);
+  assert.equal(current.inventory.registrations, 4069);
+  assert.equal(Object.keys(current.sources).length, 7673);
+  const previousNames = new Set(old.inventory.tests.map(test => test.name));
+  const currentNames = new Set(current.inventory.tests.map(test => test.name));
+  assert.deepEqual([...previousNames].filter(name => !currentNames.has(name)), []);
+  assert.deepEqual([...currentNames].filter(name => !previousNames.has(name)).sort(),
+    ['elab/bitvec_ofNatClamp.lean', 'elab/bv_decide_shift_symbolic.lean', 'misc_dir/rc_sticky']);
+  assert.deepEqual(current.inventory.excludedByUpstream, old.inventory.excludedByUpstream);
+  const shards = Array.from({ length: 4 }, (_, index) =>
+    selectNativeTests(current.inventory, current.sources, undefined, index, 4).selected).flat();
+  assert.equal(shards.length, 3499);
+  assert.equal(new Set(shards.map(test => test.name)).size, 3499);
+  assert.throws(() => selectNativeTests(current.inventory, current.sources,
+    read('upstream-native-build-time-r3-2026-09-23.json'), 0, 4), /does not match/);
+  const ledger = read('lean-4.34.1-mixed-driver-classification.json');
+  assert.equal(ledger.leanCommit, current.inventory.leanCommit);
+  assert.equal(ledger.tests.length, 111);
+  assert.equal(ledger.tests.find(test => test.name === 'misc_dir/rc_sticky').phase, 'native-and-foreign-application');
+});
+
+test('a campaign cannot switch release identities or source manifests', () => {
+  for (const version of ['4.34.0', '4.34.1']) {
+    const evidence = loadUpstreamEvidence(version);
+    const manifest = { lean: version, leanCommit: evidence.inventory.leanCommit,
+      sourceArchiveSha256: evidence.inventory.sourceArchiveSha256,
+      sourceManifestSha256: evidence.sourceManifestSha256 };
+    assert.equal(campaignSourceEvidence(manifest).inventory.lean, version);
+    for (const key of ['leanCommit', 'sourceArchiveSha256', 'sourceManifestSha256'])
+      assert.throws(() => campaignSourceEvidence({ ...manifest, [key]: 'changed' }), /does not match/);
+    assert.throws(() => campaignSourceEvidence({ ...manifest,
+      lean: version === '4.34.0' ? '4.34.1' : '4.34.0' }), /does not match/);
+  }
+  assert.throws(() => loadUpstreamEvidence('../4.34.1'), /No pinned/);
+  assert.throws(() => loadUpstreamEvidence('999.0.0'), /No pinned/);
+});
 
 test('original upstream aliases use their recorded target bytes and preserve link identity', () => {
   const omega = sourceIdentity(sources, 'tests/elab_bench/big_omega_MT.lean');
@@ -57,6 +97,11 @@ test('native CI arguments survive an empty environment and missing selection fai
     assert.equal(result.status, 0, result.stderr);
     assert.deepEqual(result.stdout.trim().split('\n'), ['scripts/application-tests/prepare-native-shard.mjs',
       '.work/upstream-native-ci', 'remaining-r3-2026-09-23', '1', '2']);
+    const current = spawnSync('/bin/bash', [command, 'prepare', 'all', '0', '4', '4.34.1'],
+      { env: { PATH: dir }, encoding: 'utf8' });
+    assert.equal(current.status, 0, current.stderr);
+    assert.deepEqual(current.stdout.trim().split('\n'), ['scripts/application-tests/prepare-native-shard.mjs',
+      '.work/upstream-native-ci', 'all', '0', '4', '4.34.1']);
     const missing = spawnSync('/bin/bash', [command, 'prepare'], { env: { PATH: dir }, encoding: 'utf8' });
     assert.equal(missing.status, 2); assert.equal(missing.stdout, '');
     assert.match(missing.stderr, /explicitly/);

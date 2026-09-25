@@ -1,5 +1,5 @@
 // Prepare an explicit parallel CTest suite for the managed application product.
-// The pinned upstream source archive and all 7,669 test/helper entries are checked.
+// The pinned release's upstream source archive and every test/helper entry are checked.
 import { mkdirSync, readFileSync, writeFileSync, existsSync, lstatSync, readlinkSync, chmodSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,20 +8,18 @@ import { hashFile } from '../../src/managed-artifacts.mjs';
 import { provisionLean } from '../../src/managed-lean.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { sourceIdentity } from './source-identity.mjs';
+import { loadUpstreamEvidence } from './upstream-evidence.mjs';
 
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
-const [outputArg, category, target, engineArg, compilerArg, filter = '.*', mode = 'upstream'] = process.argv.slice(2);
-if (!outputArg || !['compiled-application', 'compiled-test-driver', 'compiled-driver-and-native-compiler', 'native-build-time'].includes(category) || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
-  throw new Error('Supply NEW_OUTPUT CATEGORY TARGET ENGINE INSTALLED_COMPILER [FILTER]');
+const [outputArg, category, target, engineArg, compilerArg, filter = '.*', mode = 'upstream', version = '4.34.0'] = process.argv.slice(2);
+if (process.argv.length > 10 || !outputArg || !['compiled-application', 'compiled-test-driver', 'compiled-driver-and-native-compiler', 'native-build-time'].includes(category) || !['node', 'deno', 'bun'].includes(target) || !engineArg || !compilerArg)
+  throw new Error('Supply NEW_OUTPUT CATEGORY TARGET ENGINE INSTALLED_COMPILER [FILTER [MODE [LEAN_VERSION]]]');
 if (!['upstream', 'probe-compile-disabled'].includes(mode) || mode !== 'upstream' && category !== 'compiled-application')
   throw new Error('The optional probe-compile-disabled mode applies only to compiled-application cases');
 const output = resolve(outputArg), compiler = resolve(compilerArg), engine = resolve(engineArg);
 if (existsSync(output)) throw new Error('Use a new campaign directory');
-const inventoryFile = join(root, 'docs/evidence/lean-4.34-upstream-application-inventory.json');
-const sourcesFile = join(root, 'docs/evidence/lean-4.34-upstream-source-files.json');
-const inventory = JSON.parse(readFileSync(inventoryFile, 'utf8')), hashes = JSON.parse(readFileSync(sourcesFile, 'utf8'));
-const archive = join(root, '.cache/downloads/lean4-v4.34.0.tar.gz');
+const { inventory, sources: hashes, archive, sourceManifestSha256 } = loadUpstreamEvidence(version);
 if (await hashFile(archive) !== inventory.sourceArchiveSha256) throw new Error('Upstream archive changed');
 const source = join(output, 'source'), execution = join(output, 'run');
 mkdirSync(source, { recursive: true }); mkdirSync(execution);
@@ -38,7 +36,7 @@ for (const [name, expected] of Object.entries(hashes)) {
 // The upstream repository's root pin points at its own build/stage1, which is
 // not a developer toolchain selection. It is not extracted. The test sources
 // remain exact; this generated parallel project selects the matching release.
-writeFileSync(join(source, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+writeFileSync(join(source, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
 const lean = await provisionLean(source);
 if (lean.commit !== inventory.leanCommit) throw new Error('Native control version mismatch');
 const tests = inventory.tests.filter(test => test.category === category && new RegExp(filter).test(test.name))
@@ -62,7 +60,7 @@ if (!projectServer && (category === 'compiled-application' || sharedDriver || st
   // tests/lean-toolchain also points at upstream's build/release/stage1. Keep
   // that original file intact and add a nearer, generated release selection in
   // this parallel suite, matching the native driver's explicit PATH selection.
-  writeFileSync(pin, 'leanprover/lean4:v4.34.0\n'); generatedPins.push(pin);
+  writeFileSync(pin, `leanprover/lean4:v${version}\n`); generatedPins.push(pin);
 }
 const environment = { TEST_DIR: join(source, 'tests'), SRC_DIR: join(source, 'src'), SCRIPT_DIR: join(source, 'script'),
   BUILD_DIR: lean.prefix, STAGE: '1', TEST_CTEST: '1',
@@ -77,7 +75,8 @@ const nativeEnvironment = projectServer ? join(root, 'scripts/application-tests/
 if (!sharedDriver && !standaloneServer)
   writeFileSync(nativeEnvironment, '#!/usr/bin/env bash\nsource "$TEST_DIR/util.sh"\ndriver="$1"; shift\nsource "$driver"\n');
 let compiledDriver;
-const additionalHarnessFiles = [];
+const additionalHarnessFiles = [fileURLToPath(import.meta.url),
+  join(root, 'scripts/application-tests/upstream-evidence.mjs'), join(root, 'scripts/application-tests/source-identity.mjs')];
 let compileDriver = join(root, 'scripts/application-tests',
   mode === 'probe-compile-disabled' ? 'probe-compile-disabled.sh' : 'compile-case.sh');
 if (sharedDriver) {
@@ -92,7 +91,7 @@ if (sharedDriver) {
     // project cwd, input and shell driver; its server remains managed native.
     const driverProject = join(output, 'driver-project'); mkdirSync(driverProject);
     const pin = join(driverProject, 'lean-toolchain');
-    writeFileSync(pin, 'leanprover/lean4:v4.34.0\n'); generatedPins.push(pin);
+    writeFileSync(pin, `leanprover/lean4:v${version}\n`); generatedPins.push(pin);
     compiledSource = join(driverProject, 'run_test.lean');
     writeFileSync(compiledSource, readFileSync(driverSource));
   }
@@ -126,7 +125,7 @@ if (standaloneServer) {
 }
 const timeoutSeconds = 900;
 const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sourceArchiveSha256: inventory.sourceArchiveSha256,
-  sourceManifestSha256: await hashFile(sourcesFile), verifiedOriginalFilesAndLinks: verified,
+  sourceManifestSha256, verifiedOriginalFilesAndLinks: verified,
   output, source, execution, category, mode, target, engine, compiler, nativeEnvironment, compileDriver, timeoutSeconds, environment, tests, generatedPins,
   nativeArtifactIdentity: lean.identity, compiledDriver, additionalHarnessFiles, resourceReport: process.env.LASM_RESOURCE_REPORT,
   scope: category === 'native-build-time' ? 'Unchanged managed native compiler tests; no deployed runtime pass implied'

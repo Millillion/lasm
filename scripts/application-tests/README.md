@@ -1,6 +1,6 @@
 # Managed application upstream tests
 
-This parallel harness uses the pinned Lean 4.34 source archive and the recorded
+This parallel harness uses an exact pinned Lean source archive and the recorded
 upstream inventory. It verifies every original test/helper file and symlink
 before and after execution. Run one campaign at a time through the existing
 resource guard; application execution also requires the base-page wrapper for
@@ -13,7 +13,7 @@ node scripts/full-lean/run-bounded.mjs -- \
   env LASM_TOOLCHAIN_CACHE=/absolute/managed-cache \
   node scripts/application-tests/prepare.mjs \
   .work/application-campaign compiled-application node /absolute/node \
-  /absolute/project/node_modules/@lasm/compiler '^compile/'
+  /absolute/project/node_modules/@lasm/compiler '^compile/' upstream 4.34.1
 
 node scripts/full-lean/run-bounded.mjs -- \
   python3 scripts/full-lean/base-pages.py \
@@ -23,6 +23,23 @@ node scripts/full-lean/run-bounded.mjs -- \
 `compiled-application` selects the registered application cases. The filter is
 optional; its default includes every case in that category. `native-build-time`
 selects managed native compiler checks, with no deployed-runtime pass implied.
+The final optional arguments are `FILTER MODE LEAN_VERSION`. Existing commands
+retain the historical `4.34.0` default; new acceptance campaigns explicitly select
+`4.34.1` and require an installed compiler with a matching validated runtime.
+Preparation selects that exact native toolchain and source manifest. Execution
+checks the version, commit and archive/manifest hashes again. Older source
+inventories and results remain unchanged, and prior-release passes cannot be
+subtracted from a later-release shard.
+
+`prepare-native-shard.mjs OUTPUT SELECTION INDEX COUNT [LEAN_VERSION]` and
+`native-ci.sh prepare|run|both SELECTION INDEX COUNT [LEAN_VERSION]` accept the
+same explicit version. Historical `remaining-*` selections apply only to their
+original release. `prepare-mixed.mjs OUTPUT FILTER [LEAN_VERSION]` selects a
+matching reviewed classification. `classify-mixed.mjs LEAN_VERSION
+PRISTINE_SOURCE NEW_OUTPUT` regenerates that static review without overwriting
+existing evidence. The new 4.34.1 `rc_sticky` C regression has both native and
+deployed-runtime obligations; its native pass cannot satisfy the deployed phase.
+
 `compiled-test-driver` selects the 202 documentation-parser inputs. Preparation
 compiles their original `run_test.lean` once through the installed CLI; run this
 preparation under the base-page wrapper as well. Each input then runs through
