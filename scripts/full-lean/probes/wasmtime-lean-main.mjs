@@ -1,25 +1,36 @@
-// Diagnostic integration of the frozen, unchanged const_fold application's main.
+// Diagnostic integration of a verified compiled application's ordinary main.
 // Unknown imports must fail explicitly; this is not the shipping backend.
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { Worker, MessageChannel, receiveMessageOnPort, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
-import { writeSync } from 'node:fs';
+import { readFileSync, writeSync } from 'node:fs';
 import { cpus } from 'node:os';
 import { hashFile } from '../../../src/managed-artifacts.mjs';
 import { prepareBunStack } from '../../../src/bun-stack.mjs';
 import { createNodeRuntimeHost } from '../../../src/node-host.mjs';
 import nativeThreadId from '../../../src/thread-id.cjs';
+import { writeWasiStdio } from './wasmtime-wasi-stdio.mjs';
 
 const ffi = createRequire(import.meta.url)('koffi');
 ffi.config({ sync_stack_size: 16 * 1024 ** 2 });
 prepareBunStack(import.meta.url);
 const isRuntimeRoot = isMainThread || workerData?.runtimeRoot === true;
-const [libraryPath, cache, expectedHash, nativeApiPath] = isMainThread ? process.argv.slice(2) : workerData.arguments;
+const [libraryPath, cache, expectedHash, nativeApiPath, checkPath] = isMainThread ? process.argv.slice(2) : workerData.arguments;
+const check = checkPath ? JSON.parse(readFileSync(checkPath, 'utf8')) : {
+  name: 'const_fold', lean: '4.34.0', args: ['15'], leanStackSizeKb: '4194304',
+  expected: { stdout: '93011 93011\n', stderr: '', code: 0 },
+  computationStackBytes: String(4 * 1024 ** 3 + 128 * 1024),
+};
+assert.equal(typeof check.name, 'string'); assert.ok(check.name && !check.name.includes('\0'));
+assert.match(check.lean, /^\d+\.\d+\.\d+$/);
+assert.ok(Array.isArray(check.args) && check.args.every(arg => typeof arg === 'string' && !arg.includes('\0')));
+assert.equal(typeof check.expected.stdout, 'string'); assert.equal(typeof check.expected.stderr, 'string');
+assert.ok(Number.isInteger(check.expected.code) && check.expected.code >= 0 && check.expected.code <= 255);
 const nativeDriver = nativeApiPath ? createRequire(import.meta.url)(nativeApiPath).open(libraryPath) : null;
 const controlStackBytes = (nativeDriver ? 64 : 12) * 1024 ** 2;
 if (isRuntimeRoot) assert.equal(await hashFile(cache), expectedHash);
-assert.equal(process.env.LEAN_STACK_SIZE_KB, '4194304');
+if (check.leanStackSizeKb !== undefined) assert.equal(process.env.LEAN_STACK_SIZE_KB, check.leanStackSizeKb);
 assert.equal(Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 1, 0), 'not-equal');
 const library = ffi.load(libraryPath);
 const clockType = ffi.proto('double lasm_main_clock(void)');
@@ -44,7 +55,7 @@ const workers = new Map(), timers = new Set(), registered = [], trace = [];
 const stdout = [], stderr = [], hostOperations = [], completions = [];
 let completionWaiter, response = new Uint8Array(0), requestedExit;
 let workerMessageListener;
-const host = isRuntimeRoot ? createNodeRuntimeHost({ leanVersion: '4.34.0', args: ['15'], appPath: 'const_fold',
+const host = isRuntimeRoot ? createNodeRuntimeHost({ leanVersion: check.lean, args: check.args, appPath: check.name,
   stdio: { stdout: bytes => stdout.push(Buffer.from(bytes)), stderr: bytes => stderr.push(Buffer.from(bytes)) } }) : null;
 let probe, closed = false, ownPthread, callbackError, settled = false;
 let resolveOutcome, rejectOutcome;
@@ -136,6 +147,17 @@ async function handleRpc({ request, signal, port, sender }) {
     let result;
     if (request.kind === 'spawn') result = { status: spawnWorker(request.pthread, request.start, request.argument) };
     else if (request.kind === 'cleanup') { await cleanupThread(request.pthread); result = {}; }
+    else if (request.kind === 'wasi-stdio') {
+      assert.ok(request.fd === 1 || request.fd === 2);
+      const bytes = new Uint8Array(request.byteBuffer, request.byteOffset, request.byteLength);
+      hostOperations.push({ wasi: 'fd_write', fd: request.fd, inputBytes: bytes.length, thread: String(sender) });
+      // This diagnostic installs infallible byte-capturing sinks in node-host.
+      // Do not map Lean file handles to WASI descriptors or pretend that this
+      // proves real descriptor redirection, partial writes or native errors.
+      const captured = await host.request(3, request.fd, 0n, bytes, { fiber: Number(sender) });
+      assert.equal(captured.error, false); assert.equal(captured.bytes.length, 0);
+      result = { errno: 0, written: bytes.length };
+    }
     else if (request.kind === 'host') {
       const { operation, handle, argument, mode } = request;
       const bytes = new Uint8Array(request.byteBuffer, request.byteOffset, request.byteLength);
@@ -186,7 +208,7 @@ function spawnWorker(pthread, start, argument) {
   assert.ok(!workers.has(key) || workers.get(key).cleaned, 'Live thread cannot be replaced');
   const worker = new Worker(fileURLToPath(import.meta.url), { resourceLimits: {
     stackSizeMb: 96, maxOldGenerationSizeMb: 128,
-  }, workerData: { arguments: [libraryPath, cache, expectedHash, nativeApiPath], parent: ffi.address(probe), pthread, start, argument } });
+  }, workerData: { arguments: [libraryPath, cache, expectedHash, nativeApiPath, checkPath], parent: ffi.address(probe), pthread, start, argument } });
   const record = { worker, pthread, start, argument, exited: false };
   workers.set(key, record);
   trace.push({ kind: 'spawn', pthread: key, start: String(start) });
@@ -263,26 +285,31 @@ const runtime = callback((kind, a, b, c, d, e, output) => {
       // loop integration is a separate acceptance gate.
       result = 0n;
     } else if (kind === 9) { assert.ok(!isRuntimeRoot); requestedExit = Number(a); }
+    else if (kind === 10) result = BigInt(writeWasiStdio({ fd: Number(a), iovs: b, count: c, nwritten: d,
+      memoryBytes: snapshot()[3], read: readGuest, write: writeGuest,
+      sink: (fd, bytes) => rpc({ kind: 'wasi-stdio', fd,
+        byteBuffer: bytes.buffer, byteOffset: bytes.byteOffset, byteLength: bytes.byteLength }) }));
     else throw new Error(`Unknown runtime callback ${kind}`);
     ffi.encode(output, 'uint64_t', BigInt.asUintN(64, result));
     return 0;
   } catch (error) { fail(error); return 1; }
 }, runtimeType);
 async function finishApplication(code) {
-  assert.equal(code, 0); assert.ok(!settled); settled = true;
+  assert.equal(code, check.expected.code); assert.ok(!settled); settled = true;
   await host.flushStdIO(); host.close();
   const actual = Buffer.concat(stdout).toString(), errors = Buffer.concat(stderr).toString();
-  assert.equal(actual, '93011 93011\n'); assert.equal(errors, '');
+  assert.equal(actual, check.expected.stdout); assert.equal(errors, check.expected.stderr);
   const threadResults = [...workers.values()].map(record => ({ ready: record.ready, result: record.result,
     cleaned: !!record.cleaned, exited: record.exited, strongref: !!record.strongref }));
   // Lean 4.34 runtime/thread.cpp adds LEAN_STACK_BUFFER_SPACE (128 KiB) to
   // LEAN_STACK_SIZE_KB. Verify its exact real allocation, without reducing it.
-  assert.ok(threadResults.some(record => record.ready?.guestStackBytes === String(4 * 1024 ** 3 + 128 * 1024)
+  assert.ok(threadResults.some(record => (!check.computationStackBytes || record.ready?.guestStackBytes === check.computationStackBytes)
     && record.cleaned && record.exited && record.result?.result === '0'));
-  const output = { scope: 'Unchanged const_fold main through a private Wasmtime host integration; not shipping acceptance',
+  const output = { scope: 'Verified application main through a private Wasmtime host integration; not shipping acceptance',
+    application: check.name, lean: check.lean,
     engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
     version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
-    args: ['15'], leanStackSizeKb: process.env.LEAN_STACK_SIZE_KB, stdout: actual, stderr: errors, code,
+    args: check.args, leanStackSizeKb: process.env.LEAN_STACK_SIZE_KB, stdout: actual, stderr: errors, code,
     threads: threadResults, trace, hostOperations, sharedBytes: String(snapshot()[3]),
     wasmEntry: nativeDriver ? 'direct Node-API on verified worker stacks' : 'Koffi synchronous FFI',
     controlStackBytes, nativeStackOverflowControl: !!nativeDriver,
@@ -297,7 +324,7 @@ async function finishApplication(code) {
 const environment = Object.entries(process.env).map(([key, value]) => `${key}=${value}`);
 const bytes = Buffer.from(environment.join('\0') + '\0');
 probe = create(isRuntimeRoot ? cache : null, clock, mailbox, bytes, bytes.length, environment.length,
-  'const_fold', isRuntimeRoot ? null : workerData.parent, spawn, events, error, error.length);
+  check.name, isRuntimeRoot ? null : workerData.parent, spawn, events, error, error.length);
 try {
   assert.ok(probe, message());
   setRuntime(probe, runtime);
@@ -348,14 +375,14 @@ try {
     invoke('__set_stack_limits', [invoke('emscripten_stack_get_base'), invoke('emscripten_stack_get_end')], 0);
     invoke('__wasm_call_ctors', [], 0);
     ownPthread = invoke('pthread_self');
-    const args = ['const_fold', '15'], pointers = [];
+    const args = [check.name, ...check.args], pointers = [];
     for (const arg of args) {
       const text = Buffer.from(arg + '\0'), pointer = invoke('malloc', [BigInt(text.length)]);
-      assert.ok(pointer); new Uint8Array(view(pointer, text.length).buffer).set(text); pointers.push(pointer);
+      assert.ok(pointer); writeGuest(pointer, text); pointers.push(pointer);
     }
-    const argv = invoke('calloc', [3n, 8n]); assert.ok(argv);
+    const argv = invoke('calloc', [BigInt(args.length + 1), 8n]); assert.ok(argv);
     for (const [index, pointer] of pointers.entries()) view(argv + BigInt(index * 8)).setBigUint64(0, pointer, true);
-    assert.equal(invoke('_emscripten_proxy_main', [2n, argv]), 0n);
+    assert.equal(invoke('_emscripten_proxy_main', [BigInt(args.length), argv]), 0n);
     if (callbackError) throw callbackError;
     const timer = setTimeout(() => fail(new Error('Application main diagnostic deadline')), 45_000);
     try { await outcome; } finally { clearTimeout(timer); }

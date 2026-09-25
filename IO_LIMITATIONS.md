@@ -325,6 +325,17 @@ separately from the earlier runtime evidence below.
   native oracles. Peak guarded memory is 435 MiB without resource events.
   This removes the prototype's FFI ceiling, while shipping integration, adaptive
   stack needs and the other general compatibility gaps remain open.
+  The [Lean 4.34.1 application follow-up](docs/evidence/wasmtime-lean-4.34.1-application-2026-09-25.json)
+  now converts and compiles the unchanged cold-installed application and matches
+  both native oracles in all three engines for ordinary IO and uncaught errors.
+  Real monotonic timing and captured WASI stdout/stderr repair two missing-import
+  failures. Six application comparisons and four focused output controls pass;
+  three deliberate assertion failures terminate their owned processes in under
+  six seconds. Compilation peaks at 5.17 GiB; application runs remain below
+  0.5 GiB, without OOM or resource stops. The earlier failures remain intact.
+  These private Linux x64 diagnostics do not establish shipping integration,
+  real WASI descriptor redirection/errors, embedded disposal, general imports,
+  cancellation, full API coverage or other native platforms.
 
 ## Earlier runtime evidence and remaining compatibility work
 

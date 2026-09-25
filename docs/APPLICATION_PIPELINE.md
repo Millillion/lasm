@@ -952,3 +952,29 @@ both native oracles. Peak guarded memory is 435 MiB with no resource events.
 This removes the FFI stack ceiling from this real-application prototype; managed
 packaging, general imports, lifetime/cancellation, larger adaptive stack needs,
 latest-runtime coverage and native platform acceptance remain open.
+
+The [Lean 4.34.1 private application continuation](evidence/wasmtime-lean-4.34.1-application-2026-09-25.json)
+now reuses the exact ordinary IO program from the cold-installed `.25` package.
+Its complete Wasm module converts to standardized exceptions and compiles with
+single-worker Wasmtime 49.0.0; the verified local compiled cache is reused.
+Fresh interpreted and C-compiled native controls match Node, Deno and Bun for
+Unicode/empty arguments, async file IO, a missing-file error and exit code 7,
+and separately for an uncaught Unicode exception with exit code 1.
+
+The first attempt exposed a missing monotonic-clock import and Node shutdown
+waiting on workers still executing native Wasm. The next error-path probe exposed
+missing WASI `fd_write`. The helper now uses the OS monotonic clock coherently
+across Stores, and a memory64 scatter/gather adapter forwards raw bytes to the
+same captured stdout/stderr sinks as Lean IO. Four focused controls cover high
+addresses, invalid ranges, raw bytes, partial sink counts and sink errors.
+These synthetic sink controls do not establish native descriptor semantics.
+
+The standalone diagnostic supervisor uses native `_Exit` only after writing its
+result synchronously. Three deliberate oracle mismatches terminate in about
+2–6 seconds; a preserved initial negative-control failure omitted the baseline
+stack environment and is corrected without changing the application. This
+owned-process shutdown is not embedded Store disposal. Compilation peaks at
+5.17 GiB and application runs remain below 0.5 GiB, with every guard released
+and no resource aborts. Shipping packaging, general imports/descriptors,
+keepalive, cancellation, reusable disposal, larger transfers/adaptive stacks
+and all other native platforms remain open.

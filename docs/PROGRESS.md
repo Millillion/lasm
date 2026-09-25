@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Shipping helper integration, full API parity and native platform acceptance lack defensible durations.
 
-**Changed:** [The ordinary HTTP server passes all sixty checks](evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json): thirty deployed and thirty native across the three stock engines, with unchanged assertions/deadlines and zero skips. Peak memory is 7.76 GiB without OOM or proactive stops. One Bun preflight refuses insufficient disk before launch; verified lossless archival enables the unchanged-limit retry. The private Wasmtime helper is next, extending earlier benchmark evidence to ordinary IO and errors. Pushes await restored SSH credentials.
+**Changed:** [The private Wasmtime helper matches native Lean 4.34.1](evidence/wasmtime-lean-4.34.1-application-2026-09-25.json) in six ordinary IO/exception comparisons across the three stock engines. Real clock and captured WASI output repair missing imports. Four output controls and three prompt failure-shutdown controls pass; compilation peaks at 5.17 GiB and execution below 0.5 GiB without OOM. This is private-helper evidence, not shipping acceptance. Nine further upstream HTTP cases per engine are running sequentially. Pushes await restored SSH credentials.
 
 **Remaining:** Complete latest-release suite/API coverage; shipping engine parity and callable bindings; six-platform native acceptance.
 

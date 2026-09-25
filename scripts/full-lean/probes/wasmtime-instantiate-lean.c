@@ -80,6 +80,10 @@ static wasm_trap_t *runtime_import(void *data, wasmtime_caller_t *caller,
         return wasmtime_trap_new(item->name, strlen(item->name));
     }
     if (nargs > 5 || nresults > 1) return wasmtime_trap_new("unexpected runtime ABI", 22);
+    if (item->kind == 10 && (nargs != 4 || nresults != 1 || args[0].kind != WASMTIME_I32 ||
+        args[1].kind != WASMTIME_I64 || args[2].kind != WASMTIME_I64 || args[3].kind != WASMTIME_I64 ||
+        item->result_kind != WASM_I32))
+        return wasmtime_trap_new("unexpected memory64 fd_write ABI", 32);
     uint64_t inputs[5] = {0}, result = 0;
     for (size_t i = 0; i < nargs; i++) {
         if (args[i].kind == WASMTIME_I64) inputs[i] = (uint64_t)args[i].of.i64;
@@ -106,6 +110,21 @@ static wasm_trap_t *clock_import(void *data, wasmtime_caller_t *caller,
     lean_probe_t *probe = data;
     probe->clock_calls++;
     results[0] = (wasmtime_val_t){ .kind = WASMTIME_F64, .of.f64 = probe->date_now() };
+    return NULL;
+}
+static wasm_trap_t *monotonic_clock_import(void *data, wasmtime_caller_t *caller,
+    const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results, size_t nresults) {
+    (void)caller; (void)args;
+    if (nargs || nresults != 1) return wasmtime_trap_new("unexpected monotonic clock ABI", 30);
+    struct timespec time;
+    if (clock_gettime(CLOCK_MONOTONIC, &time))
+        return wasmtime_trap_new("native monotonic clock read failed", 34);
+    // One monotonic origin for every Store/thread, coherent with our WASI
+    // CLOCK_MONOTONIC provider. Wall-clock adjustments cannot alter timeouts.
+    lean_probe_t *probe = data;
+    probe->clock_calls++;
+    results[0] = (wasmtime_val_t){ .kind = WASMTIME_F64,
+        .of.f64 = (double)time.tv_sec * 1000.0 + (double)time.tv_nsec / 1000000.0 };
     return NULL;
 }
 static wasm_trap_t *heap_max_import(void *data, wasmtime_caller_t *caller,
@@ -523,8 +542,10 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
                     if (name->size == strlen(names[k]) && !memcmp(name->data, names[k], name->size)) runtime_kind = k;
             }
             if (module->size == strlen("wasi_snapshot_preview1") &&
-                !memcmp(module->data, "wasi_snapshot_preview1", module->size) &&
-                name->size == 9 && !memcmp(name->data, "proc_exit", 9)) runtime_kind = 9;
+                !memcmp(module->data, "wasi_snapshot_preview1", module->size)) {
+                if (name->size == 9 && !memcmp(name->data, "proc_exit", 9)) runtime_kind = 9;
+                if (name->size == 8 && !memcmp(name->data, "fd_write", 8)) runtime_kind = 10;
+            }
             if (runtime_kind) {
                 runtime_import_t *item = calloc(1, sizeof(*item));
                 if (!item) { snprintf(error, capacity, "runtime import allocation failed"); status = 1; break; }
@@ -628,16 +649,20 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
                 wasmtime_func_new(context, heap_type, heap_max_import, probe, NULL, &imports[i].of.func);
                 break;
             }
-            if (module->size == 3 && !memcmp(module->data, "env", 3) &&
-                name->size == strlen("emscripten_date_now") && !memcmp(name->data, "emscripten_date_now", name->size)) {
+            bool monotonic_clock = name->size == strlen("emscripten_get_now") &&
+                !memcmp(name->data, "emscripten_get_now", name->size);
+            bool wall_clock = name->size == strlen("emscripten_date_now") &&
+                !memcmp(name->data, "emscripten_date_now", name->size);
+            if (module->size == 3 && !memcmp(module->data, "env", 3) && (monotonic_clock || wall_clock)) {
                 const wasm_functype_t *clock_type = wasm_externtype_as_functype_const(type);
                 const wasm_valtype_vec_t *returns = wasm_functype_results(clock_type);
                 if (wasm_functype_params(clock_type)->size || returns->size != 1 ||
                     wasm_valtype_kind(returns->data[0]) != WASM_F64) {
-                    snprintf(error, capacity, "unexpected wall-clock import signature"); status = 1; break;
+                    snprintf(error, capacity, "unexpected clock import signature"); status = 1; break;
                 }
                 imports[i].kind = WASMTIME_EXTERN_FUNC;
-                wasmtime_func_new(context, clock_type, clock_import, probe, NULL, &imports[i].of.func);
+                wasmtime_func_new(context, clock_type, monotonic_clock ? monotonic_clock_import : clock_import,
+                    probe, NULL, &imports[i].of.func);
                 break;
             }
             rejected_import_t *item = calloc(1, sizeof(*item));
