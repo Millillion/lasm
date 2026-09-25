@@ -53,6 +53,14 @@ covering source, compiler, toolchain and original output. Peak memory is
 5.85 GiB with no resource events; disk space stays above 6.57 GiB. This does not
 extend cold-install acceptance to the other native hosts or close full API parity.
 
+The [fresh installed IO campaign](evidence/lean-4.34.1-installed-io-2026-09-25.json)
+passes all eight supplementary filesystem/console fixtures in each stock engine
+on Linux x64. All 24 source-hidden deployed comparisons match interpreted and
+C-compiled native output and pass cleanup checks. Peak memory is 4.48 GiB with
+no resource events. The queue stops only after the final successful IO workload
+releases its guard, before the HTTP server's larger module-data copies; HTTP
+continues separately with additional disk headroom.
+
 Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
 downloads and extraction stream their data. Installation stages privately and
 publishes only a complete tree. Subsequent use hashes every recorded file and

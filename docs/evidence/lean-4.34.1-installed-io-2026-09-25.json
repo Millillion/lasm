@@ -1,0 +1,1919 @@
+{
+  "recordedAt": "2026-09-25T05:51:01.694304+00:00",
+  "scope": "Eight supplementary Lean 4.34.1 IO fixtures, each compared against interpreted and compiled native Lean in three stock engines on Linux x64",
+  "package": {
+    "version": "0.1.0-experimental.25",
+    "tarball": ".work/application-package-4.34.1-r1/lasm-compiler-0.1.0-experimental.25.tgz",
+    "sha256": "ac8dcef8b95fb91cd760fa6f1b332c4c783901b7ca6b73b4f5eeadb559be0c6a"
+  },
+  "passedComparisons": 24,
+  "oracles": {
+    "filesystem-surface": {
+      "source": "integration/fixtures/FilesystemSurface.lean",
+      "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+      "observed": {
+        "code": 0,
+        "stdout": "ok: regular handle is not a terminal\nok: read zero bytes\nok: handle getLine Unicode\nok: handle lines CRLF and final partial line\nok: handle EOF\nok: rewind clears EOF\nok: handle readBinToEndInto keeps prefix\nok: handle readToEnd\nok: handle readBinToEnd\nok: filesystem lines\nok: write mode truncates\nok: append mode survives rewind\nok: truncate at read cursor\nok: withFile escaped handle remains open\nok: append creates missing file\nok: handle stream terminal query\nok: stream lines\nok: stream getLine\nok: stream readToEnd\nok: stream readBinToEndInto\nok: stream readBinToEnd\nok: buffer getLine\nok: buffer cursor\nok: buffer partial read\nok: buffer overwrite extends\nok: buffer terminal query\nok: isolated streams capture both channels\nok: stream invalid UTF8 rejected\nok: createDirAll is idempotent\nok: binary roundtrip\nok: directory entry count\nok: directory entry path\nok: file metadata\nok: directory metadata\nok: ordinary symlinkMetadata\nok: realPath is absolute\nok: rename changes path\nok: hard link survives original removal\nok: removeDirAll removes descendants\nok: exclusive lock excludes second handle\nok: unlock permits second handle\nok: first shared lock\nok: second shared lock\nok: handle finalization releases lock\nok: createTempFile read/write\nok: createTempDir exists\nok: withTempFile preserves body exception\nok: withTempFile cleans up after exception\nok: withTempDir preserves body exception\nok: withTempDir cleans descendants after exception\nfilesystem surface checks passed\n",
+        "stderr": ""
+      }
+    },
+    "filesystem-errors": {
+      "source": "integration/fixtures/FilesystemErrors.lean",
+      "sourceSha256": "484d9860c5361ce70c97d0325517c6302939f93a76657c751fa315a08f21e88d",
+      "observed": {
+        "code": 0,
+        "stdout": "read missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nread directory: error IO.Error.inappropriateType none 21 \"illegal operation on a directory\"\nread invalid UTF8: error IO.Error.userError \"Tried to read file 'data/invalid-utf8' containing non UTF-8 data.\"\nread through regular file: error IO.Error.inappropriateType (some \"data/regular/child\") 20 \"not a directory\"\nread empty path: error IO.Error.noFileOrDirectory \"\" 2 \"no such file or directory\"\nwrite missing parent: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nwrite directory: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nwriteNew existing file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nwriteNew existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\nreadWrite absent file: error IO.Error.noFileOrDirectory \"data/readwrite-absent\" 2 \"no such file or directory\"\nwrite on read-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\ntruncate read-only handle: error IO.Error.invalidArgument none 22 \"invalid argument\"\nread on write-only handle: error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nmetadata missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\ndirectory listing on file: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\ncreate existing directory: error IO.Error.alreadyExists (some \"data/directory\") 17 \"file already exists\"\ncreate directory through file: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nremove missing file: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nremove directory as file: error IO.Error.inappropriateType (some \"data/directory\") 21 \"illegal operation on a directory\"\nremove file as directory: error IO.Error.inappropriateType (some \"data/regular\") 20 \"not a directory\"\nremove nonempty directory: error IO.Error.unsatisfiedConstraints 39 \"directory not empty\"\nrename missing source: error IO.Error.noFileOrDirectory \"data/absent/entry and/or data/renamed\" 2 \"no such file or directory\"\nrename file over directory: error IO.Error.inappropriateType (some \"data/regular and/or data/directory\") 21 \"illegal operation on a directory\"\nhard link missing source: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"no such file or directory\"\nhard link existing destination: error IO.Error.alreadyExists (some \"data/regular\") 17 \"file already exists\"\nrealPath missing: error IO.Error.noFileOrDirectory \"data/absent/entry\" 2 \"\"\nread path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nrename path containing NUL: error IO.Error.invalidArgument (some \"data/regular\\x00ignored\") 22 \"string contains NUL bytes\"\nfilesystem error observations completed\n",
+        "stderr": ""
+      }
+    },
+    "filesystem-devices": {
+      "source": "integration/fixtures/FilesystemDevices.lean",
+      "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+      "observed": {
+        "code": 0,
+        "stdout": "ok: null zero-byte read\nok: null read is EOF\nok: null line is EOF\nok: null rewind remains EOF\nok: null is not a terminal\nok: null accepts flushed binary output\nok: /dev/zero returns exactly requested zero bytes\nok: /dev/zero remains readable after rewind\nok: /dev/zero has device metadata\nok: /dev/full returns exactly requested zero bytes\nok: /dev/full remains readable after rewind\nok: /dev/full has device metadata\nfull buffered write: ok\nfull flush: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull repeated flush: ok\nfull write after error: error IO.Error.resourceExhausted none 28 \"no space left on device\"\nfull flush after large write: ok\nfull high-level small write: ok\nfull high-level large write: error IO.Error.resourceExhausted none 28 \"no space left on device\"\n/dev/null truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/zero truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\n/dev/full truncate: error IO.Error.invalidArgument none 22 \"invalid argument\"\nok: proc reports zero byte size\nok: zero-size proc file still has readable content\nfilesystem device observations completed\n",
+        "stderr": ""
+      }
+    },
+    "windows-timezone": {
+      "source": "integration/fixtures/WindowsTimezone.lean",
+      "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+      "observed": {
+        "code": 0,
+        "stdout": "utc initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nutc next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nnew-york next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nberlin next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nunknown next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nembedded-nul next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name initial: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlong-name next: error IO.Error.invalidArgument none 22 \"failed to get timezone, its windows only.\"\nlocal timezone at epoch: error IO.Error.invalidArgument none 22 \"timezone retrieval is Windows-only\"\nwindows timezone observations completed\n",
+        "stderr": ""
+      }
+    },
+    "standard-io": {
+      "source": "test/fixtures/standard-io/Main.lean",
+      "sourceSha256": "25b04269fd564ff77eee30473de2a04efaf8f1d428b60974a273de5898577249",
+      "observed": {
+        "code": 0,
+        "stdout": "standard IO checks passed\n",
+        "stderr": "stderr \u03bb\n"
+      }
+    },
+    "getline-state": {
+      "source": "test/fixtures/getline-state/Main.lean",
+      "sourceSha256": "7bc6293b979c3df900e803f0514d6b40fe4aefa8799a185ce5d88934d60b586a",
+      "observed": {
+        "code": 0,
+        "stdout": "partial initial bytes: 5\npartial appended: \"\u03b2\\n\"\nnewline initial bytes: 6\nnewline appended: \"\u03b2\\n\"\nempty initial bytes: 0\nempty appended: \"\u03b2\\n\"\nbinary-read initial bytes: 5\nbinary-read appended: \"tail\"\nrepeat-eof initial bytes: 5\nrepeat-eof empty: \"\"\nrepeat-eof appended: \"\u03b2\\n\"\nlong-partial initial bytes: 65537\nlong-partial appended: \"\u03b2\\n\"\ngetLine stream-state comparison completed\n",
+        "stderr": ""
+      }
+    },
+    "truncate-errors": {
+      "source": "test/fixtures/truncate-errors/Main.lean",
+      "sourceSha256": "2eab6468a7672fb95078590d8c1f1d27328c2829937ed518c6c3a2bef0638928",
+      "observed": {
+        "code": 0,
+        "stdout": "read-only regular truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nregular truncate at read cursor: ok\nregular contents: \"ab\"\npipe reader truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\npipe writer truncate: IO.Error.invalidArgument none 22 \"invalid argument\"\nchild exit: 0\ntruncate error comparison completed\n",
+        "stderr": ""
+      }
+    },
+    "console-buffering": {
+      "source": "test/fixtures/console-buffering/Main.lean",
+      "sourceSha256": "a57406c4f3e7529485538c002364986ea7a70954bf8273175570da11db61aef4",
+      "observed": {
+        "code": 0,
+        "stdout": "unflushed parent before|unflushed child|unflushed parent after\nredirected-stdin child|redirected-stdin parent before|redirected-stdin parent after\nflushed parent before|flushed child|flushed parent after\nnormal shutdown flush\n",
+        "stderr": "stderr parent before|stderr child|stderr parent after\n"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "engine": "node",
+      "engineVersion": "v26.10.0",
+      "case": "filesystem-surface",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-node-filesystem-surface-r1/result.json",
+        "sha256": "65c902afcdbf5190a2a02519950763cc62de1f65ea1903de9b9e1c2dd58f9653"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+            "cSha256": "0133deba379bc20d3d2d4a46f1b0e3868529685a248920b4f1abe561c74a8e2c"
+          }
+        ],
+        "signature": "e1218431c6b30fd0f45ce2d09b21ab7cc3c5b2cfe7ee840c09dc5a3037d4eec6",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "752ac8f63e0eee930f741232f4fd496b54b6dad89e4edab2dd3da43957c46222",
+      "observationsIdentical": true,
+      "stdoutSha256": "3f9472385e066b64edb14c210f28d64c6af6cb2d5392e8ee0a155d463d1a6e15",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-node-filesystem-surface-r1/filesystem-surface/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-node-filesystem-surface-r1-resources.json",
+        "sha256": "cb7153eecbb5c999dddabef2bf3025c13db92bed2e3855a4a84bf6833c637ce2",
+        "peakMemoryBytes": 4814950400,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "node",
+      "engineVersion": "v26.10.0",
+      "case": "filesystem-errors",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-node-filesystem-errors-r1/result.json",
+        "sha256": "b9ee78db19e033ea494b80e4a91d1c668673385c68e3ff6c2391170609c8317b"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "484d9860c5361ce70c97d0325517c6302939f93a76657c751fa315a08f21e88d",
+            "cSha256": "fb1008d285da2f04fdf2cdcceb933634bb37a39539658dd481b99f04e9b1a772"
+          }
+        ],
+        "signature": "56f283efc17cf3fe233f547ae01d73bdefeb709ea28cb6df18f9ec7d8a8a21c5",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "89c914fb678743e2e8d0e455b8786f4908fd02c85f08bc9000fe0a47ccdf202e",
+      "observationsIdentical": true,
+      "stdoutSha256": "b2e2eeec457892be6afca994900829c8e9e74b11ebc0efc7dd14106a48537265",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-node-filesystem-errors-r1/filesystem-errors/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-node-filesystem-errors-r1-resources.json",
+        "sha256": "b253ac3188584baa1f036513d62d3362a0c633048aa053e9a483131215ed3989",
+        "peakMemoryBytes": 4251815936,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "node",
+      "engineVersion": "v26.10.0",
+      "case": "filesystem-devices",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-node-filesystem-devices-r1/result.json",
+        "sha256": "b131e063b0485f65c2e1aa7185a0e7dfd4541fe52e7f717abcb70e81a39d174b"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+            "cSha256": "2e4ccf162529f130f4147ec26acb7b3f9d17d348be7c79a667c5224dd9ea6645"
+          }
+        ],
+        "signature": "aba1282234d4ec296524ebd0149ac2cc6046702f89fd571be666611191f25b01",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "cccfff55df95ec714d776960fda885b951d20e1b435606d3e788101ef5671999",
+      "observationsIdentical": true,
+      "stdoutSha256": "0ec9ed8cbfb08fdfc73c554bdf141272b9d10a8a290fe81b65a0222db05ba312",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-node-filesystem-devices-r1/filesystem-devices/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-node-filesystem-devices-r1-resources.json",
+        "sha256": "6579f3c8836fef4c8f1db35145ce3483a0b49d4ea128a082f74065baed9c5b84",
+        "peakMemoryBytes": 4031696896,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "node",
+      "engineVersion": "v26.10.0",
+      "case": "windows-timezone",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-node-windows-timezone-r1/result.json",
+        "sha256": "bf88602ffd0ba430f5252ffb621ea780c157e6c7c0be4edcc22c5ee32ba34ae2"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+            "cSha256": "4ed90de776f6e790104863fd9ae0332c16b772c701a603e83cd110b67ce2e2f4"
+          }
+        ],
+        "signature": "7cf282442399d094ec83029eeaa8791b6987bbfd23ad53f030aa06598c280347",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "f97daa5baa46899de48a6cb5339331cf76f5db33eb02b9a6bfbad799a18a6102",
+      "observationsIdentical": true,
+      "stdoutSha256": "8e5ad860d63612557cbfe77c9f5ac63ef03007831b21bcf40c4953a52aa6853c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-node-windows-timezone-r1/windows-timezone/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-node-windows-timezone-r1-resources.json",
+        "sha256": "74b79d35118d5385716d5c2998b88b2fb5b879ce814be686c7307cbd2b1673af",
+        "peakMemoryBytes": 3943235584,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "node",
+      "engineVersion": "v26.10.0",
+      "case": "standard-io",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-node-standard-io-r1/result.json",
+        "sha256": "58c25aba8490741d3bdc655447aa73faede31fbb73d5904d063832035e9af3e5"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "25b04269fd564ff77eee30473de2a04efaf8f1d428b60974a273de5898577249",
+            "cSha256": "bd93356b55961558a0571c486338e119a682f8168dcdfe3fac32f5e01cecf56b"
+          }
+        ],
+        "signature": "264aebdd2ee1d18230ed02e6b33ccd819e972c5d8433d4b345c037136a73b7ba",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "68d3fd2cfd27419334842437a1ac1c3c744829c0265bacf5c11f60a4b1bccbc7",
+      "observationsIdentical": true,
+      "stdoutSha256": "6a1d820cf1d55685d97afee838668b1821a84ca423c42daa0ead328cb4ff3150",
+      "stderrSha256": "dc15b181920b786890b876f696b6f1a4ee4b34d052a54f0e2250eacaba53745c",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-node-standard-io-r1/standard-io/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-node-standard-io-r1-resources.json",
+        "sha256": "28fab6ff37b40514d63912f67c7779290515700e66499059912b238afe31463b",
+        "peakMemoryBytes": 3666100224,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "node",
+      "engineVersion": "v26.10.0",
+      "case": "getline-state",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-node-getline-state-r1/result.json",
+        "sha256": "e2444907d6ded0a01263f0f503afe749acf51d0cbc9486eac6db06b2417c9b5e"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "7bc6293b979c3df900e803f0514d6b40fe4aefa8799a185ce5d88934d60b586a",
+            "cSha256": "cd6f3d06a472cac7c3f6e7455ef80574114741b21ab70bd14085465680cf7552"
+          }
+        ],
+        "signature": "758d68795e2105cd5132cc7925ca27359f1a5f531f4e3f49e27b2389288ea0f2",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "8a8122ba5b3c37a3975f0923e57fc902669ecc6fc292349428c649a92eb9279c",
+      "observationsIdentical": true,
+      "stdoutSha256": "6cebf45b5155ca4c10ed9751905a0e69fc9a82e45dcbaf923d1e626acff00c63",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-node-getline-state-r1/getline-state/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-node-getline-state-r1-resources.json",
+        "sha256": "314f1c2b9eba40e5e418ab9f22ef3aaced38cdae2ce6bf1e2325d07891badf8a",
+        "peakMemoryBytes": 3835486208,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "node",
+      "engineVersion": "v26.10.0",
+      "case": "truncate-errors",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-node-truncate-errors-r1/result.json",
+        "sha256": "3f4deb04c7427f7b223a5548356f6f2c5c8288b4b63f49f6e8ef03ed789c7ce4"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "2eab6468a7672fb95078590d8c1f1d27328c2829937ed518c6c3a2bef0638928",
+            "cSha256": "c2ff41645dc867b96d5b3400c36907927960a3bab9cd4748320dcf5d4a37ffa3"
+          }
+        ],
+        "signature": "1b5629875999b1ae0d9cda743653d67b46f44a2e32fead4ab462ef1ba3b134c7",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "c873ba7a3418e34318dd5da5b916d031a2778670762106b316b8a515da2efe74",
+      "observationsIdentical": true,
+      "stdoutSha256": "ad3ae98eac7bfb84bdab690b919ef4287ad18abd75311b4e1b027741379c07fe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-node-truncate-errors-r1/truncate-errors/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-node-truncate-errors-r1-resources.json",
+        "sha256": "dc428c554d8294cd9d29a8c16c631df61cac1e53e934dcbc93e2d69e29789f65",
+        "peakMemoryBytes": 3869171712,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "node",
+      "engineVersion": "v26.10.0",
+      "case": "console-buffering",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-node-console-buffering-r1/result.json",
+        "sha256": "457136290805b78fd74246849b7b10ed57b4313e28dce011696b565e8f8e007a"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "a57406c4f3e7529485538c002364986ea7a70954bf8273175570da11db61aef4",
+            "cSha256": "72eb6524cc3ae0f65b42931629a0c249ce6c8c9a0f1a2ddac6d19526963118b3"
+          }
+        ],
+        "signature": "bd2298e3dbbd6bcb59cc8d45a65ded2348771d9a31abe39aebf08a7970475f5c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "8d860808122d464998977eb7ba75a7cc068945cdc5166ebcd627fc6e07a12f5b",
+      "observationsIdentical": true,
+      "stdoutSha256": "ed9ee8e60b1498af3781ac77f359885ef0a4054df3018a686aa5421b959df304",
+      "stderrSha256": "cd605e1cc3abb34cbe022adf86e2b59ac396775c46ed8fb3dde40fe37dfc2699",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-node-console-buffering-r1/console-buffering/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-node-console-buffering-r1-resources.json",
+        "sha256": "d832461be6bf3a5b7bac8c02e4b3d6a158806ea0e5349333b7d9b0fcb38f3abf",
+        "peakMemoryBytes": 3811737600,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "case": "filesystem-surface",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-deno-filesystem-surface-r1/result.json",
+        "sha256": "ba20f6876f1312353a19916782c345b6cb7da777eef6114bb39702375f99815d"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+            "cSha256": "0133deba379bc20d3d2d4a46f1b0e3868529685a248920b4f1abe561c74a8e2c"
+          }
+        ],
+        "signature": "4f843128dba60c16cc550ea9bc54e97c05d4840b86fbd4a6b01e4dd7e0c75d0d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "752ac8f63e0eee930f741232f4fd496b54b6dad89e4edab2dd3da43957c46222",
+      "observationsIdentical": true,
+      "stdoutSha256": "3f9472385e066b64edb14c210f28d64c6af6cb2d5392e8ee0a155d463d1a6e15",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-deno-filesystem-surface-r1/filesystem-surface/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-deno-filesystem-surface-r1-resources.json",
+        "sha256": "a3d186a3256212a534f768b03417bc748e4f57b5d3bf398031beba4b0a720023",
+        "peakMemoryBytes": 3967623168,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "case": "filesystem-errors",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-deno-filesystem-errors-r1/result.json",
+        "sha256": "f2f0ebf223a99bdfd9416f6a883d71b81a8c725b03dde715742388cd0cbecc08"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "484d9860c5361ce70c97d0325517c6302939f93a76657c751fa315a08f21e88d",
+            "cSha256": "fb1008d285da2f04fdf2cdcceb933634bb37a39539658dd481b99f04e9b1a772"
+          }
+        ],
+        "signature": "24bdd40361df846345e788dd3c1abec99cb5ae40717f7ad4df3311689f52b4dc",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "89c914fb678743e2e8d0e455b8786f4908fd02c85f08bc9000fe0a47ccdf202e",
+      "observationsIdentical": true,
+      "stdoutSha256": "b2e2eeec457892be6afca994900829c8e9e74b11ebc0efc7dd14106a48537265",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-deno-filesystem-errors-r1/filesystem-errors/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-deno-filesystem-errors-r1-resources.json",
+        "sha256": "8f644d99f0c0d0bb578c1217d22a83d65dbc4d58cd4c0130309520e376d6a6ae",
+        "peakMemoryBytes": 3864633344,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "case": "filesystem-devices",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-deno-filesystem-devices-r1/result.json",
+        "sha256": "44992d8da09abeaed576758a37d494a9a948b1bb362d323fa07bd86671e72880"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+            "cSha256": "2e4ccf162529f130f4147ec26acb7b3f9d17d348be7c79a667c5224dd9ea6645"
+          }
+        ],
+        "signature": "850b7912b8db949b64e22b30644405dd962fa4e0f1e6683c8998fea384cb06df",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "cccfff55df95ec714d776960fda885b951d20e1b435606d3e788101ef5671999",
+      "observationsIdentical": true,
+      "stdoutSha256": "0ec9ed8cbfb08fdfc73c554bdf141272b9d10a8a290fe81b65a0222db05ba312",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-deno-filesystem-devices-r1/filesystem-devices/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-deno-filesystem-devices-r1-resources.json",
+        "sha256": "9d457d2de84622f4dea7ddc1207d80417c8b81a146660f6063aa695bc1f735f7",
+        "peakMemoryBytes": 3828219904,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "case": "windows-timezone",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-deno-windows-timezone-r1/result.json",
+        "sha256": "c0796ba78a2ae47fd6105559d4b48d4a0fa3fd8e585f2a1c194b3369696ad86a"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+            "cSha256": "4ed90de776f6e790104863fd9ae0332c16b772c701a603e83cd110b67ce2e2f4"
+          }
+        ],
+        "signature": "115527075a02e746f04a601e13b11f6c5949813577b267c91e50ca3fc59b7fda",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "f97daa5baa46899de48a6cb5339331cf76f5db33eb02b9a6bfbad799a18a6102",
+      "observationsIdentical": true,
+      "stdoutSha256": "8e5ad860d63612557cbfe77c9f5ac63ef03007831b21bcf40c4953a52aa6853c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-deno-windows-timezone-r1/windows-timezone/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-deno-windows-timezone-r1-resources.json",
+        "sha256": "fe896799f9b9ff0af849f813a49d03bc85fea36b692e87a405668b03c92c5341",
+        "peakMemoryBytes": 3961950208,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "case": "standard-io",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-deno-standard-io-r1/result.json",
+        "sha256": "8a3c8bac4f970b8a9120b99ada576939b0c6440d35aae151beda7352294079d0"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "25b04269fd564ff77eee30473de2a04efaf8f1d428b60974a273de5898577249",
+            "cSha256": "bd93356b55961558a0571c486338e119a682f8168dcdfe3fac32f5e01cecf56b"
+          }
+        ],
+        "signature": "7d24d997067283d33b602caf64d7876809aaaa9e182ec48e5fe519df5da39e19",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "68d3fd2cfd27419334842437a1ac1c3c744829c0265bacf5c11f60a4b1bccbc7",
+      "observationsIdentical": true,
+      "stdoutSha256": "6a1d820cf1d55685d97afee838668b1821a84ca423c42daa0ead328cb4ff3150",
+      "stderrSha256": "dc15b181920b786890b876f696b6f1a4ee4b34d052a54f0e2250eacaba53745c",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-deno-standard-io-r1/standard-io/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-deno-standard-io-r1-resources.json",
+        "sha256": "4e07d26dce379b0f9f70d18999bd0e517cc13efb2cc5d254fa310ebfa4a28f60",
+        "peakMemoryBytes": 3802238976,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "case": "getline-state",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-deno-getline-state-r1/result.json",
+        "sha256": "b7971cc636af77579a6e070690610a5d73f703c7f6bbe825c7edb2ccfe485a48"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "7bc6293b979c3df900e803f0514d6b40fe4aefa8799a185ce5d88934d60b586a",
+            "cSha256": "cd6f3d06a472cac7c3f6e7455ef80574114741b21ab70bd14085465680cf7552"
+          }
+        ],
+        "signature": "a461dde95a5a16fe7b2682fdc42b08e5688fbcca428927864d0d03ec16c194ff",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "8a8122ba5b3c37a3975f0923e57fc902669ecc6fc292349428c649a92eb9279c",
+      "observationsIdentical": true,
+      "stdoutSha256": "6cebf45b5155ca4c10ed9751905a0e69fc9a82e45dcbaf923d1e626acff00c63",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-deno-getline-state-r1/getline-state/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-deno-getline-state-r1-resources.json",
+        "sha256": "bef49ab63e9157b032714967a3ebf62dd986f1bebb5e255024b7c99de8bc6b8f",
+        "peakMemoryBytes": 3934224384,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "case": "truncate-errors",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-deno-truncate-errors-r1/result.json",
+        "sha256": "52a8a73856de135c8a9d0f0a75a9a18a038b6bf58a463f95370fe10d3c4d8ebc"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "2eab6468a7672fb95078590d8c1f1d27328c2829937ed518c6c3a2bef0638928",
+            "cSha256": "c2ff41645dc867b96d5b3400c36907927960a3bab9cd4748320dcf5d4a37ffa3"
+          }
+        ],
+        "signature": "2f991fbac880defd89e86f724fdffb43462e22877523c6987ac9e7249f88c047",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "c873ba7a3418e34318dd5da5b916d031a2778670762106b316b8a515da2efe74",
+      "observationsIdentical": true,
+      "stdoutSha256": "ad3ae98eac7bfb84bdab690b919ef4287ad18abd75311b4e1b027741379c07fe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-deno-truncate-errors-r1/truncate-errors/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-deno-truncate-errors-r1-resources.json",
+        "sha256": "7cd3c60fbfc0eff3b66156dfef84ab8ad846287f6db567c0cf50adab64f6df5b",
+        "peakMemoryBytes": 3968614400,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "case": "console-buffering",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-deno-console-buffering-r1/result.json",
+        "sha256": "941d41c615594e9b1ed3764ac5264ae1334fb9c6926261ddb92cd35c49d2c4f8"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "a57406c4f3e7529485538c002364986ea7a70954bf8273175570da11db61aef4",
+            "cSha256": "72eb6524cc3ae0f65b42931629a0c249ce6c8c9a0f1a2ddac6d19526963118b3"
+          }
+        ],
+        "signature": "434e3039513db4b3c9fbda8bc840d8f0871be40bc9726a5e211bc34ab925b29d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "8d860808122d464998977eb7ba75a7cc068945cdc5166ebcd627fc6e07a12f5b",
+      "observationsIdentical": true,
+      "stdoutSha256": "ed9ee8e60b1498af3781ac77f359885ef0a4054df3018a686aa5421b959df304",
+      "stderrSha256": "cd605e1cc3abb34cbe022adf86e2b59ac396775c46ed8fb3dde40fe37dfc2699",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-deno-console-buffering-r1/console-buffering/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-deno-console-buffering-r1-resources.json",
+        "sha256": "c0cb3f0699c4374d0696a9a6c8afea0af7e010c22f6a79dcb93297be300fa67f",
+        "peakMemoryBytes": 3887063040,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "engineVersion": "1.4.2",
+      "case": "filesystem-surface",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-bun-filesystem-surface-r1/result.json",
+        "sha256": "b161a1d0e2d040c7ed4e983df10be12efda01cbf17eee529ae9704a380191f7c"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "48a04fc0f90be8539b362bc04f6ad8e8bee6edb9c077fb57534b9ef94a83f329",
+            "cSha256": "0133deba379bc20d3d2d4a46f1b0e3868529685a248920b4f1abe561c74a8e2c"
+          }
+        ],
+        "signature": "aeb90e9e7cb32d14562624908d8494c23aa306e8c26b316201c04705e63af930",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "8b5e2f5668db3dab0a49dda569b791ecba3169486cfafadcc7b65485e030ec57",
+      "observationsIdentical": true,
+      "stdoutSha256": "3f9472385e066b64edb14c210f28d64c6af6cb2d5392e8ee0a155d463d1a6e15",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-bun-filesystem-surface-r1/filesystem-surface/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-bun-filesystem-surface-r1-resources.json",
+        "sha256": "959917f5d341f788adf227e7cd877678f0246fdbce5f5253b295126c2a4284fd",
+        "peakMemoryBytes": 4033658880,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "engineVersion": "1.4.2",
+      "case": "filesystem-errors",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-bun-filesystem-errors-r1/result.json",
+        "sha256": "18ffc2ff26b3ab3fcc1c21afb26056b1eca36a1880bb17b088397d0e4f9ad5e1"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "484d9860c5361ce70c97d0325517c6302939f93a76657c751fa315a08f21e88d",
+            "cSha256": "fb1008d285da2f04fdf2cdcceb933634bb37a39539658dd481b99f04e9b1a772"
+          }
+        ],
+        "signature": "5c170ec2fde2fb87686ca2b5124304458bf6745a0531ff8829d12c28d6d46565",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "ff1adb9f43e30e2fa3ec0f419a41a50c172e81127616d48dd16746a964fd892b",
+      "observationsIdentical": true,
+      "stdoutSha256": "b2e2eeec457892be6afca994900829c8e9e74b11ebc0efc7dd14106a48537265",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-bun-filesystem-errors-r1/filesystem-errors/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-bun-filesystem-errors-r1-resources.json",
+        "sha256": "4e270d7aee1a7a2e7fc60a4e70bbba38e80336724ef1b1250f2c0307281b87be",
+        "peakMemoryBytes": 4109197312,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "engineVersion": "1.4.2",
+      "case": "filesystem-devices",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-bun-filesystem-devices-r1/result.json",
+        "sha256": "482e388dc02e94c9aa75580aa656434bfd86b6cbda6a21f11e27db80aaa22eac"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "7868b5be2f57021af7ae4c1557f3cd9d6030ce3f20d5e692f6829cfe3ed4f219",
+            "cSha256": "2e4ccf162529f130f4147ec26acb7b3f9d17d348be7c79a667c5224dd9ea6645"
+          }
+        ],
+        "signature": "083646b749406074556bcb9d529e8bdfea748b4ab8343b1cfb15f5588e6c33c0",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "1e2665484a11c37943000d9f3dd7d9f65b2ac95df4ed04618617e1653d2f8140",
+      "observationsIdentical": true,
+      "stdoutSha256": "0ec9ed8cbfb08fdfc73c554bdf141272b9d10a8a290fe81b65a0222db05ba312",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-bun-filesystem-devices-r1/filesystem-devices/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-bun-filesystem-devices-r1-resources.json",
+        "sha256": "b56aafacc82ab7c4645b1bf41553b2052798cfcfe2b8980034a35c260453e93d",
+        "peakMemoryBytes": 4016545792,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "engineVersion": "1.4.2",
+      "case": "windows-timezone",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-bun-windows-timezone-r1/result.json",
+        "sha256": "348c7c81912bc3b20fa3e571b08751e75f7859a2e5a1ad4ec76856cde4e6d995"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "c091995d3c3e85620d97572c511efa6cc21ca158b06e0bf0866441622ffbb3b1",
+            "cSha256": "4ed90de776f6e790104863fd9ae0332c16b772c701a603e83cd110b67ce2e2f4"
+          }
+        ],
+        "signature": "428328a55a2c79071cde93832931d212711730e9b21306565912d666c64214d2",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "4e6cae22f6d75d8dad39c19e5b59061d767d73aee0c1ed4456a6950fbedde26c",
+      "observationsIdentical": true,
+      "stdoutSha256": "8e5ad860d63612557cbfe77c9f5ac63ef03007831b21bcf40c4953a52aa6853c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-bun-windows-timezone-r1/windows-timezone/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-bun-windows-timezone-r1-resources.json",
+        "sha256": "9f45b8b75a94797d55f2aa21ee128c64ec9b2e614154f8f46f010dbdf0bdb950",
+        "peakMemoryBytes": 4104876032,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "engineVersion": "1.4.2",
+      "case": "standard-io",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-bun-standard-io-r1/result.json",
+        "sha256": "91f39007bd5005bbf7b4286975e143dc72b997d517c2ae14b01d3060b905cc2c"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "25b04269fd564ff77eee30473de2a04efaf8f1d428b60974a273de5898577249",
+            "cSha256": "bd93356b55961558a0571c486338e119a682f8168dcdfe3fac32f5e01cecf56b"
+          }
+        ],
+        "signature": "c8e026067fe35b55187564867d5deb4fc248b413418f2f6d072fa48ca654cef4",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "b2b7b122701e1121b98909dc360d57fa715801f14a35392fc6b04ed3aa9f2247",
+      "observationsIdentical": true,
+      "stdoutSha256": "6a1d820cf1d55685d97afee838668b1821a84ca423c42daa0ead328cb4ff3150",
+      "stderrSha256": "dc15b181920b786890b876f696b6f1a4ee4b34d052a54f0e2250eacaba53745c",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-bun-standard-io-r1/standard-io/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-bun-standard-io-r1-resources.json",
+        "sha256": "c0af8ee10fde8d0128bae8d8215f715ac9e510e36ace28bf5712cd1a1276b82b",
+        "peakMemoryBytes": 3953946624,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "engineVersion": "1.4.2",
+      "case": "getline-state",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-bun-getline-state-r1/result.json",
+        "sha256": "563f66153568b4a0692e8b65ac84531086384c7c4b7fd9ea46523aef57630b37"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "7bc6293b979c3df900e803f0514d6b40fe4aefa8799a185ce5d88934d60b586a",
+            "cSha256": "cd6f3d06a472cac7c3f6e7455ef80574114741b21ab70bd14085465680cf7552"
+          }
+        ],
+        "signature": "0a0583b0c60778bae3d9cb00e26521a8d831c0660e41259b8f68d888d1e7a838",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "43bd3380c885cb1221487a05249b28fce69f741c72d934ce0be9767475896549",
+      "observationsIdentical": true,
+      "stdoutSha256": "6cebf45b5155ca4c10ed9751905a0e69fc9a82e45dcbaf923d1e626acff00c63",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-bun-getline-state-r1/getline-state/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-bun-getline-state-r1-resources.json",
+        "sha256": "d7d30ca3e56b7d3a5fd04e4a7afb7fa794627b152c05535ff59731cf9e4df24d",
+        "peakMemoryBytes": 4079026176,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "engineVersion": "1.4.2",
+      "case": "truncate-errors",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-bun-truncate-errors-r1/result.json",
+        "sha256": "eb0c5293f1964ce34edcf9b099a3a12783a1e2274f2c29b55a421fecd81ad984"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "2eab6468a7672fb95078590d8c1f1d27328c2829937ed518c6c3a2bef0638928",
+            "cSha256": "c2ff41645dc867b96d5b3400c36907927960a3bab9cd4748320dcf5d4a37ffa3"
+          }
+        ],
+        "signature": "a92a6b481fbbafcbd4326efa6874b9f2f3771d4e4795b768379ac9a29ac96557",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "727f491e74a0769fdd4ea055bffaaafc7af7704bc6fe5bf59089b1d9bc3bd01c",
+      "observationsIdentical": true,
+      "stdoutSha256": "ad3ae98eac7bfb84bdab690b919ef4287ad18abd75311b4e1b027741379c07fe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-bun-truncate-errors-r1/truncate-errors/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-bun-truncate-errors-r1-resources.json",
+        "sha256": "3351a86d71d656cbf5046e8652e5414b54d87634aa1ecc4259df62b511bf2aea",
+        "peakMemoryBytes": 4054138880,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "engineVersion": "1.4.2",
+      "case": "console-buffering",
+      "passed": true,
+      "result": {
+        "path": ".work/application-io-4.34.1-bun-console-buffering-r1/result.json",
+        "sha256": "3d627869daac07446a58dd25236ab0f06f8706dd4aa77d7bf91e5a7e623c0da1"
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "a57406c4f3e7529485538c002364986ea7a70954bf8273175570da11db61aef4",
+            "cSha256": "72eb6524cc3ae0f65b42931629a0c249ce6c8c9a0f1a2ddac6d19526963118b3"
+          }
+        ],
+        "signature": "72f5138ccbf35ffdd56b0c8687ead8de538579b0ebef9e236f52a8c4d3e7cfbe",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "7468ac2d696f0ff8ae72f8336a8f265e58777369aa802a258ca0f5a2ad93ff4d",
+      "observationsIdentical": true,
+      "stdoutSha256": "ed9ee8e60b1498af3781ac77f359885ef0a4054df3018a686aa5421b959df304",
+      "stderrSha256": "cd605e1cc3abb34cbe022adf86e2b59ac396775c46ed8fb3dde40fe37dfc2699",
+      "code": 0,
+      "sourceUnchanged": true,
+      "temporaryAndFixtureCleanupPassed": true,
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true,
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-bun-console-buffering-r1/console-buffering/relocated deployment"
+      },
+      "resource": {
+        "path": ".work/product-acceptance/application-io-4.34.1-bun-console-buffering-r1-resources.json",
+        "sha256": "e3f89deb43723fe158314260703d12c6c53ff22db9e512bed10c9121cfb5d351",
+        "peakMemoryBytes": 4120584192,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    }
+  ],
+  "peakMemoryBytes": 4814950400,
+  "allResourceGuardsReleased": true,
+  "resourceAborts": 0,
+  "originalSchedule": {
+    "path": ".work/product-acceptance/io-http-acceptance-4.34.1-r1.json",
+    "note": "Supervisor deliberately stopped only after the final IO child finished and released its guard. Its last phase remains running in that interrupted scheduler receipt; the completed child result and guard above establish the pass. No HTTP phase launched in that schedule.",
+    "pause": {
+      "action": "Pause only the serial supervisor; let its existing final IO workload finish under the unchanged resource guard",
+      "supervisorPid": 4173301,
+      "activePhase": {
+        "name": "application-io-4.34.1-bun-console-buffering-r1",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "6144",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-4.34.1-bun-console-buffering-r1-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "env",
+          "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=512",
+          "integration/application-io-regressions.mjs",
+          "/home/lastmjs/development/lasm/compiler/.work/application-io-4.34.1-bun-console-buffering-r1",
+          "bun",
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+          "console-buffering",
+          "--lean-version",
+          "4.34.1"
+        ],
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-4.34.1-bun-console-buffering-r1.log",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-io-4.34.1-bun-console-buffering-r1-resources.json",
+        "status": "running"
+      },
+      "reason": "Next HTTP builds copy 2.06 GiB of standard module data twice; current disk headroom is insufficient for their actual profile",
+      "at": "2026-09-25T05:48:20.647345+00:00",
+      "workloadFinishedWithoutInterruption": true,
+      "guardReleased": true,
+      "finishedPhasePassed": true,
+      "supervisorAction": "Interrupt the paused supervisor after its completed child released the guard; preserve original schedule and continue with a new disk profile",
+      "atFinished": "2026-09-25T05:49:20.274051+00:00"
+    }
+  },
+  "harness": {
+    "path": "integration/application-io-regressions.mjs",
+    "sha256": "7fd3d2bf8a8a031257adee5c4bd096b0af4ce78c6919a6f35b52f5b9f429aef6"
+  },
+  "limitations": [
+    "All comparisons ran on Linux x64. The windows-timezone fixture exercises only its Linux fallback branch.",
+    "These inputs do not establish complete IO.FS, console, concurrency or other standard-library behavior.",
+    "Source-hidden relocated execution with empty PATH is not filesystem denial; the separate cold Node deployment has that stricter control.",
+    "HTTP testing continues separately after adjusting for its 2.06 GiB runtime-metadata copies."
+  ]
+}

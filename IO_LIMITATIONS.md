@@ -21,6 +21,11 @@ separately from the earlier runtime evidence below.
   A [fresh Node/npm-only installation and isolated deployment](docs/evidence/lean-4.34.1-cold-install-2026-09-25.json)
   also pass on Linux x64, with managed tools starting empty. That installation
   gate does not add broader API or other-platform passes.
+  The [fresh installed filesystem/console comparison](docs/evidence/lean-4.34.1-installed-io-2026-09-25.json)
+  now passes eight unchanged fixtures in each engine: all 24 deployed outputs
+  match independently interpreted and compiled native Lean, including cleanup.
+  These Linux x64 inputs are partial API coverage. HTTP builds continue in a
+  separate campaign with disk headroom for their runtime module-data copies.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.

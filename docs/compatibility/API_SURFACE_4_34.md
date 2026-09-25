@@ -11,9 +11,12 @@ counts do not carry behavioral passes to a new release.
 Eight unchanged supplementary filesystem and console fixtures have fresh
 [native interpreted and C-compiled controls](../evidence/lean-4.34.1-native-io-ci-2026-09-25.json)
 on Linux x64. Their outputs match exactly and cleanup checks pass. A retained
-pressure-aborted attempt precedes the successful base-page retry. Installed
-comparisons and native validation on the other five platforms remain separate
-acceptance work; these controls do not establish complete API parity.
+pressure-aborted attempt precedes the successful base-page retry. The
+[installed `.25` comparisons](../evidence/lean-4.34.1-installed-io-2026-09-25.json)
+now pass all eight fixtures in each stock engine: 24 exact native/deployed output
+comparisons, including temporary-resource cleanup and source-hidden relocation
+with empty PATH. Peak memory is 4.48 GiB without resource events. Native
+validation on the other five platforms and complete API parity remain open.
 
 ## Lean 4.34.0 application API inventory
 
