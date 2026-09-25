@@ -162,7 +162,8 @@ if (category === 'compiled-driver-and-native-compiler') {
 if (mode === 'probe-compile-disabled') {
   manifest.scope = 'Additional native AOT and installed-Lasm AOT experiments for original upstream compile-disabled inputs; original markers/driver run unchanged first';
   manifest.adaptations.push('After the unchanged upstream driver, an additional native AOT control runs the ordinary compile driver commands and original assertions, followed by installed-Lasm AOT.',
-    'No no_compile marker is removed or edited; the extra-native-aot phase distinguishes a native control failure from a deployed application failure.');
+    'No no_compile marker is removed or edited; the extra-native-aot phase distinguishes a native control failure from a deployed application failure.',
+    'Native compiler children restore the original driver LEAN_SYSROOT/LEAN_PATH instead of inheriting deployed metadata paths; their invocations remain native coverage.');
 }
 const manifestFile = join(output, 'manifest.json');
 writeFileSync(manifestFile, JSON.stringify(manifest, null, 2) + '\n');

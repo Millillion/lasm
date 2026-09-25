@@ -51,8 +51,14 @@ separately from the earlier runtime evidence below.
   now records 97 deployed passes and four original compilation-disabled
   registrations. All 7,673 original entries and the frozen harness are unchanged;
   peak memory is 5.43 GiB with no resource events. Native compiler children
-  retain their native classification. Separate AOT controls for the four omitted
-  deployments and the remaining engine campaigns are pending.
+  retain their native classification. [Separate AOT controls for the four omitted
+  deployments](docs/evidence/lean-4.34.1-compile-disabled-2026-09-25.json) now pass
+  in all three installed engines: twelve comparisons with the original drivers,
+  markers and assertions intact. The language-server benchmark initially inherited
+  deployed metadata paths in its native compiler child; the parallel harness now
+  restores that child's original native search environment. Its earlier failure
+  remains recorded. Peak memory is 5.17 GiB without resource events. Other full
+  engine campaigns remain pending.
   These are partial Linux x64 observations. Other upstream contexts, complete
   API/language coverage and the other five native platforms remain open.
   Earlier results retain their stated release scope.

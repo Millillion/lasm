@@ -37,6 +37,14 @@ directly into another build would consume the disk reserve. Resume with a fresh
 campaign after diagnosing the failure and restoring headroom. Unstarted tests
 remain untested, and upstream-disabled registrations remain explicit skips.
 
+`probe-compile-disabled` runs separately selected native/deployed AOT controls
+after the original compilation-disabled driver. Its recorded native compiler
+children restore the original driver's `LEAN_SYSROOT` and `LEAN_PATH`: deployed
+module-data paths belong to the application and contain no native compiler.
+The original markers, sources, assertions and timeouts remain unchanged. Fresh
+[Lean 4.34.1 controls pass all four inputs in each engine](../../docs/evidence/lean-4.34.1-compile-disabled-2026-09-25.json),
+with native server/compiler child actions recorded separately.
+
 `prepare-native-shard.mjs OUTPUT SELECTION INDEX COUNT [LEAN_VERSION]` and
 `native-ci.sh prepare|run|both SELECTION INDEX COUNT [LEAN_VERSION]` accept the
 same explicit version. Historical `remaining-*` selections apply only to their

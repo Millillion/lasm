@@ -8,10 +8,20 @@ source "$TEST_DIR/util.sh"
 # Some excluded inputs launch a real compiler/server. Record every native Lean
 # invocation in all control phases; the shim execs the exact managed binary and
 # preserves arguments, streams, exit status and PID. This is harness evidence.
+# Restore the native driver's search environment in its compiler children. A
+# deployed application's metadata root intentionally contains no native tools.
+for name in LEAN_SYSROOT LEAN_PATH; do
+  if [[ -v $name ]]; then export "LASM_NATIVE_TEST_$name=${!name}";
+  else unset "LASM_NATIVE_TEST_$name"; fi
+done
 mkdir "$evidence/native-compiler-bin"
 cat > "$evidence/native-compiler-bin/lean" <<'SHIM'
 #!/usr/bin/env bash
 set -eo pipefail
+for name in LEAN_SYSROOT LEAN_PATH; do
+  saved="LASM_NATIVE_TEST_$name"
+  if [[ -v $saved ]]; then export "$name=${!saved}"; else unset "$name"; fi
+done
 {
   printf '%q ' "$LASM_NATIVE_LEAN" "$@"
   printf '\n'
@@ -51,6 +61,8 @@ printf 'application-build\n' > "$evidence/phase.txt"
 run_before "$file"
 "$LASM_BUILD_NODE" "$LASM_COMPILER/bin/lasm.mjs" build "$PWD/$file" \
   --target "$LASM_APPLICATION_TARGET" --output "$evidence/dist"
+"$LASM_BUILD_NODE" "${BASH_SOURCE[0]%/*}/reclaim-case-metadata.mjs" \
+  "$PWD/$file" "$evidence/dist" "$evidence/module-data-reclamation.json"
 prefix=()
 if [[ $LASM_APPLICATION_TARGET == deno ]]; then prefix=(run -A); fi
 printf 'application-runtime\n' > "$evidence/phase.txt"

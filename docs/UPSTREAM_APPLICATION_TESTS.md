@@ -110,9 +110,24 @@ entries and the frozen harness remain unchanged. Peak guarded memory is
 5.43 GiB, without OOM, swap, memory pressure stops or disk stops. Original
 assertions, arguments, sidecars and exclusions remain active. Six fixtures invoke
 native Lean children; those compiler actions remain native evidence. This is one
-category on Linux x64. The four excluded inputs have separate AOT controls queued;
-other latest-release engine/category/platform campaigns and full API parity
-remain unfinished.
+category on Linux x64. Other latest-release engine/category/platform campaigns
+and full API parity remain unfinished.
+
+The [four compilation-disabled inputs now pass separate AOT controls in all
+three installed engines](evidence/lean-4.34.1-compile-disabled-2026-09-25.json):
+twelve deployed comparisons, each following the unchanged original driver and
+an additional native AOT control. The original compilation-disabled markers stay
+active in the full category campaigns. All 7,673 source entries and each frozen
+harness remain unchanged throughout their runs; peak memory is 5.17 GiB with
+no resource events.
+
+`identifier_completion` launches a native Lean language server. Its first Node
+deployment failed because that child inherited the application's deployed
+`LEAN_SYSROOT`, then looked for a native worker under `dist/lean/bin/lean`.
+The parallel shim now restores the original native driver's `LEAN_SYSROOT` and
+`LEAN_PATH` for compiler children. A fresh Node case and both other engines pass
+the original assertions. The failure, output and resource receipts remain
+recorded separately; these compiler/server actions remain native coverage.
 
 The results and checked items below retain their original **4.34.0** scope.
 

@@ -42,7 +42,9 @@ below retain their original, narrower scope.
   and compiled-application paths, including the reviewed mixed drivers.
   [The latest Node compiled-application category](docs/evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
   now has 97 deployed passes and four original compilation-disabled cases;
-  remaining categories, engines and parallel excluded-input controls stay open.
+  [parallel AOT controls for those four cases](docs/evidence/lean-4.34.1-compile-disabled-2026-09-25.json)
+  now pass in all three engines. Remaining categories and full engine campaigns
+  stay open.
 - [ ] Audit and differentially test all standard APIs, including IO.FS and Std.Http.
 - [ ] Complete source-free deployment and native six-platform acceptance for
   stock Node, Deno and Bun.
