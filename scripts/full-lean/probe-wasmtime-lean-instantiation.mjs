@@ -14,8 +14,10 @@ import { ensureResourceGuard } from './resource-guard.mjs';
 await ensureResourceGuard();
 const [outputArg, toolchainCacheArg, restoredCacheArg, profile = 'startup', ...extra] = process.argv.slice(2);
 assert.ok(outputArg && toolchainCacheArg && !extra.length,
-  'Supply NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [VERIFIED_RESTORED_CACHE] [startup|high-allocation|workers|main]');
-assert.ok(['startup', 'high-allocation', 'workers', 'main'].includes(profile));
+  'Supply NEW_OUTPUT EXISTING_TOOLCHAIN_CACHE [VERIFIED_RESTORED_CACHE] [startup|high-allocation|workers|main|main-native-api]');
+assert.ok(['startup', 'high-allocation', 'workers', 'main', 'main-native-api'].includes(profile));
+const runMain = ['main', 'main-native-api'].includes(profile);
+const directNativeApi = profile === 'main-native-api';
 assert.equal(process.platform + '-' + process.arch, 'linux-x64');
 const root = fileURLToPath(new URL('../..', import.meta.url)), output = resolve(outputArg);
 const toolchainCache = resolve(toolchainCacheArg);
@@ -39,9 +41,10 @@ const inputs = ['scripts/full-lean/probes/wasmtime-instantiate-lean.c',
   'scripts/full-lean/probes/wasmtime-instantiate-lean.mjs',
   'scripts/full-lean/probe-wasmtime-lean-instantiation.mjs', 'integration/fixtures/LeanPureExports.lean',
   'scripts/full-lean/probes/wasmtime-lean-workers.mjs',
-  'scripts/full-lean/probes/wasmtime-lean-main.mjs', 'src/bun-stack.mjs', 'src/node-host.mjs'];
+  'scripts/full-lean/probes/wasmtime-lean-main.mjs', 'src/bun-stack.mjs', 'src/node-host.mjs',
+  'scripts/full-lean/probes/wasmtime-native-api.c', 'scripts/full-lean/probes/wasmtime-lean-supervisor.mjs'];
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
-const report = { scope: profile === 'main'
+const report = { scope: runMain
   ? 'Unchanged const_fold main through a private Wasmtime integration and native Lean oracles; not shipping backend or general API acceptance'
   : 'Instantiate the actual compiled const_fold module and compare pure runtime exports; actual startup/clock/memory metadata, other function imports reject, no application-main/API acceptance',
   inputs: hashes, build: previous.build, trustedCache: cacheIdentity, archive, toolchainCache, profile,
@@ -86,7 +89,7 @@ try {
   assert.equal(oracle.trim().split('\n').length, 23);
   const oraclePath = join(output, 'oracle.txt'); writeFileSync(oraclePath, oracle);
   report.oracle = { cases: 23, stdout: oracle, nativeCompiledMatches: true };
-  if (profile === 'main') {
+  if (runMain) {
     const original = join(root, '.work/upstream-mixed-native-r1/source/tests/compile_bench/const_fold.lean');
     const originalInit = original + '.init.sh', source = join(output, 'const_fold.lean');
     const sourceSha256 = await hashFile(original), initSha256 = await hashFile(originalInit);
@@ -115,6 +118,16 @@ try {
     '-I' + join(sdk, 'include'), join(root, inputs[0]), '-L' + join(sdk, 'lib'), '-lwasmtime',
     '-Wl,-rpath,' + join(sdk, 'lib'), '-o', helper]);
   report.helperSha256 = await hashFile(helper);
+  const nativeApi = join(output, 'native-api.node');
+  if (directNativeApi) {
+    const headers = join(root, '.cache/js-runtimes/node-26.10.0/include/node');
+    report.nativeApiHeaders = Object.fromEntries(await Promise.all(
+      ['node_api.h', 'node_api_types.h', 'js_native_api.h', 'js_native_api_types.h'].map(async name =>
+        [name, await hashFile(join(headers, name))])));
+    run('compile direct Node-API driver', 'cc', ['-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
+      '-shared', '-fPIC', '-I' + headers, join(root, inputs[8]), '-ldl', '-o', nativeApi]);
+    report.nativeApiSha256 = await hashFile(nativeApi);
+  }
   for (const [engine, args] of [
     [join(root, '.cache/js-runtimes/node-26.10.0/bin/node'), ['--max-old-space-size=128']],
     [join(root, '.cache/js-runtimes/deno-2.9.7/deno'), ['run', '-A', '--v8-flags=--max-old-space-size=128']],
@@ -122,11 +135,12 @@ try {
   ]) {
     try { report.results.push(JSON.parse(run('pure runtime exports', engine,
       [...args, join(root, inputs[1]), helper, cache, cacheIdentity.sha256, oraclePath,
-        ['workers', 'main'].includes(profile) ? 'high-allocation' : profile])));
+        profile === 'workers' || runMain ? 'high-allocation' : profile])));
       if (profile === 'workers') report.workerResults.push(JSON.parse(run('real guest pthread lifecycle', engine,
         [...args, join(root, inputs[4]), helper, cache, cacheIdentity.sha256])));
-      if (profile === 'main') report.mainResults.push(JSON.parse(run('unchanged application main', engine,
-        [...args, join(root, inputs[5]), helper, cache, cacheIdentity.sha256],
+      if (runMain) report.mainResults.push(JSON.parse(run('unchanged application main', engine,
+        [...args, join(root, inputs[directNativeApi ? 9 : 5]), helper, cache, cacheIdentity.sha256,
+          ...(directNativeApi ? [nativeApi] : [])],
         { ...process.env, LEAN_STACK_SIZE_KB: '4194304', LASM_VM_STACK_MB: '96' })));
     }
     catch (error) { report.failures.push({ engine, message: error.message }); }
@@ -137,9 +151,19 @@ try {
     [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
   if (profile === 'workers') assert.deepEqual(report.workerResults.map(row => [row.engine, row.version]),
     [['node', '26.10.0'], ['deno', '2.9.7'], ['bun', '1.4.2']]);
-  if (profile === 'main') assert.deepEqual(report.mainResults.map(row => [row.engine, row.version, row.stdout, row.code]),
+  if (runMain) assert.deepEqual(report.mainResults.map(row => [row.engine, row.version, row.stdout, row.code]),
     ['node', 'deno', 'bun'].map((engine, index) =>
       [engine, ['26.10.0', '2.9.7', '1.4.2'][index], report.mainOracle.stdout, 0]));
+  if (directNativeApi) for (const result of report.mainResults) {
+    assert.equal(result.wasmEntry, 'direct Node-API on verified worker stacks');
+    assert.equal(result.controlStackBytes, 64 * 1024 ** 2);
+    assert.equal(result.nativeStackOverflowControl, true);
+    for (const thread of result.threads) {
+      assert.equal(thread.ready.wasmEntry, 'direct Node-API');
+      assert.equal(thread.ready.wasmControlStackBudget, 64 * 1024 ** 2);
+      assert.ok(thread.ready.nativeStackBytes >= 80 * 1024 ** 2);
+    }
+  }
   report.cacheUnchanged = await hashFile(cache) === cacheIdentity.sha256; assert.ok(report.cacheUnchanged);
   report.passed = true;
 } catch (error) { report.error = { message: error.message, stack: error.stack }; throw error; }

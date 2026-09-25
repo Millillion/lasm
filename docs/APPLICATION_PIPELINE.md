@@ -856,3 +856,16 @@ back into JavaScript again; small main stacks are rejected before that workload.
 Peak memory is 69 MiB. This provides a tested route beyond Koffi's 16 MiB stack
 ceiling. Real Wasmtime integration and relocating runtime ownership onto a
 verified worker stack are still required before increasing its current limit.
+
+The [real main now passes through that direct Node-API path](evidence/wasmtime-native-api-main-2026-09-24.json)
+in all three stock engines. Runtime ownership moves to a verified 96 MiB worker;
+the process main thread supervises termination. Each direct Wasm entry checks
+native stack headroom, allowing a 64 MiB Wasmtime budget with room for host
+callbacks. An independent recursion control traps safely and recovers in the
+same Store. Its initial four-million-call depth fit the new budget, so the
+recorded follow-up increases only that diagnostic control to eight million.
+The unchanged Lean benchmark still preserves its 4 GiB stack setting and matches
+both native oracles. Peak guarded memory is 435 MiB with no resource events.
+This removes the FFI stack ceiling from this real-application prototype; managed
+packaging, general imports, lifetime/cancellation, larger adaptive stack needs,
+latest-runtime coverage and native platform acceptance remain open.

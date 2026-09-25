@@ -38,6 +38,7 @@ typedef struct {
     uint64_t growth_requests, growth_successes, largest_growth_request;
     uint64_t pthread_creations, pthread_cleanups, pthread_exits, blocking_checks;
     bool is_worker;
+    size_t wasm_stack_budget;
     char *program_name;
     size_t environment_size, environment_count;
     uint8_t *environment;
@@ -427,7 +428,7 @@ void lasm_lean_instance_delete(lean_probe_t *probe) {
     free(probe);
 }
 
-lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t date_now,
+static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_cache, date_callback_t date_now,
     mailbox_callback_t schedule_mailbox,
     const uint8_t *environment, size_t environment_size, size_t environment_count,
     const char *program_name,
@@ -463,7 +464,11 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
     probe->schedule_mailbox = schedule_mailbox;
     probe->spawn = spawn; probe->thread_event = thread_event;
     probe->is_worker = parent != NULL;
+    probe->wasm_stack_budget = wasm_stack_budget;
     if (parent) {
+        if (parent->wasm_stack_budget != wasm_stack_budget) {
+            snprintf(error, capacity, "worker stack budget differs from shared engine"); goto failed;
+        }
         // Clone reference-counted immutable/shared values only. Each JS isolate
         // owns its new Store and Instance; no Store crosses a thread boundary.
         probe->engine = wasmtime_engine_clone(parent->engine);
@@ -479,10 +484,9 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
     wasmtime_config_parallel_compilation_set(config, false);
     wasmtime_config_cranelift_opt_level_set(config, WASMTIME_OPT_LEVEL_NONE);
     wasmtime_config_memory_reservation_set(config, UINT64_C(8589934592));
-    // Koffi switches synchronous calls onto its own stack. Keep Wasmtime's
-    // native stack budget below the configured 16 MiB FFI reservation; the
-    // guest's independent linear-memory stack remains the original 4 GiB.
-    wasmtime_config_max_wasm_stack_set(config, 12 * 1024 * 1024);
+    // The FFI driver uses 12 MiB below its 16 MiB reservation. The direct
+    // Node-API driver verifies a larger native worker stack on every entry.
+    wasmtime_config_max_wasm_stack_set(config, wasm_stack_budget);
     wasmtime_config_async_stack_size_set(config, 80 * 1024 * 1024);
     probe->engine = wasm_engine_new_with_config(config);
     if (!probe->engine) { snprintf(error, capacity, "engine allocation failed"); goto failed; }
@@ -692,6 +696,37 @@ lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t 
 failed:
     lasm_lean_instance_delete(probe); return NULL;
 }
+lean_probe_t *lasm_lean_instance_new(const char *trusted_cache, date_callback_t date_now,
+    mailbox_callback_t mailbox, const uint8_t *environment, size_t environment_size,
+    size_t environment_count, const char *program_name, lean_probe_t *parent,
+    spawn_callback_t spawn, thread_event_callback_t thread_event, char *error, size_t capacity) {
+    return instance_new(12 * 1024 * 1024, trusted_cache, date_now, mailbox, environment,
+        environment_size, environment_count, program_name, parent, spawn, thread_event, error, capacity);
+}
+lean_probe_t *lasm_lean_instance_new_large(const char *trusted_cache, date_callback_t date_now,
+    mailbox_callback_t mailbox, const uint8_t *environment, size_t environment_size,
+    size_t environment_count, const char *program_name, lean_probe_t *parent,
+    spawn_callback_t spawn, thread_event_callback_t thread_event, char *error, size_t capacity) {
+    return instance_new(64 * 1024 * 1024, trusted_cache, date_now, mailbox, environment,
+        environment_size, environment_count, program_name, parent, spawn, thread_event, error, capacity);
+}
+int lasm_lean_native_entry_check(lean_probe_t *probe, char *error, size_t capacity) {
+    pthread_attr_t attr;
+    void *base = NULL; size_t size = 0;
+    if (pthread_getattr_np(pthread_self(), &attr)) {
+        snprintf(error, capacity, "cannot inspect native entry stack"); return 1;
+    }
+    int status = pthread_attr_getstack(&attr, &base, &size);
+    pthread_attr_destroy(&attr);
+    uintptr_t frame = (uintptr_t)&attr, bottom = (uintptr_t)base;
+    // Reentrant imports share the original Wasmtime entry's stack limit.
+    // Require additional headroom for host callbacks even on nested entry.
+    size_t required = 8 * 1024 * 1024 + (probe->active_context ? 0 : probe->wasm_stack_budget);
+    if (status || frame < bottom || frame - bottom >= size || frame - bottom < required) {
+        snprintf(error, capacity, "insufficient native stack for direct Wasmtime entry"); return 1;
+    }
+    return 0;
+}
 
 int lasm_lean_instance_call(lean_probe_t *probe, const char *name, const uint64_t *args,
     size_t nargs, uint32_t result_count, uint64_t *result, char *error, size_t capacity) {
@@ -778,7 +813,8 @@ void lasm_lean_instance_set_runtime(lean_probe_t *probe, runtime_callback_t runt
 }
 int lasm_lean_stack_control(lean_probe_t *probe, char *error, size_t capacity) {
     // Fixed tiny control, compiled with the SAME engine limits as the real
-    // module. Deep recursion must trap before Koffi's native stack is exhausted.
+    // module. Deep recursion must trap before the verified native reservation
+    // is exhausted, then the same Store must remain usable.
     const char *wat = "(module (func (export \"recur\") (param i32) (result i32) "
         "local.get 0 i32.eqz if (result i32) i32.const 0 else "
         "local.get 0 i32.const 1 i32.sub call 0 i32.const 1 i32.add end))";
@@ -801,7 +837,7 @@ int lasm_lean_stack_control(lean_probe_t *probe, char *error, size_t capacity) {
         if (!wasmtime_instance_export_get(context, &instance, "recur", 5, &entry)) {
             snprintf(error, capacity, "missing stack control export"); status = 1;
         } else {
-            wasmtime_val_t argument = { .kind = WASMTIME_I32, .of.i32 = 1000000 }, result;
+            wasmtime_val_t argument = { .kind = WASMTIME_I32, .of.i32 = 8000000 }, result;
             trap = NULL;
             called = wasmtime_func_call(context, &entry.of.func, &argument, 1, &result, 1, &trap);
             wasmtime_trap_code_t code;

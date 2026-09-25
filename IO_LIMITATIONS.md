@@ -281,6 +281,14 @@ separately from the earlier runtime evidence below.
   96 MiB worker safely uses about 24 MiB of native stack, beyond Koffi's maximum.
   The process main stack is only about 8 MiB and rejects this workload before
   execution. Integrating this path with actual Wasmtime execution remains open.
+  [The real-main follow-up](docs/evidence/wasmtime-native-api-main-2026-09-24.json)
+  now passes through direct Node-API in all three engines with a 64 MiB Wasmtime
+  budget on verified 96 MiB workers. Every direct entry checks stack headroom;
+  an independent recursion control traps and recovers safely. The unchanged
+  benchmark retains the original 4 GiB Lean stack setting and matches both
+  native oracles. Peak guarded memory is 435 MiB without resource events.
+  This removes the prototype's FFI ceiling, while shipping integration, adaptive
+  stack needs and the other general compatibility gaps remain open.
 
 ## Earlier runtime evidence and remaining compatibility work
 
