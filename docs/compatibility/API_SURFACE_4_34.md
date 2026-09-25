@@ -18,22 +18,20 @@ comparisons, including temporary-resource cleanup and source-hidden relocation
 with empty PATH. Peak memory is 4.48 GiB without resource events. Native
 validation on the other five platforms and complete API parity remain open.
 
-The [installed upstream HTTP IO comparisons](../evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
-also pass 85 original actions in each engine. Three reviewed elaboration tests
-run their unchanged native drivers first, then separate byte-preserving
-ordinary-main copies execute every action at runtime. All nine deployed
-comparisons match interpreted and compiled native exits and output. These are
-partial behavior observations, not individual declaration coverage or complete
-`Std.Http` equivalence; other input contexts remain unmapped by this adapter.
+The [expanded upstream HTTP IO comparison](../evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
+passes twelve original inputs and all 148 actions in each stock engine: 36
+native/deployed comparisons and 444 deployed actions. Inputs cover bodies,
+headers, dispatch, expectations, incremental/fuzz parsing, keep-alive,
+replayable bodies, request lines, response framing and trailers. Every original
+native driver passes before the separate byte-preserving parallel mains run.
+Native interpreted, native compiled and installed `.25` deployed exits and
+output match exactly; assertions and deadlines retain their original bytes.
 
-The [expanded installed Node comparison](../evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
-passes twelve original HTTP IO inputs, totaling 148 actions. Nine additional
-inputs cover dispatch, expectations, incremental/fuzz parsing, keep-alive,
-replayable bodies, request lines, response framing and trailers. The original
-drivers and both native parallel modes pass before exact deployed comparison.
-The reviewed source hashes, action counts and five integrity controls are
-recorded; assertions and timeouts remain unchanged. Deno/Bun continuations,
-other upstream contexts and declaration-level coverage remain pending.
+Five integrity controls protect exact source/release/action review and syntax
+contexts. All resource guards release without aborts. These Linux x64 behavior
+observations do not establish individual declaration coverage or complete
+`Std.Http` equivalence. Serial fuzz/hang cases, other contexts and all other
+native platforms remain pending.
 
 ## Lean 4.34.0 application API inventory
 

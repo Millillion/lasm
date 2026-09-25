@@ -1,0 +1,80 @@
+{
+  "scope": "Lossless archival of completed private helper cache/converted module and an already archived cold-deployment input; no source, failed experiment, tool cache, log or result changes",
+  "archiveReceipt": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/private-wasmtime-4.34.1-archive-r1.json",
+  "archiveReceiptSha256": "dc578692444141a47a3ab6c9cd60c57548bbe9f97c6449f960740204b1fd825b",
+  "files": [
+    {
+      "original": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-4.34.1-compilation-r1/compiled.cwasm",
+      "originalSha256": "e52524bed8f10b6d4aa9c9d9475e496d76a4c99af8eee6598071737ca580a429",
+      "originalBytes": 610796624,
+      "mode": 436,
+      "mtimeNs": 1790318266330938354,
+      "archive": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-4.34.1-compilation-r1/compiled.cwasm.gz",
+      "archiveSha256": "f92aa918054e6438d6b2de155c2d2bf571971348a751885337ed15518e927b72",
+      "archiveBytes": 182701859,
+      "reusedVerifiedArchive": false,
+      "verifiedDecompression": true,
+      "phase": "archived"
+    },
+    {
+      "original": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-4.34.1-format-r1/converted.wasm",
+      "originalSha256": "655beac9ef34b01f7e241d9790fa926a2fa24e29117e80432f945ea88bfe4a78",
+      "originalBytes": 160507363,
+      "mode": 436,
+      "mtimeNs": 1790318100033359249,
+      "archive": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-4.34.1-format-r1/converted.wasm.gz",
+      "archiveSha256": "0e85f30a8686b3bc1a329015865e58404dd741f5bc2f80e1bd49a1c0cf0fc83b",
+      "archiveBytes": 37265501,
+      "reusedVerifiedArchive": false,
+      "verifiedDecompression": true,
+      "phase": "archived"
+    },
+    {
+      "original": "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/dist/program.wasm",
+      "originalSha256": "de24114234218bf4b01ecf06be13a694b88ad79a07ff41075b85e7910ce155eb",
+      "originalBytes": 160431795,
+      "mode": 509,
+      "mtimeNs": 1790312653024873786,
+      "archive": "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/dist/program.wasm.gz",
+      "archiveSha256": "c0939ae42d7d55150e9ddaa4e61b8ca04e4d923ae50cd3b82d0478404636a6d0",
+      "archiveBytes": 37245999,
+      "reusedVerifiedArchive": true,
+      "verifiedDecompression": true,
+      "phase": "archived"
+    }
+  ],
+  "freedBytes": 711761920,
+  "restore": "Decompress to the original path, verify original SHA256 and size, then restore the recorded mode and mtimeNs before reusing a probe.",
+  "resources": {
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/private-wasmtime-4.34.1-archive-r1-resources.json",
+    "startedAt": "2026-09-25T07:49:06.088Z",
+    "finishedAt": "2026-09-25T07:49:27.514Z",
+    "limits": {
+      "memoryMax": 2147483648,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 1717986918,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "peakMemoryBytes": 809705472,
+    "minimumHostAvailable": 22981881856,
+    "unitReleased": true,
+    "result": {
+      "code": 0,
+      "signal": null
+    },
+    "resourceLimited": false,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0
+  },
+  "recordedAt": "2026-09-25T07:50:55.819747+00:00"
+}

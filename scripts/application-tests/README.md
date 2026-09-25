@@ -69,8 +69,8 @@ The initial three inputs are `async_http_body`, `async_http_body_framing` and
 `async_http_request_headers`; their three-engine results are recorded separately.
 Nine additional flat IO inputs cover dispatch, expectations, incremental parsing,
 parser fuzzing, keep-alive, replayable bodies, request lines, response framing
-and trailers. Their [twelve-input Node comparison](../../docs/evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
-now passes all 148 actions; other engines' continuations are recorded separately.
+and trailers. Their [twelve-input three-engine comparison](../../docs/evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
+now passes all 148 actions per engine, for 444 deployed actions in total.
 Listing a new input permits validation attempts, not an execution pass.
 It first runs the original native elaboration driver and its assertions. The
 matching native Lean parser then identifies each unwrapped evaluation token.

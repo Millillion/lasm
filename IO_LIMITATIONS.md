@@ -6,48 +6,31 @@ build platforms. Its [application pipeline status](docs/APPLICATION_PIPELINE.md)
 and [unchanged upstream inventory](docs/UPSTREAM_APPLICATION_TESTS.md) are tracked
 separately from the earlier runtime evidence below.
 
-- [ ] Complete fresh Lean 4.34.1 Wasm/application acceptance. The
-  [complete runtime rebuild](docs/evidence/lean-4.34.1-runtime-build-2026-09-25.json)
-  now compiles all 2,516 modules and verifies every generated C archive and
-  object. The [native bootstrap and patch regressions](docs/evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
-  pass on Linux x64, and exact source comparison validates retaining the existing
-  IO error policy. The release also changes reference-counting runtime headers
-  and library code; fresh deployed execution evidence remains required.
-  Earlier results below remain scoped to 4.34.0 or their stated older version.
-  The [installed `.25` main and upstream reference-count checks](docs/evidence/lean-4.34.1-installed-main-2026-09-25.json)
-  now pass in all three stock engines on Linux x64, including exact native IO,
-  argument and exit comparisons, cache reuse and direct-file execution. Broader
-  filesystem, HTTP, suite and native platform acceptance remain open.
-  A [fresh Node/npm-only installation and isolated deployment](docs/evidence/lean-4.34.1-cold-install-2026-09-25.json)
-  also pass on Linux x64, with managed tools starting empty. That installation
-  gate does not add broader API or other-platform passes.
-  The [fresh installed filesystem/console comparison](docs/evidence/lean-4.34.1-installed-io-2026-09-25.json)
-  now passes eight unchanged fixtures in each engine: all 24 deployed outputs
-  match independently interpreted and compiled native Lean, including cleanup.
-  These Linux x64 inputs are partial API coverage. HTTP builds continue in a
-  separate campaign with disk headroom for their runtime module-data copies.
-  The [fresh Node HTTP server](docs/evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
-  now passes twenty unchanged native/deployed Vitest checks. Separately,
-  [85 upstream HTTP IO actions pass through installed Node](docs/evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json)
-  using byte-preserving ordinary-main copies and exact native comparisons.
-  These partial checks do not close full API, suite or platform acceptance;
-  Deno/Bun counterparts continue separately.
-  The [three-engine upstream IO continuation](docs/evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
-  now passes all nine comparisons: 85 actions per engine, 255 deployed actions
-  total, preserving all original source, assertion and timeout bytes. The
-  ordinary HTTP server's Deno/Bun checks remain separate.
-  The [ordinary HTTP server now also passes in all three engines](docs/evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json):
-  sixty unchanged Vitest checks, thirty deployed and thirty native, with no
-  failures or skips. A disk preflight stops one Bun attempt before launch;
-  verified archival supplies headroom for the successful unchanged-limit retry.
-  This remains partial HTTP behavior coverage on Linux x64.
-  The [expanded Node HTTP IO continuation](docs/evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
-  now passes twelve original inputs and all 148 actions, including nine new
-  dispatch, expectation, parsing/fuzz, connection and framing cases. Every
-  original driver and both native parallel controls pass. Exact source hashes
-  and action counts gate adaptation; five integrity controls pass. No assertion,
-  timeout or original test is changed. Deno/Bun counterparts for those nine
-  inputs and other upstream contexts continue separately.
+- [ ] Complete fresh Lean 4.34.1 application, language and API acceptance.
+  The [runtime rebuild](docs/evidence/lean-4.34.1-runtime-build-2026-09-25.json)
+  compiles all 2,516 modules and verifies every generated C archive and object;
+  [native bootstrap and patch regressions](docs/evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
+  also pass. These build results do not transfer older behavioral passes.
+  [Installed `.25` mains and upstream reference-count checks](docs/evidence/lean-4.34.1-installed-main-2026-09-25.json)
+  match native controls in all three engines. A [Node/npm-only cold installation
+  and isolated deployment](docs/evidence/lean-4.34.1-cold-install-2026-09-25.json)
+  pass with the managed tool cache initially empty.
+  [Eight filesystem/console fixtures per engine](docs/evidence/lean-4.34.1-installed-io-2026-09-25.json)
+  pass all 24 native/deployed comparisons, including cleanup. The
+  [ordinary HTTP server](docs/evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json)
+  passes sixty unchanged Vitest checks: thirty deployed and thirty native.
+  Its retained Bun disk preflight refusal precedes a successful retry after
+  verified archival, with the original resource limits intact.
+  [Twelve upstream HTTP IO inputs per engine](docs/evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
+  now pass all 36 comparisons and 444 deployed actions. Original drivers run
+  unchanged before byte-preserving parallel mains; interpreted-native,
+  C-compiled-native and deployed exits/output match exactly. Five integrity
+  controls enforce reviewed release/source/action counts and safe syntax
+  contexts. No assertion or timeout changes. All guards release without memory
+  or disk aborts; peak memory is 4.58 GiB for these IO-expression comparisons.
+  These are partial Linux x64 observations. Serial fuzz/hang tests, other
+  upstream contexts, complete API/language coverage and the other five native
+  platforms remain open. Earlier results retain their stated release scope.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.

@@ -978,3 +978,10 @@ owned-process shutdown is not embedded Store disposal. Compilation peaks at
 and no resource aborts. Shipping packaging, general imports/descriptors,
 keepalive, cancellation, reusable disposal, larger transfers/adaptive stacks
 and all other native platforms remain open.
+
+The completed private cache, converted Wasm and restored cold-deployment input
+are now [retained as verified compressed archives](evidence/wasmtime-lean-4.34.1-retention-2026-09-25.json).
+Decompression matches every original byte; recorded modes and timestamps permit
+restoration to the original paths before reuse. This recovers 712 MB without
+changing sources, results, failed experiments or the managed tool cache. The
+archival guard peaks below 0.8 GiB and releases without resource events.

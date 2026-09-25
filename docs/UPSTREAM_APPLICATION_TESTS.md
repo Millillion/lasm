@@ -20,37 +20,28 @@ installed application linker. Original assertions remain active; unexpected
 arguments fail. Relocated executions with sources hidden and PATH empty also
 match native output and status. Broader 4.34.1 suite campaigns remain pending.
 
-[Three additional HTTP IO comparisons pass on Node](evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json):
-69 body actions, twelve body-framing groups and four request-header groups.
+[Twelve upstream HTTP IO inputs now pass in all three engines](evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json):
+36 comparisons, with all 148 original actions executed per engine and 444
+across Node, Deno and Bun. The inputs cover bodies, request headers, dispatch,
+expectations, incremental/fuzz parsing, keep-alive, replayable bodies, request
+lines, response framing and trailers.
+
 Each unchanged original native elaboration driver passes first. A reviewed
 parallel adapter uses Lean's parser to replace only unwrapped `#eval` tokens,
 preserving every expression, assertion and timeout byte. Its ordinary `main`
-executes all 85 actions at runtime, with exact interpreted-native,
-C-compiled-native and installed `.25` deployed output. Four integrity controls
-cover Unicode/comment preservation and rejected contexts/ranges/collisions.
-Source-hidden relocation uses empty PATH. These registrations retain their
-native-build-time classification; additional deployed API comparisons are
-recorded separately. Deno/Bun counterparts are still pending at this checkpoint.
+executes every action at runtime. Interpreted-native, C-compiled-native and
+installed `.25` source-hidden deployments have identical exits/stdout/stderr;
+PATH is empty. Five integrity controls enforce Unicode/comment preservation,
+valid contexts/ranges/names and exact release/source review binding. All guards
+release without OOM, swap or resource stops; maximum memory is 4.58 GiB.
 
-The [complete three-engine continuation](evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
-now passes all nine comparisons: all 85 original actions execute in each stock
-engine, for 255 deployed actions. Every unchanged native driver and both native
-parallel execution modes pass, and all deployed exits/stdout/stderr match exactly.
-All guards release successfully, with no memory-limit, OOM or swap events.
-The scope remains three reviewed HTTP inputs on Linux x64, with the original
-registration categories and broader suite/API gaps unchanged.
-
-The [expanded Node continuation](evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
-now passes twelve original HTTP IO inputs and all 148 actions. The nine new
-inputs cover dispatch, expectations, incremental parsing, parser fuzzing,
-keep-alive, replayable bodies, request lines, response framing and trailers.
-An explicit review ledger pins each input's release, source hash and action
-count. Five integrity controls pass; a new release or changed source cannot
-silently reuse an earlier review. All original native drivers, both native
-parallel modes and source-hidden installed Node deployments match, with no
-changed assertions/deadlines or resource stops. Deno/Bun runs of the nine new
-inputs continue separately; serial fuzz/hang tests and other contexts remain
-outside this adapter's verified scope.
+The [initial three-input results](evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
+and [expanded Node checkpoint](evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
+remain intact. Original registrations retain their native-build-time category;
+parallel runtime checks add deployed API observations. Serial fuzz/hang inputs,
+guarded/scoped evaluations, full declaration coverage and other native platforms
+remain separate unfinished work. These checks do not establish full `Std.Http`
+or complete latest-release upstream-suite acceptance.
 
 The results and checked items below retain their original **4.34.0** scope.
 
