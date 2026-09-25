@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { nativeFiles } from '../src/native-files.mjs';
@@ -70,4 +70,17 @@ test('a failed worker read preserves the error and allows subsequent operations'
   const reader = await files.open(path, 0);
   try { assert.equal((await files.read(reader, 1024)).toString(), 'ok'); }
   finally { await files.closeAsync(reader); }
+});
+
+test('writes preserve offsets and caller ownership through the file worker', async t => {
+  const files = nativeFiles(), path = await fixture(t, '');
+  const backing = new Uint8Array(1024 * 1024 + 13);
+  for (let i = 0; i < backing.length; i++) backing[i] = i % 251;
+  const bytes = backing.subarray(7, -6), expected = Buffer.from(bytes);
+  const writer = await files.open(path, 1);
+  try { await files.write(writer, bytes); }
+  finally { await files.closeAsync(writer); }
+  assert.equal(backing.length, 1024 * 1024 + 13);
+  assert.deepEqual(Buffer.from(bytes), expected);
+  assert.deepEqual(await readFile(path), expected);
 });

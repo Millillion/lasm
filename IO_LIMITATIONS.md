@@ -317,8 +317,8 @@ separately from the earlier runtime evidence below.
   16 MiB FFI reservation, 12 MiB Wasmtime control-stack limit, and verified
   stack-overflow traps/recovery. The final guard peaks at 369 MiB.
   Shipping integration, the latest runtime candidate, general imports/dynamic
-  linking, cancellation, reusable-instance cleanup, larger control stacks,
-  transfers beyond the diagnostic's 64 MiB bound and other platforms still need
+  linking, cancellation, reusable-instance cleanup, larger control stacks
+  and other platforms still need
   work. No fundamental limitation has been demonstrated.
   A [direct Node-API stack control](docs/evidence/native-api-stack-2026-09-24.json)
   passes in all three engines: registered/nested callbacks work and a verified
@@ -350,6 +350,21 @@ separately from the earlier runtime evidence below.
   pass. An initial coordinator argument error remains recorded separately from
   the successful retry and application results. The existing helper limitations
   still apply.
+  The [large-file continuation](docs/evidence/lean-4.34.1-large-transfers-2026-09-25.json)
+  removes the private helper's 64 MiB transfer ceiling with complete guest-range
+  checks and short memory views. A 64 MiB + 1 byte ordinary Lean file program
+  matches both native controls through installed `.27` and the private helper
+  in all three engines. All bytes, a direct short read at EOF, and cleanup are
+  checked. Deno initially exhausted its subprocess JavaScript heap while its
+  worker adapter enumerated typed-array indexes; that failed run remains intact.
+  Internal ArrayBuffer messages repair the excess allocation without raising
+  heap limits. Caller-owned bytes stay live, and nested/pooled results preserve
+  their exact visible bytes. Forty-nine focused checks pass; the Windows-only
+  decoder check remains skipped on Linux. Private execution peaks at 1.31 GiB;
+  the whole continuation peaks at 5.86 GiB during compilation. No host OOM or
+  guard abort occurred. Transfers still require whole host buffers and remain
+  bounded by actual memory and Buffer capacity. Complete descriptor semantics,
+  shipping helper integration and other API/platform gaps remain open.
 
 ## Earlier runtime evidence and remaining compatibility work
 

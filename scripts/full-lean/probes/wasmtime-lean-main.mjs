@@ -12,6 +12,7 @@ import { createNodeRuntimeHost } from '../../../src/node-host.mjs';
 import nativeThreadId from '../../../src/thread-id.cjs';
 import { writeWasiStdio } from './wasmtime-wasi-stdio.mjs';
 import { processOutput } from '../../../integration/process-output.mjs';
+import { readGuestBytes, writeGuestBytes } from './wasmtime-guest-memory.mjs';
 
 const ffi = createRequire(import.meta.url)('koffi');
 ffi.config({ sync_stack_size: 16 * 1024 ** 2 });
@@ -93,22 +94,10 @@ function view(offset, size = 8) {
 }
 function snapshot() { const values = Array(26).fill(0); details(probe, values); return values.map(BigInt); }
 function readGuest(offset, length) {
-  offset = BigInt(offset); length = Number(length);
-  assert.ok(Number.isSafeInteger(length) && length >= 0 && length <= 64 * 1024 ** 2,
-    'Diagnostic host transfer is bounded to 64 MiB');
-  const bytes = Buffer.alloc(length);
-  for (let cursor = 0; cursor < length; cursor += 65536) {
-    const size = Math.min(65536, length - cursor);
-    bytes.set(new Uint8Array(view(offset + BigInt(cursor), size).buffer), cursor);
-  }
-  return bytes;
+  return readGuestBytes({ offset, length, memoryBytes: snapshot()[3], view });
 }
 function writeGuest(offset, bytes) {
-  offset = BigInt(offset);
-  for (let cursor = 0; cursor < bytes.length; cursor += 65536) {
-    const size = Math.min(65536, bytes.length - cursor);
-    new Uint8Array(view(offset + BigInt(cursor), size).buffer).set(bytes.subarray(cursor, cursor + size));
-  }
+  writeGuestBytes({ offset, bytes, memoryBytes: snapshot()[3], view });
 }
 function rpc(request) {
   assert.ok(!isRuntimeRoot);

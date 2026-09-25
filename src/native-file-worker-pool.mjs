@@ -1,6 +1,7 @@
 import { Worker } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
 import forwardWorkerStdio from './worker-stdio.cjs';
+import { encodeFileMessage, decodeFileMessage } from './native-file-message.mjs';
 const DenoWebWorker = globalThis[Symbol.for('lasm.denoWebWorker')] ?? globalThis.Worker;
 
 // Blocking stdio calls cannot use the shared N-API/libuv pool: enough reads
@@ -45,7 +46,10 @@ function create() {
     });
   if (!process.versions.deno && !process.versions.bun) forwardWorkerStdio(worker);
   const state = { worker };
-  const received = message => {
+  const received = encoded => {
+    let message;
+    try { message = decodeFileMessage(encoded); }
+    catch (error) { failed(state, error); return; }
     const job = state.job;
     if (!job) return failed(state, new Error('Unexpected native file worker response'));
     state.job = undefined;
@@ -80,7 +84,8 @@ export function callNativeFile(operation, args) {
       clearTimeout(state.timer);
       state.worker.ref?.();
       state.job = { resolve, reject };
-      state.worker.postMessage({ operation, args });
+      // Requests are cloned, not transferred: callers retain their input bytes.
+      state.worker.postMessage(encodeFileMessage({ operation, args }).message);
     } catch (error) {
       if (state) failed(state, error);
       else reject(error);

@@ -1,9 +1,10 @@
 // Private memory64 diagnostic adapter. Only the two captured standard output
 // descriptors exist here; general WASI descriptor ownership is still pending.
 import assert from 'node:assert/strict';
+import { constants as bufferConstants } from 'node:buffer';
 
 const EFAULT = 21, EOVERFLOW = 61, MAX_U64 = (1n << 64n) - 1n;
-const transferLimit = 64n * 1024n ** 2n;
+const transferCapacity = BigInt(Math.min(bufferConstants.MAX_LENGTH, Number.MAX_SAFE_INTEGER));
 
 export function writeWasiStdio({ fd, iovs, count, nwritten, memoryBytes, read, write, sink }) {
   assert.ok(fd === 1 || fd === 2, `Unimplemented private WASI output descriptor: ${fd}`);
@@ -12,7 +13,7 @@ export function writeWasiStdio({ fd, iovs, count, nwritten, memoryBytes, read, w
   // Pointers and size_t are eight bytes in this SDK's wasm64 ABI. Check the
   // complete table and output pointer before touching any guest bytes or sink.
   if (count < 0n || count > MAX_U64 / 16n || !inRange(iovs, count * 16n) || !inRange(nwritten, 8n)) return EFAULT;
-  assert.ok(count * 16n <= transferLimit, 'Diagnostic iovec table exceeds the transfer limit');
+  assert.ok(count * 16n <= transferCapacity, 'Iovec table exceeds this host Buffer capacity');
   const vectors = [];
   let total = 0n;
   for (let index = 0n; index < count; index++) {
@@ -23,11 +24,15 @@ export function writeWasiStdio({ fd, iovs, count, nwritten, memoryBytes, read, w
     if (length > MAX_U64 - total) return EOVERFLOW;
     total += length; vectors.push({ address, length });
   }
-  assert.ok(total <= transferLimit, 'Diagnostic host transfer is bounded to 64 MiB');
-  const bytes = Buffer.concat(vectors.filter(v => v.length).map(v => {
-    const data = Buffer.from(read(v.address, Number(v.length)));
-    assert.equal(data.length, Number(v.length)); return data;
-  }), Number(total));
+  assert.ok(total <= transferCapacity, 'Output exceeds this host Buffer capacity');
+  const bytes = Buffer.alloc(Number(total));
+  let cursor = 0;
+  for (const vector of vectors) {
+    if (!vector.length) continue;
+    const data = read(vector.address, Number(vector.length));
+    assert.ok(data instanceof Uint8Array && data.byteLength === Number(vector.length));
+    bytes.set(data, cursor); cursor += data.byteLength;
+  }
   // A single scatter/gather write keeps ordering and byte boundaries intact:
   // no UTF-8 decoding, line splitting, extra newline or swallowed write error.
   const result = sink(fd, bytes);

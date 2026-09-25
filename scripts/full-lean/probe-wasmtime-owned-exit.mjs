@@ -35,7 +35,10 @@ const checkFile = join(output, 'negative-check.json');
 writeFileSync(checkFile, JSON.stringify(check, null, 2) + '\n');
 const inputs = ['scripts/full-lean/probe-wasmtime-owned-exit.mjs',
   'scripts/full-lean/probes/wasmtime-lean-supervisor.mjs', 'scripts/full-lean/probes/wasmtime-lean-main.mjs',
-  'scripts/full-lean/probes/wasmtime-wasi-stdio.mjs'];
+  'scripts/full-lean/probes/wasmtime-wasi-stdio.mjs',
+  'scripts/full-lean/probes/wasmtime-guest-memory.mjs', 'integration/process-output.mjs',
+  'src/native-files.mjs', 'src/native-file-worker.mjs', 'src/native-file-worker-pool.mjs',
+  'src/native-file-worker-deno.mjs', 'src/native-file-message.mjs'];
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 const report = { scope: 'Intentional private-runner assertion failure must terminate its owned process promptly; no Lean source/test changes',
   prior: priorFile, priorSha256: await hashFile(priorFile), inputs: hashes, negativeCheckSha256: await hashFile(checkFile),

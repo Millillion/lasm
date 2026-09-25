@@ -46,6 +46,8 @@ const cases = [
     marker: 'normal shutdown flush\n', posix: true },
   { name: 'binary-console', source: 'integration/fixtures/BinaryConsole.lean',
     marker: 'binary console checks passed', removesData: true },
+  { name: 'large-file-transfer', source: 'integration/fixtures/LargeFileTransfer.lean',
+    marker: 'large file transfer checks passed\n', removesData: true },
 ];
 assert.ok(selection.every(name => cases.some(row => row.name === name)), 'Unknown fixture selection');
 const chosen = cases.filter(row => !selection.length || selection.includes(row.name));

@@ -1,5 +1,6 @@
 import { parentPort } from 'node:worker_threads';
 import { nativeFiles } from './native-files.mjs';
+import { encodeFileMessage, decodeFileMessage } from './native-file-message.mjs';
 
 // FILE pointers and CRT descriptors belong to this process, not to a JS
 // isolate. The owning host serializes operations and keeps each stream alive
@@ -11,25 +12,21 @@ const port = parentPort ?? {
 };
 const operations = new Set(['open', 'read', 'write', 'flush', 'rewind', 'truncate', 'getLine',
   'closeAsync', 'readDirectory', 'realPath', 'removeFile', 'groupInfo', 'checkDirectorySearch', 'createTemporary']);
-port.on('message', async ({ operation, args }) => {
+function respond(value) {
+  const encoded = encodeFileMessage(value, { move: true });
+  port.postMessage(encoded.message, encoded.transfer);
+}
+port.on('message', async message => {
   try {
+    const { operation, args } = decodeFileMessage(message);
     if (!operations.has(operation)) throw new Error(`Invalid native file operation: ${operation}`);
     let value = await files[operation](...args);
     if (operation === 'open') value = { stream: value.stream, fd: value.fd, type: value.type };
     if (operation === 'createTemporary' && value.file)
       value.file = { stream: value.file.stream, fd: value.file.fd, type: value.file.type };
-    // Move full allocations directly. A short read or pooled Buffer must copy
-    // only its returned bytes: cloning the view would clone its entire backing
-    // allocation, even at EOF. A fresh Uint8Array also leaves pooled peers live.
-    const transfer = [];
-    if (Buffer.isBuffer(value)) {
-      if (value.byteOffset !== 0 || value.byteLength !== value.buffer.byteLength)
-        value = new Uint8Array(value);
-      transfer.push(value.buffer);
-    }
-    port.postMessage({ ok: true, value }, transfer);
+    respond({ ok: true, value });
   } catch (error) {
-    port.postMessage({ ok: false, error: { message: error.message,
+    respond({ ok: false, error: { message: error.message,
       code: error.code, errno: error.errno, nativeMessage: error.nativeMessage,
       leanUserError: error.leanUserError, errorOrigin: error.errorOrigin } });
   }

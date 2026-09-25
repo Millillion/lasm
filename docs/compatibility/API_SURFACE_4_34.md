@@ -26,6 +26,15 @@ on 295 stdout bytes and seven stderr bytes. Raw byte records prevent invalid
 UTF-8 from collapsing into falsely equal decoded text. This adds behavior
 coverage without claiming complete stream, descriptor or platform parity.
 
+The [large-file fixture](../evidence/lean-4.34.1-large-transfers-2026-09-25.json)
+now passes on installed `.27` in all three engines, matching both native
+controls for every byte of a 64 MiB + 1 byte file, a direct short read at EOF,
+and cleanup. Separate private-helper runs also pass after repairing Deno's
+per-byte worker-message heap overhead with internal ArrayBuffer envelopes.
+Forty-nine focused controls pass; one Windows-only check remains skipped on
+Linux. Earlier Deno heap-exhaustion evidence is retained, with no host OOM.
+Whole-buffer allocation limits and full API/platform acceptance remain open.
+
 The [expanded upstream HTTP IO comparison](../evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
 passes twelve original inputs and all 148 actions in each stock engine: 36
 native/deployed comparisons and 444 deployed actions. Inputs cover bodies,

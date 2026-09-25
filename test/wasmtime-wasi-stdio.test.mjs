@@ -40,3 +40,24 @@ test('empty writes stay empty and unsupported descriptors fail explicitly', () =
   assert.equal(seen[0].bytes.length, 0);
   assert.throws(() => writeWasiStdio({ ...input, fd: 10 }), /Unimplemented private WASI output descriptor/);
 });
+
+test('an output above 64 MiB preserves all bytes and its uint64 write count', () => {
+  const size = 64 * 1024 ** 2 + 1, payload = Buffer.alloc(size, 0x80);
+  payload[0] = 0; payload[size - 1] = 0xff;
+  const table = Buffer.alloc(16), output = Buffer.alloc(8);
+  table.writeBigUInt64LE(4096n); table.writeBigUInt64LE(BigInt(size), 8);
+  let calls = 0;
+  const status = writeWasiStdio({ fd: 1, iovs: 0n, count: 1n, nwritten: 16n,
+    memoryBytes: 4096n + BigInt(size),
+    read(address, length) {
+      if (address === 0n) { assert.equal(length, 16); return table; }
+      assert.equal(address, 4096n); assert.equal(length, size); return payload;
+    },
+    write(address, bytes) { assert.equal(address, 16n); output.set(bytes); },
+    sink(fd, bytes) {
+      calls++; assert.equal(fd, 1); assert.deepEqual(bytes, payload);
+      return { errno: 0, written: bytes.length };
+    } });
+  assert.equal(status, 0); assert.equal(calls, 1);
+  assert.equal(output.readBigUInt64LE(), BigInt(size));
+});

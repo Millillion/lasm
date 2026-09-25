@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Shipping helper integration, full API parity and native platform acceptance lack defensible durations.
 
-**Changed:** [Fixed missing interpreter signatures](evidence/lean-4.34.1-ir-signatures-2026-09-25.json): seven integrity checks and both original incremental applications pass through installed `.26`. All 7,673 original entries remain unchanged; peak memory is 5.49 GiB without resource events. The earlier full campaign's failure and disk stop are preserved. Verified historical-tool archival recovered 10.57 GiB; campaigns now stop at their first failure. Large-transfer checks are running; remaining Node registrations are queued. Pushes await restored SSH credentials.
+**Changed:** [Fixed Deno worker-message heap growth and the private 64 MiB transfer ceiling](evidence/lean-4.34.1-large-transfers-2026-09-25.json). All three installed `.27` targets and private helpers match native Lean on 64 MiB + 1 byte files. Forty-nine focused checks pass; one Windows-only check is skipped. The original subprocess failure is preserved; no host OOM occurred. All 101 Node application registrations are running. Pushes await restored SSH credentials.
 
 **Remaining:** Complete latest-release suite/API coverage; shipping engine parity and callable bindings; six-platform native acceptance.
 
