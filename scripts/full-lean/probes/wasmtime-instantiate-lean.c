@@ -12,6 +12,7 @@
 #include <pthread.h>
 #include <time.h>
 #include "wasmtime-canonical-imports.h"
+#include "wasmtime-engine-config.h"
 
 typedef double (*date_callback_t)(void);
 typedef int32_t (*mailbox_callback_t)(uint64_t, uint64_t);
@@ -593,21 +594,6 @@ void lasm_lean_instance_delete(lean_probe_t *probe) {
     free(probe->function_globals);
     free(probe);
 }
-static wasm_engine_t *create_engine(size_t wasm_stack_budget) {
-    wasm_config_t *config = wasm_config_new();
-    wasmtime_config_wasm_memory64_set(config, true);
-    wasmtime_config_wasm_threads_set(config, true);
-    wasmtime_config_shared_memory_set(config, true);
-    wasmtime_config_wasm_exceptions_set(config, true);
-    wasmtime_config_strategy_set(config, WASMTIME_STRATEGY_CRANELIFT);
-    wasmtime_config_parallel_compilation_set(config, false);
-    wasmtime_config_cranelift_opt_level_set(config, WASMTIME_OPT_LEVEL_NONE);
-    wasmtime_config_memory_reservation_set(config, UINT64_C(8589934592));
-    wasmtime_config_max_wasm_stack_set(config, wasm_stack_budget);
-    wasmtime_config_async_stack_size_set(config, 80 * 1024 * 1024);
-    return wasm_engine_new_with_config(config);
-}
-
 int lasm_lean_prepare_process(char *error, size_t capacity) {
     // Keep native Wasm allocations on base pages in this process. Deployment
     // must not depend on inheriting the maintainer's build wrapper. This changes
@@ -675,8 +661,8 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
     } else {
     // The FFI driver uses 12 MiB below its 16 MiB reservation. The direct
     // Node-API driver verifies a larger native worker stack on every entry.
-    probe->engine = create_engine(wasm_stack_budget);
-    if (!probe->engine) { snprintf(error, capacity, "engine allocation failed"); goto failed; }
+    probe->engine = create_engine(wasm_stack_budget, error, capacity);
+    if (!probe->engine) goto failed;
     // The JS harness verifies the locally-produced cache and its SDK before
     // this unsafe native-code deserializer. Never accept external cache bytes.
     if (failure(wasmtime_module_deserialize_file(probe->engine, trusted_cache, &probe->module),

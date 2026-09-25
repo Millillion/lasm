@@ -2,6 +2,8 @@ import { createReadStream, readFileSync, lstatSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 
+export const wasmtimeCpuTarget = 'x86_64-unknown-linux-gnu';
+
 export const wasmtimeHostFiles = ['wasmtime-runtime.mjs', 'wasmtime-worker.mjs', 'wasmtime-standalone.mjs',
   'wasmtime-artifact.mjs', 'wasmtime-native-stdio.mjs', 'wasmtime-guest-memory.mjs',
   'wasmtime-wasi-stdio.mjs', 'wasmtime-console.mjs', 'wasmtime-process-host.mjs'];
@@ -16,10 +18,12 @@ export async function hashWasmtimeFile(file) {
 // produce them. This integrity check is not authentication of external caches.
 export async function readWasmtimeArtifact(directory, platform = process.platform, arch = process.arch) {
   const manifest = JSON.parse(readFileSync(join(directory, 'wasmtime.json'), 'utf8'));
-  if (manifest.schema !== 1 || manifest.backend !== 'wasmtime-49.0.0'
+  if (manifest.schema !== 2 || manifest.backend !== 'wasmtime-49.0.0'
       || manifest.platform !== platform || manifest.arch !== arch
       || !/^\d+\.\d+\.\d+$/.test(manifest.leanVersion))
     throw new Error('This Wasmtime application does not match the current native platform');
+  if (manifest.cpuTarget !== wasmtimeCpuTarget || manifest.cpuFeatures !== 'baseline')
+    throw new Error('This Wasmtime application lacks the supported baseline CPU target');
   const required = ['program.cwasm', 'host/instance.so', 'host/native-api.node', 'host/libwasmtime.so'];
   if (!manifest.files || Object.keys(manifest.files).length !== required.length)
     throw new Error('Invalid Wasmtime application file manifest');

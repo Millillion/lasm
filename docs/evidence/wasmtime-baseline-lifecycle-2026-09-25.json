@@ -1,0 +1,806 @@
+{
+  "scope": "Linux x64 standalone Wasmtime preview: shared explicit baseline CPU compilation/loading, fresh lifecycle comparison including completed deleted-cwd recovery. Same physical CPU only, not managed CLI or six-platform acceptance.",
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v4.34.1"
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "expected": "v26.10.0"
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v2.9.7"
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "expected": "bun-v1.4.2"
+    },
+    "checkedAt": "2026-09-25T22:11:07.355817+00:00"
+  },
+  "configuration": {
+    "compiler": "Cranelift",
+    "optimization": "none",
+    "parallelCompilation": false,
+    "cpuTarget": "x86_64-unknown-linux-gnu",
+    "cpuFeatures": "baseline",
+    "inputBoundBytes": 536870912,
+    "serializedBoundBytes": 671088640,
+    "memory64": true,
+    "threads": true,
+    "sharedMemory": true,
+    "exceptions": true,
+    "maximumWasmStack": 67108864,
+    "asyncStackSize": 83886080,
+    "coreDumpsDisabled": true,
+    "memoryReservation": 8589934592,
+    "instantiation": false,
+    "linearMemoryAllocated": false
+  },
+  "engineConfiguration": {
+    "path": "scripts/full-lean/probes/wasmtime-engine-config.h",
+    "sha256": "d2ef4c127c2cb22be76657c240d3e9f0099b38ce5d34fa95129f8ad7d7df155d"
+  },
+  "changes": [
+    "Use one explicit x86_64-unknown-linux-gnu engine configuration for compilation and loading; Wasmtime target selection disables optional native CPU-feature inference.",
+    "Require schema 2 cache manifests with explicit baseline CPU metadata; old native-inferred caches are not relabeled.",
+    "Require the exact compilation engine/configuration and canonical-import header identities before packaging; stale/missing identities fail before invoking compilers or creating a deployment.",
+    "Record the native deleted-cwd error constructor and continue to relative directory recovery. Native controls must reach intended exits for all nine supplementary cases."
+  ],
+  "cpuControls": {
+    "receipt": {
+      "path": ".work/wasmtime-cpu-target-controls-r2/result.json",
+      "sha256": "1e6a1cc1dee95b560e797b149501950a76d8d63400bf182e747a704226247bc7"
+    },
+    "native": {
+      "passed": true,
+      "cpuTarget": "x86_64-unknown-linux-gnu",
+      "baselineCacheExecutions": 2,
+      "nativeCacheExecutions": 2,
+      "sharedMemory64AtomicAndSimdResult": 16
+    },
+    "manifestControls": {
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    "inputs": {
+      "scripts/full-lean/probe-wasmtime-cpu-target.mjs": "60417c171544e867bb7df3cb796bbae6d902dd5a10b9f003a8684d0da1bc39aa",
+      "scripts/full-lean/probes/wasmtime-cpu-target.c": "3578a677b39c685cf3af337a13a86a41a90fb092df149a929068de5ce399afea",
+      "test/wasmtime-artifact.test.mjs": "dcc5c5192429a1b766b0009904fafed7ec6977a2be0868958ec4cb99770db839",
+      "src/wasmtime-artifact.mjs": "a41e36a49222679ebd697d5c1ed763326e1c8bf259456779b1f8cb60d05aa514",
+      "scripts/full-lean/probes/wasmtime-engine-config.h": "d2ef4c127c2cb22be76657c240d3e9f0099b38ce5d34fa95129f8ad7d7df155d"
+    },
+    "undefinedBehaviorSanitizer": true
+  },
+  "configurationRegressions": {
+    "environment": {
+      "receipt": {
+        "path": ".work/wasmtime-baseline-environment-controls-r1/result.json",
+        "sha256": "85526efb4fc52cf03acbebad2688537a853f73c9ef237fb2570eb1365d7b0da9"
+      },
+      "native": {
+        "passed": true,
+        "validSnapshots": 6,
+        "malformedSnapshots": 7,
+        "guestBoundaryChecks": 16,
+        "largeSnapshotBytes": 1228800
+      }
+    },
+    "functionGlobals": {
+      "receipt": {
+        "path": ".work/wasmtime-baseline-function-globals-controls-r1/result.json",
+        "sha256": "bc1f56e84503e34ce4e6fcc6fc3635ec5430270f2290166903543ad54d431d54"
+      },
+      "native": {
+        "passed": true,
+        "bindings": 9,
+        "existingTableAddressesPreserved": true,
+        "duplicateAndExportAliasesRetainPointerEquality": true,
+        "indirectConsoleCalls": 13,
+        "argumentsAbove4GiB": true,
+        "compiledIndirectCalls": 2,
+        "workerPointersMatch": true,
+        "missingCallbackTrapsAndRecovers": true,
+        "modifiedBindingRejected": true,
+        "negativeModules": 9,
+        "canonicalTransformControls": 6,
+        "nonExportSectionsUnchanged": true
+      },
+      "engines": [
+        {
+          "passed": true,
+          "scope": "Private helper indirect console functions with unchanged SDK decoder/sink oracle",
+          "engine": "node",
+          "version": "26.10.0",
+          "cases": 788,
+          "callbacks": 4728,
+          "pointers": [
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "resultSha256": "f5ee7cba2b9896cca10ea316eb6e6bc1865c45243011b3691a71d6a7b47874e5",
+          "oracle": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-lifecycle-4.34.1-build-r1/dist/program.cjs",
+            "sha256": "c2ba8c57a59827d6dec08c46b5c977ed2d569d84f730edfc6774fb1c12a9d6c8",
+            "extractedFunctionSha256": "359db31446d8698f28b7a16d648e5a1c75cc3c7ccc7b5b8337cf04652197734d"
+          },
+          "capturedMethods": [
+            "log",
+            "error",
+            "warn",
+            "trace",
+            "out",
+            "err"
+          ],
+          "scopeNotes": [
+            "Console method dispatch and arguments are exact; engine stack-trace text is not normalized or claimed equal.",
+            "Synthetic low-address reference heaps are compared with real Wasmtime memory, including its endpoint."
+          ]
+        },
+        {
+          "passed": true,
+          "scope": "Private helper indirect console functions with unchanged SDK decoder/sink oracle",
+          "engine": "deno",
+          "version": "2.9.7",
+          "cases": 788,
+          "callbacks": 4728,
+          "pointers": [
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "resultSha256": "f5ee7cba2b9896cca10ea316eb6e6bc1865c45243011b3691a71d6a7b47874e5",
+          "oracle": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-lifecycle-4.34.1-build-r1/dist/program.cjs",
+            "sha256": "c2ba8c57a59827d6dec08c46b5c977ed2d569d84f730edfc6774fb1c12a9d6c8",
+            "extractedFunctionSha256": "359db31446d8698f28b7a16d648e5a1c75cc3c7ccc7b5b8337cf04652197734d"
+          },
+          "capturedMethods": [
+            "log",
+            "error",
+            "warn",
+            "trace",
+            "out",
+            "err"
+          ],
+          "scopeNotes": [
+            "Console method dispatch and arguments are exact; engine stack-trace text is not normalized or claimed equal.",
+            "Synthetic low-address reference heaps are compared with real Wasmtime memory, including its endpoint."
+          ]
+        },
+        {
+          "passed": true,
+          "scope": "Private helper indirect console functions with unchanged SDK decoder/sink oracle",
+          "engine": "bun",
+          "version": "1.4.2",
+          "cases": 788,
+          "callbacks": 4728,
+          "pointers": [
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "resultSha256": "f5ee7cba2b9896cca10ea316eb6e6bc1865c45243011b3691a71d6a7b47874e5",
+          "oracle": {
+            "path": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-lifecycle-4.34.1-build-r1/dist/program.cjs",
+            "sha256": "c2ba8c57a59827d6dec08c46b5c977ed2d569d84f730edfc6774fb1c12a9d6c8",
+            "extractedFunctionSha256": "359db31446d8698f28b7a16d648e5a1c75cc3c7ccc7b5b8337cf04652197734d"
+          },
+          "capturedMethods": [
+            "log",
+            "error",
+            "warn",
+            "trace",
+            "out",
+            "err"
+          ],
+          "scopeNotes": [
+            "Console method dispatch and arguments are exact; engine stack-trace text is not normalized or claimed equal.",
+            "Synthetic low-address reference heaps are compared with real Wasmtime memory, including its endpoint."
+          ]
+        }
+      ]
+    }
+  },
+  "packagingInputControls": {
+    "receipt": {
+      "path": ".work/wasmtime-package-input-controls-r1/result.json",
+      "sha256": "3f7877d3c4c08f382e6416f35b21cd33d0628aa1c65d22833b5e61d17ee3755e"
+    },
+    "rejections": [
+      {
+        "name": "engineConfigurationSha256-missing",
+        "code": 1,
+        "signal": null,
+        "deploymentCreated": false
+      },
+      {
+        "name": "engineConfigurationSha256-changed",
+        "code": 1,
+        "signal": null,
+        "deploymentCreated": false
+      },
+      {
+        "name": "canonicalImportsSha256-missing",
+        "code": 1,
+        "signal": null,
+        "deploymentCreated": false
+      },
+      {
+        "name": "canonicalImportsSha256-changed",
+        "code": 1,
+        "signal": null,
+        "deploymentCreated": false
+      }
+    ],
+    "validCompilationIdentitiesMatched": true,
+    "scope": "Added after successful packaging/deployment; only rejection checks and identity comparisons rerun, no application runtime code changed."
+  },
+  "campaign": {
+    "path": ".work/product-acceptance/wasmtime-standalone-baseline-lifecycle-4.34.1-r2.json",
+    "sha256": "6aef8b579e38b372a04f9f7355ad26dc0535540b82995f165ed6d6df755557fd"
+  },
+  "compilation": {
+    "path": ".work/wasmtime-standalone-baseline-lifecycle-4.34.1-compilation-r2/result.json",
+    "sha256": "213a16b359721d1aca08d3b058a65672312a025fa6fa1c65afb9b927dd008a8c"
+  },
+  "cache": {
+    "file": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-baseline-lifecycle-4.34.1-compilation-r2/compiled.cwasm",
+    "sha256": "e705fcb99acda68535872e3520bac7efc5ed2b5525ade35de1824406577ea6c6",
+    "bytes": 610924384,
+    "trust": "Produced and reloaded only within this guarded experiment; never an untrusted compiled-code input"
+  },
+  "package": {
+    "path": ".work/wasmtime-standalone-baseline-lifecycle-4.34.1-package-r2/result.json",
+    "sha256": "a13c8b10096814040c3e858939962c0971383ffce0c316650f8443b0dc31749f"
+  },
+  "manifest": {
+    "schema": 2,
+    "backend": "wasmtime-49.0.0",
+    "leanVersion": "4.34.1",
+    "cpuTarget": "x86_64-unknown-linux-gnu",
+    "cpuFeatures": "baseline",
+    "platform": "linux",
+    "arch": "x64",
+    "files": {
+      "program.cwasm": {
+        "bytes": 610924384,
+        "sha256": "e705fcb99acda68535872e3520bac7efc5ed2b5525ade35de1824406577ea6c6"
+      },
+      "host/instance.so": {
+        "bytes": 64872,
+        "sha256": "937de7e2cf98901539dccf4928cc78a32c27023a02e360a7deea681f57b675ef"
+      },
+      "host/native-api.node": {
+        "bytes": 17040,
+        "sha256": "e6a6b5fd46aef1bd36136b30ecd2110afeab68237d586bfc819c4acad84b680d"
+      },
+      "host/libwasmtime.so": {
+        "bytes": 31590960,
+        "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+      }
+    }
+  },
+  "deployment": {
+    "receipt": {
+      "path": ".work/wasmtime-standalone-baseline-lifecycle-4.34.1-deployment-r2/result.json",
+      "sha256": "46cfec96375da2e45f1e402002e7c82d6707d761d018c411fd1e90d833c42da1"
+    },
+    "comparisons": [
+      {
+        "engine": "node",
+        "args": [
+          "buffered"
+        ],
+        "exitCode": 7,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "node",
+        "args": [
+          "exit"
+        ],
+        "exitCode": 19,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "node",
+        "args": [
+          "forced"
+        ],
+        "exitCode": 23,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "node",
+        "args": [
+          "high-exit"
+        ],
+        "exitCode": 255,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "node",
+        "args": [
+          "error"
+        ],
+        "exitCode": 1,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "6f2b92a1adea828b3ca6a9752458edb7f28eccd0c111ba684f6b6f6be2fd702f",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "node",
+        "args": [
+          "stdio"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "6f2dfb124f3573ab475388d42f88ca156239a3ff9d55b2fe9bfda4921062ae60",
+        "stderrSha256": "91f285661eb121f06c4d3e7110c3b3bce0d028b15c99e6bc0ae142ef5be621ad",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "node",
+        "args": [
+          "cwd"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "400e8569ded3d993824f70082dd01cbadbbb02f24f007f46489c80935964afd3",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "node",
+        "args": [
+          "removed-cwd"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "58c25566f7c1f408239b62fc6de05ceab81c5b4801e0ba2459a6fafa98c64f02",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "node",
+        "args": [
+          "wait"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "70f75627b31729d1549bb18ba0da2f5c6a21c90cbf1606f0edfda40e6cf21514",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "buffered"
+        ],
+        "exitCode": 7,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "exit"
+        ],
+        "exitCode": 19,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "forced"
+        ],
+        "exitCode": 23,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "high-exit"
+        ],
+        "exitCode": 255,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "error"
+        ],
+        "exitCode": 1,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "6f2b92a1adea828b3ca6a9752458edb7f28eccd0c111ba684f6b6f6be2fd702f",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "stdio"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "6f2dfb124f3573ab475388d42f88ca156239a3ff9d55b2fe9bfda4921062ae60",
+        "stderrSha256": "91f285661eb121f06c4d3e7110c3b3bce0d028b15c99e6bc0ae142ef5be621ad",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "cwd"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "400e8569ded3d993824f70082dd01cbadbbb02f24f007f46489c80935964afd3",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "removed-cwd"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "58c25566f7c1f408239b62fc6de05ceab81c5b4801e0ba2459a6fafa98c64f02",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "wait"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "70f75627b31729d1549bb18ba0da2f5c6a21c90cbf1606f0edfda40e6cf21514",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "buffered"
+        ],
+        "exitCode": 7,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "exit"
+        ],
+        "exitCode": 19,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "forced"
+        ],
+        "exitCode": 23,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "high-exit"
+        ],
+        "exitCode": 255,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "error"
+        ],
+        "exitCode": 1,
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "6f2b92a1adea828b3ca6a9752458edb7f28eccd0c111ba684f6b6f6be2fd702f",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "stdio"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "6f2dfb124f3573ab475388d42f88ca156239a3ff9d55b2fe9bfda4921062ae60",
+        "stderrSha256": "91f285661eb121f06c4d3e7110c3b3bce0d028b15c99e6bc0ae142ef5be621ad",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "cwd"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "400e8569ded3d993824f70082dd01cbadbbb02f24f007f46489c80935964afd3",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "removed-cwd"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "58c25566f7c1f408239b62fc6de05ceab81c5b4801e0ba2459a6fafa98c64f02",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "wait"
+        ],
+        "exitCode": 0,
+        "stdoutSha256": "70f75627b31729d1549bb18ba0da2f5c6a21c90cbf1606f0edfda40e6cf21514",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "filesystemMatchesNative": true
+      }
+    ],
+    "freshNativeInterpretedControls": 9,
+    "freshNativeCompiledControls": 9,
+    "filesystemDenials": 3,
+    "inputsUnchanged": true,
+    "copiedDirectoryRemovedAfterSuccess": true,
+    "deletedCwdOutput": "deleted cwd error: IO.Error.userError \"failed to retrieve current working directory\"\nremoved cwd and new worker passed\n"
+  },
+  "resources": [
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-cpu-target-controls-r2-resources.json",
+        "sha256": "eac9623f5fa88a21e5bcedbbf5a7015db98257d0ae979e7bbbffe0d307767e96"
+      },
+      "limits": {
+        "memoryMax": 1610612736,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1288490188,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 34848768,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-baseline-environment-controls-r1-resources.json",
+        "sha256": "682b628fb9ef1c53fcd3d288620ac850a20bd70b2dc281f8e6279795a3513af5"
+      },
+      "limits": {
+        "memoryMax": 1610612736,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1288490188,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 58720256,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-baseline-function-globals-controls-r1-resources.json",
+        "sha256": "aa5344ed4fa6e91c92c187e9b6d451cb1704a6a102be939895410518f834e75f"
+      },
+      "limits": {
+        "memoryMax": 1610612736,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1288490188,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 104964096,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-package-input-controls-r1-resources.json",
+        "sha256": "61be1b0b3793dd746510e1e7a14d6609ae823aa7471f352b72bd1374f9f0fdc5"
+      },
+      "limits": {
+        "memoryMax": 1610612736,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1288490188,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 29298688,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-baseline-lifecycle-4.34.1-compilation-r2-resources.json",
+        "sha256": "c74c9dbf4249a4a1a16867a54eeb6b0e3551859a3f25df068541c864e9cbca79"
+      },
+      "limits": {
+        "memoryMax": 8589934592,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 6871947673,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 5701476352,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-baseline-lifecycle-4.34.1-package-r2-resources.json",
+        "sha256": "8128add885fd9535d5ab319f2dcc6a15d50968084fc359be5e46024697e242c9"
+      },
+      "limits": {
+        "memoryMax": 3221225472,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 2576980377,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 725618688,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-baseline-lifecycle-4.34.1-deployment-r2-resources.json",
+        "sha256": "413374db3752b163f455bbf7a670b36adc2fee0977986b6232b8af28130421bb"
+      },
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 1307258880,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true
+    }
+  ],
+  "preservedFailures": [
+    {
+      "receipt": {
+        "path": ".work/wasmtime-cpu-target-controls-r1/result.json",
+        "sha256": "f4c6e217fc91429ee2fae517055f13a9975b7560cbad6ca402f8bac6777b1c7e"
+      },
+      "cause": "Control engine used a different memory reservation from the loader; corrected the control to match all non-CPU settings. No OOM."
+    },
+    {
+      "receipt": {
+        "path": ".work/wasmtime-standalone-baseline-lifecycle-4.34.1-build-r1/result.json",
+        "sha256": "3a8a29be67465c7ab9104a006db825cc353052a56d742dbcf8dfb57d68e850ad"
+      },
+      "cause": "Supplementary fixture lacked Repr IO.Error; native elaboration failed before target execution. Added an ordinary deriving instance. No upstream test changed."
+    }
+  ],
+  "upstreamTestsChanged": false,
+  "remaining": [
+    "Native deployment on a different physical CPU and five additional OS/architecture combinations.",
+    "Managed CLI/npm backend integration and repair of the unchanged shipping Bun const_fold failure.",
+    "General imports/descriptors, runtime module data, reusable lifetime, full suite and standard API parity."
+  ],
+  "fundamentalLimitationsProven": false,
+  "recordedAt": "2026-09-25T22:26:22.944286+00:00"
+}

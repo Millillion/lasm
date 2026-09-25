@@ -20,7 +20,7 @@ static void compile_fixture(const char *path) {
         "(func (export \"get\") (param i64 i64) (result i32) (call $get (local.get 0) (local.get 1))))";
     wasm_byte_vec_t bytes, serialized;
     check(failure(wasmtime_wat2wasm(wat, strlen(wat), &bytes), NULL, diagnostic, sizeof(diagnostic)));
-    wasm_engine_t *engine = create_engine(12 * 1024 * 1024); assert(engine);
+    wasm_engine_t *engine = create_engine(12 * 1024 * 1024, diagnostic, sizeof(diagnostic)); assert(engine);
     wasmtime_module_t *module;
     uint8_t *canonical = NULL; size_t canonical_size = 0; uint32_t added;
     check(lasm_canonicalize_imports((uint8_t *)bytes.data, bytes.size,

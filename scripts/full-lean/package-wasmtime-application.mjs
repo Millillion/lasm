@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { ensureResourceGuard } from './resource-guard.mjs';
 import { copyApplicationHost, applicationHostFiles } from '../../src/application-output.mjs';
-import { hashWasmtimeFile as hashFile, readWasmtimeArtifact, wasmtimeHostFiles } from '../../src/wasmtime-artifact.mjs';
+import { hashWasmtimeFile as hashFile, readWasmtimeArtifact, wasmtimeHostFiles, wasmtimeCpuTarget } from '../../src/wasmtime-artifact.mjs';
 
 await ensureResourceGuard();
 const [compilationArg, outputArg, ...extra] = process.argv.slice(2);
@@ -18,11 +18,19 @@ assert.ok(!existsSync(output), 'Keep earlier deployments and failed attempts');
 const compilationFile = resolve(compilationArg), compilation = JSON.parse(readFileSync(compilationFile));
 const guard = JSON.parse(readFileSync(compilation.resourceReport));
 assert.ok(compilation.passed && compilation.inputUnchanged && compilation.harnessUnchanged);
+assert.equal(compilation.configuration.cpuTarget, wasmtimeCpuTarget, 'Recompile older caches with the explicit baseline target');
+assert.equal(compilation.configuration.cpuFeatures, 'baseline');
+assert.equal(compilation.engineConfigurationSha256,
+  await hashFile(join(root, 'scripts/full-lean/probes/wasmtime-engine-config.h')),
+  'Compilation and loading must use the same engine configuration');
+assert.equal(compilation.canonicalImportsSha256,
+  await hashFile(join(root, 'scripts/full-lean/probes/wasmtime-canonical-imports.h')),
+  'Compilation and loading must use the same canonical import transform');
 assert.ok(guard.unitReleased && !guard.resourceLimited); assert.deepEqual(guard.result, { code: 0, signal: null });
 assert.equal(await hashFile(compilation.cache.file), compilation.cache.sha256);
 const names = wasmtimeHostFiles;
 const sources = [fileURLToPath(import.meta.url), ...[...names, ...applicationHostFiles].map(name => join(root, 'src', name)),
-  ...['wasmtime-instantiate-lean.c', 'wasmtime-canonical-imports.h', 'wasmtime-native-api.c', 'wasmtime-process-setup.c']
+  ...['wasmtime-instantiate-lean.c', 'wasmtime-canonical-imports.h', 'wasmtime-native-api.c', 'wasmtime-process-setup.c', 'wasmtime-engine-config.h']
     .map(name => join(root, 'scripts/full-lean/probes', name))];
 const hashes = Object.fromEntries(await Promise.all(sources.map(async path => [path, await hashFile(path)])));
 mkdirSync(output, { recursive: true });
@@ -31,7 +39,7 @@ const report = { scope: 'Relocatable standalone Wasmtime preview on Linux x64; m
   compilation: compilationFile, compilationSha256: await hashFile(compilationFile), cache: compilation.cache,
   inputs: hashes, resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], passed: false,
   limitations: ['Native compilation still uses maintainer C tools.',
-    'Native caches currently infer build-host CPU features; relocation tests do not establish portability to a different CPU.',
+    'Native caches use an explicit baseline target; native validation on a different CPU remains unfinished.',
     'Complete WASI descriptors, dynamic imports, keepalive/cancellation and reusable disposal remain unimplemented.',
     'This preview packages one native platform and no additional runtime Lean module data.'] };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
@@ -70,7 +78,8 @@ try {
   const files = {};
   for (const name of ['program.cwasm', 'host/instance.so', 'host/native-api.node', 'host/libwasmtime.so'])
     files[name] = { bytes: statSync(join(dist, name)).size, sha256: await hashFile(join(dist, name)) };
-  const manifest = { schema: 1, backend: 'wasmtime-49.0.0', leanVersion: compilation.build.lean,
+  const manifest = { schema: 2, backend: 'wasmtime-49.0.0', leanVersion: compilation.build.lean,
+    cpuTarget: wasmtimeCpuTarget, cpuFeatures: 'baseline',
     platform: process.platform, arch: process.arch, files };
   writeFileSync(join(dist, 'wasmtime.json'), JSON.stringify(manifest, null, 2) + '\n');
   writeFileSync(join(dist, 'package.json'), JSON.stringify({ private: true, type: 'module' }) + '\n');

@@ -1,6 +1,8 @@
 /- Supplementary deployment coverage. Ordinary Lean only; no upstream tests change. -/
 import Init
 
+deriving instance Repr for IO.Error
+
 initialize retained : IO.Ref (Option IO.FS.Handle) ← IO.mkRef none
 
 private def payload : ByteArray := ByteArray.mk #[0, 255, 206, 187, 10]
@@ -58,13 +60,15 @@ def main (args : List String) : IO UInt32 := do
       let task ← IO.asTask (do
         let entries ← ("." : System.FilePath).readDir
         ensure entries.isEmpty "removed directory is not empty"
-        try
+        let nameless ← try
           discard IO.currentDir
-          throw (IO.userError "deleted cwd unexpectedly has a name")
+          pure false
         catch error =>
-          match error with
-          | .noFileOrDirectory _ _ _ => pure ()
-          | _ => throw error) Task.Priority.dedicated
+          -- Record the actual native error constructor as well as its text;
+          -- currentDir uses a general IO error for this native failure.
+          IO.println s!"deleted cwd error: {repr error}"
+          pure true
+        ensure nameless "deleted cwd unexpectedly has a name") Task.Priority.dedicated
       IO.ofExcept (← IO.wait task)
       IO.Process.setCurrentDir ".."
       ensure ((← IO.currentDir) == original) "relative directory recovery failed"

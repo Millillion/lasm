@@ -72,7 +72,7 @@ static void canonical_control(const char *wat, uint32_t expected, const char *re
     } else {
         check(status); assert(added == expected);
         if (added) unchanged_sections((uint8_t *)bytes.data, bytes.size, canonical, length);
-        wasm_engine_t *engine = create_engine(12 * 1024 * 1024); assert(engine);
+        wasm_engine_t *engine = create_engine(12 * 1024 * 1024, diagnostic, sizeof(diagnostic)); assert(engine);
         wasmtime_module_t *module;
         check(failure(wasmtime_module_new(engine, canonical ? canonical : (uint8_t *)bytes.data,
             canonical ? length : bytes.size, &module), NULL, diagnostic, sizeof(diagnostic)));
@@ -115,7 +115,7 @@ static void canonical_controls(void) {
 static void compile_fixture(const char *wat, const char *path) {
     wasm_byte_vec_t bytes, serialized;
     check(failure(wasmtime_wat2wasm(wat, strlen(wat), &bytes), NULL, diagnostic, sizeof(diagnostic)));
-    wasm_engine_t *engine = create_engine(12 * 1024 * 1024);
+    wasm_engine_t *engine = create_engine(12 * 1024 * 1024, diagnostic, sizeof(diagnostic));
     assert(engine);
     wasmtime_module_t *module;
     uint8_t *canonical = NULL; size_t canonical_length = 0; uint32_t added;

@@ -111,6 +111,11 @@ try {
     const interpreted = { ...run('native interpreted main', [lean.lean, '-Dlinter.all=false', '--run', interpretedSource, ...args], cwd1, sampleEnvironments?.[index] ?? interpretedEnv), ...observeFiles(cwd1) };
     const compiled = { ...run('native compiled main', [native, ...args], cwd2, sampleEnvironments?.[index] ?? nativeEnv), ...observeFiles(cwd2) };
     assert.deepEqual(compiled, interpreted); oracles.push(interpreted);
+    if (profile === 'lifecycle') {
+      const codes = { buffered: 7, exit: 19, forced: 23, 'high-exit': 255, error: 1,
+        stdio: 0, cwd: 0, 'removed-cwd': 0, wait: 0 };
+      assert.equal(compiled.code, codes[args[0]], 'The native fixture must complete its intended case');
+    }
     if (profile === 'environment') {
       assert.equal(compiled.code, 0, 'Both native environment controls must succeed');
       const keys = ['PATH', 'HOME', 'LEAN_NUM_THREADS', 'LASM_EMPTY', 'LASM_UNICODE',

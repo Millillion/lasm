@@ -18,6 +18,7 @@ const inputs = ['scripts/full-lean/probe-wasmtime-function-globals.mjs',
   'scripts/full-lean/probes/wasmtime-guest-memory.mjs', 'test/fixtures/emscripten-console.mjs',
   'test/wasmtime-console.test.mjs', 'scripts/full-lean/probes/wasmtime-canonical-imports.h'];
 inputs.push('src/wasmtime-console.mjs', 'src/wasmtime-guest-memory.mjs');
+inputs.push('scripts/full-lean/probes/wasmtime-engine-config.h');
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 const glueSha256 = await hashFile(glue);
 mkdirSync(output, { recursive: true });

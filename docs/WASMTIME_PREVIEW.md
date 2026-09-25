@@ -5,6 +5,9 @@ The Linux x64 preview now runs a copied Lean 4.34.1 application in stock Node
 artifacts denied by Landlock. All 45 native/deployed comparisons pass across
 the initial application and supplementary lifecycle and environment fixtures.
 See [the exact evidence and retained failures](evidence/wasmtime-standalone-preview-2026-09-25.json).
+The [baseline CPU follow-up](evidence/wasmtime-baseline-lifecycle-2026-09-25.json)
+adds 27 fresh lifecycle comparisons with explicit CPU settings, including
+completed recovery from a deleted working directory.
 
 This is a maintainer preview. Automatic provisioning and backend selection in
 the managed `lasm` CLI remain unfinished. The existing installed Bun backend
@@ -23,6 +26,11 @@ engine and the complete deployment directory. The library uses a relative
 lookup path, and the loader checks the cache and native-library identities.
 These locally generated caches contain native machine code; hashes establish
 the recorded identities, not trust in an outside producer.
+Compilation and loading now share an explicit `x86_64-unknown-linux-gnu` target
+with optional build-host CPU feature inference disabled. Schema 2 manifests
+record that baseline; older native-inferred caches require recompilation.
+Packaging also rejects changed or missing engine-configuration and import-transform
+identities. Actual deployment on a different physical CPU remains unverified.
 
 Validation includes 46 focused checks, 27 raw-descriptor comparisons, three
 shared-runtime native comparisons, three deliberate oracle-mismatch controls,
@@ -44,13 +52,17 @@ memory ranges. Six valid snapshots, seven malformed snapshots and 16 guest
 boundary checks also pass with undefined-behavior checking enabled. The original
 six target failures and two supplementary harness failures remain recorded.
 
-- [ ] Complete deleted-working-directory recovery: the current fixture matches
-  native's error but exits before reaching relative recovery.
+- [x] Complete deleted-working-directory recovery. The revised supplementary
+  fixture records native's error constructor, recovers through `..`, verifies
+  the original directory and succeeds in all three engines. Its native controls
+  must reach the intended exit code, preventing an early error from counting as
+  recovery. The earlier fixture and its narrower evidence remain recorded.
 - [x] Finish empty/large-environment comparisons.
 - [x] Remove the experimental loader's empty-environment rejection and 1 MiB
   environment limit while preserving range and allocation checks.
-- [ ] Select a portable native CPU target and verify deployment across CPUs;
-  current caches infer this build host's features.
+- [x] Select the explicit baseline CPU target consistently for compilation and
+  loading, with actual SIMD/shared-memory64 execution and cache reload controls.
+- [ ] Verify deployment across different physical CPUs.
 - [ ] Complete general imports, WASI descriptors, runtime lifetime and Lean
   module-data support. The current loader resolves the pinned console globals;
   this is not proof of arbitrary dynamic imports.

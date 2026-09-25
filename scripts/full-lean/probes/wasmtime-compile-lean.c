@@ -7,6 +7,11 @@
 #include <sys/resource.h>
 #define LASM_CANONICAL_IMPORTS_IMPLEMENTATION
 #include "wasmtime-canonical-imports.h"
+#include "wasmtime-engine-config.h"
+
+const char *lasm_wasmtime_compilation_cpu_target(void) {
+    return LASM_WASMTIME_CPU_TARGET;
+}
 
 static int describe(wasmtime_error_t *failure, char *error, size_t capacity) {
     if (!failure) return 0;
@@ -27,21 +32,8 @@ int lasm_compile_lean_module(const uint8_t *bytes, size_t length, const char *ca
     if (length > 512 * 1024 * 1024) {
         snprintf(error, capacity, "module exceeds reviewed 512 MiB input bound"); return 2;
     }
-    wasm_config_t *config = wasm_config_new();
-    wasmtime_config_wasm_memory64_set(config, true);
-    wasmtime_config_wasm_threads_set(config, true);
-    wasmtime_config_shared_memory_set(config, true);
-    wasmtime_config_wasm_exceptions_set(config, true);
-    wasmtime_config_strategy_set(config, WASMTIME_STRATEGY_CRANELIFT);
-    wasmtime_config_parallel_compilation_set(config, false);
-    wasmtime_config_cranelift_opt_level_set(config, WASMTIME_OPT_LEVEL_NONE);
-    wasmtime_config_memory_reservation_set(config, UINT64_C(8589934592));
-    wasmtime_config_max_wasm_stack_set(config, 64 * 1024 * 1024);
-    // The async-enabled C API validates this relationship even for a probe
-    // that never creates a Store. No execution stack is allocated here.
-    wasmtime_config_async_stack_size_set(config, 80 * 1024 * 1024);
-    wasm_engine_t *engine = wasm_engine_new_with_config(config);
-    if (!engine) { snprintf(error, capacity, "engine creation failed"); return 1; }
+    wasm_engine_t *engine = create_engine(64 * 1024 * 1024, error, capacity);
+    if (!engine) return 1;
     wasmtime_module_t *module = NULL, *restored = NULL;
     uint8_t *canonical = NULL; size_t canonical_length = 0; uint32_t added = 0;
     int status = lasm_canonicalize_imports(bytes, length, &canonical, &canonical_length, &added, error, capacity);

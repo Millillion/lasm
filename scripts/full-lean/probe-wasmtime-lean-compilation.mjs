@@ -8,6 +8,7 @@ import { createRequire } from 'node:module';
 import { spawnSync } from 'node:child_process';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from './resource-guard.mjs';
+import { wasmtimeCpuTarget } from '../../src/wasmtime-artifact.mjs';
 
 await ensureResourceGuard();
 const [formatProbeArg, outputArg, ...extra] = process.argv.slice(2);
@@ -30,13 +31,16 @@ mkdirSync(output, { recursive: true });
 const source = join(root, 'scripts/full-lean/probes/wasmtime-compile-lean.c');
 const harness = fileURLToPath(import.meta.url);
 const canonicalHeader = join(root, 'scripts/full-lean/probes/wasmtime-canonical-imports.h');
+const engineHeader = join(root, 'scripts/full-lean/probes/wasmtime-engine-config.h');
 const report = { scope: 'Single-worker compilation, serialization and trusted-cache reload of a real Lean module; no application instantiated or executed',
   input, inputSha256: previous.converted.sha256, inputBytes: previous.converted.bytes,
   precedingFormatProbe: previousFile, precedingResultSha256: await hashFile(previousFile),
   build: previous.build, canonicalImportsSha256: await hashFile(canonicalHeader),
+  engineConfigurationSha256: await hashFile(engineHeader),
   importedFunctionIdentity: 'Add private canonical function exports; retain all original code, elements and export entries',
   sourceSha256: await hashFile(source), harnessSha256: await hashFile(harness),
   configuration: { compiler: 'Cranelift', optimization: 'none', parallelCompilation: false,
+    cpuTarget: wasmtimeCpuTarget, cpuFeatures: 'baseline',
     inputBoundBytes: 512 * 1024 * 1024, serializedBoundBytes: 640 * 1024 * 1024,
     memory64: true, threads: true, sharedMemory: true, exceptions: true,
     maximumWasmStack: 64 * 1024 * 1024, asyncStackSize: 80 * 1024 * 1024,
@@ -60,6 +64,7 @@ try {
     '-L' + join(sdk, 'lib'), '-lwasmtime', '-Wl,-rpath,' + join(sdk, 'lib'), '-o', helper]);
   report.helperSha256 = await hashFile(helper);
   const ffi = createRequire(import.meta.url)('koffi'), library = ffi.load(helper);
+  assert.equal(library.func('str lasm_wasmtime_compilation_cpu_target(void)')(), wasmtimeCpuTarget);
   const compile = library.func('int lasm_compile_lean_module(const uint8_t *bytes, size_t length, const char *cache_file, uint64_t *details, char *error, size_t capacity)');
   const bytes = readFileSync(input), details = Buffer.alloc(5 * 8), error = Buffer.alloc(8192);
   const cacheFile = join(output, 'compiled.cwasm');
@@ -84,7 +89,8 @@ try {
 } finally {
   report.inputUnchanged = await hashFile(input) === report.inputSha256;
   report.harnessUnchanged = await hashFile(harness) === report.harnessSha256 && await hashFile(source) === report.sourceSha256
-    && await hashFile(canonicalHeader) === report.canonicalImportsSha256;
+    && await hashFile(canonicalHeader) === report.canonicalImportsSha256
+    && await hashFile(engineHeader) === report.engineConfigurationSha256;
   report.finishedAt = new Date().toISOString(); save();
   assert.ok(report.inputUnchanged && report.harnessUnchanged);
 }

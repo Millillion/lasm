@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, renameSync, symlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { readWasmtimeArtifact, hashWasmtimeFile, wasmtimeHostFiles } from '../src/wasmtime-artifact.mjs';
+import { readWasmtimeArtifact, hashWasmtimeFile, wasmtimeHostFiles, wasmtimeCpuTarget } from '../src/wasmtime-artifact.mjs';
 import { applicationHostFiles } from '../src/application-output.mjs';
 
 async function fixture(t) {
@@ -15,7 +15,8 @@ async function fixture(t) {
     const bytes = Buffer.from('fixture bytes for ' + name); writeFileSync(join(root, name), bytes);
     files[name] = { bytes: bytes.length, sha256: await hashWasmtimeFile(join(root, name)) };
   }
-  const manifest = { schema: 1, backend: 'wasmtime-49.0.0', platform: 'linux', arch: 'x64', leanVersion: '4.34.1', files };
+  const manifest = { schema: 2, backend: 'wasmtime-49.0.0', platform: 'linux', arch: 'x64',
+    cpuTarget: wasmtimeCpuTarget, cpuFeatures: 'baseline', leanVersion: '4.34.1', files };
   const save = () => writeFileSync(join(root, 'wasmtime.json'), JSON.stringify(manifest));
   save(); return { root, manifest, save };
 }
@@ -54,6 +55,21 @@ test('a redirected cache path is not accepted as the owned native file', async t
   const { root } = await fixture(t), original = join(root, 'program.cwasm');
   renameSync(original, original + '.other'); symlinkSync('program.cwasm.other', original);
   await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), /file changed/);
+});
+
+test('native-inferred and mismatched CPU caches cannot claim baseline deployment', async t => {
+  const { root, manifest, save } = await fixture(t);
+  for (const cpuTarget of [undefined, 'native', 'aarch64-unknown-linux-gnu']) {
+    manifest.cpuTarget = cpuTarget; save();
+    await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), /baseline CPU target/);
+  }
+  manifest.cpuTarget = wasmtimeCpuTarget;
+  for (const cpuFeatures of [undefined, 'native', 'avx2']) {
+    manifest.cpuFeatures = cpuFeatures; save();
+    await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), /baseline CPU target/);
+  }
+  manifest.cpuFeatures = 'baseline'; manifest.schema = 1; save();
+  await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), /native platform/);
 });
 
 test('standalone deployment carries every local JavaScript dependency', () => {
