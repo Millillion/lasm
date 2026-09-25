@@ -8,17 +8,18 @@ import { provisionLean } from '../src/managed-lean.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [outputArg, target = 'node', engineArg = process.execPath] = process.argv.slice(2);
-if (!outputArg || !['node', 'deno', 'bun'].includes(target)) throw new Error('Usage: managed-application.mjs NEW_OUTPUT [TARGET ENGINE]');
-const base = resolve(outputArg), engine = resolve(engineArg);
+const [outputArg, target = 'node', engineArg = process.execPath, version = '4.34.0', compilerArg = root, ...extra] = process.argv.slice(2);
+if (!outputArg || !['node', 'deno', 'bun'].includes(target) || !/^\d+\.\d+\.\d+$/.test(version) || extra.length)
+  throw new Error('Usage: managed-application.mjs NEW_OUTPUT [TARGET ENGINE LEAN_VERSION INSTALLED_COMPILER]');
+const base = resolve(outputArg), engine = resolve(engineArg), compiler = resolve(compilerArg);
 if (existsSync(base)) throw new Error('Choose a new output directory');
 const project = join(base, 'source project'), dist = join(base, 'deployment'), source = join(project, 'Main.lean');
 mkdirSync(project, { recursive: true });
 copyFileSync(join(root, 'test/fixtures/application-main/Main.lean'), source);
-writeFileSync(join(project, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
+writeFileSync(join(project, 'lean-toolchain'), `leanprover/lean4:v${version}\n`);
 const env = { ...process.env, PATH: dirname(process.execPath) };
 for (const name of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/.test(name)) delete env[name];
-const cli = args => execFileSync(process.execPath, [join(root, 'bin/lasm.mjs'), ...args],
+const cli = args => execFileSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), ...args],
   { cwd: project, env, encoding: 'utf8', timeout: 1800_000, stdio: ['ignore', 'pipe', 'inherit'] });
 const started = performance.now();
 cli(['build', source, '--target', target, '--output', dist]);
@@ -54,7 +55,7 @@ for (const args of [['hello λ', '', 'space argument'], ['fail']]) {
 // Exercise the actual direct-file command and its argument separator too. The
 // build above deliberately had only Node on PATH; running selects the installed
 // target engine, so add only that engine's directory for this control.
-const cliRun = spawnSync(process.execPath, [join(root, 'bin/lasm.mjs'), source, '--target', target,
+const cliRun = spawnSync(process.execPath, [join(compiler, 'bin/lasm.mjs'), source, '--target', target,
   '--', ...controls[0].args], { cwd: project, encoding: 'utf8', timeout: 180_000,
   env: { ...env, LEAN_NUM_THREADS: '2', PATH: [dirname(process.execPath), dirname(engine)].join(delimiter) } });
 assert.ifError(cliRun.error);
@@ -62,6 +63,7 @@ assert.equal(cliRun.status, controls[0].native.code);
 assert.equal(cliRun.stdout, controls[0].native.stdout);
 assert.doesNotMatch(cliRun.stderr, /Building .*for/);
 const report = { scope: 'Primary CLI with verified preprovisioned managed tools; cold npm installation and separate-machine deployment remain separate gates',
+  compiler, packageVersion: JSON.parse(readFileSync(join(compiler, 'package.json'), 'utf8')).version,
   target, platform: `${process.platform}-${process.arch}`, node: process.version,
   engineVersion: execFileSync(engine, ['--version'], { encoding: 'utf8' }).trim(), build: first,
   wasmSha256: wasmHash, buildSeconds, cachedBuildSeconds, controls,

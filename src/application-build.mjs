@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile, stat, rename, rm, copyFile } from 'node:fs/promises';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join, resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
@@ -9,16 +9,12 @@ import { provisionGit } from './managed-git.mjs';
 import { hashFile } from './managed-artifacts.mjs';
 import { applicationRuntime } from './application-runtime.mjs';
 import { applicationSources, findApplicationProject } from './application-sources.mjs';
-import { readApplicationSymbols } from './application-symbols.mjs';
+import { linkApplication } from './application-link.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint } from './application-output.mjs';
 import { outputReceipt, fileInventory, reusableOutput, deliverOutput } from './application-files.mjs';
 import { withApplicationLock } from './application-lock.mjs';
 import { applicationMetadata, copyApplicationMetadata } from './application-metadata.mjs';
-import { executableName, responseFile, insideDirectory } from './platform.mjs';
-import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader.mjs';
-import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
-import { optimizeMainTableGrowth } from '../scripts/full-lean/table-growth.mjs';
-import { preserveWebWorker } from '../scripts/full-lean/preserve-web-worker.mjs';
+import { insideDirectory } from './platform.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const helpers = ['emscripten-pre.js', 'host-pre.js', 'host-library.js', 'lean-symbol-loader.mjs',
@@ -85,45 +81,8 @@ async function buildLockedApplication(source, { target = 'node', output, rebuild
   log(`Building ${relative(process.cwd(), source) || source} for ${target}…`);
   const temporary = join(work, '.build-' + randomUUID()), dist = join(temporary, 'dist');
   await mkdir(dist, { recursive: true });
-  const compileFlags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN',
-    '-sMEMORY64=1', '-I', join(runtime.directory, 'include')];
-  const execute = (tool, args) => sdk.execute(tool, args, { stdio: 'inherit', timeout: 1800_000 });
-  const objects = [];
-  for (let index = 0; index < generated.sources.length; index++) {
-    const object = join(temporary, `module-${index}.o`);
-    execute('emcc', [...compileFlags, '-c', generated.sources[index], '-o', object]);
-    objects.push(object);
-  }
-  const registry = readApplicationSymbols(generated.sources, objects, join(sdk.prefix, 'bin', executableName('llvm-nm')),
-    runtime.manifest.applicationSymbolHook);
-  const registryC = join(temporary, 'application-symbols.c'), registryObject = join(temporary, 'application-symbols.o');
-  await writeFile(registryC, registry.source);
-  execute('emcc', [...compileFlags, '-c', registryC, '-o', registryObject]);
-  objects.push(registryObject);
-  const exportsFile = join(temporary, 'exports.json');
-  await writeFile(exportsFile, JSON.stringify([...new Set([...JSON.parse(await readFile(join(runtime.directory, 'exports.json'), 'utf8')), ...registry.exports])].sort()) + '\n');
-  // Bake the verified release into the private runtime prelude. It must not
-  // depend on mutable process environment or alter Lean's visible environment.
-  const applicationPrelude = join(temporary, 'application-pre.js');
-  await writeFile(applicationPrelude, `Module.lasmLeanVersion = ${JSON.stringify(lean.version)};\n`);
-  const link = [...objects, '-O1', '-pthread', '-fwasm-exceptions', `-sMEMORY64=${memoryMode}`, '-sMALLOC=mimalloc',
-    '-sMAIN_MODULE=2', `-sEXPORTED_FUNCTIONS=@${exportsFile}`, '-sPROXY_TO_PTHREAD=1', '-sPTHREAD_POOL_SIZE=4',
-    '-sEXPORTED_RUNTIME_METHODS=stringToNewUTF8', '-sEXIT_RUNTIME=1', '-sNODERAWFS=1',
-    '-sALLOW_MEMORY_GROWTH=1', '-sGROWABLE_ARRAYBUFFERS=1', '-sSTACK_OVERFLOW_CHECK=2',
-    '-Wl,--export-if-defined=__cpp_exception', '-sINITIAL_MEMORY=134217728',
-    `-sMAXIMUM_MEMORY=${memoryMode === 1 ? 8589934592 : 4294967296}`, '-sSTACK_SIZE=67108864',
-    '-Wno-experimental', '-Wno-pthreads-mem-growth', '-Wl,--start-group',
-    ...runtime.manifest.libraries.map(name => join(runtime.directory, name)), '-Wl,--end-group',
-    '--pre-js', join(root, 'scripts/full-lean/emscripten-pre.js'),
-    '--pre-js', applicationPrelude,
-    '--pre-js', join(root, 'scripts/full-lean/host-pre.js'),
-    '--js-library', join(root, 'scripts/full-lean/host-library.js'), '-o', join(dist, 'program.cjs')];
-  const argumentsFile = join(temporary, 'link.rsp'); await writeFile(argumentsFile, responseFile(link));
-  execute('em++', ['@' + argumentsFile]);
-  const glue = join(dist, 'program.cjs');
-  writeFileSync(glue, connectLeanSymbolLoader(readFileSync(glue, 'utf8'), true, { packageSymbols: true }));
-  await indexFunctionTable(join(dist, 'program.wasm'), glue);
-  writeFileSync(glue, optimizeMainTableGrowth(readFileSync(glue, 'utf8'))); preserveWebWorker(glue);
+  await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
+    leanVersion: lean.version, memoryMode });
   copyApplicationHost(dist); writeApplicationEntrypoint(dist, target);
   await copyApplicationMetadata(metadata, dist);
   await copyFile(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), join(dist, 'THIRD_PARTY_NOTICES.txt'));

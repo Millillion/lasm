@@ -14,6 +14,10 @@ separately from the earlier runtime evidence below.
   IO error policy. The release also changes reference-counting runtime headers
   and library code; fresh deployed execution evidence remains required.
   Earlier results below remain scoped to 4.34.0 or their stated older version.
+  The [installed `.25` main and upstream reference-count checks](docs/evidence/lean-4.34.1-installed-main-2026-09-25.json)
+  now pass in all three stock engines on Linux x64, including exact native IO,
+  argument and exit comparisons, cache reuse and direct-file execution. Broader
+  filesystem, HTTP, suite and native platform acceptance remain open.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.

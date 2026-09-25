@@ -12,8 +12,13 @@ counts and upstream exclusions are unchanged. The
 [mixed-driver review](evidence/lean-4.34.1-mixed-driver-classification.json)
 remain separate from earlier evidence. Five focused checks verify release
 isolation, shard coverage and CI argument forwarding. Harness support and this
-inventory do not establish new suite passes. The runtime rebuild and shipping
-execution campaigns remain pending.
+inventory do not establish new suite passes. The full runtime rebuild now
+passes, and the [unchanged `rc_sticky` driver](evidence/lean-4.34.1-installed-main-2026-09-25.json)
+passes both natively and through installed `.25` in Node, Deno and Bun on Linux
+x64. The parallel adapter maps only its exact C compiler invocation to the
+installed application linker. Original assertions remain active; unexpected
+arguments fail. Relocated executions with sources hidden and PATH empty also
+match native output and status. Broader 4.34.1 suite campaigns remain pending.
 
 The results and checked items below retain their original **4.34.0** scope.
 

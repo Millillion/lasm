@@ -29,6 +29,19 @@ source indexing cover 72,985 declarations and 875 standard C symbols; these
 counts are not behavioral passes. Older binaries and acceptance results retain
 their original versions.
 
+The local `.25` candidate now passes
+[fresh installed main and reference-count checks](evidence/lean-4.34.1-installed-main-2026-09-25.json)
+in stock Node, Deno and Bun on Linux x64. Six native/deployed main comparisons
+cover Unicode/empty arguments, large-integer async work, filesystem operations
+and normal/error exit status; cache reuse and the direct-file command pass in
+each engine. The unchanged upstream `misc_dir/rc_sticky` source and shell driver
+also pass through the installed production linker, including separate relocated
+execution with sources hidden and PATH empty. This private parallel C-test
+adapter adds no public foreign-code CLI. Installation used the local npm cache
+and preprovisioned build tools; cold installation, broader IO/HTTP and upstream
+acceptance are separate gates. All six workloads finish without resource events,
+with a maximum 3.81 GiB peak.
+
 Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
 downloads and extraction stream their data. Installation stages privately and
 publishes only a complete tree. Subsequent use hashes every recorded file and

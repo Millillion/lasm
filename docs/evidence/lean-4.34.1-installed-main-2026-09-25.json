@@ -1,0 +1,1253 @@
+{
+  "scope": "Fresh Lean 4.34.1 installed CLI and unchanged upstream reference-count checks on Linux x64; local npm cache and preprovisioned managed build tools, not cold installation or full API/suite acceptance",
+  "recordedAt": "2026-09-25T04:50:35.974970+00:00",
+  "versions": {
+    "checkedAt": "2026-09-25T04:28:45.499195+00:00",
+    "scope": "Official stable versions for the fresh Lean 4.34.1 application acceptance campaign",
+    "sources": {
+      "lean": {
+        "url": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+        "tag_name": "v4.34.1",
+        "published_at": "2026-09-24T20:24:21Z",
+        "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+        "prerelease": false,
+        "draft": false,
+        "target_commitish": "master"
+      },
+      "node": {
+        "url": "https://nodejs.org/dist/index.json",
+        "version": "v26.10.0",
+        "date": "2026-09-21",
+        "lts": false
+      },
+      "deno": {
+        "url": "https://api.github.com/repos/denoland/deno/releases/latest",
+        "tag_name": "v2.9.7",
+        "published_at": "2026-09-17T09:04:55Z",
+        "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+        "prerelease": false,
+        "draft": false,
+        "target_commitish": "main"
+      },
+      "bun": {
+        "url": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+        "tag_name": "bun-v1.4.2",
+        "published_at": "2026-09-05T05:55:48Z",
+        "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+        "prerelease": false,
+        "draft": false,
+        "target_commitish": "744846f844374847c902b5e7fd59b4342a51ef99"
+      }
+    }
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-4.34.1-r1/lasm-compiler-0.1.0-experimental.25.tgz",
+    "sha256": "ac8dcef8b95fb91cd760fa6f1b332c4c783901b7ca6b73b4f5eeadb559be0c6a",
+    "compressedBytes": 125732393,
+    "installedBytes": 632276588,
+    "files": 2700,
+    "candidateVersion": "0.1.0-experimental.25",
+    "defaultLean": "4.34.1",
+    "runtime": {
+      "name": "lean-4.34.1-wasm64",
+      "identity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-package-4.34.1-r1-resources.json",
+    "recordedAt": "2026-09-25T04:34:22.313Z"
+  },
+  "installation": {
+    "scope": "Byte-verified candidate staging preserved in its existing authenticated npm tarball, followed by isolated offline npm installation; managed tools are preprovisioned in later build tests",
+    "archive": {
+      "scope": "Local candidate assembly; installation and runtime checks are separate",
+      "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-4.34.1-r1/lasm-compiler-0.1.0-experimental.25.tgz",
+      "sha256": "ac8dcef8b95fb91cd760fa6f1b332c4c783901b7ca6b73b4f5eeadb559be0c6a",
+      "compressedBytes": 125732393,
+      "installedBytes": 632276588,
+      "files": 2700,
+      "candidateVersion": "0.1.0-experimental.25",
+      "defaultLean": "4.34.1",
+      "runtime": {
+        "name": "lean-4.34.1-wasm64",
+        "identity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e"
+      },
+      "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-package-4.34.1-r1-resources.json",
+      "recordedAt": "2026-09-25T04:34:22.313Z"
+    },
+    "freeBefore": 5340942336,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/install-candidate-4.34.1-r1-resources.json",
+    "phase": "complete",
+    "restore": "Extract the recorded npm tarball package/ directory to compiler/; recorded mode and mtimeNs retain original staging metadata.",
+    "installation": {
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=512",
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/lib/node_modules/npm/bin/npm-cli.js",
+        "install",
+        "--ignore-scripts",
+        "--offline",
+        "--no-audit",
+        "--no-fund",
+        "--cache",
+        "/home/lastmjs/development/lasm/compiler/.cache/npm",
+        "/home/lastmjs/development/lasm/compiler/.work/application-package-4.34.1-r1/lasm-compiler-0.1.0-experimental.25.tgz"
+      ],
+      "code": 0,
+      "log": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/npm-install.log"
+    },
+    "installedCompiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+    "installedPackageFilesVerified": 2700,
+    "freeAfter": 5336137728,
+    "finishedAt": "2026-09-25T04:36:07.635105+00:00"
+  },
+  "inputHashes": {
+    "src/application-build.mjs": "afa24ec17f4a300731e5561228db5e0fb8346475b4484133e77ba05fa248b1ba",
+    "src/application-link.mjs": "638fb3b5a3dabc110e19d801c5b65560058882a0c36926d4fcc6c0e802937965",
+    "integration/managed-application.mjs": "c52f8493745689aac0a7e3fbbfe449e23b7a1c997231545f036cda6c8241945b",
+    "integration/application-upstream-c.mjs": "7b441076db01092ca406bc98bcf6b0959809a245179f6afbcd7939cca850e7d5",
+    "scripts/package-application-release.mjs": "5b9156da2fea1b0e358f50dd1a3bf9fadbc36f9c9132ad814863427d98f0020f"
+  },
+  "unitTests": {
+    "path": ".work/product-acceptance/application-link-refactor-unit-r1.log",
+    "sha256": "dd237e983681141f36a7d7aba95a21e3cf2528bf21de5a40dc8f487b74e0a623",
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0
+  },
+  "main": {
+    "node": {
+      "path": ".work/managed-application-4.34.1-node-r1/result.json",
+      "sha256": "ffb29676b16bbca252e3f1060b2baf472dfef909bb583a7862069375d5abb3dc",
+      "scope": "Primary CLI with verified preprovisioned managed tools; cold npm installation and separate-machine deployment remain separate gates",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.25",
+      "target": "node",
+      "platform": "linux-x64",
+      "node": "v26.10.0",
+      "engineVersion": "v26.10.0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+            "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+          }
+        ],
+        "signature": "becb697495ff33d0613414243a83db53e3c08294f52c61209624d794a6528a17",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "69b6f21f9074769630af773b9f7b4210ad4d7ca841ed5dda922e91b50c33cce4",
+      "buildSeconds": 62.513391963000004,
+      "cachedBuildSeconds": 16.172524534999997,
+      "controls": [
+        {
+          "args": [
+            "hello \u03bb",
+            "",
+            "space argument"
+          ],
+          "native": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          },
+          "target": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          }
+        },
+        {
+          "args": [
+            "fail"
+          ],
+          "native": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          },
+          "target": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          }
+        }
+      ],
+      "directFileCommand": {
+        "code": 7,
+        "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "Preparing Lean 4.34.1 for node\u2026\n"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-4.34.1-node-r1-resources.json",
+      "recordedAt": "2026-09-25T04:38:35.639Z"
+    },
+    "deno": {
+      "path": ".work/managed-application-4.34.1-deno-r1/result.json",
+      "sha256": "b8705de5544986a8e6c14e10888de02076142666bbfecccb9a2cd724a56d70a9",
+      "scope": "Primary CLI with verified preprovisioned managed tools; cold npm installation and separate-machine deployment remain separate gates",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.25",
+      "target": "deno",
+      "platform": "linux-x64",
+      "node": "v26.10.0",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+            "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+          }
+        ],
+        "signature": "43ff8fbcac1efe15199f7c4d9be858327841705f97c17a41c718426c79b1c500",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "69b6f21f9074769630af773b9f7b4210ad4d7ca841ed5dda922e91b50c33cce4",
+      "buildSeconds": 65.024303047,
+      "cachedBuildSeconds": 16.582581122999997,
+      "controls": [
+        {
+          "args": [
+            "hello \u03bb",
+            "",
+            "space argument"
+          ],
+          "native": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          },
+          "target": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          }
+        },
+        {
+          "args": [
+            "fail"
+          ],
+          "native": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          },
+          "target": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          }
+        }
+      ],
+      "directFileCommand": {
+        "code": 7,
+        "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "Preparing Lean 4.34.1 for deno\u2026\n"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-4.34.1-deno-r1-resources.json",
+      "recordedAt": "2026-09-25T04:41:54.392Z"
+    },
+    "bun": {
+      "path": ".work/managed-application-4.34.1-bun-r1/result.json",
+      "sha256": "ab0180ccf377dad354f07d91ba1ef9012eb26a944b637365d9b10113eef90b39",
+      "scope": "Primary CLI with verified preprovisioned managed tools; cold npm installation and separate-machine deployment remain separate gates",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.25",
+      "target": "bun",
+      "platform": "linux-x64",
+      "node": "v26.10.0",
+      "engineVersion": "1.4.2",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+            "cSha256": "eec71666b21b6f167c93f6d0793d56c27350f016b5779669c6dd96c3ed7fc2c9"
+          }
+        ],
+        "signature": "d177d2118f8dfb45ac651ebfa2fb0226c8f38a859a15d3b3113d718916bbe621",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "deefe3f96e5a12af4b4c5ee8422951578c18d124f82130f25723a89db92bd838",
+      "buildSeconds": 91.698735776,
+      "cachedBuildSeconds": 15.917576480999996,
+      "controls": [
+        {
+          "args": [
+            "hello \u03bb",
+            "",
+            "space argument"
+          ],
+          "native": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          },
+          "target": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          }
+        },
+        {
+          "args": [
+            "fail"
+          ],
+          "native": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          },
+          "target": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          }
+        }
+      ],
+      "directFileCommand": {
+        "code": 7,
+        "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "Preparing Lean 4.34.1 for bun\u2026\n"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-4.34.1-bun-r1-resources.json",
+      "recordedAt": "2026-09-25T04:44:24.924Z"
+    }
+  },
+  "upstreamReferenceCount": {
+    "node": {
+      "path": ".work/upstream-rc-sticky-4.34.1-node-r1/result.json",
+      "sha256": "8ae5aa675aff4107da73354be49cf86b47a6749544e78eb75033f02262934c2a",
+      "name": "misc_dir/rc_sticky",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "scope": "Unchanged native and deployed C reference-count assertions through the installed application linker; not a public foreign-code CLI",
+      "target": "node",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+      "originalHashes": {
+        "tests/misc_dir/rc_sticky/rc_sticky.c": "e3a50f62415b4a8ab09c00d6874b99af76e7346b351deb2e9fdd788fb53b6abe",
+        "tests/misc_dir/rc_sticky/run_test.sh": "ad2f44565373048b5918a5f993f415ddbc6d7396483fd66cc469c79c9a17a1dc",
+        "tests/util.sh": "d24761b6293f81cc74f672cfdd227f936fcafdc875a4eb363aba356c5b6ade26"
+      },
+      "harnessSha256": "7b441076db01092ca406bc98bcf6b0959809a245179f6afbcd7939cca850e7d5",
+      "adaptations": [
+        "The original C source, shell driver, empty LEANC_OPTS and runtime assertions are unchanged.",
+        "Only the exact deployed leanc -o rc_sticky.produced rc_sticky.c invocation uses an explicit adapter; unexpected arguments fail.",
+        "The installed Lean application linker supplies its usual C optimization, Wasm ABI and host support.",
+        "After the unchanged shell driver, a separate native/deployed comparison checks stdout, stderr and exit status after relocation with source hidden and PATH empty.",
+        "One guarded workload with one linker worker; build deadline 1800 seconds, runtime deadline 120 seconds."
+      ],
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-rc-sticky-4.34.1-node-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "v26.10.0\n",
+          "stderr": ""
+        },
+        {
+          "label": "unchanged native shell driver",
+          "program": "/bin/bash",
+          "args": [
+            "-c",
+            "source \"$TEST_DIR/util.sh\"\nsource ./run_test.sh\n"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1/native-source",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "++ ./rc_sticky.produced\n"
+        },
+        {
+          "label": "native executable",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1/native-source/rc_sticky.produced",
+          "args": [],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "unchanged deployed shell driver with exact compile adapter",
+          "program": "/bin/bash",
+          "args": [
+            "-c",
+            "source \"$TEST_DIR/util.sh\"\nleanc() { \"$LASM_BUILD_NODE\" \"$LASM_C_CASE_HARNESS\" --compile \"$LASM_C_CASE_INPUT\" \"$@\"; }\nsource ./run_test.sh\n"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1/deployed-source",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "em++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n++ ./rc_sticky.produced\n"
+        },
+        {
+          "label": "relocated deployed executable",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1/relocated deployment/main.mjs"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "passed": true,
+      "engineVersion": "v26.10.0",
+      "native": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "build": {
+        "scope": "Unchanged upstream C driver through the installed application object/link pipeline",
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "emscripten": "6.0.9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "sourceSha256": "e3a50f62415b4a8ab09c00d6874b99af76e7346b351deb2e9fdd788fb53b6abe",
+        "target": "node",
+        "applicationLinkSha256": "638fb3b5a3dabc110e19d801c5b65560058882a0c36926d4fcc6c0e802937965",
+        "wasmSha256": "76ba1475b1980032420938afc997eb9f824ebf37e2b95904e73e78bf4d45101c"
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1/relocated deployment"
+      },
+      "originalSourcesUnchanged": true,
+      "finishedAt": "2026-09-25T04:45:37.328Z"
+    },
+    "deno": {
+      "path": ".work/upstream-rc-sticky-4.34.1-deno-r1/result.json",
+      "sha256": "e1c9862e5c1b1a7678f38c548f73793f863ea2dde8818da09631581826569e5b",
+      "name": "misc_dir/rc_sticky",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "scope": "Unchanged native and deployed C reference-count assertions through the installed application linker; not a public foreign-code CLI",
+      "target": "deno",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+      "originalHashes": {
+        "tests/misc_dir/rc_sticky/rc_sticky.c": "e3a50f62415b4a8ab09c00d6874b99af76e7346b351deb2e9fdd788fb53b6abe",
+        "tests/misc_dir/rc_sticky/run_test.sh": "ad2f44565373048b5918a5f993f415ddbc6d7396483fd66cc469c79c9a17a1dc",
+        "tests/util.sh": "d24761b6293f81cc74f672cfdd227f936fcafdc875a4eb363aba356c5b6ade26"
+      },
+      "harnessSha256": "7b441076db01092ca406bc98bcf6b0959809a245179f6afbcd7939cca850e7d5",
+      "adaptations": [
+        "The original C source, shell driver, empty LEANC_OPTS and runtime assertions are unchanged.",
+        "Only the exact deployed leanc -o rc_sticky.produced rc_sticky.c invocation uses an explicit adapter; unexpected arguments fail.",
+        "The installed Lean application linker supplies its usual C optimization, Wasm ABI and host support.",
+        "After the unchanged shell driver, a separate native/deployed comparison checks stdout, stderr and exit status after relocation with source hidden and PATH empty.",
+        "One guarded workload with one linker worker; build deadline 1800 seconds, runtime deadline 120 seconds."
+      ],
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-rc-sticky-4.34.1-deno-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "args": [
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+          "stderr": ""
+        },
+        {
+          "label": "unchanged native shell driver",
+          "program": "/bin/bash",
+          "args": [
+            "-c",
+            "source \"$TEST_DIR/util.sh\"\nsource ./run_test.sh\n"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1/native-source",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "++ ./rc_sticky.produced\n"
+        },
+        {
+          "label": "native executable",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1/native-source/rc_sticky.produced",
+          "args": [],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "unchanged deployed shell driver with exact compile adapter",
+          "program": "/bin/bash",
+          "args": [
+            "-c",
+            "source \"$TEST_DIR/util.sh\"\nleanc() { \"$LASM_BUILD_NODE\" \"$LASM_C_CASE_HARNESS\" --compile \"$LASM_C_CASE_INPUT\" \"$@\"; }\nsource ./run_test.sh\n"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1/deployed-source",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "em++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n++ ./rc_sticky.produced\n"
+        },
+        {
+          "label": "relocated deployed executable",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "args": [
+            "run",
+            "-A",
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1/relocated deployment/main.mjs"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "passed": true,
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "native": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "build": {
+        "scope": "Unchanged upstream C driver through the installed application object/link pipeline",
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "emscripten": "6.0.9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "sourceSha256": "e3a50f62415b4a8ab09c00d6874b99af76e7346b351deb2e9fdd788fb53b6abe",
+        "target": "deno",
+        "applicationLinkSha256": "638fb3b5a3dabc110e19d801c5b65560058882a0c36926d4fcc6c0e802937965",
+        "wasmSha256": "5169d9d51a5909a1d459303435b62f8198951a7e161fc3a871162f2ef230e8d3"
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1/relocated deployment"
+      },
+      "originalSourcesUnchanged": true,
+      "finishedAt": "2026-09-25T04:46:46.781Z"
+    },
+    "bun": {
+      "path": ".work/upstream-rc-sticky-4.34.1-bun-r1/result.json",
+      "sha256": "aee00cd363d58542805b38f7f2982fd59b0ca9688659640f999b0305c16d3ac0",
+      "name": "misc_dir/rc_sticky",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "scope": "Unchanged native and deployed C reference-count assertions through the installed application linker; not a public foreign-code CLI",
+      "target": "bun",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+      "originalHashes": {
+        "tests/misc_dir/rc_sticky/rc_sticky.c": "e3a50f62415b4a8ab09c00d6874b99af76e7346b351deb2e9fdd788fb53b6abe",
+        "tests/misc_dir/rc_sticky/run_test.sh": "ad2f44565373048b5918a5f993f415ddbc6d7396483fd66cc469c79c9a17a1dc",
+        "tests/util.sh": "d24761b6293f81cc74f672cfdd227f936fcafdc875a4eb363aba356c5b6ade26"
+      },
+      "harnessSha256": "7b441076db01092ca406bc98bcf6b0959809a245179f6afbcd7939cca850e7d5",
+      "adaptations": [
+        "The original C source, shell driver, empty LEANC_OPTS and runtime assertions are unchanged.",
+        "Only the exact deployed leanc -o rc_sticky.produced rc_sticky.c invocation uses an explicit adapter; unexpected arguments fail.",
+        "The installed Lean application linker supplies its usual C optimization, Wasm ABI and host support.",
+        "After the unchanged shell driver, a separate native/deployed comparison checks stdout, stderr and exit status after relocation with source hidden and PATH empty.",
+        "One guarded workload with one linker worker; build deadline 1800 seconds, runtime deadline 120 seconds."
+      ],
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-rc-sticky-4.34.1-bun-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "args": [
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "1.4.2\n",
+          "stderr": ""
+        },
+        {
+          "label": "unchanged native shell driver",
+          "program": "/bin/bash",
+          "args": [
+            "-c",
+            "source \"$TEST_DIR/util.sh\"\nsource ./run_test.sh\n"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1/native-source",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "++ ./rc_sticky.produced\n"
+        },
+        {
+          "label": "native executable",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1/native-source/rc_sticky.produced",
+          "args": [],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "unchanged deployed shell driver with exact compile adapter",
+          "program": "/bin/bash",
+          "args": [
+            "-c",
+            "source \"$TEST_DIR/util.sh\"\nleanc() { \"$LASM_BUILD_NODE\" \"$LASM_C_CASE_HARNESS\" --compile \"$LASM_C_CASE_INPUT\" \"$@\"; }\nsource ./run_test.sh\n"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1/deployed-source",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": "warning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\n++ ./rc_sticky.produced\n"
+        },
+        {
+          "label": "relocated deployed executable",
+          "program": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1/relocated deployment/main.mjs"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        }
+      ],
+      "passed": true,
+      "engineVersion": "1.4.2",
+      "native": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "build": {
+        "scope": "Unchanged upstream C driver through the installed application object/link pipeline",
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "emscripten": "6.0.9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "sourceSha256": "e3a50f62415b4a8ab09c00d6874b99af76e7346b351deb2e9fdd788fb53b6abe",
+        "target": "bun",
+        "applicationLinkSha256": "638fb3b5a3dabc110e19d801c5b65560058882a0c36926d4fcc6c0e802937965",
+        "wasmSha256": "406d4af48e4eecc39c5eb96422eb8b9db5c2dafe8b0a74505d929a924745b158"
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1/relocated deployment"
+      },
+      "originalSourcesUnchanged": true,
+      "finishedAt": "2026-09-25T04:48:26.469Z"
+    }
+  },
+  "resources": {
+    "application-package-4.34.1-r1": {
+      "path": ".work/product-acceptance/application-package-4.34.1-r1-resources.json",
+      "sha256": "475ee3681b14751d517cb8b4a872ef5870d111110cbc9296c4756880d5d70229",
+      "startedAt": "2026-09-25T04:33:47.859Z",
+      "finishedAt": "2026-09-25T04:34:22.400Z",
+      "peakMemoryBytes": 2357817344,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "install-candidate-4.34.1-r1": {
+      "path": ".work/product-acceptance/install-candidate-4.34.1-r1-resources.json",
+      "sha256": "ae3a0a25f16b360fe5644f08ec4d72e4b1be76c796ef7c70b10a24dc425e5284",
+      "startedAt": "2026-09-25T04:35:44.578Z",
+      "finishedAt": "2026-09-25T04:36:07.746Z",
+      "peakMemoryBytes": 1535393792,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 2147483648,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1717986918,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "managed-application-4.34.1-node-r1": {
+      "path": ".work/product-acceptance/managed-application-4.34.1-node-r1-resources.json",
+      "sha256": "384de1464288f11685cec6d61fcdba135ec2ca6d941efc3c19c4c38d6d9e60f0",
+      "startedAt": "2026-09-25T04:36:41.214Z",
+      "finishedAt": "2026-09-25T04:38:35.738Z",
+      "peakMemoryBytes": 4089663488,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "managed-application-4.34.1-node-r1-archive": {
+      "path": ".work/product-acceptance/managed-application-4.34.1-node-r1-archive-resources.json",
+      "sha256": "6ed1957d397439dd38dbeca79de0b7fa0db4154827e73830308aa088893abf6a",
+      "startedAt": "2026-09-25T04:39:51.140Z",
+      "finishedAt": "2026-09-25T04:39:56.522Z",
+      "peakMemoryBytes": 210210816,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "upstream-rc-sticky-4.34.1-node-r1": {
+      "path": ".work/product-acceptance/upstream-rc-sticky-4.34.1-node-r1-resources.json",
+      "sha256": "b45d169c6cb92b4b863a5bf782c7ec4050072069cee9f7d3d2b77dae78a3e2e2",
+      "startedAt": "2026-09-25T04:44:30.478Z",
+      "finishedAt": "2026-09-25T04:45:37.444Z",
+      "peakMemoryBytes": 3508424704,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "upstream-rc-sticky-4.34.1-node-r1-archive": {
+      "path": ".work/product-acceptance/upstream-rc-sticky-4.34.1-node-r1-archive-resources.json",
+      "sha256": "f8f80a60b01fb011f187111ff5bb2b79cc7df8bcea2386185e919536271d8686",
+      "startedAt": "2026-09-25T04:45:37.503Z",
+      "finishedAt": "2026-09-25T04:45:41.439Z",
+      "peakMemoryBytes": 208322560,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "managed-application-4.34.1-deno-r1": {
+      "path": ".work/product-acceptance/managed-application-4.34.1-deno-r1-resources.json",
+      "sha256": "b152cce58c8abe957b56ad778b4b806f66c09c0f754315b3862dc72becc975cd",
+      "startedAt": "2026-09-25T04:39:56.572Z",
+      "finishedAt": "2026-09-25T04:41:54.491Z",
+      "peakMemoryBytes": 3416006656,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "managed-application-4.34.1-deno-r1-archive": {
+      "path": ".work/product-acceptance/managed-application-4.34.1-deno-r1-archive-resources.json",
+      "sha256": "e62277d485f3f799fedab5908cbc09727c6e9b093a81d5de773bb1436e6bd3a2",
+      "startedAt": "2026-09-25T04:41:54.543Z",
+      "finishedAt": "2026-09-25T04:42:00.407Z",
+      "peakMemoryBytes": 210206720,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "upstream-rc-sticky-4.34.1-deno-r1": {
+      "path": ".work/product-acceptance/upstream-rc-sticky-4.34.1-deno-r1-resources.json",
+      "sha256": "0a3e05a093ed1c47e96cb243603545c735baa6e1a06c0d723b84f2785b10fa3a",
+      "startedAt": "2026-09-25T04:45:41.484Z",
+      "finishedAt": "2026-09-25T04:46:46.880Z",
+      "peakMemoryBytes": 3740876800,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "upstream-rc-sticky-4.34.1-deno-r1-archive": {
+      "path": ".work/product-acceptance/upstream-rc-sticky-4.34.1-deno-r1-archive-resources.json",
+      "sha256": "d19478f6ad2d1966d123913769dcb6304d930ed053dceb3fb453e4f1c3f1a430",
+      "startedAt": "2026-09-25T04:46:46.932Z",
+      "finishedAt": "2026-09-25T04:46:50.588Z",
+      "peakMemoryBytes": 208449536,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "managed-application-4.34.1-bun-r1": {
+      "path": ".work/product-acceptance/managed-application-4.34.1-bun-r1-resources.json",
+      "sha256": "c5864696d4a283eb5abf612475d48b126e102c569a396f8ae52f6a3f0b76b1aa",
+      "startedAt": "2026-09-25T04:42:00.468Z",
+      "finishedAt": "2026-09-25T04:44:25.012Z",
+      "peakMemoryBytes": 3578130432,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "managed-application-4.34.1-bun-r1-archive": {
+      "path": ".work/product-acceptance/managed-application-4.34.1-bun-r1-archive-resources.json",
+      "sha256": "7d266defd6a8015e91aea5d757ae28d58f74d6d0ac80f3a1a26b430d2f74a2f3",
+      "startedAt": "2026-09-25T04:44:25.068Z",
+      "finishedAt": "2026-09-25T04:44:30.424Z",
+      "peakMemoryBytes": 216072192,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "upstream-rc-sticky-4.34.1-bun-r1": {
+      "path": ".work/product-acceptance/upstream-rc-sticky-4.34.1-bun-r1-resources.json",
+      "sha256": "d8869a858f0f615823ef241b30357ed5bb1c23b4b57ad7a2ae9a49d1960d462e",
+      "startedAt": "2026-09-25T04:46:50.639Z",
+      "finishedAt": "2026-09-25T04:48:26.565Z",
+      "peakMemoryBytes": 3981193216,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    },
+    "upstream-rc-sticky-4.34.1-bun-r1-archive": {
+      "path": ".work/product-acceptance/upstream-rc-sticky-4.34.1-bun-r1-archive-resources.json",
+      "sha256": "4cbed3d66daf831d0a523439dee86bee908357593992d120cf6f14188504f08a",
+      "startedAt": "2026-09-25T04:48:26.611Z",
+      "finishedAt": "2026-09-25T04:48:30.363Z",
+      "peakMemoryBytes": 215425024,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      }
+    }
+  },
+  "binaryArchives": {
+    "managed-application-4.34.1-node-r1": {
+      "path": ".work/managed-application-4.34.1-node-r1/binary-archive.json",
+      "sha256": "930cd87262018bea93d584d5a03670f5022be7700185da03763a665da53c5338",
+      "scope": "Lossless archival of completed experiment Wasm binaries only; sources, host files, logs and acceptance receipts remain intact",
+      "guard": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-4.34.1-node-r1-resources.json",
+      "guardSha256": "384de1464288f11685cec6d61fcdba135ec2ca6d941efc3c19c4c38d6d9e60f0",
+      "resultSha256": "ffb29676b16bbca252e3f1060b2baf472dfef909bb583a7862069375d5abb3dc",
+      "files": [
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-node-r1/deployment/program.wasm",
+          "originalBytes": 160431795,
+          "originalSha256": "69b6f21f9074769630af773b9f7b4210ad4d7ca841ed5dda922e91b50c33cce4",
+          "mode": 509,
+          "mtimeNs": 1790311063785050780,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-node-r1/deployment/program.wasm.gz",
+          "archiveBytes": 37245973,
+          "archiveSha256": "8fac1857065d86890b583ff2dbadc7ebbf0949aa1f3df1aa02c1fbb4d60c1026",
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-node-r1/source project/.lake/lasm/applications/6287f972ab2a59d0/becb697495ff33d0613414243a83db53e3c08294f52c61209624d794a6528a17/dist/program.wasm",
+          "originalBytes": 160431795,
+          "originalSha256": "69b6f21f9074769630af773b9f7b4210ad4d7ca841ed5dda922e91b50c33cce4",
+          "mode": 509,
+          "mtimeNs": 1790311053514938259,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-node-r1/source project/.lake/lasm/applications/6287f972ab2a59d0/becb697495ff33d0613414243a83db53e3c08294f52c61209624d794a6528a17/dist/program.wasm.gz",
+          "archiveBytes": 37245973,
+          "archiveSha256": "8fac1857065d86890b583ff2dbadc7ebbf0949aa1f3df1aa02c1fbb4d60c1026",
+          "verifiedDecompression": true,
+          "phase": "archived"
+        }
+      ],
+      "freeBefore": 4967292928,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-4.34.1-node-r1-archive-resources.json",
+      "phase": "complete",
+      "freeAfter": 5250904064,
+      "finishedAt": "2026-09-25T04:39:56.447439+00:00",
+      "restore": "Decompress each .gz to its original path, verify originalSha256, then restore the recorded mode and mtimeNs."
+    },
+    "upstream-rc-sticky-4.34.1-node-r1": {
+      "path": ".work/upstream-rc-sticky-4.34.1-node-r1/binary-archive.json",
+      "sha256": "39ce60e5cdce7193e8554b874d2f6ce5e8745ed4dfe0cc8a17c047f6425d7c7d",
+      "scope": "Lossless archival of completed experiment Wasm binaries only; sources, host files, logs and acceptance receipts remain intact",
+      "guard": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-rc-sticky-4.34.1-node-r1-resources.json",
+      "guardSha256": "b45d169c6cb92b4b863a5bf782c7ec4050072069cee9f7d3d2b77dae78a3e2e2",
+      "resultSha256": "8ae5aa675aff4107da73354be49cf86b47a6749544e78eb75033f02262934c2a",
+      "files": [
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1/relocated deployment/program.wasm",
+          "originalBytes": 160370864,
+          "originalSha256": "76ba1475b1980032420938afc997eb9f824ebf37e2b95904e73e78bf4d45101c",
+          "mode": 509,
+          "mtimeNs": 1790311523725340437,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-node-r1/relocated deployment/program.wasm.gz",
+          "archiveBytes": 37245962,
+          "archiveSha256": "ece08e626bd6fdd20f94a60bb13d641b8efd8b7fb989a55bd5053bf44c2d6a97",
+          "verifiedDecompression": true,
+          "phase": "archived"
+        }
+      ],
+      "freeBefore": 4888571904,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-rc-sticky-4.34.1-node-r1-archive-resources.json",
+      "phase": "complete",
+      "freeAfter": 5011759104,
+      "finishedAt": "2026-09-25T04:45:41.361656+00:00",
+      "restore": "Decompress each .gz to its original path, verify originalSha256, then restore the recorded mode and mtimeNs."
+    },
+    "managed-application-4.34.1-deno-r1": {
+      "path": ".work/managed-application-4.34.1-deno-r1/binary-archive.json",
+      "sha256": "a2b48c3dbb8b65264454d5a8b8be48a8581347be44616dd46294ca5b596725ab",
+      "scope": "Lossless archival of completed experiment Wasm binaries only; sources, host files, logs and acceptance receipts remain intact",
+      "guard": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-4.34.1-deno-r1-resources.json",
+      "guardSha256": "b152cce58c8abe957b56ad778b4b806f66c09c0f754315b3862dc72becc975cd",
+      "resultSha256": "b8705de5544986a8e6c14e10888de02076142666bbfecccb9a2cd724a56d70a9",
+      "files": [
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-deno-r1/deployment/program.wasm",
+          "originalBytes": 160431795,
+          "originalSha256": "69b6f21f9074769630af773b9f7b4210ad4d7ca841ed5dda922e91b50c33cce4",
+          "mode": 509,
+          "mtimeNs": 1790311261690942922,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-deno-r1/deployment/program.wasm.gz",
+          "archiveBytes": 37245973,
+          "archiveSha256": "8fac1857065d86890b583ff2dbadc7ebbf0949aa1f3df1aa02c1fbb4d60c1026",
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-deno-r1/source project/.lake/lasm/applications/f761845d445d72e5/43ff8fbcac1efe15199f7c4d9be858327841705f97c17a41c718426c79b1c500/dist/program.wasm",
+          "originalBytes": 160431795,
+          "originalSha256": "69b6f21f9074769630af773b9f7b4210ad4d7ca841ed5dda922e91b50c33cce4",
+          "mode": 509,
+          "mtimeNs": 1790311251223900796,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-deno-r1/source project/.lake/lasm/applications/f761845d445d72e5/43ff8fbcac1efe15199f7c4d9be858327841705f97c17a41c718426c79b1c500/dist/program.wasm.gz",
+          "archiveBytes": 37245973,
+          "archiveSha256": "8fac1857065d86890b583ff2dbadc7ebbf0949aa1f3df1aa02c1fbb4d60c1026",
+          "verifiedDecompression": true,
+          "phase": "archived"
+        }
+      ],
+      "freeBefore": 4881199104,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-4.34.1-deno-r1-archive-resources.json",
+      "phase": "complete",
+      "freeAfter": 5164797952,
+      "finishedAt": "2026-09-25T04:42:00.324109+00:00",
+      "restore": "Decompress each .gz to its original path, verify originalSha256, then restore the recorded mode and mtimeNs."
+    },
+    "upstream-rc-sticky-4.34.1-deno-r1": {
+      "path": ".work/upstream-rc-sticky-4.34.1-deno-r1/binary-archive.json",
+      "sha256": "38ed1de457ad56df76904e6c7a44aad18324358d3ab805088485118e38911145",
+      "scope": "Lossless archival of completed experiment Wasm binaries only; sources, host files, logs and acceptance receipts remain intact",
+      "guard": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-rc-sticky-4.34.1-deno-r1-resources.json",
+      "guardSha256": "0a3e05a093ed1c47e96cb243603545c735baa6e1a06c0d723b84f2785b10fa3a",
+      "resultSha256": "e1c9862e5c1b1a7678f38c548f73793f863ea2dde8818da09631581826569e5b",
+      "files": [
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1/relocated deployment/program.wasm",
+          "originalBytes": 160370864,
+          "originalSha256": "5169d9d51a5909a1d459303435b62f8198951a7e161fc3a871162f2ef230e8d3",
+          "mode": 509,
+          "mtimeNs": 1790311593209799778,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-deno-r1/relocated deployment/program.wasm.gz",
+          "archiveBytes": 37245962,
+          "archiveSha256": "f6fa2b13b621e545bdea78e5531141f5c30ee2f939b467e8ec68cf8c50a167e2",
+          "verifiedDecompression": true,
+          "phase": "archived"
+        }
+      ],
+      "freeBefore": 4820037632,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-rc-sticky-4.34.1-deno-r1-archive-resources.json",
+      "phase": "complete",
+      "freeAfter": 4943159296,
+      "finishedAt": "2026-09-25T04:46:50.503403+00:00",
+      "restore": "Decompress each .gz to its original path, verify originalSha256, then restore the recorded mode and mtimeNs."
+    },
+    "managed-application-4.34.1-bun-r1": {
+      "path": ".work/managed-application-4.34.1-bun-r1/binary-archive.json",
+      "sha256": "5d84b1245acf8cc049a48d856201504b1599a88ca090c7df7542833673089133",
+      "scope": "Lossless archival of completed experiment Wasm binaries only; sources, host files, logs and acceptance receipts remain intact",
+      "guard": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-4.34.1-bun-r1-resources.json",
+      "guardSha256": "c5864696d4a283eb5abf612475d48b126e102c569a396f8ae52f6a3f0b76b1aa",
+      "resultSha256": "ab0180ccf377dad354f07d91ba1ef9012eb26a944b637365d9b10113eef90b39",
+      "files": [
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-bun-r1/deployment/program.wasm",
+          "originalBytes": 166035853,
+          "originalSha256": "deefe3f96e5a12af4b4c5ee8422951578c18d124f82130f25723a89db92bd838",
+          "mode": 509,
+          "mtimeNs": 1790311412233673367,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-bun-r1/deployment/program.wasm.gz",
+          "archiveBytes": 38400395,
+          "archiveSha256": "1eefa5886578050cbba5dc970dc5ac498c468b812e32bf9b89ff311027e36b35",
+          "verifiedDecompression": true,
+          "phase": "archived"
+        },
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-bun-r1/source project/.lake/lasm/applications/d49235b47df72a73/d177d2118f8dfb45ac651ebfa2fb0226c8f38a859a15d3b3113d718916bbe621/dist/program.wasm",
+          "originalBytes": 166035853,
+          "originalSha256": "deefe3f96e5a12af4b4c5ee8422951578c18d124f82130f25723a89db92bd838",
+          "mode": 509,
+          "mtimeNs": 1790311402150617847,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-application-4.34.1-bun-r1/source project/.lake/lasm/applications/d49235b47df72a73/d177d2118f8dfb45ac651ebfa2fb0226c8f38a859a15d3b3113d718916bbe621/dist/program.wasm.gz",
+          "archiveBytes": 38400395,
+          "archiveSha256": "1eefa5886578050cbba5dc970dc5ac498c468b812e32bf9b89ff311027e36b35",
+          "verifiedDecompression": true,
+          "phase": "archived"
+        }
+      ],
+      "freeBefore": 4779257856,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-application-4.34.1-bun-r1-archive-resources.json",
+      "phase": "complete",
+      "freeAfter": 5072936960,
+      "finishedAt": "2026-09-25T04:44:30.345141+00:00",
+      "restore": "Decompress each .gz to its original path, verify originalSha256, then restore the recorded mode and mtimeNs."
+    },
+    "upstream-rc-sticky-4.34.1-bun-r1": {
+      "path": ".work/upstream-rc-sticky-4.34.1-bun-r1/binary-archive.json",
+      "sha256": "c4ab6a343a0d103fc12f3483a33af17273fde30afb806eebb9803005d4e38ee8",
+      "scope": "Lossless archival of completed experiment Wasm binaries only; sources, host files, logs and acceptance receipts remain intact",
+      "guard": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-rc-sticky-4.34.1-bun-r1-resources.json",
+      "guardSha256": "d8869a858f0f615823ef241b30357ed5bb1c23b4b57ad7a2ae9a49d1960d462e",
+      "resultSha256": "aee00cd363d58542805b38f7f2982fd59b0ca9688659640f999b0305c16d3ac0",
+      "files": [
+        {
+          "original": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1/relocated deployment/program.wasm",
+          "originalBytes": 165974989,
+          "originalSha256": "406d4af48e4eecc39c5eb96422eb8b9db5c2dafe8b0a74505d929a924745b158",
+          "mode": 509,
+          "mtimeNs": 1790311692977508060,
+          "archive": "/home/lastmjs/development/lasm/compiler/.work/upstream-rc-sticky-4.34.1-bun-r1/relocated deployment/program.wasm.gz",
+          "archiveBytes": 38384804,
+          "archiveSha256": "7d0e984f74309012e317e4f6778907396147e73a82b1fd9dc98bf2b70ed1087f",
+          "verifiedDecompression": true,
+          "phase": "archived"
+        }
+      ],
+      "freeBefore": 4745912320,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-rc-sticky-4.34.1-bun-r1-archive-resources.json",
+      "phase": "complete",
+      "freeAfter": 4873506816,
+      "finishedAt": "2026-09-25T04:48:30.285530+00:00",
+      "restore": "Decompress each .gz to its original path, verify originalSha256, then restore the recorded mode and mtimeNs."
+    }
+  },
+  "limitations": [
+    "Only Linux x64 is covered.",
+    "Main fixtures and one upstream C case do not establish complete API or suite compatibility.",
+    "The C adapter is a private parallel test harness and does not add a public C compilation API.",
+    "Node and Deno use memory64; Bun retains the existing lowered memory64 recipe and its unresolved high-address/large-stack gaps.",
+    "Cold installation, HTTP and broader filesystem acceptance are separate gates."
+  ]
+}
