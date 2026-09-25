@@ -1,0 +1,3732 @@
+{
+  "scope": "Interrupted fresh 101-registration Bun campaign through immutable installed .31. Seventy-one deployed passes, three original compilation-disabled exclusions, one preserved runtime failure and 26 unrun registrations. No complete-category or fundamental-limitation claim.",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "engine": "Bun 1.4.2",
+  "platform": "linux-x64",
+  "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r9/project/node_modules/@lasm/compiler",
+  "packageVersion": "0.1.0-experimental.31",
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-4.34.1-r9/lasm-compiler-0.1.0-experimental.31.tgz",
+    "sha256": "6fa91b29bc439e05f2370492a6719d53c325d2d8f2929add576de5045b8ae6dc",
+    "compressedBytes": 125996668,
+    "installedBytes": 633418641,
+    "files": 2703,
+    "candidateVersion": "0.1.0-experimental.31",
+    "defaultLean": "4.34.1",
+    "runtime": {
+      "name": "lean-4.34.1-wasm64",
+      "identity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/raw-cwd-4.34.1-package-r2-resources.json",
+    "recordedAt": "2026-09-25T18:36:59.387Z"
+  },
+  "registered": 101,
+  "counts": {
+    "passed": 71,
+    "upstream-compile-disabled": 3,
+    "failed": 1,
+    "not-completed": 26
+  },
+  "execution": {
+    "path": ".work/upstream-applications-4.34.1-bun-r1/execution.json",
+    "sha256": "3e8450e000ee00bfa3b531d93c0df18696226c65c405e5db8fba3144a9146047"
+  },
+  "manifest": {
+    "path": ".work/upstream-applications-4.34.1-bun-r1/manifest.json",
+    "sha256": "dd37aafd8e48d4560a4776c2d1848b73434e5f28f5829718e2d2ed374d84ee22"
+  },
+  "log": {
+    "path": ".work/upstream-applications-4.34.1-bun-r1/execution.log",
+    "sha256": "12c067fa76fee8453cb4787ff198e0535902237d5cda4b3531792276b424f342"
+  },
+  "sourceIntegrity": {
+    "before": {
+      "checked": 7673,
+      "modified": []
+    },
+    "after": {
+      "checked": 7673,
+      "modified": []
+    }
+  },
+  "harness": {
+    "before": {
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/run.mjs": "de8379b1d4fe883f76fcafc81af9994ee32acff5536ed6ee06f16508a52c2f2e",
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/case.mjs": "8d532b28bc27045a607aeb64a1cce0cfd0e9373b40e5fb9621ee91ac306312e6",
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa",
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh": "3a72157a95861615d599cd9920ef653f139beff94014cc540b32d39f30da75b7",
+      "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/native-environment.sh": "6206eb59ea251fb2ea10f0445f04d76fa6ac1d57589320c5384d74c8eecea2c6",
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/prepare.mjs": "82731e8c81e025484b4dce501953626465382b7291f7b6cea709650360eff79e",
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/source-identity.mjs": "a127c7a27949503aef5bad8fb3b16902d4d3e89c2b9b9801eca3c273094f67e6",
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/reclaim-case-metadata.mjs": "e4a7bff00a90e9ea58eab2ad1b53a85ea02441bd4523b89e947e270ea3dde5a6",
+      "/home/lastmjs/development/lasm/compiler/scripts/application-tests/reclaim-metadata.mjs": "3217b66ba0bfbf5a201f94de54e135097814cf7d9a8cc9b8a4577beead3c5602",
+      "/home/lastmjs/development/lasm/compiler/src/application-sources.mjs": "95db09652413e1b570e787fcf03bd7db6388a979066f6f7cdeaeadfd29976e00",
+      "/home/lastmjs/development/lasm/compiler/src/application-files.mjs": "6dca2556eef13759a6b9b04617b88b076f28abd174e92e31d23cbd3b0c02edac"
+    },
+    "changed": []
+  },
+  "failure": {
+    "case": {
+      "name": "compile_bench/const_fold.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "const_fold.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__const_fold.lean"
+      ],
+      "startedAt": "2026-09-25T21:09:37.825Z",
+      "finishedAt": "2026-09-25T21:11:11.473Z",
+      "exitCode": 1,
+      "signal": null,
+      "status": "failed",
+      "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+      "sourceUnchanged": true,
+      "phase": "application-runtime",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__const_fold.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "const_fold",
+            "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+            "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+          }
+        ],
+        "signature": "960b30b465cacf54fd9506550637c51e0ca5d9b07decf3137f79737f05f72419",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "c8e37fcd0ccc36ef9faafe7c952963b27099d59b1b08c2af51bb30938e59b110"
+    },
+    "nativeCode": 0,
+    "nativeOutput": "93011 93011\n",
+    "deployedCode": 1,
+    "deployedOutput": "worker sent an error! undefined:undefined: The object can not be cloned.\n1352 |       }\n1353 |     };\n1354 |     worker.onerror = e => {\n1355 |       var message = \"worker sent an error!\";\n1356 |       err(`${message} ${e.filename}:${e.lineno}: ${e.message}`);\n1357 |       throw e;\n                   ^\nDataCloneError: The object can not be cloned.\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__const_fold.lean/dist/program.cjs:1357:13)\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__const_fold.lean/dist/program.cjs:1363:38)\n      at applyHandlers (node:events:64:20)\n      at emitError (node:events:44:27)\n      at #onError (node:worker_threads:724:14)\n\nBun v1.4.2 (Linux x64)\n",
+    "originalStackSettingKb": "4194304",
+    "arguments": [
+      "15"
+    ],
+    "observation": "Bun reports DataCloneError while transferring a worker error. The earlier 4.34.0 diagnostic traced this surface error to the lowered-memory backend failing the original four-GiB thread allocation. This new campaign has not yet decoded that underlying exception independently.",
+    "historicalDiagnosis": "docs/evidence/bun-large-stack-allocation-gap-2026-09-24.json"
+  },
+  "cases": [
+    {
+      "name": "compile/534.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "534.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__534.lean"
+      ],
+      "startedAt": "2026-09-25T19:02:33.107Z",
+      "finishedAt": "2026-09-25T19:04:07.398Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "720a6465ce5267560d754b2ebcfbbc237eb06c1a1aaf7d2e0dbd28522dad300e",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__534.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "534",
+            "sourceSha256": "720a6465ce5267560d754b2ebcfbbc237eb06c1a1aaf7d2e0dbd28522dad300e",
+            "cSha256": "de49396f6a15549de72f9bbd67ba3a067e3f74edaf8a7db45e2780b7f2bbc137"
+          }
+        ],
+        "signature": "212edb3f84b5c725d3918870a002d9219db555c8acbb8a96f83da3f17dbc6f64",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "0216712381230fd35ae8b88ff8d0f3368b9c9c0451cda3a8148a9f998dbe9237"
+    },
+    {
+      "name": "compile/StackOverflow.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "StackOverflow.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__StackOverflow.lean"
+      ],
+      "startedAt": "2026-09-25T19:04:08.005Z",
+      "finishedAt": "2026-09-25T19:05:42.075Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "3cd8941d6ef61a1d34b2b381e6c114d68ea0f2b0a679c0a6509097867c8d7a9c",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__StackOverflow.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "StackOverflow",
+            "sourceSha256": "3cd8941d6ef61a1d34b2b381e6c114d68ea0f2b0a679c0a6509097867c8d7a9c",
+            "cSha256": "05d457d2657a832ddb529d4c7fd57cc48134a4ba4e04431e63e490457c211b4e"
+          }
+        ],
+        "signature": "dd9a73973cc411129fded456239893f36f58c86dcfcd40d73aeaae07f4888840",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "1e3c7ee2e3ee8471a95ff93d722ee13a8c9df19f4e23fc4ee04212519220d4ab"
+    },
+    {
+      "name": "compile/StackOverflowTask.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "StackOverflowTask.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__StackOverflowTask.lean"
+      ],
+      "startedAt": "2026-09-25T19:05:42.724Z",
+      "finishedAt": "2026-09-25T19:07:16.076Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "ca3928c152a07bdda9a0736d39de5fb38a1437af0c74e17f97fd6e47a8dd13b1",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__StackOverflowTask.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "StackOverflowTask",
+            "sourceSha256": "ca3928c152a07bdda9a0736d39de5fb38a1437af0c74e17f97fd6e47a8dd13b1",
+            "cSha256": "c70add0c8c48f468952173b743d5658dcbcb79c385bee1bde614c7fb44ba6260"
+          }
+        ],
+        "signature": "7ba82c5d4377de51ea9cdb5edeaac59244a011319a42fb965dea66cff6ddb7cd",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "bb0fa5f8a8b2d9797b8945647a80fbd211d350200aa4ac3d1e6fe70badbca3d4"
+    },
+    {
+      "name": "compile/append.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "append.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__append.lean"
+      ],
+      "startedAt": "2026-09-25T19:07:16.668Z",
+      "finishedAt": "2026-09-25T19:08:50.384Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "84ac8901a802e437f1519c8373614a9fe5b207c843046083ece5a305be51469f",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__append.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "append",
+            "sourceSha256": "84ac8901a802e437f1519c8373614a9fe5b207c843046083ece5a305be51469f",
+            "cSha256": "406e71814c3ce3dda73886bf0e5083b7a71fcffe3720c74aa660dfbf64253305"
+          }
+        ],
+        "signature": "0f4af41b86a250f830ca8749fd30e1b36a6567829c6e4ccc0e904c691c998d9b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "272962bb4332ac59235baa73c89f410610e7db2c1de7ec04249c8f0c13364859"
+    },
+    {
+      "name": "compile/arity_bug1.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "arity_bug1.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__arity_bug1.lean"
+      ],
+      "startedAt": "2026-09-25T19:08:50.981Z",
+      "finishedAt": "2026-09-25T19:10:24.533Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "77cc8b86e6a9a74f055beffffee8c044376a52a8cfde1c0039672540456ee812",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__arity_bug1.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "arity_bug1",
+            "sourceSha256": "77cc8b86e6a9a74f055beffffee8c044376a52a8cfde1c0039672540456ee812",
+            "cSha256": "369b61946f5bc8ab6129ec4c85ba2e5020ab490e47b78f2144f5323fe12dfc65"
+          }
+        ],
+        "signature": "b6036cdf766fae0901487b7617116c8fa60be93a038645daf7e8680762155d60",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "8c7fa5b93c4d258f7d115c89249f5332987a55caf5bf234b074c1182d6e0d5e4"
+    },
+    {
+      "name": "compile/array.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "array.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__array.lean"
+      ],
+      "startedAt": "2026-09-25T19:10:25.119Z",
+      "finishedAt": "2026-09-25T19:11:58.224Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "8183c02be65366c15424f733033680bf263167dd1f32986181743650f1528726",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__array.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "array",
+            "sourceSha256": "8183c02be65366c15424f733033680bf263167dd1f32986181743650f1528726",
+            "cSha256": "e1ae6d2387c55bf23ddce32d00a87635121a9c78a25b52e97d7007711d6b1b76"
+          }
+        ],
+        "signature": "5418a8f0322618c3665989b7e9841e22ce983174fb96ad71b1fb1d401a4b3fd7",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "03523db60dfb7fff53264d914c601c238d13055f797fd9213509b6362da75e5c"
+    },
+    {
+      "name": "compile/arrayMapIdxInPlace.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "arrayMapIdxInPlace.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__arrayMapIdxInPlace.lean"
+      ],
+      "startedAt": "2026-09-25T19:11:58.828Z",
+      "finishedAt": "2026-09-25T19:13:31.988Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "5fc644e8f1de97cb6020f8430c0821161413862c39f822bcb0b8ab386cb298ba",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__arrayMapIdxInPlace.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "arrayMapIdxInPlace",
+            "sourceSha256": "5fc644e8f1de97cb6020f8430c0821161413862c39f822bcb0b8ab386cb298ba",
+            "cSha256": "f10e4495b1af106567b72179d0fac5e4f3db320776e726ba1bef6d95512be6b6"
+          }
+        ],
+        "signature": "80bddeafeed583adc9722357486aba9a3eed2299f2225e4942e883b1ae5474d4",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "a339174d49f515c6746ae542260ad6a99b3af2665ea9aceb39b3e6d5590fd4cb"
+    },
+    {
+      "name": "compile/arrayMk.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "arrayMk.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__arrayMk.lean"
+      ],
+      "startedAt": "2026-09-25T19:13:32.577Z",
+      "finishedAt": "2026-09-25T19:15:05.683Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "b00cba3126381c6351bd0a8d4a363fe7d7b78e33a62a8a6ecdbe4a2cec348fcb",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__arrayMk.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "arrayMk",
+            "sourceSha256": "b00cba3126381c6351bd0a8d4a363fe7d7b78e33a62a8a6ecdbe4a2cec348fcb",
+            "cSha256": "f8186124fa7bfb924a12168b059321a2ffb3f6d7e1012dbabbf2b8d4816122bb"
+          }
+        ],
+        "signature": "26f85a399d43ac4b839d52561bfaac36e641f6913b83d836201d40805e70a459",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "72d93c1fe598a896a9d694aad40115b72ec846a11bdbd96efd014ad5d6aee5ce"
+    },
+    {
+      "name": "compile/array_test.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "array_test.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__array_test.lean"
+      ],
+      "startedAt": "2026-09-25T19:15:06.282Z",
+      "finishedAt": "2026-09-25T19:16:40.568Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "f4a54c70cea13fe6b7c5ced7e0a80fcbce5ad3b0f601571e7c4a029786096360",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__array_test.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "array_test",
+            "sourceSha256": "f4a54c70cea13fe6b7c5ced7e0a80fcbce5ad3b0f601571e7c4a029786096360",
+            "cSha256": "6bfee201d762f700cf76ef35b7b38e19ac660b8c0391f65803bfd42a41398353"
+          }
+        ],
+        "signature": "54c2a60df1660f8bd9773fd7b9bfccaf8d3935de73c9c4f60379e3c99866811f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "53776172bb33fe72efe731869e45feca89db83e898425ff6db786b4ac4d7ee5d"
+    },
+    {
+      "name": "compile/array_test2.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "array_test2.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__array_test2.lean"
+      ],
+      "startedAt": "2026-09-25T19:16:41.167Z",
+      "finishedAt": "2026-09-25T19:18:16.275Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "40dbcd1b8abed8315d130b258ef715e47f5a8d45581084bd6cb922e6eb56c8ad",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__array_test2.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "array_test2",
+            "sourceSha256": "40dbcd1b8abed8315d130b258ef715e47f5a8d45581084bd6cb922e6eb56c8ad",
+            "cSha256": "6e0b0df3713c42cc83f00c0674d9044019eb8cce6236189c0d07fba343ba63cb"
+          }
+        ],
+        "signature": "b2505ed67d1d218cbb6a6887779ab070fe06090a33f501df25fdfce3be731af9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "a8cd6437bb25ff908853e85178110f1a2395e706c17a8db4b3753e8ec30a96ca"
+    },
+    {
+      "name": "compile/bigctor.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "bigctor.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__bigctor.lean"
+      ],
+      "startedAt": "2026-09-25T19:18:16.897Z",
+      "finishedAt": "2026-09-25T19:19:50.146Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "5a49f006130293e4afd994199b5b3dbf5ccb0951ad32d87938ec384a1af67a3e",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__bigctor.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "bigctor",
+            "sourceSha256": "5a49f006130293e4afd994199b5b3dbf5ccb0951ad32d87938ec384a1af67a3e",
+            "cSha256": "26fdb3ef9b83b00a3c06ffd8260789a738165f5a43739609c2a0d925f5162995"
+          }
+        ],
+        "signature": "6271cd1811235f5bcaae08ce33aaeb96f76bb6c5420398157e04d79ee6e63556",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "d292dd31634e1b6e3a5d109259b10f58806323d9f49a5663698d01b79ba25a59"
+    },
+    {
+      "name": "compile/bytearray_bug.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "bytearray_bug.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__bytearray_bug.lean"
+      ],
+      "startedAt": "2026-09-25T19:19:50.738Z",
+      "finishedAt": "2026-09-25T19:21:24.124Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "a1c1618e9cd80412f703d6d0ff8bac56b63fe8182b70005fa8c152481aa621c6",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__bytearray_bug.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "bytearray_bug",
+            "sourceSha256": "a1c1618e9cd80412f703d6d0ff8bac56b63fe8182b70005fa8c152481aa621c6",
+            "cSha256": "a43226d10b80eec1e8b1915f83dba310775202a4a9554408cdb170ae72f41be7"
+          }
+        ],
+        "signature": "768e92285cac57d369a9ca60549a9c7b281483ee2fa7ecddc6a9cf589dd5b6dc",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "e340153d3c1f860dc1a2eb7c7c62f937d186af6577ab77038b786fadbddefca7"
+    },
+    {
+      "name": "compile/char_escape.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "char_escape.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__char_escape.lean"
+      ],
+      "startedAt": "2026-09-25T19:21:24.723Z",
+      "finishedAt": "2026-09-25T19:22:58.586Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "86eb076350ae7c690b9de4344f4fcb947d03a3e06abd0383c43b48d7f7a53bc7",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__char_escape.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "char_escape",
+            "sourceSha256": "86eb076350ae7c690b9de4344f4fcb947d03a3e06abd0383c43b48d7f7a53bc7",
+            "cSha256": "8562a6e5d45ff693ad7bd856462e84717f295ffd18c9de65057a4e3a836e1973"
+          }
+        ],
+        "signature": "f86f21490c5d2ffc4d5ccbaa1528929b248ad9d2bceb6e82ac0358c1dbf82c8c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "a9df960c3c278b968496ef257bb63a9b3b1e1792ae9efb87f364b19f076594e1"
+    },
+    {
+      "name": "compile/closure_bug1.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "closure_bug1.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug1.lean"
+      ],
+      "startedAt": "2026-09-25T19:22:59.201Z",
+      "finishedAt": "2026-09-25T19:24:33.335Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "cb4fd2b7fc146f7e62943abf6845b9465dca41ff9abc5c18746a8209d38b5e7b",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug1.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "closure_bug1",
+            "sourceSha256": "cb4fd2b7fc146f7e62943abf6845b9465dca41ff9abc5c18746a8209d38b5e7b",
+            "cSha256": "f46189d51b9dfedf13c52631af90999df3c0c8c186dae49ca325c445cd221cd6"
+          }
+        ],
+        "signature": "aff9af784ac23eb75b2ea81fab2f156c0fe2fe14bad2250bbd2afc73ec3693eb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "b8208f56e92c1652d8d2576308dcab19fd9fc23032693f43d41cf9dad4209522"
+    },
+    {
+      "name": "compile/closure_bug2.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "closure_bug2.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug2.lean"
+      ],
+      "startedAt": "2026-09-25T19:24:33.939Z",
+      "finishedAt": "2026-09-25T19:26:08.051Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "187b66395a5a0748ca89a6a80e37946b99eb2537378eeb5dd1ff848702e7efb4",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug2.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "closure_bug2",
+            "sourceSha256": "187b66395a5a0748ca89a6a80e37946b99eb2537378eeb5dd1ff848702e7efb4",
+            "cSha256": "bd59df70c0e4d743b786a1fcf1bc43418bdf3f9a897fde341fca3939c3a8e312"
+          }
+        ],
+        "signature": "faf604bdbd17c844d6367a3ec705f807b8ff56d433c1017a6d3f87d7bddb54ab",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "21fcd6c8e2fe7437222e3d639b69bc78f9ff5519c7f58270eda88bfe5fd86914"
+    },
+    {
+      "name": "compile/closure_bug3.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "closure_bug3.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug3.lean"
+      ],
+      "startedAt": "2026-09-25T19:26:08.645Z",
+      "finishedAt": "2026-09-25T19:27:42.188Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "f4d06bc8ee7dde48cd92e8a8c54ce0b35a49d1c6271163dd4fb8a577b1e24b94",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug3.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "closure_bug3",
+            "sourceSha256": "f4d06bc8ee7dde48cd92e8a8c54ce0b35a49d1c6271163dd4fb8a577b1e24b94",
+            "cSha256": "b9a8c2df4fd6e627d6ca085c137133591c77a413872d43dea9841a2475803d03"
+          }
+        ],
+        "signature": "447218cf77832ac0e0e7543483ace551b3cf7c1ca64b13c680078fb6420d4723",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "11a10710f8900a93d5035d468b0c12dbca75eb5de67ab8a0561c51e80cafc882"
+    },
+    {
+      "name": "compile/closure_bug4.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "closure_bug4.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug4.lean"
+      ],
+      "startedAt": "2026-09-25T19:27:42.787Z",
+      "finishedAt": "2026-09-25T19:29:15.069Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "ec3f89b85967b77fe265ae2bd2c71222c6fbdd613309ab8b9f14b45582e1200d",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug4.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "closure_bug4",
+            "sourceSha256": "ec3f89b85967b77fe265ae2bd2c71222c6fbdd613309ab8b9f14b45582e1200d",
+            "cSha256": "10e93a03012aa01b160a063088165719b65b36edc9fc7594d37937cbe973d1af"
+          }
+        ],
+        "signature": "b04615d7006414dcb268407d776fe7ace2f99ae5758d69066ef60f4ae92cdfdb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "6572390a348da602c9437e1ad1fec5e3d75690433defe71415982c42482b396f"
+    },
+    {
+      "name": "compile/closure_bug5.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "closure_bug5.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug5.lean"
+      ],
+      "startedAt": "2026-09-25T19:29:15.671Z",
+      "finishedAt": "2026-09-25T19:30:47.943Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "1b5458608e9ef2f814b8dae7ebfc0c01aa2583b43eead71fd579080b88cca3c1",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug5.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "closure_bug5",
+            "sourceSha256": "1b5458608e9ef2f814b8dae7ebfc0c01aa2583b43eead71fd579080b88cca3c1",
+            "cSha256": "0037dc9210088d58421858b3e52b49e60bfbb3f5758ef954848b950fcd8a8e06"
+          }
+        ],
+        "signature": "c99bc95d55218a0eebe3d453e6e5c37f8464a4537168cc8037fa18051f451475",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "b2ff1551a1cf0f30092bfd37a324ee7b798aba6d3bfd34f19fd801919c1e8c23"
+    },
+    {
+      "name": "compile/closure_bug6.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "closure_bug6.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug6.lean"
+      ],
+      "startedAt": "2026-09-25T19:30:48.538Z",
+      "finishedAt": "2026-09-25T19:32:21.816Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "024ddc06586bd07ded5ce8654ea8c3f59a8d9803984865f169d3029608a45d75",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug6.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "closure_bug6",
+            "sourceSha256": "024ddc06586bd07ded5ce8654ea8c3f59a8d9803984865f169d3029608a45d75",
+            "cSha256": "ba4ecb3ae66dd35f4bb93bceb2c9e2189cc49c9f736779807de1b117bdc7fafe"
+          }
+        ],
+        "signature": "ff8195dfaa88e7aca0c7a6440e620b992917a3d058cf57cd4f59b1040989e7bb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "cca010c39a6f9834c0a0c05083a6179d10d71f94d32ac15e4104599516d81370"
+    },
+    {
+      "name": "compile/closure_bug7.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "closure_bug7.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug7.lean"
+      ],
+      "startedAt": "2026-09-25T19:32:22.415Z",
+      "finishedAt": "2026-09-25T19:33:57.221Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "678d7543d2f609bb6b1384b52597c443bc1c5f95a5de21eef9f3aa1c899650f3",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug7.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "closure_bug7",
+            "sourceSha256": "678d7543d2f609bb6b1384b52597c443bc1c5f95a5de21eef9f3aa1c899650f3",
+            "cSha256": "d8f6266b84d545770f8ed1cac9630f5af1f5869e03490ef6a58cdb4d1348692f"
+          }
+        ],
+        "signature": "24ee3ab789dab6fdc6c6c3e116551755ba4f4c5810d7d8d7e80f41a25f2b6f7c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "f49f82cecdad34a3fa0da45e742bc5db35798da93e2c7f71b6fafd8f371addee"
+    },
+    {
+      "name": "compile/closure_bug8.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "closure_bug8.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug8.lean"
+      ],
+      "startedAt": "2026-09-25T19:33:57.816Z",
+      "finishedAt": "2026-09-25T19:35:30.050Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "6c278e83e260f998c0121cb0bac88b8e81cea092ff1969b8cd69f8f906eaf759",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__closure_bug8.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "closure_bug8",
+            "sourceSha256": "6c278e83e260f998c0121cb0bac88b8e81cea092ff1969b8cd69f8f906eaf759",
+            "cSha256": "b43a5e4436bdc6aa6367ec67f04a7f5dcd773db85e9d56838d4196ab35690cd6"
+          }
+        ],
+        "signature": "44d8e0451e85c03ad64f3a061a123457f16e60bc4c65538ac6d6b6c9ad6ea5d9",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "5b82b27a31142f38ebb631ca1393eb5b65cf954131ec26b984105c39add6779c"
+    },
+    {
+      "name": "compile/compact_closure.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "compact_closure.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__compact_closure.lean"
+      ],
+      "startedAt": "2026-09-25T19:35:30.643Z",
+      "finishedAt": "2026-09-25T19:38:07.603Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "f4652a259a32390fa80aeaef557c9f590425135581ae8e874608cce23b6306ed",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__compact_closure.lean/module-data-reclamation.json",
+        "sha256": "1573bc5002001ec27755dde668c7c203041b4c93a1cdb248802d3579ce72287d",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213286663
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "a939d1a70bb59e5a0c3eb341faaaa7e6a089997d81dd89c8e0ddb45c1733bb89",
+        "moduleDataBytes": 2213286663,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "compact_closure",
+            "sourceSha256": "f4652a259a32390fa80aeaef557c9f590425135581ae8e874608cce23b6306ed",
+            "cSha256": "2731a7e5b9619558f08587f5c320fa50aea0e91e7cd391295dc3e9f582e39070"
+          }
+        ],
+        "signature": "7654b9fb4eeadf0d0144cfd4cf06722daceb36f8be587a80ff06ec6c3a41abb3",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "9a56884d29b0726929c7ff72a3966fdbc877915c07ea3e59e9c3d5cf09b11d47"
+    },
+    {
+      "name": "compile/compact_closure_cross.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "compact_closure_cross.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__compact_closure_cross.lean"
+      ],
+      "startedAt": "2026-09-25T19:38:08.743Z",
+      "finishedAt": "2026-09-25T19:40:50.482Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "f737687c4d5d3995367037c4ad3a22a9966a74277b04cc7cf07d1abe531ec08d",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__compact_closure_cross.lean/module-data-reclamation.json",
+        "sha256": "57e0ea6e0a9d9dfadd75cf2fdf6d5bba5382ea05bea315e9cdb0ad896de92889",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213308847
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "659beab32eaece9be2d2b2ba847650db8f61f14b7b2d29308993b514a5d21fab",
+        "moduleDataBytes": 2213308847,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "compact_closure_cross",
+            "sourceSha256": "f737687c4d5d3995367037c4ad3a22a9966a74277b04cc7cf07d1abe531ec08d",
+            "cSha256": "fea23f146fcac9e053f86402d51632144d301219a70e8946d9cd497576841d57"
+          }
+        ],
+        "signature": "0d5cf9266add644acf2fb153163ea2f1c2d59a6050bed34e33d4f037b54430d3",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "a00b5d68ecdb6a89d299985d6d492b8fef1dcff9fc537eda6d5bd1f31f980657"
+    },
+    {
+      "name": "compile/compactor_chain.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "compactor_chain.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__compactor_chain.lean"
+      ],
+      "startedAt": "2026-09-25T19:40:51.625Z",
+      "finishedAt": "2026-09-25T19:40:51.931Z",
+      "exitCode": 77,
+      "signal": null,
+      "status": "upstream-compile-disabled",
+      "sourceSha256": "a9bbe382ded2090b5ca1c3aa65375821fb6fbfa05053ef54756efe78acdb291a",
+      "sourceUnchanged": true,
+      "phase": "native-driver"
+    },
+    {
+      "name": "compile/dep_regions.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "dep_regions.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__dep_regions.lean"
+      ],
+      "startedAt": "2026-09-25T19:40:51.994Z",
+      "finishedAt": "2026-09-25T19:40:52.274Z",
+      "exitCode": 77,
+      "signal": null,
+      "status": "upstream-compile-disabled",
+      "sourceSha256": "03a920cecc92dc46a430abcf5782847b65115bd10582407c08188e6ba516c6a8",
+      "sourceUnchanged": true,
+      "phase": "native-driver"
+    },
+    {
+      "name": "compile/dep_regions_miss.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "dep_regions_miss.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__dep_regions_miss.lean"
+      ],
+      "startedAt": "2026-09-25T19:40:52.347Z",
+      "finishedAt": "2026-09-25T19:40:52.635Z",
+      "exitCode": 77,
+      "signal": null,
+      "status": "upstream-compile-disabled",
+      "sourceSha256": "9c1b6e6f449c8111b94d4cbcd862dd215c71bd9c6304705e864336283a3bdf19",
+      "sourceUnchanged": true,
+      "phase": "native-driver"
+    },
+    {
+      "name": "compile/escape.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "escape.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__escape.lean"
+      ],
+      "startedAt": "2026-09-25T19:40:52.700Z",
+      "finishedAt": "2026-09-25T19:42:25.596Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "358fe3f774f6e1922a5daa2469f0da3ec97c8a04d212f73269626f1f04c04be9",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__escape.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "escape",
+            "sourceSha256": "358fe3f774f6e1922a5daa2469f0da3ec97c8a04d212f73269626f1f04c04be9",
+            "cSha256": "d39b66521b395eb65ba074332e3f1a55994e32358f3a0ac27ff0bb11b81de814"
+          }
+        ],
+        "signature": "bc281d1a29b53c58edc46a7680539c93d56179513be94e8a1a69464888f73b54",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "49dfc306722018e1d8837aba1a7d083aeb4f65e0eb9600904ce9c9136a1d9336"
+    },
+    {
+      "name": "compile/expr.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "expr.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__expr.lean"
+      ],
+      "startedAt": "2026-09-25T19:42:26.192Z",
+      "finishedAt": "2026-09-25T19:45:04.442Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "26ad97293463731d5f7c8f5ab475f5ad8daff730108174c3a2edabdbe9306758",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__expr.lean/module-data-reclamation.json",
+        "sha256": "63ef0af34720bed1786766e9dad56832095d938d0bc964195c54360298d4be55",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213255439
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "00f8df6931656aae8376e8b86252cc708d3e6051270be78f635d36e2aa723a49",
+        "moduleDataBytes": 2213255439,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "expr",
+            "sourceSha256": "26ad97293463731d5f7c8f5ab475f5ad8daff730108174c3a2edabdbe9306758",
+            "cSha256": "352cd3244e2c7514680bdba763ba180ffae583a89bb21797f1affa5f754b2b4b"
+          }
+        ],
+        "signature": "fbd4d04a29f961c973e39c6dc9d0b83f7fc574c246884ae3fe5252e41ae9231a",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "a31ce42209a189507b3b85b19179cd6117d84e41b9962f5d6be6e9a198cb0933"
+    },
+    {
+      "name": "compile/extractClosedMutualBlock.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "extractClosedMutualBlock.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__extractClosedMutualBlock.lean"
+      ],
+      "startedAt": "2026-09-25T19:45:05.618Z",
+      "finishedAt": "2026-09-25T19:46:39.996Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "e4f3c1f0a5baac982aa76fe05856786dfdc64e503097495fd01d5a0eeace52d0",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__extractClosedMutualBlock.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "extractClosedMutualBlock",
+            "sourceSha256": "e4f3c1f0a5baac982aa76fe05856786dfdc64e503097495fd01d5a0eeace52d0",
+            "cSha256": "319f1460030b92c26a9c656aa0f2546da83c39800700a5dbdbf97415290cc4c6"
+          }
+        ],
+        "signature": "b175eb8cd686ea54e8f7d66e2de55d8a55f8819c4b779307747a0646d2fd09f8",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "9be8dfe6d0a42b49946c271e36b77a677a425ac736de72dd30392c8a4c9ccd28"
+    },
+    {
+      "name": "compile/extract_uaf.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "extract_uaf.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__extract_uaf.lean"
+      ],
+      "startedAt": "2026-09-25T19:46:40.597Z",
+      "finishedAt": "2026-09-25T19:48:13.921Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "17ee71f229eb7af6d3c8fc41ee4dc00f71bfa5327d680cba27342dad6c61ad84",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__extract_uaf.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "extract_uaf",
+            "sourceSha256": "17ee71f229eb7af6d3c8fc41ee4dc00f71bfa5327d680cba27342dad6c61ad84",
+            "cSha256": "a24782227967a107df47e39869f6561da6218ada45d496420f2fa699fd9d04f5"
+          }
+        ],
+        "signature": "b63fb8151c0aae176912504e6ab3c129cd75aeacd07c3556bb5b8b604e1d83a3",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "2e521993b098129a3ecaf5a0e00aaf83917a1fb9ff542161f0fc4bcd60182f75"
+    },
+    {
+      "name": "compile/file_read_overflow.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "file_read_overflow.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__file_read_overflow.lean"
+      ],
+      "startedAt": "2026-09-25T19:48:14.526Z",
+      "finishedAt": "2026-09-25T19:49:48.699Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "22d69ba7ca9ec055b29f212ddce606dae0b9ef218364c66d61b032a5863c17bb",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__file_read_overflow.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "file_read_overflow",
+            "sourceSha256": "22d69ba7ca9ec055b29f212ddce606dae0b9ef218364c66d61b032a5863c17bb",
+            "cSha256": "c042de6e30d7863a5d5f93ce2909d0292ad2e8a8a51f6aa7bd78a9417216dd5a"
+          }
+        ],
+        "signature": "2d405f9422d5099cb0e401dcc295535ee819df327a780d9fbbce80b2aaa5ad41",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "b81601dcf361d5174b8f10cbd0361c598cf5505c93a48057325b1d6ebd788b6f"
+    },
+    {
+      "name": "compile/float.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "float.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__float.lean"
+      ],
+      "startedAt": "2026-09-25T19:49:49.298Z",
+      "finishedAt": "2026-09-25T19:51:24.092Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "bf026abcb3b21a3a88e5301454ef954d9869f4ac91ed3951a044a77b8fb64935",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__float.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "float",
+            "sourceSha256": "bf026abcb3b21a3a88e5301454ef954d9869f4ac91ed3951a044a77b8fb64935",
+            "cSha256": "82c27f5b70833c2cff3bfaeb7b659aa2bfbbcf35f69b231b364851fd0660df9a"
+          }
+        ],
+        "signature": "ee3f4e48eb788d36af82561d0998b4b5b8d71edbce799677c6f26f94b315cd19",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "995967734047ceb482c215e93309c1a78c1cbb1c68ff1018c1412011d77219b2"
+    },
+    {
+      "name": "compile/float_cases_bug.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "float_cases_bug.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__float_cases_bug.lean"
+      ],
+      "startedAt": "2026-09-25T19:51:24.692Z",
+      "finishedAt": "2026-09-25T19:53:01.305Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "cece0d6547ca6167818b4339faab098781b86f702c64420e5528b8c6306686b8",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__float_cases_bug.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "float_cases_bug",
+            "sourceSha256": "cece0d6547ca6167818b4339faab098781b86f702c64420e5528b8c6306686b8",
+            "cSha256": "42901bda5d54c3633889f9d5e8c82f9acda3a4f36e9b04b4e3663badb169725f"
+          }
+        ],
+        "signature": "c85f3b0d0e6d474112443279cd3544e93ec70d93a54fa999882ddaf4a38dbfb6",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "c6e19a47e43e5dd6d94849a039ca7749f2d3ba341bf93ac08e814cdf3a4af704"
+    },
+    {
+      "name": "compile/incr_cli_snapshot.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "incr_cli_snapshot.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__incr_cli_snapshot.lean"
+      ],
+      "startedAt": "2026-09-25T19:53:01.917Z",
+      "finishedAt": "2026-09-25T19:55:40.854Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "45a78c666318546e0c48d32f102103e75dccd243b517cf7d778e3b72f618328c",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__incr_cli_snapshot.lean/module-data-reclamation.json",
+        "sha256": "4522bac3279d20672f1a31f257739600503af80b8818ab5ddce86b93bae04b3f",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213326591
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "bbfe4395b8facd8b5c0a38e7251dd6e1588754d47af8ca5cf38e59b4a327f56a",
+        "moduleDataBytes": 2213326591,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "incr_cli_snapshot",
+            "sourceSha256": "45a78c666318546e0c48d32f102103e75dccd243b517cf7d778e3b72f618328c",
+            "cSha256": "89741c2eb0b2360e55fd0c501b1754f1c41ed684473f7289771ef4732ceb5f00"
+          }
+        ],
+        "signature": "d5a721bee12bc720e00382e1dc1a3cba43061ddff194763b06b01db28802946d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "65c55e7f281470f23e85669c90600ccd51dd2e65951f7bf4a043d21a6a56d738"
+    },
+    {
+      "name": "compile/incr_header_mismatch.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "incr_header_mismatch.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__incr_header_mismatch.lean"
+      ],
+      "startedAt": "2026-09-25T19:55:42.000Z",
+      "finishedAt": "2026-09-25T19:58:25.654Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "429e8d3c1fd344e96ac273a06316ab115222da29216303737c7708238fb85d66",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__incr_header_mismatch.lean/module-data-reclamation.json",
+        "sha256": "4621c59c42ea4537892adb374a58f9d6932024ee31fcd1e7fc53978b6b877e57",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213291079
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "0ce0e1b8e7f905d574b43550f1ccc4de6789094baae2f94ba2fbae27a2f5d127",
+        "moduleDataBytes": 2213291079,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "incr_header_mismatch",
+            "sourceSha256": "429e8d3c1fd344e96ac273a06316ab115222da29216303737c7708238fb85d66",
+            "cSha256": "c14fa5b58fddd843e3d580298a00bb01169b4d8fd7fc30e88a3013f1d17d8097"
+          }
+        ],
+        "signature": "bd1c1203e72f567b0f7945032a5961e0ad8ee9a714475efd095dfec9e1ba430a",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "95e2fc13d9cadb1df79cc20adefc33c8d86f0c6f721c7cee5611a074a871632d"
+    },
+    {
+      "name": "compile/init.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "init.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__init.lean"
+      ],
+      "startedAt": "2026-09-25T19:58:26.931Z",
+      "finishedAt": "2026-09-25T20:00:00.961Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "f831ca6842c5d8d581a2dd2aee0cad753458a625912aaa48623b6fcac7e42dfa",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__init.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "init",
+            "sourceSha256": "f831ca6842c5d8d581a2dd2aee0cad753458a625912aaa48623b6fcac7e42dfa",
+            "cSha256": "450e42246fbf901927915f2dc64c3e6d6a1418a8e2da18a2e518ec983084f0b1"
+          }
+        ],
+        "signature": "8c59fd113ab7acaf1a7376c8995d3d39401841a1ad92ce8a78a402257475abe3",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "81eaabdd864debaadc246c6adbac3752ada068fbe43f5e89250268a13d66bb45"
+    },
+    {
+      "name": "compile/initUnboxed.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "initUnboxed.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__initUnboxed.lean"
+      ],
+      "startedAt": "2026-09-25T20:00:01.565Z",
+      "finishedAt": "2026-09-25T20:01:34.991Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "63ecedbac80e2974846cdab2a3f0452316c8ebca304efa7d58602b66c22dd4ec",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__initUnboxed.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "initUnboxed",
+            "sourceSha256": "63ecedbac80e2974846cdab2a3f0452316c8ebca304efa7d58602b66c22dd4ec",
+            "cSha256": "7ac4f6b9051a9a5dccbd7f366ad8a58c281efad81041628f925d6800be6d963c"
+          }
+        ],
+        "signature": "309ccd11d2aabfe6ee3823d29151a10e30b6f3eec5d9e91afc738bbff67b379a",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "7fa3ee198ca05a66182e22039eda383ec1e16756cc4cd8a3f40e6a90e854df76"
+    },
+    {
+      "name": "compile/large_closure_bug.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "large_closure_bug.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__large_closure_bug.lean"
+      ],
+      "startedAt": "2026-09-25T20:01:35.581Z",
+      "finishedAt": "2026-09-25T20:04:20.603Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "a3d9bb5e50fc3ed89718361a67ba1e57b3a278123d673fb5aa0b4f19cfaf550f",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__large_closure_bug.lean/module-data-reclamation.json",
+        "sha256": "554238a9ca2018ed5b25f8631bcb69e644d9adbcad03e3b662d74b095b404d0c",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2215890103
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "ab0f1ae89bad591ce7f9d2fbf3508d6df85829e02b466a2f37f8f9a4fde40053",
+        "moduleDataBytes": 2215890103,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "large_closure_bug",
+            "sourceSha256": "a3d9bb5e50fc3ed89718361a67ba1e57b3a278123d673fb5aa0b4f19cfaf550f",
+            "cSha256": "1b71e8c363336040af25bdef9d1979a114fa5319dede402465ae422a0c3e9924"
+          }
+        ],
+        "signature": "1c33e6ee25da17c37edc7f2abaaf89f3c01516510f42cd5b58da8f5ef2b412bf",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "7fdf3da7c6423bca8dc788e2c4161edaf92162da30f01d550193c6cefd43633b"
+    },
+    {
+      "name": "compile/lazylist.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "lazylist.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__lazylist.lean"
+      ],
+      "startedAt": "2026-09-25T20:04:21.712Z",
+      "finishedAt": "2026-09-25T20:05:55.800Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "a8bb24b54ec9c63bffeba1c6c16a5f4c1af33c8cedf2c5f6fe79f72b72e93993",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__lazylist.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "lazylist",
+            "sourceSha256": "a8bb24b54ec9c63bffeba1c6c16a5f4c1af33c8cedf2c5f6fe79f72b72e93993",
+            "cSha256": "a5f1da73fea04e3308b52bf2a3382c19eb0854d626f8740a30a47ea948a8c115"
+          }
+        ],
+        "signature": "a12970e140a786445e07c1e7c08bd7f90baacb1711090ea2b7adf776eca6b472",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "d2ea07360fd15ee75a74f2737250a62e86f0b80c4e3e49c8035138e8c8e401e6"
+    },
+    {
+      "name": "compile/link_lake.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "link_lake.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__link_lake.lean"
+      ],
+      "startedAt": "2026-09-25T20:05:56.400Z",
+      "finishedAt": "2026-09-25T20:08:34.291Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "a655eb44474da5bae6473ffc6507232f62f276573587a881d669f9966f8c18a7",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__link_lake.lean/module-data-reclamation.json",
+        "sha256": "463682720b7caa00be4b8ebbbe039dcfbcbc0b9a98f78a90929982ae7b557c2d",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213200223
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "418e89c239d40175a4dd183ea103be8fd52b033a0572eb1cd62338a4e39851a8",
+        "moduleDataBytes": 2213200223,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "link_lake",
+            "sourceSha256": "a655eb44474da5bae6473ffc6507232f62f276573587a881d669f9966f8c18a7",
+            "cSha256": "3239bdedea350e7016a8ad59c0f176d6b803ac9a4ecc1e47e234c4b563d344c2"
+          }
+        ],
+        "signature": "9b4f688c3eecdbad8a9d6df9001b587f7f831108442068abfaaaf01f1f6e7793",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "a6a54d04966f5f1353118e1fe8b63d4944aa6993198433ee6320c570c777005a"
+    },
+    {
+      "name": "compile/map_big.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "map_big.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__map_big.lean"
+      ],
+      "startedAt": "2026-09-25T20:08:35.434Z",
+      "finishedAt": "2026-09-25T20:10:11.026Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "c43cd7bfa5ef89c5611e479b51cf8f7689c0ce4271bd646901596e9ef5202025",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__map_big.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "map_big",
+            "sourceSha256": "c43cd7bfa5ef89c5611e479b51cf8f7689c0ce4271bd646901596e9ef5202025",
+            "cSha256": "7e66fe7097667974fe2733ca09cea893bb8d192918798abf748988352ad895b9"
+          }
+        ],
+        "signature": "cb17f5c9d3a20fc5446ee106fabadf7db37d0a2eaf9aeb3c12ff80cb7a7890bb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "709444e880f251bed6d30e2f4e0e22acafdaacd448e8d6cbb948bce6d7dd324d"
+    },
+    {
+      "name": "compile/module.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "module.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__module.lean"
+      ],
+      "startedAt": "2026-09-25T20:10:11.632Z",
+      "finishedAt": "2026-09-25T20:12:48.242Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "dc70849397aec46502cef75c1d2b046b9fb14f20f3849d60b1c8956a791edea2",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__module.lean/module-data-reclamation.json",
+        "sha256": "b013e0374774559c38474d9df53d91871392192f712258be5b3998c11ae5c3a2",
+        "reclaimed": true,
+        "files": 15118,
+        "metadataBytes": 2213263615
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "6c04d154b4aa991705844c9fd4ee9ca415300f914004f4c5eb6124d6c95c7cf6",
+        "moduleDataBytes": 2213263615,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "module",
+            "sourceSha256": "dc70849397aec46502cef75c1d2b046b9fb14f20f3849d60b1c8956a791edea2",
+            "cSha256": "279655451782ccb0b01750c0bf391b7c52fc77d73be3e77829ad208212486dc5"
+          }
+        ],
+        "signature": "576d3df07ff87cdeedc2a83f43c3cc815d3f2435c0788ebfa34e6dfe229fd0c2",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "2389b7d653be98e19fe7a810e2f0e0cb7ee2168aae7e601d5be67f1f99e36300"
+    },
+    {
+      "name": "compile/nat_shiftr.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "nat_shiftr.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__nat_shiftr.lean"
+      ],
+      "startedAt": "2026-09-25T20:12:49.384Z",
+      "finishedAt": "2026-09-25T20:14:22.631Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "c4716bba5e3cd8c96e1d66b69b5a9b2bba224af442cdcc8ce33697a4f5301a19",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__nat_shiftr.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "nat_shiftr",
+            "sourceSha256": "c4716bba5e3cd8c96e1d66b69b5a9b2bba224af442cdcc8ce33697a4f5301a19",
+            "cSha256": "2a34e3686c13f325ca55fdf716dcf6add11b82f4f3275b3436748c49a83bb0ed"
+          }
+        ],
+        "signature": "bad5d228978f73b5f7a60173c8d8c2a5c150ddb2abf89d4532f17b2de9e0ab0d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "92cbaacb4e3d9bcde7c8ddd05b17bdd198ef16a4b4b550006eac2c53b438f87f"
+    },
+    {
+      "name": "compile/overflow1.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "overflow1.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__overflow1.lean"
+      ],
+      "startedAt": "2026-09-25T20:14:23.228Z",
+      "finishedAt": "2026-09-25T20:15:57.992Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "6af9b2b276bd294f4b56b6c8139b793481e17190b0ab9f1d6b4c615926bc80c7",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__overflow1.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "overflow1",
+            "sourceSha256": "6af9b2b276bd294f4b56b6c8139b793481e17190b0ab9f1d6b4c615926bc80c7",
+            "cSha256": "de66b9673ffa3cd846bd7f65ad5f6d8687f17af53d07ef631bce40c5a83142f7"
+          }
+        ],
+        "signature": "bc97b9a2748bf09b1a69d5c6ea53e104c844969d49703ed3a2407a9731aa58ea",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "39e1421e7bfa418312bc5a0268c6f2000a3967747fe56c2990e9ed2dc6489d4b"
+    },
+    {
+      "name": "compile/overflow2.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "overflow2.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__overflow2.lean"
+      ],
+      "startedAt": "2026-09-25T20:15:58.571Z",
+      "finishedAt": "2026-09-25T20:17:31.537Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "b6d4f3cc27e9204baf3a0f6c2379c0b77b8871b3fbf6614efaee35d059d454d2",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__overflow2.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "overflow2",
+            "sourceSha256": "b6d4f3cc27e9204baf3a0f6c2379c0b77b8871b3fbf6614efaee35d059d454d2",
+            "cSha256": "01a88458b23de44837773bd2cc84475fc2c097c7ba8bc18365d67021fa680d59"
+          }
+        ],
+        "signature": "b51fe11070a4b1f736f3cddd54b920c591a1458f4bfb916703878452308be00c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "af5e251d29c6f8a2281897cbd8893664da20d025940faf62dc593d420859f1f0"
+    },
+    {
+      "name": "compile/overflow3.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "overflow3.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__overflow3.lean"
+      ],
+      "startedAt": "2026-09-25T20:17:32.150Z",
+      "finishedAt": "2026-09-25T20:19:04.871Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "7c48d5941faf69709b4f4cef4cbfc2f96afd33ed6048b2e7e5bdc7d084fd7ddd",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__overflow3.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "overflow3",
+            "sourceSha256": "7c48d5941faf69709b4f4cef4cbfc2f96afd33ed6048b2e7e5bdc7d084fd7ddd",
+            "cSha256": "2b42b6378dd3fb102435b67a6598d0802d0a1c3f3a2a695d8b8b755df53d007c"
+          }
+        ],
+        "signature": "0203993df03d6ad3365857dafbf5e8a7274c4d9494c97f39f643b82a1cd9787e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "8c5908d5d400d1c910e728423f0586606ab845072d8b34b90ae031245b898259"
+    },
+    {
+      "name": "compile/partial.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "partial.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__partial.lean"
+      ],
+      "startedAt": "2026-09-25T20:19:05.479Z",
+      "finishedAt": "2026-09-25T20:20:40.037Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "b23f4b89757b55b2981e5d284d81b4f2e20ecc53370d5c2360c015c465d9e7f3",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__partial.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "partial",
+            "sourceSha256": "b23f4b89757b55b2981e5d284d81b4f2e20ecc53370d5c2360c015c465d9e7f3",
+            "cSha256": "a7917f29a50531897d49614268187dbaf0218d3f25b1210d4a88983c82afad50"
+          }
+        ],
+        "signature": "763f0c6dccbb06f2ce33506ecacec9c1a4938e4dbf34506cc912470348081ec8",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "25b2b1a834fa837279c7a42135dafb836d16955a3ce84a4e59f2aa108fde4de1"
+    },
+    {
+      "name": "compile/phashmap.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "phashmap.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__phashmap.lean"
+      ],
+      "startedAt": "2026-09-25T20:20:40.619Z",
+      "finishedAt": "2026-09-25T20:23:19.656Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "3f2b1cba03e633be1b85278d2c63614a2b17c375da48d407b823a408e47e2e6d",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__phashmap.lean/module-data-reclamation.json",
+        "sha256": "53fa801d5c433b59f43a1b20c75dd0f2ff51430050a8d231a5129726e8020bd9",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213573831
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "5e27d7b841c09e917e5e44e2858870578ab9c6ee30f9996e7d7d6d5603b2aa47",
+        "moduleDataBytes": 2213573831,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "phashmap",
+            "sourceSha256": "3f2b1cba03e633be1b85278d2c63614a2b17c375da48d407b823a408e47e2e6d",
+            "cSha256": "545a4c05dbd259df213ab8ca0b27984226907b6818382d35262bc7f20383098c"
+          }
+        ],
+        "signature": "8b8284a6b07d27f84ddb1d2bb2facb57f68a4a7950587bc04060d7f02c00f40b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "fa13e76d705f3338440d326efa6581339ffb950157a0d82460a1ac81d6e51191"
+    },
+    {
+      "name": "compile/phashmap2.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "phashmap2.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__phashmap2.lean"
+      ],
+      "startedAt": "2026-09-25T20:23:20.796Z",
+      "finishedAt": "2026-09-25T20:25:59.265Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "fa7987cf71683d581307cbed2db483a8c350ea060711268ea1f0ec958b85b02c",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__phashmap2.lean/module-data-reclamation.json",
+        "sha256": "dcc500b24f91ebc0f88b5f709dadf2bcc71cd56de65fa1619e23934ccc914f3a",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213529183
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "e82639fb1f60bcebef807eef65b03d380224d8737871623051a882f20386d040",
+        "moduleDataBytes": 2213529183,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "phashmap2",
+            "sourceSha256": "fa7987cf71683d581307cbed2db483a8c350ea060711268ea1f0ec958b85b02c",
+            "cSha256": "8d03e559a191f3963f2a90df07132ddd321451400c36741a8fa33994beb4ffb9"
+          }
+        ],
+        "signature": "b35ea575185c40b8f7076c2557a504553fc7c432620e57ab8d77c5060da261da",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "6058e590ff4d0740bd6b78e37e4aa1d8b3d226d37c02f23d9055de9cdc37c0ac"
+    },
+    {
+      "name": "compile/phashmap3.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "phashmap3.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__phashmap3.lean"
+      ],
+      "startedAt": "2026-09-25T20:26:00.471Z",
+      "finishedAt": "2026-09-25T20:28:41.044Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "52f5a792bcddf1594eabe460f09b727bfb4eb641a39404c03b736729875585f3",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__phashmap3.lean/module-data-reclamation.json",
+        "sha256": "d28d328cd46a309afd8d0745551a1bb0c31b87ce8b3c42c5dade0afa985d8f60",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213494127
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "c6d48e8fc99032a3ba5fac62f70b5e54b85abfe06e6bdfa5d90c144948bacb24",
+        "moduleDataBytes": 2213494127,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "phashmap3",
+            "sourceSha256": "52f5a792bcddf1594eabe460f09b727bfb4eb641a39404c03b736729875585f3",
+            "cSha256": "b9c294473359629fd3d9eb2aedbe1ab3bcae047851b87f01dba76ee2bded336a"
+          }
+        ],
+        "signature": "2e6989a29f4797629f7e2217547c649b1f444c729a3919617aa2727480414531",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "94478536b7f72fd059318a8a4c0937feae5b380f489d3b640b0dc884fa496b82"
+    },
+    {
+      "name": "compile/phashmap_alter.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "phashmap_alter.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__phashmap_alter.lean"
+      ],
+      "startedAt": "2026-09-25T20:28:42.187Z",
+      "finishedAt": "2026-09-25T20:31:20.943Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "cd49348c761d9343e977460bacb1a8424903c0f66c945e0d3a6d6826c668eb6a",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__phashmap_alter.lean/module-data-reclamation.json",
+        "sha256": "e339db1fb1fc5ef756acd7699790e34179ff91a4954e72ea8d8aa923a2a5eb5d",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213737207
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "09df3879b44978fb7ec9b14a59d50badede0759b01aae1d4295624467f2aaa7a",
+        "moduleDataBytes": 2213737207,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "phashmap_alter",
+            "sourceSha256": "cd49348c761d9343e977460bacb1a8424903c0f66c945e0d3a6d6826c668eb6a",
+            "cSha256": "d9c5a1ae375956b8fb4c98a95eb1a887987cdcd708a45d2acd08fe26279b662b"
+          }
+        ],
+        "signature": "9edbc60788b55e6792ff43dcf05b3c066f30a99902fcd03469e42eccbd006d5d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "a90c2ef82fd214f121d0b813f2d982f9742ea1f2557f2fd14229e39326580ac4"
+    },
+    {
+      "name": "compile/print_error.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "print_error.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__print_error.lean"
+      ],
+      "startedAt": "2026-09-25T20:31:22.085Z",
+      "finishedAt": "2026-09-25T20:32:55.249Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "72ebc52dd228ca4e9acc82c270e9c7b7bccaf76d55af84c9dc6c9c7f5e9bafe6",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__print_error.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "print_error",
+            "sourceSha256": "72ebc52dd228ca4e9acc82c270e9c7b7bccaf76d55af84c9dc6c9c7f5e9bafe6",
+            "cSha256": "98466a9817d9c60d9ada8d950318e2ba0459f2c62f709fa4aa33cafc29fc92b9"
+          }
+        ],
+        "signature": "6cc79c56565aab0f3fec0a13073534f3f29a69bfcde3a3fcf7797397d3be3efd",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "d39ec1b1adc2f67cfff25c0f069f2eb52b632848290a481f81b45c2dfdeb0131"
+    },
+    {
+      "name": "compile/qsortBadLt.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "qsortBadLt.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__qsortBadLt.lean"
+      ],
+      "startedAt": "2026-09-25T20:32:55.856Z",
+      "finishedAt": "2026-09-25T20:34:30.410Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "1e80df88b90edfa227162e8c7e42260778e9388b1d291107005689ee176c8aaa",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__qsortBadLt.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "qsortBadLt",
+            "sourceSha256": "1e80df88b90edfa227162e8c7e42260778e9388b1d291107005689ee176c8aaa",
+            "cSha256": "e6e0699826a3f232642eb4677d10d39580dca7facbfc72a9502e4e033b59b565"
+          }
+        ],
+        "signature": "24c6ac6ddaefcc56c38018a9db8bc23f99caa89d71b9e02db2d1840b971ca149",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "9a67efaa19311032e88b8ecd060f7c61925d158921f3a7ed5e27083d14fd1f6c"
+    },
+    {
+      "name": "compile/rbmap_library.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "rbmap_library.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__rbmap_library.lean"
+      ],
+      "startedAt": "2026-09-25T20:34:31.007Z",
+      "finishedAt": "2026-09-25T20:37:07.980Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "1e123d2eac6d054ae215199c9ddc005a1d4d8a25dbbff8319ea5a63d4b55b722",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__rbmap_library.lean/module-data-reclamation.json",
+        "sha256": "80efb059944c2739e4a434b40a02d5602c01a28163c0354a329c735fc5261a97",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213636615
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "a21254930f1efcd14e3ec91373e0ff8cf5af840114e1b1d084e684a727cdfde1",
+        "moduleDataBytes": 2213636615,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "rbmap_library",
+            "sourceSha256": "1e123d2eac6d054ae215199c9ddc005a1d4d8a25dbbff8319ea5a63d4b55b722",
+            "cSha256": "42a5ffac8ab72b7133edd8ffbf1ac1971537deae7ab4e540364d24d3c58aa16c"
+          }
+        ],
+        "signature": "5459cba5f5415b9525cbb4f88caa27fb3de89e97e7743085a8610131fc0fb20b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "56d61468c65bb6f86bc3138bbe23759912b02b23ba56c47fa29aba7c0cb9b032"
+    },
+    {
+      "name": "compile/reduceArity_overapp.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "reduceArity_overapp.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__reduceArity_overapp.lean"
+      ],
+      "startedAt": "2026-09-25T20:37:09.122Z",
+      "finishedAt": "2026-09-25T20:38:42.403Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "a3296fecbdec1dd8d41d8606bed4e6a70f2d62c7ef093b5d4706e05930ff0c8c",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__reduceArity_overapp.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "reduceArity_overapp",
+            "sourceSha256": "a3296fecbdec1dd8d41d8606bed4e6a70f2d62c7ef093b5d4706e05930ff0c8c",
+            "cSha256": "6328f8b40c17717f4386490a0062b9386e245e46b6e021c6701d1953bf7d680f"
+          }
+        ],
+        "signature": "5bfa8ce5ac751169a304b167562775f82e1091594b6c52abf982d41cbaa69a5b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "337f8f588465ccf989410a65ff31a51500a3286c920461afcb7055d9be2fbb41"
+    },
+    {
+      "name": "compile/reusebug.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "reusebug.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__reusebug.lean"
+      ],
+      "startedAt": "2026-09-25T20:38:43.004Z",
+      "finishedAt": "2026-09-25T20:40:15.903Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "102bc13bb452572a6a682622f0d583b6e6104bd59240a219bd2d260e5c219513",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__reusebug.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "reusebug",
+            "sourceSha256": "102bc13bb452572a6a682622f0d583b6e6104bd59240a219bd2d260e5c219513",
+            "cSha256": "fe18e9c15b59d6cf353bed0fed45e3ea6edec4d2854cbe33717d7e3f4de692c8"
+          }
+        ],
+        "signature": "9b141729cc85db33288f93633d0256c2effd052dc1b263e19593c5229c547183",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "cff1909e70b53bfeb52bf5ef29ab4a8a3897b27bf29d281fe39bddc507c5b531"
+    },
+    {
+      "name": "compile/str.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "str.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__str.lean"
+      ],
+      "startedAt": "2026-09-25T20:40:16.496Z",
+      "finishedAt": "2026-09-25T20:41:49.704Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "604f05fa57dae90153eafae2790b98f08d639ab3b80ed7613f547eaff6c8d3ad",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__str.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "str",
+            "sourceSha256": "604f05fa57dae90153eafae2790b98f08d639ab3b80ed7613f547eaff6c8d3ad",
+            "cSha256": "eedf4c7c333aa909bb77eaa0e9c9e8fbc1467d6df3aea5df5848fa9f052b0f46"
+          }
+        ],
+        "signature": "a2d5acb74d3533436e27e69d3b929775138ed22506d6b6c350eb94605b4283c3",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "4f5361427069ce7084351ebb5d59798ae1c3dfc02e77bb72e39dbba0f2e4cbd2"
+    },
+    {
+      "name": "compile/strictAndOr.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "strictAndOr.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__strictAndOr.lean"
+      ],
+      "startedAt": "2026-09-25T20:41:50.326Z",
+      "finishedAt": "2026-09-25T20:43:22.936Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "7c047fa47bf17d27a6bdedbe40cf87beadc6a49d59b8c7e5cf4dca122214fe6d",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__strictAndOr.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "strictAndOr",
+            "sourceSha256": "7c047fa47bf17d27a6bdedbe40cf87beadc6a49d59b8c7e5cf4dca122214fe6d",
+            "cSha256": "f37ed201a6c233f84a2268971885479fe1806d48303bca8fd557173fc06ca6c3"
+          }
+        ],
+        "signature": "3bb15f67ffb49f487fb6490d5a7860e831531a1b5a3d531f79e6392fa7d1d7e2",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "ff6bb4d063b3bde183f2432783fe7306230b0937dc1e5764fcdcebc30a673a88"
+    },
+    {
+      "name": "compile/t1.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "t1.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__t1.lean"
+      ],
+      "startedAt": "2026-09-25T20:43:23.530Z",
+      "finishedAt": "2026-09-25T20:44:56.343Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "a33a85b86058dc24df9169b392fc5b73e6b210e81fdbdc0c58215e99433b3bd5",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__t1.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "t1",
+            "sourceSha256": "a33a85b86058dc24df9169b392fc5b73e6b210e81fdbdc0c58215e99433b3bd5",
+            "cSha256": "11c4b32fddf274ee37ae37536092768948e378bdcf08503597e734542aef52d3"
+          }
+        ],
+        "signature": "bc9d3a54fba83417559a8ba88e3819c286ec87fd84976c2b064322a97221edc1",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "3754327768cd0330fb430595fcff9a27409e6900f8a598bfd5c8aca14290e5fe"
+    },
+    {
+      "name": "compile/t2.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "t2.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__t2.lean"
+      ],
+      "startedAt": "2026-09-25T20:44:56.942Z",
+      "finishedAt": "2026-09-25T20:46:30.263Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "bb6319337c80eb71b06c07ecf21b1a751c580faea39d16bfcc929f35815d7299",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__t2.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "t2",
+            "sourceSha256": "bb6319337c80eb71b06c07ecf21b1a751c580faea39d16bfcc929f35815d7299",
+            "cSha256": "2a2042d95de2e9f7c120dfe6f3e4a770f47bf864c09ebfc62fc0a0a16b435b46"
+          }
+        ],
+        "signature": "6eaef63f5f149cd089337b50950ab2a6b5953a5d5c58524090edfa57b7903f5b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "3c31953dd0182d5415439f061d4b46ee9134a4b90f871d56cd52658cd76cfc18"
+    },
+    {
+      "name": "compile/t4.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "t4.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__t4.lean"
+      ],
+      "startedAt": "2026-09-25T20:46:30.856Z",
+      "finishedAt": "2026-09-25T20:48:05.097Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "e392e0e2cf04700afd39ced0b47c5bd0870f027cefeecbdf5ec96b7e012cf36f",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__t4.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "t4",
+            "sourceSha256": "e392e0e2cf04700afd39ced0b47c5bd0870f027cefeecbdf5ec96b7e012cf36f",
+            "cSha256": "48f1841215f93cffeb5878e47859dc6c893660dbe8f18e516a52534b73e0b0ed"
+          }
+        ],
+        "signature": "8f84681f7df8e317a3ba90aceecb45e86fab0728202feac1d110b534b83d47f1",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "c66e90f71936c462ffb512705df075224260fafa7457d2214d358d8e7cf241f0"
+    },
+    {
+      "name": "compile/thunk.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "thunk.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__thunk.lean"
+      ],
+      "startedAt": "2026-09-25T20:48:05.683Z",
+      "finishedAt": "2026-09-25T20:49:38.342Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "f281b4b82f21e54c08a77712d6099ef6c0b957d42d8d205b2c88a158c893c639",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__thunk.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "thunk",
+            "sourceSha256": "f281b4b82f21e54c08a77712d6099ef6c0b957d42d8d205b2c88a158c893c639",
+            "cSha256": "b86ed4f8fa054dd08988805c98fd2999332ca81fffa09f64d5641b521fd56de2"
+          }
+        ],
+        "signature": "d0112927ee0d5618b7da13cd8eaf7f77e96a9d8fa63134d93bd399ba1a08721f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "0922a6d35bccae245560bcc3870b5931b21d2d7e2f6c49b6e85a6687a23635be"
+    },
+    {
+      "name": "compile/trie.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "trie.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__trie.lean"
+      ],
+      "startedAt": "2026-09-25T20:49:38.936Z",
+      "finishedAt": "2026-09-25T20:52:18.042Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "ce089a3a1aadc5983c271d98e39cb62fabb30ae0a3b28de024cb537277cd7bfd",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__trie.lean/module-data-reclamation.json",
+        "sha256": "5959f857cd7e07af598db236b4dc663184d81c8986efa8b563743e6abe28ef77",
+        "reclaimed": true,
+        "files": 15114,
+        "metadataBytes": 2213559535
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "moduleDataIdentity": "6b3bb85254a4f5ea1a959f54e108f27f9291dd90e94a042120a7b7c845987afc",
+        "moduleDataBytes": 2213559535,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "trie",
+            "sourceSha256": "ce089a3a1aadc5983c271d98e39cb62fabb30ae0a3b28de024cb537277cd7bfd",
+            "cSha256": "c2fcab25b6d6d9b91d317cbbf71e9a61d8fca4f173218a6f73b4b2ef1275d0c5"
+          }
+        ],
+        "signature": "043f508bc656e7352d8da3c42197b266b58ae74b99678a300c8047f4bb7d4e62",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "12227691f6ab80cec8d80a3994f96c79253494e477318afd8b26bd76e845509c"
+    },
+    {
+      "name": "compile/trigraphs.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "trigraphs.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__trigraphs.lean"
+      ],
+      "startedAt": "2026-09-25T20:52:19.195Z",
+      "finishedAt": "2026-09-25T20:53:52.427Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "6fd99e4f0d81084f2226c99aad625466e91b3600c0caf4abd2a180471b4135de",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__trigraphs.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "trigraphs",
+            "sourceSha256": "6fd99e4f0d81084f2226c99aad625466e91b3600c0caf4abd2a180471b4135de",
+            "cSha256": "66b6a3e34789d0a261a26c35a729d0e586c4d01b87296857c72cc62892b11562"
+          }
+        ],
+        "signature": "ca6623fc9d62d0ef40d6b54e1480ae48be138c455ff5e803899640ff0c56fe64",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "403488d5a6178c38fa45b34dea83ae58e6596c114c579e0f95ce86a3be7ca1c3"
+    },
+    {
+      "name": "compile/tuple.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "tuple.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__tuple.lean"
+      ],
+      "startedAt": "2026-09-25T20:53:53.019Z",
+      "finishedAt": "2026-09-25T20:55:26.327Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "fa24e3da090624f013f5ca8ffbc457af9b898ac77fc8117322a911f66bb58d3b",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__tuple.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "tuple",
+            "sourceSha256": "fa24e3da090624f013f5ca8ffbc457af9b898ac77fc8117322a911f66bb58d3b",
+            "cSha256": "b1492010135b3ab0ff5f6641d1d6743308bc34fff936afc224ada2599fd524cc"
+          }
+        ],
+        "signature": "02f18b03273f839e85747120d4573d439cbe2d0eedc2873d920778c9a3426395",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "fa8974fb106d0dc0517ad18d790a3586fcd242ff531ab719aac3677717fb2e58"
+    },
+    {
+      "name": "compile/typeFormerPolymorphism.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "typeFormerPolymorphism.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__typeFormerPolymorphism.lean"
+      ],
+      "startedAt": "2026-09-25T20:55:26.922Z",
+      "finishedAt": "2026-09-25T20:57:00.440Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "e8e2c6690d047ab9e5f2ef85e440040a49d5b8091f3028709a1642e993307ac0",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__typeFormerPolymorphism.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "typeFormerPolymorphism",
+            "sourceSha256": "e8e2c6690d047ab9e5f2ef85e440040a49d5b8091f3028709a1642e993307ac0",
+            "cSha256": "fc375d161df3bffcb28d414c4d9da69424017b534f6726ee58f8edc1e6373b39"
+          }
+        ],
+        "signature": "0c08afe153119118e90ad74d63d65d14a83e9eb6ac33d10ff40ba21b299c7e13",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "f336f904db03fd9adb7d1775b5546b45d8e9b5754d9f8772cbf9714aa42e43bc"
+    },
+    {
+      "name": "compile/uint_fold.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "uint_fold.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__uint_fold.lean"
+      ],
+      "startedAt": "2026-09-25T20:57:01.041Z",
+      "finishedAt": "2026-09-25T20:58:34.738Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "52658508ddc958d6bf78f560618b2d337da6ec0ffce4f11908e0237b16628827",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__uint_fold.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "uint_fold",
+            "sourceSha256": "52658508ddc958d6bf78f560618b2d337da6ec0ffce4f11908e0237b16628827",
+            "cSha256": "0af249291b4de051a54ea215a1f7a2b3687296ed499ee4e20a1f9f18617bf5f9"
+          }
+        ],
+        "signature": "5fe3277e5217428a91cbe75f3d87fc5e21c25a3314d35a2e1fa023aad3419fad",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "6068020b31581cb4ee86436fc3c4dff5bf6cd6f5de82e0d5195055c375590bed"
+    },
+    {
+      "name": "compile/unreachable.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "unreachable.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__unreachable.lean"
+      ],
+      "startedAt": "2026-09-25T20:58:35.333Z",
+      "finishedAt": "2026-09-25T21:00:07.840Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "283e9ccdaa74dab167d8d903a35f79dbb8149da069502394084c48dac2911810",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__unreachable.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "unreachable",
+            "sourceSha256": "283e9ccdaa74dab167d8d903a35f79dbb8149da069502394084c48dac2911810",
+            "cSha256": "45740e98c53f2487c4d33343c2147346090da43f9d5b445008b0503834be4049"
+          }
+        ],
+        "signature": "5dda46b8c397568ed57d2d29b13670969e466dee06e935baad465c4c7f09e4a6",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "936faf8a52b5a07b43f20943acd4fd32e49d931a73a253e1cf61b314c9ef1f3b"
+    },
+    {
+      "name": "compile/uset.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "uset.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__uset.lean"
+      ],
+      "startedAt": "2026-09-25T21:00:08.438Z",
+      "finishedAt": "2026-09-25T21:01:41.741Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "23a7eaf97fd714e1e36055d3133413eb7a0c2aa79aa8791e6e5fa1457f8bc43b",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__uset.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "uset",
+            "sourceSha256": "23a7eaf97fd714e1e36055d3133413eb7a0c2aa79aa8791e6e5fa1457f8bc43b",
+            "cSha256": "243bf9d797adea4cdab6cee67266143864506604b161aff028d9df6b18898780"
+          }
+        ],
+        "signature": "83823cbe0873f63bd1b6ec1392dfdcdd1ce523e58a47af4bd20664f611cb6af7",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "6f0154f53cf4ad141a503303a791ad80f1bc402dc9da3a20eb3b136ee09a9066"
+    },
+    {
+      "name": "compile/utf8Path.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "utf8Path.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__utf8Path.lean"
+      ],
+      "startedAt": "2026-09-25T21:01:42.344Z",
+      "finishedAt": "2026-09-25T21:03:16.091Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "eed4da6b302e07f6ef06596f76931bd2861100972348dec76f40468368bed1c5",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__utf8Path.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "utf8Path",
+            "sourceSha256": "eed4da6b302e07f6ef06596f76931bd2861100972348dec76f40468368bed1c5",
+            "cSha256": "a81b8498ca7eb071779f34837af25a8e92b09aa61654a3972a2eb52b05841c22"
+          }
+        ],
+        "signature": "b6bfa73dc017d6726b314440ed35d2a231d6ed900a89adec2359e176f4d2f19a",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "8696c225f51a114909cc9c924893124456c8bb2fa01d0cae4fdf4a1329368c11"
+    },
+    {
+      "name": "compile/wait_dedicated.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "wait_dedicated.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__wait_dedicated.lean"
+      ],
+      "startedAt": "2026-09-25T21:03:16.689Z",
+      "finishedAt": "2026-09-25T21:04:48.857Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "e4b0b1e53c3eb9eb21c705f4b2d81cd878d72fd31893a5acf82b71dc106b935e",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile__wait_dedicated.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "wait_dedicated",
+            "sourceSha256": "e4b0b1e53c3eb9eb21c705f4b2d81cd878d72fd31893a5acf82b71dc106b935e",
+            "cSha256": "7dba46b5e1228daa5453df42e810a6a39a460635d60b449887ed1ca2e665271e"
+          }
+        ],
+        "signature": "d96ef1181570a55819214e918916aad7844d6410a6e46f0aa7d3bc4caf981891",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "ef22043ee91c5d4ae77bb35a5d60e531013da648574f018f7ca551686b7b865d"
+    },
+    {
+      "name": "compile_bench/binarytrees.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "binarytrees.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__binarytrees.lean"
+      ],
+      "startedAt": "2026-09-25T21:04:49.443Z",
+      "finishedAt": "2026-09-25T21:06:25.217Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "d1a18ef9921e82a2dc4773894d6253902184a8f6229719e01ee109829ed4bfe7",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__binarytrees.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "binarytrees",
+            "sourceSha256": "d1a18ef9921e82a2dc4773894d6253902184a8f6229719e01ee109829ed4bfe7",
+            "cSha256": "299374e08b3edbb79460aee4855857c1467a48d6e36bee6a5fb8a1402f8a97c6"
+          }
+        ],
+        "signature": "261736a5006e91a89031678fd8b84b6c03b079525032f7ee97ce6de2c9efa0e0",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "5aa3c054c416501679fd90763a45a953bf6e56c0feda2e3837d7b3ead8cf4b75"
+    },
+    {
+      "name": "compile_bench/binarytrees.st.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "binarytrees.st.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__binarytrees.st.lean"
+      ],
+      "startedAt": "2026-09-25T21:06:25.819Z",
+      "finishedAt": "2026-09-25T21:07:59.833Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "e0e53844bd96d664e2e899c81522aa6dc9fed8878e0a9fecb60dc5be1c2bd637",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__binarytrees.st.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "binarytrees.st",
+            "sourceSha256": "e0e53844bd96d664e2e899c81522aa6dc9fed8878e0a9fecb60dc5be1c2bd637",
+            "cSha256": "7c8f6654d0dd9edb08f24097ccd69a3198a15c14402c425a799ef6196e35ea83"
+          }
+        ],
+        "signature": "d78b30fcfdb28307a6a4a5a8da86120e28ddc91154299a2557fada00a814845f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "b49f866be5b387af34172c38058cbc8ce834f49640dbba594749622f7af05b57"
+    },
+    {
+      "name": "compile_bench/channel.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "channel.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__channel.lean"
+      ],
+      "startedAt": "2026-09-25T21:08:00.432Z",
+      "finishedAt": "2026-09-25T21:09:37.216Z",
+      "exitCode": 0,
+      "signal": null,
+      "status": "passed",
+      "sourceSha256": "984bedcc89cba1292394ce2bc7578461e3415ba89236566bb05fbec4556f4f71",
+      "sourceUnchanged": true,
+      "phase": "complete",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__channel.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "channel",
+            "sourceSha256": "984bedcc89cba1292394ce2bc7578461e3415ba89236566bb05fbec4556f4f71",
+            "cSha256": "7897789a173cd9d01c1d9d843e8d4bcfa92f7ba43721139c685887457b551f27"
+          }
+        ],
+        "signature": "aaa81bd74f70709371451ff4c4fffef94590fbc7cc2c4ea7013662d6cf1f0cfb",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "f74ae60c1d73d051c772f85eb857981c060bca939a4d488d47f71b3785d7821a"
+    },
+    {
+      "name": "compile_bench/const_fold.lean",
+      "category": "compiled-application",
+      "command": [
+        "/bin/bash",
+        "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+        "const_fold.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__const_fold.lean"
+      ],
+      "startedAt": "2026-09-25T21:09:37.825Z",
+      "finishedAt": "2026-09-25T21:11:11.473Z",
+      "exitCode": 1,
+      "signal": null,
+      "status": "failed",
+      "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+      "sourceUnchanged": true,
+      "phase": "application-runtime",
+      "moduleDataReclamation": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__const_fold.lean/module-data-reclamation.json",
+        "sha256": "7a49a85c67e785eb2b0cf7ae9786dad2cbb8a6bb9dc3c03603b865b67754983e",
+        "reclaimed": false
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "const_fold",
+            "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+            "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+          }
+        ],
+        "signature": "960b30b465cacf54fd9506550637c51e0ca5d9b07decf3137f79737f05f72419",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "c8e37fcd0ccc36ef9faafe7c952963b27099d59b1b08c2af51bb30938e59b110"
+    },
+    {
+      "name": "compile_bench/deriv.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/hashmap.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/http_server.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/http_server_tcp.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/identifier_completion.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/ilean_roundtrip.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/incr_header_load.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/incr_header_save.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/io_compute.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/iterators.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/liasolver.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/nat_repr.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/parser.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/phashmap.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/qsort.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/rbmap.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/rbmap_checkpoint.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/rbmap_fbip.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/rbmap_library.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/select.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/server_startup.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/sigmaIterator.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/treemap.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/unionfind.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/watchdogRss.lean",
+      "status": "not-completed"
+    },
+    {
+      "name": "compile_bench/workspaceSymbolsNewRanges.lean",
+      "status": "not-completed"
+    }
+  ],
+  "minimumFreeDiskBytes": 4540284928,
+  "resources": {
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-applications-4.34.1-bun-run-r1-resources.json",
+    "startedAt": "2026-09-25T19:02:31.465Z",
+    "finishedAt": "2026-09-25T21:11:13.787Z",
+    "limits": {
+      "memoryMax": 10737418240,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 8589934592,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "peakMemoryBytes": 6454956032,
+    "minimumHostAvailable": 22739681280,
+    "unitReleased": true,
+    "resourceLimited": false,
+    "result": {
+      "code": 8,
+      "signal": null
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0
+  },
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v4.34.1"
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "expected": "v26.10.0"
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v2.9.7"
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "expected": "bun-v1.4.2"
+    },
+    "checkedAt": "2026-09-25T19:02:13.300160+00:00"
+  },
+  "remaining": [
+    "Decode this release's worker exception in a separate diagnostic copy and repair the deployed Bun path without changing original stack settings.",
+    "Execute all 26 remaining registrations; do not count them as passes.",
+    "Complete the other suite categories, API and platform acceptance."
+  ],
+  "recordedAt": "2026-09-25T21:19:22.090784+00:00"
+}

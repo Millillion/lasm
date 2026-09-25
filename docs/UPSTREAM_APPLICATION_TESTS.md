@@ -123,6 +123,18 @@ is 5.51 GiB, with no OOM, swap, pressure or disk stops; minimum free disk is
 This completes this application category on Linux x64 for Deno; the latest Bun
 campaign, other suite categories, full API parity and other platforms remain open.
 
+The [fresh Bun campaign stopped at `const_fold`](evidence/lean-4.34.1-upstream-applications-bun-interrupted-2026-09-25.json)
+through installed `.31`: 71 deployed passes, three original compilation-disabled
+exclusions, one runtime failure and 26 unrun registrations. Bun reports a
+`DataCloneError` while transferring a worker error; the native controls print
+the original expected result. The original argument and 4 GiB stack setting
+remain unchanged. The earlier 4.34.0 investigation diagnosed this surface error,
+but the underlying exception still requires a fresh 4.34.1 diagnostic.
+All 7,673 original entries and the frozen harness remain unchanged. Guarded
+memory peaks at 6.01 GiB, with no OOM, swap, pressure or disk stop. This is an
+interrupted campaign, not a complete category pass; every unfinished registration
+remains pending alongside the Bun runtime repair.
+
 The [four compilation-disabled inputs now pass separate AOT controls in all
 three installed engines](evidence/lean-4.34.1-compile-disabled-2026-09-25.json):
 twelve deployed comparisons, each following the unchanged original driver and
