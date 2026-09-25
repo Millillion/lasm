@@ -72,9 +72,10 @@ parser fuzzing, keep-alive, replayable bodies, request lines, response framing
 and trailers. Their [twelve-input three-engine comparison](../../docs/evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
 now passes all 148 actions per engine, for 444 deployed actions in total.
 Ten further reviewed inputs cover temporary files, TCP, UDP, cancellation,
-HTTP fuzzing and hang regressions. The [first Node checkpoint](../../docs/evidence/lean-4.34.1-upstream-io-stress-network-checkpoint-2026-09-25.json)
-passes temporary files and serial HTTP fuzzing, with fourteen deployed actions
-and eight integrity controls. The other new execution results remain pending.
+HTTP fuzzing and hang regressions. Their [complete Node comparison](../../docs/evidence/lean-4.34.1-upstream-io-stress-network-node-2026-09-25.json)
+passes all 71 deployed actions and eight integrity controls. Deno and Bun
+comparisons are in progress. The `async_tcp_half` input executes only its
+`listenClose` action; its unused `acceptClose` definition adds no assertion coverage.
 Listing a new input permits validation attempts, not an execution pass.
 It first runs the original native elaboration driver and its assertions. The
 matching native Lean parser then identifies each unwrapped evaluation token.
