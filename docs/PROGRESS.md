@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Shipping helper integration, full API parity and native platform acceptance lack defensible durations.
 
-**Changed:** [85 upstream HTTP IO actions pass in installed Node](evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json), preserving original expression/assertion/timeout bytes in parallel ordinary-main copies. Original native drivers and interpreted/compiled-native comparisons pass; four integrity controls pass. The [ordinary HTTP server passes all 20 Node/native checks](evidence/lean-4.34.1-installed-http-node-2026-09-25.json), with a 7.76 GiB peak and no resource events. Deno/Bun comparisons continue serially. Verified archives preserve completed artifacts while reclaiming disk. Pushes await restored SSH credentials.
+**Changed:** [All nine upstream HTTP IO comparisons pass](evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json): 85 original actions in each stock engine, 255 deployed actions total, with unchanged assertions/timeouts and exact interpreted/compiled-native parity. All guards release without resource or OOM events. The ordinary HTTP server's Deno/Bun revalidation is running serially; Node already passes. Three obsolete local installations were reclaimed only after every file matched its retained package archive. Pushes await restored SSH credentials.
 
 **Remaining:** Complete latest-release suite/API coverage; shipping engine parity and callable bindings; six-platform native acceptance.
 

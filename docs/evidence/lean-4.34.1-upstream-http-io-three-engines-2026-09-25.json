@@ -1,0 +1,2890 @@
+{
+  "scope": "Reviewed original upstream HTTP IO expression bodies run as separate ordinary-main applications through installed Lasm .25 on Linux x64",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "targets": [
+    "node",
+    "deno",
+    "bun"
+  ],
+  "package": "0.1.0-experimental.25",
+  "packageArchiveSha256": "ac8dcef8b95fb91cd760fa6f1b332c4c783901b7ca6b73b4f5eeadb559be0c6a",
+  "originalRegistrationCategory": "native-build-time",
+  "comparisons": [
+    {
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "test": "elab/async_http_body.lean",
+      "actions": 69,
+      "sourceSha256": "526c7bc0e86f13faaf7836d9dbf757abf8b218f6d5fe5a3edeeb236c51ab5f50",
+      "expressions": [
+        {
+          "start": 796,
+          "stop": 801,
+          "termStart": 802,
+          "termStop": 823,
+          "identifier": "lasmParallelEval0",
+          "sha256": "fdee51f1743a852b0a1fe0d16df6b23f1bf3af239458adf2d48d1197c8da0c5b"
+        },
+        {
+          "start": 1003,
+          "stop": 1008,
+          "termStart": 1009,
+          "termStop": 1034,
+          "identifier": "lasmParallelEval1",
+          "sha256": "3f49672bdc33f55a2ce24d5a84190c0b291c25991e20926e4ff0d8a435979430"
+        },
+        {
+          "start": 1589,
+          "stop": 1594,
+          "termStart": 1595,
+          "termStop": 1630,
+          "identifier": "lasmParallelEval2",
+          "sha256": "4f1494893a3d71dad3d61c42c96ad8beb7fd51585a8093a705fece94eaddbab1"
+        },
+        {
+          "start": 1812,
+          "stop": 1817,
+          "termStart": 1818,
+          "termStop": 1836,
+          "identifier": "lasmParallelEval3",
+          "sha256": "3534ab849a9e810025a335882255495e1bf1e5a1074316478b7b7d4fb02d106b"
+        },
+        {
+          "start": 2027,
+          "stop": 2032,
+          "termStart": 2033,
+          "termStop": 2060,
+          "identifier": "lasmParallelEval4",
+          "sha256": "55f2fd8134f52101c828cc24848b9da0d438207272fbe21e434a81fcd80c1c1f"
+        },
+        {
+          "start": 2416,
+          "stop": 2421,
+          "termStart": 2422,
+          "termStop": 2443,
+          "identifier": "lasmParallelEval5",
+          "sha256": "fbb2863ca51c5e6aaee4820e42306847b9d91defbd523a396f1a7531b5972637"
+        },
+        {
+          "start": 2673,
+          "stop": 2678,
+          "termStart": 2679,
+          "termStop": 2713,
+          "identifier": "lasmParallelEval6",
+          "sha256": "8dcd34fb0bdbdc1f7d9e26928e108a6024dbeb57c28a5d71ef3d7aed961c51b6"
+        },
+        {
+          "start": 3117,
+          "stop": 3122,
+          "termStart": 3123,
+          "termStop": 3169,
+          "identifier": "lasmParallelEval7",
+          "sha256": "39ebd96e0ccd7fbb554a04add07d7e8821eec5c650f0928e632d4e73d567b66d"
+        },
+        {
+          "start": 3591,
+          "stop": 3596,
+          "termStart": 3597,
+          "termStop": 3615,
+          "identifier": "lasmParallelEval8",
+          "sha256": "a0eb8a7c3e332ee52fb7bfb3dc7221761676969130523729569865f50a9ce142"
+        },
+        {
+          "start": 4134,
+          "stop": 4139,
+          "termStart": 4140,
+          "termStop": 4163,
+          "identifier": "lasmParallelEval9",
+          "sha256": "e772de35fdbdcbdf872a6dfa279643bd4985ee27e01db477fcc8d3e12199ac59"
+        },
+        {
+          "start": 5158,
+          "stop": 5163,
+          "termStart": 5164,
+          "termStop": 5201,
+          "identifier": "lasmParallelEval10",
+          "sha256": "bafa5ff9a15331d200be12188c2540b0555a5ea58567e50e06dae84e45498080"
+        },
+        {
+          "start": 5417,
+          "stop": 5422,
+          "termStart": 5423,
+          "termStop": 5445,
+          "identifier": "lasmParallelEval11",
+          "sha256": "5c808ffe00dc693a2494546935cb3f632b30929da6d2e63964c5e538bf82d127"
+        },
+        {
+          "start": 5827,
+          "stop": 5832,
+          "termStart": 5833,
+          "termStop": 5864,
+          "identifier": "lasmParallelEval12",
+          "sha256": "df6fd7459f83a8e067a606a388494f47c13434f93d62ac703cc2b1d621dee0f5"
+        },
+        {
+          "start": 6481,
+          "stop": 6486,
+          "termStart": 6487,
+          "termStop": 6518,
+          "identifier": "lasmParallelEval13",
+          "sha256": "e10dea5eaed478d036d737f46109726d4aa88d2f81b587b8a84aeb79bda662ed"
+        },
+        {
+          "start": 7129,
+          "stop": 7134,
+          "termStart": 7135,
+          "termStop": 7166,
+          "identifier": "lasmParallelEval14",
+          "sha256": "ab2ffe4349eacd03ac04630cf2bd776a859c62323d2d232947441e9c2897a851"
+        },
+        {
+          "start": 7700,
+          "stop": 7705,
+          "termStart": 7706,
+          "termStop": 7730,
+          "identifier": "lasmParallelEval15",
+          "sha256": "fba35135356b8a6093d2c05811e8c8d25c50a841e40873b25bf98cc3cad18238"
+        },
+        {
+          "start": 8087,
+          "stop": 8092,
+          "termStart": 8093,
+          "termStop": 8127,
+          "identifier": "lasmParallelEval16",
+          "sha256": "664d651cfda377ba6f97f1f4c8952c42b79ce5dacef3f2198610a41d3a51fe1d"
+        },
+        {
+          "start": 8575,
+          "stop": 8580,
+          "termStart": 8581,
+          "termStop": 8610,
+          "identifier": "lasmParallelEval17",
+          "sha256": "7bd4d3aa92494d1d2977b3b10fcd9e7a99e231756f1a0c6e2add62df8786ea4c"
+        },
+        {
+          "start": 8899,
+          "stop": 8904,
+          "termStart": 8905,
+          "termStop": 8932,
+          "identifier": "lasmParallelEval18",
+          "sha256": "4221f205bf15926e2a1770f65a9841b4685df2036fa90fd816e9d55970d80523"
+        },
+        {
+          "start": 9277,
+          "stop": 9282,
+          "termStart": 9283,
+          "termStop": 9308,
+          "identifier": "lasmParallelEval19",
+          "sha256": "2d9a53ff62561d6e7e9d73747553bff454e7f6057fcb1c6fc790859e1495864e"
+        },
+        {
+          "start": 9520,
+          "stop": 9525,
+          "termStart": 9526,
+          "termStop": 9550,
+          "identifier": "lasmParallelEval20",
+          "sha256": "67a0f71dc566f845bd8476cb2ff01ecfd0c4804c676184683c381a837c07fa94"
+        },
+        {
+          "start": 9932,
+          "stop": 9937,
+          "termStart": 9938,
+          "termStop": 9958,
+          "identifier": "lasmParallelEval21",
+          "sha256": "dcaf60c1100f0d29c96cbe5c8df5e5121776d91f7c066479c8a24e7460b8f18e"
+        },
+        {
+          "start": 10386,
+          "stop": 10391,
+          "termStart": 10392,
+          "termStop": 10419,
+          "identifier": "lasmParallelEval22",
+          "sha256": "b79b02ea82d94feb47403e73e7df00a890a8f50f8915fbcba4329e90ae362d01"
+        },
+        {
+          "start": 10683,
+          "stop": 10688,
+          "termStart": 10689,
+          "termStop": 10720,
+          "identifier": "lasmParallelEval23",
+          "sha256": "a6abbb331720a9427fa90d74b797eeae45acf13f396b469d7da711872e33cac2"
+        },
+        {
+          "start": 11025,
+          "stop": 11030,
+          "termStart": 11031,
+          "termStop": 11057,
+          "identifier": "lasmParallelEval24",
+          "sha256": "2c1ec8562dd75f1e17f2009050d5162fc78aef886c2162c59a9acf3af56149dc"
+        },
+        {
+          "start": 11444,
+          "stop": 11449,
+          "termStart": 11450,
+          "termStop": 11478,
+          "identifier": "lasmParallelEval25",
+          "sha256": "3ecad7a030d92423023a1647408e6c6e14532f063bfe0bbb7fac4b0e33c9e32a"
+        },
+        {
+          "start": 11708,
+          "stop": 11713,
+          "termStart": 11714,
+          "termStop": 11729,
+          "identifier": "lasmParallelEval26",
+          "sha256": "3748c837102e78b240f24c45abfa7223d94788fba893b1a760ba43e12daab574"
+        },
+        {
+          "start": 11943,
+          "stop": 11948,
+          "termStart": 11949,
+          "termStop": 11969,
+          "identifier": "lasmParallelEval27",
+          "sha256": "7882aac193364abe4edf54f76e20076ea53208965c31c9065b6b6e774c9ad7a5"
+        },
+        {
+          "start": 12273,
+          "stop": 12278,
+          "termStart": 12279,
+          "termStop": 12309,
+          "identifier": "lasmParallelEval28",
+          "sha256": "e86cdbf525b4e6219dea6bad1d3f05d01fabd539f8ecffabca6f7fc20e14a139"
+        },
+        {
+          "start": 12568,
+          "stop": 12573,
+          "termStart": 12574,
+          "termStop": 12603,
+          "identifier": "lasmParallelEval29",
+          "sha256": "a6c7109ebb4cb7943d6259f445543d5ce5741fb51433f518ff8265799e340b50"
+        },
+        {
+          "start": 12899,
+          "stop": 12904,
+          "termStart": 12905,
+          "termStop": 12932,
+          "identifier": "lasmParallelEval30",
+          "sha256": "a15840b781de307b999f1cb6fabce4aa3c5c6222f8488f37ae9369fbec4ceec7"
+        },
+        {
+          "start": 13116,
+          "stop": 13121,
+          "termStart": 13122,
+          "termStop": 13141,
+          "identifier": "lasmParallelEval31",
+          "sha256": "76bd99629b9ae01f3b05002d4fc07a02dfc712267b53b053542e6f1519c56dd3"
+        },
+        {
+          "start": 13284,
+          "stop": 13289,
+          "termStart": 13290,
+          "termStop": 13313,
+          "identifier": "lasmParallelEval32",
+          "sha256": "f0bc8fdecb3263a9c0d238ec972a48ff8613c1e279ed997c10ec5be14c63835c"
+        },
+        {
+          "start": 13552,
+          "stop": 13557,
+          "termStart": 13558,
+          "termStop": 13578,
+          "identifier": "lasmParallelEval33",
+          "sha256": "849cfa43f3a34c42ee7c58e043f75cffe490257c22e6e7a1e175212ecd80c595"
+        },
+        {
+          "start": 13811,
+          "stop": 13816,
+          "termStart": 13817,
+          "termStop": 13844,
+          "identifier": "lasmParallelEval34",
+          "sha256": "51383f3a8f5b8397670d413fd2e18abe4cd265785e0a66ba8bf3d09476073c08"
+        },
+        {
+          "start": 14127,
+          "stop": 14132,
+          "termStart": 14133,
+          "termStop": 14150,
+          "identifier": "lasmParallelEval35",
+          "sha256": "c2e6bce5adc6ab3825949c42d8f1344270673c09b17e30c67da40a54dd782be5"
+        },
+        {
+          "start": 14397,
+          "stop": 14402,
+          "termStart": 14403,
+          "termStop": 14421,
+          "identifier": "lasmParallelEval36",
+          "sha256": "b70614800212d490fc8315b522bf98aa5c9f63c435b83f6d632eaf264c79139e"
+        },
+        {
+          "start": 14796,
+          "stop": 14801,
+          "termStart": 14802,
+          "termStop": 14822,
+          "identifier": "lasmParallelEval37",
+          "sha256": "a9f2c21b2157be5ee6d1bf0bf03600e7285f8182a24a5fde0d131460dbb193cc"
+        },
+        {
+          "start": 15072,
+          "stop": 15077,
+          "termStart": 15078,
+          "termStop": 15100,
+          "identifier": "lasmParallelEval38",
+          "sha256": "011f1060b53e20c120beee650b09bc38e1e2fc3bf085261ea4f09bc14c98977e"
+        },
+        {
+          "start": 15420,
+          "stop": 15425,
+          "termStart": 15426,
+          "termStop": 15455,
+          "identifier": "lasmParallelEval39",
+          "sha256": "2dbf46bff174321aa46b1efcdc11acbd9980b0aed658b571de7a62134cbfdca3"
+        },
+        {
+          "start": 16046,
+          "stop": 16051,
+          "termStart": 16052,
+          "termStop": 16076,
+          "identifier": "lasmParallelEval40",
+          "sha256": "d97cf242099bd1374dfd893b36a475a82ae65d971da7ef92f84f2025be22015d"
+        },
+        {
+          "start": 16549,
+          "stop": 16554,
+          "termStart": 16555,
+          "termStop": 16579,
+          "identifier": "lasmParallelEval41",
+          "sha256": "942bd9e8b89a73268acb7cb02e7e7dcb8713a1d6442477a967ecfa15ad039e36"
+        },
+        {
+          "start": 16952,
+          "stop": 16957,
+          "termStart": 16958,
+          "termStop": 16987,
+          "identifier": "lasmParallelEval42",
+          "sha256": "3959a3265d84692ee61d96773d69712a54462329196d469113346f3443ba34f5"
+        },
+        {
+          "start": 17172,
+          "stop": 17177,
+          "termStart": 17178,
+          "termStop": 17204,
+          "identifier": "lasmParallelEval43",
+          "sha256": "68a4d307f7159a8d72553a636682ff67941be835e14f5b5eeb59b1aa287d878c"
+        },
+        {
+          "start": 17654,
+          "stop": 17659,
+          "termStart": 17660,
+          "termStop": 17685,
+          "identifier": "lasmParallelEval44",
+          "sha256": "d97b80b58f791761e52a5dda5d405cb0e601d88faf16a342d9c6287a8b391afa"
+        },
+        {
+          "start": 18095,
+          "stop": 18100,
+          "termStart": 18101,
+          "termStop": 18125,
+          "identifier": "lasmParallelEval45",
+          "sha256": "afd109edb0355d7292014b3decc8cf7d8e00d84608457b8b5da6c14b7709af6b"
+        },
+        {
+          "start": 18459,
+          "stop": 18464,
+          "termStart": 18465,
+          "termStop": 18491,
+          "identifier": "lasmParallelEval46",
+          "sha256": "867ade80002a6b154627195486705fb07713a24bcc395b79d0659891b948b164"
+        },
+        {
+          "start": 18772,
+          "stop": 18777,
+          "termStart": 18778,
+          "termStop": 18816,
+          "identifier": "lasmParallelEval47",
+          "sha256": "e6d779e13843bb4effe4e69aa3fb7f571264a4e1a46b7b28b8e3e37e4d612012"
+        },
+        {
+          "start": 19303,
+          "stop": 19308,
+          "termStart": 19309,
+          "termStop": 19334,
+          "identifier": "lasmParallelEval48",
+          "sha256": "2024113c2e09636f3ffa2df3cfd034df4fcf9c58d152c8ded2e9221f776590ea"
+        },
+        {
+          "start": 19786,
+          "stop": 19791,
+          "termStart": 19792,
+          "termStop": 19817,
+          "identifier": "lasmParallelEval49",
+          "sha256": "551e789ec87a69ffa4013862a2e7a681ca9bec16340d6043dc1c902d9d567f69"
+        },
+        {
+          "start": 20163,
+          "stop": 20168,
+          "termStart": 20169,
+          "termStop": 20199,
+          "identifier": "lasmParallelEval50",
+          "sha256": "9cf9b0f65cc259c8327fa31a60f5585f8576cff1925e9772229369d0cbaff469"
+        },
+        {
+          "start": 20364,
+          "stop": 20369,
+          "termStart": 20370,
+          "termStop": 20397,
+          "identifier": "lasmParallelEval51",
+          "sha256": "afe3bda0a6b665b03f204d252b0f0ad12efcafb78c6c9f7f3a5886768ae2217f"
+        },
+        {
+          "start": 20814,
+          "stop": 20819,
+          "termStart": 20820,
+          "termStop": 20846,
+          "identifier": "lasmParallelEval52",
+          "sha256": "e5c879f913e893cee61faf99561ba4acb20b39d524147c1505a7a4424c6ce2cc"
+        },
+        {
+          "start": 21225,
+          "stop": 21230,
+          "termStart": 21231,
+          "termStop": 21256,
+          "identifier": "lasmParallelEval53",
+          "sha256": "27c58ba40c2d1fa1321a74c024736c18ab726262f41a32c0709e8e1e814a4bcc"
+        },
+        {
+          "start": 21569,
+          "stop": 21574,
+          "termStart": 21575,
+          "termStop": 21602,
+          "identifier": "lasmParallelEval54",
+          "sha256": "112dfb8b38e37cf5e272c6debe6ee50af3a46e0a780a948f5eb665bed434decb"
+        },
+        {
+          "start": 21864,
+          "stop": 21869,
+          "termStart": 21870,
+          "termStop": 21906,
+          "identifier": "lasmParallelEval55",
+          "sha256": "61f38d9b782b1e98f3792ca97d9a999fb8179f940d14ef276739a5f014cb2c00"
+        },
+        {
+          "start": 22167,
+          "stop": 22172,
+          "termStart": 22173,
+          "termStop": 22212,
+          "identifier": "lasmParallelEval56",
+          "sha256": "d4e77311f06dbbf627ce563246067de6fc8a7145cc9c847350eadb67bf769e00"
+        },
+        {
+          "start": 22467,
+          "stop": 22472,
+          "termStart": 22473,
+          "termStop": 22508,
+          "identifier": "lasmParallelEval57",
+          "sha256": "d14c923eb9bdad49360eccefa21d3890a1e7bc1c41e8000d4f792d97b77da4b3"
+        },
+        {
+          "start": 22849,
+          "stop": 22854,
+          "termStart": 22855,
+          "termStop": 22890,
+          "identifier": "lasmParallelEval58",
+          "sha256": "dfda60d61aff3201c9be7e6ae7e925b62a6713b51b51487fad3c0912edd53be9"
+        },
+        {
+          "start": 23135,
+          "stop": 23140,
+          "termStart": 23141,
+          "termStop": 23172,
+          "identifier": "lasmParallelEval59",
+          "sha256": "e1afa6f3ba3244c01bd3bac452b2d28f4ae345784b14e9f31d4c7c4547de9896"
+        },
+        {
+          "start": 23429,
+          "stop": 23434,
+          "termStart": 23435,
+          "termStop": 23470,
+          "identifier": "lasmParallelEval60",
+          "sha256": "9702533dcbfddc5b8d3e07ecea5cd53c3f7007daf0627251abcb46d9ff86cf13"
+        },
+        {
+          "start": 23767,
+          "stop": 23772,
+          "termStart": 23773,
+          "termStop": 23809,
+          "identifier": "lasmParallelEval61",
+          "sha256": "83c1e923ba9396fd3fdc0a1c600cf1e3428b7761001a66615f9c8174d85578d8"
+        },
+        {
+          "start": 24204,
+          "stop": 24209,
+          "termStart": 24210,
+          "termStop": 24253,
+          "identifier": "lasmParallelEval62",
+          "sha256": "6aaf0259ca5c52f20bc3011c63e4c252877bb612d1f50e9e21719035d7a9e016"
+        },
+        {
+          "start": 24951,
+          "stop": 24956,
+          "termStart": 24957,
+          "termStop": 24993,
+          "identifier": "lasmParallelEval63",
+          "sha256": "0522ece458c4e616bdbfa3b8410dd5dddac54b7c711cd4e7f678d46481657013"
+        },
+        {
+          "start": 25295,
+          "stop": 25300,
+          "termStart": 25301,
+          "termStop": 25330,
+          "identifier": "lasmParallelEval64",
+          "sha256": "2e65ef9f098e6727638de139348b4343a7d188e02fc38626bd46feedd85e13e6"
+        },
+        {
+          "start": 25709,
+          "stop": 25714,
+          "termStart": 25715,
+          "termStop": 25749,
+          "identifier": "lasmParallelEval65",
+          "sha256": "da52ffd3cadb41ac84bda023e25e33118e41ce50563cea05f72014ba507dee11"
+        },
+        {
+          "start": 26187,
+          "stop": 26192,
+          "termStart": 26193,
+          "termStop": 26226,
+          "identifier": "lasmParallelEval66",
+          "sha256": "226dac471ecb3fbbd891e85bda0e8750241147eaa41d9894033735e1780b69d5"
+        },
+        {
+          "start": 26676,
+          "stop": 26681,
+          "termStart": 26682,
+          "termStop": 26715,
+          "identifier": "lasmParallelEval67",
+          "sha256": "29b26327503378640ea4f25aefd30d06d7ad25366bb2e29ec9dddd5ab25c42b1"
+        },
+        {
+          "start": 27147,
+          "stop": 27152,
+          "termStart": 27153,
+          "termStop": 27183,
+          "identifier": "lasmParallelEval68",
+          "sha256": "88de6ce0909b32ee367e0a126f6359343e297e104538595b7cc15a3422c81b7f"
+        }
+      ],
+      "generatedSourceSha256": "b6b48db8527f05524bbdb59d92102f4d137cdae8e963d804616c8c7e3381d2d7",
+      "originalDriverPassed": true,
+      "adaptedNativeInterpreted": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body.lean (69 actions)\n",
+        "stderr": ""
+      },
+      "adaptedNativeCompiled": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body.lean (69 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body.lean (69 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "11b840289f40a1c6fe0f60aa7c4613e92f7518e08b3bc0deb0639a18a5214b45",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "7ea349f140db207fb7c57c6d233b784f704a696e5675cad234efc3b79469513f",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "inputsUnchanged": true,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "b6b48db8527f05524bbdb59d92102f4d137cdae8e963d804616c8c7e3381d2d7",
+            "cSha256": "30b07c5fb0ddc978412904cfca1ad9a0b9440db0b122b3b2d00e6a8b2bbd4579"
+          }
+        ],
+        "signature": "0d5b034adf1baa52de059594030161017c446138bedfe7987c59b346c272bd4b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "4eaf5fbefee166e8668814d8f928a52f079f7fdb7373aa72d73cf9432eabac54",
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "adaptations": [
+        "Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.",
+        "A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.",
+        "Replace only those five-byte command tokens with named IO Unit definitions in a parallel copy; preserve every expression, assertion, constant and timeout byte.",
+        "An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.",
+        "Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.",
+        "The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately."
+      ],
+      "result": ".work/upstream-eval-io-4.34.1-node-body-r2/result.json",
+      "resultSha256": "3d04868da04001bd1c54d048e8d63e46bee2b0a825ced5aed7277677b4c60b60",
+      "resources": {
+        "path": ".work/product-acceptance/upstream-eval-io-4.34.1-node-body-r2-resources.json",
+        "sha256": "4b3d4e43e359c3793404845c227a3f985ae2a265fae3b41369c4a28074ac4f71",
+        "peakMemoryBytes": 4914049024,
+        "memoryMax": 8589934592,
+        "stopMemoryBytes": 6871947673,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "test": "elab/async_http_body_framing.lean",
+      "actions": 12,
+      "sourceSha256": "5f2afaf502d03d88af27527c7561dbb2e7edcb303daa6f3de31f32d399428ebd",
+      "expressions": [
+        {
+          "start": 137,
+          "stop": 142,
+          "termStart": 143,
+          "termStop": 1328,
+          "identifier": "lasmParallelEval0",
+          "sha256": "1c5549d7d5019d468fd03dc11d1ccfb38dee6a5d8e4f1cd0e7675c23088b75b0"
+        },
+        {
+          "start": 1330,
+          "stop": 1335,
+          "termStart": 1336,
+          "termStop": 2438,
+          "identifier": "lasmParallelEval1",
+          "sha256": "047ed57f1bbeaf938263dcb919b775d6cd5059bd3049a31dbb0d59f7c8018fce"
+        },
+        {
+          "start": 2440,
+          "stop": 2445,
+          "termStart": 2446,
+          "termStop": 5261,
+          "identifier": "lasmParallelEval2",
+          "sha256": "2aa1d7d6ff1e2c607e1e100ae1b9005fd647e1e4a64947cdb1eb618fb6f4a34e"
+        },
+        {
+          "start": 5263,
+          "stop": 5268,
+          "termStart": 5269,
+          "termStop": 7111,
+          "identifier": "lasmParallelEval3",
+          "sha256": "fbe8e22f6230f1e00eb3d516debfc0fe39f1a449838b2126dd51611dd1b9baad"
+        },
+        {
+          "start": 7148,
+          "stop": 7153,
+          "termStart": 7154,
+          "termStop": 9283,
+          "identifier": "lasmParallelEval4",
+          "sha256": "295a7d90c33729274b71c95bb294b28c6614ca704e75e6413d4106992e7eb85f"
+        },
+        {
+          "start": 9312,
+          "stop": 9317,
+          "termStart": 9318,
+          "termStop": 10066,
+          "identifier": "lasmParallelEval5",
+          "sha256": "c5d230805f0e115e1d0bb70b9463301093a30c0e13966d51b4e3051515c93806"
+        },
+        {
+          "start": 10068,
+          "stop": 10073,
+          "termStart": 10074,
+          "termStop": 11539,
+          "identifier": "lasmParallelEval6",
+          "sha256": "37bc28932ecdcb1cc3b0d2e8c8d29391472c2c52bb92057e21cc8e7fac6aea9e"
+        },
+        {
+          "start": 11541,
+          "stop": 11546,
+          "termStart": 11547,
+          "termStop": 12306,
+          "identifier": "lasmParallelEval7",
+          "sha256": "90bfce755a6c3bffcbb8dc7c7bc00c349e3c2f8735c5c1f63b88b06be536750b"
+        },
+        {
+          "start": 12308,
+          "stop": 12313,
+          "termStart": 12314,
+          "termStop": 13334,
+          "identifier": "lasmParallelEval8",
+          "sha256": "805e0a81d15dd4f8b5c8f22b1c27f9a1c71fe4c1de72f211124a3339e1e7140e"
+        },
+        {
+          "start": 13336,
+          "stop": 13341,
+          "termStart": 13342,
+          "termStop": 14907,
+          "identifier": "lasmParallelEval9",
+          "sha256": "306baa57eabc2f67932089911923f0d0d183528b83e57a3fbf4890ca38215ae5"
+        },
+        {
+          "start": 14954,
+          "stop": 14959,
+          "termStart": 14960,
+          "termStop": 16126,
+          "identifier": "lasmParallelEval10",
+          "sha256": "be21e670431ba7034ec523e0fefe3b757c3893d7479fc6f9cfa3c1f89ad4ff06"
+        },
+        {
+          "start": 16128,
+          "stop": 16133,
+          "termStart": 16134,
+          "termStop": 16678,
+          "identifier": "lasmParallelEval11",
+          "sha256": "b55e79f698fb5da67ad9751bf84f0bd0b6b01ad606072d42ac88b40ac80bcae2"
+        }
+      ],
+      "generatedSourceSha256": "cd87684b02dfea71ef724229e224b0ae47a0a974e2bc788a9ea52486e9a0cc49",
+      "originalDriverPassed": true,
+      "adaptedNativeInterpreted": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body_framing.lean (12 actions)\n",
+        "stderr": ""
+      },
+      "adaptedNativeCompiled": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body_framing.lean (12 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body_framing.lean (12 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "11b840289f40a1c6fe0f60aa7c4613e92f7518e08b3bc0deb0639a18a5214b45",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "7ea349f140db207fb7c57c6d233b784f704a696e5675cad234efc3b79469513f",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "inputsUnchanged": true,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "cd87684b02dfea71ef724229e224b0ae47a0a974e2bc788a9ea52486e9a0cc49",
+            "cSha256": "e7a82837202248d136c65cc97d10a43675b6463b1d5788ef622fd94996a43c8f"
+          }
+        ],
+        "signature": "8f10c181c056379d66412753669aeee3a8d4604a247175de13ca6e89f8c8e7f0",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "55bba5a533e7751a3abd972401bc42dc2ee57333604be367b5ffcf8958633b54",
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "adaptations": [
+        "Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.",
+        "A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.",
+        "Replace only those five-byte command tokens with named IO Unit definitions in a parallel copy; preserve every expression, assertion, constant and timeout byte.",
+        "An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.",
+        "Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.",
+        "The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately."
+      ],
+      "result": ".work/upstream-eval-io-4.34.1-node-body-framing-r3/result.json",
+      "resultSha256": "941326f3de827634eb349dfeab9d13d1ffb3e0aa6be213609c5269b5a3ba5fba",
+      "resources": {
+        "path": ".work/product-acceptance/upstream-eval-io-4.34.1-node-body-framing-r3-resources.json",
+        "sha256": "6a426f5e89b097e54192515af9509824e1f3ad79039a6a1dd3294076d061ae59",
+        "peakMemoryBytes": 4187471872,
+        "memoryMax": 8589934592,
+        "stopMemoryBytes": 6871947673,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "test": "elab/async_http_request_headers.lean",
+      "actions": 4,
+      "sourceSha256": "0f70c9cd4267f2c47ad285b806ed40c4fb336612732859d1d20ccdc5d3ce16f0",
+      "expressions": [
+        {
+          "start": 345,
+          "stop": 350,
+          "termStart": 351,
+          "termStop": 1996,
+          "identifier": "lasmParallelEval0",
+          "sha256": "fd3e8a5d3a652bcb4cb51e1235c462dace538e4fc123f0f52f765cb5c3de5dc4"
+        },
+        {
+          "start": 2057,
+          "stop": 2062,
+          "termStart": 2063,
+          "termStop": 2826,
+          "identifier": "lasmParallelEval1",
+          "sha256": "959cedd428f9032af731990695240384753618cb5507c315ddf28e1113c7d3b4"
+        },
+        {
+          "start": 2882,
+          "stop": 2887,
+          "termStart": 2888,
+          "termStop": 4516,
+          "identifier": "lasmParallelEval2",
+          "sha256": "8c8fb720764036347c2a6b34099d9449028b7a5920e21daa066ac46bdc9bfd09"
+        },
+        {
+          "start": 4518,
+          "stop": 4523,
+          "termStart": 4524,
+          "termStop": 5251,
+          "identifier": "lasmParallelEval3",
+          "sha256": "462ea543992f1041b28d2b924cdf5f7dea50322e8cb175447be81779b2e3161a"
+        }
+      ],
+      "generatedSourceSha256": "e190a54489635aa7e9cd48dc54253ba6aff21e032a8f1390eb9c652c2f2fa1e9",
+      "originalDriverPassed": true,
+      "adaptedNativeInterpreted": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_request_headers.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "adaptedNativeCompiled": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_request_headers.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_request_headers.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "11b840289f40a1c6fe0f60aa7c4613e92f7518e08b3bc0deb0639a18a5214b45",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "7ea349f140db207fb7c57c6d233b784f704a696e5675cad234efc3b79469513f",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "inputsUnchanged": true,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "e190a54489635aa7e9cd48dc54253ba6aff21e032a8f1390eb9c652c2f2fa1e9",
+            "cSha256": "e3988562880e9a0f4baad58bf2953651d767c126901e514fe12385fbbebd829e"
+          }
+        ],
+        "signature": "75967ebbed4cf579f7242d862d3a57a73da0183a6c30fadfe203932895ffa913",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "80a3be1d6be777715bd7246648a85197f3ef0f1fe824248e7929f12a1015a986",
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "adaptations": [
+        "Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.",
+        "A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.",
+        "Replace only those five-byte command tokens with named IO Unit definitions in a parallel copy; preserve every expression, assertion, constant and timeout byte.",
+        "An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.",
+        "Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.",
+        "The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately."
+      ],
+      "result": ".work/upstream-eval-io-4.34.1-node-request-headers-r3/result.json",
+      "resultSha256": "d6eb009a228e53f86ecd958da2ce5fd11940a1ee22f567302cacf7e88e50058b",
+      "resources": {
+        "path": ".work/product-acceptance/upstream-eval-io-4.34.1-node-request-headers-r3-resources.json",
+        "sha256": "06909da66114cd129f1f6c688f1f82ee4d103b098f358c5dd81daa0cda059915",
+        "peakMemoryBytes": 3853692928,
+        "memoryMax": 8589934592,
+        "stopMemoryBytes": 6871947673,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "test": "elab/async_http_body.lean",
+      "actions": 69,
+      "sourceSha256": "526c7bc0e86f13faaf7836d9dbf757abf8b218f6d5fe5a3edeeb236c51ab5f50",
+      "expressions": [
+        {
+          "start": 796,
+          "stop": 801,
+          "termStart": 802,
+          "termStop": 823,
+          "identifier": "lasmParallelEval0",
+          "sha256": "fdee51f1743a852b0a1fe0d16df6b23f1bf3af239458adf2d48d1197c8da0c5b"
+        },
+        {
+          "start": 1003,
+          "stop": 1008,
+          "termStart": 1009,
+          "termStop": 1034,
+          "identifier": "lasmParallelEval1",
+          "sha256": "3f49672bdc33f55a2ce24d5a84190c0b291c25991e20926e4ff0d8a435979430"
+        },
+        {
+          "start": 1589,
+          "stop": 1594,
+          "termStart": 1595,
+          "termStop": 1630,
+          "identifier": "lasmParallelEval2",
+          "sha256": "4f1494893a3d71dad3d61c42c96ad8beb7fd51585a8093a705fece94eaddbab1"
+        },
+        {
+          "start": 1812,
+          "stop": 1817,
+          "termStart": 1818,
+          "termStop": 1836,
+          "identifier": "lasmParallelEval3",
+          "sha256": "3534ab849a9e810025a335882255495e1bf1e5a1074316478b7b7d4fb02d106b"
+        },
+        {
+          "start": 2027,
+          "stop": 2032,
+          "termStart": 2033,
+          "termStop": 2060,
+          "identifier": "lasmParallelEval4",
+          "sha256": "55f2fd8134f52101c828cc24848b9da0d438207272fbe21e434a81fcd80c1c1f"
+        },
+        {
+          "start": 2416,
+          "stop": 2421,
+          "termStart": 2422,
+          "termStop": 2443,
+          "identifier": "lasmParallelEval5",
+          "sha256": "fbb2863ca51c5e6aaee4820e42306847b9d91defbd523a396f1a7531b5972637"
+        },
+        {
+          "start": 2673,
+          "stop": 2678,
+          "termStart": 2679,
+          "termStop": 2713,
+          "identifier": "lasmParallelEval6",
+          "sha256": "8dcd34fb0bdbdc1f7d9e26928e108a6024dbeb57c28a5d71ef3d7aed961c51b6"
+        },
+        {
+          "start": 3117,
+          "stop": 3122,
+          "termStart": 3123,
+          "termStop": 3169,
+          "identifier": "lasmParallelEval7",
+          "sha256": "39ebd96e0ccd7fbb554a04add07d7e8821eec5c650f0928e632d4e73d567b66d"
+        },
+        {
+          "start": 3591,
+          "stop": 3596,
+          "termStart": 3597,
+          "termStop": 3615,
+          "identifier": "lasmParallelEval8",
+          "sha256": "a0eb8a7c3e332ee52fb7bfb3dc7221761676969130523729569865f50a9ce142"
+        },
+        {
+          "start": 4134,
+          "stop": 4139,
+          "termStart": 4140,
+          "termStop": 4163,
+          "identifier": "lasmParallelEval9",
+          "sha256": "e772de35fdbdcbdf872a6dfa279643bd4985ee27e01db477fcc8d3e12199ac59"
+        },
+        {
+          "start": 5158,
+          "stop": 5163,
+          "termStart": 5164,
+          "termStop": 5201,
+          "identifier": "lasmParallelEval10",
+          "sha256": "bafa5ff9a15331d200be12188c2540b0555a5ea58567e50e06dae84e45498080"
+        },
+        {
+          "start": 5417,
+          "stop": 5422,
+          "termStart": 5423,
+          "termStop": 5445,
+          "identifier": "lasmParallelEval11",
+          "sha256": "5c808ffe00dc693a2494546935cb3f632b30929da6d2e63964c5e538bf82d127"
+        },
+        {
+          "start": 5827,
+          "stop": 5832,
+          "termStart": 5833,
+          "termStop": 5864,
+          "identifier": "lasmParallelEval12",
+          "sha256": "df6fd7459f83a8e067a606a388494f47c13434f93d62ac703cc2b1d621dee0f5"
+        },
+        {
+          "start": 6481,
+          "stop": 6486,
+          "termStart": 6487,
+          "termStop": 6518,
+          "identifier": "lasmParallelEval13",
+          "sha256": "e10dea5eaed478d036d737f46109726d4aa88d2f81b587b8a84aeb79bda662ed"
+        },
+        {
+          "start": 7129,
+          "stop": 7134,
+          "termStart": 7135,
+          "termStop": 7166,
+          "identifier": "lasmParallelEval14",
+          "sha256": "ab2ffe4349eacd03ac04630cf2bd776a859c62323d2d232947441e9c2897a851"
+        },
+        {
+          "start": 7700,
+          "stop": 7705,
+          "termStart": 7706,
+          "termStop": 7730,
+          "identifier": "lasmParallelEval15",
+          "sha256": "fba35135356b8a6093d2c05811e8c8d25c50a841e40873b25bf98cc3cad18238"
+        },
+        {
+          "start": 8087,
+          "stop": 8092,
+          "termStart": 8093,
+          "termStop": 8127,
+          "identifier": "lasmParallelEval16",
+          "sha256": "664d651cfda377ba6f97f1f4c8952c42b79ce5dacef3f2198610a41d3a51fe1d"
+        },
+        {
+          "start": 8575,
+          "stop": 8580,
+          "termStart": 8581,
+          "termStop": 8610,
+          "identifier": "lasmParallelEval17",
+          "sha256": "7bd4d3aa92494d1d2977b3b10fcd9e7a99e231756f1a0c6e2add62df8786ea4c"
+        },
+        {
+          "start": 8899,
+          "stop": 8904,
+          "termStart": 8905,
+          "termStop": 8932,
+          "identifier": "lasmParallelEval18",
+          "sha256": "4221f205bf15926e2a1770f65a9841b4685df2036fa90fd816e9d55970d80523"
+        },
+        {
+          "start": 9277,
+          "stop": 9282,
+          "termStart": 9283,
+          "termStop": 9308,
+          "identifier": "lasmParallelEval19",
+          "sha256": "2d9a53ff62561d6e7e9d73747553bff454e7f6057fcb1c6fc790859e1495864e"
+        },
+        {
+          "start": 9520,
+          "stop": 9525,
+          "termStart": 9526,
+          "termStop": 9550,
+          "identifier": "lasmParallelEval20",
+          "sha256": "67a0f71dc566f845bd8476cb2ff01ecfd0c4804c676184683c381a837c07fa94"
+        },
+        {
+          "start": 9932,
+          "stop": 9937,
+          "termStart": 9938,
+          "termStop": 9958,
+          "identifier": "lasmParallelEval21",
+          "sha256": "dcaf60c1100f0d29c96cbe5c8df5e5121776d91f7c066479c8a24e7460b8f18e"
+        },
+        {
+          "start": 10386,
+          "stop": 10391,
+          "termStart": 10392,
+          "termStop": 10419,
+          "identifier": "lasmParallelEval22",
+          "sha256": "b79b02ea82d94feb47403e73e7df00a890a8f50f8915fbcba4329e90ae362d01"
+        },
+        {
+          "start": 10683,
+          "stop": 10688,
+          "termStart": 10689,
+          "termStop": 10720,
+          "identifier": "lasmParallelEval23",
+          "sha256": "a6abbb331720a9427fa90d74b797eeae45acf13f396b469d7da711872e33cac2"
+        },
+        {
+          "start": 11025,
+          "stop": 11030,
+          "termStart": 11031,
+          "termStop": 11057,
+          "identifier": "lasmParallelEval24",
+          "sha256": "2c1ec8562dd75f1e17f2009050d5162fc78aef886c2162c59a9acf3af56149dc"
+        },
+        {
+          "start": 11444,
+          "stop": 11449,
+          "termStart": 11450,
+          "termStop": 11478,
+          "identifier": "lasmParallelEval25",
+          "sha256": "3ecad7a030d92423023a1647408e6c6e14532f063bfe0bbb7fac4b0e33c9e32a"
+        },
+        {
+          "start": 11708,
+          "stop": 11713,
+          "termStart": 11714,
+          "termStop": 11729,
+          "identifier": "lasmParallelEval26",
+          "sha256": "3748c837102e78b240f24c45abfa7223d94788fba893b1a760ba43e12daab574"
+        },
+        {
+          "start": 11943,
+          "stop": 11948,
+          "termStart": 11949,
+          "termStop": 11969,
+          "identifier": "lasmParallelEval27",
+          "sha256": "7882aac193364abe4edf54f76e20076ea53208965c31c9065b6b6e774c9ad7a5"
+        },
+        {
+          "start": 12273,
+          "stop": 12278,
+          "termStart": 12279,
+          "termStop": 12309,
+          "identifier": "lasmParallelEval28",
+          "sha256": "e86cdbf525b4e6219dea6bad1d3f05d01fabd539f8ecffabca6f7fc20e14a139"
+        },
+        {
+          "start": 12568,
+          "stop": 12573,
+          "termStart": 12574,
+          "termStop": 12603,
+          "identifier": "lasmParallelEval29",
+          "sha256": "a6c7109ebb4cb7943d6259f445543d5ce5741fb51433f518ff8265799e340b50"
+        },
+        {
+          "start": 12899,
+          "stop": 12904,
+          "termStart": 12905,
+          "termStop": 12932,
+          "identifier": "lasmParallelEval30",
+          "sha256": "a15840b781de307b999f1cb6fabce4aa3c5c6222f8488f37ae9369fbec4ceec7"
+        },
+        {
+          "start": 13116,
+          "stop": 13121,
+          "termStart": 13122,
+          "termStop": 13141,
+          "identifier": "lasmParallelEval31",
+          "sha256": "76bd99629b9ae01f3b05002d4fc07a02dfc712267b53b053542e6f1519c56dd3"
+        },
+        {
+          "start": 13284,
+          "stop": 13289,
+          "termStart": 13290,
+          "termStop": 13313,
+          "identifier": "lasmParallelEval32",
+          "sha256": "f0bc8fdecb3263a9c0d238ec972a48ff8613c1e279ed997c10ec5be14c63835c"
+        },
+        {
+          "start": 13552,
+          "stop": 13557,
+          "termStart": 13558,
+          "termStop": 13578,
+          "identifier": "lasmParallelEval33",
+          "sha256": "849cfa43f3a34c42ee7c58e043f75cffe490257c22e6e7a1e175212ecd80c595"
+        },
+        {
+          "start": 13811,
+          "stop": 13816,
+          "termStart": 13817,
+          "termStop": 13844,
+          "identifier": "lasmParallelEval34",
+          "sha256": "51383f3a8f5b8397670d413fd2e18abe4cd265785e0a66ba8bf3d09476073c08"
+        },
+        {
+          "start": 14127,
+          "stop": 14132,
+          "termStart": 14133,
+          "termStop": 14150,
+          "identifier": "lasmParallelEval35",
+          "sha256": "c2e6bce5adc6ab3825949c42d8f1344270673c09b17e30c67da40a54dd782be5"
+        },
+        {
+          "start": 14397,
+          "stop": 14402,
+          "termStart": 14403,
+          "termStop": 14421,
+          "identifier": "lasmParallelEval36",
+          "sha256": "b70614800212d490fc8315b522bf98aa5c9f63c435b83f6d632eaf264c79139e"
+        },
+        {
+          "start": 14796,
+          "stop": 14801,
+          "termStart": 14802,
+          "termStop": 14822,
+          "identifier": "lasmParallelEval37",
+          "sha256": "a9f2c21b2157be5ee6d1bf0bf03600e7285f8182a24a5fde0d131460dbb193cc"
+        },
+        {
+          "start": 15072,
+          "stop": 15077,
+          "termStart": 15078,
+          "termStop": 15100,
+          "identifier": "lasmParallelEval38",
+          "sha256": "011f1060b53e20c120beee650b09bc38e1e2fc3bf085261ea4f09bc14c98977e"
+        },
+        {
+          "start": 15420,
+          "stop": 15425,
+          "termStart": 15426,
+          "termStop": 15455,
+          "identifier": "lasmParallelEval39",
+          "sha256": "2dbf46bff174321aa46b1efcdc11acbd9980b0aed658b571de7a62134cbfdca3"
+        },
+        {
+          "start": 16046,
+          "stop": 16051,
+          "termStart": 16052,
+          "termStop": 16076,
+          "identifier": "lasmParallelEval40",
+          "sha256": "d97cf242099bd1374dfd893b36a475a82ae65d971da7ef92f84f2025be22015d"
+        },
+        {
+          "start": 16549,
+          "stop": 16554,
+          "termStart": 16555,
+          "termStop": 16579,
+          "identifier": "lasmParallelEval41",
+          "sha256": "942bd9e8b89a73268acb7cb02e7e7dcb8713a1d6442477a967ecfa15ad039e36"
+        },
+        {
+          "start": 16952,
+          "stop": 16957,
+          "termStart": 16958,
+          "termStop": 16987,
+          "identifier": "lasmParallelEval42",
+          "sha256": "3959a3265d84692ee61d96773d69712a54462329196d469113346f3443ba34f5"
+        },
+        {
+          "start": 17172,
+          "stop": 17177,
+          "termStart": 17178,
+          "termStop": 17204,
+          "identifier": "lasmParallelEval43",
+          "sha256": "68a4d307f7159a8d72553a636682ff67941be835e14f5b5eeb59b1aa287d878c"
+        },
+        {
+          "start": 17654,
+          "stop": 17659,
+          "termStart": 17660,
+          "termStop": 17685,
+          "identifier": "lasmParallelEval44",
+          "sha256": "d97b80b58f791761e52a5dda5d405cb0e601d88faf16a342d9c6287a8b391afa"
+        },
+        {
+          "start": 18095,
+          "stop": 18100,
+          "termStart": 18101,
+          "termStop": 18125,
+          "identifier": "lasmParallelEval45",
+          "sha256": "afd109edb0355d7292014b3decc8cf7d8e00d84608457b8b5da6c14b7709af6b"
+        },
+        {
+          "start": 18459,
+          "stop": 18464,
+          "termStart": 18465,
+          "termStop": 18491,
+          "identifier": "lasmParallelEval46",
+          "sha256": "867ade80002a6b154627195486705fb07713a24bcc395b79d0659891b948b164"
+        },
+        {
+          "start": 18772,
+          "stop": 18777,
+          "termStart": 18778,
+          "termStop": 18816,
+          "identifier": "lasmParallelEval47",
+          "sha256": "e6d779e13843bb4effe4e69aa3fb7f571264a4e1a46b7b28b8e3e37e4d612012"
+        },
+        {
+          "start": 19303,
+          "stop": 19308,
+          "termStart": 19309,
+          "termStop": 19334,
+          "identifier": "lasmParallelEval48",
+          "sha256": "2024113c2e09636f3ffa2df3cfd034df4fcf9c58d152c8ded2e9221f776590ea"
+        },
+        {
+          "start": 19786,
+          "stop": 19791,
+          "termStart": 19792,
+          "termStop": 19817,
+          "identifier": "lasmParallelEval49",
+          "sha256": "551e789ec87a69ffa4013862a2e7a681ca9bec16340d6043dc1c902d9d567f69"
+        },
+        {
+          "start": 20163,
+          "stop": 20168,
+          "termStart": 20169,
+          "termStop": 20199,
+          "identifier": "lasmParallelEval50",
+          "sha256": "9cf9b0f65cc259c8327fa31a60f5585f8576cff1925e9772229369d0cbaff469"
+        },
+        {
+          "start": 20364,
+          "stop": 20369,
+          "termStart": 20370,
+          "termStop": 20397,
+          "identifier": "lasmParallelEval51",
+          "sha256": "afe3bda0a6b665b03f204d252b0f0ad12efcafb78c6c9f7f3a5886768ae2217f"
+        },
+        {
+          "start": 20814,
+          "stop": 20819,
+          "termStart": 20820,
+          "termStop": 20846,
+          "identifier": "lasmParallelEval52",
+          "sha256": "e5c879f913e893cee61faf99561ba4acb20b39d524147c1505a7a4424c6ce2cc"
+        },
+        {
+          "start": 21225,
+          "stop": 21230,
+          "termStart": 21231,
+          "termStop": 21256,
+          "identifier": "lasmParallelEval53",
+          "sha256": "27c58ba40c2d1fa1321a74c024736c18ab726262f41a32c0709e8e1e814a4bcc"
+        },
+        {
+          "start": 21569,
+          "stop": 21574,
+          "termStart": 21575,
+          "termStop": 21602,
+          "identifier": "lasmParallelEval54",
+          "sha256": "112dfb8b38e37cf5e272c6debe6ee50af3a46e0a780a948f5eb665bed434decb"
+        },
+        {
+          "start": 21864,
+          "stop": 21869,
+          "termStart": 21870,
+          "termStop": 21906,
+          "identifier": "lasmParallelEval55",
+          "sha256": "61f38d9b782b1e98f3792ca97d9a999fb8179f940d14ef276739a5f014cb2c00"
+        },
+        {
+          "start": 22167,
+          "stop": 22172,
+          "termStart": 22173,
+          "termStop": 22212,
+          "identifier": "lasmParallelEval56",
+          "sha256": "d4e77311f06dbbf627ce563246067de6fc8a7145cc9c847350eadb67bf769e00"
+        },
+        {
+          "start": 22467,
+          "stop": 22472,
+          "termStart": 22473,
+          "termStop": 22508,
+          "identifier": "lasmParallelEval57",
+          "sha256": "d14c923eb9bdad49360eccefa21d3890a1e7bc1c41e8000d4f792d97b77da4b3"
+        },
+        {
+          "start": 22849,
+          "stop": 22854,
+          "termStart": 22855,
+          "termStop": 22890,
+          "identifier": "lasmParallelEval58",
+          "sha256": "dfda60d61aff3201c9be7e6ae7e925b62a6713b51b51487fad3c0912edd53be9"
+        },
+        {
+          "start": 23135,
+          "stop": 23140,
+          "termStart": 23141,
+          "termStop": 23172,
+          "identifier": "lasmParallelEval59",
+          "sha256": "e1afa6f3ba3244c01bd3bac452b2d28f4ae345784b14e9f31d4c7c4547de9896"
+        },
+        {
+          "start": 23429,
+          "stop": 23434,
+          "termStart": 23435,
+          "termStop": 23470,
+          "identifier": "lasmParallelEval60",
+          "sha256": "9702533dcbfddc5b8d3e07ecea5cd53c3f7007daf0627251abcb46d9ff86cf13"
+        },
+        {
+          "start": 23767,
+          "stop": 23772,
+          "termStart": 23773,
+          "termStop": 23809,
+          "identifier": "lasmParallelEval61",
+          "sha256": "83c1e923ba9396fd3fdc0a1c600cf1e3428b7761001a66615f9c8174d85578d8"
+        },
+        {
+          "start": 24204,
+          "stop": 24209,
+          "termStart": 24210,
+          "termStop": 24253,
+          "identifier": "lasmParallelEval62",
+          "sha256": "6aaf0259ca5c52f20bc3011c63e4c252877bb612d1f50e9e21719035d7a9e016"
+        },
+        {
+          "start": 24951,
+          "stop": 24956,
+          "termStart": 24957,
+          "termStop": 24993,
+          "identifier": "lasmParallelEval63",
+          "sha256": "0522ece458c4e616bdbfa3b8410dd5dddac54b7c711cd4e7f678d46481657013"
+        },
+        {
+          "start": 25295,
+          "stop": 25300,
+          "termStart": 25301,
+          "termStop": 25330,
+          "identifier": "lasmParallelEval64",
+          "sha256": "2e65ef9f098e6727638de139348b4343a7d188e02fc38626bd46feedd85e13e6"
+        },
+        {
+          "start": 25709,
+          "stop": 25714,
+          "termStart": 25715,
+          "termStop": 25749,
+          "identifier": "lasmParallelEval65",
+          "sha256": "da52ffd3cadb41ac84bda023e25e33118e41ce50563cea05f72014ba507dee11"
+        },
+        {
+          "start": 26187,
+          "stop": 26192,
+          "termStart": 26193,
+          "termStop": 26226,
+          "identifier": "lasmParallelEval66",
+          "sha256": "226dac471ecb3fbbd891e85bda0e8750241147eaa41d9894033735e1780b69d5"
+        },
+        {
+          "start": 26676,
+          "stop": 26681,
+          "termStart": 26682,
+          "termStop": 26715,
+          "identifier": "lasmParallelEval67",
+          "sha256": "29b26327503378640ea4f25aefd30d06d7ad25366bb2e29ec9dddd5ab25c42b1"
+        },
+        {
+          "start": 27147,
+          "stop": 27152,
+          "termStart": 27153,
+          "termStop": 27183,
+          "identifier": "lasmParallelEval68",
+          "sha256": "88de6ce0909b32ee367e0a126f6359343e297e104538595b7cc15a3422c81b7f"
+        }
+      ],
+      "generatedSourceSha256": "b6b48db8527f05524bbdb59d92102f4d137cdae8e963d804616c8c7e3381d2d7",
+      "originalDriverPassed": true,
+      "adaptedNativeInterpreted": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body.lean (69 actions)\n",
+        "stderr": ""
+      },
+      "adaptedNativeCompiled": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body.lean (69 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body.lean (69 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "11b840289f40a1c6fe0f60aa7c4613e92f7518e08b3bc0deb0639a18a5214b45",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "7ea349f140db207fb7c57c6d233b784f704a696e5675cad234efc3b79469513f",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "inputsUnchanged": true,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "b6b48db8527f05524bbdb59d92102f4d137cdae8e963d804616c8c7e3381d2d7",
+            "cSha256": "30b07c5fb0ddc978412904cfca1ad9a0b9440db0b122b3b2d00e6a8b2bbd4579"
+          }
+        ],
+        "signature": "802ebc2c88b00c15b62f22e7d46f08343c00db3f033cf4e67a3707d4744e3bc1",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "4eaf5fbefee166e8668814d8f928a52f079f7fdb7373aa72d73cf9432eabac54",
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "adaptations": [
+        "Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.",
+        "A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.",
+        "Replace only those five-byte command tokens with named IO Unit definitions in a parallel copy; preserve every expression, assertion, constant and timeout byte.",
+        "An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.",
+        "Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.",
+        "The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately."
+      ],
+      "result": ".work/upstream-eval-io-4.34.1-deno-body-r3/result.json",
+      "resultSha256": "d8fdc595d98407ca0e62de25a4a9d8a4f39e7ea6a85ec228c794b24b54caf6f3",
+      "resources": {
+        "path": ".work/product-acceptance/upstream-eval-io-4.34.1-deno-body-r3-resources.json",
+        "sha256": "4533b3d9c8bae202ea2821552e42ca804627249a22cfb4fdcd7766e8378e949d",
+        "peakMemoryBytes": 3677003776,
+        "memoryMax": 8589934592,
+        "stopMemoryBytes": 6871947673,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "test": "elab/async_http_body_framing.lean",
+      "actions": 12,
+      "sourceSha256": "5f2afaf502d03d88af27527c7561dbb2e7edcb303daa6f3de31f32d399428ebd",
+      "expressions": [
+        {
+          "start": 137,
+          "stop": 142,
+          "termStart": 143,
+          "termStop": 1328,
+          "identifier": "lasmParallelEval0",
+          "sha256": "1c5549d7d5019d468fd03dc11d1ccfb38dee6a5d8e4f1cd0e7675c23088b75b0"
+        },
+        {
+          "start": 1330,
+          "stop": 1335,
+          "termStart": 1336,
+          "termStop": 2438,
+          "identifier": "lasmParallelEval1",
+          "sha256": "047ed57f1bbeaf938263dcb919b775d6cd5059bd3049a31dbb0d59f7c8018fce"
+        },
+        {
+          "start": 2440,
+          "stop": 2445,
+          "termStart": 2446,
+          "termStop": 5261,
+          "identifier": "lasmParallelEval2",
+          "sha256": "2aa1d7d6ff1e2c607e1e100ae1b9005fd647e1e4a64947cdb1eb618fb6f4a34e"
+        },
+        {
+          "start": 5263,
+          "stop": 5268,
+          "termStart": 5269,
+          "termStop": 7111,
+          "identifier": "lasmParallelEval3",
+          "sha256": "fbe8e22f6230f1e00eb3d516debfc0fe39f1a449838b2126dd51611dd1b9baad"
+        },
+        {
+          "start": 7148,
+          "stop": 7153,
+          "termStart": 7154,
+          "termStop": 9283,
+          "identifier": "lasmParallelEval4",
+          "sha256": "295a7d90c33729274b71c95bb294b28c6614ca704e75e6413d4106992e7eb85f"
+        },
+        {
+          "start": 9312,
+          "stop": 9317,
+          "termStart": 9318,
+          "termStop": 10066,
+          "identifier": "lasmParallelEval5",
+          "sha256": "c5d230805f0e115e1d0bb70b9463301093a30c0e13966d51b4e3051515c93806"
+        },
+        {
+          "start": 10068,
+          "stop": 10073,
+          "termStart": 10074,
+          "termStop": 11539,
+          "identifier": "lasmParallelEval6",
+          "sha256": "37bc28932ecdcb1cc3b0d2e8c8d29391472c2c52bb92057e21cc8e7fac6aea9e"
+        },
+        {
+          "start": 11541,
+          "stop": 11546,
+          "termStart": 11547,
+          "termStop": 12306,
+          "identifier": "lasmParallelEval7",
+          "sha256": "90bfce755a6c3bffcbb8dc7c7bc00c349e3c2f8735c5c1f63b88b06be536750b"
+        },
+        {
+          "start": 12308,
+          "stop": 12313,
+          "termStart": 12314,
+          "termStop": 13334,
+          "identifier": "lasmParallelEval8",
+          "sha256": "805e0a81d15dd4f8b5c8f22b1c27f9a1c71fe4c1de72f211124a3339e1e7140e"
+        },
+        {
+          "start": 13336,
+          "stop": 13341,
+          "termStart": 13342,
+          "termStop": 14907,
+          "identifier": "lasmParallelEval9",
+          "sha256": "306baa57eabc2f67932089911923f0d0d183528b83e57a3fbf4890ca38215ae5"
+        },
+        {
+          "start": 14954,
+          "stop": 14959,
+          "termStart": 14960,
+          "termStop": 16126,
+          "identifier": "lasmParallelEval10",
+          "sha256": "be21e670431ba7034ec523e0fefe3b757c3893d7479fc6f9cfa3c1f89ad4ff06"
+        },
+        {
+          "start": 16128,
+          "stop": 16133,
+          "termStart": 16134,
+          "termStop": 16678,
+          "identifier": "lasmParallelEval11",
+          "sha256": "b55e79f698fb5da67ad9751bf84f0bd0b6b01ad606072d42ac88b40ac80bcae2"
+        }
+      ],
+      "generatedSourceSha256": "cd87684b02dfea71ef724229e224b0ae47a0a974e2bc788a9ea52486e9a0cc49",
+      "originalDriverPassed": true,
+      "adaptedNativeInterpreted": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body_framing.lean (12 actions)\n",
+        "stderr": ""
+      },
+      "adaptedNativeCompiled": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body_framing.lean (12 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body_framing.lean (12 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "11b840289f40a1c6fe0f60aa7c4613e92f7518e08b3bc0deb0639a18a5214b45",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "7ea349f140db207fb7c57c6d233b784f704a696e5675cad234efc3b79469513f",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "inputsUnchanged": true,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "cd87684b02dfea71ef724229e224b0ae47a0a974e2bc788a9ea52486e9a0cc49",
+            "cSha256": "e7a82837202248d136c65cc97d10a43675b6463b1d5788ef622fd94996a43c8f"
+          }
+        ],
+        "signature": "448d32471a3da1df5b43e1dc3434a76ff2114c015ba3e37bf215eb379b4a0174",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "55bba5a533e7751a3abd972401bc42dc2ee57333604be367b5ffcf8958633b54",
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "adaptations": [
+        "Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.",
+        "A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.",
+        "Replace only those five-byte command tokens with named IO Unit definitions in a parallel copy; preserve every expression, assertion, constant and timeout byte.",
+        "An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.",
+        "Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.",
+        "The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately."
+      ],
+      "result": ".work/upstream-eval-io-4.34.1-deno-body-framing-r3/result.json",
+      "resultSha256": "024df72b214d6d1f4c90becfa64d47774e7ff590f62dd478cdd9afaf2bdfe083",
+      "resources": {
+        "path": ".work/product-acceptance/upstream-eval-io-4.34.1-deno-body-framing-r3-resources.json",
+        "sha256": "26fe6f7b336e4aff7e9145f4b2f675fa0815a87364baaf1a33b9d59323a210b4",
+        "peakMemoryBytes": 3864223744,
+        "memoryMax": 8589934592,
+        "stopMemoryBytes": 6871947673,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "test": "elab/async_http_request_headers.lean",
+      "actions": 4,
+      "sourceSha256": "0f70c9cd4267f2c47ad285b806ed40c4fb336612732859d1d20ccdc5d3ce16f0",
+      "expressions": [
+        {
+          "start": 345,
+          "stop": 350,
+          "termStart": 351,
+          "termStop": 1996,
+          "identifier": "lasmParallelEval0",
+          "sha256": "fd3e8a5d3a652bcb4cb51e1235c462dace538e4fc123f0f52f765cb5c3de5dc4"
+        },
+        {
+          "start": 2057,
+          "stop": 2062,
+          "termStart": 2063,
+          "termStop": 2826,
+          "identifier": "lasmParallelEval1",
+          "sha256": "959cedd428f9032af731990695240384753618cb5507c315ddf28e1113c7d3b4"
+        },
+        {
+          "start": 2882,
+          "stop": 2887,
+          "termStart": 2888,
+          "termStop": 4516,
+          "identifier": "lasmParallelEval2",
+          "sha256": "8c8fb720764036347c2a6b34099d9449028b7a5920e21daa066ac46bdc9bfd09"
+        },
+        {
+          "start": 4518,
+          "stop": 4523,
+          "termStart": 4524,
+          "termStop": 5251,
+          "identifier": "lasmParallelEval3",
+          "sha256": "462ea543992f1041b28d2b924cdf5f7dea50322e8cb175447be81779b2e3161a"
+        }
+      ],
+      "generatedSourceSha256": "e190a54489635aa7e9cd48dc54253ba6aff21e032a8f1390eb9c652c2f2fa1e9",
+      "originalDriverPassed": true,
+      "adaptedNativeInterpreted": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_request_headers.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "adaptedNativeCompiled": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_request_headers.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_request_headers.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "11b840289f40a1c6fe0f60aa7c4613e92f7518e08b3bc0deb0639a18a5214b45",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "7ea349f140db207fb7c57c6d233b784f704a696e5675cad234efc3b79469513f",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "inputsUnchanged": true,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "e190a54489635aa7e9cd48dc54253ba6aff21e032a8f1390eb9c652c2f2fa1e9",
+            "cSha256": "e3988562880e9a0f4baad58bf2953651d767c126901e514fe12385fbbebd829e"
+          }
+        ],
+        "signature": "135e10bb5d747db3ad6076b81b2c4ebf46bce9f4ca218e187b1a44e75fe1b557",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "80a3be1d6be777715bd7246648a85197f3ef0f1fe824248e7929f12a1015a986",
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "adaptations": [
+        "Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.",
+        "A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.",
+        "Replace only those five-byte command tokens with named IO Unit definitions in a parallel copy; preserve every expression, assertion, constant and timeout byte.",
+        "An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.",
+        "Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.",
+        "The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately."
+      ],
+      "result": ".work/upstream-eval-io-4.34.1-deno-request-headers-r3/result.json",
+      "resultSha256": "6d32ea29c62d0dc8cfbb4741f2132122f5cb146e11dc4ff7b529a84125a068c5",
+      "resources": {
+        "path": ".work/product-acceptance/upstream-eval-io-4.34.1-deno-request-headers-r3-resources.json",
+        "sha256": "03ea96d331df98aa1f01a40412e9f8272df6670f06965d2e1c74a7ec0d6e0a07",
+        "peakMemoryBytes": 3865305088,
+        "memoryMax": 8589934592,
+        "stopMemoryBytes": 6871947673,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "test": "elab/async_http_body.lean",
+      "actions": 69,
+      "sourceSha256": "526c7bc0e86f13faaf7836d9dbf757abf8b218f6d5fe5a3edeeb236c51ab5f50",
+      "expressions": [
+        {
+          "start": 796,
+          "stop": 801,
+          "termStart": 802,
+          "termStop": 823,
+          "identifier": "lasmParallelEval0",
+          "sha256": "fdee51f1743a852b0a1fe0d16df6b23f1bf3af239458adf2d48d1197c8da0c5b"
+        },
+        {
+          "start": 1003,
+          "stop": 1008,
+          "termStart": 1009,
+          "termStop": 1034,
+          "identifier": "lasmParallelEval1",
+          "sha256": "3f49672bdc33f55a2ce24d5a84190c0b291c25991e20926e4ff0d8a435979430"
+        },
+        {
+          "start": 1589,
+          "stop": 1594,
+          "termStart": 1595,
+          "termStop": 1630,
+          "identifier": "lasmParallelEval2",
+          "sha256": "4f1494893a3d71dad3d61c42c96ad8beb7fd51585a8093a705fece94eaddbab1"
+        },
+        {
+          "start": 1812,
+          "stop": 1817,
+          "termStart": 1818,
+          "termStop": 1836,
+          "identifier": "lasmParallelEval3",
+          "sha256": "3534ab849a9e810025a335882255495e1bf1e5a1074316478b7b7d4fb02d106b"
+        },
+        {
+          "start": 2027,
+          "stop": 2032,
+          "termStart": 2033,
+          "termStop": 2060,
+          "identifier": "lasmParallelEval4",
+          "sha256": "55f2fd8134f52101c828cc24848b9da0d438207272fbe21e434a81fcd80c1c1f"
+        },
+        {
+          "start": 2416,
+          "stop": 2421,
+          "termStart": 2422,
+          "termStop": 2443,
+          "identifier": "lasmParallelEval5",
+          "sha256": "fbb2863ca51c5e6aaee4820e42306847b9d91defbd523a396f1a7531b5972637"
+        },
+        {
+          "start": 2673,
+          "stop": 2678,
+          "termStart": 2679,
+          "termStop": 2713,
+          "identifier": "lasmParallelEval6",
+          "sha256": "8dcd34fb0bdbdc1f7d9e26928e108a6024dbeb57c28a5d71ef3d7aed961c51b6"
+        },
+        {
+          "start": 3117,
+          "stop": 3122,
+          "termStart": 3123,
+          "termStop": 3169,
+          "identifier": "lasmParallelEval7",
+          "sha256": "39ebd96e0ccd7fbb554a04add07d7e8821eec5c650f0928e632d4e73d567b66d"
+        },
+        {
+          "start": 3591,
+          "stop": 3596,
+          "termStart": 3597,
+          "termStop": 3615,
+          "identifier": "lasmParallelEval8",
+          "sha256": "a0eb8a7c3e332ee52fb7bfb3dc7221761676969130523729569865f50a9ce142"
+        },
+        {
+          "start": 4134,
+          "stop": 4139,
+          "termStart": 4140,
+          "termStop": 4163,
+          "identifier": "lasmParallelEval9",
+          "sha256": "e772de35fdbdcbdf872a6dfa279643bd4985ee27e01db477fcc8d3e12199ac59"
+        },
+        {
+          "start": 5158,
+          "stop": 5163,
+          "termStart": 5164,
+          "termStop": 5201,
+          "identifier": "lasmParallelEval10",
+          "sha256": "bafa5ff9a15331d200be12188c2540b0555a5ea58567e50e06dae84e45498080"
+        },
+        {
+          "start": 5417,
+          "stop": 5422,
+          "termStart": 5423,
+          "termStop": 5445,
+          "identifier": "lasmParallelEval11",
+          "sha256": "5c808ffe00dc693a2494546935cb3f632b30929da6d2e63964c5e538bf82d127"
+        },
+        {
+          "start": 5827,
+          "stop": 5832,
+          "termStart": 5833,
+          "termStop": 5864,
+          "identifier": "lasmParallelEval12",
+          "sha256": "df6fd7459f83a8e067a606a388494f47c13434f93d62ac703cc2b1d621dee0f5"
+        },
+        {
+          "start": 6481,
+          "stop": 6486,
+          "termStart": 6487,
+          "termStop": 6518,
+          "identifier": "lasmParallelEval13",
+          "sha256": "e10dea5eaed478d036d737f46109726d4aa88d2f81b587b8a84aeb79bda662ed"
+        },
+        {
+          "start": 7129,
+          "stop": 7134,
+          "termStart": 7135,
+          "termStop": 7166,
+          "identifier": "lasmParallelEval14",
+          "sha256": "ab2ffe4349eacd03ac04630cf2bd776a859c62323d2d232947441e9c2897a851"
+        },
+        {
+          "start": 7700,
+          "stop": 7705,
+          "termStart": 7706,
+          "termStop": 7730,
+          "identifier": "lasmParallelEval15",
+          "sha256": "fba35135356b8a6093d2c05811e8c8d25c50a841e40873b25bf98cc3cad18238"
+        },
+        {
+          "start": 8087,
+          "stop": 8092,
+          "termStart": 8093,
+          "termStop": 8127,
+          "identifier": "lasmParallelEval16",
+          "sha256": "664d651cfda377ba6f97f1f4c8952c42b79ce5dacef3f2198610a41d3a51fe1d"
+        },
+        {
+          "start": 8575,
+          "stop": 8580,
+          "termStart": 8581,
+          "termStop": 8610,
+          "identifier": "lasmParallelEval17",
+          "sha256": "7bd4d3aa92494d1d2977b3b10fcd9e7a99e231756f1a0c6e2add62df8786ea4c"
+        },
+        {
+          "start": 8899,
+          "stop": 8904,
+          "termStart": 8905,
+          "termStop": 8932,
+          "identifier": "lasmParallelEval18",
+          "sha256": "4221f205bf15926e2a1770f65a9841b4685df2036fa90fd816e9d55970d80523"
+        },
+        {
+          "start": 9277,
+          "stop": 9282,
+          "termStart": 9283,
+          "termStop": 9308,
+          "identifier": "lasmParallelEval19",
+          "sha256": "2d9a53ff62561d6e7e9d73747553bff454e7f6057fcb1c6fc790859e1495864e"
+        },
+        {
+          "start": 9520,
+          "stop": 9525,
+          "termStart": 9526,
+          "termStop": 9550,
+          "identifier": "lasmParallelEval20",
+          "sha256": "67a0f71dc566f845bd8476cb2ff01ecfd0c4804c676184683c381a837c07fa94"
+        },
+        {
+          "start": 9932,
+          "stop": 9937,
+          "termStart": 9938,
+          "termStop": 9958,
+          "identifier": "lasmParallelEval21",
+          "sha256": "dcaf60c1100f0d29c96cbe5c8df5e5121776d91f7c066479c8a24e7460b8f18e"
+        },
+        {
+          "start": 10386,
+          "stop": 10391,
+          "termStart": 10392,
+          "termStop": 10419,
+          "identifier": "lasmParallelEval22",
+          "sha256": "b79b02ea82d94feb47403e73e7df00a890a8f50f8915fbcba4329e90ae362d01"
+        },
+        {
+          "start": 10683,
+          "stop": 10688,
+          "termStart": 10689,
+          "termStop": 10720,
+          "identifier": "lasmParallelEval23",
+          "sha256": "a6abbb331720a9427fa90d74b797eeae45acf13f396b469d7da711872e33cac2"
+        },
+        {
+          "start": 11025,
+          "stop": 11030,
+          "termStart": 11031,
+          "termStop": 11057,
+          "identifier": "lasmParallelEval24",
+          "sha256": "2c1ec8562dd75f1e17f2009050d5162fc78aef886c2162c59a9acf3af56149dc"
+        },
+        {
+          "start": 11444,
+          "stop": 11449,
+          "termStart": 11450,
+          "termStop": 11478,
+          "identifier": "lasmParallelEval25",
+          "sha256": "3ecad7a030d92423023a1647408e6c6e14532f063bfe0bbb7fac4b0e33c9e32a"
+        },
+        {
+          "start": 11708,
+          "stop": 11713,
+          "termStart": 11714,
+          "termStop": 11729,
+          "identifier": "lasmParallelEval26",
+          "sha256": "3748c837102e78b240f24c45abfa7223d94788fba893b1a760ba43e12daab574"
+        },
+        {
+          "start": 11943,
+          "stop": 11948,
+          "termStart": 11949,
+          "termStop": 11969,
+          "identifier": "lasmParallelEval27",
+          "sha256": "7882aac193364abe4edf54f76e20076ea53208965c31c9065b6b6e774c9ad7a5"
+        },
+        {
+          "start": 12273,
+          "stop": 12278,
+          "termStart": 12279,
+          "termStop": 12309,
+          "identifier": "lasmParallelEval28",
+          "sha256": "e86cdbf525b4e6219dea6bad1d3f05d01fabd539f8ecffabca6f7fc20e14a139"
+        },
+        {
+          "start": 12568,
+          "stop": 12573,
+          "termStart": 12574,
+          "termStop": 12603,
+          "identifier": "lasmParallelEval29",
+          "sha256": "a6c7109ebb4cb7943d6259f445543d5ce5741fb51433f518ff8265799e340b50"
+        },
+        {
+          "start": 12899,
+          "stop": 12904,
+          "termStart": 12905,
+          "termStop": 12932,
+          "identifier": "lasmParallelEval30",
+          "sha256": "a15840b781de307b999f1cb6fabce4aa3c5c6222f8488f37ae9369fbec4ceec7"
+        },
+        {
+          "start": 13116,
+          "stop": 13121,
+          "termStart": 13122,
+          "termStop": 13141,
+          "identifier": "lasmParallelEval31",
+          "sha256": "76bd99629b9ae01f3b05002d4fc07a02dfc712267b53b053542e6f1519c56dd3"
+        },
+        {
+          "start": 13284,
+          "stop": 13289,
+          "termStart": 13290,
+          "termStop": 13313,
+          "identifier": "lasmParallelEval32",
+          "sha256": "f0bc8fdecb3263a9c0d238ec972a48ff8613c1e279ed997c10ec5be14c63835c"
+        },
+        {
+          "start": 13552,
+          "stop": 13557,
+          "termStart": 13558,
+          "termStop": 13578,
+          "identifier": "lasmParallelEval33",
+          "sha256": "849cfa43f3a34c42ee7c58e043f75cffe490257c22e6e7a1e175212ecd80c595"
+        },
+        {
+          "start": 13811,
+          "stop": 13816,
+          "termStart": 13817,
+          "termStop": 13844,
+          "identifier": "lasmParallelEval34",
+          "sha256": "51383f3a8f5b8397670d413fd2e18abe4cd265785e0a66ba8bf3d09476073c08"
+        },
+        {
+          "start": 14127,
+          "stop": 14132,
+          "termStart": 14133,
+          "termStop": 14150,
+          "identifier": "lasmParallelEval35",
+          "sha256": "c2e6bce5adc6ab3825949c42d8f1344270673c09b17e30c67da40a54dd782be5"
+        },
+        {
+          "start": 14397,
+          "stop": 14402,
+          "termStart": 14403,
+          "termStop": 14421,
+          "identifier": "lasmParallelEval36",
+          "sha256": "b70614800212d490fc8315b522bf98aa5c9f63c435b83f6d632eaf264c79139e"
+        },
+        {
+          "start": 14796,
+          "stop": 14801,
+          "termStart": 14802,
+          "termStop": 14822,
+          "identifier": "lasmParallelEval37",
+          "sha256": "a9f2c21b2157be5ee6d1bf0bf03600e7285f8182a24a5fde0d131460dbb193cc"
+        },
+        {
+          "start": 15072,
+          "stop": 15077,
+          "termStart": 15078,
+          "termStop": 15100,
+          "identifier": "lasmParallelEval38",
+          "sha256": "011f1060b53e20c120beee650b09bc38e1e2fc3bf085261ea4f09bc14c98977e"
+        },
+        {
+          "start": 15420,
+          "stop": 15425,
+          "termStart": 15426,
+          "termStop": 15455,
+          "identifier": "lasmParallelEval39",
+          "sha256": "2dbf46bff174321aa46b1efcdc11acbd9980b0aed658b571de7a62134cbfdca3"
+        },
+        {
+          "start": 16046,
+          "stop": 16051,
+          "termStart": 16052,
+          "termStop": 16076,
+          "identifier": "lasmParallelEval40",
+          "sha256": "d97cf242099bd1374dfd893b36a475a82ae65d971da7ef92f84f2025be22015d"
+        },
+        {
+          "start": 16549,
+          "stop": 16554,
+          "termStart": 16555,
+          "termStop": 16579,
+          "identifier": "lasmParallelEval41",
+          "sha256": "942bd9e8b89a73268acb7cb02e7e7dcb8713a1d6442477a967ecfa15ad039e36"
+        },
+        {
+          "start": 16952,
+          "stop": 16957,
+          "termStart": 16958,
+          "termStop": 16987,
+          "identifier": "lasmParallelEval42",
+          "sha256": "3959a3265d84692ee61d96773d69712a54462329196d469113346f3443ba34f5"
+        },
+        {
+          "start": 17172,
+          "stop": 17177,
+          "termStart": 17178,
+          "termStop": 17204,
+          "identifier": "lasmParallelEval43",
+          "sha256": "68a4d307f7159a8d72553a636682ff67941be835e14f5b5eeb59b1aa287d878c"
+        },
+        {
+          "start": 17654,
+          "stop": 17659,
+          "termStart": 17660,
+          "termStop": 17685,
+          "identifier": "lasmParallelEval44",
+          "sha256": "d97b80b58f791761e52a5dda5d405cb0e601d88faf16a342d9c6287a8b391afa"
+        },
+        {
+          "start": 18095,
+          "stop": 18100,
+          "termStart": 18101,
+          "termStop": 18125,
+          "identifier": "lasmParallelEval45",
+          "sha256": "afd109edb0355d7292014b3decc8cf7d8e00d84608457b8b5da6c14b7709af6b"
+        },
+        {
+          "start": 18459,
+          "stop": 18464,
+          "termStart": 18465,
+          "termStop": 18491,
+          "identifier": "lasmParallelEval46",
+          "sha256": "867ade80002a6b154627195486705fb07713a24bcc395b79d0659891b948b164"
+        },
+        {
+          "start": 18772,
+          "stop": 18777,
+          "termStart": 18778,
+          "termStop": 18816,
+          "identifier": "lasmParallelEval47",
+          "sha256": "e6d779e13843bb4effe4e69aa3fb7f571264a4e1a46b7b28b8e3e37e4d612012"
+        },
+        {
+          "start": 19303,
+          "stop": 19308,
+          "termStart": 19309,
+          "termStop": 19334,
+          "identifier": "lasmParallelEval48",
+          "sha256": "2024113c2e09636f3ffa2df3cfd034df4fcf9c58d152c8ded2e9221f776590ea"
+        },
+        {
+          "start": 19786,
+          "stop": 19791,
+          "termStart": 19792,
+          "termStop": 19817,
+          "identifier": "lasmParallelEval49",
+          "sha256": "551e789ec87a69ffa4013862a2e7a681ca9bec16340d6043dc1c902d9d567f69"
+        },
+        {
+          "start": 20163,
+          "stop": 20168,
+          "termStart": 20169,
+          "termStop": 20199,
+          "identifier": "lasmParallelEval50",
+          "sha256": "9cf9b0f65cc259c8327fa31a60f5585f8576cff1925e9772229369d0cbaff469"
+        },
+        {
+          "start": 20364,
+          "stop": 20369,
+          "termStart": 20370,
+          "termStop": 20397,
+          "identifier": "lasmParallelEval51",
+          "sha256": "afe3bda0a6b665b03f204d252b0f0ad12efcafb78c6c9f7f3a5886768ae2217f"
+        },
+        {
+          "start": 20814,
+          "stop": 20819,
+          "termStart": 20820,
+          "termStop": 20846,
+          "identifier": "lasmParallelEval52",
+          "sha256": "e5c879f913e893cee61faf99561ba4acb20b39d524147c1505a7a4424c6ce2cc"
+        },
+        {
+          "start": 21225,
+          "stop": 21230,
+          "termStart": 21231,
+          "termStop": 21256,
+          "identifier": "lasmParallelEval53",
+          "sha256": "27c58ba40c2d1fa1321a74c024736c18ab726262f41a32c0709e8e1e814a4bcc"
+        },
+        {
+          "start": 21569,
+          "stop": 21574,
+          "termStart": 21575,
+          "termStop": 21602,
+          "identifier": "lasmParallelEval54",
+          "sha256": "112dfb8b38e37cf5e272c6debe6ee50af3a46e0a780a948f5eb665bed434decb"
+        },
+        {
+          "start": 21864,
+          "stop": 21869,
+          "termStart": 21870,
+          "termStop": 21906,
+          "identifier": "lasmParallelEval55",
+          "sha256": "61f38d9b782b1e98f3792ca97d9a999fb8179f940d14ef276739a5f014cb2c00"
+        },
+        {
+          "start": 22167,
+          "stop": 22172,
+          "termStart": 22173,
+          "termStop": 22212,
+          "identifier": "lasmParallelEval56",
+          "sha256": "d4e77311f06dbbf627ce563246067de6fc8a7145cc9c847350eadb67bf769e00"
+        },
+        {
+          "start": 22467,
+          "stop": 22472,
+          "termStart": 22473,
+          "termStop": 22508,
+          "identifier": "lasmParallelEval57",
+          "sha256": "d14c923eb9bdad49360eccefa21d3890a1e7bc1c41e8000d4f792d97b77da4b3"
+        },
+        {
+          "start": 22849,
+          "stop": 22854,
+          "termStart": 22855,
+          "termStop": 22890,
+          "identifier": "lasmParallelEval58",
+          "sha256": "dfda60d61aff3201c9be7e6ae7e925b62a6713b51b51487fad3c0912edd53be9"
+        },
+        {
+          "start": 23135,
+          "stop": 23140,
+          "termStart": 23141,
+          "termStop": 23172,
+          "identifier": "lasmParallelEval59",
+          "sha256": "e1afa6f3ba3244c01bd3bac452b2d28f4ae345784b14e9f31d4c7c4547de9896"
+        },
+        {
+          "start": 23429,
+          "stop": 23434,
+          "termStart": 23435,
+          "termStop": 23470,
+          "identifier": "lasmParallelEval60",
+          "sha256": "9702533dcbfddc5b8d3e07ecea5cd53c3f7007daf0627251abcb46d9ff86cf13"
+        },
+        {
+          "start": 23767,
+          "stop": 23772,
+          "termStart": 23773,
+          "termStop": 23809,
+          "identifier": "lasmParallelEval61",
+          "sha256": "83c1e923ba9396fd3fdc0a1c600cf1e3428b7761001a66615f9c8174d85578d8"
+        },
+        {
+          "start": 24204,
+          "stop": 24209,
+          "termStart": 24210,
+          "termStop": 24253,
+          "identifier": "lasmParallelEval62",
+          "sha256": "6aaf0259ca5c52f20bc3011c63e4c252877bb612d1f50e9e21719035d7a9e016"
+        },
+        {
+          "start": 24951,
+          "stop": 24956,
+          "termStart": 24957,
+          "termStop": 24993,
+          "identifier": "lasmParallelEval63",
+          "sha256": "0522ece458c4e616bdbfa3b8410dd5dddac54b7c711cd4e7f678d46481657013"
+        },
+        {
+          "start": 25295,
+          "stop": 25300,
+          "termStart": 25301,
+          "termStop": 25330,
+          "identifier": "lasmParallelEval64",
+          "sha256": "2e65ef9f098e6727638de139348b4343a7d188e02fc38626bd46feedd85e13e6"
+        },
+        {
+          "start": 25709,
+          "stop": 25714,
+          "termStart": 25715,
+          "termStop": 25749,
+          "identifier": "lasmParallelEval65",
+          "sha256": "da52ffd3cadb41ac84bda023e25e33118e41ce50563cea05f72014ba507dee11"
+        },
+        {
+          "start": 26187,
+          "stop": 26192,
+          "termStart": 26193,
+          "termStop": 26226,
+          "identifier": "lasmParallelEval66",
+          "sha256": "226dac471ecb3fbbd891e85bda0e8750241147eaa41d9894033735e1780b69d5"
+        },
+        {
+          "start": 26676,
+          "stop": 26681,
+          "termStart": 26682,
+          "termStop": 26715,
+          "identifier": "lasmParallelEval67",
+          "sha256": "29b26327503378640ea4f25aefd30d06d7ad25366bb2e29ec9dddd5ab25c42b1"
+        },
+        {
+          "start": 27147,
+          "stop": 27152,
+          "termStart": 27153,
+          "termStop": 27183,
+          "identifier": "lasmParallelEval68",
+          "sha256": "88de6ce0909b32ee367e0a126f6359343e297e104538595b7cc15a3422c81b7f"
+        }
+      ],
+      "generatedSourceSha256": "b6b48db8527f05524bbdb59d92102f4d137cdae8e963d804616c8c7e3381d2d7",
+      "originalDriverPassed": true,
+      "adaptedNativeInterpreted": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body.lean (69 actions)\n",
+        "stderr": ""
+      },
+      "adaptedNativeCompiled": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body.lean (69 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body.lean (69 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "11b840289f40a1c6fe0f60aa7c4613e92f7518e08b3bc0deb0639a18a5214b45",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "7ea349f140db207fb7c57c6d233b784f704a696e5675cad234efc3b79469513f",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "inputsUnchanged": true,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "b6b48db8527f05524bbdb59d92102f4d137cdae8e963d804616c8c7e3381d2d7",
+            "cSha256": "30b07c5fb0ddc978412904cfca1ad9a0b9440db0b122b3b2d00e6a8b2bbd4579"
+          }
+        ],
+        "signature": "85b851baa4c123d3148a6991eac3e369672ee2f74d6563b9274de7933de64ee5",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "54a4d15d14aa748d803797945519e1c1732dd798546221f2563b18c5899bc84f",
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "adaptations": [
+        "Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.",
+        "A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.",
+        "Replace only those five-byte command tokens with named IO Unit definitions in a parallel copy; preserve every expression, assertion, constant and timeout byte.",
+        "An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.",
+        "Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.",
+        "The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately."
+      ],
+      "result": ".work/upstream-eval-io-4.34.1-bun-body-r3/result.json",
+      "resultSha256": "33e0d446b85dc0b87b5df75f4f492b6e67cc28bd295aec59c0243933935358ae",
+      "resources": {
+        "path": ".work/product-acceptance/upstream-eval-io-4.34.1-bun-body-r3-resources.json",
+        "sha256": "bd5114fb249d5ea8f95a5bb5c45dc994cf1e093a73042ec1493d3a1dac705158",
+        "peakMemoryBytes": 3998826496,
+        "memoryMax": 8589934592,
+        "stopMemoryBytes": 6871947673,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "test": "elab/async_http_body_framing.lean",
+      "actions": 12,
+      "sourceSha256": "5f2afaf502d03d88af27527c7561dbb2e7edcb303daa6f3de31f32d399428ebd",
+      "expressions": [
+        {
+          "start": 137,
+          "stop": 142,
+          "termStart": 143,
+          "termStop": 1328,
+          "identifier": "lasmParallelEval0",
+          "sha256": "1c5549d7d5019d468fd03dc11d1ccfb38dee6a5d8e4f1cd0e7675c23088b75b0"
+        },
+        {
+          "start": 1330,
+          "stop": 1335,
+          "termStart": 1336,
+          "termStop": 2438,
+          "identifier": "lasmParallelEval1",
+          "sha256": "047ed57f1bbeaf938263dcb919b775d6cd5059bd3049a31dbb0d59f7c8018fce"
+        },
+        {
+          "start": 2440,
+          "stop": 2445,
+          "termStart": 2446,
+          "termStop": 5261,
+          "identifier": "lasmParallelEval2",
+          "sha256": "2aa1d7d6ff1e2c607e1e100ae1b9005fd647e1e4a64947cdb1eb618fb6f4a34e"
+        },
+        {
+          "start": 5263,
+          "stop": 5268,
+          "termStart": 5269,
+          "termStop": 7111,
+          "identifier": "lasmParallelEval3",
+          "sha256": "fbe8e22f6230f1e00eb3d516debfc0fe39f1a449838b2126dd51611dd1b9baad"
+        },
+        {
+          "start": 7148,
+          "stop": 7153,
+          "termStart": 7154,
+          "termStop": 9283,
+          "identifier": "lasmParallelEval4",
+          "sha256": "295a7d90c33729274b71c95bb294b28c6614ca704e75e6413d4106992e7eb85f"
+        },
+        {
+          "start": 9312,
+          "stop": 9317,
+          "termStart": 9318,
+          "termStop": 10066,
+          "identifier": "lasmParallelEval5",
+          "sha256": "c5d230805f0e115e1d0bb70b9463301093a30c0e13966d51b4e3051515c93806"
+        },
+        {
+          "start": 10068,
+          "stop": 10073,
+          "termStart": 10074,
+          "termStop": 11539,
+          "identifier": "lasmParallelEval6",
+          "sha256": "37bc28932ecdcb1cc3b0d2e8c8d29391472c2c52bb92057e21cc8e7fac6aea9e"
+        },
+        {
+          "start": 11541,
+          "stop": 11546,
+          "termStart": 11547,
+          "termStop": 12306,
+          "identifier": "lasmParallelEval7",
+          "sha256": "90bfce755a6c3bffcbb8dc7c7bc00c349e3c2f8735c5c1f63b88b06be536750b"
+        },
+        {
+          "start": 12308,
+          "stop": 12313,
+          "termStart": 12314,
+          "termStop": 13334,
+          "identifier": "lasmParallelEval8",
+          "sha256": "805e0a81d15dd4f8b5c8f22b1c27f9a1c71fe4c1de72f211124a3339e1e7140e"
+        },
+        {
+          "start": 13336,
+          "stop": 13341,
+          "termStart": 13342,
+          "termStop": 14907,
+          "identifier": "lasmParallelEval9",
+          "sha256": "306baa57eabc2f67932089911923f0d0d183528b83e57a3fbf4890ca38215ae5"
+        },
+        {
+          "start": 14954,
+          "stop": 14959,
+          "termStart": 14960,
+          "termStop": 16126,
+          "identifier": "lasmParallelEval10",
+          "sha256": "be21e670431ba7034ec523e0fefe3b757c3893d7479fc6f9cfa3c1f89ad4ff06"
+        },
+        {
+          "start": 16128,
+          "stop": 16133,
+          "termStart": 16134,
+          "termStop": 16678,
+          "identifier": "lasmParallelEval11",
+          "sha256": "b55e79f698fb5da67ad9751bf84f0bd0b6b01ad606072d42ac88b40ac80bcae2"
+        }
+      ],
+      "generatedSourceSha256": "cd87684b02dfea71ef724229e224b0ae47a0a974e2bc788a9ea52486e9a0cc49",
+      "originalDriverPassed": true,
+      "adaptedNativeInterpreted": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body_framing.lean (12 actions)\n",
+        "stderr": ""
+      },
+      "adaptedNativeCompiled": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body_framing.lean (12 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_body_framing.lean (12 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "11b840289f40a1c6fe0f60aa7c4613e92f7518e08b3bc0deb0639a18a5214b45",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "7ea349f140db207fb7c57c6d233b784f704a696e5675cad234efc3b79469513f",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "inputsUnchanged": true,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "cd87684b02dfea71ef724229e224b0ae47a0a974e2bc788a9ea52486e9a0cc49",
+            "cSha256": "e7a82837202248d136c65cc97d10a43675b6463b1d5788ef622fd94996a43c8f"
+          }
+        ],
+        "signature": "ce1651cc7af063bdc947296427f60823d551efa5473c058ae294039c55039498",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "eceb427306e65e58e245c4f08301014d136695e671209917eb5752734f76c99b",
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "adaptations": [
+        "Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.",
+        "A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.",
+        "Replace only those five-byte command tokens with named IO Unit definitions in a parallel copy; preserve every expression, assertion, constant and timeout byte.",
+        "An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.",
+        "Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.",
+        "The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately."
+      ],
+      "result": ".work/upstream-eval-io-4.34.1-bun-body-framing-r3/result.json",
+      "resultSha256": "68c934ae2e0f9b8d4844035ab9546ec9276528a707fba63979f39ccef328d2d7",
+      "resources": {
+        "path": ".work/product-acceptance/upstream-eval-io-4.34.1-bun-body-framing-r3-resources.json",
+        "sha256": "8e7b6fc1d47692ceacdc2284dd0f556188e692421eebe75a421435edc1a28810",
+        "peakMemoryBytes": 4112834560,
+        "memoryMax": 8589934592,
+        "stopMemoryBytes": 6871947673,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "test": "elab/async_http_request_headers.lean",
+      "actions": 4,
+      "sourceSha256": "0f70c9cd4267f2c47ad285b806ed40c4fb336612732859d1d20ccdc5d3ce16f0",
+      "expressions": [
+        {
+          "start": 345,
+          "stop": 350,
+          "termStart": 351,
+          "termStop": 1996,
+          "identifier": "lasmParallelEval0",
+          "sha256": "fd3e8a5d3a652bcb4cb51e1235c462dace538e4fc123f0f52f765cb5c3de5dc4"
+        },
+        {
+          "start": 2057,
+          "stop": 2062,
+          "termStart": 2063,
+          "termStop": 2826,
+          "identifier": "lasmParallelEval1",
+          "sha256": "959cedd428f9032af731990695240384753618cb5507c315ddf28e1113c7d3b4"
+        },
+        {
+          "start": 2882,
+          "stop": 2887,
+          "termStart": 2888,
+          "termStop": 4516,
+          "identifier": "lasmParallelEval2",
+          "sha256": "8c8fb720764036347c2a6b34099d9449028b7a5920e21daa066ac46bdc9bfd09"
+        },
+        {
+          "start": 4518,
+          "stop": 4523,
+          "termStart": 4524,
+          "termStop": 5251,
+          "identifier": "lasmParallelEval3",
+          "sha256": "462ea543992f1041b28d2b924cdf5f7dea50322e8cb175447be81779b2e3161a"
+        }
+      ],
+      "generatedSourceSha256": "e190a54489635aa7e9cd48dc54253ba6aff21e032a8f1390eb9c652c2f2fa1e9",
+      "originalDriverPassed": true,
+      "adaptedNativeInterpreted": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_request_headers.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "adaptedNativeCompiled": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_request_headers.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_request_headers.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "11b840289f40a1c6fe0f60aa7c4613e92f7518e08b3bc0deb0639a18a5214b45",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "7ea349f140db207fb7c57c6d233b784f704a696e5675cad234efc3b79469513f",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "inputsUnchanged": true,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "e190a54489635aa7e9cd48dc54253ba6aff21e032a8f1390eb9c652c2f2fa1e9",
+            "cSha256": "e3988562880e9a0f4baad58bf2953651d767c126901e514fe12385fbbebd829e"
+          }
+        ],
+        "signature": "8279cc21dc2c83668ba4ae9ca9c11e1ede5ae1dcd6237c85d4d82137e9e2cb2e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "08192aa7962f3598341582be46633449a578982a771d13352540c231fb8bbe35",
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "adaptations": [
+        "Run the unchanged original elaboration driver, including its output and success assertions, in a separate exact source copy.",
+        "A Lean syntax parser identifies only unwrapped top-level #eval tokens in explicitly reviewed, flat IO Unit tests.",
+        "Replace only those five-byte command tokens with named IO Unit definitions in a parallel copy; preserve every expression, assertion, constant and timeout byte.",
+        "An ordinary main calls every original action in source order and prints a completion marker. No evaluation action remains at compilation time.",
+        "Compare interpreted-native, compiled-native and source-hidden relocated installed AOT execution of the same parallel main.",
+        "The original registration remains native-build-time coverage; these additional runtime comparisons are recorded separately."
+      ],
+      "result": ".work/upstream-eval-io-4.34.1-bun-request-headers-r3/result.json",
+      "resultSha256": "224a53f5620d78038ec0c1a6b808927c10c660a37c2a356aa4c0721614afc03e",
+      "resources": {
+        "path": ".work/product-acceptance/upstream-eval-io-4.34.1-bun-request-headers-r3-resources.json",
+        "sha256": "b9135412b4b63fe6120d1a1ba5bae650bef82506e4c105ac5560bade86ab0516",
+        "peakMemoryBytes": 4133171200,
+        "memoryMax": 8589934592,
+        "stopMemoryBytes": 6871947673,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    }
+  ],
+  "limitations": [
+    "These parallel API comparisons do not reclassify native compiler tests or establish full-suite/API compatibility.",
+    "Only reviewed flat IO Unit actions are adapted; other types, scopes, guards and sidecars are rejected.",
+    "Source-hidden relocation with empty PATH removes ordinary build dependencies; it is not kernel-enforced filesystem isolation.",
+    "Other operating systems and architectures remain unvalidated by this local campaign."
+  ],
+  "comparisonsPassed": 9,
+  "actionsPerEngine": 85,
+  "totalDeployedActions": 255,
+  "recordedAt": "2026-09-25T06:24:17.007737+00:00",
+  "integrityControls": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "log": ".work/product-acceptance/eval-io-source-unit-r1.log",
+    "resources": {
+      "path": ".work/product-acceptance/eval-io-source-unit-r1-resources.json",
+      "sha256": "92c5ee0606c7ddc4019f240f6f02a93b43a8243da33c60498fb26c1974e17b37",
+      "peakMemoryBytes": 30035968,
+      "memoryMax": 134217728,
+      "stopMemoryBytes": 107374182,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  }
+}

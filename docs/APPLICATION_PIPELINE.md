@@ -78,6 +78,11 @@ with a named action called by ordinary `main`. Original native drivers, native
 interpreted/compiled copies and installed relocated execution all pass. These
 are additional API checks; the original registrations remain native compiler
 tests, and this does not establish full HTTP or suite compatibility.
+The [Deno/Bun continuation](evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
+also passes, completing nine comparisons and 255 deployed actions across the
+three engines. Original sources and assertions are unchanged, and no resource
+abort or OOM event occurs. The ordinary HTTP server's remaining engine checks
+continue separately.
 
 Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
 downloads and extraction stream their data. Installation stages privately and

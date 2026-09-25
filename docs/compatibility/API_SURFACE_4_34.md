@@ -18,6 +18,14 @@ comparisons, including temporary-resource cleanup and source-hidden relocation
 with empty PATH. Peak memory is 4.48 GiB without resource events. Native
 validation on the other five platforms and complete API parity remain open.
 
+The [installed upstream HTTP IO comparisons](../evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
+also pass 85 original actions in each engine. Three reviewed elaboration tests
+run their unchanged native drivers first, then separate byte-preserving
+ordinary-main copies execute every action at runtime. All nine deployed
+comparisons match interpreted and compiled native exits and output. These are
+partial behavior observations, not individual declaration coverage or complete
+`Std.Http` equivalence; other input contexts remain unmapped by this adapter.
+
 ## Lean 4.34.0 application API inventory
 
 The [recorded audit](../evidence/application-api-inventory-2026-09-23.json) imports

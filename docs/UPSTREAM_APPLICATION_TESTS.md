@@ -32,6 +32,14 @@ Source-hidden relocation uses empty PATH. These registrations retain their
 native-build-time classification; additional deployed API comparisons are
 recorded separately. Deno/Bun counterparts are still pending at this checkpoint.
 
+The [complete three-engine continuation](evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
+now passes all nine comparisons: all 85 original actions execute in each stock
+engine, for 255 deployed actions. Every unchanged native driver and both native
+parallel execution modes pass, and all deployed exits/stdout/stderr match exactly.
+All guards release successfully, with no memory-limit, OOM or swap events.
+The scope remains three reviewed HTTP inputs on Linux x64, with the original
+registration categories and broader suite/API gaps unchanged.
+
 The results and checked items below retain their original **4.34.0** scope.
 
 The [product plan](PLAN.md) calls for ordinary native compilation followed by

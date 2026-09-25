@@ -32,6 +32,10 @@ separately from the earlier runtime evidence below.
   using byte-preserving ordinary-main copies and exact native comparisons.
   These partial checks do not close full API, suite or platform acceptance;
   Deno/Bun counterparts continue separately.
+  The [three-engine upstream IO continuation](docs/evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
+  now passes all nine comparisons: 85 actions per engine, 255 deployed actions
+  total, preserving all original source, assertion and timeout bytes. The
+  ordinary HTTP server's Deno/Bun checks remain separate.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.
