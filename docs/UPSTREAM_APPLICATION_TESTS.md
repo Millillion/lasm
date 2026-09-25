@@ -20,6 +20,18 @@ installed application linker. Original assertions remain active; unexpected
 arguments fail. Relocated executions with sources hidden and PATH empty also
 match native output and status. Broader 4.34.1 suite campaigns remain pending.
 
+[Three additional HTTP IO comparisons pass on Node](evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json):
+69 body actions, twelve body-framing groups and four request-header groups.
+Each unchanged original native elaboration driver passes first. A reviewed
+parallel adapter uses Lean's parser to replace only unwrapped `#eval` tokens,
+preserving every expression, assertion and timeout byte. Its ordinary `main`
+executes all 85 actions at runtime, with exact interpreted-native,
+C-compiled-native and installed `.25` deployed output. Four integrity controls
+cover Unicode/comment preservation and rejected contexts/ranges/collisions.
+Source-hidden relocation uses empty PATH. These registrations retain their
+native-build-time classification; additional deployed API comparisons are
+recorded separately. Deno/Bun counterparts are still pending at this checkpoint.
+
 The results and checked items below retain their original **4.34.0** scope.
 
 The [product plan](PLAN.md) calls for ordinary native compilation followed by

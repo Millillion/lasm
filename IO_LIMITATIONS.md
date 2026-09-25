@@ -26,6 +26,12 @@ separately from the earlier runtime evidence below.
   match independently interpreted and compiled native Lean, including cleanup.
   These Linux x64 inputs are partial API coverage. HTTP builds continue in a
   separate campaign with disk headroom for their runtime module-data copies.
+  The [fresh Node HTTP server](docs/evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
+  now passes twenty unchanged native/deployed Vitest checks. Separately,
+  [85 upstream HTTP IO actions pass through installed Node](docs/evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json)
+  using byte-preserving ordinary-main copies and exact native comparisons.
+  These partial checks do not close full API, suite or platform acceptance;
+  Deno/Bun counterparts continue separately.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.

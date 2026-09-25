@@ -61,6 +61,24 @@ no resource events. The queue stops only after the final successful IO workload
 releases its guard, before the HTTP server's larger module-data copies; HTTP
 continues separately with additional disk headroom.
 
+The [fresh Node HTTP comparison](evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
+now passes all twenty unchanged Vitest checks, ten each against deployed Wasm
+and native Lean. This includes concurrent mutations, persistence, binary and
+chunked bodies, streaming, protocol errors and graceful restart. The installed
+CLI supplies its ordinary module data; the harness verifies and reclaims only
+the redundant generated cache copy after the build. Peak memory is 7.76 GiB
+with no resource stop or OOM events, and disk free space remains above 4.71 GiB.
+Completed data and Wasm binaries are retained in verified lossless archives.
+Deno/Bun HTTP server revalidation remains pending at this checkpoint.
+
+An additional [Node upstream HTTP comparison](evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json)
+passes all 85 IO actions from three original elaboration tests. A separate copy
+preserves every expression byte while replacing each unwrapped `#eval` token
+with a named action called by ordinary `main`. Original native drivers, native
+interpreted/compiled copies and installed relocated execution all pass. These
+are additional API checks; the original registrations remain native compiler
+tests, and this does not establish full HTTP or suite compatibility.
+
 Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
 downloads and extraction stream their data. Installation stages privately and
 publishes only a complete tree. Subsequent use hashes every recorded file and

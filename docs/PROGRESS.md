@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Shipping helper integration, full API parity and native platform acceptance lack defensible durations.
 
-**Changed:** [All 24 installed IO comparisons pass](evidence/lean-4.34.1-installed-io-2026-09-25.json) with Lean 4.34.1: eight fixtures per stock engine on Linux x64, exact interpreted/compiled-native output and cleanup parity. Peak memory is 4.48 GiB without resource events. The supervisor stopped after its final successful child released the guard, before HTTP's larger metadata copies could exhaust disk headroom. HTTP and additional upstream runtime checks follow separately. Pushes await restored SSH credentials.
+**Changed:** [85 upstream HTTP IO actions pass in installed Node](evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json), preserving original expression/assertion/timeout bytes in parallel ordinary-main copies. Original native drivers and interpreted/compiled-native comparisons pass; four integrity controls pass. The [ordinary HTTP server passes all 20 Node/native checks](evidence/lean-4.34.1-installed-http-node-2026-09-25.json), with a 7.76 GiB peak and no resource events. Deno/Bun comparisons continue serially. Verified archives preserve completed artifacts while reclaiming disk. Pushes await restored SSH credentials.
 
 **Remaining:** Complete latest-release suite/API coverage; shipping engine parity and callable bindings; six-platform native acceptance.
 

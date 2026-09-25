@@ -62,6 +62,28 @@ The target and engine arguments accept Node, Deno or Bun. The harness itself
 requires Linux, Bash, GNU tar, CTest, Perl and diff, as used by the upstream
 drivers. End-user tool provisioning is tested separately.
 
+`integration/application-upstream-eval-io.mjs` adds parallel deployed checks for
+three reviewed HTTP tests whose original actions run through `#eval`:
+`async_http_body`, `async_http_body_framing` and `async_http_request_headers`.
+It first runs the original native elaboration driver and its assertions. The
+matching native Lean parser then identifies each unwrapped evaluation token.
+Only that token becomes a named `IO Unit` definition in a separate copy; every
+expression, assertion and timeout retains its original bytes. Reversing the
+edits must reproduce the complete original source. An ordinary main calls every
+action in source order. Parsing that generated file must find no remaining
+evaluation commands before native and installed AOT comparisons run.
+
+Arguments are `NEW_OUTPUT TARGET ENGINE INSTALLED_COMPILER PRISTINE_REFERENCE
+REVIEWED_TEST [LEAN_VERSION]`, where the reviewed name is, for example,
+`elab/async_http_body.lean`. Use the resource guard and base-page wrapper as above.
+The native interpreted, native C-compiled and source-hidden relocated deployed
+programs must have identical exits and output, including a completion marker.
+This adapter adds runtime API coverage without changing the original suite or
+reclassifying its native-build-time registrations. Guarded evaluations, other
+result types, scoped commands, sidecars and unreviewed inputs need separate
+adaptation; they are rejected rather than silently omitted. Its fresh execution
+results are recorded separately from the historical 4.32 command adapter.
+
 `integration/application-upstream-projects.mjs` handles the reviewed upstream
 `path with spaces` and `def_clash` Lake projects. Run each engine/project pair
 in a fresh directory:
