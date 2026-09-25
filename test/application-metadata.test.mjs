@@ -16,6 +16,7 @@ async function fixture(t) {
   await put(generated.sources[0], 'lean_object * initialize_Lean_Environment(uint8_t builtin);');
   await put(join(lean.prefix, 'lib/lean/Init.olean'), 'standard data');
   await put(join(lean.prefix, 'lib/lean/Lean/Environment.ir'), 'interpreter data');
+  await put(join(lean.prefix, 'lib/lean/Lean/Environment.ir.sig'), 'interpreter signatures');
   await put(join(lean.prefix, 'lib/lean/Lean/Environment.olean.private'), 'private data');
   await put(join(lean.prefix, 'lib/lean/Lean/Environment.olean.server'), 'server data');
   await put(join(lean.prefix, 'lib/lean/libleanshared.so'), 'native code excluded');
@@ -28,7 +29,7 @@ test('runtime module data preserves search precedence and relocates without orig
   const { directory, lean, generated } = await fixture(t);
   const metadata = await applicationMetadata(generated, lean);
   assert.deepEqual(metadata.manifest.roots, ['packages/0', 'packages/1']);
-  assert.equal(metadata.files.length, 6);
+  assert.equal(metadata.files.length, 7);
   assert.equal(metadata.manifest.files.some(file => file.path.endsWith('.so')), false);
   assert.equal(JSON.stringify(metadata.manifest).includes(directory), false);
   const dist = join(directory, 'output'); await copyApplicationMetadata(metadata, dist);
@@ -43,6 +44,7 @@ test('runtime module data preserves search precedence and relocates without orig
   assert.equal(await readFile(join(paths[0], 'Same.olean'), 'utf8'), 'project definition');
   assert.equal(await readFile(join(paths[1], 'Same.olean'), 'utf8'), 'dependency definition');
   assert.equal(await readFile(join(paths[2], 'Init.olean'), 'utf8'), 'standard data');
+  assert.equal(await readFile(join(paths[2], 'Lean/Environment.ir.sig'), 'utf8'), 'interpreter signatures');
 });
 
 test('metadata content changes invalidate the recipe and copies reject concurrent changes', async t => {
@@ -52,6 +54,20 @@ test('metadata content changes invalidate the recipe and copies reject concurren
   const after = await applicationMetadata(generated, lean);
   assert.notEqual(after.identity, before.identity);
   await assert.rejects(copyApplicationMetadata(before, join(directory, 'output')), /changed during the build/);
+});
+
+test('IR signatures are build inputs for standard and project module data', async t => {
+  const { directory, lean, generated, put } = await fixture(t);
+  await put(join(generated.metadataRoots[0], 'Same.ir.sig'), 'project signatures');
+  const before = await applicationMetadata(generated, lean);
+  await put(join(lean.prefix, 'lib/lean/Lean/Environment.ir.sig'), 'changed signatures');
+  const after = await applicationMetadata(generated, lean);
+  assert.notEqual(after.identity, before.identity);
+  await assert.rejects(copyApplicationMetadata(before, join(directory, 'stale output')), /changed during the build/);
+  const output = join(directory, 'fresh output');
+  await copyApplicationMetadata(after, output);
+  assert.equal(await readFile(join(output, 'lean/packages/0/Same.ir.sig'), 'utf8'), 'project signatures');
+  assert.equal(await readFile(join(output, 'lean/lib/lean/Lean/Environment.ir.sig'), 'utf8'), 'changed signatures');
 });
 
 test('linked module data is materialized, duplicate roots removed and cycles rejected', async t => {

@@ -147,6 +147,13 @@ separately from the earlier runtime evidence below.
   [Bun selections also pass](docs/evidence/application-module-data-bun-2026-09-24.json)
   in the same installed candidate. Complete dynamic-module handling and other
   platforms stay open.
+  Latest-release testing exposed omitted `.ir.sig` interpreter companions.
+  The [packaging repair](docs/evidence/lean-4.34.1-ir-signatures-2026-09-25.json)
+  passes seven integrity checks and the original incremental-snapshot and
+  header-mismatch applications through installed `.26` on Node. Their native
+  Lean child processes retain their native coverage classification. The earlier
+  full campaign's one failure and disk stop remain recorded separately; broader
+  suite, engine and platform acceptance stays open.
 - [ ] Implement the latest runtime's `Std.Internal.UV.Loop.configure` and
   `Std.Internal.UV.Loop.alive`. The compiled library declarations are present,
   but their Emscripten C implementations still reject the operation or abort;

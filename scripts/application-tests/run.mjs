@@ -52,7 +52,9 @@ if (diskAtStart < minimumFreeDisk) {
   writeFileSync(resultFile, JSON.stringify(report, null, 2) + '\n');
   console.error(report.resourceStop.reason); process.exit(125);
 }
-const args = ['--test-dir', manifest.execution, '-j', '1', '--no-tests=error', '--output-on-failure',
+// A failed deployment is retained for diagnosis and can contain gigabytes of
+// module data. Stop before building another case into that reduced disk space.
+const args = ['--test-dir', manifest.execution, '-j', '1', '--no-tests=error', '--stop-on-failure', '--output-on-failure',
   '--output-junit', join(manifest.output, 'results.xml')];
 writeFileSync(join(manifest.output, 'execution-started.json'), JSON.stringify({ runId, startedAt, args, before, harnessBefore, diskAtStart, minimumFreeDisk,
   resourceReport: process.env.LASM_RESOURCE_REPORT }, null, 2) + '\n');

@@ -31,6 +31,12 @@ checks the version, commit and archive/manifest hashes again. Older source
 inventories and results remain unchanged, and prior-release passes cannot be
 subtracted from a later-release shard.
 
+Execution stops at the first failing registration. Failed deployments remain
+available for diagnosis and may retain gigabytes of module data; continuing
+directly into another build would consume the disk reserve. Resume with a fresh
+campaign after diagnosing the failure and restoring headroom. Unstarted tests
+remain untested, and upstream-disabled registrations remain explicit skips.
+
 `prepare-native-shard.mjs OUTPUT SELECTION INDEX COUNT [LEAN_VERSION]` and
 `native-ci.sh prepare|run|both SELECTION INDEX COUNT [LEAN_VERSION]` accept the
 same explicit version. Historical `remaining-*` selections apply only to their

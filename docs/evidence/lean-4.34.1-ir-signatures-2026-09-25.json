@@ -1,0 +1,548 @@
+{
+  "scope": "Repair missing Lean 4.34.1 interpreter signature data in the managed application package. Seven unit controls, a byte-identical-code diagnosis and two unchanged upstream compiled-application cases pass. This is partial Node Linux x64 evidence, not a complete-suite/API or three-engine acceptance claim. The two deployed clients launch native Lean compiler subprocesses; those compiler actions remain native evidence.",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "target": "node",
+  "engine": "26.10.0",
+  "recordedAt": "2026-09-25T10:24:37.514769+00:00",
+  "originalCampaign": {
+    "path": ".work/upstream-applications-4.34.1-node-r1/execution.json",
+    "sha256": "ec46eab39c2cd7815146344127a169793595694422c520bd6ac6a4fb35d8c729",
+    "counts": {
+      "passed": 30,
+      "upstream-compile-disabled": 3,
+      "failed": 1,
+      "not-completed": 67
+    },
+    "originalSources": {
+      "before": {
+        "checked": 7673,
+        "modified": []
+      },
+      "after": {
+        "checked": 7673,
+        "modified": []
+      }
+    },
+    "harnessChanged": [],
+    "resources": {
+      "path": ".work/product-acceptance/upstream-applications-4.34.1-node-run-r1-resources.json",
+      "sha256": "1e1aac51b111fb8918638dd23ad29893de772292a9375986ae4fcd0122e3225f",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": true,
+      "peakMemoryBytes": 6341410816,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 19417542656
+    },
+    "disk": {
+      "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+      "minimumFreeBytes": 4294967296,
+      "preflightRequiredBytes": 9663676416,
+      "status": "resource-aborted",
+      "updatedAt": "2026-09-25T09:58:03.264866+00:00",
+      "freeAtStart": 10524078080,
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "scripts/full-lean/run-bounded.mjs",
+        "--memory-mib",
+        "10240",
+        "--report",
+        "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-applications-4.34.1-node-run-r1-resources.json",
+        "--",
+        "python3",
+        "scripts/full-lean/base-pages.py",
+        "env",
+        "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=512",
+        "scripts/application-tests/run.mjs",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-node-r1/manifest.json",
+        "--minimum-free-disk-mib",
+        "4096"
+      ],
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-applications-4.34.1-node-run-r1-resources.json",
+      "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-applications-4.34.1-node-run-r1.log",
+      "minimumObservedFreeBytes": 3615621120,
+      "terminationRequested": {
+        "reason": "disk-reserve",
+        "freeBytes": 3660460032
+      },
+      "exitCode": 125,
+      "freeAtEnd": 3615526912,
+      "error": "Inspect preserved test and resource evidence"
+    }
+  },
+  "cause": "applicationMetadata omitted .ir.sig files. Upstream readIRPartsOfMod returns no IR when the signature file is absent, so a native child using bundled metadata cannot compile IO.eprintln evaluation.",
+  "repair": "Include .ir.sig in hashed/cached/copied module data for standard, project and dependency roots. Stop CTest on first failure so retained deployments do not accumulate before the next build.",
+  "diagnosis": {
+    "path": ".work/ir-signatures-4.34.1-diagnosis-r1/result.json",
+    "sha256": "a64e59771c9f46dda5b81c4ccad3c49d3c1bc453b63be7d23daa368c898b33fb",
+    "phases": [
+      {
+        "name": "original",
+        "code": 1,
+        "stdout": "",
+        "stderr": "uncaught exception: `--incr-save` failed (exit 1):\nstdout:\n./_tmp_incr_cli_src.lean:1:0-1:5: error: failed to compile definition, compiler IR check failed at `_eval`. Error: depends on declaration 'IO.eprintln._at_._private.Init.System.IO.0.IO.eprintlnAux.spec_0', which has no executable code; consider marking definition as 'noncomputable'\n./_tmp_incr_cli_src.lean:2:0-2:5: error: failed to compile definition, compiler IR check failed at `_eval`. Error: depends on declaration 'IO.eprintln._at_._private.Init.System.IO.0.IO.eprintlnAux.spec_0', which has no executable code; consider marking definition as 'noncomputable'\n\nstderr:\n\n",
+        "entry": "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-node-r1/cases/compile__incr_cli_snapshot.lean/dist"
+      },
+      {
+        "name": "supplemented",
+        "code": 0,
+        "stdout": "",
+        "stderr": "",
+        "entry": "/home/lastmjs/development/lasm/compiler/.work/ir-signatures-4.34.1-diagnosis-r1/supplemented-deployment"
+      }
+    ],
+    "addedSignatures": 2518,
+    "originalWasmSha256": "96a7d3e75e5a7b06a12cc87ca6a2ae39bdee936ed10849bd6d24ce9dccd51b02",
+    "originalPreserved": true,
+    "resources": {
+      "path": ".work/product-acceptance/ir-signatures-4.34.1-diagnosis-r1-resources.json",
+      "sha256": "e940f702d536ba736b2a5396b080c0e4c2546035a12c9709e46e924a016ad5eb",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "peakMemoryBytes": 1315819520,
+      "limits": {
+        "memoryMax": 3221225472,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 2576980377,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 26234449920
+    }
+  },
+  "unit": {
+    "path": ".work/product-acceptance/ir-signatures-4.34.1-unit-r1.log",
+    "sha256": "dc82f9440fa531496a8aa4dbea96f388747ec9a97c29d233f59ab8084866695b",
+    "passed": 7,
+    "resources": {
+      "path": ".work/product-acceptance/ir-signatures-4.34.1-unit-r1-resources.json",
+      "sha256": "807febebc96766961e1d6b93e2f9010160e3cf53e9aa9d153ccf33b774899f1d",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "peakMemoryBytes": 37556224,
+      "limits": {
+        "memoryMax": 536870912,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 429496729,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 27579506688
+    }
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-4.34.1-r3/lasm-compiler-0.1.0-experimental.26.tgz",
+    "sha256": "e52e4c3cf968f1a671ce3d468ae38d3a967375e4e9bfd1b608c77e3aa5f4460e",
+    "compressedBytes": 125780898,
+    "installedBytes": 632481567,
+    "files": 2700,
+    "candidateVersion": "0.1.0-experimental.26",
+    "defaultLean": "4.34.1",
+    "runtime": {
+      "name": "lean-4.34.1-wasm64",
+      "identity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-package-4.34.1-r3-resources.json",
+    "recordedAt": "2026-09-25T10:19:18.017Z"
+  },
+  "installation": {
+    "path": ".work/product-acceptance/install-candidate-4.34.1-r3.json",
+    "sha256": "74b09a1d6e65f5ad01ef7d6eafe857044bcb9c9ad301f28cdbca83c1e7790edc",
+    "verifiedFiles": 2700
+  },
+  "upstream": {
+    "path": ".work/upstream-ir-signatures-4.34.1-node-r1/execution.json",
+    "sha256": "69b703df613a9e54c4e3b5cc478960e4d37506605af360f0175923703acc2ea7",
+    "counts": {
+      "passed": 2
+    },
+    "originalSources": {
+      "before": {
+        "checked": 7673,
+        "modified": []
+      },
+      "after": {
+        "checked": 7673,
+        "modified": []
+      }
+    },
+    "harnessChanged": [],
+    "cases": [
+      {
+        "name": "compile/incr_cli_snapshot.lean",
+        "category": "compiled-application",
+        "command": [
+          "/bin/bash",
+          "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+          "incr_cli_snapshot.lean",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-ir-signatures-4.34.1-node-r1/cases/compile__incr_cli_snapshot.lean"
+        ],
+        "startedAt": "2026-09-25T10:20:03.773Z",
+        "finishedAt": "2026-09-25T10:22:12.447Z",
+        "exitCode": 0,
+        "signal": null,
+        "status": "passed",
+        "sourceSha256": "45a78c666318546e0c48d32f102103e75dccd243b517cf7d778e3b72f618328c",
+        "sourceUnchanged": true,
+        "phase": "complete",
+        "moduleDataReclamation": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-ir-signatures-4.34.1-node-r1/cases/compile__incr_cli_snapshot.lean/module-data-reclamation.json",
+          "sha256": "1b30dd180741d9849c863358d008f0f3b185377ffb10a8ccd609f534c594a3b0",
+          "reclaimed": true,
+          "files": 15114,
+          "metadataBytes": 2213326591
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.1",
+          "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+          "buildDriverIdentity": "af30ad3c2b48e7c39ebbc5b65424f891d3ffea2cdee6804ba91c57ea5ac48ffe",
+          "moduleDataIdentity": "bbfe4395b8facd8b5c0a38e7251dd6e1588754d47af8ca5cf38e59b4a327f56a",
+          "moduleDataBytes": 2213326591,
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "incr_cli_snapshot",
+              "sourceSha256": "45a78c666318546e0c48d32f102103e75dccd243b517cf7d778e3b72f618328c",
+              "cSha256": "89741c2eb0b2360e55fd0c501b1754f1c41ed684473f7289771ef4732ceb5f00"
+            }
+          ],
+          "signature": "347b56e8662d6a9d520069dbdfc9d4ec8ff06b345a0432b72a147d3fdd5d09ab",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "wasmSha256": "96a7d3e75e5a7b06a12cc87ca6a2ae39bdee936ed10849bd6d24ce9dccd51b02"
+      },
+      {
+        "name": "compile/incr_header_mismatch.lean",
+        "category": "compiled-application",
+        "command": [
+          "/bin/bash",
+          "/home/lastmjs/development/lasm/compiler/scripts/application-tests/compile-case.sh",
+          "incr_header_mismatch.lean",
+          "/home/lastmjs/development/lasm/compiler/.work/upstream-ir-signatures-4.34.1-node-r1/cases/compile__incr_header_mismatch.lean"
+        ],
+        "startedAt": "2026-09-25T10:22:13.599Z",
+        "finishedAt": "2026-09-25T10:24:25.778Z",
+        "exitCode": 0,
+        "signal": null,
+        "status": "passed",
+        "sourceSha256": "429e8d3c1fd344e96ac273a06316ab115222da29216303737c7708238fb85d66",
+        "sourceUnchanged": true,
+        "phase": "complete",
+        "moduleDataReclamation": {
+          "path": "/home/lastmjs/development/lasm/compiler/.work/upstream-ir-signatures-4.34.1-node-r1/cases/compile__incr_header_mismatch.lean/module-data-reclamation.json",
+          "sha256": "99598daffbf3c5fb6582da9285a55384b908fd297ac42a55eab4109a3a2b0a59",
+          "reclaimed": true,
+          "files": 15114,
+          "metadataBytes": 2213291079
+        },
+        "build": {
+          "schema": 1,
+          "lean": "4.34.1",
+          "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+          "emscripten": "6.0.9",
+          "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+          "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+          "buildDriverIdentity": "af30ad3c2b48e7c39ebbc5b65424f891d3ffea2cdee6804ba91c57ea5ac48ffe",
+          "moduleDataIdentity": "0ce0e1b8e7f905d574b43550f1ccc4de6789094baae2f94ba2fbae27a2f5d127",
+          "moduleDataBytes": 2213291079,
+          "target": "node",
+          "memoryMode": 1,
+          "modules": [
+            {
+              "module": "incr_header_mismatch",
+              "sourceSha256": "429e8d3c1fd344e96ac273a06316ab115222da29216303737c7708238fb85d66",
+              "cSha256": "c14fa5b58fddd843e3d580298a00bb01169b4d8fd7fc30e88a3013f1d17d8097"
+            }
+          ],
+          "signature": "925cddbce289aec1448c5aeec48cdad1b6ccb9d13272f020494b68dd1182694f",
+          "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+          "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+        },
+        "wasmSha256": "dd365a7cb2705bc21d78b62b6eb3e1249cf56a884c265481bdfbe565e32412ee"
+      }
+    ],
+    "resources": {
+      "path": ".work/product-acceptance/upstream-ir-signatures-4.34.1-node-run-r1-resources.json",
+      "sha256": "334b4725659e47869b4304c62313ae147962e192a49fde5b8dba827f4d92b006",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "peakMemoryBytes": 5891899392,
+      "limits": {
+        "memoryMax": 10737418240,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 8589934592,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 23916732416
+    }
+  },
+  "priorPackagingFailure": {
+    "path": ".work/product-acceptance/application-package-4.34.1-r2.log",
+    "sha256": "362a19cc778011d99b0b5eb0e563a7c58e8fba5a7e66681a436b51156136fcdc",
+    "reason": "The archived legacy installed .23 package was unavailable; retry uses the intact .25 predecessor. Failure occurred before staging or test execution.",
+    "resources": {
+      "path": ".work/product-acceptance/application-package-4.34.1-r2-resources.json",
+      "sha256": "c807bdb20b8dae21d7403e907f4ad1519189df9861a4d9f47151ce6c077535ae",
+      "result": {
+        "code": 1,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "peakMemoryBytes": 418267136,
+      "limits": {
+        "memoryMax": 3221225472,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 2576980377,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "minimumHostAvailable": 27386339328
+    }
+  },
+  "releaseRefresh": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v4.34.1"
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "expected": "v26.10.0"
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v2.9.7"
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "expected": "bun-v1.4.2"
+    },
+    "checkedAt": "2026-09-25T10:17:09.688219+00:00"
+  },
+  "retention": [
+    {
+      "path": ".work/product-acceptance/interrupted-applications-4.34.1-retention-r1.json",
+      "sha256": "b3f14393c31d6b243ed56d3ca529b5c8e18452d70bc2f1b2a268f866ee7fa159",
+      "scope": "Lossless compression of generated cache and incomplete deployment after disk resource stop. Preserve failed complete deployment, originals, logs, outcomes and all generated bytes. Never claim the interrupted case passed.",
+      "files": 485,
+      "freeBefore": 3612426240,
+      "freeAfter": 4539756544,
+      "resources": {
+        "path": ".work/product-acceptance/interrupted-applications-4.34.1-retention-r1-resources.json",
+        "sha256": "da486421205687e19fc159aa4af46e5449d0b98c1dae613648be9da5797b296b",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "peakMemoryBytes": 241328128,
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "minimumHostAvailable": 23107252224
+      }
+    },
+    {
+      "path": ".work/product-acceptance/interrupted-applications-4.34.1-retention-r2.json",
+      "sha256": "52bea82b7d04894dda2227bead9e49781cb82823dec10eb97a1da8a7d63ff995",
+      "scope": "Lossless compression of generated cache and incomplete deployment after disk resource stop. Preserve failed complete deployment, originals, logs, outcomes and all generated bytes. Never claim the interrupted case passed.",
+      "files": 6765,
+      "freeBefore": 4538114048,
+      "freeAfter": 5370892288,
+      "resources": {
+        "path": ".work/product-acceptance/interrupted-applications-4.34.1-retention-r2-resources.json",
+        "sha256": "883c922bd14a6c29283b5cdb20a180deb30b0ae02b7998dc1af19df3e06875f4",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "peakMemoryBytes": 90447872,
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "minimumHostAvailable": 23104770048
+      }
+    },
+    {
+      "path": ".work/product-acceptance/historical-sdk-tools-retention-r1.json",
+      "sha256": "09c29333ee41837a7ff7a3d3c4c8e2c415ecaad687382daeed9316938ecded07",
+      "scope": "Paused historical compiler-in-Wasm SDK snapshots only. Keep every original byte in verified gzip, with paths/mode/mtime and hashes for restoration. No current managed tools, stock engines, source/tests, result logs or runtime/application binaries are touched. Restore exact executable paths before resuming a historical build. Gzip copies may share an immutable inode.",
+      "files": 126,
+      "freeBefore": 5329596416,
+      "freeAfter": 16674680832,
+      "resources": {
+        "path": ".work/product-acceptance/historical-sdk-tools-retention-r1-resources.json",
+        "sha256": "9ea642e4ea695ede72aa7efc9a3948e4ff715eec0a9ed436e3ab2a697087a77a",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "unitReleased": true,
+        "resourceLimited": false,
+        "peakMemoryBytes": 218062848,
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "minimumHostAvailable": 26976886784
+      }
+    }
+  ],
+  "inputs": {
+    "src/application-metadata.mjs": "ca2fffe1fb31b24cb206e5cc5d6fd294ad7612fe68e0a00359b4e695d602cdfe",
+    "test/application-metadata.test.mjs": "69e5c2ef50a260ecef7a4e72e9a2b033d5f53463ab7e1aa1b164c84c160cfc9c",
+    "scripts/application-tests/run.mjs": "de8379b1d4fe883f76fcafc81af9994ee32acff5536ed6ee06f16508a52c2f2e"
+  },
+  "limitations": [
+    "The interrupted full campaign is preserved as 30 passes, 3 upstream-disabled, 1 failure and 67 unfinished; it is not a full-suite pass.",
+    "Rerun broad latest-release suite and API acceptance in all stock engines and native platforms.",
+    "No remaining gap demonstrated fundamental."
+  ]
+}

@@ -78,6 +78,30 @@ cache links, standalone/Lake cache selection, build-identity mismatch and builds
 without module data. This is a resource adaptation in the parallel suite, not a
 shipping builder change or a complete-suite pass.
 
+The first full 4.34.1 Node application campaign recorded 30 deployed passes,
+three upstream-disabled registrations, one failure and 67 unfinished cases.
+Its separate disk guard stopped the next build; no OOM event occurred. Every
+original source and frozen harness file remained unchanged. The failure exposed
+missing `.ir.sig` companion files in automatic module-data packaging: current
+Lean skips interpreter IR when those signatures are absent.
+
+The [signature packaging repair](evidence/lean-4.34.1-ir-signatures-2026-09-25.json)
+passes seven integrity tests, an unchanged-code failure/success diagnostic,
+and fresh installed `.26` executions of the original `incr_cli_snapshot` and
+`incr_header_mismatch` tests. Both deployed clients invoke native Lean children;
+their compiler actions remain native evidence. Each deployment includes 15,114
+metadata files. All 7,673 original entries stay unchanged; peak guarded memory
+is 5.49 GiB with no resource events. CTest now stops at the first failure so
+retained failed deployments cannot accumulate before another build. Remaining
+registrations still require fresh acceptance.
+
+The same receipts preserve the interrupted campaign's generated files in
+verified gzip archives. An additional 10.57 GiB was recovered by losslessly
+archiving 126 unused SDK executables from paused compiler-in-Wasm snapshots.
+Current managed tools, original source/tests and result logs stay intact.
+Restore archived executable paths using their recorded hashes, modes and times
+before resuming a historical SDK; shared gzip archives must remain immutable.
+
 The results and checked items below retain their original **4.34.0** scope.
 
 The [product plan](PLAN.md) calls for ordinary native compilation followed by
