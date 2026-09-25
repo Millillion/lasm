@@ -45,6 +45,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const clearerr = bind('clearerr', 'void', ['void *']);
   const isatty = bind(windows ? '_isatty' : 'isatty', 'int', ['int']);
   const strerror = bind('strerror', 'str', ['int']);
+  const uname = process.platform === 'linux' ? bind('uname', 'int', ['void *']) : null;
   const free = bind('free', 'void', ['void *']);
   const realpath = windows ? null : bind('realpath', 'void *', ['str', 'void *']);
   const unlink = windows ? null : bind('unlink', 'int', ['str']);
@@ -142,6 +143,23 @@ export function nativeFiles({ synchronous = false } = {}) {
     };
   }
   const adapter = {
+    systemInformation() {
+      if (!uname) throw failure(ffi.os.errno.ENOSYS);
+      // Linux's UTS ABI has six 65-byte fields on both supported architectures.
+      // Preserve the native release/version distinction and machine spelling;
+      // an engine's node:os compatibility layer can change those values.
+      const bytes = Buffer.alloc(6 * 65);
+      if (uname(bytes) < 0) {
+        const errno = ffi.errno();
+        throw Object.assign(failure(errno), { errno: -errno, nativeMessage: false });
+      }
+      return [0, 2, 3, 4].map(index => {
+        const field = bytes.subarray(index * 65, (index + 1) * 65);
+        const end = field.indexOf(0);
+        if (end < 0) throw new Error('Invalid native uname field');
+        return field.subarray(0, end);
+      });
+    },
     homeDirectory() {
       if (windows) return Buffer.from(homedir());
       // An empty HOME is present. Only an absent value uses the passwd entry.

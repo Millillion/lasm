@@ -93,7 +93,7 @@ their compiler actions remain native evidence. Each deployment includes 15,114
 metadata files. All 7,673 original entries stay unchanged; peak guarded memory
 is 5.49 GiB with no resource events. CTest now stops at the first failure so
 retained failed deployments cannot accumulate before another build. Remaining
-registrations still require fresh acceptance.
+registrations required a fresh campaign, recorded below.
 
 The same receipts preserve the interrupted campaign's generated files in
 verified gzip archives. An additional 10.57 GiB was recovered by losslessly
@@ -101,6 +101,18 @@ archiving 126 unused SDK executables from paused compiler-in-Wasm snapshots.
 Current managed tools, original source/tests and result logs stay intact.
 Restore archived executable paths using their recorded hashes, modes and times
 before resuming a historical SDK; shared gzip archives must remain immutable.
+
+The [complete fresh Node campaign](evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
+now covers all 101 compiled-application registrations through installed `.27`:
+97 deployed passes and four original compilation-disabled registrations. Both
+incremental regressions pass within this complete campaign. All 7,673 original
+entries and the frozen harness remain unchanged. Peak guarded memory is
+5.43 GiB, without OOM, swap, memory pressure stops or disk stops. Original
+assertions, arguments, sidecars and exclusions remain active. Six fixtures invoke
+native Lean children; those compiler actions remain native evidence. This is one
+category on Linux x64. The four excluded inputs have separate AOT controls queued;
+other latest-release engine/category/platform campaigns and full API parity
+remain unfinished.
 
 The results and checked items below retain their original **4.34.0** scope.
 

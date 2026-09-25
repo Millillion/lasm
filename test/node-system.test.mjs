@@ -1,7 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as os from 'node:os';
+import { execFileSync } from 'node:child_process';
 import { createNodeRuntimeHost, numbers } from '../src/node-host.mjs';
+
+test('Linux system information preserves all four native uname fields', { skip: process.platform !== 'linux' }, async t => {
+  const host = createNodeRuntimeHost(); t.after(() => host.close());
+  const result = await host.request(137, 0, 0n, Buffer.alloc(0));
+  assert.equal(result.error, false);
+  let offset = 0;
+  for (const option of ['-s', '-r', '-v', '-m']) {
+    const output = execFileSync('uname', [option]);
+    assert.equal(output.at(-1), 10);
+    const expected = output.subarray(0, -1);
+    const length = Number(result.bytes.readBigUInt64LE(offset)); offset += 8;
+    assert.equal(length, expected.length);
+    assert.deepEqual(result.bytes.subarray(offset, offset + length), expected, option);
+    offset += length;
+  }
+  assert.equal(offset, result.bytes.length);
+});
 
 test('system operations expose host identities, group lookup, and consistent environment updates', async t => {
   const host = createNodeRuntimeHost(); t.after(() => host.close());

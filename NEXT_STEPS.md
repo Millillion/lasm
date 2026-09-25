@@ -5,7 +5,7 @@
 These items follow the [updated plan](docs/PLAN.md); the historical milestones
 below retain their original, narrower scope.
 
-- [x] Pin the latest stable acceptance baseline: Lean 4.34.0, Node 26.10.0,
+- [x] Pin the latest stable acceptance baseline: Lean 4.34.1, Node 26.10.0,
   Deno 2.9.7 and stock Bun 1.4.2.
 - [x] Provision and verify native Lean/Lake and the compiler SDK on the five
   platforms with upstream distributions; verify private Python on all six.
@@ -13,8 +13,8 @@ below retain their original, narrower scope.
   transport on all six platforms; SSH and full Lake integration remain open.
 - [x] Build the matching full runtime and all 2,516 shipped Lean library modules.
 - [x] Verify the first ordinary compiled Lean main in all three stock engines.
-- [x] Inventory all 4,066 unchanged upstream test registrations and exclusions.
-- [x] Classify the execution obligations of all 110 mixed shell registrations;
+- [x] Inventory all 4,069 unchanged upstream test registrations and exclusions.
+- [x] Classify the execution obligations of all 111 mixed shell registrations;
   their native and deployed phases still need execution evidence.
 - [x] Inventory the declaration and extern surface of all 2,516 compiled latest
   standard modules; implementation and behavioral coverage remain separate work.
@@ -40,6 +40,9 @@ below retain their original, narrower scope.
   managed relocatable distribution and complete package acceptance remain open.
 - [ ] Run unchanged upstream tests through their appropriate native build-time
   and compiled-application paths, including the reviewed mixed drivers.
+  [The latest Node compiled-application category](docs/evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
+  now has 97 deployed passes and four original compilation-disabled cases;
+  remaining categories, engines and parallel excluded-input controls stay open.
 - [ ] Audit and differentially test all standard APIs, including IO.FS and Std.Http.
 - [ ] Complete source-free deployment and native six-platform acceptance for
   stock Node, Deno and Bun.

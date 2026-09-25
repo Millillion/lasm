@@ -53,7 +53,8 @@ export function createNodeSystem() {
       if (priority < -20 || priority > 19) throw invalidArgument();
       os.setPriority(Number(BigInt.asIntN(32, argument)), priority); return empty;
     }
-    case 137: return Buffer.concat([os.type(), os.release(), os.version(), os.machine()].map(string));
+    case 137: return Buffer.concat((process.platform === 'linux' ? nativeFiles().systemInformation()
+      : [os.type(), os.release(), os.version(), os.machine()]).map(string));
     case 138: {
       const r = process.resourceUsage();
       return numbers(Math.trunc(r.userCPUTime / 1000), Math.trunc(r.systemCPUTime / 1000), r.maxRSS,

@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Shipping helper integration, full API parity and native platform acceptance lack defensible durations.
 
-**Changed:** [Fixed Deno worker-message heap growth and the private 64 MiB transfer ceiling](evidence/lean-4.34.1-large-transfers-2026-09-25.json). All three installed `.27` targets and private helpers match native Lean on 64 MiB + 1 byte files. Forty-nine focused checks pass; one Windows-only check is skipped. The original subprocess failure is preserved; no host OOM occurred. All 101 Node application registrations are running. Pushes await restored SSH credentials.
+**Changed:** [All 101 Node application registrations completed](evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json): 97 deployed passes, four original compilation-disabled cases, unchanged sources, no resource stops. A [Linux OS-information fix](evidence/lean-4.34.1-system-host-diagnosis-2026-09-25.json) matches native host calls in all three engines; three unit checks pass. The same diagnostic confirms incorrect available-memory reporting in Deno/Bun. Terminal tests are running. Pushes await restored SSH credentials.
 
 **Remaining:** Complete latest-release suite/API coverage; shipping engine parity and callable bindings; six-platform native acceptance.
 

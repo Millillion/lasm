@@ -39,6 +39,12 @@ separately from the earlier runtime evidence below.
   release every guard without resource events; peak memory is 3.47 GiB. The
   upstream TCP half-close file executes only its listener-close check, so its
   unused accept-close definition does not count as half-close coverage.
+  The [complete installed `.27` Node application category](docs/evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
+  now records 97 deployed passes and four original compilation-disabled
+  registrations. All 7,673 original entries and the frozen harness are unchanged;
+  peak memory is 5.43 GiB with no resource events. Native compiler children
+  retain their native classification. Separate AOT controls for the four omitted
+  deployments and the remaining engine campaigns are pending.
   These are partial Linux x64 observations. Other upstream contexts, complete
   API/language coverage and the other five native platforms remain open.
   Earlier results retain their stated release scope.
@@ -63,6 +69,15 @@ separately from the earlier runtime evidence below.
   covers all 2,516 compiled modules and 72,985 non-theorem, non-internal
   declarations, including 925 extern declarations. Implementation and behavior
   coverage remain unverified individually; these counts are not API passes.
+- [ ] Match native system memory accounting in every target. A
+  [1 GiB guarded native-library comparison](docs/evidence/lean-4.34.1-system-host-diagnosis-2026-09-25.json)
+  confirms that Deno and Bun's current host adapters report about 25 GiB of
+  available memory despite the constraint; Node respects it. All three report
+  the constraint correctly. No large allocations or memory-pressure tests were
+  used. The same diagnostic exposes Deno's OS version/release mismatch. A
+  candidate Linux `uname` bridge now matches native Lean in all three engines,
+  with three unit checks passing. This is direct host-module evidence; fresh
+  installed ordinary-Lean and other-platform validation remain required.
 - [ ] Complete native platform-query acceptance on all six host combinations.
   The [Lean 4.34 Linux-query repair](docs/evidence/application-platform-linux-2026-09-24.json)
   preserves the failing installed `.13` comparison and changes only the affected
