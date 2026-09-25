@@ -11,6 +11,7 @@ import { prepareBunStack } from '../../../src/bun-stack.mjs';
 import { createNodeRuntimeHost } from '../../../src/node-host.mjs';
 import nativeThreadId from '../../../src/thread-id.cjs';
 import { writeWasiStdio } from './wasmtime-wasi-stdio.mjs';
+import { processOutput } from '../../../integration/process-output.mjs';
 
 const ffi = createRequire(import.meta.url)('koffi');
 ffi.config({ sync_stack_size: 16 * 1024 ** 2 });
@@ -297,8 +298,14 @@ const runtime = callback((kind, a, b, c, d, e, output) => {
 async function finishApplication(code) {
   assert.equal(code, check.expected.code); assert.ok(!settled); settled = true;
   await host.flushStdIO(); host.close();
-  const actual = Buffer.concat(stdout).toString(), errors = Buffer.concat(stderr).toString();
-  assert.equal(actual, check.expected.stdout); assert.equal(errors, check.expected.stderr);
+  const observed = processOutput({ status: code, stdout: Buffer.concat(stdout), stderr: Buffer.concat(stderr) });
+  assert.equal(observed.stdout, check.expected.stdout); assert.equal(observed.stderr, check.expected.stderr);
+  // Older UTF-8-only probe descriptions remain usable. New native oracles
+  // carry raw bytes so different invalid UTF-8 sequences cannot compare equal.
+  for (const stream of ['stdout', 'stderr']) {
+    const expected = check.expected[stream + 'Base64'] ?? Buffer.from(check.expected[stream], 'utf8').toString('base64');
+    assert.equal(observed[stream + 'Base64'], expected, stream + ' bytes differ');
+  }
   const threadResults = [...workers.values()].map(record => ({ ready: record.ready, result: record.result,
     cleaned: !!record.cleaned, exited: record.exited, strongref: !!record.strongref }));
   // Lean 4.34 runtime/thread.cpp adds LEAN_STACK_BUFFER_SPACE (128 KiB) to
@@ -309,7 +316,7 @@ async function finishApplication(code) {
     application: check.name, lean: check.lean,
     engine: process.versions.bun ? 'bun' : process.versions.deno ? 'deno' : 'node',
     version: process.versions.bun ?? process.versions.deno ?? process.versions.node,
-    args: check.args, leanStackSizeKb: process.env.LEAN_STACK_SIZE_KB, stdout: actual, stderr: errors, code,
+    args: check.args, leanStackSizeKb: process.env.LEAN_STACK_SIZE_KB, ...observed,
     threads: threadResults, trace, hostOperations, sharedBytes: String(snapshot()[3]),
     wasmEntry: nativeDriver ? 'direct Node-API on verified worker stacks' : 'Koffi synchronous FFI',
     controlStackBytes, nativeStackOverflowControl: !!nativeDriver,

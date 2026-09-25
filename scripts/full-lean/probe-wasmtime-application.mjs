@@ -9,6 +9,7 @@ import { hashFile } from '../../src/managed-artifacts.mjs';
 import { provisionLean } from '../../src/managed-lean.mjs';
 import { nativeLeanEnvironment } from '../../src/application-sources.mjs';
 import { ensureResourceGuard } from './resource-guard.mjs';
+import { processOutput } from '../../integration/process-output.mjs';
 
 await ensureResourceGuard();
 const [compilationArg, sourceArg, outputArg, toolchainCacheArg, argumentsJson = '[]', ...extra] = process.argv.slice(2);
@@ -33,7 +34,7 @@ const sources = ['scripts/full-lean/probe-wasmtime-application.mjs',
   'scripts/full-lean/probes/wasmtime-instantiate-lean.c', 'scripts/full-lean/probes/wasmtime-native-api.c',
   'scripts/full-lean/probes/wasmtime-lean-supervisor.mjs', 'scripts/full-lean/probes/wasmtime-lean-main.mjs',
   'src/node-host.mjs', 'src/lean-io-errors.mjs', 'src/bun-stack.mjs',
-  'scripts/full-lean/probes/wasmtime-wasi-stdio.mjs'];
+  'scripts/full-lean/probes/wasmtime-wasi-stdio.mjs', 'integration/process-output.mjs'];
 const hashes = Object.fromEntries(await Promise.all(sources.map(async path => [path, await hashFile(join(root, path))])));
 mkdirSync(output, { recursive: true });
 const report = { scope: 'Fresh native-interpreted/native-compiled and private Wasmtime helper comparisons; not installed backend or full API acceptance',
@@ -42,13 +43,14 @@ const report = { scope: 'Fresh native-interpreted/native-compiled and private Wa
   commands: [], results: [], failures: [], passed: false };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(label, program, arguments_, { cwd = output, env = process.env, runtime = false } = {}) {
-  const result = spawnSync(program, arguments_, { cwd, encoding: 'utf8', timeout: 90_000,
+  const result = spawnSync(program, arguments_, { cwd, timeout: 90_000,
     killSignal: 'SIGKILL', maxBuffer: 256 * 1024, env: { ...env, RAYON_NUM_THREADS: '1' } });
+  const observed = processOutput(result);
   report.commands.push({ label, program, args: arguments_, cwd, code: result.status, signal: result.signal,
-    error: result.error?.message, stdout: result.stdout, stderr: result.stderr }); save();
-  assert.ifError(result.error); assert.equal(result.signal, null, result.stderr);
-  if (!runtime) assert.equal(result.status, 0, result.stderr);
-  return { code: result.status, stdout: result.stdout, stderr: result.stderr };
+    error: result.error?.message, ...observed }); save();
+  assert.ifError(result.error); assert.equal(result.signal, null, observed.stderr);
+  if (!runtime) assert.equal(result.status, 0, observed.stderr);
+  return observed;
 }
 save();
 try {
@@ -99,7 +101,8 @@ try {
       { cwd, env: { ...env, LASM_VM_STACK_MB: '96' } });
       assert.equal(actual.stderr, '');
       const result = JSON.parse(actual.stdout);
-      assert.deepEqual({ code: result.code, stdout: result.stdout, stderr: result.stderr }, interpreted);
+      assert.deepEqual({ code: result.code, stdout: result.stdout, stderr: result.stderr,
+        stdoutBase64: result.stdoutBase64, stderrBase64: result.stderrBase64 }, interpreted);
       assert.equal(result.wasmEntry, 'direct Node-API on verified worker stacks');
       assert.equal(result.controlStackBytes, 64 * 1024 ** 2);
       assert.equal(result.nativeStackOverflowControl, true);

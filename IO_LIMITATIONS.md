@@ -16,7 +16,11 @@ separately from the earlier runtime evidence below.
   and isolated deployment](docs/evidence/lean-4.34.1-cold-install-2026-09-25.json)
   pass with the managed tool cache initially empty.
   [Eight filesystem/console fixtures per engine](docs/evidence/lean-4.34.1-installed-io-2026-09-25.json)
-  pass all 24 native/deployed comparisons, including cleanup. The
+  pass all 24 native/deployed comparisons, including cleanup. An additional
+  [binary-console fixture](docs/evidence/lean-4.34.1-binary-console-2026-09-25.json)
+  passes in every installed engine with byte-exact native output, including all
+  byte values, split writes, invalid UTF-8 and shutdown flushing. The harness
+  now records raw bytes so decoding cannot hide binary differences. The
   [ordinary HTTP server](docs/evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json)
   passes sixty unchanged Vitest checks: thirty deployed and thirty native.
   Its retained Bun disk preflight refusal precedes a successful retry after
@@ -333,6 +337,12 @@ separately from the earlier runtime evidence below.
   These private Linux x64 diagnostics do not establish shipping integration,
   real WASI descriptor redirection/errors, embedded disposal, general imports,
   cancellation, full API coverage or other native platforms.
+  The [binary-console continuation](docs/evidence/lean-4.34.1-binary-console-2026-09-25.json)
+  also preserves all 302 native output bytes in each private helper/engine
+  profile. Thirteen integrity controls and three owned-process failure controls
+  pass. An initial coordinator argument error remains recorded separately from
+  the successful retry and application results. The existing helper limitations
+  still apply.
 
 ## Earlier runtime evidence and remaining compatibility work
 

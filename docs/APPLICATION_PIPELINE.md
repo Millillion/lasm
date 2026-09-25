@@ -61,6 +61,16 @@ no resource events. The queue stops only after the final successful IO workload
 releases its guard, before the HTTP server's larger module-data copies; HTTP
 continues separately with additional disk headroom.
 
+A [byte-exact console/filesystem fixture](evidence/lean-4.34.1-binary-console-2026-09-25.json)
+also passes in all three installed targets. It round-trips every byte value
+through a binary file, flushes individual console bytes, writes split UTF-8 and
+invalid UTF-8, and leaves its final output for normal shutdown. Both native
+controls and the relocated deployments produce exactly 295 stdout bytes and
+seven stderr bytes, with clean temporary directories. The harness now compares
+raw bytes alongside readable text; a focused control proves that distinct
+invalid bytes can evade the preceding text-only comparison. Installed builds
+peak at 3.44 GiB. These Linux x64 observations do not establish other platforms.
+
 The [fresh Node HTTP comparison](evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
 now passes all twenty unchanged Vitest checks, ten each against deployed Wasm
 and native Lean. This includes concurrent mutations, persistence, binary and
@@ -985,3 +995,15 @@ Decompression matches every original byte; recorded modes and timestamps permit
 restoration to the original paths before reuse. This recovers 712 MB without
 changing sources, results, failed experiments or the managed tool cache. The
 archival guard peaks below 0.8 GiB and releases without resource events.
+
+The subsequent [binary-console application comparison](evidence/lean-4.34.1-binary-console-2026-09-25.json)
+matches all 302 native output bytes through the private helper in Node, Deno and
+Bun, including invalid UTF-8 and byte-at-a-time flushing. The comparison keeps
+Base64 byte records as well as readable diagnostics. Thirteen integrity controls
+pass, and three deliberate oracle mismatches terminate within the original
+deadline. A coordinator argument error is preserved separately: it passed a
+result file where the negative control expects a directory and failed before
+application execution. A fresh invocation corrects only that argument. Private
+compilation peaks at 5.16 GiB and execution below 0.47 GiB; all guards release
+without resource events. Shipping integration and the other private-helper gaps
+listed above remain open.

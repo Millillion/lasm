@@ -18,6 +18,14 @@ comparisons, including temporary-resource cleanup and source-hidden relocation
 with empty PATH. Peak memory is 4.48 GiB without resource events. Native
 validation on the other five platforms and complete API parity remain open.
 
+The [additional binary-console fixture](../evidence/lean-4.34.1-binary-console-2026-09-25.json)
+passes through all three installed targets and, separately, the private helper.
+Ordinary `IO.FS` binary-file and stream APIs preserve every byte value, split
+writes and shutdown flushing. Both native controls and every deployment agree
+on 295 stdout bytes and seven stderr bytes. Raw byte records prevent invalid
+UTF-8 from collapsing into falsely equal decoded text. This adds behavior
+coverage without claiming complete stream, descriptor or platform parity.
+
 The [expanded upstream HTTP IO comparison](../evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
 passes twelve original inputs and all 148 actions in each stock engine: 36
 native/deployed comparisons and 444 deployed actions. Inputs cover bodies,

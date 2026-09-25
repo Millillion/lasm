@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable — low confidence; likely window unknown. Shipping helper integration, full API parity and native platform acceptance lack defensible durations.
 
-**Changed:** [Ten additional upstream IO inputs pass in all three engines](evidence/lean-4.34.1-upstream-io-stress-network-complete-2026-09-25.json): 30 comparisons and 213 deployed actions for temporary files, networking, cancellation and serial HTTP fuzz/hang cases. Combined IO-expression coverage reaches 657 actions. Assertions, deadlines and reviewed sidecars remain unchanged. Every guard releases without resource events; this campaign peaks at 3.47 GiB. Successful-build cleanup preserves sources, hashes and results. Pushes await restored SSH credentials.
+**Changed:** [Byte-exact console/filesystem checks](evidence/lean-4.34.1-binary-console-2026-09-25.json) pass in all three installed targets and separately through the private helper. Thirteen integrity controls and three deliberate failure controls pass. Raw output comparison fixes a harness weakness that could hide different invalid UTF-8 bytes. A coordinator argument error and its successful retry are preserved. [Verified cleanup](evidence/lean-4.34.1-successful-output-retention-2026-09-25.json) recovers 4.85 GiB while retaining sources, results and hashes. All guards release without resource events. Pushes await restored SSH credentials.
 
 **Remaining:** Complete latest-release suite/API coverage; shipping engine parity and callable bindings; six-platform native acceptance.
 

@@ -9,6 +9,7 @@ import { provisionLean } from '../src/managed-lean.mjs';
 import { nativeLeanEnvironment } from '../src/application-sources.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 import { ensureResourceGuard } from '../scripts/full-lean/resource-guard.mjs';
+import { processOutput } from './process-output.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -43,6 +44,8 @@ const cases = [
     marker: 'truncate error comparison completed\n', posix: true },
   { name: 'console-buffering', source: 'test/fixtures/console-buffering/Main.lean',
     marker: 'normal shutdown flush\n', posix: true },
+  { name: 'binary-console', source: 'integration/fixtures/BinaryConsole.lean',
+    marker: 'binary console checks passed', removesData: true },
 ];
 assert.ok(selection.every(name => cases.some(row => row.name === name)), 'Unknown fixture selection');
 const chosen = cases.filter(row => !selection.length || selection.includes(row.name));
@@ -60,14 +63,15 @@ const report = { scope: nativeOnly ? 'Native interpreted/compiled fixture contro
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 function run(label, program, args, cwd, environment = env, timeout = 120_000) {
   const started = performance.now();
-  const result = spawnSync(program, args, { cwd, env: environment, encoding: 'utf8', timeout,
+  const result = spawnSync(program, args, { cwd, env: environment, timeout,
     killSignal: 'SIGKILL', maxBuffer: 1024 * 1024 });
+  const observed = processOutput(result);
   const record = { label, program, args, cwd, code: result.status, signal: result.signal,
     error: result.error?.message, seconds: (performance.now() - started) / 1000,
-    stdout: result.stdout, stderr: result.stderr };
+    ...observed };
   report.commands.push(record); save();
   assert.ifError(result.error); assert.equal(record.code, 0, label + ': ' + record.stderr);
-  return { code: record.code, stdout: record.stdout, stderr: record.stderr };
+  return observed;
 }
 function execute(label, command, base, row, environment) {
   const cwd = join(base, label); mkdirSync(cwd); mkdirSync(join(cwd, 'data')); mkdirSync(join(cwd, 'temporary'));

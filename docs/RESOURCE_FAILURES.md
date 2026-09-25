@@ -350,3 +350,18 @@ cap. All three HTTP comparisons finish without OOM or proactive memory stops.
 The guard refusal is a resource preflight result, not a test failure; the
 original report and archive/restore receipts remain in the
 [three-engine HTTP evidence](evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json).
+
+A subsequent successful-output cleanup reclaims 4.85 GiB from 60 completed
+Lean 4.34.1 comparisons: 36 HTTP IO-expression comparisons and 24 supplementary
+filesystem/console comparisons. Every original result, source, diagnostic and
+prior archive receipt is verified and retained. Only reproducible successful
+deployments, per-case build caches and native binaries are retired, after their
+contents and prior compressed copies are checked. Failed and interrupted cases,
+global tools and private helper experiments are ineligible.
+
+This applies the existing upstream-suite receipt-only retention policy; the
+retired binaries are no longer held in lossless archives. Later per-case
+retirement receipts explicitly supersede the earlier archive retention status.
+Cleanup peaks at 53.74 MiB inside its one-GiB guard, releases the service without
+resource events and leaves 10.43 GiB free. No guard threshold or host setting is
+changed. See the [verified retirement records](evidence/lean-4.34.1-successful-output-retention-2026-09-25.json).

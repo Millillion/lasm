@@ -58,6 +58,13 @@ Guarded/scoped evaluations, full declaration coverage and other native platforms
 remain unfinished. These checks do not establish full `Std.Http` or complete
 latest-release upstream-suite acceptance.
 
+The [later successful-output retirement](evidence/lean-4.34.1-successful-output-retention-2026-09-25.json)
+reclaims 4.85 GiB from the preceding 36 HTTP comparisons and 24 supplementary
+filesystem/console comparisons. Sources, results, diagnostics and generated
+output hashes remain intact. Their earlier archive receipts are preserved, but
+the reproducible binaries have now been retired under the existing suite
+retention policy. Failed and interrupted outputs remain untouched.
+
 The results and checked items below retain their original **4.34.0** scope.
 
 The [product plan](PLAN.md) calls for ordinary native compilation followed by
