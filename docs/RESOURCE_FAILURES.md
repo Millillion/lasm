@@ -338,3 +338,15 @@ and C-compiled controls at 304 MiB, without resource events. Caps and pressure
 thresholds were unchanged. The first attempt remains a resource abort, including
 its partial observations; the successful retry supports the mitigation without
 establishing a unique cause. See the [two preserved attempts](evidence/lean-4.34.1-native-io-ci-2026-09-25.json).
+
+The latest-release HTTP campaign separately refuses to start Bun with
+9,344,819,200 free bytes, below its nine-GiB preflight allowance
+(9,663,676,416 bytes). No service, build, test or Bun output directory is
+created for that attempt. Node and Deno have already passed. Lossless,
+decompression-verified archival of completed cold-install Wasm files and native
+HTTP executables restores headroom. A fresh Bun run passes all twenty unchanged
+checks under the same start allowance, four-GiB disk reserve and ten-GiB memory
+cap. All three HTTP comparisons finish without OOM or proactive memory stops.
+The guard refusal is a resource preflight result, not a test failure; the
+original report and archive/restore receipts remain in the
+[three-engine HTTP evidence](evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json).

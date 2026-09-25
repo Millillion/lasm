@@ -1,0 +1,1253 @@
+{
+  "scope": "Installed .25 ordinary Lake HTTP server under latest pinned Lean 4.34.1 and stock Node/Deno/Bun on Linux x64; unchanged Vitest assertions and deadlines",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "package": "0.1.0-experimental.25",
+  "packageArchiveSha256": "ac8dcef8b95fb91cd760fa6f1b332c4c783901b7ca6b73b4f5eeadb559be0c6a",
+  "runs": [
+    {
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "result": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-node-r2/result.json",
+      "resultSha256": "f23889694311eb390e39fd24362c8311d671d93507b89bb041c4d2dfa0ac6266",
+      "tests": [
+        {
+          "name": "ordinary Lean HTTP server: wasm routes requests and produces ordinary HTTP metadata",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm validates JSON and Unicode titles",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm reads, updates with revision checks, and deletes todos",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm concurrent mutations are serialized without losing updates",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm preserves arbitrary binary request and response bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm accepts chunked request bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm streams events and remains usable after a client disconnects",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm enforces body limits and rejects malformed protocol input",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm serves pipelined requests over one connection",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm reloads persisted state after graceful shutdown and restart",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native routes requests and produces ordinary HTTP metadata",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native validates JSON and Unicode titles",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native reads, updates with revision checks, and deletes todos",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native concurrent mutations are serialized without losing updates",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native preserves arbitrary binary request and response bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native accepts chunked request bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native streams events and remains usable after a client disconnects",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native enforces body limits and rejects malformed protocol input",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native serves pipelined requests over one connection",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native reloads persisted state after graceful shutdown and restart",
+          "status": "passed"
+        }
+      ],
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "moduleDataIdentity": "86d52c019ac9bc5d478cbe67681bf53e16b22c2e1996d52be77ba842ab70a73e",
+        "moduleDataBytes": 2216242781,
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "+App.Model",
+            "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+            "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+          },
+          {
+            "module": "+App.Server",
+            "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+            "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+          },
+          {
+            "module": "/+Main",
+            "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+            "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+          }
+        ],
+        "signature": "86af864276586005b5e102cc4c3c4a8bca58aeb9eb4093eff2cb0aefad7a3cd2",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "sourceHashes": {
+        "integration/managed-http.mjs": "899c975ece2aaf817c18a0ed8ce6136c1bfdb5c39af8e386200f10e739eb911e",
+        "examples/lean-server-latest/Main.lean": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+        "examples/lean-server-latest/App/Model.lean": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+        "examples/lean-server-latest/App/Server.lean": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+        "examples/lean-server-latest/test/server.test.mjs": "faa83f12123f666cb94febe6b6bf516c5e93064ac87c49e6c96a6712259a5b60",
+        "examples/lean-server-latest/vitest.config.mjs": "c4d2b3b802161b978c67724931cba0983c57293f4ad67d519140c5ef037661d7"
+      },
+      "sourcesUnchanged": true,
+      "resources": {
+        "startedAt": "2026-09-25T05:58:29.147Z",
+        "finishedAt": "2026-09-25T06:01:05.378Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-resources.json",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 8328159232,
+        "minimumHostAvailable": 20045656064,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 9663676416,
+        "status": "passed",
+        "updatedAt": "2026-09-25T06:01:06.183285+00:00",
+        "freeAtStart": 9921560576,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "10240",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "env",
+          "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=512",
+          "integration/managed-http.mjs",
+          ".work/managed-http-4.34.1-node-r2",
+          "node",
+          ".cache/js-runtimes/node-26.10.0/bin/node",
+          ".work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+          "4.34.1"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2.log",
+        "minimumObservedFreeBytes": 5057720320,
+        "exitCode": 0,
+        "freeAtEnd": 7178362880
+      },
+      "metadataReclamation": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-node-r2/metadata-reclamation.json",
+        "files": 12610,
+        "metadataBytes": 2216242781,
+        "metadataSha256": "b5a95bee1fd0af46e810243462c54bca3de8968cd3cf8df571d3c3df97097b7f"
+      },
+      "metadataArchive": {
+        "source": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-node-r2/deployed/lean",
+        "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-node-r2/module-data.tgz",
+        "sha256": "d717e984065e8a4b04bad77b9b7048315bd4672ab03a74e8f45fc757aed2ba38",
+        "bytes": 689823689,
+        "identitySha256": "0340735b0153c45dd4f62e5d2d9ff07589ee09ca4ef6c37384fe0fa699dc9f31",
+        "files": 12610,
+        "contentBytes": 2218086047,
+        "verifiedDecompression": true,
+        "identity": {
+          "scope": "Completed unchanged HTTP assertions, deployed module data retained losslessly",
+          "lean": "4.34.1",
+          "target": "node",
+          "moduleDataIdentity": "86d52c019ac9bc5d478cbe67681bf53e16b22c2e1996d52be77ba842ab70a73e",
+          "originalResourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-resources.json"
+        },
+        "options": {
+          "identity": {
+            "scope": "Completed unchanged HTTP assertions, deployed module data retained losslessly",
+            "lean": "4.34.1",
+            "target": "node",
+            "moduleDataIdentity": "86d52c019ac9bc5d478cbe67681bf53e16b22c2e1996d52be77ba842ab70a73e",
+            "originalResourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-resources.json"
+          },
+          "maximumContentBytes": 3221225472,
+          "maximumArchiveBytes": 1073741824
+        },
+        "restore": "Use restoreCompletedTree(archive, a fresh source directory, { ...options, sha256 });",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-metadata-archive-r2-resources.json"
+      },
+      "metadataArchiveResources": {
+        "startedAt": "2026-09-25T06:02:25.757Z",
+        "finishedAt": "2026-09-25T06:03:21.622Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-metadata-archive-r2-resources.json",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 876355584,
+        "minimumHostAvailable": 23167832064,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "binaryArchive": {
+        "scope": "Lossless archival of completed experiment Wasm binaries only; sources, host files, logs and acceptance receipts remain intact",
+        "guard": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-resources.json",
+        "guardSha256": "df590b914c4ae06da790ef1e4fe2d79f91b3755788643af75bb0dec84831ecd2",
+        "resultSha256": "f23889694311eb390e39fd24362c8311d671d93507b89bb041c4d2dfa0ac6266",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-node-r2/deployed/program.wasm",
+            "originalBytes": 160855197,
+            "originalSha256": "7464bf1cd40676cfdf8a03a2e8fbe64de7478e19ad4282320531a874248afca0",
+            "mode": 509,
+            "mtimeNs": 1790316027890244548,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-node-r2/deployed/program.wasm.gz",
+            "archiveBytes": 37353305,
+            "archiveSha256": "489ba699f4a8a74cb2c27b771233480ec72dfbc011b9406a9e99b8d351565a6c",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-node-r2/ordinary Lake project/.lake/lasm/applications/0bd14e899acaaa6c/86af864276586005b5e102cc4c3c4a8bca58aeb9eb4093eff2cb0aefad7a3cd2/dist/program.wasm",
+            "originalBytes": 160855197,
+            "originalSha256": "7464bf1cd40676cfdf8a03a2e8fbe64de7478e19ad4282320531a874248afca0",
+            "mode": 509,
+            "mtimeNs": 1790315984217952800,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-node-r2/ordinary Lake project/.lake/lasm/applications/0bd14e899acaaa6c/86af864276586005b5e102cc4c3c4a8bca58aeb9eb4093eff2cb0aefad7a3cd2/dist/program.wasm.gz",
+            "archiveBytes": 37353305,
+            "archiveSha256": "489ba699f4a8a74cb2c27b771233480ec72dfbc011b9406a9e99b8d351565a6c",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          }
+        ],
+        "freeBefore": 8732876800,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-binary-archive-resources.json",
+        "phase": "complete",
+        "freeAfter": 9017249792,
+        "finishedAt": "2026-09-25T06:04:04.795917+00:00",
+        "restore": "Decompress each .gz to its original path, verify originalSha256, then restore the recorded mode and mtimeNs."
+      },
+      "binaryArchiveResources": {
+        "startedAt": "2026-09-25T06:03:59.253Z",
+        "finishedAt": "2026-09-25T06:04:04.887Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-node-r2-binary-archive-resources.json",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 208998400,
+        "minimumHostAvailable": 23325372416,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "result": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-deno-r2/result.json",
+      "resultSha256": "2ead14a2e335df4b23e35905019d879f57ee16141e5398ed0b958333e8d9dedb",
+      "tests": [
+        {
+          "name": "ordinary Lean HTTP server: wasm routes requests and produces ordinary HTTP metadata",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm validates JSON and Unicode titles",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm reads, updates with revision checks, and deletes todos",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm concurrent mutations are serialized without losing updates",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm preserves arbitrary binary request and response bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm accepts chunked request bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm streams events and remains usable after a client disconnects",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm enforces body limits and rejects malformed protocol input",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm serves pipelined requests over one connection",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm reloads persisted state after graceful shutdown and restart",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native routes requests and produces ordinary HTTP metadata",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native validates JSON and Unicode titles",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native reads, updates with revision checks, and deletes todos",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native concurrent mutations are serialized without losing updates",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native preserves arbitrary binary request and response bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native accepts chunked request bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native streams events and remains usable after a client disconnects",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native enforces body limits and rejects malformed protocol input",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native serves pipelined requests over one connection",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native reloads persisted state after graceful shutdown and restart",
+          "status": "passed"
+        }
+      ],
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "moduleDataIdentity": "86d52c019ac9bc5d478cbe67681bf53e16b22c2e1996d52be77ba842ab70a73e",
+        "moduleDataBytes": 2216242781,
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "+App.Model",
+            "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+            "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+          },
+          {
+            "module": "+App.Server",
+            "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+            "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+          },
+          {
+            "module": "/+Main",
+            "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+            "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+          }
+        ],
+        "signature": "21cc40ccc4e95aeb532d3b1c1dacf9ce5c3cdd6b111bc1fbf5699e43fbb4db29",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "sourceHashes": {
+        "integration/managed-http.mjs": "899c975ece2aaf817c18a0ed8ce6136c1bfdb5c39af8e386200f10e739eb911e",
+        "examples/lean-server-latest/Main.lean": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+        "examples/lean-server-latest/App/Model.lean": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+        "examples/lean-server-latest/App/Server.lean": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+        "examples/lean-server-latest/test/server.test.mjs": "faa83f12123f666cb94febe6b6bf516c5e93064ac87c49e6c96a6712259a5b60",
+        "examples/lean-server-latest/vitest.config.mjs": "c4d2b3b802161b978c67724931cba0983c57293f4ad67d519140c5ef037661d7"
+      },
+      "sourcesUnchanged": true,
+      "resources": {
+        "startedAt": "2026-09-25T06:23:16.962Z",
+        "finishedAt": "2026-09-25T06:25:46.646Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-resources.json",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 4865892352,
+        "minimumHostAvailable": 19688755200,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 9663676416,
+        "status": "passed",
+        "updatedAt": "2026-09-25T06:25:47.326168+00:00",
+        "freeAtStart": 10234142720,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "10240",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "env",
+          "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=512",
+          "integration/managed-http.mjs",
+          "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-deno-r2",
+          "deno",
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+          "4.34.1"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2.log",
+        "minimumObservedFreeBytes": 5368401920,
+        "exitCode": 0,
+        "freeAtEnd": 7486386176
+      },
+      "metadataReclamation": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-deno-r2/metadata-reclamation.json",
+        "files": 12610,
+        "metadataBytes": 2216242781,
+        "metadataSha256": "b5a95bee1fd0af46e810243462c54bca3de8968cd3cf8df571d3c3df97097b7f"
+      },
+      "metadataArchive": {
+        "source": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-deno-r2/deployed/lean",
+        "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-deno-r2/module-data.tgz",
+        "sha256": "43c5295602c9517179494a655542ce8fd5cfd687526cfe76e5f7e5b575586bea",
+        "bytes": 689823978,
+        "identitySha256": "f0b1bdcb46be3e81e92b85149a196f7318a3b117c58d59204de6bb00b4a97c0d",
+        "files": 12610,
+        "contentBytes": 2218086047,
+        "verifiedDecompression": true,
+        "identity": {
+          "scope": "Completed unchanged HTTP assertions, deployed module data retained losslessly",
+          "lean": "4.34.1",
+          "target": "deno",
+          "moduleDataIdentity": "86d52c019ac9bc5d478cbe67681bf53e16b22c2e1996d52be77ba842ab70a73e",
+          "originalResourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-resources.json"
+        },
+        "options": {
+          "identity": {
+            "scope": "Completed unchanged HTTP assertions, deployed module data retained losslessly",
+            "lean": "4.34.1",
+            "target": "deno",
+            "moduleDataIdentity": "86d52c019ac9bc5d478cbe67681bf53e16b22c2e1996d52be77ba842ab70a73e",
+            "originalResourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-resources.json"
+          },
+          "maximumContentBytes": 3221225472,
+          "maximumArchiveBytes": 1073741824
+        },
+        "restore": "Use restoreCompletedTree(archive, a fresh source directory, { ...options, sha256 });",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-metadata-archive-resources.json"
+      },
+      "metadataArchiveResources": {
+        "startedAt": "2026-09-25T06:25:47.423Z",
+        "finishedAt": "2026-09-25T06:26:43.445Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-metadata-archive-resources.json",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 1197416448,
+        "minimumHostAvailable": 22814052352,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "binaryArchive": {
+        "scope": "Lossless archival of completed experiment Wasm binaries only; sources, host files, logs and acceptance receipts remain intact",
+        "guard": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-resources.json",
+        "guardSha256": "a7d401e5823bd73c77b921449aa0e222094fcdb3f5dd1d2ce44fe99d6d4a8874",
+        "resultSha256": "2ead14a2e335df4b23e35905019d879f57ee16141e5398ed0b958333e8d9dedb",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-deno-r2/deployed/program.wasm",
+            "originalBytes": 160855197,
+            "originalSha256": "7464bf1cd40676cfdf8a03a2e8fbe64de7478e19ad4282320531a874248afca0",
+            "mode": 509,
+            "mtimeNs": 1790317508928364149,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-deno-r2/deployed/program.wasm.gz",
+            "archiveBytes": 37353305,
+            "archiveSha256": "489ba699f4a8a74cb2c27b771233480ec72dfbc011b9406a9e99b8d351565a6c",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-deno-r2/ordinary Lake project/.lake/lasm/applications/f40a4d9788211969/21cc40ccc4e95aeb532d3b1c1dacf9ce5c3cdd6b111bc1fbf5699e43fbb4db29/dist/program.wasm",
+            "originalBytes": 160855197,
+            "originalSha256": "7464bf1cd40676cfdf8a03a2e8fbe64de7478e19ad4282320531a874248afca0",
+            "mode": 509,
+            "mtimeNs": 1790317467305904725,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-deno-r2/ordinary Lake project/.lake/lasm/applications/f40a4d9788211969/21cc40ccc4e95aeb532d3b1c1dacf9ce5c3cdd6b111bc1fbf5699e43fbb4db29/dist/program.wasm.gz",
+            "archiveBytes": 37353305,
+            "archiveSha256": "489ba699f4a8a74cb2c27b771233480ec72dfbc011b9406a9e99b8d351565a6c",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          }
+        ],
+        "freeBefore": 9060519936,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-binary-archive-resources.json",
+        "phase": "complete",
+        "freeAfter": 9344872448,
+        "finishedAt": "2026-09-25T06:26:48.828777+00:00",
+        "restore": "Decompress each .gz to its original path, verify originalSha256, then restore the recorded mode and mtimeNs."
+      },
+      "binaryArchiveResources": {
+        "startedAt": "2026-09-25T06:26:43.709Z",
+        "finishedAt": "2026-09-25T06:26:48.937Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-deno-r2-binary-archive-resources.json",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 208986112,
+        "minimumHostAvailable": 23260139520,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    {
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "result": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-bun-r3/result.json",
+      "resultSha256": "242db5a2c10e247aad75cdec4928f3ca5721c3d52fdf6cdf23565064ccdcdb5a",
+      "tests": [
+        {
+          "name": "ordinary Lean HTTP server: wasm routes requests and produces ordinary HTTP metadata",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm validates JSON and Unicode titles",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm reads, updates with revision checks, and deletes todos",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm concurrent mutations are serialized without losing updates",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm preserves arbitrary binary request and response bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm accepts chunked request bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm streams events and remains usable after a client disconnects",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm enforces body limits and rejects malformed protocol input",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm serves pipelined requests over one connection",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: wasm reloads persisted state after graceful shutdown and restart",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native routes requests and produces ordinary HTTP metadata",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native validates JSON and Unicode titles",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native reads, updates with revision checks, and deletes todos",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native concurrent mutations are serialized without losing updates",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native preserves arbitrary binary request and response bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native accepts chunked request bodies",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native streams events and remains usable after a client disconnects",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native enforces body limits and rejects malformed protocol input",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native serves pipelined requests over one connection",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary Lean HTTP server: native reloads persisted state after graceful shutdown and restart",
+          "status": "passed"
+        }
+      ],
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "moduleDataIdentity": "86d52c019ac9bc5d478cbe67681bf53e16b22c2e1996d52be77ba842ab70a73e",
+        "moduleDataBytes": 2216242781,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "+App.Model",
+            "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+            "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+          },
+          {
+            "module": "+App.Server",
+            "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+            "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+          },
+          {
+            "module": "/+Main",
+            "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+            "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+          }
+        ],
+        "signature": "ca1bfcf0aa0f9644ca1fd8b6a3e6e25cbf3333ef3c2320ff2f855208e27f7acc",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "sourceHashes": {
+        "integration/managed-http.mjs": "899c975ece2aaf817c18a0ed8ce6136c1bfdb5c39af8e386200f10e739eb911e",
+        "examples/lean-server-latest/Main.lean": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+        "examples/lean-server-latest/App/Model.lean": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+        "examples/lean-server-latest/App/Server.lean": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+        "examples/lean-server-latest/test/server.test.mjs": "faa83f12123f666cb94febe6b6bf516c5e93064ac87c49e6c96a6712259a5b60",
+        "examples/lean-server-latest/vitest.config.mjs": "c4d2b3b802161b978c67724931cba0983c57293f4ad67d519140c5ef037661d7"
+      },
+      "sourcesUnchanged": true,
+      "resources": {
+        "startedAt": "2026-09-25T06:30:25.696Z",
+        "finishedAt": "2026-09-25T06:33:23.364Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-resources.json",
+        "limits": {
+          "memoryMax": 10737418240,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 8589934592,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 5075206144,
+        "minimumHostAvailable": 19968856064,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "disk": {
+        "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+        "minimumFreeBytes": 4294967296,
+        "preflightRequiredBytes": 9663676416,
+        "status": "passed",
+        "updatedAt": "2026-09-25T06:33:23.850252+00:00",
+        "freeAtStart": 9799217152,
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "scripts/full-lean/run-bounded.mjs",
+          "--memory-mib",
+          "10240",
+          "--report",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-resources.json",
+          "--",
+          "python3",
+          "scripts/full-lean/base-pages.py",
+          "env",
+          "LASM_TOOLCHAIN_CACHE=/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=512",
+          "integration/managed-http.mjs",
+          "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-bun-r3",
+          "bun",
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r1/project/node_modules/@lasm/compiler",
+          "4.34.1"
+        ],
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-resources.json",
+        "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3.log",
+        "minimumObservedFreeBytes": 4920823808,
+        "exitCode": 0,
+        "freeAtEnd": 7034077184
+      },
+      "metadataReclamation": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-bun-r3/metadata-reclamation.json",
+        "files": 12610,
+        "metadataBytes": 2216242781,
+        "metadataSha256": "b5a95bee1fd0af46e810243462c54bca3de8968cd3cf8df571d3c3df97097b7f"
+      },
+      "metadataArchive": {
+        "source": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-bun-r3/deployed/lean",
+        "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-bun-r3/module-data.tgz",
+        "sha256": "321dcc768376698e6efac2f99a69cd747403ffaf1d9e0711d8fc2ccebc75e2b1",
+        "bytes": 689823933,
+        "identitySha256": "b04e79fa36e34eb3ad972c1b3cbf12146bd7510ce2493c55892bc1efd4eb2bc8",
+        "files": 12610,
+        "contentBytes": 2218086047,
+        "verifiedDecompression": true,
+        "identity": {
+          "scope": "Completed unchanged HTTP assertions, deployed module data retained losslessly",
+          "lean": "4.34.1",
+          "target": "bun",
+          "moduleDataIdentity": "86d52c019ac9bc5d478cbe67681bf53e16b22c2e1996d52be77ba842ab70a73e",
+          "originalResourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-resources.json"
+        },
+        "options": {
+          "identity": {
+            "scope": "Completed unchanged HTTP assertions, deployed module data retained losslessly",
+            "lean": "4.34.1",
+            "target": "bun",
+            "moduleDataIdentity": "86d52c019ac9bc5d478cbe67681bf53e16b22c2e1996d52be77ba842ab70a73e",
+            "originalResourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-resources.json"
+          },
+          "maximumContentBytes": 3221225472,
+          "maximumArchiveBytes": 1073741824
+        },
+        "restore": "Use restoreCompletedTree(archive, a fresh source directory, { ...options, sha256 });",
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-metadata-archive-resources.json"
+      },
+      "metadataArchiveResources": {
+        "startedAt": "2026-09-25T06:33:23.947Z",
+        "finishedAt": "2026-09-25T06:34:19.592Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-metadata-archive-resources.json",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 1098735616,
+        "minimumHostAvailable": 22367047680,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "binaryArchive": {
+        "scope": "Lossless archival of completed experiment Wasm binaries only; sources, host files, logs and acceptance receipts remain intact",
+        "guard": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-resources.json",
+        "guardSha256": "5315ada306cb44234d0b880200d0cb0cdf643eba9f3aa496a8525d89ab5eaca0",
+        "resultSha256": "242db5a2c10e247aad75cdec4928f3ca5721c3d52fdf6cdf23565064ccdcdb5a",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-bun-r3/deployed/program.wasm",
+            "originalBytes": 166473322,
+            "originalSha256": "9cd171beb061b997b4fe6d90330e5528c00223a0bb89193273b6833b6c1477a1",
+            "mode": 509,
+            "mtimeNs": 1790317967948081183,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-bun-r3/deployed/program.wasm.gz",
+            "archiveBytes": 38501047,
+            "archiveSha256": "5c29472f71477fd466efa87e9cf1d3e997d20dc9848ff1c832768a6536d33312",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-bun-r3/ordinary Lake project/.lake/lasm/applications/e66cfc1debc0e3a0/ca1bfcf0aa0f9644ca1fd8b6a3e6e25cbf3333ef3c2320ff2f855208e27f7acc/dist/program.wasm",
+            "originalBytes": 166473322,
+            "originalSha256": "9cd171beb061b997b4fe6d90330e5528c00223a0bb89193273b6833b6c1477a1",
+            "mode": 509,
+            "mtimeNs": 1790317926724676936,
+            "archive": "/home/lastmjs/development/lasm/compiler/.work/managed-http-4.34.1-bun-r3/ordinary Lake project/.lake/lasm/applications/e66cfc1debc0e3a0/ca1bfcf0aa0f9644ca1fd8b6a3e6e25cbf3333ef3c2320ff2f855208e27f7acc/dist/program.wasm.gz",
+            "archiveBytes": 38501047,
+            "archiveSha256": "5c29472f71477fd466efa87e9cf1d3e997d20dc9848ff1c832768a6536d33312",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          }
+        ],
+        "freeBefore": 8590544896,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-binary-archive-resources.json",
+        "phase": "complete",
+        "freeAfter": 8884981760,
+        "finishedAt": "2026-09-25T06:34:25.534434+00:00",
+        "restore": "Decompress each .gz to its original path, verify originalSha256, then restore the recorded mode and mtimeNs."
+      },
+      "binaryArchiveResources": {
+        "startedAt": "2026-09-25T06:34:20.060Z",
+        "finishedAt": "2026-09-25T06:34:25.613Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r3-binary-archive-resources.json",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 215945216,
+        "minimumHostAvailable": 23302795264,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    }
+  ],
+  "diskPreflightRefusal": {
+    "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/managed-http-4.34.1-bun-r2-disk.json",
+    "sha256": "d4e4366052e9677a5ae3baf24d16e7113a19e480f477cc10ceee12c84f5d7faa",
+    "evidence": {
+      "scope": "Separate disk reserve and whole-process-tree memory guard; resource aborts are not API failures",
+      "minimumFreeBytes": 4294967296,
+      "preflightRequiredBytes": 9663676416,
+      "status": "stopped",
+      "updatedAt": "2026-09-25T06:26:49.714291+00:00",
+      "freeAtStart": 9344819200,
+      "error": "Insufficient free disk for reserve plus complete build headroom"
+    },
+    "testLaunched": false,
+    "classification": "Resource preflight only; no behavior failure or interruption. Retry retains the same memory and disk limits."
+  },
+  "retention": {
+    "coldPackage": {
+      "receipt": ".work/application-cold-4.34.1-r1/installed-package-archive.json",
+      "sha256": "792ac4abc32b81ee2e00bb18c505fbfefccd92a3b65b545dae30c44e3719afe6",
+      "phase": "archived",
+      "freeBefore": 8925405184,
+      "freeAfter": 9421590528,
+      "resources": {
+        "startedAt": "2026-09-25T06:07:55.795Z",
+        "finishedAt": "2026-09-25T06:08:09.040Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/cold-installed-package-4.34.1-archive-r1-resources.json",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 811188224,
+        "minimumHostAvailable": 23114399744,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    "oldInstallations": {
+      "receipt": ".work/product-acceptance/reclaimed-old-installations-r1.json",
+      "sha256": "192a80b0499ce6c447060434e0f98aead7753ef5ac8d71b77e20fb3c3e31e004",
+      "phase": "complete",
+      "freeBefore": 8681148416,
+      "freeAfter": 10234150912,
+      "resources": {
+        "startedAt": "2026-09-25T06:22:52.881Z",
+        "finishedAt": "2026-09-25T06:23:16.446Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/old-installed-package-reclamation-r1-resources.json",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 266768384,
+        "minimumHostAvailable": 23014318080,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    "coldWasm": {
+      "receipt": ".work/application-cold-4.34.1-r1/binary-archive.json",
+      "sha256": "5a2395e1f54f234c2d35c41db9b0c8020c4d23dcd9a131602564d3c36a365364",
+      "phase": "complete",
+      "freeBefore": 9343959040,
+      "freeAfter": 9631936512,
+      "resources": {
+        "startedAt": "2026-09-25T06:29:14.377Z",
+        "finishedAt": "2026-09-25T06:29:20.043Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/cold-install-wasm-archive-4.34.1-r1-resources.json",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 210059264,
+        "minimumHostAvailable": 23258206208,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    "nativeHttp": {
+      "receipt": ".work/product-acceptance/http-native-archives-4.34.1-r1.json",
+      "sha256": "ed2f3a77605fffa4187edfd9a34e3c58a6d8abe46d2cc5ef95db3720a91c7449",
+      "phase": "complete",
+      "freeBefore": 9631047680,
+      "freeAfter": 9799225344,
+      "resources": {
+        "startedAt": "2026-09-25T06:30:18.647Z",
+        "finishedAt": "2026-09-25T06:30:24.659Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/http-native-archives-4.34.1-r1-resources.json",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 175022080,
+        "minimumHostAvailable": 23342669824,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    },
+    "restoredColdInput": {
+      "receipt": ".work/application-cold-4.34.1-r1/restored-wasm-4.34.1-r1.json",
+      "verified": true,
+      "originalSha256": "de24114234218bf4b01ecf06be13a694b88ad79a07ff41075b85e7910ce155eb",
+      "resources": {
+        "startedAt": "2026-09-25T06:34:26.107Z",
+        "finishedAt": "2026-09-25T06:34:27.204Z",
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/cold-wasm-restore-4.34.1-r1-resources.json",
+        "limits": {
+          "memoryMax": 536870912,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 429496729,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 216203264,
+        "minimumHostAvailable": 23322996736,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    }
+  },
+  "passed": 60,
+  "failed": 0,
+  "skipped": 0,
+  "deployedChecks": 30,
+  "nativeChecks": 30,
+  "peakMemoryBytes": 8328159232,
+  "minimumFreeDiskBytes": 4920823808,
+  "limitations": [
+    "This is partial HTTP/API behavior coverage, not complete Std.Http or complete upstream-suite acceptance.",
+    "No other native OS/architecture is validated by these Linux x64 tests.",
+    "Empty runtime PATH is checked; this HTTP harness does not enforce kernel denial of source/build paths.",
+    "Only redundant generated metadata cache copies are reclaimed after hashing against retained deployment data; shipping build behavior is unchanged."
+  ],
+  "recordedAt": "2026-09-25T06:35:31.756640+00:00"
+}

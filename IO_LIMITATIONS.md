@@ -36,6 +36,11 @@ separately from the earlier runtime evidence below.
   now passes all nine comparisons: 85 actions per engine, 255 deployed actions
   total, preserving all original source, assertion and timeout bytes. The
   ordinary HTTP server's Deno/Bun checks remain separate.
+  The [ordinary HTTP server now also passes in all three engines](docs/evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json):
+  sixty unchanged Vitest checks, thirty deployed and thirty native, with no
+  failures or skips. A disk preflight stops one Bun attempt before launch;
+  verified archival supplies headroom for the successful unchanged-limit retry.
+  This remains partial HTTP behavior coverage on Linux x64.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.

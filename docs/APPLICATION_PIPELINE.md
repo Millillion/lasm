@@ -84,6 +84,17 @@ three engines. Original sources and assertions are unchanged, and no resource
 abort or OOM event occurs. The ordinary HTTP server's remaining engine checks
 continue separately.
 
+The [full HTTP fixture continuation](evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json)
+now passes all sixty Vitest checks: ten deployed and ten native checks per stock
+engine, with zero failures/skips and unchanged sources/assertions/deadlines.
+All three builds produce identical runtime module-data identities. The maximum
+guarded peak is 7.76 GiB and no OOM, swap or proactive memory stop occurs.
+Bun's first attempt stops at disk preflight before any test or build starts;
+verified lossless archival recovers headroom and the fresh retry retains the
+same nine-GiB start allowance, four-GiB reserve and ten-GiB memory cap. This closes
+the latest-release Linux x64 HTTP example comparison, not complete API or
+native platform acceptance.
+
 Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
 downloads and extraction stream their data. Installation stages privately and
 publishes only a complete tree. Subsequent use hashes every recorded file and
