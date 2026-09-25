@@ -35,6 +35,12 @@ const result = { name: test.name, category: test.category, command, startedAt, f
 if (existsSync(join(evidence, 'phase.txt'))) result.phase = readFileSync(join(evidence, 'phase.txt'), 'utf8').trim();
 const nativeCalls = join(evidence, 'native-compiler-invocations.txt');
 if (existsSync(nativeCalls)) result.nativeCompilerInvocations = readFileSync(nativeCalls, 'utf8').trim().split('\n').filter(Boolean);
+const reclamation = join(evidence, 'module-data-reclamation.json');
+if (existsSync(reclamation)) {
+  const receipt = JSON.parse(readFileSync(reclamation));
+  result.moduleDataReclamation = { path: reclamation, sha256: await hashFile(reclamation),
+    reclaimed: receipt.reclaimed, files: receipt.files, metadataBytes: receipt.metadataBytes };
+}
 const dist = join(evidence, 'dist');
 if (existsSync(join(dist, 'build-info.json'))) {
   result.build = JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8'));

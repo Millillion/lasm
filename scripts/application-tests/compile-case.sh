@@ -27,6 +27,8 @@ printf 'application-build\n' > "$evidence/phase.txt"
 run_before "$file"
 "$LASM_BUILD_NODE" "$LASM_COMPILER/bin/lasm.mjs" build "$PWD/$file" \
   --target "$LASM_APPLICATION_TARGET" --output "$evidence/dist"
+"$LASM_BUILD_NODE" "${BASH_SOURCE[0]%/*}/reclaim-case-metadata.mjs" \
+  "$PWD/$file" "$evidence/dist" "$evidence/module-data-reclamation.json"
 
 prefix=()
 if [[ $LASM_APPLICATION_TARGET == deno ]]; then prefix=(run -A); fi

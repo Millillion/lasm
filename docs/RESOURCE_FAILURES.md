@@ -365,3 +365,13 @@ retirement receipts explicitly supersede the earlier archive retention status.
 Cleanup peaks at 53.74 MiB inside its one-GiB guard, releases the service without
 resource events and leaves 10.43 GiB free. No guard threshold or host setting is
 changed. See the [verified retirement records](evidence/lean-4.34.1-successful-output-retention-2026-09-25.json).
+
+The [upstream application metadata check](evidence/lean-4.34.1-upstream-metadata-reclamation-2026-09-25.json)
+extends the already tested HTTP-harness adaptation to compiled-application and
+shared-driver campaigns. After a successful build, the harness binds the
+metadata manifest to its recorded build identity, hashes both generated copies,
+retains the complete deployment and removes only the identical cached copy.
+The original `compile/expr.lean` driver and deployed Node assertions pass with
+2.06 GiB reclaimed across 12,596 files. Six integrity controls pass; the real
+case peaks at 5.12 GiB, with no resource events or original-source changes.
+The shipping builder, tests, deadlines and resource limits are unchanged.

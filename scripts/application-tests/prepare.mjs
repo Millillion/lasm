@@ -9,6 +9,7 @@ import { provisionLean } from '../../src/managed-lean.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { sourceIdentity } from './source-identity.mjs';
 import { loadUpstreamEvidence } from './upstream-evidence.mjs';
+import { reclaimApplicationBuildMetadata } from './reclaim-metadata.mjs';
 
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
@@ -76,7 +77,9 @@ if (!sharedDriver && !standaloneServer)
   writeFileSync(nativeEnvironment, '#!/usr/bin/env bash\nsource "$TEST_DIR/util.sh"\ndriver="$1"; shift\nsource "$driver"\n');
 let compiledDriver;
 const additionalHarnessFiles = [fileURLToPath(import.meta.url),
-  join(root, 'scripts/application-tests/upstream-evidence.mjs'), join(root, 'scripts/application-tests/source-identity.mjs')];
+  join(root, 'scripts/application-tests/upstream-evidence.mjs'), join(root, 'scripts/application-tests/source-identity.mjs'),
+  join(root, 'scripts/application-tests/reclaim-case-metadata.mjs'), join(root, 'scripts/application-tests/reclaim-metadata.mjs'),
+  join(root, 'src/application-sources.mjs'), join(root, 'src/application-files.mjs')];
 let compileDriver = join(root, 'scripts/application-tests',
   mode === 'probe-compile-disabled' ? 'probe-compile-disabled.sh' : 'compile-case.sh');
 if (sharedDriver) {
@@ -103,6 +106,7 @@ if (sharedDriver) {
     ...(projectServer ? { compiledSource, compiledSourceSha256: await hashFile(compiledSource) } : {}),
     dist, build: JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf8')),
     wasmSha256: await hashFile(join(dist, 'program.wasm')) };
+  compiledDriver.metadataReclamation = await reclaimApplicationBuildMetadata(compiledSource, dist);
   environment.LASM_TEST_DRIVER_DIST = dist;
   const shimDirectory = join(output, 'parallel-bin'); mkdirSync(shimDirectory);
   compileDriver = join(shimDirectory, 'lean');
@@ -138,6 +142,7 @@ const manifest = { schema: 1, lean: inventory.lean, leanCommit: lean.commit, sou
       : 'This separately named experiment retains the upstream compile-disabled markers and adds explicit native/deployed AOT controls after the unchanged original driver.',
     'Additional compiler flags without an implemented application mapping fail explicitly rather than being dropped.',
     'One CTest job and 900-second case deadline; resource aborts are separate from test failures.',
+    'After a successful build, hash-check runtime module data against its build identity and redundant cache copy; retain all deployed data and reclaim only that duplicate before execution.',
     'Successful large binaries and per-case caches are removed after recording build identities and Wasm hashes; failed outputs remain.'],
   recordedAt: new Date().toISOString() };
 if (compiledDriver) manifest.adaptations.push(

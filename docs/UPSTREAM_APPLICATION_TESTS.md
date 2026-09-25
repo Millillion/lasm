@@ -65,6 +65,19 @@ output hashes remain intact. Their earlier archive receipts are preserved, but
 the reproducible binaries have now been retired under the existing suite
 retention policy. Failed and interrupted outputs remain untouched.
 
+The parallel application harness now [reclaims redundant module data before
+execution](evidence/lean-4.34.1-upstream-metadata-reclamation-2026-09-25.json).
+After the installed build finishes, it checks the metadata manifest against the
+recorded build identity and hashes every file in both generated copies. Only
+the identical cached copy is removed; the deployment stays complete. The
+unchanged `compile/expr.lean` native driver and Node deployment pass with 12,596
+metadata files and 2.06 GiB of duplication reclaimed. All 7,673 original entries
+and harness hashes remain unchanged; peak guarded memory is 5.12 GiB.
+Six focused controls cover retained source/deployment data, mismatched copies,
+cache links, standalone/Lake cache selection, build-identity mismatch and builds
+without module data. This is a resource adaptation in the parallel suite, not a
+shipping builder change or a complete-suite pass.
+
 The results and checked items below retain their original **4.34.0** scope.
 
 The [product plan](PLAN.md) calls for ordinary native compilation followed by
