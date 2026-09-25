@@ -6,6 +6,13 @@ build platforms. Its [application pipeline status](docs/APPLICATION_PIPELINE.md)
 and [unchanged upstream inventory](docs/UPSTREAM_APPLICATION_TESTS.md) are tracked
 separately from the earlier runtime evidence below.
 
+The executable CLI and the earlier callable-library backend have different
+schedulers. Managed `.lean` executables already use the full Lean runtime and
+guest pthreads; callable `lasm.json` libraries retain the smaller cooperative
+runtime. Both remain within the product's compatibility goal. Items labeled
+callable below apply to that earlier path, not to all executable applications.
+See [the IO guide](docs/IO.md) for the interface-to-backend mapping.
+
 - [ ] Complete fresh Lean 4.34.1 application, language and API acceptance.
   The [runtime rebuild](docs/evidence/lean-4.34.1-runtime-build-2026-09-25.json)
   compiles all 2,516 modules and verifies every generated C archive and object;
@@ -784,9 +791,12 @@ and do not establish full-suite conformance. See
 
 ## Scheduling and cancellation
 
-- [ ] Integrate and validate the full compiler's real Lean scheduler/pthreads in
-  the packaged application path, which still runs tasks cooperatively on one
-  JavaScript thread.
+- [ ] Bring callable-library scheduling up to the full runtime's Lean
+  scheduler/pthread semantics. The earlier callable backend still schedules
+  tasks cooperatively. Managed executable applications already link the full
+  pthread runtime; the [latest excluded-concurrency comparisons](docs/evidence/lean-4.34.1-compile-disabled-2026-09-25.json)
+  add twelve native/deployed checks in the three stock engines. These passes
+  do not establish complete scheduler or callable-library parity.
 - [ ] Complete full-compiler subprocess and language-server memory validation.
   A private loader index removes the eager JavaScript scan of all 261,062
   function-table entries in each worker. Three unchanged Node cancellation
@@ -803,7 +813,8 @@ and do not establish full-suite conformance. See
 - [ ] Validate all task-drop/cancellation propagation behavior against the native
   scheduler, beyond explicit cooperative cancellation and tested task/promise
   lifetimes. Do not infer complete scheduling equivalence from server tests.
-- [ ] Main shutdown drains runnable and running cooperative tasks. Native Lean
+- [ ] The earlier callable backend's main shim drains runnable and running
+  cooperative tasks at shutdown. Native Lean
   stops its ordinary worker pool before joining dedicated workers, so a dedicated
   task that spawns more ordinary work after shutdown begins can behave differently.
 - [ ] Complete `Std.Async` coverage. Process, signal, UDP and system host primitives
@@ -811,16 +822,17 @@ and do not establish full-suite conformance. See
   checks pass in all three engines. Full Node now passes all upstream registrations,
   including all 35 `async_` tests and opt-in mutex/signal cases; complete Deno/Bun
   runs and behavior outside these tests remain open.
-- [ ] Standard Node tasks currently require Asyncify. JSPI remains available for
-  the legacy custom-host bridge only, with a separate artifact and engine support.
-- [ ] CPU-bound Lean code cannot be interrupted by an AbortSignal or a timer;
+- [ ] Standard IO in the earlier callable backend requires Asyncify. Managed
+  executables use guest pthreads. JSPI remains available for the legacy custom-host
+  bridge only, with a separate artifact and engine support.
+- [ ] CPU-bound callable Lean code cannot be interrupted by an AbortSignal or a timer;
   isolation in a Worker/process is needed for enforceable execution deadlines.
-- [ ] Aborting a standard-IO export from JavaScript discards the whole instance;
+- [ ] Aborting a callable standard-IO export from JavaScript discards the whole instance;
   it is not the same as Lean's cooperative task cancellation. Completed or already
   issued host effects are not rolled back.
-- [ ] Each instance permits one active external async call; callbacks cannot
+- [ ] Each callable instance permits one active external async call; callbacks cannot
   reenter it. Lean's internal concurrent tasks/HTTP connections are supported.
-- [ ] Busy instances require their active call to settle before disposal; use a
+- [ ] Busy callable instances require their active call to settle before disposal; use a
   normal shutdown path or abort. Long-lived background tasks need application
   lifecycle management.
 

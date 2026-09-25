@@ -1,0 +1,26 @@
+{
+  "scope": "Static documentation audit only. No new runtime behavior or test pass is claimed.",
+  "reviewedAt": "2026-09-25T20:22:23.376110+00:00",
+  "findings": [
+    "The CLI and three compatibility launchers use the managed application path for ordinary Lean executable sources.",
+    "Application linking enables pthreads, the full Lean runtime compiled to Wasm and main execution on a guest thread; it does not instrument the application with Asyncify.",
+    "The earlier config-driven compiler and main shim use the smaller runtime, Asyncify and cooperative task draining. Callable-library parity remains a product obligation.",
+    "Earlier IO guide described every executable as cooperative and described all current IO evidence as Lean 4.32.0; both claims were stale. Existing 4.34.1 evidence remains separately scoped."
+  ],
+  "sources": {
+    "bin/lasm.mjs": "553d8fd8792ca809bd824af906844fd9c3aada6484457b80f0d7bf311802d6a0",
+    "src/application-cli.mjs": "7ad789d3e23ed22088557a26ba5abbd79c4c6796ff5d6dde6a0100318bf67192",
+    "src/launcher.mjs": "7ea29145c45ce933e370b962d9935de24a6a3687ac38007d42dbfa134c08ae04",
+    "src/application-link.mjs": "638fb3b5a3dabc110e19d801c5b65560058882a0c36926d4fcc6c0e802937965",
+    "src/main.mjs": "e76f971521634ec6c89efc0cf44d69e66d97d0a35c36ffe7b7ae12f1507354da",
+    "src/build.mjs": "ce32c71c5fa688b2219957d7c5a2ab95f9730896436aab5676be12913a529a89",
+    "src/runtime.mjs": "0275b4754fe81813338e43bd6d510ff1671b4ae575f0177e316274224d428296"
+  },
+  "existingEvidence": {
+    "docs/evidence/lean-4.34.1-compile-disabled-2026-09-25.json": "33dbf7f095b3282f953a1ffa2b558a5ae6fec7a9317d80e2492e0bbdecf788d2",
+    "docs/evidence/lean-4.34.1-installed-io-2026-09-25.json": "140a2830c452ff33b24cfdb4f52849f5d824572abe5b90d40b7a9441eacd8ab7",
+    "docs/evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json": "3e382010eea1f63a480ac89b3bfe2cb6d578d1009b0a3aaf5cfb5e1876f371da"
+  },
+  "behavioralChanges": false,
+  "newRuntimeTests": 0
+}
