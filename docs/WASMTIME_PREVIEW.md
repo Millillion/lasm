@@ -2,8 +2,8 @@
 
 The Linux x64 preview now runs a copied Lean 4.34.1 application in stock Node
 26.10.0, Deno 2.9.7 and Bun 1.4.2 with its source, build tools and original
-artifacts denied by Landlock. All 39 native/deployed comparisons pass across
-the initial application and supplementary lifecycle fixture.
+artifacts denied by Landlock. All 45 native/deployed comparisons pass across
+the initial application and supplementary lifecycle and environment fixtures.
 See [the exact evidence and retained failures](evidence/wasmtime-standalone-preview-2026-09-25.json).
 
 This is a maintainer preview. Automatic provisioning and backend selection in
@@ -26,7 +26,7 @@ the recorded identities, not trust in an outside producer.
 
 Validation includes 46 focused checks, 27 raw-descriptor comparisons, three
 shared-runtime native comparisons, three deliberate oracle-mismatch controls,
-and 39 copied deployments. Filesystem denial controls run independently
+and 45 copied deployments. Filesystem denial controls run independently
 in each engine. Raw descriptor coverage includes binary bytes, closed/read-only
 descriptors, full devices, short writes, broken pipes, blocked writes and normal
 versus forced buffer flushing. Lifecycle checks cover ordinary and forced exits,
@@ -35,12 +35,19 @@ working directories and execution beyond the diagnostic runner's 45-second
 deadline. The native interpreter loads initializers through an import-only
 wrapper; the Lean application and compiled native control stay unchanged.
 Original assertions remain strict. All successful guards release without
-resource events; deployment peaks at 1.35 GiB and compilation at 5.34 GiB.
+resource events; deployment peaks at 1.77 GiB and compilation at 5.34 GiB.
+
+[Empty and 1.2 MiB process environments now match native Lean](evidence/wasmtime-standalone-environment-2026-09-25.json)
+in all three engines. The loader accepts empty snapshots and removes its former
+1 MiB cap while retaining checked sizes, entry counts, termination and guest
+memory ranges. Six valid snapshots, seven malformed snapshots and 16 guest
+boundary checks also pass with undefined-behavior checking enabled. The original
+six target failures and two supplementary harness failures remain recorded.
 
 - [ ] Complete deleted-working-directory recovery: the current fixture matches
   native's error but exits before reaching relative recovery.
-- [ ] Finish empty/large-environment comparisons.
-- [ ] Remove the experimental loader's empty-environment rejection and 1 MiB
+- [x] Finish empty/large-environment comparisons.
+- [x] Remove the experimental loader's empty-environment rejection and 1 MiB
   environment limit while preserving range and allocation checks.
 - [ ] Select a portable native CPU target and verify deployment across CPUs;
   current caches infer this build host's features.

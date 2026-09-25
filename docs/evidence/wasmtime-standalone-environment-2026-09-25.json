@@ -1,0 +1,571 @@
+{
+  "scope": "Linux x64 standalone Wasmtime preview environment repair in stock Node, Deno and Bun. Empty and above-one-MiB environments match fresh native interpreted/C-compiled Lean; not managed CLI or whole API acceptance.",
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v4.34.1"
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "expected": "v26.10.0"
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v2.9.7"
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "expected": "bun-v1.4.2"
+    },
+    "checkedAt": "2026-09-25T21:39:57.597772+00:00"
+  },
+  "changes": [
+    "Allow zero entries/bytes without dereferencing or copying a null buffer.",
+    "Remove the diagnostic one-MiB environment limit.",
+    "Retain terminator/count checks, checked pointer-table size multiplication, guest range checks and allocation errors."
+  ],
+  "source": {
+    "path": "integration/fixtures/StandaloneEnvironment.lean",
+    "sha256": "e624a87adc8be897c7b1c46beb76e4cdf893e706442529e0eb811f455461b561"
+  },
+  "controls": {
+    "receipt": {
+      "path": ".work/wasmtime-environment-controls-r2/result.json",
+      "sha256": "b46b8b224e9d9fdb8feaedb1f597664fba0b292f607e76b3210c2d5960085357"
+    },
+    "result": {
+      "passed": true,
+      "validSnapshots": 6,
+      "malformedSnapshots": 7,
+      "guestBoundaryChecks": 16,
+      "largeSnapshotBytes": 1228800
+    },
+    "undefinedBehaviorSanitizer": true,
+    "inputs": {
+      "scripts/full-lean/probe-wasmtime-environment.mjs": "f39b78f897d505f7f4e3972d92cf29e4c9e3fdab39e907167add3e0d74c36da8",
+      "scripts/full-lean/probes/wasmtime-environment.c": "1502365d0fb8c12d52f1c0bf76e13ee151aad9470a724136b64ed3e3b2c5808a",
+      "scripts/full-lean/probes/wasmtime-instantiate-lean.c": "6b944e434f68f7552c1041464b24bc61971865c004632a9ced37189989a66255",
+      "scripts/full-lean/probes/wasmtime-canonical-imports.h": "b34892bc581d519d9a066c987f97d9c157eaa8f6b4df373bbb75650da5dff72a"
+    }
+  },
+  "build": {
+    "path": ".work/wasmtime-standalone-environment-4.34.1-build-r1/result.json",
+    "sha256": "28f1bd38e72954f4329aeaf0aa3164f1d7f68846e2a083436facbfbf6c782383"
+  },
+  "compilation": {
+    "path": ".work/wasmtime-standalone-environment-4.34.1-compilation-r1/result.json",
+    "sha256": "98208eae3e32232139ec7f69435dffd30c4e570545d13dac10dbcaba9225c3b6"
+  },
+  "package": {
+    "path": ".work/wasmtime-standalone-environment-4.34.1-package-r2/result.json",
+    "sha256": "90c8cb994c7fe1ef5080d17fdf1a6e7de0948c5c7bc27aeb40ba2323113f7280"
+  },
+  "deployment": {
+    "receipt": {
+      "path": ".work/wasmtime-standalone-environment-4.34.1-deployment-r3/result.json",
+      "sha256": "2f47a6aac4c111ff69a31718d546e4b8f4dcb116d8b540c63c26f0a3bd75fe1f"
+    },
+    "environments": [
+      {
+        "name": "empty",
+        "entries": 0,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "above-one-MiB",
+        "entries": 23,
+        "bytes": 1229121,
+        "sha256": "bd067375b2e436aedfcebb6be6d46fbdf695f9af5796a9b2a6c89775ab6bb817"
+      }
+    ],
+    "comparisons": [
+      {
+        "engine": "node",
+        "args": [],
+        "environment": {
+          "name": "empty",
+          "entries": 0,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: absent\nLASM_EMPTY: absent\nLASM_UNICODE: absent\nLASM_WIDE_0: absent\nLASM_WIDE_1: absent\nLASM_WIDE_2: absent\nLASM_WIDE_3: absent\nLASM_WIDE_4: absent\nLASM_WIDE_5: absent\nLASM_WIDE_6: absent\nLASM_WIDE_7: absent\nLASM_WIDE_8: absent\nLASM_WIDE_9: absent\nLASM_WIDE_10: absent\nLASM_WIDE_11: absent\nLASM_WIDE_12: absent\nLASM_WIDE_13: absent\nLASM_WIDE_14: absent\nLASM_WIDE_15: absent\nLASM_WIDE_16: absent\nLASM_WIDE_17: absent\nLASM_WIDE_18: absent\nLASM_WIDE_19: absent\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBhYnNlbnQKTEFTTV9FTVBUWTogYWJzZW50CkxBU01fVU5JQ09ERTogYWJzZW50CkxBU01fV0lERV8wOiBhYnNlbnQKTEFTTV9XSURFXzE6IGFic2VudApMQVNNX1dJREVfMjogYWJzZW50CkxBU01fV0lERV8zOiBhYnNlbnQKTEFTTV9XSURFXzQ6IGFic2VudApMQVNNX1dJREVfNTogYWJzZW50CkxBU01fV0lERV82OiBhYnNlbnQKTEFTTV9XSURFXzc6IGFic2VudApMQVNNX1dJREVfODogYWJzZW50CkxBU01fV0lERV85OiBhYnNlbnQKTEFTTV9XSURFXzEwOiBhYnNlbnQKTEFTTV9XSURFXzExOiBhYnNlbnQKTEFTTV9XSURFXzEyOiBhYnNlbnQKTEFTTV9XSURFXzEzOiBhYnNlbnQKTEFTTV9XSURFXzE0OiBhYnNlbnQKTEFTTV9XSURFXzE1OiBhYnNlbnQKTEFTTV9XSURFXzE2OiBhYnNlbnQKTEFTTV9XSURFXzE3OiBhYnNlbnQKTEFTTV9XSURFXzE4OiBhYnNlbnQKTEFTTV9XSURFXzE5OiBhYnNlbnQK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: absent\nLASM_EMPTY: absent\nLASM_UNICODE: absent\nLASM_WIDE_0: absent\nLASM_WIDE_1: absent\nLASM_WIDE_2: absent\nLASM_WIDE_3: absent\nLASM_WIDE_4: absent\nLASM_WIDE_5: absent\nLASM_WIDE_6: absent\nLASM_WIDE_7: absent\nLASM_WIDE_8: absent\nLASM_WIDE_9: absent\nLASM_WIDE_10: absent\nLASM_WIDE_11: absent\nLASM_WIDE_12: absent\nLASM_WIDE_13: absent\nLASM_WIDE_14: absent\nLASM_WIDE_15: absent\nLASM_WIDE_16: absent\nLASM_WIDE_17: absent\nLASM_WIDE_18: absent\nLASM_WIDE_19: absent\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBhYnNlbnQKTEFTTV9FTVBUWTogYWJzZW50CkxBU01fVU5JQ09ERTogYWJzZW50CkxBU01fV0lERV8wOiBhYnNlbnQKTEFTTV9XSURFXzE6IGFic2VudApMQVNNX1dJREVfMjogYWJzZW50CkxBU01fV0lERV8zOiBhYnNlbnQKTEFTTV9XSURFXzQ6IGFic2VudApMQVNNX1dJREVfNTogYWJzZW50CkxBU01fV0lERV82OiBhYnNlbnQKTEFTTV9XSURFXzc6IGFic2VudApMQVNNX1dJREVfODogYWJzZW50CkxBU01fV0lERV85OiBhYnNlbnQKTEFTTV9XSURFXzEwOiBhYnNlbnQKTEFTTV9XSURFXzExOiBhYnNlbnQKTEFTTV9XSURFXzEyOiBhYnNlbnQKTEFTTV9XSURFXzEzOiBhYnNlbnQKTEFTTV9XSURFXzE0OiBhYnNlbnQKTEFTTV9XSURFXzE1OiBhYnNlbnQKTEFTTV9XSURFXzE2OiBhYnNlbnQKTEFTTV9XSURFXzE3OiBhYnNlbnQKTEFTTV9XSURFXzE4OiBhYnNlbnQKTEFTTV9XSURFXzE5OiBhYnNlbnQK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "node",
+        "args": [],
+        "environment": {
+          "name": "above-one-MiB",
+          "entries": 23,
+          "bytes": 1229121,
+          "sha256": "bd067375b2e436aedfcebb6be6d46fbdf695f9af5796a9b2a6c89775ab6bb817"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: bytes=1, checksum=50\nLASM_EMPTY: bytes=0, checksum=0\nLASM_UNICODE: bytes=6, checksum=1069\nLASM_WIDE_0: bytes=61440, checksum=3993600\nLASM_WIDE_1: bytes=61440, checksum=4055040\nLASM_WIDE_2: bytes=61440, checksum=4116480\nLASM_WIDE_3: bytes=61440, checksum=4177920\nLASM_WIDE_4: bytes=61440, checksum=4239360\nLASM_WIDE_5: bytes=61440, checksum=4300800\nLASM_WIDE_6: bytes=61440, checksum=4362240\nLASM_WIDE_7: bytes=61440, checksum=4423680\nLASM_WIDE_8: bytes=61440, checksum=4485120\nLASM_WIDE_9: bytes=61440, checksum=4546560\nLASM_WIDE_10: bytes=61440, checksum=4608000\nLASM_WIDE_11: bytes=61440, checksum=4669440\nLASM_WIDE_12: bytes=61440, checksum=4730880\nLASM_WIDE_13: bytes=61440, checksum=4792320\nLASM_WIDE_14: bytes=61440, checksum=4853760\nLASM_WIDE_15: bytes=61440, checksum=4915200\nLASM_WIDE_16: bytes=61440, checksum=4976640\nLASM_WIDE_17: bytes=61440, checksum=5038080\nLASM_WIDE_18: bytes=61440, checksum=5099520\nLASM_WIDE_19: bytes=61440, checksum=5160960\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBieXRlcz0xLCBjaGVja3N1bT01MApMQVNNX0VNUFRZOiBieXRlcz0wLCBjaGVja3N1bT0wCkxBU01fVU5JQ09ERTogYnl0ZXM9NiwgY2hlY2tzdW09MTA2OQpMQVNNX1dJREVfMDogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTM5OTM2MDAKTEFTTV9XSURFXzE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MDU1MDQwCkxBU01fV0lERV8yOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDExNjQ4MApMQVNNX1dJREVfMzogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQxNzc5MjAKTEFTTV9XSURFXzQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MjM5MzYwCkxBU01fV0lERV81OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDMwMDgwMApMQVNNX1dJREVfNjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQzNjIyNDAKTEFTTV9XSURFXzc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NDIzNjgwCkxBU01fV0lERV84OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDQ4NTEyMApMQVNNX1dJREVfOTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ1NDY1NjAKTEFTTV9XSURFXzEwOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDYwODAwMApMQVNNX1dJREVfMTE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NjY5NDQwCkxBU01fV0lERV8xMjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ3MzA4ODAKTEFTTV9XSURFXzEzOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDc5MjMyMApMQVNNX1dJREVfMTQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00ODUzNzYwCkxBU01fV0lERV8xNTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ5MTUyMDAKTEFTTV9XSURFXzE2OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDk3NjY0MApMQVNNX1dJREVfMTc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT01MDM4MDgwCkxBU01fV0lERV8xODogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTUwOTk1MjAKTEFTTV9XSURFXzE5OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NTE2MDk2MAo=",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: bytes=1, checksum=50\nLASM_EMPTY: bytes=0, checksum=0\nLASM_UNICODE: bytes=6, checksum=1069\nLASM_WIDE_0: bytes=61440, checksum=3993600\nLASM_WIDE_1: bytes=61440, checksum=4055040\nLASM_WIDE_2: bytes=61440, checksum=4116480\nLASM_WIDE_3: bytes=61440, checksum=4177920\nLASM_WIDE_4: bytes=61440, checksum=4239360\nLASM_WIDE_5: bytes=61440, checksum=4300800\nLASM_WIDE_6: bytes=61440, checksum=4362240\nLASM_WIDE_7: bytes=61440, checksum=4423680\nLASM_WIDE_8: bytes=61440, checksum=4485120\nLASM_WIDE_9: bytes=61440, checksum=4546560\nLASM_WIDE_10: bytes=61440, checksum=4608000\nLASM_WIDE_11: bytes=61440, checksum=4669440\nLASM_WIDE_12: bytes=61440, checksum=4730880\nLASM_WIDE_13: bytes=61440, checksum=4792320\nLASM_WIDE_14: bytes=61440, checksum=4853760\nLASM_WIDE_15: bytes=61440, checksum=4915200\nLASM_WIDE_16: bytes=61440, checksum=4976640\nLASM_WIDE_17: bytes=61440, checksum=5038080\nLASM_WIDE_18: bytes=61440, checksum=5099520\nLASM_WIDE_19: bytes=61440, checksum=5160960\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBieXRlcz0xLCBjaGVja3N1bT01MApMQVNNX0VNUFRZOiBieXRlcz0wLCBjaGVja3N1bT0wCkxBU01fVU5JQ09ERTogYnl0ZXM9NiwgY2hlY2tzdW09MTA2OQpMQVNNX1dJREVfMDogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTM5OTM2MDAKTEFTTV9XSURFXzE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MDU1MDQwCkxBU01fV0lERV8yOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDExNjQ4MApMQVNNX1dJREVfMzogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQxNzc5MjAKTEFTTV9XSURFXzQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MjM5MzYwCkxBU01fV0lERV81OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDMwMDgwMApMQVNNX1dJREVfNjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQzNjIyNDAKTEFTTV9XSURFXzc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NDIzNjgwCkxBU01fV0lERV84OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDQ4NTEyMApMQVNNX1dJREVfOTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ1NDY1NjAKTEFTTV9XSURFXzEwOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDYwODAwMApMQVNNX1dJREVfMTE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NjY5NDQwCkxBU01fV0lERV8xMjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ3MzA4ODAKTEFTTV9XSURFXzEzOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDc5MjMyMApMQVNNX1dJREVfMTQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00ODUzNzYwCkxBU01fV0lERV8xNTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ5MTUyMDAKTEFTTV9XSURFXzE2OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDk3NjY0MApMQVNNX1dJREVfMTc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT01MDM4MDgwCkxBU01fV0lERV8xODogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTUwOTk1MjAKTEFTTV9XSURFXzE5OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NTE2MDk2MAo=",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [],
+        "environment": {
+          "name": "empty",
+          "entries": 0,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: absent\nLASM_EMPTY: absent\nLASM_UNICODE: absent\nLASM_WIDE_0: absent\nLASM_WIDE_1: absent\nLASM_WIDE_2: absent\nLASM_WIDE_3: absent\nLASM_WIDE_4: absent\nLASM_WIDE_5: absent\nLASM_WIDE_6: absent\nLASM_WIDE_7: absent\nLASM_WIDE_8: absent\nLASM_WIDE_9: absent\nLASM_WIDE_10: absent\nLASM_WIDE_11: absent\nLASM_WIDE_12: absent\nLASM_WIDE_13: absent\nLASM_WIDE_14: absent\nLASM_WIDE_15: absent\nLASM_WIDE_16: absent\nLASM_WIDE_17: absent\nLASM_WIDE_18: absent\nLASM_WIDE_19: absent\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBhYnNlbnQKTEFTTV9FTVBUWTogYWJzZW50CkxBU01fVU5JQ09ERTogYWJzZW50CkxBU01fV0lERV8wOiBhYnNlbnQKTEFTTV9XSURFXzE6IGFic2VudApMQVNNX1dJREVfMjogYWJzZW50CkxBU01fV0lERV8zOiBhYnNlbnQKTEFTTV9XSURFXzQ6IGFic2VudApMQVNNX1dJREVfNTogYWJzZW50CkxBU01fV0lERV82OiBhYnNlbnQKTEFTTV9XSURFXzc6IGFic2VudApMQVNNX1dJREVfODogYWJzZW50CkxBU01fV0lERV85OiBhYnNlbnQKTEFTTV9XSURFXzEwOiBhYnNlbnQKTEFTTV9XSURFXzExOiBhYnNlbnQKTEFTTV9XSURFXzEyOiBhYnNlbnQKTEFTTV9XSURFXzEzOiBhYnNlbnQKTEFTTV9XSURFXzE0OiBhYnNlbnQKTEFTTV9XSURFXzE1OiBhYnNlbnQKTEFTTV9XSURFXzE2OiBhYnNlbnQKTEFTTV9XSURFXzE3OiBhYnNlbnQKTEFTTV9XSURFXzE4OiBhYnNlbnQKTEFTTV9XSURFXzE5OiBhYnNlbnQK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: absent\nLASM_EMPTY: absent\nLASM_UNICODE: absent\nLASM_WIDE_0: absent\nLASM_WIDE_1: absent\nLASM_WIDE_2: absent\nLASM_WIDE_3: absent\nLASM_WIDE_4: absent\nLASM_WIDE_5: absent\nLASM_WIDE_6: absent\nLASM_WIDE_7: absent\nLASM_WIDE_8: absent\nLASM_WIDE_9: absent\nLASM_WIDE_10: absent\nLASM_WIDE_11: absent\nLASM_WIDE_12: absent\nLASM_WIDE_13: absent\nLASM_WIDE_14: absent\nLASM_WIDE_15: absent\nLASM_WIDE_16: absent\nLASM_WIDE_17: absent\nLASM_WIDE_18: absent\nLASM_WIDE_19: absent\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBhYnNlbnQKTEFTTV9FTVBUWTogYWJzZW50CkxBU01fVU5JQ09ERTogYWJzZW50CkxBU01fV0lERV8wOiBhYnNlbnQKTEFTTV9XSURFXzE6IGFic2VudApMQVNNX1dJREVfMjogYWJzZW50CkxBU01fV0lERV8zOiBhYnNlbnQKTEFTTV9XSURFXzQ6IGFic2VudApMQVNNX1dJREVfNTogYWJzZW50CkxBU01fV0lERV82OiBhYnNlbnQKTEFTTV9XSURFXzc6IGFic2VudApMQVNNX1dJREVfODogYWJzZW50CkxBU01fV0lERV85OiBhYnNlbnQKTEFTTV9XSURFXzEwOiBhYnNlbnQKTEFTTV9XSURFXzExOiBhYnNlbnQKTEFTTV9XSURFXzEyOiBhYnNlbnQKTEFTTV9XSURFXzEzOiBhYnNlbnQKTEFTTV9XSURFXzE0OiBhYnNlbnQKTEFTTV9XSURFXzE1OiBhYnNlbnQKTEFTTV9XSURFXzE2OiBhYnNlbnQKTEFTTV9XSURFXzE3OiBhYnNlbnQKTEFTTV9XSURFXzE4OiBhYnNlbnQKTEFTTV9XSURFXzE5OiBhYnNlbnQK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [],
+        "environment": {
+          "name": "above-one-MiB",
+          "entries": 23,
+          "bytes": 1229121,
+          "sha256": "bd067375b2e436aedfcebb6be6d46fbdf695f9af5796a9b2a6c89775ab6bb817"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: bytes=1, checksum=50\nLASM_EMPTY: bytes=0, checksum=0\nLASM_UNICODE: bytes=6, checksum=1069\nLASM_WIDE_0: bytes=61440, checksum=3993600\nLASM_WIDE_1: bytes=61440, checksum=4055040\nLASM_WIDE_2: bytes=61440, checksum=4116480\nLASM_WIDE_3: bytes=61440, checksum=4177920\nLASM_WIDE_4: bytes=61440, checksum=4239360\nLASM_WIDE_5: bytes=61440, checksum=4300800\nLASM_WIDE_6: bytes=61440, checksum=4362240\nLASM_WIDE_7: bytes=61440, checksum=4423680\nLASM_WIDE_8: bytes=61440, checksum=4485120\nLASM_WIDE_9: bytes=61440, checksum=4546560\nLASM_WIDE_10: bytes=61440, checksum=4608000\nLASM_WIDE_11: bytes=61440, checksum=4669440\nLASM_WIDE_12: bytes=61440, checksum=4730880\nLASM_WIDE_13: bytes=61440, checksum=4792320\nLASM_WIDE_14: bytes=61440, checksum=4853760\nLASM_WIDE_15: bytes=61440, checksum=4915200\nLASM_WIDE_16: bytes=61440, checksum=4976640\nLASM_WIDE_17: bytes=61440, checksum=5038080\nLASM_WIDE_18: bytes=61440, checksum=5099520\nLASM_WIDE_19: bytes=61440, checksum=5160960\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBieXRlcz0xLCBjaGVja3N1bT01MApMQVNNX0VNUFRZOiBieXRlcz0wLCBjaGVja3N1bT0wCkxBU01fVU5JQ09ERTogYnl0ZXM9NiwgY2hlY2tzdW09MTA2OQpMQVNNX1dJREVfMDogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTM5OTM2MDAKTEFTTV9XSURFXzE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MDU1MDQwCkxBU01fV0lERV8yOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDExNjQ4MApMQVNNX1dJREVfMzogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQxNzc5MjAKTEFTTV9XSURFXzQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MjM5MzYwCkxBU01fV0lERV81OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDMwMDgwMApMQVNNX1dJREVfNjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQzNjIyNDAKTEFTTV9XSURFXzc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NDIzNjgwCkxBU01fV0lERV84OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDQ4NTEyMApMQVNNX1dJREVfOTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ1NDY1NjAKTEFTTV9XSURFXzEwOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDYwODAwMApMQVNNX1dJREVfMTE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NjY5NDQwCkxBU01fV0lERV8xMjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ3MzA4ODAKTEFTTV9XSURFXzEzOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDc5MjMyMApMQVNNX1dJREVfMTQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00ODUzNzYwCkxBU01fV0lERV8xNTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ5MTUyMDAKTEFTTV9XSURFXzE2OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDk3NjY0MApMQVNNX1dJREVfMTc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT01MDM4MDgwCkxBU01fV0lERV8xODogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTUwOTk1MjAKTEFTTV9XSURFXzE5OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NTE2MDk2MAo=",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: bytes=1, checksum=50\nLASM_EMPTY: bytes=0, checksum=0\nLASM_UNICODE: bytes=6, checksum=1069\nLASM_WIDE_0: bytes=61440, checksum=3993600\nLASM_WIDE_1: bytes=61440, checksum=4055040\nLASM_WIDE_2: bytes=61440, checksum=4116480\nLASM_WIDE_3: bytes=61440, checksum=4177920\nLASM_WIDE_4: bytes=61440, checksum=4239360\nLASM_WIDE_5: bytes=61440, checksum=4300800\nLASM_WIDE_6: bytes=61440, checksum=4362240\nLASM_WIDE_7: bytes=61440, checksum=4423680\nLASM_WIDE_8: bytes=61440, checksum=4485120\nLASM_WIDE_9: bytes=61440, checksum=4546560\nLASM_WIDE_10: bytes=61440, checksum=4608000\nLASM_WIDE_11: bytes=61440, checksum=4669440\nLASM_WIDE_12: bytes=61440, checksum=4730880\nLASM_WIDE_13: bytes=61440, checksum=4792320\nLASM_WIDE_14: bytes=61440, checksum=4853760\nLASM_WIDE_15: bytes=61440, checksum=4915200\nLASM_WIDE_16: bytes=61440, checksum=4976640\nLASM_WIDE_17: bytes=61440, checksum=5038080\nLASM_WIDE_18: bytes=61440, checksum=5099520\nLASM_WIDE_19: bytes=61440, checksum=5160960\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBieXRlcz0xLCBjaGVja3N1bT01MApMQVNNX0VNUFRZOiBieXRlcz0wLCBjaGVja3N1bT0wCkxBU01fVU5JQ09ERTogYnl0ZXM9NiwgY2hlY2tzdW09MTA2OQpMQVNNX1dJREVfMDogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTM5OTM2MDAKTEFTTV9XSURFXzE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MDU1MDQwCkxBU01fV0lERV8yOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDExNjQ4MApMQVNNX1dJREVfMzogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQxNzc5MjAKTEFTTV9XSURFXzQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MjM5MzYwCkxBU01fV0lERV81OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDMwMDgwMApMQVNNX1dJREVfNjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQzNjIyNDAKTEFTTV9XSURFXzc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NDIzNjgwCkxBU01fV0lERV84OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDQ4NTEyMApMQVNNX1dJREVfOTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ1NDY1NjAKTEFTTV9XSURFXzEwOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDYwODAwMApMQVNNX1dJREVfMTE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NjY5NDQwCkxBU01fV0lERV8xMjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ3MzA4ODAKTEFTTV9XSURFXzEzOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDc5MjMyMApMQVNNX1dJREVfMTQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00ODUzNzYwCkxBU01fV0lERV8xNTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ5MTUyMDAKTEFTTV9XSURFXzE2OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDk3NjY0MApMQVNNX1dJREVfMTc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT01MDM4MDgwCkxBU01fV0lERV8xODogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTUwOTk1MjAKTEFTTV9XSURFXzE5OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NTE2MDk2MAo=",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [],
+        "environment": {
+          "name": "empty",
+          "entries": 0,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: absent\nLASM_EMPTY: absent\nLASM_UNICODE: absent\nLASM_WIDE_0: absent\nLASM_WIDE_1: absent\nLASM_WIDE_2: absent\nLASM_WIDE_3: absent\nLASM_WIDE_4: absent\nLASM_WIDE_5: absent\nLASM_WIDE_6: absent\nLASM_WIDE_7: absent\nLASM_WIDE_8: absent\nLASM_WIDE_9: absent\nLASM_WIDE_10: absent\nLASM_WIDE_11: absent\nLASM_WIDE_12: absent\nLASM_WIDE_13: absent\nLASM_WIDE_14: absent\nLASM_WIDE_15: absent\nLASM_WIDE_16: absent\nLASM_WIDE_17: absent\nLASM_WIDE_18: absent\nLASM_WIDE_19: absent\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBhYnNlbnQKTEFTTV9FTVBUWTogYWJzZW50CkxBU01fVU5JQ09ERTogYWJzZW50CkxBU01fV0lERV8wOiBhYnNlbnQKTEFTTV9XSURFXzE6IGFic2VudApMQVNNX1dJREVfMjogYWJzZW50CkxBU01fV0lERV8zOiBhYnNlbnQKTEFTTV9XSURFXzQ6IGFic2VudApMQVNNX1dJREVfNTogYWJzZW50CkxBU01fV0lERV82OiBhYnNlbnQKTEFTTV9XSURFXzc6IGFic2VudApMQVNNX1dJREVfODogYWJzZW50CkxBU01fV0lERV85OiBhYnNlbnQKTEFTTV9XSURFXzEwOiBhYnNlbnQKTEFTTV9XSURFXzExOiBhYnNlbnQKTEFTTV9XSURFXzEyOiBhYnNlbnQKTEFTTV9XSURFXzEzOiBhYnNlbnQKTEFTTV9XSURFXzE0OiBhYnNlbnQKTEFTTV9XSURFXzE1OiBhYnNlbnQKTEFTTV9XSURFXzE2OiBhYnNlbnQKTEFTTV9XSURFXzE3OiBhYnNlbnQKTEFTTV9XSURFXzE4OiBhYnNlbnQKTEFTTV9XSURFXzE5OiBhYnNlbnQK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: absent\nLASM_EMPTY: absent\nLASM_UNICODE: absent\nLASM_WIDE_0: absent\nLASM_WIDE_1: absent\nLASM_WIDE_2: absent\nLASM_WIDE_3: absent\nLASM_WIDE_4: absent\nLASM_WIDE_5: absent\nLASM_WIDE_6: absent\nLASM_WIDE_7: absent\nLASM_WIDE_8: absent\nLASM_WIDE_9: absent\nLASM_WIDE_10: absent\nLASM_WIDE_11: absent\nLASM_WIDE_12: absent\nLASM_WIDE_13: absent\nLASM_WIDE_14: absent\nLASM_WIDE_15: absent\nLASM_WIDE_16: absent\nLASM_WIDE_17: absent\nLASM_WIDE_18: absent\nLASM_WIDE_19: absent\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBhYnNlbnQKTEFTTV9FTVBUWTogYWJzZW50CkxBU01fVU5JQ09ERTogYWJzZW50CkxBU01fV0lERV8wOiBhYnNlbnQKTEFTTV9XSURFXzE6IGFic2VudApMQVNNX1dJREVfMjogYWJzZW50CkxBU01fV0lERV8zOiBhYnNlbnQKTEFTTV9XSURFXzQ6IGFic2VudApMQVNNX1dJREVfNTogYWJzZW50CkxBU01fV0lERV82OiBhYnNlbnQKTEFTTV9XSURFXzc6IGFic2VudApMQVNNX1dJREVfODogYWJzZW50CkxBU01fV0lERV85OiBhYnNlbnQKTEFTTV9XSURFXzEwOiBhYnNlbnQKTEFTTV9XSURFXzExOiBhYnNlbnQKTEFTTV9XSURFXzEyOiBhYnNlbnQKTEFTTV9XSURFXzEzOiBhYnNlbnQKTEFTTV9XSURFXzE0OiBhYnNlbnQKTEFTTV9XSURFXzE1OiBhYnNlbnQKTEFTTV9XSURFXzE2OiBhYnNlbnQKTEFTTV9XSURFXzE3OiBhYnNlbnQKTEFTTV9XSURFXzE4OiBhYnNlbnQKTEFTTV9XSURFXzE5OiBhYnNlbnQK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [],
+        "environment": {
+          "name": "above-one-MiB",
+          "entries": 23,
+          "bytes": 1229121,
+          "sha256": "bd067375b2e436aedfcebb6be6d46fbdf695f9af5796a9b2a6c89775ab6bb817"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: bytes=1, checksum=50\nLASM_EMPTY: bytes=0, checksum=0\nLASM_UNICODE: bytes=6, checksum=1069\nLASM_WIDE_0: bytes=61440, checksum=3993600\nLASM_WIDE_1: bytes=61440, checksum=4055040\nLASM_WIDE_2: bytes=61440, checksum=4116480\nLASM_WIDE_3: bytes=61440, checksum=4177920\nLASM_WIDE_4: bytes=61440, checksum=4239360\nLASM_WIDE_5: bytes=61440, checksum=4300800\nLASM_WIDE_6: bytes=61440, checksum=4362240\nLASM_WIDE_7: bytes=61440, checksum=4423680\nLASM_WIDE_8: bytes=61440, checksum=4485120\nLASM_WIDE_9: bytes=61440, checksum=4546560\nLASM_WIDE_10: bytes=61440, checksum=4608000\nLASM_WIDE_11: bytes=61440, checksum=4669440\nLASM_WIDE_12: bytes=61440, checksum=4730880\nLASM_WIDE_13: bytes=61440, checksum=4792320\nLASM_WIDE_14: bytes=61440, checksum=4853760\nLASM_WIDE_15: bytes=61440, checksum=4915200\nLASM_WIDE_16: bytes=61440, checksum=4976640\nLASM_WIDE_17: bytes=61440, checksum=5038080\nLASM_WIDE_18: bytes=61440, checksum=5099520\nLASM_WIDE_19: bytes=61440, checksum=5160960\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBieXRlcz0xLCBjaGVja3N1bT01MApMQVNNX0VNUFRZOiBieXRlcz0wLCBjaGVja3N1bT0wCkxBU01fVU5JQ09ERTogYnl0ZXM9NiwgY2hlY2tzdW09MTA2OQpMQVNNX1dJREVfMDogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTM5OTM2MDAKTEFTTV9XSURFXzE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MDU1MDQwCkxBU01fV0lERV8yOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDExNjQ4MApMQVNNX1dJREVfMzogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQxNzc5MjAKTEFTTV9XSURFXzQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MjM5MzYwCkxBU01fV0lERV81OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDMwMDgwMApMQVNNX1dJREVfNjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQzNjIyNDAKTEFTTV9XSURFXzc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NDIzNjgwCkxBU01fV0lERV84OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDQ4NTEyMApMQVNNX1dJREVfOTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ1NDY1NjAKTEFTTV9XSURFXzEwOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDYwODAwMApMQVNNX1dJREVfMTE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NjY5NDQwCkxBU01fV0lERV8xMjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ3MzA4ODAKTEFTTV9XSURFXzEzOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDc5MjMyMApMQVNNX1dJREVfMTQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00ODUzNzYwCkxBU01fV0lERV8xNTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ5MTUyMDAKTEFTTV9XSURFXzE2OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDk3NjY0MApMQVNNX1dJREVfMTc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT01MDM4MDgwCkxBU01fV0lERV8xODogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTUwOTk1MjAKTEFTTV9XSURFXzE5OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NTE2MDk2MAo=",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: bytes=1, checksum=50\nLASM_EMPTY: bytes=0, checksum=0\nLASM_UNICODE: bytes=6, checksum=1069\nLASM_WIDE_0: bytes=61440, checksum=3993600\nLASM_WIDE_1: bytes=61440, checksum=4055040\nLASM_WIDE_2: bytes=61440, checksum=4116480\nLASM_WIDE_3: bytes=61440, checksum=4177920\nLASM_WIDE_4: bytes=61440, checksum=4239360\nLASM_WIDE_5: bytes=61440, checksum=4300800\nLASM_WIDE_6: bytes=61440, checksum=4362240\nLASM_WIDE_7: bytes=61440, checksum=4423680\nLASM_WIDE_8: bytes=61440, checksum=4485120\nLASM_WIDE_9: bytes=61440, checksum=4546560\nLASM_WIDE_10: bytes=61440, checksum=4608000\nLASM_WIDE_11: bytes=61440, checksum=4669440\nLASM_WIDE_12: bytes=61440, checksum=4730880\nLASM_WIDE_13: bytes=61440, checksum=4792320\nLASM_WIDE_14: bytes=61440, checksum=4853760\nLASM_WIDE_15: bytes=61440, checksum=4915200\nLASM_WIDE_16: bytes=61440, checksum=4976640\nLASM_WIDE_17: bytes=61440, checksum=5038080\nLASM_WIDE_18: bytes=61440, checksum=5099520\nLASM_WIDE_19: bytes=61440, checksum=5160960\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBieXRlcz0xLCBjaGVja3N1bT01MApMQVNNX0VNUFRZOiBieXRlcz0wLCBjaGVja3N1bT0wCkxBU01fVU5JQ09ERTogYnl0ZXM9NiwgY2hlY2tzdW09MTA2OQpMQVNNX1dJREVfMDogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTM5OTM2MDAKTEFTTV9XSURFXzE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MDU1MDQwCkxBU01fV0lERV8yOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDExNjQ4MApMQVNNX1dJREVfMzogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQxNzc5MjAKTEFTTV9XSURFXzQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MjM5MzYwCkxBU01fV0lERV81OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDMwMDgwMApMQVNNX1dJREVfNjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQzNjIyNDAKTEFTTV9XSURFXzc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NDIzNjgwCkxBU01fV0lERV84OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDQ4NTEyMApMQVNNX1dJREVfOTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ1NDY1NjAKTEFTTV9XSURFXzEwOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDYwODAwMApMQVNNX1dJREVfMTE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NjY5NDQwCkxBU01fV0lERV8xMjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ3MzA4ODAKTEFTTV9XSURFXzEzOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDc5MjMyMApMQVNNX1dJREVfMTQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00ODUzNzYwCkxBU01fV0lERV8xNTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ5MTUyMDAKTEFTTV9XSURFXzE2OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDk3NjY0MApMQVNNX1dJREVfMTc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT01MDM4MDgwCkxBU01fV0lERV8xODogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTUwOTk1MjAKTEFTTV9XSURFXzE5OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NTE2MDk2MAo=",
+          "stderrBase64": ""
+        }
+      }
+    ],
+    "denials": [
+      {
+        "engine": "node",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ab9c8eecf9f82d6693cdc3accced17034065c8d96213b0aa76a7e803d20ae1da",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-environment-4.34.1-deployment-r3/node-rules.json"
+      },
+      {
+        "engine": "deno",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-environment-4.34.1-deployment-r3/deno-rules.json"
+      },
+      {
+        "engine": "bun",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-environment-4.34.1-deployment-r3/bun-rules.json"
+      }
+    ],
+    "sourceAndBuildContentsDenied": true,
+    "temporaryDeploymentRemoved": true
+  },
+  "baseline": {
+    "receipt": {
+      "path": ".work/wasmtime-standalone-environment-4.34.1-deployment-r1/result.json",
+      "sha256": "eb7e559101821d6253101f8f819419b6424e04f0bcee1482ae3795b1e132c071"
+    },
+    "comparisons": [
+      {
+        "engine": "node",
+        "args": [],
+        "environment": {
+          "name": "empty",
+          "entries": 0,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: absent\nLASM_EMPTY: absent\nLASM_UNICODE: absent\nLASM_WIDE_0: absent\nLASM_WIDE_1: absent\nLASM_WIDE_2: absent\nLASM_WIDE_3: absent\nLASM_WIDE_4: absent\nLASM_WIDE_5: absent\nLASM_WIDE_6: absent\nLASM_WIDE_7: absent\nLASM_WIDE_8: absent\nLASM_WIDE_9: absent\nLASM_WIDE_10: absent\nLASM_WIDE_11: absent\nLASM_WIDE_12: absent\nLASM_WIDE_13: absent\nLASM_WIDE_14: absent\nLASM_WIDE_15: absent\nLASM_WIDE_16: absent\nLASM_WIDE_17: absent\nLASM_WIDE_18: absent\nLASM_WIDE_19: absent\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBhYnNlbnQKTEFTTV9FTVBUWTogYWJzZW50CkxBU01fVU5JQ09ERTogYWJzZW50CkxBU01fV0lERV8wOiBhYnNlbnQKTEFTTV9XSURFXzE6IGFic2VudApMQVNNX1dJREVfMjogYWJzZW50CkxBU01fV0lERV8zOiBhYnNlbnQKTEFTTV9XSURFXzQ6IGFic2VudApMQVNNX1dJREVfNTogYWJzZW50CkxBU01fV0lERV82OiBhYnNlbnQKTEFTTV9XSURFXzc6IGFic2VudApMQVNNX1dJREVfODogYWJzZW50CkxBU01fV0lERV85OiBhYnNlbnQKTEFTTV9XSURFXzEwOiBhYnNlbnQKTEFTTV9XSURFXzExOiBhYnNlbnQKTEFTTV9XSURFXzEyOiBhYnNlbnQKTEFTTV9XSURFXzEzOiBhYnNlbnQKTEFTTV9XSURFXzE0OiBhYnNlbnQKTEFTTV9XSURFXzE1OiBhYnNlbnQKTEFTTV9XSURFXzE2OiBhYnNlbnQKTEFTTV9XSURFXzE3OiBhYnNlbnQKTEFTTV9XSURFXzE4OiBhYnNlbnQKTEFTTV9XSURFXzE5OiBhYnNlbnQK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "Error: AssertionError [ERR_ASSERTION]: invalid environment snapshot\n    at runWasmtimeMain (file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment%20space%20%CE%BB/host/wasmtime-runtime.mjs:388:10)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment%20space%20%CE%BB/host/wasmtime-worker.mjs:4:1\n    at Worker.<anonymous> (file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment%20space%20%CE%BB/host/wasmtime-standalone.mjs:67:58)\n    at Worker.emit (node:events:514:20)\n    at MessagePort.<anonymous> (node:internal/worker:354:14)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:872:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28)\n",
+          "stdoutBase64": "",
+          "stderrBase64": "RXJyb3I6IEFzc2VydGlvbkVycm9yIFtFUlJfQVNTRVJUSU9OXTogaW52YWxpZCBlbnZpcm9ubWVudCBzbmFwc2hvdAogICAgYXQgcnVuV2FzbXRpbWVNYWluIChmaWxlOi8vL3RtcC9sYXNtLXdhc210aW1lLWRlcGxveS1JeW9jV04vZGVwbG95bWVudCUyMHNwYWNlJTIwJUNFJUJCL2hvc3Qvd2FzbXRpbWUtcnVudGltZS5tanM6Mzg4OjEwKQogICAgYXQgcHJvY2Vzcy5wcm9jZXNzVGlja3NBbmRSZWplY3Rpb25zIChub2RlOmludGVybmFsL3Byb2Nlc3MvdGFza19xdWV1ZXM6MTA0OjUpCiAgICBhdCBhc3luYyBmaWxlOi8vL3RtcC9sYXNtLXdhc210aW1lLWRlcGxveS1JeW9jV04vZGVwbG95bWVudCUyMHNwYWNlJTIwJUNFJUJCL2hvc3Qvd2FzbXRpbWUtd29ya2VyLm1qczo0OjEKICAgIGF0IFdvcmtlci48YW5vbnltb3VzPiAoZmlsZTovLy90bXAvbGFzbS13YXNtdGltZS1kZXBsb3ktSXlvY1dOL2RlcGxveW1lbnQlMjBzcGFjZSUyMCVDRSVCQi9ob3N0L3dhc210aW1lLXN0YW5kYWxvbmUubWpzOjY3OjU4KQogICAgYXQgV29ya2VyLmVtaXQgKG5vZGU6ZXZlbnRzOjUxNDoyMCkKICAgIGF0IE1lc3NhZ2VQb3J0Ljxhbm9ueW1vdXM+IChub2RlOmludGVybmFsL3dvcmtlcjozNTQ6MTQpCiAgICBhdCBbbm9kZWpzLmludGVybmFsLmtIeWJyaWREaXNwYXRjaF0gKG5vZGU6aW50ZXJuYWwvZXZlbnRfdGFyZ2V0Ojg3MjoyMCkKICAgIGF0IE1lc3NhZ2VQb3J0Ljxhbm9ueW1vdXM+IChub2RlOmludGVybmFsL3Blcl9jb250ZXh0L21lc3NhZ2Vwb3J0OjIzOjI4KQo="
+        }
+      },
+      {
+        "engine": "node",
+        "args": [],
+        "environment": {
+          "name": "above-one-MiB",
+          "entries": 23,
+          "bytes": 1229121,
+          "sha256": "bd067375b2e436aedfcebb6be6d46fbdf695f9af5796a9b2a6c89775ab6bb817"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: bytes=1, checksum=50\nLASM_EMPTY: bytes=0, checksum=0\nLASM_UNICODE: bytes=6, checksum=1069\nLASM_WIDE_0: bytes=61440, checksum=3993600\nLASM_WIDE_1: bytes=61440, checksum=4055040\nLASM_WIDE_2: bytes=61440, checksum=4116480\nLASM_WIDE_3: bytes=61440, checksum=4177920\nLASM_WIDE_4: bytes=61440, checksum=4239360\nLASM_WIDE_5: bytes=61440, checksum=4300800\nLASM_WIDE_6: bytes=61440, checksum=4362240\nLASM_WIDE_7: bytes=61440, checksum=4423680\nLASM_WIDE_8: bytes=61440, checksum=4485120\nLASM_WIDE_9: bytes=61440, checksum=4546560\nLASM_WIDE_10: bytes=61440, checksum=4608000\nLASM_WIDE_11: bytes=61440, checksum=4669440\nLASM_WIDE_12: bytes=61440, checksum=4730880\nLASM_WIDE_13: bytes=61440, checksum=4792320\nLASM_WIDE_14: bytes=61440, checksum=4853760\nLASM_WIDE_15: bytes=61440, checksum=4915200\nLASM_WIDE_16: bytes=61440, checksum=4976640\nLASM_WIDE_17: bytes=61440, checksum=5038080\nLASM_WIDE_18: bytes=61440, checksum=5099520\nLASM_WIDE_19: bytes=61440, checksum=5160960\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBieXRlcz0xLCBjaGVja3N1bT01MApMQVNNX0VNUFRZOiBieXRlcz0wLCBjaGVja3N1bT0wCkxBU01fVU5JQ09ERTogYnl0ZXM9NiwgY2hlY2tzdW09MTA2OQpMQVNNX1dJREVfMDogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTM5OTM2MDAKTEFTTV9XSURFXzE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MDU1MDQwCkxBU01fV0lERV8yOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDExNjQ4MApMQVNNX1dJREVfMzogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQxNzc5MjAKTEFTTV9XSURFXzQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MjM5MzYwCkxBU01fV0lERV81OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDMwMDgwMApMQVNNX1dJREVfNjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQzNjIyNDAKTEFTTV9XSURFXzc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NDIzNjgwCkxBU01fV0lERV84OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDQ4NTEyMApMQVNNX1dJREVfOTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ1NDY1NjAKTEFTTV9XSURFXzEwOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDYwODAwMApMQVNNX1dJREVfMTE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NjY5NDQwCkxBU01fV0lERV8xMjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ3MzA4ODAKTEFTTV9XSURFXzEzOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDc5MjMyMApMQVNNX1dJREVfMTQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00ODUzNzYwCkxBU01fV0lERV8xNTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ5MTUyMDAKTEFTTV9XSURFXzE2OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDk3NjY0MApMQVNNX1dJREVfMTc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT01MDM4MDgwCkxBU01fV0lERV8xODogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTUwOTk1MjAKTEFTTV9XSURFXzE5OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NTE2MDk2MAo=",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "Error: AssertionError [ERR_ASSERTION]: invalid environment snapshot\n    at runWasmtimeMain (file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment%20space%20%CE%BB/host/wasmtime-runtime.mjs:388:10)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment%20space%20%CE%BB/host/wasmtime-worker.mjs:4:1\n    at Worker.<anonymous> (file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment%20space%20%CE%BB/host/wasmtime-standalone.mjs:67:58)\n    at Worker.emit (node:events:514:20)\n    at MessagePort.<anonymous> (node:internal/worker:354:14)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:872:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28)\n",
+          "stdoutBase64": "",
+          "stderrBase64": "RXJyb3I6IEFzc2VydGlvbkVycm9yIFtFUlJfQVNTRVJUSU9OXTogaW52YWxpZCBlbnZpcm9ubWVudCBzbmFwc2hvdAogICAgYXQgcnVuV2FzbXRpbWVNYWluIChmaWxlOi8vL3RtcC9sYXNtLXdhc210aW1lLWRlcGxveS1JeW9jV04vZGVwbG95bWVudCUyMHNwYWNlJTIwJUNFJUJCL2hvc3Qvd2FzbXRpbWUtcnVudGltZS5tanM6Mzg4OjEwKQogICAgYXQgcHJvY2Vzcy5wcm9jZXNzVGlja3NBbmRSZWplY3Rpb25zIChub2RlOmludGVybmFsL3Byb2Nlc3MvdGFza19xdWV1ZXM6MTA0OjUpCiAgICBhdCBhc3luYyBmaWxlOi8vL3RtcC9sYXNtLXdhc210aW1lLWRlcGxveS1JeW9jV04vZGVwbG95bWVudCUyMHNwYWNlJTIwJUNFJUJCL2hvc3Qvd2FzbXRpbWUtd29ya2VyLm1qczo0OjEKICAgIGF0IFdvcmtlci48YW5vbnltb3VzPiAoZmlsZTovLy90bXAvbGFzbS13YXNtdGltZS1kZXBsb3ktSXlvY1dOL2RlcGxveW1lbnQlMjBzcGFjZSUyMCVDRSVCQi9ob3N0L3dhc210aW1lLXN0YW5kYWxvbmUubWpzOjY3OjU4KQogICAgYXQgV29ya2VyLmVtaXQgKG5vZGU6ZXZlbnRzOjUxNDoyMCkKICAgIGF0IE1lc3NhZ2VQb3J0Ljxhbm9ueW1vdXM+IChub2RlOmludGVybmFsL3dvcmtlcjozNTQ6MTQpCiAgICBhdCBbbm9kZWpzLmludGVybmFsLmtIeWJyaWREaXNwYXRjaF0gKG5vZGU6aW50ZXJuYWwvZXZlbnRfdGFyZ2V0Ojg3MjoyMCkKICAgIGF0IE1lc3NhZ2VQb3J0Ljxhbm9ueW1vdXM+IChub2RlOmludGVybmFsL3Blcl9jb250ZXh0L21lc3NhZ2Vwb3J0OjIzOjI4KQo="
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [],
+        "environment": {
+          "name": "empty",
+          "entries": 0,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: absent\nLASM_EMPTY: absent\nLASM_UNICODE: absent\nLASM_WIDE_0: absent\nLASM_WIDE_1: absent\nLASM_WIDE_2: absent\nLASM_WIDE_3: absent\nLASM_WIDE_4: absent\nLASM_WIDE_5: absent\nLASM_WIDE_6: absent\nLASM_WIDE_7: absent\nLASM_WIDE_8: absent\nLASM_WIDE_9: absent\nLASM_WIDE_10: absent\nLASM_WIDE_11: absent\nLASM_WIDE_12: absent\nLASM_WIDE_13: absent\nLASM_WIDE_14: absent\nLASM_WIDE_15: absent\nLASM_WIDE_16: absent\nLASM_WIDE_17: absent\nLASM_WIDE_18: absent\nLASM_WIDE_19: absent\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBhYnNlbnQKTEFTTV9FTVBUWTogYWJzZW50CkxBU01fVU5JQ09ERTogYWJzZW50CkxBU01fV0lERV8wOiBhYnNlbnQKTEFTTV9XSURFXzE6IGFic2VudApMQVNNX1dJREVfMjogYWJzZW50CkxBU01fV0lERV8zOiBhYnNlbnQKTEFTTV9XSURFXzQ6IGFic2VudApMQVNNX1dJREVfNTogYWJzZW50CkxBU01fV0lERV82OiBhYnNlbnQKTEFTTV9XSURFXzc6IGFic2VudApMQVNNX1dJREVfODogYWJzZW50CkxBU01fV0lERV85OiBhYnNlbnQKTEFTTV9XSURFXzEwOiBhYnNlbnQKTEFTTV9XSURFXzExOiBhYnNlbnQKTEFTTV9XSURFXzEyOiBhYnNlbnQKTEFTTV9XSURFXzEzOiBhYnNlbnQKTEFTTV9XSURFXzE0OiBhYnNlbnQKTEFTTV9XSURFXzE1OiBhYnNlbnQKTEFTTV9XSURFXzE2OiBhYnNlbnQKTEFTTV9XSURFXzE3OiBhYnNlbnQKTEFTTV9XSURFXzE4OiBhYnNlbnQKTEFTTV9XSURFXzE5OiBhYnNlbnQK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "Error: AssertionError [ERR_ASSERTION]: invalid environment snapshot\n    at runWasmtimeMain (file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-runtime.mjs:388:10)\n    at processTicksAndRejections (ext:core/01_core.js:405:7)\n    at drainTicks (ext:core/01_core.js:432:5)\n    at __drainNextTickAndMacrotasks (ext:core/01_core.js:471:5)\n    at async file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-worker.mjs:4:1\n    at NodeWorker.<anonymous> (file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-standalone.mjs:67:58)\n    at NodeWorker.emit (ext:deno_node/_events.mjs:4:461)\n    at NodeWorker.#dispatchWorkerThreadMessage (ext:deno_node/worker_threads.ts:1:9526)\n    at NodeWorker.#pollMessages (ext:deno_node/worker_threads.ts:1:9825)\n",
+          "stdoutBase64": "",
+          "stderrBase64": "RXJyb3I6IEFzc2VydGlvbkVycm9yIFtFUlJfQVNTRVJUSU9OXTogaW52YWxpZCBlbnZpcm9ubWVudCBzbmFwc2hvdAogICAgYXQgcnVuV2FzbXRpbWVNYWluIChmaWxlOi8vL3RtcC9sYXNtLXdhc210aW1lLWRlcGxveS1JeW9jV04vZGVwbG95bWVudCBzcGFjZSDOuy9ob3N0L3dhc210aW1lLXJ1bnRpbWUubWpzOjM4ODoxMCkKICAgIGF0IHByb2Nlc3NUaWNrc0FuZFJlamVjdGlvbnMgKGV4dDpjb3JlLzAxX2NvcmUuanM6NDA1OjcpCiAgICBhdCBkcmFpblRpY2tzIChleHQ6Y29yZS8wMV9jb3JlLmpzOjQzMjo1KQogICAgYXQgX19kcmFpbk5leHRUaWNrQW5kTWFjcm90YXNrcyAoZXh0OmNvcmUvMDFfY29yZS5qczo0NzE6NSkKICAgIGF0IGFzeW5jIGZpbGU6Ly8vdG1wL2xhc20td2FzbXRpbWUtZGVwbG95LUl5b2NXTi9kZXBsb3ltZW50IHNwYWNlIM67L2hvc3Qvd2FzbXRpbWUtd29ya2VyLm1qczo0OjEKICAgIGF0IE5vZGVXb3JrZXIuPGFub255bW91cz4gKGZpbGU6Ly8vdG1wL2xhc20td2FzbXRpbWUtZGVwbG95LUl5b2NXTi9kZXBsb3ltZW50IHNwYWNlIM67L2hvc3Qvd2FzbXRpbWUtc3RhbmRhbG9uZS5tanM6Njc6NTgpCiAgICBhdCBOb2RlV29ya2VyLmVtaXQgKGV4dDpkZW5vX25vZGUvX2V2ZW50cy5tanM6NDo0NjEpCiAgICBhdCBOb2RlV29ya2VyLiNkaXNwYXRjaFdvcmtlclRocmVhZE1lc3NhZ2UgKGV4dDpkZW5vX25vZGUvd29ya2VyX3RocmVhZHMudHM6MTo5NTI2KQogICAgYXQgTm9kZVdvcmtlci4jcG9sbE1lc3NhZ2VzIChleHQ6ZGVub19ub2RlL3dvcmtlcl90aHJlYWRzLnRzOjE6OTgyNSkK"
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [],
+        "environment": {
+          "name": "above-one-MiB",
+          "entries": 23,
+          "bytes": 1229121,
+          "sha256": "bd067375b2e436aedfcebb6be6d46fbdf695f9af5796a9b2a6c89775ab6bb817"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: bytes=1, checksum=50\nLASM_EMPTY: bytes=0, checksum=0\nLASM_UNICODE: bytes=6, checksum=1069\nLASM_WIDE_0: bytes=61440, checksum=3993600\nLASM_WIDE_1: bytes=61440, checksum=4055040\nLASM_WIDE_2: bytes=61440, checksum=4116480\nLASM_WIDE_3: bytes=61440, checksum=4177920\nLASM_WIDE_4: bytes=61440, checksum=4239360\nLASM_WIDE_5: bytes=61440, checksum=4300800\nLASM_WIDE_6: bytes=61440, checksum=4362240\nLASM_WIDE_7: bytes=61440, checksum=4423680\nLASM_WIDE_8: bytes=61440, checksum=4485120\nLASM_WIDE_9: bytes=61440, checksum=4546560\nLASM_WIDE_10: bytes=61440, checksum=4608000\nLASM_WIDE_11: bytes=61440, checksum=4669440\nLASM_WIDE_12: bytes=61440, checksum=4730880\nLASM_WIDE_13: bytes=61440, checksum=4792320\nLASM_WIDE_14: bytes=61440, checksum=4853760\nLASM_WIDE_15: bytes=61440, checksum=4915200\nLASM_WIDE_16: bytes=61440, checksum=4976640\nLASM_WIDE_17: bytes=61440, checksum=5038080\nLASM_WIDE_18: bytes=61440, checksum=5099520\nLASM_WIDE_19: bytes=61440, checksum=5160960\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBieXRlcz0xLCBjaGVja3N1bT01MApMQVNNX0VNUFRZOiBieXRlcz0wLCBjaGVja3N1bT0wCkxBU01fVU5JQ09ERTogYnl0ZXM9NiwgY2hlY2tzdW09MTA2OQpMQVNNX1dJREVfMDogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTM5OTM2MDAKTEFTTV9XSURFXzE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MDU1MDQwCkxBU01fV0lERV8yOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDExNjQ4MApMQVNNX1dJREVfMzogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQxNzc5MjAKTEFTTV9XSURFXzQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MjM5MzYwCkxBU01fV0lERV81OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDMwMDgwMApMQVNNX1dJREVfNjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQzNjIyNDAKTEFTTV9XSURFXzc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NDIzNjgwCkxBU01fV0lERV84OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDQ4NTEyMApMQVNNX1dJREVfOTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ1NDY1NjAKTEFTTV9XSURFXzEwOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDYwODAwMApMQVNNX1dJREVfMTE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NjY5NDQwCkxBU01fV0lERV8xMjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ3MzA4ODAKTEFTTV9XSURFXzEzOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDc5MjMyMApMQVNNX1dJREVfMTQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00ODUzNzYwCkxBU01fV0lERV8xNTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ5MTUyMDAKTEFTTV9XSURFXzE2OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDk3NjY0MApMQVNNX1dJREVfMTc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT01MDM4MDgwCkxBU01fV0lERV8xODogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTUwOTk1MjAKTEFTTV9XSURFXzE5OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NTE2MDk2MAo=",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "Error: AssertionError [ERR_ASSERTION]: invalid environment snapshot\n    at runWasmtimeMain (file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-runtime.mjs:388:10)\n    at processTicksAndRejections (ext:core/01_core.js:405:7)\n    at drainTicks (ext:core/01_core.js:432:5)\n    at __drainNextTickAndMacrotasks (ext:core/01_core.js:471:5)\n    at async file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-worker.mjs:4:1\n    at NodeWorker.<anonymous> (file:///tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-standalone.mjs:67:58)\n    at NodeWorker.emit (ext:deno_node/_events.mjs:4:461)\n    at NodeWorker.#dispatchWorkerThreadMessage (ext:deno_node/worker_threads.ts:1:9526)\n    at NodeWorker.#pollMessages (ext:deno_node/worker_threads.ts:1:9825)\n",
+          "stdoutBase64": "",
+          "stderrBase64": "RXJyb3I6IEFzc2VydGlvbkVycm9yIFtFUlJfQVNTRVJUSU9OXTogaW52YWxpZCBlbnZpcm9ubWVudCBzbmFwc2hvdAogICAgYXQgcnVuV2FzbXRpbWVNYWluIChmaWxlOi8vL3RtcC9sYXNtLXdhc210aW1lLWRlcGxveS1JeW9jV04vZGVwbG95bWVudCBzcGFjZSDOuy9ob3N0L3dhc210aW1lLXJ1bnRpbWUubWpzOjM4ODoxMCkKICAgIGF0IHByb2Nlc3NUaWNrc0FuZFJlamVjdGlvbnMgKGV4dDpjb3JlLzAxX2NvcmUuanM6NDA1OjcpCiAgICBhdCBkcmFpblRpY2tzIChleHQ6Y29yZS8wMV9jb3JlLmpzOjQzMjo1KQogICAgYXQgX19kcmFpbk5leHRUaWNrQW5kTWFjcm90YXNrcyAoZXh0OmNvcmUvMDFfY29yZS5qczo0NzE6NSkKICAgIGF0IGFzeW5jIGZpbGU6Ly8vdG1wL2xhc20td2FzbXRpbWUtZGVwbG95LUl5b2NXTi9kZXBsb3ltZW50IHNwYWNlIM67L2hvc3Qvd2FzbXRpbWUtd29ya2VyLm1qczo0OjEKICAgIGF0IE5vZGVXb3JrZXIuPGFub255bW91cz4gKGZpbGU6Ly8vdG1wL2xhc20td2FzbXRpbWUtZGVwbG95LUl5b2NXTi9kZXBsb3ltZW50IHNwYWNlIM67L2hvc3Qvd2FzbXRpbWUtc3RhbmRhbG9uZS5tanM6Njc6NTgpCiAgICBhdCBOb2RlV29ya2VyLmVtaXQgKGV4dDpkZW5vX25vZGUvX2V2ZW50cy5tanM6NDo0NjEpCiAgICBhdCBOb2RlV29ya2VyLiNkaXNwYXRjaFdvcmtlclRocmVhZE1lc3NhZ2UgKGV4dDpkZW5vX25vZGUvd29ya2VyX3RocmVhZHMudHM6MTo5NTI2KQogICAgYXQgTm9kZVdvcmtlci4jcG9sbE1lc3NhZ2VzIChleHQ6ZGVub19ub2RlL3dvcmtlcl90aHJlYWRzLnRzOjE6OTgyNSkK"
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [],
+        "environment": {
+          "name": "empty",
+          "entries": 0,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: absent\nLASM_EMPTY: absent\nLASM_UNICODE: absent\nLASM_WIDE_0: absent\nLASM_WIDE_1: absent\nLASM_WIDE_2: absent\nLASM_WIDE_3: absent\nLASM_WIDE_4: absent\nLASM_WIDE_5: absent\nLASM_WIDE_6: absent\nLASM_WIDE_7: absent\nLASM_WIDE_8: absent\nLASM_WIDE_9: absent\nLASM_WIDE_10: absent\nLASM_WIDE_11: absent\nLASM_WIDE_12: absent\nLASM_WIDE_13: absent\nLASM_WIDE_14: absent\nLASM_WIDE_15: absent\nLASM_WIDE_16: absent\nLASM_WIDE_17: absent\nLASM_WIDE_18: absent\nLASM_WIDE_19: absent\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBhYnNlbnQKTEFTTV9FTVBUWTogYWJzZW50CkxBU01fVU5JQ09ERTogYWJzZW50CkxBU01fV0lERV8wOiBhYnNlbnQKTEFTTV9XSURFXzE6IGFic2VudApMQVNNX1dJREVfMjogYWJzZW50CkxBU01fV0lERV8zOiBhYnNlbnQKTEFTTV9XSURFXzQ6IGFic2VudApMQVNNX1dJREVfNTogYWJzZW50CkxBU01fV0lERV82OiBhYnNlbnQKTEFTTV9XSURFXzc6IGFic2VudApMQVNNX1dJREVfODogYWJzZW50CkxBU01fV0lERV85OiBhYnNlbnQKTEFTTV9XSURFXzEwOiBhYnNlbnQKTEFTTV9XSURFXzExOiBhYnNlbnQKTEFTTV9XSURFXzEyOiBhYnNlbnQKTEFTTV9XSURFXzEzOiBhYnNlbnQKTEFTTV9XSURFXzE0OiBhYnNlbnQKTEFTTV9XSURFXzE1OiBhYnNlbnQKTEFTTV9XSURFXzE2OiBhYnNlbnQKTEFTTV9XSURFXzE3OiBhYnNlbnQKTEFTTV9XSURFXzE4OiBhYnNlbnQKTEFTTV9XSURFXzE5OiBhYnNlbnQK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "Error: AssertionError [ERR_ASSERTION]: invalid environment snapshot\n    at runWasmtimeMain (/tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-runtime.mjs:388:10)\n    at processTicksAndRejections (native:7:39)\n    at <anonymous> (/tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-standalone.mjs:67:62)\n    at emit (node:events:100:22)\n    at #onMessage (node:worker_threads:727:14)\n",
+          "stdoutBase64": "",
+          "stderrBase64": "RXJyb3I6IEFzc2VydGlvbkVycm9yIFtFUlJfQVNTRVJUSU9OXTogaW52YWxpZCBlbnZpcm9ubWVudCBzbmFwc2hvdAogICAgYXQgcnVuV2FzbXRpbWVNYWluICgvdG1wL2xhc20td2FzbXRpbWUtZGVwbG95LUl5b2NXTi9kZXBsb3ltZW50IHNwYWNlIM67L2hvc3Qvd2FzbXRpbWUtcnVudGltZS5tanM6Mzg4OjEwKQogICAgYXQgcHJvY2Vzc1RpY2tzQW5kUmVqZWN0aW9ucyAobmF0aXZlOjc6MzkpCiAgICBhdCA8YW5vbnltb3VzPiAoL3RtcC9sYXNtLXdhc210aW1lLWRlcGxveS1JeW9jV04vZGVwbG95bWVudCBzcGFjZSDOuy9ob3N0L3dhc210aW1lLXN0YW5kYWxvbmUubWpzOjY3OjYyKQogICAgYXQgZW1pdCAobm9kZTpldmVudHM6MTAwOjIyKQogICAgYXQgI29uTWVzc2FnZSAobm9kZTp3b3JrZXJfdGhyZWFkczo3Mjc6MTQpCg=="
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [],
+        "environment": {
+          "name": "above-one-MiB",
+          "entries": 23,
+          "bytes": 1229121,
+          "sha256": "bd067375b2e436aedfcebb6be6d46fbdf695f9af5796a9b2a6c89775ab6bb817"
+        },
+        "expected": {
+          "code": 0,
+          "stdout": "PATH: absent\nHOME: absent\nLEAN_NUM_THREADS: bytes=1, checksum=50\nLASM_EMPTY: bytes=0, checksum=0\nLASM_UNICODE: bytes=6, checksum=1069\nLASM_WIDE_0: bytes=61440, checksum=3993600\nLASM_WIDE_1: bytes=61440, checksum=4055040\nLASM_WIDE_2: bytes=61440, checksum=4116480\nLASM_WIDE_3: bytes=61440, checksum=4177920\nLASM_WIDE_4: bytes=61440, checksum=4239360\nLASM_WIDE_5: bytes=61440, checksum=4300800\nLASM_WIDE_6: bytes=61440, checksum=4362240\nLASM_WIDE_7: bytes=61440, checksum=4423680\nLASM_WIDE_8: bytes=61440, checksum=4485120\nLASM_WIDE_9: bytes=61440, checksum=4546560\nLASM_WIDE_10: bytes=61440, checksum=4608000\nLASM_WIDE_11: bytes=61440, checksum=4669440\nLASM_WIDE_12: bytes=61440, checksum=4730880\nLASM_WIDE_13: bytes=61440, checksum=4792320\nLASM_WIDE_14: bytes=61440, checksum=4853760\nLASM_WIDE_15: bytes=61440, checksum=4915200\nLASM_WIDE_16: bytes=61440, checksum=4976640\nLASM_WIDE_17: bytes=61440, checksum=5038080\nLASM_WIDE_18: bytes=61440, checksum=5099520\nLASM_WIDE_19: bytes=61440, checksum=5160960\n",
+          "stderr": "",
+          "stdoutBase64": "UEFUSDogYWJzZW50CkhPTUU6IGFic2VudApMRUFOX05VTV9USFJFQURTOiBieXRlcz0xLCBjaGVja3N1bT01MApMQVNNX0VNUFRZOiBieXRlcz0wLCBjaGVja3N1bT0wCkxBU01fVU5JQ09ERTogYnl0ZXM9NiwgY2hlY2tzdW09MTA2OQpMQVNNX1dJREVfMDogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTM5OTM2MDAKTEFTTV9XSURFXzE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MDU1MDQwCkxBU01fV0lERV8yOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDExNjQ4MApMQVNNX1dJREVfMzogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQxNzc5MjAKTEFTTV9XSURFXzQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00MjM5MzYwCkxBU01fV0lERV81OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDMwMDgwMApMQVNNX1dJREVfNjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQzNjIyNDAKTEFTTV9XSURFXzc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NDIzNjgwCkxBU01fV0lERV84OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDQ4NTEyMApMQVNNX1dJREVfOTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ1NDY1NjAKTEFTTV9XSURFXzEwOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDYwODAwMApMQVNNX1dJREVfMTE6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00NjY5NDQwCkxBU01fV0lERV8xMjogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ3MzA4ODAKTEFTTV9XSURFXzEzOiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDc5MjMyMApMQVNNX1dJREVfMTQ6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT00ODUzNzYwCkxBU01fV0lERV8xNTogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTQ5MTUyMDAKTEFTTV9XSURFXzE2OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NDk3NjY0MApMQVNNX1dJREVfMTc6IGJ5dGVzPTYxNDQwLCBjaGVja3N1bT01MDM4MDgwCkxBU01fV0lERV8xODogYnl0ZXM9NjE0NDAsIGNoZWNrc3VtPTUwOTk1MjAKTEFTTV9XSURFXzE5OiBieXRlcz02MTQ0MCwgY2hlY2tzdW09NTE2MDk2MAo=",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "Error: AssertionError [ERR_ASSERTION]: invalid environment snapshot\n    at runWasmtimeMain (/tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-runtime.mjs:388:10)\n    at processTicksAndRejections (native:7:39)\n    at <anonymous> (/tmp/lasm-wasmtime-deploy-IyocWN/deployment space \u03bb/host/wasmtime-standalone.mjs:67:62)\n    at emit (node:events:100:22)\n    at #onMessage (node:worker_threads:727:14)\n",
+          "stdoutBase64": "",
+          "stderrBase64": "RXJyb3I6IEFzc2VydGlvbkVycm9yIFtFUlJfQVNTRVJUSU9OXTogaW52YWxpZCBlbnZpcm9ubWVudCBzbmFwc2hvdAogICAgYXQgcnVuV2FzbXRpbWVNYWluICgvdG1wL2xhc20td2FzbXRpbWUtZGVwbG95LUl5b2NXTi9kZXBsb3ltZW50IHNwYWNlIM67L2hvc3Qvd2FzbXRpbWUtcnVudGltZS5tanM6Mzg4OjEwKQogICAgYXQgcHJvY2Vzc1RpY2tzQW5kUmVqZWN0aW9ucyAobmF0aXZlOjc6MzkpCiAgICBhdCA8YW5vbnltb3VzPiAoL3RtcC9sYXNtLXdhc210aW1lLWRlcGxveS1JeW9jV04vZGVwbG95bWVudCBzcGFjZSDOuy9ob3N0L3dhc210aW1lLXN0YW5kYWxvbmUubWpzOjY3OjYyKQogICAgYXQgZW1pdCAobm9kZTpldmVudHM6MTAwOjIyKQogICAgYXQgI29uTWVzc2FnZSAobm9kZTp3b3JrZXJfdGhyZWFkczo3Mjc6MTQpCg=="
+        }
+      }
+    ],
+    "nativeControlsPassed": true,
+    "targetFailures": 6,
+    "failure": "invalid environment snapshot",
+    "originalWasmReusedForRepair": true
+  },
+  "resources": [
+    {
+      "name": "wasmtime-environment-controls-r2",
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-environment-controls-r2-resources.json",
+        "sha256": "970305bf4dbab9317f36468b24cba657bd8595d66799966a85abd8208eaa2077"
+      },
+      "limits": {
+        "memoryMax": 1610612736,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1288490188,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 58851328,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true,
+      "minimumFreeBytes": 5895602176
+    },
+    {
+      "name": "wasmtime-standalone-environment-4.34.1-package-r2",
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-environment-4.34.1-package-r2-resources.json",
+        "sha256": "b2bafb6329effd4dbecc52cfb8c790741a44e4ac16620c4e946e18760d4feb88"
+      },
+      "limits": {
+        "memoryMax": 3221225472,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 2576980377,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 726704128,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true,
+      "minimumFreeBytes": 6341869568
+    },
+    {
+      "name": "wasmtime-standalone-environment-4.34.1-deployment-r3",
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-environment-4.34.1-deployment-r3-resources.json",
+        "sha256": "5e6bc35d56aae4032a947f4505cd65cebb91fa079db8196ae4938c492250851c"
+      },
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 1897041920,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "unitReleased": true,
+      "minimumFreeBytes": 6367830016
+    }
+  ],
+  "preservedHarnessFailures": [
+    {
+      "receipt": {
+        "path": ".work/wasmtime-environment-controls-r1/result.json",
+        "sha256": "6d8fc384e9b3eff405adb2145c043c992d5fe24ccaec9339d0f3164d37db5f40"
+      },
+      "cause": "C control used an unsupported numeric separator. Only the numeric literal spelling changed before retry."
+    },
+    {
+      "receipt": {
+        "path": ".work/wasmtime-standalone-environment-4.34.1-deployment-r2/result.json",
+        "sha256": "a9684057bda0d8f0a566f7367b699364c918abb6d0cf221f00652a41c0949fda"
+      },
+      "cause": "Strict EACCES control targeted an archived compiler cache and observed ENOENT. Retry targets the existing original packaged cache, verifies every denied original exists, and additionally checks the compiler cache when present. Strict EACCES remains required; no application was executed in the failed retry."
+    }
+  ],
+  "diskPreservation": [
+    {
+      "path": ".work/product-acceptance/environment-reserve-archive-r1.json",
+      "sha256": "13b00179a5e4bbe1a58ccc35b2b475525c8a6eb2998133debb34a30ca0a76c12"
+    },
+    {
+      "path": ".work/product-acceptance/environment-wasm-archive-r1.json",
+      "sha256": "1888dd9ff1e07e9c8ae2bf5d709552b30f2c5979646daae394e36dbaa5394aeb"
+    },
+    {
+      "path": ".work/product-acceptance/environment-compilation-archive-r1.json",
+      "sha256": "18b9e0ed4775c48b5640a69d511d74c0e6a47a63c84770df0bf85e6deaf89692"
+    },
+    {
+      "path": ".work/product-acceptance/environment-deployment-deduplication-r1.json",
+      "sha256": "90ee72eb9ace0f55ae6f9bfeb6875a355ec2ece3a47c4615f14877932d8783a7"
+    }
+  ],
+  "upstreamTestsChanged": false,
+  "remaining": [
+    "Deleted-cwd recovery and broader lifecycle behavior.",
+    "Portable CPU target and native deployment across different CPUs.",
+    "General imports, descriptors, module data and runtime lifetime.",
+    "Managed installed package integration, complete suite/API surface and six native platforms."
+  ],
+  "recordedAt": "2026-09-25T21:55:48.553235+00:00"
+}

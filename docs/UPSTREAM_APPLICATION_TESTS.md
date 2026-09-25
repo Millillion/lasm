@@ -128,8 +128,10 @@ through installed `.31`: 71 deployed passes, three original compilation-disabled
 exclusions, one runtime failure and 26 unrun registrations. Bun reports a
 `DataCloneError` while transferring a worker error; the native controls print
 the original expected result. The original argument and 4 GiB stack setting
-remain unchanged. The earlier 4.34.0 investigation diagnosed this surface error,
-but the underlying exception still requires a fresh 4.34.1 diagnostic.
+remain unchanged. A [fresh 4.34.1 diagnostic](evidence/bun-4.34.1-const-fold-diagnosis-2026-09-25.json)
+now exposes the underlying Lean exception: thread creation failed with
+`Resource temporarily unavailable`. Only a separate generated-JavaScript copy
+adds exception decoding; the original deployment remains byte-for-byte unchanged.
 All 7,673 original entries and the frozen harness remain unchanged. Guarded
 memory peaks at 6.01 GiB, with no OOM, swap, pressure or disk stop. This is an
 interrupted campaign, not a complete category pass; every unfinished registration

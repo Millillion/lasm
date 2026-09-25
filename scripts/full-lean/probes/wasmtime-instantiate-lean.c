@@ -397,7 +397,8 @@ static wasm_trap_t *environment_get_import(void *data, wasmtime_caller_t *caller
         !memory_range(probe, strings, probe->environment_size))
         return wasmtime_trap_new("environment pointer outside memory", 34);
     uint8_t *memory = wasmtime_sharedmemory_data(probe->memory);
-    memcpy(memory + strings, probe->environment, probe->environment_size);
+    if (probe->environment_size)
+        memcpy(memory + strings, probe->environment, probe->environment_size);
     size_t offset = 0;
     for (size_t i = 0; i < probe->environment_count; i++) {
         uint64_t address = strings + offset;
@@ -637,9 +638,13 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
     probe->program_name = malloc(strlen(program_name) + 1);
     if (!probe->program_name) { snprintf(error, capacity, "program name allocation failed"); goto failed; }
     strcpy(probe->program_name, program_name);
-    if (!environment || !environment_size || environment_size > 1024 * 1024 ||
-        environment[environment_size - 1] != 0 || !environment_count ||
-        environment_count > environment_size) {
+    // Empty process environments are valid. The OS and allocator determine
+    // capacity; keep structural and guest pointer-table arithmetic checks
+    // without imposing the diagnostic runner's former one-MiB limit.
+    if (environment_count > SIZE_MAX / sizeof(uint64_t) ||
+        (environment_size == 0 ? environment_count != 0 :
+            (!environment || !environment_count || environment_count > environment_size ||
+             environment[environment_size - 1] != 0))) {
         snprintf(error, capacity, "invalid environment snapshot"); goto failed;
     }
     size_t terminators = 0;
@@ -647,9 +652,11 @@ static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_
     if (terminators != environment_count) {
         snprintf(error, capacity, "environment snapshot count mismatch"); goto failed;
     }
-    probe->environment = malloc(environment_size);
-    if (!probe->environment) { snprintf(error, capacity, "environment allocation failed"); goto failed; }
-    memcpy(probe->environment, environment, environment_size);
+    if (environment_size) {
+        probe->environment = malloc(environment_size);
+        if (!probe->environment) { snprintf(error, capacity, "environment allocation failed"); goto failed; }
+        memcpy(probe->environment, environment, environment_size);
+    }
     probe->environment_size = environment_size; probe->environment_count = environment_count;
     probe->date_now = date_now;
     probe->schedule_mailbox = schedule_mailbox;

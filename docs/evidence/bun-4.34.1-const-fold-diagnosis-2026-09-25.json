@@ -1,0 +1,119 @@
+{
+  "scope": "Fresh 4.34.1 installed Bun failure reproduced and decoded without changing the upstream test, original Wasm, arguments or stack. Not repaired acceptance or a fundamental-limit claim.",
+  "diagnostic": {
+    "path": ".work/bun-const-fold-4.34.1-diagnostic-r1/result.json",
+    "sha256": "1cb668ca85dafed31b2f5f31083bea3a4d54573d4a820a3f0388da399042a50a"
+  },
+  "script": {
+    "path": ".work/probe-bun-const-fold-4.34.1-r1.mjs",
+    "sha256": "1f48241d03bb04122d3066bbbd008d957a52942feec5d7a3c5bba025d18cf930"
+  },
+  "build": {
+    "schema": 1,
+    "lean": "4.34.1",
+    "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+    "emscripten": "6.0.9",
+    "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+    "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+    "buildDriverIdentity": "9db77e84512702d0ced767014026e8e9e9b487eae096631b2bb30a390fd04803",
+    "target": "bun",
+    "memoryMode": 2,
+    "modules": [
+      {
+        "module": "const_fold",
+        "sourceSha256": "2343c13ea3b4728faca0bb2c918eab48cc2661506925dcb36d73dd90c60c8164",
+        "cSha256": "679297d6e6d9d98dc7135bfd27354304bae2f8b711573460a4fa154c225fb01a"
+      }
+    ],
+    "signature": "960b30b465cacf54fd9506550637c51e0ca5d9b07decf3137f79737f05f72419",
+    "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+    "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+  },
+  "checks": [
+    {
+      "name": "installed-unchanged",
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__const_fold.lean/dist/main.mjs",
+        "15"
+      ],
+      "selectedEnvironment": {
+        "LEAN_NUM_THREADS": "1",
+        "LEAN_STACK_SIZE_KB": "4194304"
+      },
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "worker sent an error! undefined:undefined: The object can not be cloned.\n1352 |       }\n1353 |     };\n1354 |     worker.onerror = e => {\n1355 |       var message = \"worker sent an error!\";\n1356 |       err(`${message} ${e.filename}:${e.lineno}: ${e.message}`);\n1357 |       throw e;\n                   ^\nDataCloneError: The object can not be cloned.\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__const_fold.lean/dist/program.cjs:1357:13)\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/upstream-applications-4.34.1-bun-r1/cases/compile_bench__const_fold.lean/dist/program.cjs:1363:38)\n      at applyHandlers (node:events:64:20)\n      at emitError (node:events:44:27)\n      at #onError (node:worker_threads:724:14)\n\nBun v1.4.2 (Linux x64)\n"
+    },
+    {
+      "name": "decoded-same-settings",
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-4.34.1-diagnostic-r1/dist/main.mjs",
+        "15"
+      ],
+      "selectedEnvironment": {
+        "LEAN_NUM_THREADS": "1",
+        "LEAN_STACK_SIZE_KB": "4194304"
+      },
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "LASM_CLONE_DIAGNOSTIC {\"cmd\":8,\"keys\":[\"cmd\",\"error\"],\"type\":\"object\",\"string\":\"[object WebAssembly.Exception]\",\"constructor\":\"Exception\",\"own\":[],\"clone\":\"DataCloneError: The object can not be cloned.\",\"cloneStack\":\"postMessage@[native code]\\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-4.34.1-diagnostic-r1/dist/program.cjs:403:40\\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-4.34.1-diagnostic-r1/dist/program.cjs:450:18\\nprocessTicksAndRejections@\",\"wasmException\":true,\"cppException\":true,\"cppPayload\":\"115058144\",\"cppType\":\"lean::exception\",\"cppMessage\":\"failed to create thread: Resource temporarily unavailable\"}\nworker sent an error! undefined:undefined: The object can not be cloned.\n1380 |       }\n1381 |     };\n1382 |     worker.onerror = e => {\n1383 |       var message = \"worker sent an error!\";\n1384 |       err(`${message} ${e.filename}:${e.lineno}: ${e.message}`);\n1385 |       throw e;\n                   ^\nDataCloneError: The object can not be cloned.\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-4.34.1-diagnostic-r1/dist/program.cjs:1385:13)\n      at <anonymous> (/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-4.34.1-diagnostic-r1/dist/program.cjs:1391:38)\n      at applyHandlers (node:events:64:20)\n      at emitError (node:events:44:27)\n      at #onError (node:worker_threads:724:14)\n\nBun v1.4.2 (Linux x64)\n",
+      "exception": {
+        "cmd": 8,
+        "keys": [
+          "cmd",
+          "error"
+        ],
+        "type": "object",
+        "string": "[object WebAssembly.Exception]",
+        "constructor": "Exception",
+        "own": [],
+        "clone": "DataCloneError: The object can not be cloned.",
+        "cloneStack": "postMessage@[native code]\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-4.34.1-diagnostic-r1/dist/program.cjs:403:40\n@/home/lastmjs/development/lasm/compiler/.work/bun-const-fold-4.34.1-diagnostic-r1/dist/program.cjs:450:18\nprocessTicksAndRejections@",
+        "wasmException": true,
+        "cppException": true,
+        "cppPayload": "115058144",
+        "cppType": "lean::exception",
+        "cppMessage": "failed to create thread: Resource temporarily unavailable"
+      }
+    }
+  ],
+  "originalFilesUnchanged": true,
+  "onlyDiagnosticFileChanged": "program.cjs",
+  "adaptation": {
+    "needle": "globalThis.postMessage = msg => parentPort.postMessage(msg);",
+    "replacement": "globalThis.postMessage = msg => {\n      try { return parentPort.postMessage(msg); }\n      catch (cloneError) {\n        const e = msg?.error;\n        const fields = { cmd: msg?.cmd, keys: Object.keys(msg ?? {}), type: typeof e,\n          name: e?.name, message: e?.message, string: String(e), stack: e?.stack,\n          constructor: e?.constructor?.name, own: e && Object.getOwnPropertyNames(e),\n          clone: String(cloneError), cloneStack: cloneError.stack };\n        try { if (e instanceof WebAssembly.Exception) {\n          fields.wasmException = true;\n          fields.cppException = e.is(wasmExports.__cpp_exception);\n          if (fields.cppException) {\n            const payload = e.getArg(wasmExports.__cpp_exception, 0);\n            fields.cppPayload = String(payload);\n            const sp = stackSave();\n            try {\n              const type = stackAlloc(8), message = stackAlloc(8);\n              wasmExports.__get_exception_message(wasmExports.__thrown_object_from_unwind_exception(payload), BigInt(type), BigInt(message));\n              const typePtr = HEAPU64[type / 8], messagePtr = HEAPU64[message / 8];\n              fields.cppType = UTF8ToString(Number(typePtr));\n              fields.cppMessage = messagePtr ? UTF8ToString(Number(messagePtr)) : null;\n              wasmExports.free(typePtr); if (messagePtr) wasmExports.free(messagePtr);\n            } finally { stackRestore(sp); }\n          }\n        } } catch (diagnosticError) { fields.diagnosticError = String(diagnosticError); }\n        require('node:fs').writeSync(2, 'LASM_CLONE_DIAGNOSTIC ' + JSON.stringify(fields) + '\\n');\n        throw cloneError;\n      }\n    };"
+  },
+  "resources": {
+    "receipt": {
+      "path": ".work/product-acceptance/bun-const-fold-4.34.1-diagnostic-r1-resources.json",
+      "sha256": "ffcbd8874b8c3a2a178dd0597095cf32fcbf8c146610518d5192515ce193d356"
+    },
+    "peakMemoryBytes": 1613590528,
+    "limits": {
+      "memoryMax": 6442450944,
+      "memoryHigh": "infinity",
+      "stopMemoryBytes": 5153960755,
+      "memorySwapMax": 0,
+      "tasksMax": 1024,
+      "nice": 0,
+      "coreFileBytes": 0
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0,
+    "unitReleased": true
+  },
+  "conclusion": "The fresh DataCloneError masks a Lean C++ exception: failed to create thread: Resource temporarily unavailable. The installed Bun backend still cannot run this unchanged 4 GiB-stack case; helper shipping and a fresh suite rerun remain required.",
+  "recordedAt": "2026-09-25T21:43:13.147042+00:00"
+}

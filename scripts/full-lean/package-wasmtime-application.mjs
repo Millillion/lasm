@@ -32,7 +32,6 @@ const report = { scope: 'Relocatable standalone Wasmtime preview on Linux x64; m
   inputs: hashes, resourceReport: process.env.LASM_RESOURCE_REPORT, commands: [], passed: false,
   limitations: ['Native compilation still uses maintainer C tools.',
     'Native caches currently infer build-host CPU features; relocation tests do not establish portability to a different CPU.',
-    'The experimental C loader still rejects empty environments and environment blocks above one MiB; general environment acceptance remains open.',
     'Complete WASI descriptors, dynamic imports, keepalive/cancellation and reusable disposal remain unimplemented.',
     'This preview packages one native platform and no additional runtime Lean module data.'] };
 const save = () => writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
