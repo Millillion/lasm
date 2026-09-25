@@ -1,0 +1,14 @@
+{
+  "4.34.0": {
+    "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "url": "https://codeload.github.com/leanprover/lean4/tar.gz/293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+    "bytes": 87810307,
+    "sha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b"
+  },
+  "4.34.1": {
+    "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "url": "https://codeload.github.com/leanprover/lean4/tar.gz/5045d0056413266e57c625dcd7c365b10e377c52",
+    "bytes": 87806397,
+    "sha256": "2714b59e868977f0458e2735dab8ad346ca33f72d16241307b3b70ce7d1947fc"
+  }
+}

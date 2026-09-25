@@ -226,6 +226,8 @@ test('nearest standard Lean pin wins; unsupported pins are never silently replac
   const pin = join(f.base, 'project/lean-toolchain');
   await writeFile(pin, 'leanprover/lean4:v4.34.0\n');
   assert.deepEqual(await selectLeanVersion(main), { version: '4.34.0', pin });
+  await writeFile(pin, 'leanprover/lean4:v4.34.1\n');
+  assert.deepEqual(await selectLeanVersion(main), { version: '4.34.1', pin });
   for (const value of ['nightly', 'v4.34.0-rc1', '', '../tool', 'leanprover/lean4:v999.0.0']) {
     await writeFile(pin, value); await assert.rejects(selectLeanVersion(main), /Unsupported Lean toolchain/);
     assert.equal(await readFile(pin, 'utf8'), value);

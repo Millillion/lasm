@@ -12,6 +12,17 @@ matching versioned catalog entry, and supplies Lean/Lake in a private cache. The
 initial catalog selects Lean 4.34.0. Unsupported pins fail without modifying the
 project. The primary application CLI now uses this module.
 
+Lean 4.34.1 was published during this work and is the new latest-release target.
+Its [verified native bootstrap](evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
+passes on Linux x64, including the unchanged upstream reference-count regression,
+both new BitVec tests and interpreted-versus-compiled ordinary IO/error cases.
+The catalog accepts explicit 4.34.1 pins and preserves the 4.34.0 default pending
+its matching application bundle. Source comparison verifies that the IO error
+constructor and decoder files are unchanged, so the reviewed host policy accepts
+4.34.1. The native checks do not validate its Wasm runtime or other platforms.
+All application libraries are being rebuilt with the changed runtime headers;
+older binaries and acceptance results are not relabeled.
+
 Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
 downloads and extraction stream their data. Installation stages privately and
 publishes only a complete tree. Subsequent use hashes every recorded file and

@@ -15,7 +15,7 @@ test('unknown Lean releases cannot silently use an unverified error ABI', () => 
 });
 
 test('explicit Lean errors retain their messages and constructors under either ABI', () => {
-  for (const version of ['4.32.0', '4.34.0']) {
+  for (const version of ['4.32.0', '4.34.0', '4.34.1']) {
     assert.deepEqual(fields(encodeError({ code: 'EINVAL', errno: 22, nativeMessage: true,
       message: 'string contains NUL bytes' }, version)), { kind: 4, code: 22, message: 'string contains NUL bytes' });
     assert.deepEqual(fields(encodeError({ code: 'ENOENT', errno: 2, nativeMessage: true,
@@ -28,8 +28,9 @@ test('explicit Lean errors retain their messages and constructors under either A
 test('libuv errno signs follow the selected Lean release, including node:os errors', () => {
   const error = { info: { code: 'EINVAL', errno: -22, message: 'system failure' } };
   assert.equal(fields(encodeError(error, '4.32.0')).code, 4294967274);
-  assert.deepEqual(fields(encodeError(error, '4.34.0')),
-    { kind: 4, code: 22, message: 'invalid argument' });
+  for (const version of ['4.34.0', '4.34.1'])
+    assert.deepEqual(fields(encodeError(error, version)),
+      { kind: 4, code: 22, message: 'invalid argument' });
 });
 
 test('Windows CRT aliases and default cases match the observed native Lean decoder',
@@ -48,7 +49,7 @@ test('Windows CRT aliases and default cases match the observed native Lean decod
 test('CRT provenance survives the native file worker, with instance-local Lean versions', async () => {
   const cwd = mkdtempSync(join(tmpdir(), 'lasm-io-error-'));
   const legacy = createNodeRuntimeHost({ cwd, leanVersion: '4.32.0' });
-  const current = createNodeRuntimeHost({ cwd, leanVersion: '4.34.0' });
+  const current = createNodeRuntimeHost({ cwd, leanVersion: '4.34.1' });
   try {
     const path = Buffer.from('missing');
     const old = fields(await legacy.request(1, 0, 0n, path));

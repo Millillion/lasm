@@ -1,0 +1,1347 @@
+{
+  "scope": "Lean 4.34.1 native Linux x64 provisioning and upstream patch regressions; no 4.34.1 Wasm, installed-package or six-platform acceptance",
+  "recordedAt": "2026-09-25T03:09:33.542439+00:00",
+  "versions": {
+    "path": ".work/product-acceptance/current-versions-2026-09-24-r2.json",
+    "sha256": "73da99b61b5357f74edef307ca1476e669aed913340172c849c43c9bd3170dad",
+    "content": {
+      "lean": {
+        "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+        "tag": "v4.34.1",
+        "publishedAt": "2026-09-24T20:24:21Z",
+        "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+        "draft": false,
+        "prerelease": false
+      },
+      "deno": {
+        "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+        "tag": "v2.9.7",
+        "publishedAt": "2026-09-17T09:04:55Z",
+        "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+        "draft": false,
+        "prerelease": false
+      },
+      "bun": {
+        "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+        "tag": "bun-v1.4.2",
+        "publishedAt": "2026-09-05T05:55:48Z",
+        "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+        "draft": false,
+        "prerelease": false
+      },
+      "node": {
+        "source": "https://nodejs.org/dist/index.json",
+        "tag": "v26.10.0",
+        "date": "2026-09-21",
+        "lts": false
+      },
+      "checkedAt": "2026-09-25T02:40:54.818254+00:00"
+    }
+  },
+  "release": {
+    "path": ".work/product-acceptance/lean-4.34.1-assessment-r1/release.json",
+    "sha256": "d8c59233ff7e9ea7be1e0de4354209ebd4abec4255701d5c0e5e202ea405d180",
+    "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+    "publishedAt": "2026-09-24T20:24:21Z",
+    "assets": [
+      {
+        "name": "lean-4.34.1-darwin.tar.zst",
+        "bytes": 564348102,
+        "digest": "sha256:c2fee70250444e46c1106a27bddfef948d1e563eef431eaac05bb946b2f73d3a"
+      },
+      {
+        "name": "lean-4.34.1-darwin.zip",
+        "bytes": 801613065,
+        "digest": "sha256:60b45c76003a4561fb66d7ec2003569006d255d2860179445e56d3e2a029090e"
+      },
+      {
+        "name": "lean-4.34.1-darwin_aarch64.tar.zst",
+        "bytes": 562038070,
+        "digest": "sha256:65f22a4f047738ec742667b3247e836a86ebf06eabc12655c3dee00637e37866"
+      },
+      {
+        "name": "lean-4.34.1-darwin_aarch64.zip",
+        "bytes": 797037816,
+        "digest": "sha256:9019fcd34e93fddf0ecf9d40d28f05a86ba563ac3b701a9c5116ce1c96379360"
+      },
+      {
+        "name": "lean-4.34.1-linux.tar.zst",
+        "bytes": 580432872,
+        "digest": "sha256:47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4"
+      },
+      {
+        "name": "lean-4.34.1-linux.zip",
+        "bytes": 904280152,
+        "digest": "sha256:3013aba02bb8bf31b1cf8c9d956d60fb95bb1c10920dfe91abcaa59cb461ddac"
+      },
+      {
+        "name": "lean-4.34.1-linux_aarch64.tar.zst",
+        "bytes": 581946052,
+        "digest": "sha256:fdb974c2cdb4627e090d5d4007b913e09d13c4868720fb5594e22808b3de9e37"
+      },
+      {
+        "name": "lean-4.34.1-linux_aarch64.zip",
+        "bytes": 906740684,
+        "digest": "sha256:b4bcf1d79f1b5859c04625058d3707701d87a65815f7f0686a1f14df821954c5"
+      },
+      {
+        "name": "lean-4.34.1-windows.tar.zst",
+        "bytes": 589007020,
+        "digest": "sha256:667394ecf6708a228221eb4919c0bdb419966b7408bcf3089a9096a6f4ae62c9"
+      },
+      {
+        "name": "lean-4.34.1-windows.zip",
+        "bytes": 850624573,
+        "digest": "sha256:457698d4e2132243e899ff32178d7ae63c16431d09ed9ad524d859c3581992af"
+      }
+    ]
+  },
+  "comparison": {
+    "path": ".work/product-acceptance/lean-4.34.1-assessment-r1/comparison.json",
+    "sha256": "bcbd4c79c37f4fecef292df80999442555639d5aaeb7c3a64aae44d0a9324c0d",
+    "commits": [
+      {
+        "sha": "2bb7b936ba22786ae817a7e26a67e85c7754eac5",
+        "subject": "feat: add BitVec.ofNatClamp (#14916) (#15179)"
+      },
+      {
+        "sha": "5039560c60b2aebef5fae2b68be4008c685d49f9",
+        "subject": "chore: backport 14928 to releases/v4.34.0 (#15180)"
+      },
+      {
+        "sha": "27e473f2866ecadff221063f11efc431259b376d",
+        "subject": "fix: preserve sticky counts in deletion cascades (#15241)"
+      },
+      {
+        "sha": "e71b3cccb4b3911b581b8717c087de1777aaec6b",
+        "subject": "fix: mark the children of objects whose single-threaded count overflowed (#15288)"
+      },
+      {
+        "sha": "846ad6cd66e5886633eb752d4234f72233068937",
+        "subject": "[Backport releases/v4.34.0] fix: panic instead of wrapping counts in `sharecommon_quick_fn` (#15307)"
+      },
+      {
+        "sha": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "subject": "chore: prepare release"
+      }
+    ],
+    "files": [
+      {
+        "name": "src/CMakeLists.txt",
+        "status": "modified",
+        "changes": 2
+      },
+      {
+        "name": "src/Init/Data/BitVec/BasicAux.lean",
+        "status": "modified",
+        "changes": 13
+      },
+      {
+        "name": "src/Init/Data/BitVec/Lemmas.lean",
+        "status": "modified",
+        "changes": 92
+      },
+      {
+        "name": "src/Lean/Meta/Sym/DSimp/EvalGround.lean",
+        "status": "modified",
+        "changes": 7
+      },
+      {
+        "name": "src/Lean/Meta/Sym/Simp/EvalGround.lean",
+        "status": "modified",
+        "changes": 9
+      },
+      {
+        "name": "src/Lean/Meta/Tactic/BVDecide/Normalize/Simproc.lean",
+        "status": "modified",
+        "changes": 182
+      },
+      {
+        "name": "src/Lean/Meta/Tactic/Simp/BuiltinSimprocs/BitVec.lean",
+        "status": "modified",
+        "changes": 8
+      },
+      {
+        "name": "src/Std/Tactic/BVDecide/Normalize/BitVec.lean",
+        "status": "modified",
+        "changes": 17
+      },
+      {
+        "name": "src/include/lean/lean.h",
+        "status": "modified",
+        "changes": 38
+      },
+      {
+        "name": "src/runtime/object.cpp",
+        "status": "modified",
+        "changes": 31
+      },
+      {
+        "name": "src/runtime/sharecommon.cpp",
+        "status": "modified",
+        "changes": 28
+      },
+      {
+        "name": "tests/elab/bitvec_ofNatClamp.lean",
+        "status": "added",
+        "changes": 30
+      },
+      {
+        "name": "tests/elab/bv_decide_shift_symbolic.lean",
+        "status": "added",
+        "changes": 100
+      },
+      {
+        "name": "tests/misc_dir/rc_sticky/rc_sticky.c",
+        "status": "added",
+        "changes": 177
+      },
+      {
+        "name": "tests/misc_dir/rc_sticky/run_test.sh",
+        "status": "added",
+        "changes": 2
+      }
+    ]
+  },
+  "provisioning": {
+    "path": ".work/lean-4.34.1-native-r1/result.json",
+    "sha256": "668f78019e6c1269799d019517eebcf988d0d36e8764700f96080d182016f771",
+    "content": {
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-4.34.1-native-r1-resources.json",
+      "freeBefore": 8372506624,
+      "passed": true,
+      "native": {
+        "version": "4.34.1",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "identity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "prefix": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "lean": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+        "lake": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lake"
+      },
+      "source": {
+        "url": "https://codeload.github.com/leanprover/lean4/tar.gz/5045d0056413266e57c625dcd7c365b10e377c52",
+        "archive": "/home/lastmjs/development/lasm/compiler/.cache/downloads/lean4-v4.34.1.tar.gz",
+        "bytes": 87806397,
+        "sha256": "2714b59e868977f0458e2735dab8ad346ca33f72d16241307b3b70ce7d1947fc",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52"
+      },
+      "freeAfter": 5131698176,
+      "finishedAt": "2026-09-25T02:56:45.199Z"
+    }
+  },
+  "nativeControls": {
+    "path": ".work/lean-4.34.1-native-controls-r1/result.json",
+    "sha256": "034768e1c2e08084cb3fc8412221dde6d7149e76211e84b48cb0ddab2ab5f973",
+    "content": {
+      "scope": "Native Lean 4.34.1 patch regressions and source ABI comparison; not Wasm or full API acceptance",
+      "provisioning": {
+        "path": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-r1/result.json",
+        "sha256": "668f78019e6c1269799d019517eebcf988d0d36e8764700f96080d182016f771"
+      },
+      "native": {
+        "version": "4.34.1",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "identity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "prefix": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "lean": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+        "lake": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lake"
+      },
+      "sourceArchives": {
+        "4.34.0": "/home/lastmjs/development/lasm/compiler/.cache/downloads/lean4-v4.34.0.tar.gz",
+        "4.34.1": "/home/lastmjs/development/lasm/compiler/.cache/downloads/lean4-v4.34.1.tar.gz"
+      },
+      "sourceCatalog": {
+        "4.34.0": {
+          "commit": "293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "url": "https://codeload.github.com/leanprover/lean4/tar.gz/293d5d0c0c3f3dded4688b3ccd6a33939ac5102b",
+          "bytes": 87810307,
+          "sha256": "09ae33c3327dd90fe934a79f5c9399b720dc340afee5a5c9b08cfe4a6a32226b"
+        },
+        "4.34.1": {
+          "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+          "url": "https://codeload.github.com/leanprover/lean4/tar.gz/5045d0056413266e57c625dcd7c365b10e377c52",
+          "bytes": 87806397,
+          "sha256": "2714b59e868977f0458e2735dab8ad346ca33f72d16241307b3b70ce7d1947fc"
+        }
+      },
+      "inputs": {
+        "scripts/full-lean/probe-lean-patch-release.mjs": "a0ee608beca5bf144ba5924816fb3993e7a0df91eaf83c596e706576ffeec5fe",
+        "scripts/full-lean/lean-sources.json": "632133523cf38161c41e7f6a7899076d59a3edfd9c76402b39a47315b45647b9",
+        "src/toolchains.json": "01094188c5773147878ef3cfaacea8cb4775271a47c3a99d840ac3906c68653b",
+        "test/fixtures/application-main/Main.lean": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-4.34.1-native-controls-r1-resources.json",
+      "commands": [
+        {
+          "label": "native release identity",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "--githash"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "5045d0056413266e57c625dcd7c365b10e377c52\n",
+          "stderr": ""
+        },
+        {
+          "label": "native Lean version",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)\n",
+          "stderr": ""
+        },
+        {
+          "label": "native Lake version",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lake",
+          "args": [
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "Lake version 5.0.0-src+5045d00 (Lean version 4.34.1)\n",
+          "stderr": ""
+        },
+        {
+          "label": "extract and compare exact upstream inputs",
+          "program": "python3",
+          "args": [
+            "-I",
+            "-B",
+            "-c",
+            "\nimport pathlib,sys,tarfile,hashlib,json\nout=pathlib.Path(sys.argv[3]); records={}\ncommon=['src/runtime/io.cpp','src/Init/System/IO.lean']\ntests=['tests/misc_dir/rc_sticky/rc_sticky.c','tests/misc_dir/rc_sticky/run_test.sh',\n       'tests/elab/bitvec_ofNatClamp.lean','tests/elab/bv_decide_shift_symbolic.lean']\nfor version,archive in zip(['4.34.0','4.34.1'],sys.argv[1:3]):\n selected=set(common+(tests if version=='4.34.1' else [])); records[version]={}\n with tarfile.open(archive,'r|gz') as entries:\n  for entry in entries:\n   name='/'.join(pathlib.PurePosixPath(entry.name).parts[1:])\n   if name not in selected:continue\n   assert entry.isfile() and entry.size<1024*1024 and name not in records[version]\n   data=entries.extractfile(entry).read(); assert len(data)==entry.size\n   target=out/version/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)\n   records[version][name]={'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}\n assert set(records[version])==selected\nfor name in common:assert records['4.34.0'][name]==records['4.34.1'][name],name\n(out/'selected-inputs.json').write_text(json.dumps(records,indent=2)+'\\n')\n",
+            "/home/lastmjs/development/lasm/compiler/.cache/downloads/lean4-v4.34.0.tar.gz",
+            "/home/lastmjs/development/lasm/compiler/.cache/downloads/lean4-v4.34.1.tar.gz",
+            "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "compile unchanged upstream reference-count regression",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-o",
+            "rc_sticky.produced",
+            "rc_sticky.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/4.34.1/tests/misc_dir/rc_sticky",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "unchanged upstream reference-count regression",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/4.34.1/tests/misc_dir/rc_sticky/rc_sticky.produced",
+          "args": [],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "unchanged upstream bitvec_ofNatClamp",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/4.34.1/tests/elab/bitvec_ofNatClamp.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "unchanged upstream bv_decide_shift_symbolic",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/4.34.1/tests/elab/bv_decide_shift_symbolic.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "generate ordinary application",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/main.c",
+            "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "compile ordinary application",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "args": [
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/native-main",
+            "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/main.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1",
+          "code": 0,
+          "signal": null,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "label": "native interpreted application",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/Main.lean",
+            "hello \u03bb",
+            "",
+            "space argument"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/interpreted-0",
+          "code": 7,
+          "signal": null,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": ""
+        },
+        {
+          "label": "native compiled application",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/native-main",
+          "args": [
+            "hello \u03bb",
+            "",
+            "space argument"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/compiled-0",
+          "code": 7,
+          "signal": null,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": ""
+        },
+        {
+          "label": "native interpreted application",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "args": [
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/Main.lean",
+            "fail"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/interpreted-1",
+          "code": 1,
+          "signal": null,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n"
+        },
+        {
+          "label": "native compiled application",
+          "program": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/native-main",
+          "args": [
+            "fail"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/lean-4.34.1-native-controls-r1/compiled-1",
+          "code": 1,
+          "signal": null,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n"
+        }
+      ],
+      "passed": true,
+      "versions": {
+        "lean": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)",
+        "lake": "Lake version 5.0.0-src+5045d00 (Lean version 4.34.1)"
+      },
+      "selectedInputs": {
+        "4.34.0": {
+          "src/Init/System/IO.lean": {
+            "bytes": 68710,
+            "sha256": "4612b91e65806364c814fc445b35598d8e26ee0f2a811ffde6c330d792dcddab"
+          },
+          "src/runtime/io.cpp": {
+            "bytes": 59777,
+            "sha256": "426bd6862706a516dbdf70fe7d8993efc028b115d386cef06fe0b081c14a5dcf"
+          }
+        },
+        "4.34.1": {
+          "src/Init/System/IO.lean": {
+            "bytes": 68710,
+            "sha256": "4612b91e65806364c814fc445b35598d8e26ee0f2a811ffde6c330d792dcddab"
+          },
+          "src/runtime/io.cpp": {
+            "bytes": 59777,
+            "sha256": "426bd6862706a516dbdf70fe7d8993efc028b115d386cef06fe0b081c14a5dcf"
+          },
+          "tests/elab/bitvec_ofNatClamp.lean": {
+            "bytes": 851,
+            "sha256": "49a92b9113c44f6094aef741be8d5cda73ff669f0b81771b8281e2b7ff5ef7cf"
+          },
+          "tests/elab/bv_decide_shift_symbolic.lean": {
+            "bytes": 2997,
+            "sha256": "5a1a9996e1f7a2796efd374c6a85e5f56522478fe0ba415c6c831e5043f93c15"
+          },
+          "tests/misc_dir/rc_sticky/rc_sticky.c": {
+            "bytes": 6366,
+            "sha256": "e3a50f62415b4a8ab09c00d6874b99af76e7346b351deb2e9fdd788fb53b6abe"
+          },
+          "tests/misc_dir/rc_sticky/run_test.sh": {
+            "bytes": 80,
+            "sha256": "ad2f44565373048b5918a5f993f415ddbc6d7396483fd66cc469c79c9a17a1dc"
+          }
+        }
+      },
+      "ioErrorSourceUnchanged": true,
+      "application": [
+        {
+          "args": [
+            "hello \u03bb",
+            "",
+            "space argument"
+          ],
+          "interpreted": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          },
+          "compiled": {
+            "code": 7,
+            "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+            "stderr": ""
+          }
+        },
+        {
+          "args": [
+            "fail"
+          ],
+          "interpreted": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          },
+          "compiled": {
+            "code": 1,
+            "stdout": "",
+            "stderr": "uncaught exception: ordinary failure \u03bb\n"
+          }
+        }
+      ],
+      "upstreamTestsUnchanged": true,
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T03:04:19.857Z"
+    }
+  },
+  "resources": [
+    {
+      "path": ".work/product-acceptance/lean-4.34.1-native-r1-resources.json",
+      "sha256": "cf601455c11c517a6bbcf241b13a78e68576dd7522c68574798afeffdec8ce1f",
+      "content": {
+        "startedAt": "2026-09-25T02:48:16.402Z",
+        "command": [
+          ".cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=256",
+          ".work/product-acceptance/prepare-lean-4.34.1-r1.mjs"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "a6bc04ce-6efa-4e99-9527-e964baab68c1",
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23578996736
+        },
+        "minimumHostAvailable": 23233167360,
+        "peakMemoryBytes": 4066127872,
+        "peakTasks": 11,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-4.34.1-native-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-25T02:56:45.263Z",
+          "memoryBytes": 3343699968,
+          "peakMemoryBytes": 4066127872,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 8753152,
+            "file": 3206553600,
+            "kernel": 127602688,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 3206553600,
+            "slab": 126774480
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "highWaterProcesses": {
+          "at": "2026-09-25T02:55:08.868Z",
+          "processes": [
+            {
+              "pid": 4123027,
+              "name": "node-MainThread",
+              "residentBytes": 266063872,
+              "threads": 11
+            }
+          ]
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-25T02:56:45.273Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 3347107840,
+          "peakMemoryBytes": 4066127872,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 3206553600,
+            "kernel": 127725568,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 3206553600,
+            "slab": 126775856
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-25T02:56:45.299Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": ".work/product-acceptance/lean-4.34.1-native-controls-r1-resources.json",
+      "sha256": "7c311b59b4688a5ea2f4df4a9689faeffbee07bfd9d599b8d262e38d878e4737",
+      "content": {
+        "startedAt": "2026-09-25T03:04:10.174Z",
+        "command": [
+          ".cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=128",
+          "scripts/full-lean/probe-lean-patch-release.mjs",
+          ".work/lean-4.34.1-native-r1/result.json",
+          ".work/lean-4.34.1-native-controls-r1"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "b5bfefda-8b68-4994-b387-259b0a2fd177",
+        "limits": {
+          "memoryMax": 2147483648,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 1717986918,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23247978496
+        },
+        "minimumHostAvailable": 23107317760,
+        "peakMemoryBytes": 294133760,
+        "peakTasks": 23,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/lean-4.34.1-native-controls-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-25T03:04:19.791Z",
+          "memoryBytes": 229564416,
+          "peakMemoryBytes": 294133760,
+          "swapBytes": 0,
+          "tasks": 18,
+          "memoryBreakdown": {
+            "anon": 97017856,
+            "file": 114970624,
+            "kernel": 16691200,
+            "shmem": 0,
+            "file_mapped": 8331264,
+            "inactive_file": 59871232,
+            "slab": 2287992
+          },
+          "pressureSomeAvg10": 2.02,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-25T03:04:19.922Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 129540096,
+          "peakMemoryBytes": 294133760,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11644928,
+            "file": 114970624,
+            "kernel": 1359872,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 59871232,
+            "slab": 421376
+          },
+          "pressureSomeAvg10": 2.02,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-25T03:04:19.946Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": ".work/product-acceptance/native-cache-headroom-r2-resources.json",
+      "sha256": "cb6caf4a06ec939f29f592250dfc971e5b0177f4da757e538fbd9855957b752b",
+      "content": {
+        "startedAt": "2026-09-25T02:46:48.237Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/product-acceptance/native-cache-headroom-r2.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "cd765e71-6533-414b-99da-c58874ac2b7d",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23530651648
+        },
+        "minimumHostAvailable": 23415017472,
+        "peakMemoryBytes": 71217152,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/native-cache-headroom-r2-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-25T02:47:15.277Z",
+          "memoryBytes": 24764416,
+          "peakMemoryBytes": 71217152,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 23650304,
+            "kernel": 1105920,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 23547904,
+            "slab": 1094568
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-25T02:47:15.321Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 38387712,
+          "peakMemoryBytes": 71217152,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11657216,
+            "file": 23650304,
+            "kernel": 2158592,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 23592960,
+            "slab": 1221288
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-25T02:47:15.350Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": ".work/product-acceptance/frozen-code-dedup-r1-resources.json",
+      "sha256": "65e6250de73761f80b02ebf26dccb2ab54311414bbbb51f8f2e6cebd29131af0",
+      "content": {
+        "startedAt": "2026-09-25T02:57:13.439Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/product-acceptance/frozen-code-dedup-r1.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "a6143f82-eebc-4097-aa83-ec5915ee35ce",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23450705920
+        },
+        "minimumHostAvailable": 23430807552,
+        "peakMemoryBytes": 13770752,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/frozen-code-dedup-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-25T02:57:25.858Z",
+          "memoryBytes": 139264,
+          "peakMemoryBytes": 10403840,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 126976,
+            "kernel": 12288,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 126976,
+            "slab": 11128
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-25T02:57:25.900Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 13770752,
+          "peakMemoryBytes": 13770752,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11649024,
+            "file": 126976,
+            "kernel": 1081344,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 126976,
+            "slab": 146848
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-25T02:57:25.925Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    },
+    {
+      "path": ".work/product-acceptance/archive-unused-llvm-tools-r1-resources.json",
+      "sha256": "69b7447f1d3e4d1db8537b45aa7547d63f906c49ef75e1cad5ec4f219ef38e4b",
+      "content": {
+        "startedAt": "2026-09-25T03:00:24.366Z",
+        "command": [
+          "python3",
+          "-I",
+          "-B",
+          ".work/product-acceptance/archive-unused-llvm-tools-r1.py"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler",
+        "unit": "lasm-heavy-a79a4e3ab9f2.service",
+        "id": "e4627644-c89b-4c74-8603-079f631a4e6b",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "hostAtStart": {
+          "total": 33456926720,
+          "available": 23360053248
+        },
+        "minimumHostAvailable": 23282192384,
+        "peakMemoryBytes": 106975232,
+        "peakTasks": 1,
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/archive-unused-llvm-tools-r1-resources.json",
+        "status": "finished",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "lastSample": {
+          "at": "2026-09-25T03:01:12.839Z",
+          "memoryBytes": 352256,
+          "peakMemoryBytes": 106975232,
+          "swapBytes": 0,
+          "tasks": 1,
+          "memoryBreakdown": {
+            "anon": 0,
+            "file": 315392,
+            "kernel": 36864,
+            "shmem": 0,
+            "file_mapped": 0,
+            "inactive_file": 315392,
+            "slab": 32912
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "unitReleased": true,
+        "service": {
+          "serviceResult": "success",
+          "exitCode": "exited",
+          "exitStatus": "0",
+          "capturedAt": "2026-09-25T03:01:12.882Z",
+          "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+          "memoryBytes": 14151680,
+          "peakMemoryBytes": 106975232,
+          "swapBytes": 0,
+          "tasks": 7,
+          "memoryBreakdown": {
+            "anon": 11649024,
+            "file": 315392,
+            "kernel": 1101824,
+            "shmem": 0,
+            "file_mapped": 86016,
+            "inactive_file": 315392,
+            "slab": 164696
+          },
+          "pressureSomeAvg10": 0,
+          "memoryEvents": {
+            "low": 0,
+            "high": 0,
+            "max": 0,
+            "oom": 0,
+            "oom_kill": 0,
+            "oom_group_kill": 0
+          }
+        },
+        "finishedAt": "2026-09-25T03:01:12.909Z",
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryThrottled": false
+      }
+    }
+  ],
+  "unitTests": {
+    "path": ".work/product-acceptance/lean-4.34.1-bootstrap-unit-r1.log",
+    "sha256": "2dd32bed6d6b8fd9487a2bde8f7a636b3be9da811caf7c7a269758409d0518be",
+    "tests": 37,
+    "passed": 36,
+    "failed": 0,
+    "skipped": 1,
+    "skip": "Windows-specific CRT control on this Linux host",
+    "log": "TAP version 13\n# Subtest: unknown Lean releases cannot silently use an unverified error ABI\nok 1 - unknown Lean releases cannot silently use an unverified error ABI\n  ---\n  duration_ms: 1.174799\n  type: 'test'\n  ...\n# Subtest: explicit Lean errors retain their messages and constructors under either ABI\nok 2 - explicit Lean errors retain their messages and constructors under either ABI\n  ---\n  duration_ms: 1.365619\n  type: 'test'\n  ...\n# Subtest: libuv errno signs follow the selected Lean release, including node:os errors\nok 3 - libuv errno signs follow the selected Lean release, including node:os errors\n  ---\n  duration_ms: 0.596531\n  type: 'test'\n  ...\n# Subtest: Windows CRT aliases and default cases match the observed native Lean decoder\nok 4 - Windows CRT aliases and default cases match the observed native Lean decoder # SKIP\n  ---\n  duration_ms: 0.102387\n  type: 'test'\n  ...\n# Subtest: CRT provenance survives the native file worker, with instance-local Lean versions\nok 5 - CRT provenance survives the native file worker, with instance-local Lean versions\n  ---\n  duration_ms: 50.038867\n  type: 'test'\n  ...\n# Subtest: streamed installation preserves executable files and notices; reuse verifies every file\nok 6 - streamed installation preserves executable files and notices; reuse verifies every file\n  ---\n  duration_ms: 78.077444\n  type: 'test'\n  ...\n# Subtest: concurrent requests share an install; version identities never share directories\nok 7 - concurrent requests share an install; version identities never share directories\n  ---\n  duration_ms: 27.743286\n  type: 'test'\n  ...\n# Subtest: gzip bootstrap archives need no external decompression executable\nok 8 - gzip bootstrap archives need no external decompression executable\n  ---\n  duration_ms: 15.621171\n  type: 'test'\n  ...\n# Subtest: rootless portable archives preserve notices and forward hardlinks without stripping directories\nok 9 - rootless portable archives preserve notices and forward hardlinks without stripping directories\n  ---\n  duration_ms: 15.132591\n  type: 'test'\n  ...\n# Subtest: rootless archives reject traversal\nok 10 - rootless archives reject traversal\n  ---\n  duration_ms: 8.717663\n  type: 'test'\n  ...\n# Subtest: rootless archives reject absolute\nok 11 - rootless archives reject absolute\n  ---\n  duration_ms: 7.320765\n  type: 'test'\n  ...\n# Subtest: rootless archives reject duplicate spelling\nok 12 - rootless archives reject duplicate spelling\n  ---\n  duration_ms: 10.245832\n  type: 'test'\n  ...\n# Subtest: rootless archives reject escaping link\nok 13 - rootless archives reject escaping link\n  ---\n  duration_ms: 8.095341\n  type: 'test'\n  ...\n# Subtest: rootless archives reject escaping hardlink\nok 14 - rootless archives reject escaping hardlink\n  ---\n  duration_ms: 7.707859\n  type: 'test'\n  ...\n# Subtest: digest downloads leave no completed artifact or staging directory\nok 15 - digest downloads leave no completed artifact or staging directory\n  ---\n  duration_ms: 7.816654\n  type: 'test'\n  ...\n# Subtest: truncated downloads leave no completed artifact or staging directory\nok 16 - truncated downloads leave no completed artifact or staging directory\n  ---\n  duration_ms: 6.899207\n  type: 'test'\n  ...\n# Subtest: oversized downloads leave no completed artifact or staging directory\nok 17 - oversized downloads leave no completed artifact or staging directory\n  ---\n  duration_ms: 7.577668\n  type: 'test'\n  ...\n# Subtest: http-error downloads leave no completed artifact or staging directory\nok 18 - http-error downloads leave no completed artifact or staging directory\n  ---\n  duration_ms: 6.052123\n  type: 'test'\n  ...\n# Subtest: interrupted downloads leave no completed artifact or staging directory\nok 19 - interrupted downloads leave no completed artifact or staging directory\n  ---\n  duration_ms: 7.768273\n  type: 'test'\n  ...\n# Subtest: rejects traversal before publishing a cache entry\nok 20 - rejects traversal before publishing a cache entry\n  ---\n  duration_ms: 8.699524\n  type: 'test'\n  ...\n# Subtest: rejects absolute path before publishing a cache entry\nok 21 - rejects absolute path before publishing a cache entry\n  ---\n  duration_ms: 6.556782\n  type: 'test'\n  ...\n# Subtest: rejects backslash path before publishing a cache entry\nok 22 - rejects backslash path before publishing a cache entry\n  ---\n  duration_ms: 6.56877\n  type: 'test'\n  ...\n# Subtest: rejects wrong archive root before publishing a cache entry\nok 23 - rejects wrong archive root before publishing a cache entry\n  ---\n  duration_ms: 7.068453\n  type: 'test'\n  ...\n# Subtest: rejects duplicate path before publishing a cache entry\nok 24 - rejects duplicate path before publishing a cache entry\n  ---\n  duration_ms: 7.959018\n  type: 'test'\n  ...\n# Subtest: rejects escaping symlink before publishing a cache entry\nok 25 - rejects escaping symlink before publishing a cache entry\n  ---\n  duration_ms: 6.786751\n  type: 'test'\n  ...\n# Subtest: rejects escaping hardlink before publishing a cache entry\nok 26 - rejects escaping hardlink before publishing a cache entry\n  ---\n  duration_ms: 6.546838\n  type: 'test'\n  ...\n# Subtest: rejects special file before publishing a cache entry\nok 27 - rejects special file before publishing a cache entry\n  ---\n  duration_ms: 8.414946\n  type: 'test'\n  ...\n# Subtest: extraction size is independently bounded\nok 28 - extraction size is independently bounded\n  ---\n  duration_ms: 6.941794\n  type: 'test'\n  ...\n# Subtest: added files and deleted cache receipts invalidate the complete tree\nok 29 - added files and deleted cache receipts invalidate the complete tree\n  ---\n  duration_ms: 11.111599\n  type: 'test'\n  ...\n# Subtest: relative toolchain symlinks work and later escapes are rejected\nok 30 - relative toolchain symlinks work and later escapes are rejected\n  ---\n  duration_ms: 12.815783\n  type: 'test'\n  ...\n# Subtest: official-style shared-library symlink chains are created after ordinary files\nok 31 - official-style shared-library symlink chains are created after ordinary files\n  ---\n  duration_ms: 12.750446\n  type: 'test'\n  ...\n# Subtest: forward hardlinks retain file contents\nok 32 - forward hardlinks retain file contents\n  ---\n  duration_ms: 9.604471\n  type: 'test'\n  ...\n# Subtest: cache parents may use OS path aliases without misclassifying internal links as escapes\nok 33 - cache parents may use OS path aliases without misclassifying internal links as escapes\n  ---\n  duration_ms: 11.269596\n  type: 'test'\n  ...\n# Subtest: symlink directory aliases cannot redirect extracted files\nok 34 - symlink directory aliases cannot redirect extracted files\n  ---\n  duration_ms: 7.819732\n  type: 'test'\n  ...\n# Subtest: artifact descriptors require fixed hashes, sizes and HTTPS\nok 35 - artifact descriptors require fixed hashes, sizes and HTTPS\n  ---\n  duration_ms: 3.817037\n  type: 'test'\n  ...\n# Subtest: nearest standard Lean pin wins; unsupported pins are never silently replaced\nok 36 - nearest standard Lean pin wins; unsupported pins are never silently replaced\n  ---\n  duration_ms: 18.13838\n  type: 'test'\n  ...\n# Subtest: Windows ARM64 remains explicit until a native compiler artifact is implemented\nok 37 - Windows ARM64 remains explicit until a native compiler artifact is implemented\n  ---\n  duration_ms: 4.33754\n  type: 'test'\n  ...\n1..37\n# tests 37\n# suites 0\n# pass 36\n# fail 0\n# cancelled 0\n# skipped 1\n# todo 0\n# duration_ms 600.217901\n"
+  },
+  "diskPreparation": {
+    "cacheAudit": "d9e11ebfd7d6518ce2f77f1b07f12186a55a0c1ecc13b8afea38c990761c18a6",
+    "archival": {
+      "path": ".work/product-acceptance/archive-unused-llvm-tools-r1.json",
+      "sha256": "b3853df9dc9d1ef917a1ead550360728fb541f1318e3acf3bf8034db63cb126c",
+      "content": {
+        "scope": "Lossless archival of unused Fortran and MLIR tools in the cached Bun research SDK; C/C++ build tools, sources, completed builds and evidence remain available",
+        "files": [
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/flang-21",
+            "originalBytes": 338510312,
+            "originalSha256": "cc6a72a5014e00ede78521794f23556309032a0166ffec60a38331259a1e576e",
+            "mode": 493,
+            "mtimeNs": 1765885151000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/flang-21.gz",
+            "archiveBytes": 93592561,
+            "archiveSha256": "515732072bd4b2b831a279bcd8d5233f6d6f1b9dfdc2fd97bccfca41c65ae200",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-opt",
+            "originalBytes": 333469240,
+            "originalSha256": "67e9921fac5740606fa515dff00e149dd68e6fb5d02243dbf49dbf154e024a5e",
+            "mode": 493,
+            "mtimeNs": 1765886453000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-opt.gz",
+            "archiveBytes": 85687546,
+            "archiveSha256": "405d8ae235f17fdac66e1440cfc0605f59510f0231e1702d87698e7944d5c215",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-rewrite",
+            "originalBytes": 270114968,
+            "originalSha256": "b08b732e503d4f7be3a99fe5657aea36735844583e26220f2ecaa8f5a7d1ad17",
+            "mode": 493,
+            "mtimeNs": 1765886633000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-rewrite.gz",
+            "archiveBytes": 69851340,
+            "archiveSha256": "129491d52b797b8da2ad2b752754def54af3f5b6b3f6a4ed0c482fa827552e66",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/bbc",
+            "originalBytes": 245306288,
+            "originalSha256": "f4db66ad927807c0d250e6cd2d67393370abbf43e8e6d5433ac1866977209310",
+            "mode": 493,
+            "mtimeNs": 1765887793000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/bbc.gz",
+            "archiveBytes": 67504573,
+            "archiveSha256": "55f7909e0def8305372c3a807c603e6456ba277203b1c21bec71297186039aaf",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-reduce",
+            "originalBytes": 212173976,
+            "originalSha256": "af8575412fed77fcb6ec23e575c9456f79894384fcd9739c7bd024a8aaf6050f",
+            "mode": 493,
+            "mtimeNs": 1765886594000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-reduce.gz",
+            "archiveBytes": 57063859,
+            "archiveSha256": "4052731d2d7341c4fbab6ca416e798e8bfd2428ce1c2e7b86fdab6ed5de9502e",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-transform-opt",
+            "originalBytes": 208675168,
+            "originalSha256": "de69549ea7f963ff4c1a0b1728c3482d9fbb9c4089182a47ee9f0dd97e15494a",
+            "mode": 493,
+            "mtimeNs": 1765886782000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-transform-opt.gz",
+            "archiveBytes": 56739094,
+            "archiveSha256": "cb24980caec7db72433e1a1347f3419b6fdf470ad62c0a39835febae4814c559",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-lsp-server",
+            "originalBytes": 205091168,
+            "originalSha256": "d8502f4e7b94eb19ed2f215259637bc0e0ec4b24837baa6d8a38e8e393d77693",
+            "mode": 493,
+            "mtimeNs": 1765886307000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-lsp-server.gz",
+            "archiveBytes": 54645112,
+            "archiveSha256": "0bf8f743ca34461d93e8ebe47df4c0814c1fd3c6fad89551ffc19e0558f15041",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-query",
+            "originalBytes": 190273336,
+            "originalSha256": "e738b40c0deb820e2576a6b34f6319d7402a44a2755c6a593bd79818d8c1d0dd",
+            "mode": 493,
+            "mtimeNs": 1765886462000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/bin/mlir-query.gz",
+            "archiveBytes": 50621812,
+            "archiveSha256": "9a5378c1bc76ce0960f7d0590e8834695eeff9fab5db03cfe624f76d90503acd",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libFortranSemantics.a",
+            "originalBytes": 161728412,
+            "originalSha256": "a9ca2ba210514e2df9249657bc0ea4b3e0dff76f32f362d394f30ed2761151bc",
+            "mode": 420,
+            "mtimeNs": 1765884845000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libFortranSemantics.a.gz",
+            "archiveBytes": 25751369,
+            "archiveSha256": "7645c4109f7ec2d892cabe2a87fc209f41b00dcc39c57af8223d4eba1234b37f",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libFortranEvaluate.a",
+            "originalBytes": 148552850,
+            "originalSha256": "7636fe635118fec87f71ecb5e9bc6fa8b87be25342285978885e644580fe4981",
+            "mode": 420,
+            "mtimeNs": 1765884633000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libFortranEvaluate.a.gz",
+            "archiveBytes": 26925150,
+            "archiveSha256": "e6ab94a94fcc26b988793080c230fbbc23f06d8b41e5c375c6cebb58ac7dbbed",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libFortranLower.a",
+            "originalBytes": 137760306,
+            "originalSha256": "185b86c14ccc3a739f90e64ba8f060a5ac1defabf987d249e55bf9d3b12ad835",
+            "mode": 420,
+            "mtimeNs": 1765884846000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libFortranLower.a.gz",
+            "archiveBytes": 19790191,
+            "archiveSha256": "d2d9ad24539979288f503c63e7a2da927f2260e6250a9b1cbdd04ba012227a81",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          },
+          {
+            "original": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libFortranParser.a",
+            "originalBytes": 34002992,
+            "originalSha256": "413718660faabda4dfeac301668ca78db2eb5f34cf5883f8e39f47ddd6da969a",
+            "mode": 420,
+            "mtimeNs": 1765884346000000000,
+            "archive": "/home/lastmjs/development/lasm/compiler/.cache/bun-build-tools/llvm/LLVM-21.1.8-Linux-X64/lib/libFortranParser.a.gz",
+            "archiveBytes": 7581205,
+            "archiveSha256": "d448a19a40819893e9433437c056d1718455def23cc77d8e47e9baa30b20429e",
+            "verifiedDecompression": true,
+            "phase": "archived"
+          }
+        ],
+        "freeBefore": 5134962688,
+        "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/archive-unused-llvm-tools-r1-resources.json",
+        "freeAfter": 7003975680,
+        "finishedAt": "2026-09-25T03:01:12.826426+00:00",
+        "restore": "Decompress each archive to the original path, verify originalSha256, restore mode and mtimeNs from this receipt."
+      }
+    },
+    "frozenCode": {
+      "path": ".work/product-acceptance/frozen-code-dedup-r1.json",
+      "actualFilesReplaced": 0,
+      "reason": "Those frozen snapshots already share their underlying files."
+    }
+  },
+  "earlierResourceStop": {
+    "path": ".work/product-acceptance/native-cache-headroom-r1-resources.json",
+    "sha256": "74e19e6bfce1dca441c41c0a485e52bcc18dded86a64b070498498f9b94ee167",
+    "content": {
+      "startedAt": "2026-09-25T02:45:00.131Z",
+      "command": [
+        "python3",
+        "-I",
+        "-B",
+        ".work/product-acceptance/native-cache-headroom-r1.py"
+      ],
+      "cwd": "/home/lastmjs/development/lasm/compiler",
+      "unit": "lasm-heavy-a79a4e3ab9f2.service",
+      "id": "38460f66-adca-4131-bfbf-f46599665d2e",
+      "limits": {
+        "memoryMax": 536870912,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 429496729,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "hostAtStart": {
+        "total": 33456926720,
+        "available": 23260102656
+      },
+      "minimumHostAvailable": 23260102656,
+      "peakMemoryBytes": 455200768,
+      "peakTasks": 1,
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/native-cache-headroom-r1-resources.json",
+      "status": "finished",
+      "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+      "lastSample": {
+        "at": "2026-09-25T02:45:03.339Z",
+        "memoryBytes": 453627904,
+        "peakMemoryBytes": 453627904,
+        "swapBytes": 0,
+        "tasks": 1,
+        "memoryBreakdown": {
+          "anon": 30511104,
+          "file": 421396480,
+          "kernel": 1548288,
+          "shmem": 0,
+          "file_mapped": 0,
+          "inactive_file": 421380096,
+          "slab": 1395632
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "highWaterProcesses": {
+        "at": "2026-09-25T02:45:02.539Z",
+        "processes": [
+          {
+            "pid": 4122382,
+            "name": "python3",
+            "residentBytes": 40787968,
+            "threads": 1
+          }
+        ]
+      },
+      "stoppedBecause": "Workload reached its proactive memory budget",
+      "unitReleased": true,
+      "service": {
+        "serviceResult": "success",
+        "exitCode": "killed",
+        "exitStatus": "TERM",
+        "capturedAt": "2026-09-25T02:45:03.415Z",
+        "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/lasm-heavy-a79a4e3ab9f2.service",
+        "memoryBytes": 437977088,
+        "peakMemoryBytes": 455200768,
+        "swapBytes": 0,
+        "tasks": 7,
+        "memoryBreakdown": {
+          "anon": 11644928,
+          "file": 422899712,
+          "kernel": 2437120,
+          "shmem": 0,
+          "file_mapped": 86016,
+          "inactive_file": 422899712,
+          "slab": 1507912
+        },
+        "pressureSomeAvg10": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "finishedAt": "2026-09-25T02:45:03.440Z",
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": true,
+      "memoryThrottled": false
+    }
+  },
+  "verified": [
+    "Official 4.34.1 native compiler identity matches 5045d0056413266e57c625dcd7c365b10e377c52; the immutable source archive is pinned by hash and size.",
+    "Unchanged rc_sticky C regression and both new BitVec elaboration tests pass with the official native release.",
+    "Ordinary filesystem, Unicode, asynchronous tasks, successful nonzero exit and uncaught error output match fresh interpreted and compiled native runs.",
+    "Init/System/IO.lean and runtime/io.cpp are byte-identical between the two official source archives, allowing the existing reviewed IO error policy to include 4.34.1.",
+    "The existing default and all prior acceptance evidence remain 4.34.0. New pins select 4.34.1 native tools without silently changing older pins."
+  ],
+  "remaining": [
+    "Rebuild and package every 4.34.1 runtime/standard library object with the new headers and source, then verify ordinary applications and upstream regressions in stock Node/Deno/Bun.",
+    "Run latest-version native and deployment acceptance on all six platforms, including a new Windows ARM64 native build.",
+    "Complete helper shipping integration and all remaining API/concurrency/lifetime gaps. No remaining difference is demonstrated fundamental."
+  ]
+}

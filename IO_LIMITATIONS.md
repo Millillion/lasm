@@ -1,10 +1,17 @@
 # Current IO limitations in Lasm
 
-The [current product plan](docs/PLAN.md) targets full ordinary Lean 4.34.0
+The [current product plan](docs/PLAN.md) now targets full ordinary Lean 4.34.1
 applications in stock Node 26.10.0, Deno 2.9.7 and Bun 1.4.2 on all six native
 build platforms. Its [application pipeline status](docs/APPLICATION_PIPELINE.md)
 and [unchanged upstream inventory](docs/UPSTREAM_APPLICATION_TESTS.md) are tracked
 separately from the earlier runtime evidence below.
+
+- [ ] Complete the new Lean 4.34.1 runtime rebuild and fresh Wasm/application
+  acceptance. The [native bootstrap and patch regressions](docs/evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
+  pass on Linux x64, and exact source comparison validates retaining the existing
+  IO error policy. The release also changes reference-counting runtime headers
+  and library code, which require rebuilt objects and fresh execution evidence.
+  Earlier results below remain scoped to 4.34.0 or their stated older version.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
   application path; earlier 4.32 results do not transfer automatically.

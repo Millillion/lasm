@@ -140,7 +140,9 @@ const windowsCrtCases = new Set(`
 `.trim().split(/\s+/));
 
 export function checkLeanIOVersion(version) {
-  if (version !== '4.32.0' && version !== '4.34.0')
+  // The verified 4.34.1 archives preserve both Init.System.IO and runtime/io.cpp
+  // byte-for-byte. Keep unreviewed releases explicit instead of a version range.
+  if (!['4.32.0', '4.34.0', '4.34.1'].includes(version))
     throw new Error('No verified IO error policy for Lean ' + version);
 }
 
