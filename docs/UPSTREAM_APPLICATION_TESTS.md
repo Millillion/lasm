@@ -38,10 +38,25 @@ release without OOM, swap or resource stops; maximum memory is 4.58 GiB.
 The [initial three-input results](evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
 and [expanded Node checkpoint](evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
 remain intact. Original registrations retain their native-build-time category;
-parallel runtime checks add deployed API observations. Serial fuzz/hang inputs,
-guarded/scoped evaluations, full declaration coverage and other native platforms
-remain separate unfinished work. These checks do not establish full `Std.Http`
-or complete latest-release upstream-suite acceptance.
+parallel runtime checks add deployed API observations.
+
+[Ten additional original inputs now pass in all three engines](evidence/lean-4.34.1-upstream-io-stress-network-complete-2026-09-25.json):
+30 comparisons and 213 deployed actions covering temporary files, TCP, UDP,
+cancellation reasons, serial HTTP fuzzing, size limits and hang regressions.
+Combined with the twelve preceding HTTP inputs, these are 66 comparisons and
+657 deployed actions. Eight integrity controls enforce exact source and sidecar
+hashes, supported syntax contexts and upstream serial-execution requirements.
+All original assertions and deadlines remain unchanged. The additional campaign
+peaked at 3.47 GiB, retained at least 5.22 GiB free disk, and released every
+guard without resource events. Successful generated outputs follow the existing
+suite cleanup policy: sources, results and hashes remain; these are not retained
+binary archives, apart from the Node temporary-file case.
+
+The `async_tcp_half` input executes only its original `listenClose` check; its
+unused `acceptClose` definition does not establish half-close coverage.
+Guarded/scoped evaluations, full declaration coverage and other native platforms
+remain unfinished. These checks do not establish full `Std.Http` or complete
+latest-release upstream-suite acceptance.
 
 The results and checked items below retain their original **4.34.0** scope.
 

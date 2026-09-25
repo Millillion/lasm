@@ -1,0 +1,4090 @@
+{
+  "scope": "Additional byte-preserving IO-expression comparisons for original Lean 4.34.1 tests. Native original drivers run unchanged; parallel mains execute every reviewed IO action through native interpretation, native C compilation and installed .25 deployed AOT. Original registrations remain native-build-time, not reclassified as deployed compiler checks.",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "targets": [
+    "node",
+    "deno",
+    "bun"
+  ],
+  "reviewSha256": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+  "reviewedInputs": {
+    "elab/tempfile.lean": {
+      "sha256": "aaf51d63382e0aae22cb6ec054a34c96ae78b4b47f3eb5da1c0c6f7119c17e4e",
+      "actions": 4
+    },
+    "elab/async_tcp_fname_errors.lean": {
+      "sha256": "d37535c6d32c5761c23968e7ba1ae84e86933cba5097df54798c27ab1e9eb27b",
+      "actions": 1
+    },
+    "elab/async_tcp_half.lean": {
+      "sha256": "714436bdf6c6f1975983b817af4de6639f6bde69621c9d8e95921f6b60bf8feb",
+      "actions": 1
+    },
+    "elab/async_tcp_server_client.lean": {
+      "sha256": "5471ef0ce0cbfa9a4a3ad25fbe7b1a617d39390be1257f83eb6ee07e752a6290",
+      "actions": 2
+    },
+    "elab/async_udp_sockets.lean": {
+      "sha256": "566a8a4c9e6715d098ab49682cfde49c4786aeaee775bbf8827ff33df4b5e4ae",
+      "actions": 2
+    },
+    "elab/async_cancellation_reasons.lean": {
+      "sha256": "43e2405f5d7d5a01d1f192fc437fd0329976fa75b4b99099e3471f9620489866",
+      "actions": 11
+    },
+    "elab/async_http_fuzz.lean": {
+      "sha256": "d28901076d0af0f77f860777032bd01b486970d1d8fe017a9c7f14ce0daf2da2",
+      "actions": 10,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ]
+    },
+    "elab/async_http_fuzz_limits.lean": {
+      "sha256": "ef9e819611a80bee8c957b1b9c7409d18cb8552661399ed8eebb545eff74529f",
+      "actions": 10,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz_limits.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ]
+    },
+    "elab/async_http_fuzz_random.lean": {
+      "sha256": "ab96c3e1cbdd2927896c10826317b92bc64be1dc2ae4510516756ae8f017c982",
+      "actions": 8,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz_random.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ]
+    },
+    "elab/async_http_hang_regressions.lean": {
+      "sha256": "b75a003ded614169a1b4017243a0c67ce0f0f41674223194e0f2cf18ea45e258",
+      "actions": 22,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_hang_regressions.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ]
+    }
+  },
+  "runs": [
+    {
+      "name": "elab/tempfile.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 4,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-tempfile-r1/result.json",
+      "resultSha256": "643f414767d29d1cae5983638af63d541fd68b7ba4adb6bf720984466f3d0937",
+      "sourceSha256": "aaf51d63382e0aae22cb6ec054a34c96ae78b4b47f3eb5da1c0c6f7119c17e4e",
+      "parallelSourceSha256": "29e35eb50fab55642128b0091ac9c4e7fd2bd107e95061b159492a4a50c0f70d",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/tempfile.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "e345cc81d5a3ccd8704a3dce4da9078897c0008cda1097e9026f9b8565df6f44",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "29e35eb50fab55642128b0091ac9c4e7fd2bd107e95061b159492a4a50c0f70d",
+            "cSha256": "e08f65e33464c242195e05da9e473097696a77649eff6f7f23b833d37b743b0c"
+          }
+        ],
+        "signature": "3e306562a9da10fe6ab2765428ed43321b0ab7d6f08a85f2c8191d18b5e5c306",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/tempfile.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/tempfile.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-tempfile-r1-resources.json",
+        "startedAt": "2026-09-25T07:59:30.977Z",
+        "finishedAt": "2026-09-25T08:01:01.146Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3546099712,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-tempfile-r1/binary-archive.json",
+      "retentionReceiptSha256": "ac31852fb6d6b9bceadc2604de4caeec7710c736e4f89c687b423cef8f83bccb",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-tempfile-r1-archive-resources.json",
+        "startedAt": "2026-09-25T08:01:29.251Z",
+        "finishedAt": "2026-09-25T08:01:35.334Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 209539072,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "verified lossless Wasm archival",
+      "minimumFreeDiskBytes": 5820936192
+    },
+    {
+      "name": "elab/async_tcp_fname_errors.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 1,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-tcp-fname-errors-r1/result.json",
+      "resultSha256": "63eb22ddcc4e0b32bbcb20496c662d92367ba229e7c94243e81772c06781a647",
+      "sourceSha256": "d37535c6d32c5761c23968e7ba1ae84e86933cba5097df54798c27ab1e9eb27b",
+      "parallelSourceSha256": "7bb11806645b7409984e2ee5cecf3f8795dd4c6fee78e54327229357788e4f96",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_tcp_fname_errors.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "5dd7a5622730cb6472bc7c8735a61ba8e7a4d551ff30f847b24d5e74ff953d29",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "7bb11806645b7409984e2ee5cecf3f8795dd4c6fee78e54327229357788e4f96",
+            "cSha256": "8705b0b45bcce720f2d20be10d467276694e4838ca48306c117622413e54ce43"
+          }
+        ],
+        "signature": "f0e0f8be0bc52169c94823edff70e0f2ad2f5be11c6d1bb91c986dd3b973adf7",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_fname_errors.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_fname_errors.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-tcp-fname-errors-r1-resources.json",
+        "startedAt": "2026-09-25T08:06:36.264Z",
+        "finishedAt": "2026-09-25T08:08:03.156Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3546300416,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-tcp-fname-errors-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "6cb9925830b79205342b8c656ed86bb42f3a21aa06b66bcab46b85985b52fed6",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-tcp-fname-errors-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:08:03.342Z",
+        "finishedAt": "2026-09-25T08:08:05.819Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170582016,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5693415424
+    },
+    {
+      "name": "elab/async_tcp_half.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 1,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-tcp-half-r1/result.json",
+      "resultSha256": "0bc35990be1adda840fac3f92f9e01986c69bdabe5292e09f75a576a3c352b29",
+      "sourceSha256": "714436bdf6c6f1975983b817af4de6639f6bde69621c9d8e95921f6b60bf8feb",
+      "parallelSourceSha256": "588083d9f3d867489d4e894284700691831b6b60c834f65f85ceb81dbcde1ed3",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_tcp_half.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "21c52b6b32ec82518808bedc9b21616eaf4b7f489c7f91c09c6c95374e2a8d58",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "588083d9f3d867489d4e894284700691831b6b60c834f65f85ceb81dbcde1ed3",
+            "cSha256": "c1b86ed00ea879130660e98e59bc08c316a8e61538f1791a38b25416c8c1e2e0"
+          }
+        ],
+        "signature": "3aeb0b4eaa077bca959c59150785142e486db80f98a8ed723e64c2329425edb4",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_half.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_half.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-tcp-half-r1-resources.json",
+        "startedAt": "2026-09-25T08:08:06.382Z",
+        "finishedAt": "2026-09-25T08:09:35.132Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3548823552,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-tcp-half-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "ba0d18f69f75f351f5b0535dd73693fed59e557cafb983dd1f4b7e4b8f931da7",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-tcp-half-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:09:35.480Z",
+        "finishedAt": "2026-09-25T08:09:38.518Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170532864,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5742542848
+    },
+    {
+      "name": "elab/async_tcp_server_client.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 2,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-tcp-server-client-r1/result.json",
+      "resultSha256": "741892e1b96777292b0b586308dd4f6a8eeff3389de39d878dcd5dc868e53596",
+      "sourceSha256": "5471ef0ce0cbfa9a4a3ad25fbe7b1a617d39390be1257f83eb6ee07e752a6290",
+      "parallelSourceSha256": "62e9922b687316e184d7cbceaf14fb6142844acb7aa48982663c95337c2046fe",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_tcp_server_client.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "3668687005652064ece0343747f3c8df511dea1db052d80db906eeabf47e4347",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "62e9922b687316e184d7cbceaf14fb6142844acb7aa48982663c95337c2046fe",
+            "cSha256": "c1253b3f943679bcd9b088e0242ade5921c09e408627f35ff536761ec40b8033"
+          }
+        ],
+        "signature": "4b46bc963fa3789496520634653c339f9f8f684c48f17e08a652d17f4154988d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_server_client.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_server_client.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-tcp-server-client-r1-resources.json",
+        "startedAt": "2026-09-25T08:09:39.516Z",
+        "finishedAt": "2026-09-25T08:11:09.222Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3554021376,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-tcp-server-client-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "01171f20b33b1da0ea0a461e966de14e893d2c927d67b1c5560f3978df845788",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-tcp-server-client-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:11:09.628Z",
+        "finishedAt": "2026-09-25T08:11:12.236Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170721280,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5741076480
+    },
+    {
+      "name": "elab/async_udp_sockets.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 2,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-udp-sockets-r1/result.json",
+      "resultSha256": "14e39f202eb7b437e6b8f8dd7fbbc362f2ee92a67afc75addeca1cf15c38ca97",
+      "sourceSha256": "566a8a4c9e6715d098ab49682cfde49c4786aeaee775bbf8827ff33df4b5e4ae",
+      "parallelSourceSha256": "3c65cd119e97217a072dd9f2cb4b3200a01b93f87de09b5b78b560405d08f108",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_udp_sockets.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "c11b412d734d2fff20a43d5c10dcf36c33c94a1154aa2f685f0f26606c356a19",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "3c65cd119e97217a072dd9f2cb4b3200a01b93f87de09b5b78b560405d08f108",
+            "cSha256": "cd760d56ddb92151cc64076aaee56181dae9b2c6229941353ccdb78747d1cb4b"
+          }
+        ],
+        "signature": "e9ba24f51729c70d63dd532123cbcb89175179dde33ec4ded14fab4f51a18271",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_udp_sockets.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_udp_sockets.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-udp-sockets-r1-resources.json",
+        "startedAt": "2026-09-25T08:11:12.677Z",
+        "finishedAt": "2026-09-25T08:12:40.964Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3544584192,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-udp-sockets-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "2eddfd49045e6008f5e8ae312b1d3706bcab95554a01aac3bf9667ef48d826f9",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-udp-sockets-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:12:41.754Z",
+        "finishedAt": "2026-09-25T08:12:44.583Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170582016,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5741162496
+    },
+    {
+      "name": "elab/async_cancellation_reasons.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 11,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-cancellation-reasons-r1/result.json",
+      "resultSha256": "f1bcb377ff07216de457f3615b99da0428ec80d5797e18b82e2949a730f61b93",
+      "sourceSha256": "43e2405f5d7d5a01d1f192fc437fd0329976fa75b4b99099e3471f9620489866",
+      "parallelSourceSha256": "4d4e77435a35fa980664f31e9b7e6e39f6797f99091f27b4d6c0fc4510cd1d3d",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_cancellation_reasons.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "97ea92fb1c1cc085ee9737f95fa1d44d6c99068604c78c2c8ffa5939555d4c39",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "4d4e77435a35fa980664f31e9b7e6e39f6797f99091f27b4d6c0fc4510cd1d3d",
+            "cSha256": "0db2b1e93e8a59b334e9191ba2c240d0ef345311a6c04ed742281bada62e8981"
+          }
+        ],
+        "signature": "d06b3aed73d704acc9bfae89b63823b95dbe8667a7b0a9f986b411bac154976d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_cancellation_reasons.lean (11 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_cancellation_reasons.lean (11 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-cancellation-reasons-r1-resources.json",
+        "startedAt": "2026-09-25T08:12:44.796Z",
+        "finishedAt": "2026-09-25T08:14:14.293Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3544735744,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-async-cancellation-reasons-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "7f4219249d5f875e40f7486bfa42efa16e46a66666c11bc60b80607ded5ce79f",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-async-cancellation-reasons-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:14:14.975Z",
+        "finishedAt": "2026-09-25T08:14:17.956Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170717184,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5739384832
+    },
+    {
+      "name": "elab/async_http_fuzz.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 10,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-fuzz-r1/result.json",
+      "resultSha256": "aa2c9167626a0e9bb9854b22d30b07a609bdabce4d8fea4624d349643697f166",
+      "sourceSha256": "d28901076d0af0f77f860777032bd01b486970d1d8fe017a9c7f14ce0daf2da2",
+      "parallelSourceSha256": "edf51d80f163e5c5d766a637dc7ef5a370a259c9f65bd7a8139e2e33cf1d41d8",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz.lean.serial"
+      ],
+      "wasmSha256": "2c5317ccb94120d1a64772b2c49d4917f33a373f599e00084b82042b6d203f3c",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "edf51d80f163e5c5d766a637dc7ef5a370a259c9f65bd7a8139e2e33cf1d41d8",
+            "cSha256": "88aa72873ee18f8785bd862b64087d8dfd3934b238962dbd79ddc700d3b1ead7"
+          }
+        ],
+        "signature": "25ac974221bfba6eb8ce00cbc3eff72bfb5265573301e87d7c23971a4fcac8c6",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-fuzz-r1-resources.json",
+        "startedAt": "2026-09-25T08:02:12.981Z",
+        "finishedAt": "2026-09-25T08:03:53.621Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3564113920,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-fuzz-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "4dc94d10fabc6b65978213b331bbb060979890768ef88fdc76d9b2ef5a9bf0f6",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-fuzz-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:05:28.832Z",
+        "finishedAt": "2026-09-25T08:05:31.430Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 171020288,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5735256064
+    },
+    {
+      "name": "elab/async_http_fuzz_limits.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 10,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-fuzz-limits-r1/result.json",
+      "resultSha256": "3e16e5a762f6a01687987feb430a8e56587eb546c8d9c480e7a73a77973fb345",
+      "sourceSha256": "ef9e819611a80bee8c957b1b9c7409d18cb8552661399ed8eebb545eff74529f",
+      "parallelSourceSha256": "9ea2382f365e50ae15625234e1e65446fba72ab1d33eed852c68b95e3bcd3eeb",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz_limits.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz_limits.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz_limits.lean.serial"
+      ],
+      "wasmSha256": "a156f4543303a2c82fc3a25d79d2264bf766b5e6eff2a6b97d85d3e800648fef",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "9ea2382f365e50ae15625234e1e65446fba72ab1d33eed852c68b95e3bcd3eeb",
+            "cSha256": "1d811b53a4945c9824cde477b4cfdf7fc8fb9e374bf40cba5295a54d307e9c48"
+          }
+        ],
+        "signature": "4dea28a5e4acad6ed9dbf33c0895ffe2a6bce4eee31a24f48827b40ee6061ab4",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_limits.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_limits.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-fuzz-limits-r1-resources.json",
+        "startedAt": "2026-09-25T08:14:19.048Z",
+        "finishedAt": "2026-09-25T08:15:53.070Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3556761600,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-fuzz-limits-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "90a01c338bd21b33659712dd1873a7295d51e9767aadfc348368bc747428bb6a",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-fuzz-limits-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:15:54.136Z",
+        "finishedAt": "2026-09-25T08:15:57.274Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170692608,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5735653376
+    },
+    {
+      "name": "elab/async_http_fuzz_random.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 8,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-fuzz-random-r1/result.json",
+      "resultSha256": "8816f110e3a0dd88da4eda50d7bc01be5b05de14a0950d0f0431c9d44e3e52c9",
+      "sourceSha256": "ab96c3e1cbdd2927896c10826317b92bc64be1dc2ae4510516756ae8f017c982",
+      "parallelSourceSha256": "aa2266e3a305b1a730af31d272d1dafd6f02a193496a101daf75c08e87744be2",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz_random.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz_random.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz_random.lean.serial"
+      ],
+      "wasmSha256": "d483e938b7759aefb734397d48611545e5f2b79240ee76c1b23e56351a04cb89",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "aa2266e3a305b1a730af31d272d1dafd6f02a193496a101daf75c08e87744be2",
+            "cSha256": "f3af8b1014ff72fa77a80952cd5227d31f4ea98a36bf073f57b5620d2805085d"
+          }
+        ],
+        "signature": "d6a9f6c8207f53e3382aae49ff16ec0d6eed377923314e796c2872fc1037a1e3",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_random.lean (8 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_random.lean (8 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-fuzz-random-r1-resources.json",
+        "startedAt": "2026-09-25T08:15:58.179Z",
+        "finishedAt": "2026-09-25T08:17:31.852Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3549114368,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-fuzz-random-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "ba063390057713f469df68782886c09a14a79c7fc2d95986976650850ffaef0d",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-fuzz-random-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:17:32.267Z",
+        "finishedAt": "2026-09-25T08:17:34.845Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170692608,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5736202240
+    },
+    {
+      "name": "elab/async_http_hang_regressions.lean",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "actions": 22,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-hang-regressions-r1/result.json",
+      "resultSha256": "902fef49302bae7f76f7e98d429db6fbe9f172842f48ae3b45dc8114d25368a6",
+      "sourceSha256": "b75a003ded614169a1b4017243a0c67ce0f0f41674223194e0f2cf18ea45e258",
+      "parallelSourceSha256": "4f3a0698b6cd970160e097547808438f4fc959c1065b47d598ffdff1b3abfecb",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_hang_regressions.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_hang_regressions.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_hang_regressions.lean.serial"
+      ],
+      "wasmSha256": "2a9753299439b40d96c6d17ece58e1fa099336b93c89371522ff2798fe2785c3",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "4f3a0698b6cd970160e097547808438f4fc959c1065b47d598ffdff1b3abfecb",
+            "cSha256": "5d0fcb5695e25dd28082b8b898acdf5d3f02bffa0c57dd4015c4f364e57f69c1"
+          }
+        ],
+        "signature": "edd2a7ad762e66ace218d49c8123322922834a50423a29b0b1fc11b414b62f97",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_hang_regressions.lean (22 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_hang_regressions.lean (22 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-hang-regressions-r1-resources.json",
+        "startedAt": "2026-09-25T08:17:35.313Z",
+        "finishedAt": "2026-09-25T08:19:15.026Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3570032640,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-node-hang-regressions-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "58dcfe0f89244f2751836b3c453857713a564b26c09b00fab48f55b9cba62865",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-node-hang-regressions-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:19:15.394Z",
+        "finishedAt": "2026-09-25T08:19:18.589Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 171065344,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5729955840
+    },
+    {
+      "name": "elab/tempfile.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 4,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-tempfile-r1/result.json",
+      "resultSha256": "bf531f03caa3f53ac49570a3a3a4656244cb547d3ea8cf51e51b3a9d36b7852d",
+      "sourceSha256": "aaf51d63382e0aae22cb6ec054a34c96ae78b4b47f3eb5da1c0c6f7119c17e4e",
+      "parallelSourceSha256": "29e35eb50fab55642128b0091ac9c4e7fd2bd107e95061b159492a4a50c0f70d",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/tempfile.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "e345cc81d5a3ccd8704a3dce4da9078897c0008cda1097e9026f9b8565df6f44",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "29e35eb50fab55642128b0091ac9c4e7fd2bd107e95061b159492a4a50c0f70d",
+            "cSha256": "e08f65e33464c242195e05da9e473097696a77649eff6f7f23b833d37b743b0c"
+          }
+        ],
+        "signature": "d2ac4c90b710342221282ba11327105e73c87d861e4eea1ad30568217f32836b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/tempfile.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/tempfile.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-tempfile-r1-resources.json",
+        "startedAt": "2026-09-25T08:19:19.438Z",
+        "finishedAt": "2026-09-25T08:20:48.910Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3539439616,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-tempfile-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "27a0984810706cad2a7a88a0bac1722c21c5b03e9c8e7b6d6cdfb630d7ed6669",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-tempfile-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:20:49.542Z",
+        "finishedAt": "2026-09-25T08:20:52.045Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170545152,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5739360256
+    },
+    {
+      "name": "elab/async_tcp_fname_errors.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 1,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-tcp-fname-errors-r1/result.json",
+      "resultSha256": "23a75cf0167d2f86778466f3597d92967a8f1b92ad550d563cdd9756e268a68a",
+      "sourceSha256": "d37535c6d32c5761c23968e7ba1ae84e86933cba5097df54798c27ab1e9eb27b",
+      "parallelSourceSha256": "7bb11806645b7409984e2ee5cecf3f8795dd4c6fee78e54327229357788e4f96",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_tcp_fname_errors.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "5dd7a5622730cb6472bc7c8735a61ba8e7a4d551ff30f847b24d5e74ff953d29",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "7bb11806645b7409984e2ee5cecf3f8795dd4c6fee78e54327229357788e4f96",
+            "cSha256": "8705b0b45bcce720f2d20be10d467276694e4838ca48306c117622413e54ce43"
+          }
+        ],
+        "signature": "698c42a922fcb1c8c7164aa0f94c378dae54519f4b04e04fde4baeeb1396a421",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_fname_errors.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_fname_errors.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-tcp-fname-errors-r1-resources.json",
+        "startedAt": "2026-09-25T08:20:52.583Z",
+        "finishedAt": "2026-09-25T08:22:17.945Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3542953984,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-tcp-fname-errors-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "5a75579c3bc3f03200f45a4deaca3dacc9f06666963bb9c683eff91d5d163062",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-tcp-fname-errors-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:22:18.679Z",
+        "finishedAt": "2026-09-25T08:22:21.124Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170577920,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5733015552
+    },
+    {
+      "name": "elab/async_tcp_half.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 1,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-tcp-half-r1/result.json",
+      "resultSha256": "4bfadc20fdfa807299aed6904a5db7bc716a8f33d390e92faef107c827e83550",
+      "sourceSha256": "714436bdf6c6f1975983b817af4de6639f6bde69621c9d8e95921f6b60bf8feb",
+      "parallelSourceSha256": "588083d9f3d867489d4e894284700691831b6b60c834f65f85ceb81dbcde1ed3",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_tcp_half.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "21c52b6b32ec82518808bedc9b21616eaf4b7f489c7f91c09c6c95374e2a8d58",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "588083d9f3d867489d4e894284700691831b6b60c834f65f85ceb81dbcde1ed3",
+            "cSha256": "c1b86ed00ea879130660e98e59bc08c316a8e61538f1791a38b25416c8c1e2e0"
+          }
+        ],
+        "signature": "87b3e0a68ccef84446f45990e61231c09c9fad2c3ec871a2cc1bb7b86589bf34",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_half.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_half.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-tcp-half-r1-resources.json",
+        "startedAt": "2026-09-25T08:22:21.727Z",
+        "finishedAt": "2026-09-25T08:23:46.688Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3550175232,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-tcp-half-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "05ad60a72c5ee0bde5ababdf4cb0d4c3a4b455ac60e9e202be0a332d611c6d9e",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-tcp-half-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:23:46.859Z",
+        "finishedAt": "2026-09-25T08:23:49.887Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170553344,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5732683776
+    },
+    {
+      "name": "elab/async_tcp_server_client.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 2,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-tcp-server-client-r1/result.json",
+      "resultSha256": "15461cced36d12b1a6ed5bcfe256ab9b185c6718c2e3d1b398101d1d8532157f",
+      "sourceSha256": "5471ef0ce0cbfa9a4a3ad25fbe7b1a617d39390be1257f83eb6ee07e752a6290",
+      "parallelSourceSha256": "62e9922b687316e184d7cbceaf14fb6142844acb7aa48982663c95337c2046fe",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_tcp_server_client.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "3668687005652064ece0343747f3c8df511dea1db052d80db906eeabf47e4347",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "62e9922b687316e184d7cbceaf14fb6142844acb7aa48982663c95337c2046fe",
+            "cSha256": "c1253b3f943679bcd9b088e0242ade5921c09e408627f35ff536761ec40b8033"
+          }
+        ],
+        "signature": "52e68032c4ccba5f0404c743b6e90dfe74cbdb40253020d2df90b384b5fca6e6",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_server_client.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_server_client.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-tcp-server-client-r1-resources.json",
+        "startedAt": "2026-09-25T08:23:50.898Z",
+        "finishedAt": "2026-09-25T08:25:18.364Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3549257728,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-tcp-server-client-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "d688b8990a20d7989dc33079d8269f04412f5ac3d88e3c45de8ff1600522c180",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-tcp-server-client-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:25:19.019Z",
+        "finishedAt": "2026-09-25T08:25:21.491Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170586112,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5727256576
+    },
+    {
+      "name": "elab/async_udp_sockets.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 2,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-udp-sockets-r1/result.json",
+      "resultSha256": "b2d27d7237c2745f34851f4ef4f19d6d880aff7b97913f08649b6f62988b127d",
+      "sourceSha256": "566a8a4c9e6715d098ab49682cfde49c4786aeaee775bbf8827ff33df4b5e4ae",
+      "parallelSourceSha256": "3c65cd119e97217a072dd9f2cb4b3200a01b93f87de09b5b78b560405d08f108",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_udp_sockets.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "c11b412d734d2fff20a43d5c10dcf36c33c94a1154aa2f685f0f26606c356a19",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "3c65cd119e97217a072dd9f2cb4b3200a01b93f87de09b5b78b560405d08f108",
+            "cSha256": "cd760d56ddb92151cc64076aaee56181dae9b2c6229941353ccdb78747d1cb4b"
+          }
+        ],
+        "signature": "e44f3be47049bd6b49ddc77ecf81310d827a7eef03391f376523621eb0e8243c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_udp_sockets.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_udp_sockets.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-udp-sockets-r1-resources.json",
+        "startedAt": "2026-09-25T08:25:22.058Z",
+        "finishedAt": "2026-09-25T08:26:49.673Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3541917696,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-udp-sockets-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "39ada28f8fe418c6a4fac7de6e175ca8a5b4effc70d58a5a8645fc30020c03f5",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-udp-sockets-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:26:50.153Z",
+        "finishedAt": "2026-09-25T08:26:52.604Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170582016,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5726134272
+    },
+    {
+      "name": "elab/async_cancellation_reasons.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 11,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-cancellation-reasons-r1/result.json",
+      "resultSha256": "72261fda40273bfcd466bcdf3fc9b3ac96fe1185f55bd439c0537181aed11370",
+      "sourceSha256": "43e2405f5d7d5a01d1f192fc437fd0329976fa75b4b99099e3471f9620489866",
+      "parallelSourceSha256": "4d4e77435a35fa980664f31e9b7e6e39f6797f99091f27b4d6c0fc4510cd1d3d",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_cancellation_reasons.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "97ea92fb1c1cc085ee9737f95fa1d44d6c99068604c78c2c8ffa5939555d4c39",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "4d4e77435a35fa980664f31e9b7e6e39f6797f99091f27b4d6c0fc4510cd1d3d",
+            "cSha256": "0db2b1e93e8a59b334e9191ba2c240d0ef345311a6c04ed742281bada62e8981"
+          }
+        ],
+        "signature": "4dc44fe1294b7b30f230f7f0d107cfae9c0780543d3ab7a6ee02fb9eaa4da663",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_cancellation_reasons.lean (11 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_cancellation_reasons.lean (11 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-cancellation-reasons-r1-resources.json",
+        "startedAt": "2026-09-25T08:26:53.196Z",
+        "finishedAt": "2026-09-25T08:28:22.185Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3552182272,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-async-cancellation-reasons-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "ec6e1690e326cfe0801e50ada550b97367efbde5c7ac80480e7d2c8916a6cbef",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-async-cancellation-reasons-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:28:22.288Z",
+        "finishedAt": "2026-09-25T08:28:24.743Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170713088,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5719654400
+    },
+    {
+      "name": "elab/async_http_fuzz.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 10,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-fuzz-r1/result.json",
+      "resultSha256": "5fa0578588e05ff5a883810ef0064ebdfe105d009af80a428c460983cb542667",
+      "sourceSha256": "d28901076d0af0f77f860777032bd01b486970d1d8fe017a9c7f14ce0daf2da2",
+      "parallelSourceSha256": "edf51d80f163e5c5d766a637dc7ef5a370a259c9f65bd7a8139e2e33cf1d41d8",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz.lean.serial"
+      ],
+      "wasmSha256": "2c5317ccb94120d1a64772b2c49d4917f33a373f599e00084b82042b6d203f3c",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "edf51d80f163e5c5d766a637dc7ef5a370a259c9f65bd7a8139e2e33cf1d41d8",
+            "cSha256": "88aa72873ee18f8785bd862b64087d8dfd3934b238962dbd79ddc700d3b1ead7"
+          }
+        ],
+        "signature": "1f65616a6e52261d6aa86aab7fb8eaf148cb3c94e13df0de37a8435f6b6cef1c",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-fuzz-r1-resources.json",
+        "startedAt": "2026-09-25T08:28:25.323Z",
+        "finishedAt": "2026-09-25T08:30:04.598Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3551723520,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-fuzz-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "ed49b8e9acd01289477fa3f26a717cba3bcd7745e0d3baf9bd3bedbe1504a648",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-fuzz-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:30:05.433Z",
+        "finishedAt": "2026-09-25T08:30:07.906Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 171200512,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5711372288
+    },
+    {
+      "name": "elab/async_http_fuzz_limits.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 10,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-fuzz-limits-r1/result.json",
+      "resultSha256": "5e3817fe60c67f5465e4c5cd4e12e86f0fed0f9521aad0924593b6e34ce89c68",
+      "sourceSha256": "ef9e819611a80bee8c957b1b9c7409d18cb8552661399ed8eebb545eff74529f",
+      "parallelSourceSha256": "9ea2382f365e50ae15625234e1e65446fba72ab1d33eed852c68b95e3bcd3eeb",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz_limits.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz_limits.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz_limits.lean.serial"
+      ],
+      "wasmSha256": "a156f4543303a2c82fc3a25d79d2264bf766b5e6eff2a6b97d85d3e800648fef",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "9ea2382f365e50ae15625234e1e65446fba72ab1d33eed852c68b95e3bcd3eeb",
+            "cSha256": "1d811b53a4945c9824cde477b4cfdf7fc8fb9e374bf40cba5295a54d307e9c48"
+          }
+        ],
+        "signature": "9033470916fc8cf119279d5535f4cf3a27fef74a9d30022b1379a20902587385",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_limits.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_limits.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-fuzz-limits-r1-resources.json",
+        "startedAt": "2026-09-25T08:30:08.463Z",
+        "finishedAt": "2026-09-25T08:31:44.569Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3557511168,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-fuzz-limits-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "8a5b457847e81bd19d76831a28934884e4f1f80a8dcc1dd91f51bb99ca5a043a",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-fuzz-limits-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:31:45.588Z",
+        "finishedAt": "2026-09-25T08:31:48.091Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170680320,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5714477056
+    },
+    {
+      "name": "elab/async_http_fuzz_random.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 8,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-fuzz-random-r1/result.json",
+      "resultSha256": "cb0d721131b93f00b38d542ab8b64a666c8afaacc38e3aa6c1b91579843516f7",
+      "sourceSha256": "ab96c3e1cbdd2927896c10826317b92bc64be1dc2ae4510516756ae8f017c982",
+      "parallelSourceSha256": "aa2266e3a305b1a730af31d272d1dafd6f02a193496a101daf75c08e87744be2",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz_random.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz_random.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz_random.lean.serial"
+      ],
+      "wasmSha256": "d483e938b7759aefb734397d48611545e5f2b79240ee76c1b23e56351a04cb89",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "aa2266e3a305b1a730af31d272d1dafd6f02a193496a101daf75c08e87744be2",
+            "cSha256": "f3af8b1014ff72fa77a80952cd5227d31f4ea98a36bf073f57b5620d2805085d"
+          }
+        ],
+        "signature": "26fafa450806496b1e98ea1b2325a5f9ab84b1dc760af69bd15b0499dd8165a0",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_random.lean (8 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_random.lean (8 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-fuzz-random-r1-resources.json",
+        "startedAt": "2026-09-25T08:31:48.624Z",
+        "finishedAt": "2026-09-25T08:33:21.682Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3549138944,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-fuzz-random-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "b49464f10b46854d964e57e8cb770b5e55ec7d5538e7f9fd17b75a94a8c2f914",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-fuzz-random-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:33:22.723Z",
+        "finishedAt": "2026-09-25T08:33:25.276Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170692608,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5713739776
+    },
+    {
+      "name": "elab/async_http_hang_regressions.lean",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "actions": 22,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-hang-regressions-r1/result.json",
+      "resultSha256": "e867410549cd590009aafd59da18a1df15789388e0b3280b751264a490b33aac",
+      "sourceSha256": "b75a003ded614169a1b4017243a0c67ce0f0f41674223194e0f2cf18ea45e258",
+      "parallelSourceSha256": "4f3a0698b6cd970160e097547808438f4fc959c1065b47d598ffdff1b3abfecb",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_hang_regressions.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_hang_regressions.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_hang_regressions.lean.serial"
+      ],
+      "wasmSha256": "2a9753299439b40d96c6d17ece58e1fa099336b93c89371522ff2798fe2785c3",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "4f3a0698b6cd970160e097547808438f4fc959c1065b47d598ffdff1b3abfecb",
+            "cSha256": "5d0fcb5695e25dd28082b8b898acdf5d3f02bffa0c57dd4015c4f364e57f69c1"
+          }
+        ],
+        "signature": "20df49a875cfb98d5d6698f98e1716348ade247abde1f72fc877c8733230a8d7",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_hang_regressions.lean (22 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_hang_regressions.lean (22 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-hang-regressions-r1-resources.json",
+        "startedAt": "2026-09-25T08:33:25.779Z",
+        "finishedAt": "2026-09-25T08:35:06.462Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3564453888,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-deno-hang-regressions-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "5ab1a6beb0320c2190131c17f592063d43712087106333f21ef217a71a7d7b39",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-deno-hang-regressions-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:35:06.991Z",
+        "finishedAt": "2026-09-25T08:35:10.623Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 170979328,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5701648384
+    },
+    {
+      "name": "elab/tempfile.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 4,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-tempfile-r1/result.json",
+      "resultSha256": "807c92eba2e881d49dfe0ef6c35c51b1ecedd4d911e434467df41e231d5ae7dc",
+      "sourceSha256": "aaf51d63382e0aae22cb6ec054a34c96ae78b4b47f3eb5da1c0c6f7119c17e4e",
+      "parallelSourceSha256": "29e35eb50fab55642128b0091ac9c4e7fd2bd107e95061b159492a4a50c0f70d",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/tempfile.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "e102a9bb7e238fb0c52f76234a32aaad571a7e59f977df67814c3846e7e5c065",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "29e35eb50fab55642128b0091ac9c4e7fd2bd107e95061b159492a4a50c0f70d",
+            "cSha256": "e08f65e33464c242195e05da9e473097696a77649eff6f7f23b833d37b743b0c"
+          }
+        ],
+        "signature": "0e868ddb3b53b32a371009becaf6b50515470c492be6b9245193ca6a189994a2",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/tempfile.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/tempfile.lean (4 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-tempfile-r1-resources.json",
+        "startedAt": "2026-09-25T08:35:11.002Z",
+        "finishedAt": "2026-09-25T08:37:05.979Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3668406272,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-tempfile-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "cc6b3170ea6bfd1b7b111937ba1f924875927b379d4d23f853dd6105b19e0c74",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-tempfile-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:37:06.157Z",
+        "finishedAt": "2026-09-25T08:37:08.660Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176189440,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5696331776
+    },
+    {
+      "name": "elab/async_tcp_fname_errors.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 1,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-tcp-fname-errors-r1/result.json",
+      "resultSha256": "84c9e23f83324cdb6a1ab4de4344063164e6eb917ce0f2e3f89d2bd47b132755",
+      "sourceSha256": "d37535c6d32c5761c23968e7ba1ae84e86933cba5097df54798c27ab1e9eb27b",
+      "parallelSourceSha256": "7bb11806645b7409984e2ee5cecf3f8795dd4c6fee78e54327229357788e4f96",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_tcp_fname_errors.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "46b53d94e36b110ae4cdbd26eb684771b5c4055d7b33c374c668762ca9c50952",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "7bb11806645b7409984e2ee5cecf3f8795dd4c6fee78e54327229357788e4f96",
+            "cSha256": "8705b0b45bcce720f2d20be10d467276694e4838ca48306c117622413e54ce43"
+          }
+        ],
+        "signature": "61efb7c3c82000f2c28aa7ab6de86c65ee06b8e1619448134a4f8bdaec7ff234",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_fname_errors.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_fname_errors.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-tcp-fname-errors-r1-resources.json",
+        "startedAt": "2026-09-25T08:37:09.203Z",
+        "finishedAt": "2026-09-25T08:39:04.625Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3701653504,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-tcp-fname-errors-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "46342acca6f93693f95ac7b7aa2b46d2f403515f668221b7c205f5c725827f39",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-tcp-fname-errors-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:39:05.313Z",
+        "finishedAt": "2026-09-25T08:39:07.807Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176205824,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5687205888
+    },
+    {
+      "name": "elab/async_tcp_half.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 1,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-tcp-half-r1/result.json",
+      "resultSha256": "be8960732cb01d5a273e9fa8b32c29e2cf41255fc2211b993841f4e47104d7d8",
+      "sourceSha256": "714436bdf6c6f1975983b817af4de6639f6bde69621c9d8e95921f6b60bf8feb",
+      "parallelSourceSha256": "588083d9f3d867489d4e894284700691831b6b60c834f65f85ceb81dbcde1ed3",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_tcp_half.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "15823d91cdfe75b71e9e786d6eb77fbda1140bc2788fc3e454439fa6237bde2e",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "588083d9f3d867489d4e894284700691831b6b60c834f65f85ceb81dbcde1ed3",
+            "cSha256": "c1b86ed00ea879130660e98e59bc08c316a8e61538f1791a38b25416c8c1e2e0"
+          }
+        ],
+        "signature": "a9996f6cbd99046a0caa6f1d7e90c235cd8be0e4d8236fbc68e2abc7456c9eb8",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_half.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_half.lean (1 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-tcp-half-r1-resources.json",
+        "startedAt": "2026-09-25T08:39:08.374Z",
+        "finishedAt": "2026-09-25T08:41:03.370Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3704115200,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-tcp-half-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "5b58b0eb5e2d2dfc6d6608b43326f90ae7cfb73e26b4f8ad4d56c9de69baf6d9",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-tcp-half-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:41:03.499Z",
+        "finishedAt": "2026-09-25T08:41:06.016Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176324608,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5679161344
+    },
+    {
+      "name": "elab/async_tcp_server_client.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 2,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-tcp-server-client-r1/result.json",
+      "resultSha256": "be72f90d1d91f66a4c4f6552467767bf0b4b5a3c07aaf4bf12ad9ff6f444f441",
+      "sourceSha256": "5471ef0ce0cbfa9a4a3ad25fbe7b1a617d39390be1257f83eb6ee07e752a6290",
+      "parallelSourceSha256": "62e9922b687316e184d7cbceaf14fb6142844acb7aa48982663c95337c2046fe",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_tcp_server_client.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "1f250e68dfd2bb29e42feac98d871b3e63d9977a04018f3cdea1ea6c6afdc92b",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "62e9922b687316e184d7cbceaf14fb6142844acb7aa48982663c95337c2046fe",
+            "cSha256": "c1253b3f943679bcd9b088e0242ade5921c09e408627f35ff536761ec40b8033"
+          }
+        ],
+        "signature": "e63c57a8a299848cce88d3ee9fb7ebfdb0c67a73fe093a9cd211d67a9963dd74",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_server_client.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_tcp_server_client.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-tcp-server-client-r1-resources.json",
+        "startedAt": "2026-09-25T08:41:06.561Z",
+        "finishedAt": "2026-09-25T08:43:01.350Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3707219968,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-tcp-server-client-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "fd8cafe564c339a5f0c083f7fdc156ab119b5ca890449f049e79ee7cdda4e457",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-tcp-server-client-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:43:01.672Z",
+        "finishedAt": "2026-09-25T08:43:04.899Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176070656,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5670789120
+    },
+    {
+      "name": "elab/async_udp_sockets.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 2,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-udp-sockets-r1/result.json",
+      "resultSha256": "8b64cb2435a1d06931993e35cd1a942ae2e7d93242be792bb1f6b19a99375479",
+      "sourceSha256": "566a8a4c9e6715d098ab49682cfde49c4786aeaee775bbf8827ff33df4b5e4ae",
+      "parallelSourceSha256": "3c65cd119e97217a072dd9f2cb4b3200a01b93f87de09b5b78b560405d08f108",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_udp_sockets.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "6353bf6a8c9a9e44c92943eb53aa5a1c1df37896d6b171af8d7e1722945957ef",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "3c65cd119e97217a072dd9f2cb4b3200a01b93f87de09b5b78b560405d08f108",
+            "cSha256": "cd760d56ddb92151cc64076aaee56181dae9b2c6229941353ccdb78747d1cb4b"
+          }
+        ],
+        "signature": "062adeb964bfa9652a35f771775640cc35e08e11a272441e59f9ae43c8d0720f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_udp_sockets.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_udp_sockets.lean (2 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-udp-sockets-r1-resources.json",
+        "startedAt": "2026-09-25T08:43:05.707Z",
+        "finishedAt": "2026-09-25T08:44:58.349Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3712643072,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-udp-sockets-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "3f04c629762e2fd5e7b6ab76ae2e230d98716beed3827ee826b75363dd0770ce",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-udp-sockets-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:44:58.813Z",
+        "finishedAt": "2026-09-25T08:45:01.395Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176267264,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5663715328
+    },
+    {
+      "name": "elab/async_cancellation_reasons.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 11,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-cancellation-reasons-r1/result.json",
+      "resultSha256": "72e81f837b140ae9854f5f5a86f3587b5f81a39cea97475cf2ed17f5803c5c9e",
+      "sourceSha256": "43e2405f5d7d5a01d1f192fc437fd0329976fa75b4b99099e3471f9620489866",
+      "parallelSourceSha256": "4d4e77435a35fa980664f31e9b7e6e39f6797f99091f27b4d6c0fc4510cd1d3d",
+      "expressionBytesUnchanged": true,
+      "sidecars": [],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_cancellation_reasons.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt"
+      ],
+      "wasmSha256": "b1d52edc5c57a31e64ceb4bb77f49885169be1f5e6c5fdce4af5f3e871fd814d",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "4d4e77435a35fa980664f31e9b7e6e39f6797f99091f27b4d6c0fc4510cd1d3d",
+            "cSha256": "0db2b1e93e8a59b334e9191ba2c240d0ef345311a6c04ed742281bada62e8981"
+          }
+        ],
+        "signature": "65b3c1897b67948063760daa403a3fc095de3f73ab855e30af5ca977787d696a",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_cancellation_reasons.lean (11 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_cancellation_reasons.lean (11 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-cancellation-reasons-r1-resources.json",
+        "startedAt": "2026-09-25T08:45:01.859Z",
+        "finishedAt": "2026-09-25T08:47:04.508Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3721830400,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-async-cancellation-reasons-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "57913a6e12d23ae587a6d7f59b7385fab9333555568e4c5b420d57fe5fadfe95",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-async-cancellation-reasons-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:47:05.006Z",
+        "finishedAt": "2026-09-25T08:47:07.541Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176365568,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5622108160
+    },
+    {
+      "name": "elab/async_http_fuzz.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 10,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-fuzz-r1/result.json",
+      "resultSha256": "bd02c717a2d7c25328ff0df6cb8c9794ea19ecc3f3c25d9b087d89cb19486d87",
+      "sourceSha256": "d28901076d0af0f77f860777032bd01b486970d1d8fe017a9c7f14ce0daf2da2",
+      "parallelSourceSha256": "edf51d80f163e5c5d766a637dc7ef5a370a259c9f65bd7a8139e2e33cf1d41d8",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz.lean.serial"
+      ],
+      "wasmSha256": "caa1614e115961fb7d60b45a5f014dfd659810c16e1dfb9f804f6b69ed2fff8b",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "edf51d80f163e5c5d766a637dc7ef5a370a259c9f65bd7a8139e2e33cf1d41d8",
+            "cSha256": "88aa72873ee18f8785bd862b64087d8dfd3934b238962dbd79ddc700d3b1ead7"
+          }
+        ],
+        "signature": "6256155cac74789199cd44f4d9088d802f01a4afcd1dec1877e835b4978147d0",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-fuzz-r1-resources.json",
+        "startedAt": "2026-09-25T08:47:08.058Z",
+        "finishedAt": "2026-09-25T08:49:23.724Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3723747328,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-fuzz-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "951b94fd5d58a3c2470dcee286cead4e3b07aa3bccec80403fecd3abeda71276",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-fuzz-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:49:24.173Z",
+        "finishedAt": "2026-09-25T08:49:26.762Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176709632,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5633306624
+    },
+    {
+      "name": "elab/async_http_fuzz_limits.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 10,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-fuzz-limits-r1/result.json",
+      "resultSha256": "3770380337ab70191c55926a0cefddb3ff05765db1dfbadc906fa4d40497fd89",
+      "sourceSha256": "ef9e819611a80bee8c957b1b9c7409d18cb8552661399ed8eebb545eff74529f",
+      "parallelSourceSha256": "9ea2382f365e50ae15625234e1e65446fba72ab1d33eed852c68b95e3bcd3eeb",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz_limits.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz_limits.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz_limits.lean.serial"
+      ],
+      "wasmSha256": "5d382d0354740b787874e314ce23949faf87191fbe5b77b3eaa3b766940a9a66",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "9ea2382f365e50ae15625234e1e65446fba72ab1d33eed852c68b95e3bcd3eeb",
+            "cSha256": "1d811b53a4945c9824cde477b4cfdf7fc8fb9e374bf40cba5295a54d307e9c48"
+          }
+        ],
+        "signature": "664dbd9932fd8b8b4b388569ae3c2c3babc0c172331223fdd7413aece80a096e",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_limits.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_limits.lean (10 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-fuzz-limits-r1-resources.json",
+        "startedAt": "2026-09-25T08:49:27.210Z",
+        "finishedAt": "2026-09-25T08:51:32.789Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3677335552,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-fuzz-limits-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "c3746d693992034be6b0d3b56899f9def1d08c39e945bc1ff3de57980c83b8dc",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-fuzz-limits-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:51:33.346Z",
+        "finishedAt": "2026-09-25T08:51:36.134Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176345088,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5629227008
+    },
+    {
+      "name": "elab/async_http_fuzz_random.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 8,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-fuzz-random-r1/result.json",
+      "resultSha256": "914c9488a6498ec39f1e6f861e833bb1e6329cc37c6eb29cccddbc7437c7f0dc",
+      "sourceSha256": "ab96c3e1cbdd2927896c10826317b92bc64be1dc2ae4510516756ae8f017c982",
+      "parallelSourceSha256": "aa2266e3a305b1a730af31d272d1dafd6f02a193496a101daf75c08e87744be2",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_fuzz_random.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_fuzz_random.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_fuzz_random.lean.serial"
+      ],
+      "wasmSha256": "af6eff618ef6e278e226adc6e00a46969edbd0efc8e6d8662f2642bc18a3ee42",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "aa2266e3a305b1a730af31d272d1dafd6f02a193496a101daf75c08e87744be2",
+            "cSha256": "f3af8b1014ff72fa77a80952cd5227d31f4ea98a36bf073f57b5620d2805085d"
+          }
+        ],
+        "signature": "f04899987fd3123bc7d6df92f0eab7d7b12ef3af94f76e5fe7136cc942706133",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_random.lean (8 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_fuzz_random.lean (8 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-fuzz-random-r1-resources.json",
+        "startedAt": "2026-09-25T08:51:36.418Z",
+        "finishedAt": "2026-09-25T08:53:42.587Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3679584256,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-fuzz-random-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "27de2b844a10ffcd1d473dc3ca3a1000475d9a01ce1532b7ec9d27693496b070",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-fuzz-random-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:53:43.555Z",
+        "finishedAt": "2026-09-25T08:53:46.079Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176185344,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5622276096
+    },
+    {
+      "name": "elab/async_http_hang_regressions.lean",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "actions": 22,
+      "result": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-hang-regressions-r1/result.json",
+      "resultSha256": "a513333221529d2411059ac643122b4cb95ee60aec9745f53abd4fb153f83403",
+      "sourceSha256": "b75a003ded614169a1b4017243a0c67ce0f0f41674223194e0f2cf18ea45e258",
+      "parallelSourceSha256": "4f3a0698b6cd970160e097547808438f4fc959c1065b47d598ffdff1b3abfecb",
+      "expressionBytesUnchanged": true,
+      "sidecars": [
+        {
+          "path": "tests/elab/async_http_hang_regressions.lean.serial",
+          "sha256": "6eb1d9b69ec2e0d1c35c2147b84b9c8be1ba791194ff64a8dfee03f2ff2e5088",
+          "kind": "ctest-run-serial"
+        }
+      ],
+      "executionSequential": true,
+      "originals": [
+        "tests/elab/async_http_hang_regressions.lean",
+        "tests/elab/run_test.sh",
+        "tests/util.sh",
+        "tests/CMakeLists.txt",
+        "tests/elab/async_http_hang_regressions.lean.serial"
+      ],
+      "wasmSha256": "1b98eb60fc4558d7df1f7ae70ca3afa9c8c921b7ec36bb9ddfe7b46d886b2700",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "d2c9f8d6c5885b6806f2a69fd85994446f8dac0db22d7517590b30f53ec4a603",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "4f3a0698b6cd970160e097547808438f4fc959c1065b47d598ffdff1b3abfecb",
+            "cSha256": "5d0fcb5695e25dd28082b8b898acdf5d3f02bffa0c57dd4015c4f364e57f69c1"
+          }
+        ],
+        "signature": "60d52fff5f8715de71c01cad138f1743e7b254f50b2661ec4f091e238c003f9b",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "nativeOracle": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_hang_regressions.lean (22 actions)\n",
+        "stderr": ""
+      },
+      "deployed": {
+        "code": 0,
+        "stdout": "parallel upstream IO completed: elab/async_http_hang_regressions.lean (22 actions)\n",
+        "stderr": ""
+      },
+      "inputs": {
+        "integration/application-upstream-eval-io.mjs": "aed7561ea8fbe72db43f95d71b35f27c336b5a1e6889dcc24f9e43a782a3822b",
+        "scripts/upstream/EvalCommandRanges.lean": "38e670f4f6869249db12772b8a06e5c96c947e5a95bd084684f18074774f0f4c",
+        "scripts/application-tests/eval-io-source.mjs": "042981368eddb53d656c0c1628f2240e987aa7424c182d0ac27a592463b5d239",
+        "scripts/application-tests/eval-io-reviewed.json": "89c7a092171f4941bf269f5c29af8b0e1b490ebbbf7df070bb06d618e1fa2a5a",
+        "scripts/application-tests/eval-io-sidecars.mjs": "4d7ba65ae146da29e6b8986df56da18df5f320649784f4d669a7f5b6a140a414",
+        "scripts/application-tests/upstream-evidence.mjs": "8cb2b2a45217cc30d757a81effefbfb6cfe3f33fa7028f965c0e127654d1ebfa"
+      },
+      "resources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-hang-regressions-r1-resources.json",
+        "startedAt": "2026-09-25T08:53:46.605Z",
+        "finishedAt": "2026-09-25T08:56:00.818Z",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3719446528,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "deployment": {
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "retentionReceipt": "/home/lastmjs/development/lasm/compiler/.work/upstream-eval-io-4.34.1-bun-hang-regressions-r1/generated-output-retention.json",
+      "retentionReceiptSha256": "8e1d5dfc32c484a459396f436227513db46eae6ddac60e5cf5f34bb31be73804",
+      "retentionResources": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/upstream-eval-io-4.34.1-bun-hang-regressions-r1-retention-resources.json",
+        "startedAt": "2026-09-25T08:56:01.738Z",
+        "finishedAt": "2026-09-25T08:56:04.302Z",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 176746496,
+        "unitReleased": true,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "resourceLimited": false,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      "retentionPolicy": "retain receipts and sources; remove reproducible successful generated outputs",
+      "minimumFreeDiskBytes": 5608460288
+    }
+  ],
+  "comparisonsPassed": 30,
+  "comparisonsFailed": 0,
+  "deployedActions": 213,
+  "peakMemoryBytes": 3723747328,
+  "minimumFreeDiskBytes": 5608460288,
+  "recordedAt": "2026-09-25T08:56:20.540706+00:00",
+  "integrityControls": {
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "log": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/eval-io-serial-review-unit-r1.log",
+    "logSha256": "424703322ad8d9932d2cc8b3a7e19f227f281d04bc40e4414726c25c3b5e5f75",
+    "resources": {
+      "report": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/eval-io-serial-review-unit-r1-resources.json",
+      "startedAt": "2026-09-25T07:59:10.206Z",
+      "finishedAt": "2026-09-25T07:59:10.456Z",
+      "limits": {
+        "memoryMax": 134217728,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 107374182,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 42565632,
+      "unitReleased": true,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "scope": "Source, context, range, UTF-8 and exact release/source review checks plus exact sidecar inventory/hash, unsupported sidecar rejection and sequential-execution requirements."
+  },
+  "limitations": [
+    "Linux x64 installed .25 comparisons only; full API, latest-release suite and six-platform acceptance remain incomplete.",
+    "Original expressions, assertions and deadlines retain their bytes. Source-hidden relocation with empty PATH is tested; no kernel source/tool denial here.",
+    "Original #eval registrations remain native-build-time; additional AOT API observations are separate.",
+    "async_tcp_half executes only upstream listenClose. Its unused acceptClose definition is not half-close assertion coverage.",
+    "Guarded/scoped/non-IO tests and unreviewed sidecar types remain unsupported by this narrow parallel adapter.",
+    "Successful generated outputs use the existing suite cleanup policy after recording hashes and exact results; only the Node tempfile binaries retain verified gzip archives. Failed outputs are preserved."
+  ],
+  "queueSha256": "73f9af3f9c918f931e6a590d0abb7783b1c173dc50b82f495e8bd5c2e39384e3"
+}

@@ -30,8 +30,17 @@ output match exactly; assertions and deadlines retain their original bytes.
 Five integrity controls protect exact source/release/action review and syntax
 contexts. All resource guards release without aborts. These Linux x64 behavior
 observations do not establish individual declaration coverage or complete
-`Std.Http` equivalence. Serial fuzz/hang cases, other contexts and all other
-native platforms remain pending.
+`Std.Http` equivalence.
+
+[Ten further inputs pass in all three engines](../evidence/lean-4.34.1-upstream-io-stress-network-complete-2026-09-25.json),
+adding 30 comparisons and 213 deployed actions for temporary files, TCP, UDP,
+cancellation reasons and serial HTTP fuzz/hang cases. Eight integrity controls
+preserve exact sources, serial sidecars and execution requirements. Assertions
+and timeouts are unchanged; every resource guard releases without an abort.
+Combined coverage is 22 inputs per engine and 657 deployed actions. The TCP
+half-close input runs only `listenClose`; its unused `acceptClose` definition
+does not establish behavior. Full declaration coverage, other evaluation contexts
+and all other native platforms remain pending.
 
 ## Lean 4.34.0 application API inventory
 

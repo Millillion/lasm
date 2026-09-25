@@ -28,10 +28,13 @@ separately from the earlier runtime evidence below.
   controls enforce reviewed release/source/action counts and safe syntax
   contexts. No assertion or timeout changes. All guards release without memory
   or disk aborts; peak memory is 4.58 GiB for these IO-expression comparisons.
-  [Ten further original inputs pass in installed Node](docs/evidence/lean-4.34.1-upstream-io-stress-network-node-2026-09-25.json),
-  adding 71 deployed actions for temporary files, TCP, UDP, cancellation and
+  [Ten further original inputs pass in all three installed engines](docs/evidence/lean-4.34.1-upstream-io-stress-network-complete-2026-09-25.json),
+  adding 213 deployed actions for temporary files, TCP, UDP, cancellation and
   serial HTTP fuzz/hang regressions. Eight integrity controls preserve exact
-  reviewed sidecars and sequential execution. Deno and Bun checks are underway.
+  reviewed sidecars and sequential execution. These 30 additional comparisons
+  release every guard without resource events; peak memory is 3.47 GiB. The
+  upstream TCP half-close file executes only its listener-close check, so its
+  unused accept-close definition does not count as half-close coverage.
   These are partial Linux x64 observations. Other upstream contexts, complete
   API/language coverage and the other five native platforms remain open.
   Earlier results retain their stated release scope.
