@@ -105,6 +105,23 @@ under the same 1 GiB cap. A fresh package with a bounded npm heap and 4 GiB
 process-tree cap completes at 1.71 GiB, followed by byte-verified npm installation.
 Other native platforms and full API acceptance remain open.
 
+The [installed `.29` TCP repair](evidence/lean-4.34.1-tcp-error-phases-2026-09-25.json)
+matches 66 ordinary Lean observations across Node, Deno and Bun on Linux x64.
+Both native execution modes agree with every relocated deployment, with source
+hidden and PATH empty. The private bridge now distinguishes errors raised by an
+IO action before it returns a promise from errors delivered through that promise.
+The host also preserves empty-vector writes, cancellation, zero-capacity read
+errors, EOF readiness and shutdown behavior observed in the native controls.
+
+Only the async bridge object changes in a freshly verified runtime archive;
+the 2,516 standard modules and original runtime bundle remain intact. Twenty-one
+focused checks and sixty unchanged HTTP checks pass, including thirty deployed
+and thirty native HTTP checks. Disk preflight refusals prevented execution when
+headroom was insufficient. An archival attempt reached its proactive memory
+budget without OOM or swap; a bounded streaming retry with file-cache eviction
+passes under the same cap. These results leave complete TCP/API and native
+platform acceptance open.
+
 The [fresh Node HTTP comparison](evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
 now passes all twenty unchanged Vitest checks, ten each against deployed Wasm
 and native Lean. This includes concurrent mutations, persistence, binary and

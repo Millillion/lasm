@@ -46,9 +46,9 @@ export function createNodeNetwork({ add, get, release }) {
     return resource;
   }
   function receive(resource, count, peek) {
-    if (resource.readWait) throw failure('EBUSY', 'Parallel reads on one socket are not allowed');
+    if (resource.readWait) throw tcpFailure('EALREADY');
     const socket = resource.socket;
-    if (!socket) throw failure('ENOTCONN', 'Socket is not connected');
+    if (!socket) throw tcpFailure('ENOTCONN');
     return new Promise((resolve, reject) => {
       const resumeImported = Boolean(process.versions.deno && resource.bound);
       const cleanup = () => {
@@ -62,10 +62,22 @@ export function createNodeNetwork({ add, get, release }) {
         if (resource.error) return failed(resource.error);
         if (socket.readableLength) {
           if (peek) return finish(numbers(1));
+          // libuv reports a zero-capacity read buffer when data is ready;
+          // it neither consumes the bytes nor reports EOF for that buffer.
+          if (!count) return failed(tcpFailure('ENOBUFS'));
           const value = socket.read(Math.min(count, socket.readableLength, 16 * 1024 * 1024));
           if (value) return finish(value);
         }
-        if (socket.readableEnded || socket.destroyed) return finish(peek ? numbers(0) : empty);
+        if (socket.readableEnded || socket.destroyed) {
+          // POSIX libuv requests a buffer before reading an EOF-ready fd.
+          // A zero-sized receive therefore still fails with ENOBUFS, and
+          // waitReadable observes readiness without consuming that EOF.
+          if (process.platform !== 'win32') {
+            if (peek) return finish(numbers(1));
+            if (!count) return failed(tcpFailure('ENOBUFS'));
+          }
+          return finish(peek ? numbers(0) : empty);
+        }
       }
       resource.readWait = { reject: failed };
       socket.on('readable', ready); socket.on('end', ready); socket.on('close', ready); socket.on('error', failed);
@@ -194,18 +206,26 @@ export function createNodeNetwork({ add, get, release }) {
     }
     case 54: { const t = getTcp(id); if (t.error) throw t.error; return numbers(t.accepted.shift() ?? 0); }
     case 55: { const t = getTcp(id); t.acceptWait?.reject(cancelled()); t.acceptWait = null; return empty; }
-    case 56: if (!n) return empty; return receive(getTcp(id), n, false);
+    case 56: return receive(getTcp(id), n, false);
     case 57: return receive(getTcp(id), 0, true);
     case 58: getTcp(id).readWait?.reject(cancelled()); return empty;
     case 59: {
       const t = getTcp(id);
-      if (!t.socket) throw failure('ENOTCONN', 'Socket is not connected');
+      // Lean resolves an empty vector before consulting the socket. A vector
+      // containing one empty ByteArray still invokes uv_write. Old callers
+      // supplied zero for nonempty payloads, which remain ordinary writes.
+      if (!n && !bytes.length) return empty;
+      if (!t.socket) throw tcpFailure(process.platform === 'win32' || t.bound || t.server ? 'EPIPE' : 'EBADF');
+      if (t.socket.writableEnded || t.socket.writableFinished || t.shutdownPending) throw tcpFailure('EPIPE');
       return new Promise((resolve, reject) => t.socket.write(bytes, err => err ? reject(err) : resolve(empty)));
     }
     case 60: {
       const t = getTcp(id);
-      if (!t.socket) throw failure('ENOTCONN', 'Socket is not connected');
-      return new Promise((resolve, reject) => t.socket.end(err => err ? reject(err) : resolve(empty)));
+      if (t.shutdownPending) throw tcpFailure('EALREADY');
+      if (!t.socket || t.socket.destroyed || t.socket.writableEnded || t.socket.writableFinished) throw tcpFailure('ENOTCONN');
+      t.shutdownPending = true;
+      return new Promise((resolve, reject) => t.socket.end(err => err ? reject(err) : resolve(empty)))
+        .finally(() => { t.shutdownPending = false; });
     }
     case 61: {
       const t = getTcp(id), s = t.socket;

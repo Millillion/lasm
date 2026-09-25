@@ -266,6 +266,15 @@ export function createNodeRuntimeHost({ cwd = process.cwd(), args = [], stdio = 
     }
   }
   function request(op, id, arg, bytes, context = {}) {
+    if (op === 93) {
+      // Some ordinary Lean IO actions can fail before returning a promise.
+      // Inspect only the synchronous startup result: even an already-settled
+      // JavaScript promise still belongs to Lean's asynchronous result layer.
+      const result = pending.get(id);
+      if (!result) throw new Error('Unknown asynchronous host request');
+      if (!result.then && result.error) { pending.delete(id); return result; }
+      return { error: false, bytes: empty };
+    }
     if (op === 90) {
       const result = pending.get(id);
       if (!result) throw new Error('Unknown asynchronous host request');

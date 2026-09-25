@@ -705,6 +705,19 @@ and do not establish full-suite conformance. See
 
 ## HTTP and networking
 
+- [ ] Complete native TCP error timing and lifecycle parity on every platform.
+  The [installed `.29` Lean 4.34.1 repair](docs/evidence/lean-4.34.1-tcp-error-phases-2026-09-25.json)
+  matches 22 ordinary Lean observations per engine on Linux x64, with both
+  interpreted and C-compiled native controls. Startup failures now occur before
+  returning a promise; asynchronous failures retain their promise layer. Empty
+  write vectors differ correctly from one empty chunk, competing reads preserve
+  the original cancellable operation, and zero-capacity reads wait for readiness
+  before reporting ENOBUFS without consuming data. EOF readiness, repeated
+  shutdown and bidirectional half-close also match these controls. Twenty-one
+  focused checks and sixty unchanged HTTP Vitest checks pass across all three
+  engines. Earlier baseline failures, disk preflight refusals and an archival
+  resource stop remain recorded separately. Broader socket races and the other
+  five native platforms remain unverified; no fundamental limitation is shown.
 - [ ] Complete DNS, UDP, TCP, and HTTP behavioral validation across all engines.
   DNS and UDP host implementations now exist; selected original tests pass in
   Node. This does not establish complete networking parity. There is no `IO.HTTP`

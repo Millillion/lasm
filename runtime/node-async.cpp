@@ -135,8 +135,7 @@ void ensure_completion_thread() {
     });
 }
 #endif
-O *start_request(uint32_t op, O *resource, uint64_t arg, const void *data, size_t size, unsigned kind) {
-    auto id = lasm_node_start(op, lean_is_scalar(resource) ? 0 : handle_id(resource), arg, (const uint8_t*)data, size);
+O *request_promise(uint32_t id, O *resource, unsigned kind) {
     auto *promise = lean::lean_promise_new();
     lean_inc(promise); lean_inc(resource);
 #ifdef LASM_FULL_NATIVE_THREADS
@@ -152,6 +151,18 @@ O *start_request(uint32_t op, O *resource, uint64_t arg, const void *data, size_
     lean_dec(lean_task_spawn_core(closure, 0, true));
 #endif
     return promise;
+}
+O *start_request(uint32_t op, O *resource, uint64_t arg, const void *data, size_t size, unsigned kind) {
+    auto id = lasm_node_start(op, lean_is_scalar(resource) ? 0 : handle_id(resource), arg, (const uint8_t*)data, size);
+    return request_promise(id, resource, kind);
+}
+O *start_io_request(uint32_t op, O *resource, uint64_t arg, const void *data, size_t size, unsigned kind) {
+    auto id = lasm_node_start(op, lean_is_scalar(resource) ? 0 : handle_id(resource), arg, (const uint8_t*)data, size);
+    // Native libuv may reject startup before Lean creates the observable
+    // promise. Preserve that error layer without consuming successful or
+    // asynchronous results, and without retaining a promise on early failure.
+    Reply started(93, id);
+    return started.failed ? started.result() : ok(request_promise(id, resource, kind));
 }
 O *unit_call(uint32_t op, O *h, uint64_t arg = 0) { return Reply(op, handle_id(h), arg).result(); }
 O *lock_call(uint32_t op, O *h, uint64_t arg = 0) {
@@ -227,19 +238,20 @@ O *lean_uv_tcp_try_accept(O *socket) {
     return ok(r.failed ? except(true, r.error()) : except(false, r.number() ? some(wrap_handle(r.number())) : lean_box(0)));
 }
 O *lean_uv_tcp_cancel_accept(O *socket) { return unit_call(55, socket); }
-O *lean_uv_tcp_recv(O *socket, uint64_t size) { return ok(start_request(56, socket, size, nullptr, 0, 2)); }
-O *lean_uv_tcp_wait_readable(O *socket) { return ok(start_request(57, socket, 0, nullptr, 0, 3)); }
+O *lean_uv_tcp_recv(O *socket, uint64_t size) { return start_io_request(56, socket, size, nullptr, 0, 2); }
+O *lean_uv_tcp_wait_readable(O *socket) { return start_io_request(57, socket, 0, nullptr, 0, 3); }
 O *lean_uv_tcp_cancel_recv(O *socket) { return unit_call(58, socket); }
 O *lean_uv_tcp_send(O *socket, O *data) {
     std::vector<uint8_t> bytes;
-    for (size_t i = 0; i < lean_array_size(data); i++) {
+    const auto count = lean_array_size(data);
+    for (size_t i = 0; i < count; i++) {
         auto *part = lean_array_uget(data, i);
         bytes.insert(bytes.end(), lean_sarray_cptr(part), lean_sarray_cptr(part) + lean_sarray_size(part));
     }
-    auto *promise = start_request(59, socket, 0, bytes.data(), bytes.size(), 0);
-    lean_dec(data); return ok(promise);
+    auto *result = start_io_request(59, socket, count, bytes.data(), bytes.size(), 0);
+    lean_dec(data); return result;
 }
-O *lean_uv_tcp_shutdown(O *socket) { return ok(start_request(60, socket, 0, nullptr, 0, 0)); }
+O *lean_uv_tcp_shutdown(O *socket) { return start_io_request(60, socket, 0, nullptr, 0, 0); }
 O *lean_uv_tcp_getpeername(O *socket) { auto r = Reply(61, handle_id(socket)); return r.failed ? r.result() : ok(socket_address(r)); }
 O *lean_uv_tcp_getsockname(O *socket) { auto r = Reply(62, handle_id(socket)); return r.failed ? r.result() : ok(socket_address(r)); }
 O *lean_uv_tcp_nodelay(O *socket) { return unit_call(63, socket); }

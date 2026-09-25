@@ -46,6 +46,48 @@ test('completion readiness preserves the result for its consuming Lean thread', 
   assert.throws(() => host.whenReady(id), /Unknown asynchronous host request/);
 });
 
+test('IO startup errors are available synchronously and consumed exactly once', () => {
+  const host = createNodeRuntimeHost({ leanVersion: '4.34.1' });
+  try {
+    const expected = host.request(56, 0, 1n, new Uint8Array());
+    assert.equal(expected.error, true);
+    const id = host.start(56, 0, 1n, new Uint8Array());
+    const started = host.request(93, id);
+    assert.equal(started?.then, undefined);
+    assert.deepEqual(started, expected);
+    assert.throws(() => host.request(93, id), /Unknown asynchronous host request/);
+    assert.throws(() => host.request(90, id), /Unknown asynchronous host request/);
+    assert.throws(() => host.whenReady(id), /Unknown asynchronous host request/);
+  } finally { host.close(); }
+});
+
+test('IO startup inspection preserves immediate success and later promise failure', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const host = createNodeRuntimeHost({ leanVersion: '4.34.1' });
+  try {
+    const immediate = host.start(50, 0, 0n, new Uint8Array());
+    const accepted = { error: false, bytes: Buffer.alloc(0) };
+    assert.deepEqual(host.request(93, immediate), accepted);
+    assert.deepEqual(host.request(93, immediate), accepted);
+    const result = await host.whenReady(immediate);
+    assert.equal(result.error, false);
+    assert.deepEqual(host.request(90, immediate), result);
+    host.release(Number(result.bytes.readBigUInt64LE()));
+
+    const timer = Number(host.request(70, 0, 100n, new Uint8Array()).bytes.readBigUInt64LE());
+    assert.equal(host.request(71, timer, 0n, new Uint8Array()).error, false);
+    const pending = host.start(72, timer, 0n, new Uint8Array());
+    assert.deepEqual(host.request(93, pending), accepted);
+    host.release(timer);
+    const failure = await host.whenReady(pending);
+    assert.equal(failure.error, true);
+    // Settling an asynchronous failure must never reclassify it as startup.
+    assert.deepEqual(host.request(93, pending), accepted);
+    assert.deepEqual(await host.request(90, pending), failure);
+    assert.equal(host.stats().resources, 0);
+  } finally { host.close(); }
+});
+
 test('Std.Async timers preserve UInt64 delays and reset without overflowing Node timeouts', async t => {
   t.mock.timers.enable({ apis: ['setTimeout'] });
   const host = createNodeRuntimeHost();

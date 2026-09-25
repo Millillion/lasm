@@ -1,0 +1,1773 @@
+{
+  "scope": "Installed .29 ordinary Lean TCP error timing and zero-length/EOF behavior on Linux x64, with unchanged HTTP application regressions. This is supplementary API coverage, not complete TCP/HTTP or platform acceptance.",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "platform": "linux-x64",
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v4.34.1"
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "expected": "v26.10.0"
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v2.9.7"
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "expected": "bun-v1.4.2"
+    },
+    "checkedAt": "2026-09-25T16:27:01.432424+00:00"
+  },
+  "implementationInputs": {
+    "src/node-host.mjs": "6017dec75b0b3da0fd8dfca7095808aa540aaaa312222bf4c173b5066dca06ae",
+    "src/node-network.mjs": "205dd5e551e0f5f77ce14eeb54baa5f895ca5bc9a19f851d83058eb04af8c63f",
+    "runtime/node-async.cpp": "27e0ceffdd42f963a124201d863d68eecba30583761b70314bb2685a04421e0c",
+    "test/node-host.test.mjs": "d89e10943a9822b7485a38a893c10ba4b527d88068c736b217974a9c57aa1824",
+    "test/tcp-error-phases.test.mjs": "eec9e1f8c5226bf0dd21d7c2f705bab9327273efac8c4d2c9e5bee401ae05c23",
+    "test/node-network.test.mjs": "da7a7db22421849b3ee1afdf8e8aa032821ac293dce2c42d2b1702564f7671c2"
+  },
+  "focusedTests": {
+    "total": 21,
+    "node": 13,
+    "deno": 4,
+    "bun": 4,
+    "failed": 0,
+    "skipped": 0,
+    "report": {
+      "path": ".work/product-acceptance/tcp-error-phases-focused-r2.json",
+      "sha256": "a96d9eb89fe961c349454b72d4e345ef47ce154aa72501389ed6b60d6dec302d"
+    }
+  },
+  "baseline": {
+    "result": {
+      "path": ".work/tcp-error-phases-4.34.1-node-baseline-r3/result.json",
+      "sha256": "ef1b3a42f90e215f87767eb352450c5ef0c10ef70ba1b48e6c19f84c3ccce46e"
+    },
+    "native": {
+      "code": 0,
+      "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+      "stderr": "",
+      "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+      "stderrBase64": ""
+    },
+    "actual": {
+      "code": 0,
+      "stdout": "unconnected empty array: promise error IO.Error.invalidArgument none 0 \"Socket is not connected\"\nunconnected empty chunk: promise error IO.Error.invalidArgument none 0 \"Socket is not connected\"\nunconnected send: promise error IO.Error.invalidArgument none 0 \"Socket is not connected\"\nunconnected shutdown: promise error IO.Error.invalidArgument none 0 \"Socket is not connected\"\nunconnected receive: promise error IO.Error.invalidArgument none 0 \"Socket is not connected\"\nunconnected zero receive: promise ok none\nunconnected waitReadable: promise error IO.Error.invalidArgument none 0 \"Socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: promise error IO.Error.resourceBusy 0 \"Parallel reads on one socket are not allowed\"\nparallel waitReadable: promise error IO.Error.resourceBusy 0 \"Parallel reads on one socket are not allowed\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise ok none\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise ok none\nwaitReadable after EOF: promise ok false\nrepeated shutdown: promise error IO.Error.otherError 0 \"Cannot call end after a stream was finished\"\nempty array after shutdown: promise error IO.Error.otherError 0 \"write after end\"\nempty chunk after shutdown: promise error IO.Error.otherError 0 \"write after end\"\nsend after shutdown: promise error IO.Error.otherError 0 \"write after end\"\nTCP error phases checked\n",
+      "stderr": "",
+      "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMCAiU29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIGVtcHR5IGNodW5rOiBwcm9taXNlIGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDAgIlNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCBzZW5kOiBwcm9taXNlIGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDAgIlNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCBzaHV0ZG93bjogcHJvbWlzZSBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAwICJTb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKdW5jb25uZWN0ZWQgcmVjZWl2ZTogcHJvbWlzZSBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAwICJTb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKdW5jb25uZWN0ZWQgemVybyByZWNlaXZlOiBwcm9taXNlIG9rIG5vbmUKdW5jb25uZWN0ZWQgd2FpdFJlYWRhYmxlOiBwcm9taXNlIGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDAgIlNvY2tldCBpcyBub3QgY29ubmVjdGVkIgpjb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKY29ubmVjdGVkIGVtcHR5IGNodW5rOiBwcm9taXNlIG9rICgpCnBhcmFsbGVsIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VCdXN5IDAgIlBhcmFsbGVsIHJlYWRzIG9uIG9uZSBzb2NrZXQgYXJlIG5vdCBhbGxvd2VkIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VCdXN5IDAgIlBhcmFsbGVsIHJlYWRzIG9uIG9uZSBzb2NrZXQgYXJlIG5vdCBhbGxvd2VkIgpjYW5jZWxsZWQgcmVjZWl2ZTogcHJvbWlzZSBkcm9wcGVkCmNhbmNlbGxlZCB3YWl0UmVhZGFibGU6IHByb21pc2UgZHJvcHBlZApjb25uZWN0ZWQgemVybyByZWNlaXZlOiBwcm9taXNlIG9rIG5vbmUKemVybyByZWNlaXZlIHByZXNlcnZlcyBxdWV1ZWQgYnl0ZXMKZmlyc3Qgc2h1dGRvd246IHByb21pc2Ugb2sgKCkKYmlkaXJlY3Rpb25hbCBoYWxmLWNsb3NlIHByZXNlcnZlcyBieXRlcwpyZWNlaXZlIGFmdGVyIEVPRjogcHJvbWlzZSBvayBub25lCnplcm8gcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIGZhbHNlCnJlcGVhdGVkIHNodXRkb3duOiBwcm9taXNlIGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMCAiQ2Fubm90IGNhbGwgZW5kIGFmdGVyIGEgc3RyZWFtIHdhcyBmaW5pc2hlZCIKZW1wdHkgYXJyYXkgYWZ0ZXIgc2h1dGRvd246IHByb21pc2UgZXJyb3IgSU8uRXJyb3Iub3RoZXJFcnJvciAwICJ3cml0ZSBhZnRlciBlbmQiCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBwcm9taXNlIGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMCAid3JpdGUgYWZ0ZXIgZW5kIgpzZW5kIGFmdGVyIHNodXRkb3duOiBwcm9taXNlIGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMCAid3JpdGUgYWZ0ZXIgZW5kIgpUQ1AgZXJyb3IgcGhhc2VzIGNoZWNrZWQK",
+      "stderrBase64": ""
+    },
+    "resourceReport": {
+      "path": ".work/product-acceptance/tcp-error-phases-4.34.1-node-baseline-r3-resources.json",
+      "sha256": "9e032ea5e7ccd4f78fa11f74e0529925f21c8fd5b60f491f4446b1425d63c869"
+    },
+    "initialFixtureFormattingFailure": {
+      "path": ".work/tcp-error-phases-4.34.1-node-baseline-r2/result.json",
+      "sha256": "10831a95ac58033cdc4c31dd6f0a3200f85ac696213b4803198366fccf3f7626"
+    }
+  },
+  "comparisons": [
+    {
+      "scope": "Supplementary ordinary Lean TCP error timing, empty writes and half-close compared with both native modes; original upstream tests are untouched.",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "target": "node",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.29",
+      "platform": "linux-x64",
+      "inputs": {
+        "integration/application-tcp-errors.mjs": "e824606dacaa23c36cc12a668e1640dc77bd5380caa1020b66096a19733ca504",
+        "integration/fixtures/TcpErrorPhases.lean": "c91b6d8186e58dd84f8862e6d66cddc182ab9ac1c2e6866c0502a82940c2d223"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/tcp-error-phases-4.34.1-node-repair-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1",
+          "code": 0,
+          "stdout": "v26.10.0\n",
+          "stderr": "",
+          "stdoutBase64": "djI2LjEwLjAK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native interpreted",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source",
+          "code": 0,
+          "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+          "stderr": "",
+          "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "generate native C",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "compile native application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native compiled",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source/native"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source",
+          "code": 0,
+          "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+          "stderr": "",
+          "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "build installed application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source/Main.lean",
+            "--target",
+            "node",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.1 for node: /home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/dist\n",
+          "stdoutBase64": "",
+          "stderrBase64": "UHJlcGFyaW5nIExlYW4gNC4zNC4xIGZvciBub2Rl4oCmCkJ1aWxkaW5nIE1haW4ubGVhbiBmb3Igbm9kZeKApgplbSsrOiB3YXJuaW5nOiBNRU1PUlk2NCBpcyBkZXByZWNhdGVkIChwcmVmZXIgdGhlIHN0YW5kYXJkIC1tNjQgb3IgLS10YXJnZXQ9d2FzbTY0IGZsYWdzKS4gUGxlYXNlIG9wZW4gYSBidWcgaWYgeW91IGhhdmUgYSBjb250aW51aW5nIG5lZWQgZm9yIHRoaXMgc2V0dGluZyBbLVdkZXByZWNhdGVkXQp3YXJuaW5nOiAvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvYXBwbGljYXRpb24taW5zdGFsbGVkLTQuMzQuMS1yNy9wcm9qZWN0L25vZGVfbW9kdWxlcy9AbGFzbS9jb21waWxlci9zY3JpcHRzL2Z1bGwtbGVhbi9ob3N0LWxpYnJhcnkuanM6IHNpZ25hdHVyZSByZWRlZmluaXRpb24gZm9yOiBfYWJvcnRfanNfX3NpZwp3YXJuaW5nOiAvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvYXBwbGljYXRpb24taW5zdGFsbGVkLTQuMzQuMS1yNy9wcm9qZWN0L25vZGVfbW9kdWxlcy9AbGFzbS9jb21waWxlci9zY3JpcHRzL2Z1bGwtbGVhbi9ob3N0LWxpYnJhcnkuanM6IHNpZ25hdHVyZSByZWRlZmluaXRpb24gZm9yOiBfYWJvcnRfanNfX3NpZwplbSsrOiB3YXJuaW5nOiB3YXJuaW5ncyBpbiBKUyBsaWJyYXJ5IGNvbXBpbGF0aW9uIFstV2pzLWNvbXBpbGVyXQpCdWlsdCBMZWFuIDQuMzQuMSBmb3Igbm9kZTogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3RjcC1lcnJvci1waGFzZXMtNC4zNC4xLW5vZGUtcmVwYWlyLXIxL2Rpc3QK",
+          "signal": null
+        },
+        {
+          "label": "deployed",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/relocated deployment/main.mjs"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/relocated deployment",
+          "code": 0,
+          "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+          "stderr": "",
+          "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+          "stderrBase64": "",
+          "signal": null
+        }
+      ],
+      "passed": true,
+      "engineVersion": "v26.10.0",
+      "nativeInterpreted": {
+        "code": 0,
+        "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+        "stderr": "",
+        "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+        "stderrBase64": ""
+      },
+      "nativeCompiled": {
+        "code": 0,
+        "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+        "stderr": "",
+        "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+        "stderrBase64": ""
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "793460fc9cae2535eaca126a736e426ef5b942c7856b4bdfc322a1132d05042a",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "c91b6d8186e58dd84f8862e6d66cddc182ab9ac1c2e6866c0502a82940c2d223",
+            "cSha256": "06a2f8e3bde837688445766e79bbaaf717359408984449cbaf517a7b04eeeb15"
+          }
+        ],
+        "signature": "6ce3af78a7f205e27a0074457a6dc5990e0a66b0106338e2a0ee0dcd823fc50a",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "208931f7a7c4077aa54b6eb05f44c9222f0a36b843a5f1842d253cdef0a532c1",
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-node-repair-r1/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+        "stderr": "",
+        "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+        "stderrBase64": ""
+      },
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T16:28:43.980Z",
+      "result": {
+        "path": ".work/tcp-error-phases-4.34.1-node-repair-r1/result.json",
+        "sha256": "56ecdb2d331d47e87c10fd022bc0212a524191abea21248e19017aec5469d827"
+      }
+    },
+    {
+      "scope": "Supplementary ordinary Lean TCP error timing, empty writes and half-close compared with both native modes; original upstream tests are untouched.",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "target": "deno",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.29",
+      "platform": "linux-x64",
+      "inputs": {
+        "integration/application-tcp-errors.mjs": "e824606dacaa23c36cc12a668e1640dc77bd5380caa1020b66096a19733ca504",
+        "integration/fixtures/TcpErrorPhases.lean": "c91b6d8186e58dd84f8862e6d66cddc182ab9ac1c2e6866c0502a82940c2d223"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/tcp-error-phases-4.34.1-deno-repair-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1",
+          "code": 0,
+          "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+          "stderr": "",
+          "stdoutBase64": "ZGVubyAyLjkuNyAoc3RhYmxlLCByZWxlYXNlLCB4ODZfNjQtdW5rbm93bi1saW51eC1nbnUpCnY4IDE1LjAuMjQ1LjItcnVzdHkKdHlwZXNjcmlwdCA2LjAuMwo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native interpreted",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source",
+          "code": 0,
+          "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+          "stderr": "",
+          "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "generate native C",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "compile native application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native compiled",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source/native"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source",
+          "code": 0,
+          "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+          "stderr": "",
+          "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "build installed application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source/Main.lean",
+            "--target",
+            "deno",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for deno\u2026\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.1 for deno: /home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/dist\n",
+          "stdoutBase64": "",
+          "stderrBase64": "UHJlcGFyaW5nIExlYW4gNC4zNC4xIGZvciBkZW5v4oCmCkJ1aWxkaW5nIE1haW4ubGVhbiBmb3IgZGVub+KApgplbSsrOiB3YXJuaW5nOiBNRU1PUlk2NCBpcyBkZXByZWNhdGVkIChwcmVmZXIgdGhlIHN0YW5kYXJkIC1tNjQgb3IgLS10YXJnZXQ9d2FzbTY0IGZsYWdzKS4gUGxlYXNlIG9wZW4gYSBidWcgaWYgeW91IGhhdmUgYSBjb250aW51aW5nIG5lZWQgZm9yIHRoaXMgc2V0dGluZyBbLVdkZXByZWNhdGVkXQp3YXJuaW5nOiAvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvYXBwbGljYXRpb24taW5zdGFsbGVkLTQuMzQuMS1yNy9wcm9qZWN0L25vZGVfbW9kdWxlcy9AbGFzbS9jb21waWxlci9zY3JpcHRzL2Z1bGwtbGVhbi9ob3N0LWxpYnJhcnkuanM6IHNpZ25hdHVyZSByZWRlZmluaXRpb24gZm9yOiBfYWJvcnRfanNfX3NpZwplbSsrOiB3YXJuaW5nOiB3YXJuaW5ncyBpbiBKUyBsaWJyYXJ5IGNvbXBpbGF0aW9uIFstV2pzLWNvbXBpbGVyXQpCdWlsdCBMZWFuIDQuMzQuMSBmb3IgZGVubzogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3RjcC1lcnJvci1waGFzZXMtNC4zNC4xLWRlbm8tcmVwYWlyLXIxL2Rpc3QK",
+          "signal": null
+        },
+        {
+          "label": "deployed",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "run",
+            "-A",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/relocated deployment/main.mjs"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/relocated deployment",
+          "code": 0,
+          "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+          "stderr": "",
+          "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+          "stderrBase64": "",
+          "signal": null
+        }
+      ],
+      "passed": true,
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "nativeInterpreted": {
+        "code": 0,
+        "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+        "stderr": "",
+        "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+        "stderrBase64": ""
+      },
+      "nativeCompiled": {
+        "code": 0,
+        "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+        "stderr": "",
+        "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+        "stderrBase64": ""
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "793460fc9cae2535eaca126a736e426ef5b942c7856b4bdfc322a1132d05042a",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "c91b6d8186e58dd84f8862e6d66cddc182ab9ac1c2e6866c0502a82940c2d223",
+            "cSha256": "06a2f8e3bde837688445766e79bbaaf717359408984449cbaf517a7b04eeeb15"
+          }
+        ],
+        "signature": "fa48ce6f9de4e81e013b37a3a166079fb785ae39b1abc296c134e27bcfac7101",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "208931f7a7c4077aa54b6eb05f44c9222f0a36b843a5f1842d253cdef0a532c1",
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-deno-repair-r1/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+        "stderr": "",
+        "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+        "stderrBase64": ""
+      },
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T16:30:04.207Z",
+      "result": {
+        "path": ".work/tcp-error-phases-4.34.1-deno-repair-r1/result.json",
+        "sha256": "5d4e304024717fcad4f7b0eab02b91d216e24199fe59b5843a77bfb82525107b"
+      }
+    },
+    {
+      "scope": "Supplementary ordinary Lean TCP error timing, empty writes and half-close compared with both native modes; original upstream tests are untouched.",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "target": "bun",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.29",
+      "platform": "linux-x64",
+      "inputs": {
+        "integration/application-tcp-errors.mjs": "e824606dacaa23c36cc12a668e1640dc77bd5380caa1020b66096a19733ca504",
+        "integration/fixtures/TcpErrorPhases.lean": "c91b6d8186e58dd84f8862e6d66cddc182ab9ac1c2e6866c0502a82940c2d223"
+      },
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/tcp-error-phases-4.34.1-bun-repair-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1",
+          "code": 0,
+          "stdout": "1.4.2\n",
+          "stderr": "",
+          "stdoutBase64": "MS40LjIK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native interpreted",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-Dlinter.all=false",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source",
+          "code": 0,
+          "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+          "stderr": "",
+          "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "generate native C",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-j1",
+            "-Dlinter.all=false",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "compile native application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native compiled",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source/native"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source",
+          "code": 0,
+          "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+          "stderr": "",
+          "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "build installed application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source/Main.lean",
+            "--target",
+            "bun",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for bun\u2026\nBuilding Main.lean for bun\u2026\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.1 for bun: /home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/dist\n",
+          "stdoutBase64": "",
+          "stderrBase64": "UHJlcGFyaW5nIExlYW4gNC4zNC4xIGZvciBidW7igKYKQnVpbGRpbmcgTWFpbi5sZWFuIGZvciBidW7igKYKd2FybmluZzogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL2FwcGxpY2F0aW9uLWluc3RhbGxlZC00LjM0LjEtcjcvcHJvamVjdC9ub2RlX21vZHVsZXMvQGxhc20vY29tcGlsZXIvc2NyaXB0cy9mdWxsLWxlYW4vaG9zdC1saWJyYXJ5LmpzOiBzaWduYXR1cmUgcmVkZWZpbml0aW9uIGZvcjogX2Fib3J0X2pzX19zaWcKd2FybmluZzogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL2FwcGxpY2F0aW9uLWluc3RhbGxlZC00LjM0LjEtcjcvcHJvamVjdC9ub2RlX21vZHVsZXMvQGxhc20vY29tcGlsZXIvc2NyaXB0cy9mdWxsLWxlYW4vaG9zdC1saWJyYXJ5LmpzOiBzaWduYXR1cmUgcmVkZWZpbml0aW9uIGZvcjogX2Fib3J0X2pzX19zaWcKZW0rKzogd2FybmluZzogd2FybmluZ3MgaW4gSlMgbGlicmFyeSBjb21waWxhdGlvbiBbLVdqcy1jb21waWxlcl0KQnVpbHQgTGVhbiA0LjM0LjEgZm9yIGJ1bjogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL3RjcC1lcnJvci1waGFzZXMtNC4zNC4xLWJ1bi1yZXBhaXItcjEvZGlzdAo=",
+          "signal": null
+        },
+        {
+          "label": "deployed",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/relocated deployment/main.mjs"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/relocated deployment",
+          "code": 0,
+          "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+          "stderr": "",
+          "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+          "stderrBase64": "",
+          "signal": null
+        }
+      ],
+      "passed": true,
+      "engineVersion": "1.4.2",
+      "nativeInterpreted": {
+        "code": 0,
+        "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+        "stderr": "",
+        "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+        "stderrBase64": ""
+      },
+      "nativeCompiled": {
+        "code": 0,
+        "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+        "stderr": "",
+        "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+        "stderrBase64": ""
+      },
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "793460fc9cae2535eaca126a736e426ef5b942c7856b4bdfc322a1132d05042a",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "c91b6d8186e58dd84f8862e6d66cddc182ab9ac1c2e6866c0502a82940c2d223",
+            "cSha256": "06a2f8e3bde837688445766e79bbaaf717359408984449cbaf517a7b04eeeb15"
+          }
+        ],
+        "signature": "c4a91abb508a4b3ca9c194f3ab547c2ecdd8941fa81b146c3462bf1b014d1420",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "55dd42db015f3218ca94425cfa8333e950bc61dccb17a6dea14df02721ccd01d",
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-bun-repair-r1/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "actual": {
+        "code": 0,
+        "stdout": "unconnected empty array: promise ok ()\nunconnected empty chunk: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected send: start error IO.Error.invalidArgument none 9 \"bad file descriptor\"\nunconnected shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected zero receive: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nunconnected waitReadable: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nconnected empty array: promise ok ()\nconnected empty chunk: promise ok ()\nparallel receive: start error IO.Error.otherError 114 \"connection already in progress\"\nparallel waitReadable: start error IO.Error.otherError 114 \"connection already in progress\"\ncancelled receive: promise dropped\ncancelled waitReadable: promise dropped\nconnected zero receive: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nzero receive preserves queued bytes\nfirst shutdown: promise ok ()\nbidirectional half-close preserves bytes\nreceive after EOF: promise ok none\nzero receive after EOF: promise error IO.Error.resourceExhausted none 105 \"no buffer space available\"\nwaitReadable after EOF: promise ok true\nrepeated shutdown: start error IO.Error.invalidArgument none 107 \"socket is not connected\"\nempty array after shutdown: promise ok ()\nempty chunk after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nsend after shutdown: start error IO.Error.resourceVanished 32 \"broken pipe\"\nTCP error phases checked\n",
+        "stderr": "",
+        "stdoutBase64": "dW5jb25uZWN0ZWQgZW1wdHkgYXJyYXk6IHByb21pc2Ugb2sgKCkKdW5jb25uZWN0ZWQgZW1wdHkgY2h1bms6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNlbmQ6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDkgImJhZCBmaWxlIGRlc2NyaXB0b3IiCnVuY29ubmVjdGVkIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5pbnZhbGlkQXJndW1lbnQgbm9uZSAxMDcgInNvY2tldCBpcyBub3QgY29ubmVjdGVkIgp1bmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCnVuY29ubmVjdGVkIHdhaXRSZWFkYWJsZTogc3RhcnQgZXJyb3IgSU8uRXJyb3IuaW52YWxpZEFyZ3VtZW50IG5vbmUgMTA3ICJzb2NrZXQgaXMgbm90IGNvbm5lY3RlZCIKY29ubmVjdGVkIGVtcHR5IGFycmF5OiBwcm9taXNlIG9rICgpCmNvbm5lY3RlZCBlbXB0eSBjaHVuazogcHJvbWlzZSBvayAoKQpwYXJhbGxlbCByZWNlaXZlOiBzdGFydCBlcnJvciBJTy5FcnJvci5vdGhlckVycm9yIDExNCAiY29ubmVjdGlvbiBhbHJlYWR5IGluIHByb2dyZXNzIgpwYXJhbGxlbCB3YWl0UmVhZGFibGU6IHN0YXJ0IGVycm9yIElPLkVycm9yLm90aGVyRXJyb3IgMTE0ICJjb25uZWN0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MiCmNhbmNlbGxlZCByZWNlaXZlOiBwcm9taXNlIGRyb3BwZWQKY2FuY2VsbGVkIHdhaXRSZWFkYWJsZTogcHJvbWlzZSBkcm9wcGVkCmNvbm5lY3RlZCB6ZXJvIHJlY2VpdmU6IHByb21pc2UgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VFeGhhdXN0ZWQgbm9uZSAxMDUgIm5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUiCnplcm8gcmVjZWl2ZSBwcmVzZXJ2ZXMgcXVldWVkIGJ5dGVzCmZpcnN0IHNodXRkb3duOiBwcm9taXNlIG9rICgpCmJpZGlyZWN0aW9uYWwgaGFsZi1jbG9zZSBwcmVzZXJ2ZXMgYnl0ZXMKcmVjZWl2ZSBhZnRlciBFT0Y6IHByb21pc2Ugb2sgbm9uZQp6ZXJvIHJlY2VpdmUgYWZ0ZXIgRU9GOiBwcm9taXNlIGVycm9yIElPLkVycm9yLnJlc291cmNlRXhoYXVzdGVkIG5vbmUgMTA1ICJubyBidWZmZXIgc3BhY2UgYXZhaWxhYmxlIgp3YWl0UmVhZGFibGUgYWZ0ZXIgRU9GOiBwcm9taXNlIG9rIHRydWUKcmVwZWF0ZWQgc2h1dGRvd246IHN0YXJ0IGVycm9yIElPLkVycm9yLmludmFsaWRBcmd1bWVudCBub25lIDEwNyAic29ja2V0IGlzIG5vdCBjb25uZWN0ZWQiCmVtcHR5IGFycmF5IGFmdGVyIHNodXRkb3duOiBwcm9taXNlIG9rICgpCmVtcHR5IGNodW5rIGFmdGVyIHNodXRkb3duOiBzdGFydCBlcnJvciBJTy5FcnJvci5yZXNvdXJjZVZhbmlzaGVkIDMyICJicm9rZW4gcGlwZSIKc2VuZCBhZnRlciBzaHV0ZG93bjogc3RhcnQgZXJyb3IgSU8uRXJyb3IucmVzb3VyY2VWYW5pc2hlZCAzMiAiYnJva2VuIHBpcGUiClRDUCBlcnJvciBwaGFzZXMgY2hlY2tlZAo=",
+        "stderrBase64": ""
+      },
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T16:31:52.398Z",
+      "result": {
+        "path": ".work/tcp-error-phases-4.34.1-bun-repair-r1/result.json",
+        "sha256": "84ee802c4e5a8c4ced2728583367db7e2d2754929d7a768603ce69cf91388f5f"
+      }
+    }
+  ],
+  "observationsPerEngine": 22,
+  "totalDeployedObservations": 66,
+  "nativeModesPerEngine": 2,
+  "httpRegressions": [
+    {
+      "scope": "Primary CLI with ordinary Lake dependency discovery and full HTTP differential checks",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler",
+      "target": "node",
+      "engineVersion": "v26.10.0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "793460fc9cae2535eaca126a736e426ef5b942c7856b4bdfc322a1132d05042a",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "moduleDataIdentity": "ed05ff761a3187447091a3b781ffefe4028b9de24197bcb96002b785bb9e2b2a",
+        "moduleDataBytes": 2216686477,
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "+App.Model",
+            "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+            "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+          },
+          {
+            "module": "+App.Server",
+            "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+            "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+          },
+          {
+            "module": "/+Main",
+            "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+            "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+          }
+        ],
+        "signature": "97ea126b1ba5a3ec5de75e54a93014756403ae1be40d76eb03bfd4f4f43c390d",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "sourceHashes": {
+        "integration/managed-http.mjs": "899c975ece2aaf817c18a0ed8ce6136c1bfdb5c39af8e386200f10e739eb911e",
+        "examples/lean-server-latest/Main.lean": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+        "examples/lean-server-latest/App/Model.lean": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+        "examples/lean-server-latest/App/Server.lean": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+        "examples/lean-server-latest/test/server.test.mjs": "faa83f12123f666cb94febe6b6bf516c5e93064ac87c49e6c96a6712259a5b60",
+        "examples/lean-server-latest/vitest.config.mjs": "c4d2b3b802161b978c67724931cba0983c57293f4ad67d519140c5ef037661d7"
+      },
+      "sourcesUnchanged": true,
+      "metadataReclamation": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-http-node-r3/metadata-reclamation.json",
+        "files": 15131,
+        "metadataBytes": 2216686477,
+        "metadataSha256": "3141745204b1f517ce0589523028fd72319473339f94b052d1b8c0d271dbdf80"
+      },
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/tcp-error-phases-4.34.1-http-node-r3-resources.json",
+      "recordedAt": "2026-09-25T18:10:20.212Z",
+      "result": {
+        "path": ".work/tcp-error-phases-4.34.1-http-node-r3/result.json",
+        "sha256": "9a75ee337f35ff2db80e4195e5633ccfe5ca89e30c70e74ab04de9937e919e9c"
+      },
+      "vitest": {
+        "path": ".work/tcp-error-phases-4.34.1-http-node-r3/vitest.json",
+        "sha256": "46722688d4e5c687e6b640c6afd136c7732adf5151f99617810227dbf7ff6763"
+      }
+    },
+    {
+      "scope": "Primary CLI with ordinary Lake dependency discovery and full HTTP differential checks",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler",
+      "target": "deno",
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "793460fc9cae2535eaca126a736e426ef5b942c7856b4bdfc322a1132d05042a",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "moduleDataIdentity": "ed05ff761a3187447091a3b781ffefe4028b9de24197bcb96002b785bb9e2b2a",
+        "moduleDataBytes": 2216686477,
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "+App.Model",
+            "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+            "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+          },
+          {
+            "module": "+App.Server",
+            "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+            "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+          },
+          {
+            "module": "/+Main",
+            "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+            "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+          }
+        ],
+        "signature": "b7d4d3902d7cf7cd0f9a6586777578f5bd58a3cf950dc11466ad6c50326be56f",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "sourceHashes": {
+        "integration/managed-http.mjs": "899c975ece2aaf817c18a0ed8ce6136c1bfdb5c39af8e386200f10e739eb911e",
+        "examples/lean-server-latest/Main.lean": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+        "examples/lean-server-latest/App/Model.lean": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+        "examples/lean-server-latest/App/Server.lean": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+        "examples/lean-server-latest/test/server.test.mjs": "faa83f12123f666cb94febe6b6bf516c5e93064ac87c49e6c96a6712259a5b60",
+        "examples/lean-server-latest/vitest.config.mjs": "c4d2b3b802161b978c67724931cba0983c57293f4ad67d519140c5ef037661d7"
+      },
+      "sourcesUnchanged": true,
+      "metadataReclamation": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-http-deno-r3/metadata-reclamation.json",
+        "files": 15131,
+        "metadataBytes": 2216686477,
+        "metadataSha256": "3141745204b1f517ce0589523028fd72319473339f94b052d1b8c0d271dbdf80"
+      },
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/tcp-error-phases-4.34.1-http-deno-r3-resources.json",
+      "recordedAt": "2026-09-25T18:13:31.434Z",
+      "result": {
+        "path": ".work/tcp-error-phases-4.34.1-http-deno-r3/result.json",
+        "sha256": "79778134e727144f097c242f11fc8e488c9eaaa2b504ff984e05976f3c415c30"
+      },
+      "vitest": {
+        "path": ".work/tcp-error-phases-4.34.1-http-deno-r3/vitest.json",
+        "sha256": "76de14a56e39b6fcb529cc98ce4d6fd53109033b80081abb457a6663fae214e3"
+      }
+    },
+    {
+      "scope": "Primary CLI with ordinary Lake dependency discovery and full HTTP differential checks",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r7/project/node_modules/@lasm/compiler",
+      "target": "bun",
+      "engineVersion": "1.4.2",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+        "buildDriverIdentity": "793460fc9cae2535eaca126a736e426ef5b942c7856b4bdfc322a1132d05042a",
+        "gitIdentity": "fa5931f2dddcf0fab0222f1615c6e9a7f08fe3c4ceccfcd3e8774eb02ce766e6",
+        "gitVersion": "git version 2.53.0",
+        "moduleDataIdentity": "ed05ff761a3187447091a3b781ffefe4028b9de24197bcb96002b785bb9e2b2a",
+        "moduleDataBytes": 2216686477,
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "+App.Model",
+            "sourceSha256": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+            "cSha256": "2accd7b2049e922ecb3f76fb80b845c3c85298931887801daa7c6ba18fadc65a"
+          },
+          {
+            "module": "+App.Server",
+            "sourceSha256": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+            "cSha256": "f6191f89c8d471cd66e66e852a062b3c44f7b2528b601a40984ad802ad3dc882"
+          },
+          {
+            "module": "/+Main",
+            "sourceSha256": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+            "cSha256": "1648c539312d6bc58bf8213639f722346c5ded3846b1429ef0f97157965d3478"
+          }
+        ],
+        "signature": "d93ee5d29930e1ad5a69960c4a5988424e9cb9aaf2bf599865955583d4c764ec",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "sourceHashes": {
+        "integration/managed-http.mjs": "899c975ece2aaf817c18a0ed8ce6136c1bfdb5c39af8e386200f10e739eb911e",
+        "examples/lean-server-latest/Main.lean": "678a21587d956972596d2b12d41f7b07e20d160fd12f523fef904f7c515fcdca",
+        "examples/lean-server-latest/App/Model.lean": "1b35e4e9500b88133d94ebd2c1bbbc615909cc9c5eefbb1d7d980a32af818970",
+        "examples/lean-server-latest/App/Server.lean": "3e41facf040d94c597e35aa867b99f26fe6dbf7aa785c64f8b5d357bf077e838",
+        "examples/lean-server-latest/test/server.test.mjs": "faa83f12123f666cb94febe6b6bf516c5e93064ac87c49e6c96a6712259a5b60",
+        "examples/lean-server-latest/vitest.config.mjs": "c4d2b3b802161b978c67724931cba0983c57293f4ad67d519140c5ef037661d7"
+      },
+      "sourcesUnchanged": true,
+      "metadataReclamation": {
+        "report": "/home/lastmjs/development/lasm/compiler/.work/tcp-error-phases-4.34.1-http-bun-r4/metadata-reclamation.json",
+        "files": 15131,
+        "metadataBytes": 2216686477,
+        "metadataSha256": "3141745204b1f517ce0589523028fd72319473339f94b052d1b8c0d271dbdf80"
+      },
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/tcp-error-phases-4.34.1-http-bun-r4-resources.json",
+      "recordedAt": "2026-09-25T18:23:40.060Z",
+      "result": {
+        "path": ".work/tcp-error-phases-4.34.1-http-bun-r4/result.json",
+        "sha256": "2de12ec180a390d9458ea1457cf0f5301d6c0b3f5fbd56d8930b0bda38e31a67"
+      },
+      "vitest": {
+        "path": ".work/tcp-error-phases-4.34.1-http-bun-r4/vitest.json",
+        "sha256": "616a6f41245211cfc89fe7efc5e6de4ff55cb121e706889244a297c306ede93b"
+      }
+    }
+  ],
+  "httpChecks": 60,
+  "httpDeployedChecks": 30,
+  "httpNativeChecks": 30,
+  "runtimeDerivation": {
+    "scope": "Single private async-object derivation; compiled application behavior requires separate acceptance",
+    "inputFile": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.1-r1/build-inputs.json",
+    "inputSha256": "8f632078eedb98d24506bec68eb7f4d35e9ba0e89afc76b8cba1fb7a0ce4aa76",
+    "baseline": {
+      "name": "lean-4.34.1-wasm64",
+      "manifestSha256": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e"
+    },
+    "inputs": {
+      "runtime/node-async.cpp": "27e0ceffdd42f963a124201d863d68eecba30583761b70314bb2685a04421e0c",
+      "runtime/node.hpp": "12756d4ab0f75c72bb3cb02311e2d6dd471dc027e3278458b8af6c0ccf4aa3f3",
+      "scripts/full-lean/derive-async-runtime.mjs": "69e7db3b6ec6d002b278e1675df8327c70d0f18357962a1fc0e71105321eb09c"
+    },
+    "sdk": {
+      "identity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+      "driverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+    },
+    "commands": [
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a",
+          "node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/em++",
+        "args": [
+          "-DLEAN_USE_GMP",
+          "-Wall",
+          "-Wextra",
+          "-std=c++20",
+          "-DLEAN_EMSCRIPTEN",
+          "-sALLOW_MEMORY_GROWTH=1",
+          "-sMEMORY64=1",
+          "-fwasm-exceptions",
+          "-pthread",
+          "-ffp-contract=off",
+          "-DLEAN_MULTI_THREAD",
+          "-DLEAN_BUILD_TYPE=\"Release\"",
+          "-DLEAN_EXPORTING",
+          "-D__CLANG__",
+          "-DLASM_FULL_NATIVE_THREADS=1",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.cache/gmp-wasm64/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.1-r1/build/libuv/src/libuv/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.1-r1/build/include",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.1-r1/source/src",
+          "-I",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.1-r1/build",
+          "-MMD",
+          "-MF",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/build/node-async.cpp.o.d",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/build/node-async.cpp",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/build/node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "rcs",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/build/node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "t",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "t",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a",
+          "node-io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a",
+          "node-io.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a",
+          "node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a",
+          "node-async.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a",
+          "node-system.cpp.o"
+        ]
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/derived/791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7/emar",
+        "args": [
+          "p",
+          "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/lean-4.34.1-wasm64/lib/liblasmhost.a",
+          "node-system.cpp.o"
+        ]
+      }
+    ],
+    "verifiedMembers": [
+      {
+        "name": "node-io.cpp.o",
+        "before": "dd5ec6f5a046d4e32853d51afa6263a89dc2dbaed34a050b032d77ece048f1e9",
+        "after": "dd5ec6f5a046d4e32853d51afa6263a89dc2dbaed34a050b032d77ece048f1e9"
+      },
+      {
+        "name": "node-async.cpp.o",
+        "before": "e3c464de7058d80e61b6c5d58400dfe8a8367284d5b7f24e5b75691e10c02bab",
+        "after": "a25ea9a0349e22520d5542b2e39ad3bba3e6de50ea917bff33df01077f93b8cd"
+      },
+      {
+        "name": "node-system.cpp.o",
+        "before": "69deafa4a1a67aedfb5b1d3e6e32e15e967db74e859fb11669e9ff865e5bb0c7",
+        "after": "69deafa4a1a67aedfb5b1d3e6e32e15e967db74e859fb11669e9ff865e5bb0c7"
+      }
+    ],
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/tcp-error-phases-4.34.1-derive-r1-resources.json",
+    "passed": true,
+    "target": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-async-4.34.1-r1/lean-4.34.1-wasm64",
+    "manifestSha256": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf",
+    "derivation": {
+      "baseManifestSha256": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+      "archive": "lib/liblasmhost.a",
+      "member": "node-async.cpp.o",
+      "sourceSha256": "27e0ceffdd42f963a124201d863d68eecba30583761b70314bb2685a04421e0c",
+      "headerSha256": "12756d4ab0f75c72bb3cb02311e2d6dd471dc027e3278458b8af6c0ccf4aa3f3",
+      "beforeSha256": "e3c464de7058d80e61b6c5d58400dfe8a8367284d5b7f24e5b75691e10c02bab",
+      "afterSha256": "a25ea9a0349e22520d5542b2e39ad3bba3e6de50ea917bff33df01077f93b8cd",
+      "unchangedStandardModules": 2516
+    },
+    "inputsUnchanged": true,
+    "untouchedBundleFiles": [
+      "exports.json",
+      "include/lean/config.h",
+      "include/lean/lean_gmp.h",
+      "include/lean/lean_libuv.h",
+      "include/lean/lean.h",
+      "include/lean/mimalloc.h",
+      "include/lean/version.h",
+      "lib/libgmp.a",
+      "lib/libInit.a",
+      "lib/libLake.a",
+      "lib/liblasmsymbols.a",
+      "lib/libLean.a",
+      "lib/libleancpp.a",
+      "lib/libleanrt.a",
+      "lib/libStd.a",
+      "lib/libuv.a",
+      "THIRD_PARTY_NOTICES.txt"
+    ],
+    "finishedAt": "2026-09-25T16:24:50.310Z",
+    "result": {
+      "path": ".work/application-runtime-async-4.34.1-r1/result.json",
+      "sha256": "47b38efeeadb1f466a966a864f4b1ccf0e2637f837cf273e6a1eb235e9fbe773"
+    }
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-4.34.1-r7/lasm-compiler-0.1.0-experimental.29.tgz",
+    "sha256": "a82892bada442df25f6a86089ab7af9970a93fc4ad61e8187a191aba67d16feb",
+    "compressedBytes": 125914907,
+    "installedBytes": 633049906,
+    "files": 2702,
+    "candidateVersion": "0.1.0-experimental.29",
+    "defaultLean": "4.34.1",
+    "runtime": {
+      "name": "lean-4.34.1-wasm64",
+      "identity": "4034cb85407d75be21ba2cb1fb063065aebe7cef48bbd82543f759bb6d35a4cf"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/tcp-error-phases-4.34.1-package-r1-resources.json",
+    "recordedAt": "2026-09-25T16:26:09.387Z"
+  },
+  "installation": {
+    "receipt": {
+      "path": ".work/product-acceptance/install-candidate-4.34.1-r7.json",
+      "sha256": "f9c2e4e7b0619a40b4cc32173c864d1196687bc6861dff0181a9fae9c1ff1049"
+    },
+    "filesVerified": 2702,
+    "toolCache": "preprovisioned; not a new cold-bootstrap claim"
+  },
+  "archivalPreparationFailure": {
+    "path": ".work/product-acceptance/historical-runtime-library-archive-r2-resources.json",
+    "sha256": "a1cce275f38e5f31ff42bec53adb8f558fe30be9dea0e6c5e163ff490176c17a"
+  },
+  "diskPreflightRefusal": {
+    "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-node-r1-disk.json",
+    "sha256": "fe50af23b94edf310fe55a5901e52723de119bb5394874f5b49fb15b904b96cc"
+  },
+  "diskPreflightRefusals": [
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-node-r1-disk.json",
+        "sha256": "fe50af23b94edf310fe55a5901e52723de119bb5394874f5b49fb15b904b96cc"
+      },
+      "freeAtStart": 9104105472,
+      "preflightRequiredBytes": 9663676416
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-bun-r3-disk.json",
+        "sha256": "b6c534433c2cf07d979c14d3cc7d9fd556256ee13e150c4742f6aba84574b47a"
+      },
+      "freeAtStart": 7634677760,
+      "preflightRequiredBytes": 9663676416
+    }
+  ],
+  "losslessArchival": [
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/historical-runtime-library-archive-r1.json",
+        "sha256": "7bf202f5a275ba602171cfcd9bfcc87311e849c1cad5e069572365311502a9d3"
+      },
+      "files": 20,
+      "freedBytes": 2414903296
+    },
+    {
+      "receipt": {
+        "path": ".work/product-acceptance/historical-runtime-library-archive-r3.json",
+        "sha256": "e5900ff3d53b0f938eb0bacfa6fe9a6ea7b7a4ed87eca831aef7dcb969acee4e"
+      },
+      "files": 33,
+      "freedBytes": 4059783168
+    }
+  ],
+  "moduleDataArchives": [
+    {
+      "receipt": {
+        "path": ".work/tcp-error-phases-4.34.1-http-node-r3/module-data-streaming-archive.json",
+        "sha256": "8d8162dc95947bc5ab5a7cd81972f29b97f49a4784d754fa1d829d7581181e0c"
+      },
+      "files": 15131,
+      "directories": 305,
+      "archiveSha256": "a257ea8ec9f92930ae35b3a6392e02551ca1d11878f93b61140a35e9e1cc0565",
+      "archiveBytes": 703462721,
+      "freeAfter": 9186201600,
+      "verifiedDecompression": true
+    },
+    {
+      "receipt": {
+        "path": ".work/tcp-error-phases-4.34.1-http-deno-r3/module-data-streaming-archive.json",
+        "sha256": "62bbd32597f6d00f2817a39be2bec1389ec962438c6c8fc825c58698bae3e64e"
+      },
+      "files": 15131,
+      "directories": 305,
+      "archiveSha256": "7927b0a216d7f62b47de56b390c6667c2ae2614f6ebd8d8ac1ce8146a2ff1a46",
+      "archiveBytes": 703459246,
+      "freeAfter": 10736734208,
+      "verifiedDecompression": true
+    },
+    {
+      "receipt": {
+        "path": ".work/tcp-error-phases-4.34.1-http-bun-r4/module-data-streaming-archive.json",
+        "sha256": "179ce20c1c7dd8890678005107e7e8aac005d87e1c5168d46004d3208c7e7ed4"
+      },
+      "files": 15131,
+      "directories": 305,
+      "archiveSha256": "e328e09e7e43239a27ce4602d2e4f7c3d6b345bbe2f0b01bacf67d586498eecc",
+      "archiveBytes": 703443913,
+      "freeAfter": 9516003328,
+      "verifiedDecompression": true
+    }
+  ],
+  "archivalResourceStop": {
+    "receipt": {
+      "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-node-r3-metadata-archive-resources.json",
+      "sha256": "cc33f7030aae1dd3cecd91bef165d62b6cce94ab6160987c8e24edbccaeeccab"
+    },
+    "peakMemoryBytes": 1752793088,
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "swapBytes": 0,
+    "unitReleased": true,
+    "cause": "file cache reached proactive 80-percent guard; retry used bounded streaming with page-cache eviction under the same 2 GiB cap"
+  },
+  "resources": [
+    {
+      "name": "tcp-error-phases-4.34.1-derive-r1",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-derive-r1-resources.json",
+        "sha256": "d55af229340e39531b3828ca7eb0eb6eeb9fa1abf3d2b127dfbe8af644ea0d07"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-derive-r1.log",
+        "sha256": "da765b4deecd5d065801ac434bf73efcd6042fd3dbfe870fe81c9765deb2ff2a"
+      },
+      "startedAt": "2026-09-25T16:24:28.959Z",
+      "finishedAt": "2026-09-25T16:24:50.408Z",
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 587476992,
+      "minimumHostAvailable": 27198238720,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 8714268672
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-package-r1",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-package-r1-resources.json",
+        "sha256": "c4a45f639ad8721bd6fca0560db156624f0712cc37e79260b365309178749e23"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-package-r1.log",
+        "sha256": "e8966a27b2acda23a2c7a50971a8463856ade5bf459ed563d89723f19d88681c"
+      },
+      "startedAt": "2026-09-25T16:25:31.287Z",
+      "finishedAt": "2026-09-25T16:26:09.479Z",
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 2235494400,
+      "minimumHostAvailable": 26260729856,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 7820201984
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-install-r1",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-install-r1-resources.json",
+        "sha256": "0553b82c02273de26126b993eec1e912fafc1db4ea432a2711f60cc60f76196b"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-install-r1.log",
+        "sha256": "da71d1e1a2771bfa6e4818413fec5a8acb799b51bd42a699777a360abd6cfe9d"
+      },
+      "startedAt": "2026-09-25T16:27:01.523Z",
+      "finishedAt": "2026-09-25T16:27:24.382Z",
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 1561608192,
+      "minimumHostAvailable": 26195714048,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 7745896448
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-node-repair-r1",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-node-repair-r1-resources.json",
+        "sha256": "6b2ce9cec2a1d48804881c6f7c82ef43ba9dfdaa069da6138aef802d8ff0b262"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-node-repair-r1.log",
+        "sha256": "ed5be58da91c3feb88a8a8379024107f67a4bbfeaf3876e9acc6f2adeef0e612"
+      },
+      "startedAt": "2026-09-25T16:27:24.712Z",
+      "finishedAt": "2026-09-25T16:28:44.109Z",
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 3897368576,
+      "minimumHostAvailable": 23691042816,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 7446085632
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-deno-repair-r1",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-deno-repair-r1-resources.json",
+        "sha256": "6f999bb51a8fdbdf0783ca0113e6c27eb5f2adefa68117c8cc7c98eb2222be57"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-deno-repair-r1.log",
+        "sha256": "cfc89557674b522a71f88797054abafa9bf39abb5e291d23334ce70a8ac744b4"
+      },
+      "startedAt": "2026-09-25T16:28:44.786Z",
+      "finishedAt": "2026-09-25T16:30:04.295Z",
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 3541520384,
+      "minimumHostAvailable": 24010539008,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 7075975168
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-bun-repair-r1",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-bun-repair-r1-resources.json",
+        "sha256": "73f6c2fdc376dd4681cb7e1c4215119c9ccc25e1561a171f7126838e2b2aad3a"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-bun-repair-r1.log",
+        "sha256": "0f976ace3f8e68e7b82d84833b295c7c28f4e5abbee152f263b0dbe101c4b09d"
+      },
+      "startedAt": "2026-09-25T16:30:04.892Z",
+      "finishedAt": "2026-09-25T16:31:52.496Z",
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 3698528256,
+      "minimumHostAvailable": 23778566144,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 6657536000
+    },
+    {
+      "name": "historical-runtime-library-archive-r1",
+      "report": {
+        "path": ".work/product-acceptance/historical-runtime-library-archive-r1-resources.json",
+        "sha256": "43e4b9d8c183e358ccc09e4a1eeff0bd4d78ac7ad978316bbb0033af1929d180"
+      },
+      "log": {
+        "path": ".work/product-acceptance/historical-runtime-library-archive-r1.log",
+        "sha256": "640453d743f975c8ffec49bb77edbc7f78de9924120746549e6a77f9f232127a"
+      },
+      "startedAt": "2026-09-25T16:31:53.590Z",
+      "finishedAt": "2026-09-25T16:32:46.085Z",
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 40599552,
+      "minimumHostAvailable": 26878984192,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 6641422336
+    },
+    {
+      "name": "historical-runtime-library-archive-r3",
+      "report": {
+        "path": ".work/product-acceptance/historical-runtime-library-archive-r3-resources.json",
+        "sha256": "dfdc9971dd15596464aa7db216696e9f8324c92ec0de124ffefdb5f0d964279e"
+      },
+      "log": {
+        "path": ".work/product-acceptance/historical-runtime-library-archive-r3.log",
+        "sha256": "925240d65da76b477dfedb2a1d3a00733634d55ccf3819e88a33efbcb684f394"
+      },
+      "startedAt": "2026-09-25T18:05:12.514Z",
+      "finishedAt": "2026-09-25T18:07:09.883Z",
+      "limits": {
+        "memoryMax": 1073741824,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 858993459,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 43171840,
+      "minimumHostAvailable": 26596134912,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 9051787264
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-http-node-r3",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-node-r3-resources.json",
+        "sha256": "d9e6979d84ba541098e886ad7e452a2793274a420a4629f8137c8917147e44cf"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-node-r3.log",
+        "sha256": "1656e4e0a724f111de0fc0beff81d07cbbf718c6cefcdfe58e968f0df785f306"
+      },
+      "startedAt": "2026-09-25T18:07:10.677Z",
+      "finishedAt": "2026-09-25T18:10:20.331Z",
+      "limits": {
+        "memoryMax": 8589934592,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 6871947673,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 5305745408,
+      "minimumHostAvailable": 23473582080,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 8272621568
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-http-deno-r3",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-deno-r3-resources.json",
+        "sha256": "8d67e08770449eee6e9ee3df3204262e4743ac011a6e66e2426f410aa8b38c85"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-deno-r3.log",
+        "sha256": "82d515c5b029f130803d8eff8dd3e88a1b646e3c6c821316e19a2cbf00768abe"
+      },
+      "startedAt": "2026-09-25T18:10:20.860Z",
+      "finishedAt": "2026-09-25T18:13:31.547Z",
+      "limits": {
+        "memoryMax": 8589934592,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 6871947673,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 5567549440,
+      "minimumHostAvailable": 23496757248,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 5506863104
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-http-node-r3-metadata-streaming-archive",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-node-r3-metadata-streaming-archive-resources.json",
+        "sha256": "8d744d9ad4325d401023f940c474467cddcc416da1ea9e95cfe36502d829f73e"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-node-r3-metadata-streaming-archive.log",
+        "sha256": "e69a488969853f573d4a129c6fa15af291e05da779ccb90e42f9bdfe5488c58d"
+      },
+      "startedAt": "2026-09-25T18:18:28.264Z",
+      "finishedAt": "2026-09-25T18:19:35.655Z",
+      "limits": {
+        "memoryMax": 2147483648,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1717986918,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 74743808,
+      "minimumHostAvailable": 26844278784,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 6928715776
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-http-deno-r3-metadata-streaming-archive",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-deno-r3-metadata-streaming-archive-resources.json",
+        "sha256": "fc0c0754f2ea563dcf7ae0c8cc9a5dc5e38b58f6c6dec8ead540caefb3a60704"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-deno-r3-metadata-streaming-archive.log",
+        "sha256": "8b21bbd402c48ac255b566d6b3ee7ae6c64b2c9581c9e0315bf91e400a3e2491"
+      },
+      "startedAt": "2026-09-25T18:19:36.369Z",
+      "finishedAt": "2026-09-25T18:20:42.182Z",
+      "limits": {
+        "memoryMax": 2147483648,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1717986918,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 73543680,
+      "minimumHostAvailable": 26801426432,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 8479252480
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-http-bun-r4",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-bun-r4-resources.json",
+        "sha256": "102132e23a7390653c6e4c0e0e29d49d82912fd02610cb9773f56e3052b45c63"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-bun-r4.log",
+        "sha256": "28cf7ecbabbdcd40aa00a26f61ff0ae0f007525555a776c834529e971b1c3aa3"
+      },
+      "startedAt": "2026-09-25T18:20:42.496Z",
+      "finishedAt": "2026-09-25T18:23:40.181Z",
+      "limits": {
+        "memoryMax": 8589934592,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 6871947673,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 5316775936,
+      "minimumHostAvailable": 23270236160,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 5838094336
+    },
+    {
+      "name": "tcp-error-phases-4.34.1-http-bun-r4-metadata-streaming-archive",
+      "report": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-bun-r4-metadata-streaming-archive-resources.json",
+        "sha256": "f88559a2db158a7eb2a7a2cf7ddac00df89ff1ca92a021b9125a08a44d53810d"
+      },
+      "log": {
+        "path": ".work/product-acceptance/tcp-error-phases-4.34.1-http-bun-r4-metadata-streaming-archive.log",
+        "sha256": "d968f6d9f34c07ff1fe694f38713b3b6471a50e3f8538018748e6859d2711ff4"
+      },
+      "startedAt": "2026-09-25T18:23:40.593Z",
+      "finishedAt": "2026-09-25T18:24:46.772Z",
+      "limits": {
+        "memoryMax": 2147483648,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1717986918,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 74285056,
+      "minimumHostAvailable": 26307354624,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0,
+      "minimumFreeDiskBytes": 7258521600
+    }
+  ],
+  "peakMemoryBytes": 5567549440,
+  "minimumFreeDiskBytes": 5506863104,
+  "remaining": [
+    "Complete TCP descriptor/error lifetime and all other standard APIs.",
+    "Native counterparts on the other five required OS/architecture combinations.",
+    "Raw working-directory repair, full latest-release suite and shipping helper integration."
+  ],
+  "fundamentalLimitationDemonstrated": false,
+  "recordedAt": "2026-09-25T18:25:56.447337+00:00"
+}
