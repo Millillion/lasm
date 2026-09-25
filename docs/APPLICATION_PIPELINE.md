@@ -82,6 +82,29 @@ output-limit and false-handshake cases. Each deployment is relocated with source
 hidden and PATH empty. Guards release without resource events; peak memory is
 3.44 GiB. This does not establish cooked-terminal or Windows-console behavior.
 
+The [installed `.28` system-query repair](evidence/lean-4.34.1-system-memory-repair-2026-09-25.json)
+passes in all three engines on Linux x64. Ordinary Lean programs match native
+OS identity, total memory and the cgroup constraint after relocation, with
+source hidden and PATH empty. Available/free memory is volatile; those values
+use range and constraint assertions. The private host reads the same bounded
+Linux metadata as Lean's libuv 1.48 and retains unsigned 64-bit values exactly.
+This corrects Deno/Bun's earlier host-wide available-memory result and Deno's
+OS version/release mismatch without adding any Lean API.
+
+Thirty-nine synthetic file scenarios match the unchanged upstream C functions
+in each engine, and direct native-library controls pass under a 1 GiB cap.
+Forty-seven focused checks also cover deployment dependencies; retained callable
+outputs and compiler snapshots now include the memory adapter and missing
+signal/worker-message support files. These checks establish file completeness,
+not renewed latest-Lean callable-binding acceptance.
+
+Every completed workload releases its guard; maximum memory is 3.63 GiB.
+Two preparation attempts are retained as resource stops, with no OOM, swap or
+kernel-limit events. Streaming archive verification reduces its peak to 64 MiB
+under the same 1 GiB cap. A fresh package with a bounded npm heap and 4 GiB
+process-tree cap completes at 1.71 GiB, followed by byte-verified npm installation.
+Other native platforms and full API acceptance remain open.
+
 The [fresh Node HTTP comparison](evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
 now passes all twenty unchanged Vitest checks, ten each against deployed Wasm
 and native Lean. This includes concurrent mutations, persistence, binary and

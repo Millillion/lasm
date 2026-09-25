@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { numbers } from './node-host.mjs';
 import { nativeFiles } from './native-files.mjs';
 import { nativeInterfaces } from './native-interfaces.mjs';
+import { createLinuxMemory } from './linux-memory.mjs';
 
 const string = value => { const bytes = Buffer.from(value); return Buffer.concat([numbers(bytes.length), bytes]); };
 const optionalString = value => value == null ? numbers(0) : Buffer.concat([numbers(1), string(value)]);
@@ -10,6 +11,8 @@ const empty = Buffer.alloc(0);
 function invalidArgument() { return Object.assign(new Error('invalid argument'), { code: 'EINVAL', errno: -22 }); }
 
 export function createNodeSystem() {
+  let linuxMemory;
+  const memory = () => linuxMemory ??= createLinuxMemory(nativeFiles());
   return { dispatch(op, id, argument, bytes) {
     const n = Number(argument);
     switch (op) {
@@ -62,10 +65,10 @@ export function createNodeSystem() {
         r.swappedOut, r.fsRead, r.fsWrite, r.ipcSent, r.ipcReceived, r.signalsCount,
         r.voluntaryContextSwitches, r.involuntaryContextSwitches);
     }
-    case 139: return numbers(os.freemem());
-    case 140: return numbers(os.totalmem());
-    case 141: return numbers(process.constrainedMemory());
-    case 142: return numbers(process.availableMemory());
+    case 139: return numbers(process.platform === 'linux' ? memory().free() : os.freemem());
+    case 140: return numbers(process.platform === 'linux' ? memory().total() : os.totalmem());
+    case 141: return numbers(process.platform === 'linux' ? memory().constrained() : process.constrainedMemory());
+    case 142: return numbers(process.platform === 'linux' ? memory().available() : process.availableMemory());
     case 143: return new Promise((resolve, reject) => randomBytes(n, (error, bytes) => error ? reject(error) : resolve(bytes)));
     case 144: return nativeInterfaces();
     default: throw new Error(`Unknown Lean system operation ${op}`);

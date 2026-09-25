@@ -85,13 +85,23 @@ separately from the earlier runtime evidence below.
   coverage remain unverified individually; these counts are not API passes.
 - [ ] Match native system memory accounting in every target. A
   [1 GiB guarded native-library comparison](docs/evidence/lean-4.34.1-system-host-diagnosis-2026-09-25.json)
-  confirms that Deno and Bun's current host adapters report about 25 GiB of
+  confirms that the earlier `.27` Deno and Bun host adapters report about 25 GiB of
   available memory despite the constraint; Node respects it. All three report
   the constraint correctly. No large allocations or memory-pressure tests were
-  used. The same diagnostic exposes Deno's OS version/release mismatch. A
-  candidate Linux `uname` bridge now matches native Lean in all three engines,
-  with three unit checks passing. This is direct host-module evidence; fresh
-  installed ordinary-Lean and other-platform validation remain required.
+  used. The same diagnostic exposes Deno's OS version/release mismatch. The
+  [installed `.28` repair](docs/evidence/lean-4.34.1-system-memory-repair-2026-09-25.json)
+  now matches native OS identity and stable memory totals/constraints in all
+  three engines. Relocated ordinary Lean programs with source hidden and PATH
+  empty also verify that available memory respects the constraint. Volatile
+  free/available values are checked as invariants, not exact cross-process
+  equality. Forty-seven focused checks pass, and 39 synthetic file scenarios
+  match unchanged libuv 1.48 C functions in each engine: 117 comparisons of all
+  four queries. They cover both cgroup formats, unlimited limits, 64-bit values,
+  missing data, usage above a limit and bounded reads without pressure allocations.
+  The source bridge also passes fresh native-library checks under a 1 GiB cap.
+  Two preparation steps stopped at conservative resource budgets; both retries
+  pass with their earlier evidence preserved and no OOM, swap or kernel-limit
+  events. Other operating systems and ARM64 validation remain open.
 - [ ] Complete native platform-query acceptance on all six host combinations.
   The [Lean 4.34 Linux-query repair](docs/evidence/application-platform-linux-2026-09-24.json)
   preserves the failing installed `.13` comparison and changes only the affected

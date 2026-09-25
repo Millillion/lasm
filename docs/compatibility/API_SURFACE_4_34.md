@@ -35,6 +35,16 @@ Forty-nine focused controls pass; one Windows-only check remains skipped on
 Linux. Earlier Deno heap-exhaustion evidence is retained, with no host OOM.
 Whole-buffer allocation limits and full API/platform acceptance remain open.
 
+The [Linux system-query repair](../evidence/lean-4.34.1-system-memory-repair-2026-09-25.json)
+adds installed `.28` native/deployed comparisons for `osUname`, `freeMemory`,
+`totalMemory`, `constrainedMemory` and `availableMemory` in every stock engine.
+OS identity and stable memory values match exactly; volatile values satisfy
+native range/constraint invariants. Separately, 39 deterministic file scenarios
+match the unchanged libuv 1.48 C implementation in all three engines, including
+both cgroup formats, unlimited 64-bit values and missing-data fallbacks. Forty-seven
+focused checks pass. No stress allocations are used. This is Linux x64 evidence;
+other host combinations and complete declaration coverage remain unverified.
+
 The [expanded upstream HTTP IO comparison](../evidence/lean-4.34.1-upstream-http-io-expanded-three-engines-2026-09-25.json)
 passes twelve original inputs and all 148 actions in each stock engine: 36
 native/deployed comparisons and 444 deployed actions. Inputs cover bodies,

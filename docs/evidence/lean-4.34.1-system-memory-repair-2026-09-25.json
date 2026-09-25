@@ -1,0 +1,2109 @@
+{
+  "scope": "Linux x64 Lean4.34.1 memory and uname repair: pinned upstream C oracle, actual native library in a1GiB cgroup, and fresh installed .28 ordinary Lean programs in all3stock engines. Exact system identity and stable totals/constraints; volatile memory values use invariant checks.",
+  "lean": "4.34.1",
+  "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "platform": "linux-x64",
+  "queue": {
+    "path": ".work/product-acceptance/system-memory-repair-4.34.1-r3.json",
+    "sha256": "33e1b103e313f8b9673fc647960b12421aa8d9283122b248caa0880e4f1a27fb"
+  },
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "expected": "v4.34.1"
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "expected": "v26.10.0"
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "expected": "v2.9.7"
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "expected": "bun-v1.4.2"
+    },
+    "checkedAt": "2026-09-25T13:44:27.925994+00:00"
+  },
+  "phases": [
+    {
+      "name": "linux-memory-unit-r1",
+      "resources": {
+        "path": ".work/product-acceptance/linux-memory-unit-r1-resources.json",
+        "sha256": "8f9d6afec0ce1dab6241251c018b5ae820ec1b9b5c8a2f08b81d737c48896ebf",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 44834816,
+        "minimumHostAvailable": 27237306368,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9668489216
+    },
+    {
+      "name": "linux-memory-oracle-r1",
+      "resources": {
+        "path": ".work/product-acceptance/linux-memory-oracle-r1-resources.json",
+        "sha256": "a7d490d263ddf50f625bb70265e85d76dc3c7d69b000f9feaa31313b1318e5f7",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 33550336,
+        "minimumHostAvailable": 27284242432,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9668468736
+    },
+    {
+      "name": "memory-api-4.34.1-regression-r1",
+      "resources": {
+        "path": ".work/product-acceptance/memory-api-4.34.1-regression-r1-resources.json",
+        "sha256": "00a0b3ceb9521468eae480ee29e475df9aed9ed19e079f2f92dd13d0609cbe22",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 132214784,
+        "minimumHostAvailable": 27211915264,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9668009984
+    },
+    {
+      "name": "compile-disabled-failure-archive-r2",
+      "resources": {
+        "path": ".work/product-acceptance/compile-disabled-failure-archive-r2-resources.json",
+        "sha256": "24f37c1e6debc502872b52654ed6a863cc8140f9385dafac76704f5779617262",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 66981888,
+        "minimumHostAvailable": 27492868096,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 8920989696
+    },
+    {
+      "name": "application-package-4.34.1-r6",
+      "resources": {
+        "path": ".work/product-acceptance/application-package-4.34.1-r6-resources.json",
+        "sha256": "16a305cbcd3e5d5ec6fb9cb828918961e47e7f31e3f197c3ca6907a563251613",
+        "limits": {
+          "memoryMax": 4294967296,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 3435973836,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 1834463232,
+        "minimumHostAvailable": 26469920768,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9692057600
+    },
+    {
+      "name": "application-install-4.34.1-r6",
+      "resources": {
+        "path": ".work/product-acceptance/application-install-4.34.1-r6-resources.json",
+        "sha256": "2fd9fca218e38ab839aeeb3533cd2ef9fee58c6d3041312b7926f14b78cd932e",
+        "limits": {
+          "memoryMax": 3221225472,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 2576980377,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 1617903616,
+        "minimumHostAvailable": 26551566336,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9570725888
+    },
+    {
+      "name": "application-system-4.34.1-node-r1",
+      "resources": {
+        "path": ".work/product-acceptance/application-system-4.34.1-node-r1-resources.json",
+        "sha256": "4ba8b4f9393ba053589364ecccd149cff6346aca8ade483e74478aaba5a0604d",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3902267392,
+        "minimumHostAvailable": 24043634688,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9320300544
+    },
+    {
+      "name": "application-system-4.34.1-node-r1-archive",
+      "resources": {
+        "path": ".work/product-acceptance/application-system-4.34.1-node-r1-archive-resources.json",
+        "sha256": "c590c27d7bf36d62f6d658128384c6df84a11ec519ae6a0eaf8dcbb9f18667db",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 210145280,
+        "minimumHostAvailable": 26676850688,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9283014656
+    },
+    {
+      "name": "application-system-4.34.1-deno-r1",
+      "resources": {
+        "path": ".work/product-acceptance/application-system-4.34.1-deno-r1-resources.json",
+        "sha256": "2ef6f461e1a940019c0e09919352b05d0004add0b4ec2ed214df1c44856e9527",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3523198976,
+        "minimumHostAvailable": 23916400640,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9234538496
+    },
+    {
+      "name": "application-system-4.34.1-deno-r1-archive",
+      "resources": {
+        "path": ".work/product-acceptance/application-system-4.34.1-deno-r1-archive-resources.json",
+        "sha256": "6e71a495399950829738f5c4e1b7a92f51326486bfc8041a5022aafd32a076e8",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 210092032,
+        "minimumHostAvailable": 26844758016,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9197256704
+    },
+    {
+      "name": "application-system-4.34.1-bun-r1",
+      "resources": {
+        "path": ".work/product-acceptance/application-system-4.34.1-bun-r1-resources.json",
+        "sha256": "7d0b6b7cf60605f23c22d3acde9c2204a8ab595279b3643d44008a4b38132872",
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3696398336,
+        "minimumHostAvailable": 23919624192,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9132662784
+    },
+    {
+      "name": "application-system-4.34.1-bun-r1-archive",
+      "resources": {
+        "path": ".work/product-acceptance/application-system-4.34.1-bun-r1-archive-resources.json",
+        "sha256": "53153348921a5c71dad0c4dd5cd244d3d1293824e9d68fc287708515fe6bbe26",
+        "limits": {
+          "memoryMax": 1073741824,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 858993459,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 216379392,
+        "minimumHostAvailable": 26862727168,
+        "unitReleased": true,
+        "resourceLimited": false,
+        "result": {
+          "code": 0,
+          "signal": null
+        },
+        "swapBytes": 0,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        }
+      },
+      "minimumFreeDiskBytes": 9094230016
+    }
+  ],
+  "installedComparisons": [
+    {
+      "scope": "Ordinary Lean system queries in native interpreter, native C application and isolated installed deployment on this Linux host. Volatile free/available values use invariant checks, not exact cross-process equality.",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "target": "node",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.28",
+      "platform": "linux-x64",
+      "inputs": {
+        "integration/application-system-regressions.mjs": "b27effee7aecc345d155d33a645ab49d75f768ea4be954aeec5c671bb2971d57",
+        "integration/fixtures/SystemQueries.lean": "425a6bae9573967521132b32f0eb015d5bece492e0ae1d055dd1958ff11f5ca4"
+      },
+      "expectedConstraint": 8589934592,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-system-4.34.1-node-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1",
+          "code": 0,
+          "stdout": "v26.10.0\n",
+          "stderr": "",
+          "stdoutBase64": "djI2LjEwLjAK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native interpreted",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source/Main.lean",
+            "8589934592"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source",
+          "code": 0,
+          "stdout": "{ sysname := \"Linux\",\n  release := \"6.8.0-139-generic\",\n  version := \"#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026\",\n  machine := \"x86_64\" }\ntotal=33456926720; constrained=8589934592\nsystem queries checked\n",
+          "stderr": "",
+          "stdoutBase64": "eyBzeXNuYW1lIDo9ICJMaW51eCIsCiAgcmVsZWFzZSA6PSAiNi44LjAtMTM5LWdlbmVyaWMiLAogIHZlcnNpb24gOj0gIiMxMzktVWJ1bnR1IFNNUCBQUkVFTVBUX0RZTkFNSUMgU2F0IEF1ZyAgMSAwMzo1MjowNSBVVEMgMjAyNiIsCiAgbWFjaGluZSA6PSAieDg2XzY0IiB9CnRvdGFsPTMzNDU2OTI2NzIwOyBjb25zdHJhaW5lZD04NTg5OTM0NTkyCnN5c3RlbSBxdWVyaWVzIGNoZWNrZWQK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "generate native C",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-j1",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "compile native application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native compiled",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source/native",
+            "8589934592"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source",
+          "code": 0,
+          "stdout": "{ sysname := \"Linux\",\n  release := \"6.8.0-139-generic\",\n  version := \"#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026\",\n  machine := \"x86_64\" }\ntotal=33456926720; constrained=8589934592\nsystem queries checked\n",
+          "stderr": "",
+          "stdoutBase64": "eyBzeXNuYW1lIDo9ICJMaW51eCIsCiAgcmVsZWFzZSA6PSAiNi44LjAtMTM5LWdlbmVyaWMiLAogIHZlcnNpb24gOj0gIiMxMzktVWJ1bnR1IFNNUCBQUkVFTVBUX0RZTkFNSUMgU2F0IEF1ZyAgMSAwMzo1MjowNSBVVEMgMjAyNiIsCiAgbWFjaGluZSA6PSAieDg2XzY0IiB9CnRvdGFsPTMzNDU2OTI2NzIwOyBjb25zdHJhaW5lZD04NTg5OTM0NTkyCnN5c3RlbSBxdWVyaWVzIGNoZWNrZWQK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "build installed application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source/Main.lean",
+            "--target",
+            "node",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for node\u2026\nBuilding Main.lean for node\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.1 for node: /home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/dist\n",
+          "stdoutBase64": "",
+          "stderrBase64": "UHJlcGFyaW5nIExlYW4gNC4zNC4xIGZvciBub2Rl4oCmCkJ1aWxkaW5nIE1haW4ubGVhbiBmb3Igbm9kZeKApgplbSsrOiB3YXJuaW5nOiBNRU1PUlk2NCBpcyBkZXByZWNhdGVkIChwcmVmZXIgdGhlIHN0YW5kYXJkIC1tNjQgb3IgLS10YXJnZXQ9d2FzbTY0IGZsYWdzKS4gUGxlYXNlIG9wZW4gYSBidWcgaWYgeW91IGhhdmUgYSBjb250aW51aW5nIG5lZWQgZm9yIHRoaXMgc2V0dGluZyBbLVdkZXByZWNhdGVkXQp3YXJuaW5nOiAvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvYXBwbGljYXRpb24taW5zdGFsbGVkLTQuMzQuMS1yNi9wcm9qZWN0L25vZGVfbW9kdWxlcy9AbGFzbS9jb21waWxlci9zY3JpcHRzL2Z1bGwtbGVhbi9ob3N0LWxpYnJhcnkuanM6IHNpZ25hdHVyZSByZWRlZmluaXRpb24gZm9yOiBfYWJvcnRfanNfX3NpZwp3YXJuaW5nOiAvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvYXBwbGljYXRpb24taW5zdGFsbGVkLTQuMzQuMS1yNi9wcm9qZWN0L25vZGVfbW9kdWxlcy9AbGFzbS9jb21waWxlci9zY3JpcHRzL2Z1bGwtbGVhbi9ob3N0LWxpYnJhcnkuanM6IHNpZ25hdHVyZSByZWRlZmluaXRpb24gZm9yOiBfYWJvcnRfanNfX3NpZwplbSsrOiB3YXJuaW5nOiB3YXJuaW5ncyBpbiBKUyBsaWJyYXJ5IGNvbXBpbGF0aW9uIFstV2pzLWNvbXBpbGVyXQpCdWlsdCBMZWFuIDQuMzQuMSBmb3Igbm9kZTogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL2FwcGxpY2F0aW9uLXN5c3RlbS00LjM0LjEtbm9kZS1yMS9kaXN0Cg==",
+          "signal": null
+        },
+        {
+          "label": "deployed",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/relocated deployment/main.mjs",
+            "8589934592"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/relocated deployment",
+          "code": 0,
+          "stdout": "{ sysname := \"Linux\",\n  release := \"6.8.0-139-generic\",\n  version := \"#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026\",\n  machine := \"x86_64\" }\ntotal=33456926720; constrained=8589934592\nsystem queries checked\n",
+          "stderr": "",
+          "stdoutBase64": "eyBzeXNuYW1lIDo9ICJMaW51eCIsCiAgcmVsZWFzZSA6PSAiNi44LjAtMTM5LWdlbmVyaWMiLAogIHZlcnNpb24gOj0gIiMxMzktVWJ1bnR1IFNNUCBQUkVFTVBUX0RZTkFNSUMgU2F0IEF1ZyAgMSAwMzo1MjowNSBVVEMgMjAyNiIsCiAgbWFjaGluZSA6PSAieDg2XzY0IiB9CnRvdGFsPTMzNDU2OTI2NzIwOyBjb25zdHJhaW5lZD04NTg5OTM0NTkyCnN5c3RlbSBxdWVyaWVzIGNoZWNrZWQK",
+          "stderrBase64": "",
+          "signal": null
+        }
+      ],
+      "passed": true,
+      "engineVersion": "v26.10.0",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "b4153cf2ff48806fed7f1ecc78d6e745b3369347d1af5b864692aa79f12a7310",
+        "target": "node",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "425a6bae9573967521132b32f0eb015d5bece492e0ae1d055dd1958ff11f5ca4",
+            "cSha256": "a924ef5aff24fec5fb8a7df59de79d13b988470741a930175b2211bb9b5ed21e"
+          }
+        ],
+        "signature": "353cde6f025a1269f528a668f8d7a93a51c58ac93eb1a5f7bde455db3ed51b83",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "d3be18832399add3238dcf20f8e41cecbd271c5fb074b80f95ef224ed9c0fb67",
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-node-r1/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T13:55:41.835Z",
+      "result": {
+        "path": ".work/application-system-4.34.1-node-r1/result.json",
+        "sha256": "d5dbcf1b5da56a87eaa474b012b906745aae1924d4daa52eb0227d89402ee9be"
+      },
+      "binaryArchive": {
+        "path": ".work/application-system-4.34.1-node-r1/binary-archive.json",
+        "sha256": "1838216dfee0bfcc12e3e01a319d2f02ba90274bc136a8ef92f6df53c5744c00"
+      }
+    },
+    {
+      "scope": "Ordinary Lean system queries in native interpreter, native C application and isolated installed deployment on this Linux host. Volatile free/available values use invariant checks, not exact cross-process equality.",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "target": "deno",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.28",
+      "platform": "linux-x64",
+      "inputs": {
+        "integration/application-system-regressions.mjs": "b27effee7aecc345d155d33a645ab49d75f768ea4be954aeec5c671bb2971d57",
+        "integration/fixtures/SystemQueries.lean": "425a6bae9573967521132b32f0eb015d5bece492e0ae1d055dd1958ff11f5ca4"
+      },
+      "expectedConstraint": 8589934592,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-system-4.34.1-deno-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1",
+          "code": 0,
+          "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+          "stderr": "",
+          "stdoutBase64": "ZGVubyAyLjkuNyAoc3RhYmxlLCByZWxlYXNlLCB4ODZfNjQtdW5rbm93bi1saW51eC1nbnUpCnY4IDE1LjAuMjQ1LjItcnVzdHkKdHlwZXNjcmlwdCA2LjAuMwo=",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native interpreted",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source/Main.lean",
+            "8589934592"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source",
+          "code": 0,
+          "stdout": "{ sysname := \"Linux\",\n  release := \"6.8.0-139-generic\",\n  version := \"#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026\",\n  machine := \"x86_64\" }\ntotal=33456926720; constrained=8589934592\nsystem queries checked\n",
+          "stderr": "",
+          "stdoutBase64": "eyBzeXNuYW1lIDo9ICJMaW51eCIsCiAgcmVsZWFzZSA6PSAiNi44LjAtMTM5LWdlbmVyaWMiLAogIHZlcnNpb24gOj0gIiMxMzktVWJ1bnR1IFNNUCBQUkVFTVBUX0RZTkFNSUMgU2F0IEF1ZyAgMSAwMzo1MjowNSBVVEMgMjAyNiIsCiAgbWFjaGluZSA6PSAieDg2XzY0IiB9CnRvdGFsPTMzNDU2OTI2NzIwOyBjb25zdHJhaW5lZD04NTg5OTM0NTkyCnN5c3RlbSBxdWVyaWVzIGNoZWNrZWQK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "generate native C",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-j1",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "compile native application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native compiled",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source/native",
+            "8589934592"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source",
+          "code": 0,
+          "stdout": "{ sysname := \"Linux\",\n  release := \"6.8.0-139-generic\",\n  version := \"#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026\",\n  machine := \"x86_64\" }\ntotal=33456926720; constrained=8589934592\nsystem queries checked\n",
+          "stderr": "",
+          "stdoutBase64": "eyBzeXNuYW1lIDo9ICJMaW51eCIsCiAgcmVsZWFzZSA6PSAiNi44LjAtMTM5LWdlbmVyaWMiLAogIHZlcnNpb24gOj0gIiMxMzktVWJ1bnR1IFNNUCBQUkVFTVBUX0RZTkFNSUMgU2F0IEF1ZyAgMSAwMzo1MjowNSBVVEMgMjAyNiIsCiAgbWFjaGluZSA6PSAieDg2XzY0IiB9CnRvdGFsPTMzNDU2OTI2NzIwOyBjb25zdHJhaW5lZD04NTg5OTM0NTkyCnN5c3RlbSBxdWVyaWVzIGNoZWNrZWQK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "build installed application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source/Main.lean",
+            "--target",
+            "deno",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for deno\u2026\nBuilding Main.lean for deno\u2026\nem++: warning: MEMORY64 is deprecated (prefer the standard -m64 or --target=wasm64 flags). Please open a bug if you have a continuing need for this setting [-Wdeprecated]\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.1 for deno: /home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/dist\n",
+          "stdoutBase64": "",
+          "stderrBase64": "UHJlcGFyaW5nIExlYW4gNC4zNC4xIGZvciBkZW5v4oCmCkJ1aWxkaW5nIE1haW4ubGVhbiBmb3IgZGVub+KApgplbSsrOiB3YXJuaW5nOiBNRU1PUlk2NCBpcyBkZXByZWNhdGVkIChwcmVmZXIgdGhlIHN0YW5kYXJkIC1tNjQgb3IgLS10YXJnZXQ9d2FzbTY0IGZsYWdzKS4gUGxlYXNlIG9wZW4gYSBidWcgaWYgeW91IGhhdmUgYSBjb250aW51aW5nIG5lZWQgZm9yIHRoaXMgc2V0dGluZyBbLVdkZXByZWNhdGVkXQp3YXJuaW5nOiAvaG9tZS9sYXN0bWpzL2RldmVsb3BtZW50L2xhc20vY29tcGlsZXIvLndvcmsvYXBwbGljYXRpb24taW5zdGFsbGVkLTQuMzQuMS1yNi9wcm9qZWN0L25vZGVfbW9kdWxlcy9AbGFzbS9jb21waWxlci9zY3JpcHRzL2Z1bGwtbGVhbi9ob3N0LWxpYnJhcnkuanM6IHNpZ25hdHVyZSByZWRlZmluaXRpb24gZm9yOiBfYWJvcnRfanNfX3NpZwplbSsrOiB3YXJuaW5nOiB3YXJuaW5ncyBpbiBKUyBsaWJyYXJ5IGNvbXBpbGF0aW9uIFstV2pzLWNvbXBpbGVyXQpCdWlsdCBMZWFuIDQuMzQuMSBmb3IgZGVubzogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL2FwcGxpY2F0aW9uLXN5c3RlbS00LjM0LjEtZGVuby1yMS9kaXN0Cg==",
+          "signal": null
+        },
+        {
+          "label": "deployed",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+            "run",
+            "-A",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/relocated deployment/main.mjs",
+            "8589934592"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/relocated deployment",
+          "code": 0,
+          "stdout": "{ sysname := \"Linux\",\n  release := \"6.8.0-139-generic\",\n  version := \"#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026\",\n  machine := \"x86_64\" }\ntotal=33456926720; constrained=8589934592\nsystem queries checked\n",
+          "stderr": "",
+          "stdoutBase64": "eyBzeXNuYW1lIDo9ICJMaW51eCIsCiAgcmVsZWFzZSA6PSAiNi44LjAtMTM5LWdlbmVyaWMiLAogIHZlcnNpb24gOj0gIiMxMzktVWJ1bnR1IFNNUCBQUkVFTVBUX0RZTkFNSUMgU2F0IEF1ZyAgMSAwMzo1MjowNSBVVEMgMjAyNiIsCiAgbWFjaGluZSA6PSAieDg2XzY0IiB9CnRvdGFsPTMzNDU2OTI2NzIwOyBjb25zdHJhaW5lZD04NTg5OTM0NTkyCnN5c3RlbSBxdWVyaWVzIGNoZWNrZWQK",
+          "stderrBase64": "",
+          "signal": null
+        }
+      ],
+      "passed": true,
+      "engineVersion": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "b4153cf2ff48806fed7f1ecc78d6e745b3369347d1af5b864692aa79f12a7310",
+        "target": "deno",
+        "memoryMode": 1,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "425a6bae9573967521132b32f0eb015d5bece492e0ae1d055dd1958ff11f5ca4",
+            "cSha256": "a924ef5aff24fec5fb8a7df59de79d13b988470741a930175b2211bb9b5ed21e"
+          }
+        ],
+        "signature": "e7382106ead665109e768102b3c92b0aae80d6e4c85f1e88a32fd5bd50df5172",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "d3be18832399add3238dcf20f8e41cecbd271c5fb074b80f95ef224ed9c0fb67",
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-deno-r1/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T13:57:05.941Z",
+      "result": {
+        "path": ".work/application-system-4.34.1-deno-r1/result.json",
+        "sha256": "5dfa68edf6a9268986fd06d6ebb644acbcc86ec08963ac60592b5df8568edbdf"
+      },
+      "binaryArchive": {
+        "path": ".work/application-system-4.34.1-deno-r1/binary-archive.json",
+        "sha256": "59014d4140cfacc0f44e0127524b11b94bdd750a23f70d4e29b5b4d790fe36f3"
+      }
+    },
+    {
+      "scope": "Ordinary Lean system queries in native interpreter, native C application and isolated installed deployment on this Linux host. Volatile free/available values use invariant checks, not exact cross-process equality.",
+      "lean": "4.34.1",
+      "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+      "target": "bun",
+      "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+      "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler",
+      "packageVersion": "0.1.0-experimental.28",
+      "platform": "linux-x64",
+      "inputs": {
+        "integration/application-system-regressions.mjs": "b27effee7aecc345d155d33a645ab49d75f768ea4be954aeec5c671bb2971d57",
+        "integration/fixtures/SystemQueries.lean": "425a6bae9573967521132b32f0eb015d5bece492e0ae1d055dd1958ff11f5ca4"
+      },
+      "expectedConstraint": 8589934592,
+      "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-system-4.34.1-bun-r1-resources.json",
+      "commands": [
+        {
+          "label": "engine version",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "--version"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1",
+          "code": 0,
+          "stdout": "1.4.2\n",
+          "stderr": "",
+          "stdoutBase64": "MS40LjIK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native interpreted",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "--run",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source/Main.lean",
+            "8589934592"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source",
+          "code": 0,
+          "stdout": "{ sysname := \"Linux\",\n  release := \"6.8.0-139-generic\",\n  version := \"#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026\",\n  machine := \"x86_64\" }\ntotal=33456926720; constrained=8589934592\nsystem queries checked\n",
+          "stderr": "",
+          "stdoutBase64": "eyBzeXNuYW1lIDo9ICJMaW51eCIsCiAgcmVsZWFzZSA6PSAiNi44LjAtMTM5LWdlbmVyaWMiLAogIHZlcnNpb24gOj0gIiMxMzktVWJ1bnR1IFNNUCBQUkVFTVBUX0RZTkFNSUMgU2F0IEF1ZyAgMSAwMzo1MjowNSBVVEMgMjAyNiIsCiAgbWFjaGluZSA6PSAieDg2XzY0IiB9CnRvdGFsPTMzNDU2OTI2NzIwOyBjb25zdHJhaW5lZD04NTg5OTM0NTkyCnN5c3RlbSBxdWVyaWVzIGNoZWNrZWQK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "generate native C",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+            "-j1",
+            "-Dcompiler.postponeCompile=false",
+            "-c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source/Main.lean.c",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source/Main.lean"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "compile native application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+            "-O2",
+            "-DNDEBUG",
+            "-o",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source/native",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source/Main.lean.c"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "native compiled",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source/native",
+            "8589934592"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source",
+          "code": 0,
+          "stdout": "{ sysname := \"Linux\",\n  release := \"6.8.0-139-generic\",\n  version := \"#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026\",\n  machine := \"x86_64\" }\ntotal=33456926720; constrained=8589934592\nsystem queries checked\n",
+          "stderr": "",
+          "stdoutBase64": "eyBzeXNuYW1lIDo9ICJMaW51eCIsCiAgcmVsZWFzZSA6PSAiNi44LjAtMTM5LWdlbmVyaWMiLAogIHZlcnNpb24gOj0gIiMxMzktVWJ1bnR1IFNNUCBQUkVFTVBUX0RZTkFNSUMgU2F0IEF1ZyAgMSAwMzo1MjowNSBVVEMgMjAyNiIsCiAgbWFjaGluZSA6PSAieDg2XzY0IiB9CnRvdGFsPTMzNDU2OTI2NzIwOyBjb25zdHJhaW5lZD04NTg5OTM0NTkyCnN5c3RlbSBxdWVyaWVzIGNoZWNrZWQK",
+          "stderrBase64": "",
+          "signal": null
+        },
+        {
+          "label": "build installed application",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+            "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler/bin/lasm.mjs",
+            "build",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source/Main.lean",
+            "--target",
+            "bun",
+            "--output",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/dist"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/source",
+          "code": 0,
+          "stdout": "",
+          "stderr": "Preparing Lean 4.34.1 for bun\u2026\nBuilding Main.lean for bun\u2026\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nwarning: /home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler/scripts/full-lean/host-library.js: signature redefinition for: _abort_js__sig\nem++: warning: warnings in JS library compilation [-Wjs-compiler]\nBuilt Lean 4.34.1 for bun: /home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/dist\n",
+          "stdoutBase64": "",
+          "stderrBase64": "UHJlcGFyaW5nIExlYW4gNC4zNC4xIGZvciBidW7igKYKQnVpbGRpbmcgTWFpbi5sZWFuIGZvciBidW7igKYKd2FybmluZzogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL2FwcGxpY2F0aW9uLWluc3RhbGxlZC00LjM0LjEtcjYvcHJvamVjdC9ub2RlX21vZHVsZXMvQGxhc20vY29tcGlsZXIvc2NyaXB0cy9mdWxsLWxlYW4vaG9zdC1saWJyYXJ5LmpzOiBzaWduYXR1cmUgcmVkZWZpbml0aW9uIGZvcjogX2Fib3J0X2pzX19zaWcKd2FybmluZzogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL2FwcGxpY2F0aW9uLWluc3RhbGxlZC00LjM0LjEtcjYvcHJvamVjdC9ub2RlX21vZHVsZXMvQGxhc20vY29tcGlsZXIvc2NyaXB0cy9mdWxsLWxlYW4vaG9zdC1saWJyYXJ5LmpzOiBzaWduYXR1cmUgcmVkZWZpbml0aW9uIGZvcjogX2Fib3J0X2pzX19zaWcKZW0rKzogd2FybmluZzogd2FybmluZ3MgaW4gSlMgbGlicmFyeSBjb21waWxhdGlvbiBbLVdqcy1jb21waWxlcl0KQnVpbHQgTGVhbiA0LjM0LjEgZm9yIGJ1bjogL2hvbWUvbGFzdG1qcy9kZXZlbG9wbWVudC9sYXNtL2NvbXBpbGVyLy53b3JrL2FwcGxpY2F0aW9uLXN5c3RlbS00LjM0LjEtYnVuLXIxL2Rpc3QK",
+          "signal": null
+        },
+        {
+          "label": "deployed",
+          "command": [
+            "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+            "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/relocated deployment/main.mjs",
+            "8589934592"
+          ],
+          "cwd": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/relocated deployment",
+          "code": 0,
+          "stdout": "{ sysname := \"Linux\",\n  release := \"6.8.0-139-generic\",\n  version := \"#139-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 03:52:05 UTC 2026\",\n  machine := \"x86_64\" }\ntotal=33456926720; constrained=8589934592\nsystem queries checked\n",
+          "stderr": "",
+          "stdoutBase64": "eyBzeXNuYW1lIDo9ICJMaW51eCIsCiAgcmVsZWFzZSA6PSAiNi44LjAtMTM5LWdlbmVyaWMiLAogIHZlcnNpb24gOj0gIiMxMzktVWJ1bnR1IFNNUCBQUkVFTVBUX0RZTkFNSUMgU2F0IEF1ZyAgMSAwMzo1MjowNSBVVEMgMjAyNiIsCiAgbWFjaGluZSA6PSAieDg2XzY0IiB9CnRvdGFsPTMzNDU2OTI2NzIwOyBjb25zdHJhaW5lZD04NTg5OTM0NTkyCnN5c3RlbSBxdWVyaWVzIGNoZWNrZWQK",
+          "stderrBase64": "",
+          "signal": null
+        }
+      ],
+      "passed": true,
+      "engineVersion": "1.4.2",
+      "build": {
+        "schema": 1,
+        "lean": "4.34.1",
+        "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "nativeLeanIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+        "emscripten": "6.0.9",
+        "sdkCatalogIdentity": "2ae8f76663252cc8cbf5c031d9cd49b1d68349d04b29b124ea1ca41f69d168c8",
+        "runtimeIdentity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+        "buildDriverIdentity": "b4153cf2ff48806fed7f1ecc78d6e745b3369347d1af5b864692aa79f12a7310",
+        "target": "bun",
+        "memoryMode": 2,
+        "modules": [
+          {
+            "module": "Main",
+            "sourceSha256": "425a6bae9573967521132b32f0eb015d5bece492e0ae1d055dd1958ff11f5ca4",
+            "cSha256": "a924ef5aff24fec5fb8a7df59de79d13b988470741a930175b2211bb9b5ed21e"
+          }
+        ],
+        "signature": "0af52f55aaac9f71c58b875526116413f75ccf1d921df0877c1a7552abb4b4b3",
+        "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+        "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7"
+      },
+      "wasmSha256": "8223ba5fca7e9ba09a202899f8ed3abaea0692d9440021812ac828e5f6ea6c69",
+      "deployment": {
+        "directory": "/home/lastmjs/development/lasm/compiler/.work/application-system-4.34.1-bun-r1/relocated deployment",
+        "sourceHidden": true,
+        "path": "",
+        "buildEnvironmentRemoved": true
+      },
+      "inputsUnchanged": true,
+      "finishedAt": "2026-09-25T13:58:59.000Z",
+      "result": {
+        "path": ".work/application-system-4.34.1-bun-r1/result.json",
+        "sha256": "8750b456e1632aede879a7d9f84a6b19a48e1cf9d0a54fd24cee6a3a9b878a4f"
+      },
+      "binaryArchive": {
+        "path": ".work/application-system-4.34.1-bun-r1/binary-archive.json",
+        "sha256": "ee12b71e2bfed6198b30c9b64edad1cf0bc73c8410d3b504a905f62eb1b409fd"
+      }
+    }
+  ],
+  "limitations": [
+    "No other OS or architecture acceptance is implied.",
+    "The synthetic oracle replaces only file/sysinfo inputs while keeping the pinned upstream memory functions unchanged; it does not modify real cgroups or allocate buffers from queried amounts.",
+    "Runtime available/free memory changes between processes. Exact fixture values, stable total/constraint values and runtime range invariants are distinct checks.",
+    "This is system-query coverage, not full language/library or upstream-suite acceptance. No remaining compatibility gap is demonstrated fundamental."
+  ],
+  "recordedAt": "2026-09-25T14:00:06.868338+00:00",
+  "unitTests": {
+    "log": {
+      "path": ".work/product-acceptance/linux-memory-unit-r1.log",
+      "sha256": "b10835e0076cea39fbde59c934d54b7a532f6426af0d3035559519bd80ad1fd4"
+    },
+    "passed": 47
+  },
+  "upstreamOracle": {
+    "scope": "Unchanged libuv 1.48 Linux memory functions with synthetic input files, versus each stock engine host model; no Wasm, allocations based on memory queries, or host limit changes",
+    "source": {
+      "path": "/home/lastmjs/development/lasm/compiler/.cache/api-reference/libuv-1.48.0/linux.c",
+      "sha256": "49c580568444b3da02f11ef63c7881afbe6f6f304f1414da55e80c217261c9ce",
+      "url": "https://github.com/libuv/libuv/blob/v1.48.0/src/unix/linux.c"
+    },
+    "unchangedFunctionFragmentSha256": "7aa7d012c3bf1d10a5e5232034136b3a982475d01f74992ca745c98f3053ed20",
+    "generatedHarnessSha256": "6b023de8454570e39cec17375fa71142ebc017713afa690a22b9d5345a97e322",
+    "inputs": {
+      "src/linux-memory.mjs": "859efdcdd3a06cf5274b709ac580dc7715b5cee59fd715ce85beb2eedf1d261e",
+      "test/fixtures/linux-memory.mjs": "b221b340f5583e4d0d0f12a980c65feb607759e7f4d940646aabdce58408395d",
+      "integration/linux-memory-oracle.mjs": "8cb69e84d686f89b3b8b378f82605158a89e54207398a361516c348b9b0cccfe",
+      "integration/linux-memory-vector-host.mjs": "35c7209af9be06a2e7af2d7d91f067712fc56c5983020ab7e9670df2e3415508"
+    },
+    "platform": "linux-x64",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/linux-memory-oracle-r1-resources.json",
+    "commands": [
+      {
+        "label": "compile unmodified upstream functions and verify native sysinfo ABI",
+        "command": [
+          "/usr/bin/cc",
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "/home/lastmjs/development/lasm/compiler/.work/linux-memory-oracle-r1/oracle.c",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/linux-memory-oracle-r1/oracle"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "upstream libuv C oracle",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/linux-memory-oracle-r1/oracle"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "0 8388608 16777216 1048576 786432\n1 8388608 16777216 524288 262144\n2 8388608 16777216 1048576 786432\n3 8388608 16777216 2097152 1835008\n4 8388608 16777216 18446744073709551615 8388608\n5 8388608 16777216 33554432 8388608\n6 8388608 16777216 0 8388608\n7 8388608 16777216 0 8388608\n8 8388608 16777216 0 8388608\n9 8388608 16777216 0 8388608\n10 8388608 16777216 0 8388608\n11 8388608 16777216 0 8388608\n12 8388608 16777216 0 8388608\n13 8388608 16777216 1048576 0\n14 8388608 16777216 1048576 0\n15 8388608 16777216 1048576 1048576\n16 8388608 16777216 0 0\n17 8388608 16777216 0 8388608\n18 8388608 16777216 18446744073709551615 8388608\n19 8388608 16777216 18446744073709551615 8388608\n20 8388608 16777216 18446744073709551615 8388608\n21 8388608 16777216 1048576 786432\n22 8388608 16777216 0 8388608\n23 8388608 16777216 1048576 786432\n24 8388608 16777216 1048576 786432\n25 8388608 16777216 1048576 786432\n26 8388608 16777216 524288 262144\n27 8388608 16777216 1048576 917504\n28 8388608 16777216 524288 393216\n29 8388608 16777216 524288 393216\n30 8388608 16777216 18446744073709551615 8388608\n31 8388608 16777216 18446744073709551615 8388608\n32 1048576 4194304 1048576 786432\n33 1048576 4194304 1048576 786432\n34 0 0 1048576 0\n35 1048576 4194304 1048576 786432\n36 8388608 16777216 524288 393216\n37 8388608 16777216 0 8388608\n38 8388608 18446744073709550592 1048576 786432\n",
+        "stderr": ""
+      },
+      {
+        "label": "node version",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--version"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "v26.10.0\n",
+        "stderr": ""
+      },
+      {
+        "label": "node host model",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "/home/lastmjs/development/lasm/compiler/integration/linux-memory-vector-host.mjs"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "[{\"name\":\"cgroup v2 finite maximum\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v2 lower high\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"262144\"]},{\"name\":\"cgroup v2 unlimited high\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v2 unlimited maximum\",\"values\":[\"8388608\",\"16777216\",\"2097152\",\"1835008\"]},{\"name\":\"cgroup v2 fully unlimited\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"constraint larger than physical memory\",\"values\":[\"8388608\",\"16777216\",\"33554432\",\"8388608\"]},{\"name\":\"missing or invalid maximum null\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"0\\\\n\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"max\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"max\\\\n\\\\n\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"nonsense\\\\n\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing high\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"usage temporarily exceeds constraint\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"0\"]},{\"name\":\"usage equals constraint\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"0\"]},{\"name\":\"missing usage\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"1048576\"]},{\"name\":\"missing cgroup file\",\"values\":[\"8388608\",\"16777216\",\"0\",\"0\"]},{\"name\":\"empty cgroup file\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"unsigned negative sentinel\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"unsigned decimal overflow saturates\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"negative unsigned overflow saturates\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"decimal accepts whitespace sign and trailing text\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"limit file read is bounded to 31 bytes\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"cgroup path retains invalid UTF-8\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup root path\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v1 finite soft limit\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v1 unavailable mount falls back to global controller\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"262144\"]},{\"name\":\"cgroup v1 zero local usage falls back to global usage\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"917504\"]},{\"name\":\"cgroup v1 missing controller falls back to global controller\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"393216\"]},{\"name\":\"cgroup v1 requires exact memory controller field\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"393216\"]},{\"name\":\"cgroup v1 unlimited page size 4096\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"cgroup v1 unlimited page size 65536\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"sysinfo fallback for missing meminfo\",\"values\":[\"1048576\",\"4194304\",\"1048576\",\"786432\"]},{\"name\":\"sysinfo fallback for absent or zero entries\",\"values\":[\"1048576\",\"4194304\",\"1048576\",\"786432\"]},{\"name\":\"failed sysinfo returns zero\",\"values\":[\"0\",\"0\",\"1048576\",\"0\"]},{\"name\":\"meminfo read is bounded to 4095 bytes\",\"values\":[\"1048576\",\"4194304\",\"1048576\",\"786432\"]},{\"name\":\"cgroup file read is bounded to 1023 bytes\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"393216\"]},{\"name\":\"embedded NUL terminates a system file\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"meminfo conversion wraps unsigned multiplication\",\"values\":[\"8388608\",\"18446744073709550592\",\"1048576\",\"786432\"]}]\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno version",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "--version"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno host model",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "-A",
+          "/home/lastmjs/development/lasm/compiler/integration/linux-memory-vector-host.mjs"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "[{\"name\":\"cgroup v2 finite maximum\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v2 lower high\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"262144\"]},{\"name\":\"cgroup v2 unlimited high\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v2 unlimited maximum\",\"values\":[\"8388608\",\"16777216\",\"2097152\",\"1835008\"]},{\"name\":\"cgroup v2 fully unlimited\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"constraint larger than physical memory\",\"values\":[\"8388608\",\"16777216\",\"33554432\",\"8388608\"]},{\"name\":\"missing or invalid maximum null\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"0\\\\n\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"max\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"max\\\\n\\\\n\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"nonsense\\\\n\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing high\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"usage temporarily exceeds constraint\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"0\"]},{\"name\":\"usage equals constraint\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"0\"]},{\"name\":\"missing usage\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"1048576\"]},{\"name\":\"missing cgroup file\",\"values\":[\"8388608\",\"16777216\",\"0\",\"0\"]},{\"name\":\"empty cgroup file\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"unsigned negative sentinel\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"unsigned decimal overflow saturates\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"negative unsigned overflow saturates\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"decimal accepts whitespace sign and trailing text\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"limit file read is bounded to 31 bytes\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"cgroup path retains invalid UTF-8\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup root path\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v1 finite soft limit\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v1 unavailable mount falls back to global controller\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"262144\"]},{\"name\":\"cgroup v1 zero local usage falls back to global usage\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"917504\"]},{\"name\":\"cgroup v1 missing controller falls back to global controller\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"393216\"]},{\"name\":\"cgroup v1 requires exact memory controller field\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"393216\"]},{\"name\":\"cgroup v1 unlimited page size 4096\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"cgroup v1 unlimited page size 65536\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"sysinfo fallback for missing meminfo\",\"values\":[\"1048576\",\"4194304\",\"1048576\",\"786432\"]},{\"name\":\"sysinfo fallback for absent or zero entries\",\"values\":[\"1048576\",\"4194304\",\"1048576\",\"786432\"]},{\"name\":\"failed sysinfo returns zero\",\"values\":[\"0\",\"0\",\"1048576\",\"0\"]},{\"name\":\"meminfo read is bounded to 4095 bytes\",\"values\":[\"1048576\",\"4194304\",\"1048576\",\"786432\"]},{\"name\":\"cgroup file read is bounded to 1023 bytes\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"393216\"]},{\"name\":\"embedded NUL terminates a system file\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"meminfo conversion wraps unsigned multiplication\",\"values\":[\"8388608\",\"18446744073709550592\",\"1048576\",\"786432\"]}]\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun version",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "--version"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "1.4.2\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun host model",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/integration/linux-memory-vector-host.mjs"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "[{\"name\":\"cgroup v2 finite maximum\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v2 lower high\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"262144\"]},{\"name\":\"cgroup v2 unlimited high\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v2 unlimited maximum\",\"values\":[\"8388608\",\"16777216\",\"2097152\",\"1835008\"]},{\"name\":\"cgroup v2 fully unlimited\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"constraint larger than physical memory\",\"values\":[\"8388608\",\"16777216\",\"33554432\",\"8388608\"]},{\"name\":\"missing or invalid maximum null\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"0\\\\n\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"max\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"max\\\\n\\\\n\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing or invalid maximum \\\"nonsense\\\\n\\\"\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"missing high\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"usage temporarily exceeds constraint\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"0\"]},{\"name\":\"usage equals constraint\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"0\"]},{\"name\":\"missing usage\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"1048576\"]},{\"name\":\"missing cgroup file\",\"values\":[\"8388608\",\"16777216\",\"0\",\"0\"]},{\"name\":\"empty cgroup file\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"unsigned negative sentinel\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"unsigned decimal overflow saturates\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"negative unsigned overflow saturates\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"decimal accepts whitespace sign and trailing text\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"limit file read is bounded to 31 bytes\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"cgroup path retains invalid UTF-8\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup root path\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v1 finite soft limit\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"786432\"]},{\"name\":\"cgroup v1 unavailable mount falls back to global controller\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"262144\"]},{\"name\":\"cgroup v1 zero local usage falls back to global usage\",\"values\":[\"8388608\",\"16777216\",\"1048576\",\"917504\"]},{\"name\":\"cgroup v1 missing controller falls back to global controller\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"393216\"]},{\"name\":\"cgroup v1 requires exact memory controller field\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"393216\"]},{\"name\":\"cgroup v1 unlimited page size 4096\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"cgroup v1 unlimited page size 65536\",\"values\":[\"8388608\",\"16777216\",\"18446744073709551615\",\"8388608\"]},{\"name\":\"sysinfo fallback for missing meminfo\",\"values\":[\"1048576\",\"4194304\",\"1048576\",\"786432\"]},{\"name\":\"sysinfo fallback for absent or zero entries\",\"values\":[\"1048576\",\"4194304\",\"1048576\",\"786432\"]},{\"name\":\"failed sysinfo returns zero\",\"values\":[\"0\",\"0\",\"1048576\",\"0\"]},{\"name\":\"meminfo read is bounded to 4095 bytes\",\"values\":[\"1048576\",\"4194304\",\"1048576\",\"786432\"]},{\"name\":\"cgroup file read is bounded to 1023 bytes\",\"values\":[\"8388608\",\"16777216\",\"524288\",\"393216\"]},{\"name\":\"embedded NUL terminates a system file\",\"values\":[\"8388608\",\"16777216\",\"0\",\"8388608\"]},{\"name\":\"meminfo conversion wraps unsigned multiplication\",\"values\":[\"8388608\",\"18446744073709550592\",\"1048576\",\"786432\"]}]\n",
+        "stderr": ""
+      }
+    ],
+    "observations": [
+      {
+        "target": "node",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "version": "v26.10.0",
+        "matchedVectors": 39
+      },
+      {
+        "target": "deno",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "version": "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3",
+        "matchedVectors": 39
+      },
+      {
+        "target": "bun",
+        "engine": "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "version": "1.4.2",
+        "matchedVectors": 39
+      }
+    ],
+    "passed": true,
+    "native": [
+      {
+        "name": "cgroup v2 finite maximum",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "786432"
+        ]
+      },
+      {
+        "name": "cgroup v2 lower high",
+        "values": [
+          "8388608",
+          "16777216",
+          "524288",
+          "262144"
+        ]
+      },
+      {
+        "name": "cgroup v2 unlimited high",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "786432"
+        ]
+      },
+      {
+        "name": "cgroup v2 unlimited maximum",
+        "values": [
+          "8388608",
+          "16777216",
+          "2097152",
+          "1835008"
+        ]
+      },
+      {
+        "name": "cgroup v2 fully unlimited",
+        "values": [
+          "8388608",
+          "16777216",
+          "18446744073709551615",
+          "8388608"
+        ]
+      },
+      {
+        "name": "constraint larger than physical memory",
+        "values": [
+          "8388608",
+          "16777216",
+          "33554432",
+          "8388608"
+        ]
+      },
+      {
+        "name": "missing or invalid maximum null",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "missing or invalid maximum \"\"",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "missing or invalid maximum \"0\\n\"",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "missing or invalid maximum \"max\"",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "missing or invalid maximum \"max\\n\\n\"",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "missing or invalid maximum \"nonsense\\n\"",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "missing high",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "usage temporarily exceeds constraint",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "0"
+        ]
+      },
+      {
+        "name": "usage equals constraint",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "0"
+        ]
+      },
+      {
+        "name": "missing usage",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "1048576"
+        ]
+      },
+      {
+        "name": "missing cgroup file",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "0"
+        ]
+      },
+      {
+        "name": "empty cgroup file",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "unsigned negative sentinel",
+        "values": [
+          "8388608",
+          "16777216",
+          "18446744073709551615",
+          "8388608"
+        ]
+      },
+      {
+        "name": "unsigned decimal overflow saturates",
+        "values": [
+          "8388608",
+          "16777216",
+          "18446744073709551615",
+          "8388608"
+        ]
+      },
+      {
+        "name": "negative unsigned overflow saturates",
+        "values": [
+          "8388608",
+          "16777216",
+          "18446744073709551615",
+          "8388608"
+        ]
+      },
+      {
+        "name": "decimal accepts whitespace sign and trailing text",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "786432"
+        ]
+      },
+      {
+        "name": "limit file read is bounded to 31 bytes",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "cgroup path retains invalid UTF-8",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "786432"
+        ]
+      },
+      {
+        "name": "cgroup root path",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "786432"
+        ]
+      },
+      {
+        "name": "cgroup v1 finite soft limit",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "786432"
+        ]
+      },
+      {
+        "name": "cgroup v1 unavailable mount falls back to global controller",
+        "values": [
+          "8388608",
+          "16777216",
+          "524288",
+          "262144"
+        ]
+      },
+      {
+        "name": "cgroup v1 zero local usage falls back to global usage",
+        "values": [
+          "8388608",
+          "16777216",
+          "1048576",
+          "917504"
+        ]
+      },
+      {
+        "name": "cgroup v1 missing controller falls back to global controller",
+        "values": [
+          "8388608",
+          "16777216",
+          "524288",
+          "393216"
+        ]
+      },
+      {
+        "name": "cgroup v1 requires exact memory controller field",
+        "values": [
+          "8388608",
+          "16777216",
+          "524288",
+          "393216"
+        ]
+      },
+      {
+        "name": "cgroup v1 unlimited page size 4096",
+        "values": [
+          "8388608",
+          "16777216",
+          "18446744073709551615",
+          "8388608"
+        ]
+      },
+      {
+        "name": "cgroup v1 unlimited page size 65536",
+        "values": [
+          "8388608",
+          "16777216",
+          "18446744073709551615",
+          "8388608"
+        ]
+      },
+      {
+        "name": "sysinfo fallback for missing meminfo",
+        "values": [
+          "1048576",
+          "4194304",
+          "1048576",
+          "786432"
+        ]
+      },
+      {
+        "name": "sysinfo fallback for absent or zero entries",
+        "values": [
+          "1048576",
+          "4194304",
+          "1048576",
+          "786432"
+        ]
+      },
+      {
+        "name": "failed sysinfo returns zero",
+        "values": [
+          "0",
+          "0",
+          "1048576",
+          "0"
+        ]
+      },
+      {
+        "name": "meminfo read is bounded to 4095 bytes",
+        "values": [
+          "1048576",
+          "4194304",
+          "1048576",
+          "786432"
+        ]
+      },
+      {
+        "name": "cgroup file read is bounded to 1023 bytes",
+        "values": [
+          "8388608",
+          "16777216",
+          "524288",
+          "393216"
+        ]
+      },
+      {
+        "name": "embedded NUL terminates a system file",
+        "values": [
+          "8388608",
+          "16777216",
+          "0",
+          "8388608"
+        ]
+      },
+      {
+        "name": "meminfo conversion wraps unsigned multiplication",
+        "values": [
+          "8388608",
+          "18446744073709550592",
+          "1048576",
+          "786432"
+        ]
+      }
+    ],
+    "inputsUnchanged": true,
+    "finishedAt": "2026-09-25T13:44:29.420Z",
+    "result": {
+      "path": ".work/linux-memory-oracle-r1/result.json",
+      "sha256": "0902d22527eeb8a4038df9e51bae438b40ec0751e754d5dc57355c98ce86babb"
+    },
+    "fixtureVectors": 39,
+    "exactFourQueryComparisons": 117
+  },
+  "guardedNativeLibrary": {
+    "scope": "Read-only host API regression check under one 1 GiB cgroup cap, preserving installed .27 failures and requiring repaired candidates to pass. Direct calls into the verified managed native Lean shared library are independent controls; engine observations use source host adapters, not installed Lean/Wasm applications. No large allocations or changes to memory limits.",
+    "lean": "4.34.1",
+    "nativePrefix": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-4.34.1-regression-r1-resources.json",
+    "inputs": {
+      "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-engine-r1.mjs": "baacfbdcd4448195122eeb6769112466e2b6ca56e8dab1773c8bee32b3e3de2b",
+      "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-native-r1.c": "40db9999a8f90e8fce64d2bda2463f19a91689b73ddf45d54c6c5e744c2f508b",
+      "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/probe-memory-api-r2.py": "ff5c8361d13239b3f8c39a7af7fcea7848505b1edd736c20e5ba4a456764c7d2",
+      "/home/lastmjs/development/lasm/compiler/src/node-system.mjs": "8918a6d070323c197722f0a02ac4ac4e6c21e70ef9d94db87eb6c95d07674b9e",
+      "/home/lastmjs/development/lasm/compiler/src/node-host.mjs": "1692670fcbc3e449b26479c7229a8c81ba1b9edd60ef3acec776bd613b04af88",
+      "/home/lastmjs/development/lasm/compiler/src/native-files.mjs": "8bff8adb19497a99d81aeb6ec0d20081568ccad8480e02d22a6c07db08c26ba1",
+      "/home/lastmjs/development/lasm/compiler/src/linux-memory.mjs": "859efdcdd3a06cf5274b709ac580dc7715b5cee59fd715ce85beb2eedf1d261e",
+      "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/lib/lean/libleanshared.so": "6b30cc963d065fc9d2f87f7e9cbe0682b23000ae5425bccd769c5d477fa74f13",
+      "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r4/project/node_modules/@lasm/compiler/src/node-system.mjs": "f5255a330592a7c173958a50afb78a6380879ffbd839c065064b7901d4403a3f",
+      "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r4/project/node_modules/@lasm/compiler/src/node-host.mjs": "1692670fcbc3e449b26479c7229a8c81ba1b9edd60ef3acec776bd613b04af88",
+      "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r4/project/node_modules/@lasm/compiler/src/native-files.mjs": "4ec18f0d1a455693224e58d8a5a2418f98990c46d2f189d2c40d06f2dc331297",
+      "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r4/project/node_modules/@lasm/compiler/package.json": "976c0bf59d8763e0c3e619037511b25427ce2f034bb465249d47d204ef7376a5",
+      "/home/lastmjs/development/lasm/compiler/test/node-system.test.mjs": "1c40d817627b255ab426954e0efc74a50d7a77c9d118ed39d0ca4eca4688624c"
+    },
+    "commands": [
+      {
+        "label": "compile independent native control",
+        "command": [
+          "/usr/bin/cc",
+          "-O2",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-native-r1.c",
+          "-L/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/lib/lean",
+          "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/lib/lean",
+          "-lleanshared",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/native-memory-api-cgroup-r2/native-memory"
+        ],
+        "code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "label": "node native before",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/native-memory-api-cgroup-r2/native-memory"
+        ],
+        "code": 0,
+        "stdout": "{\"libuv\":\"1.48.0\",\"free\":\"27241197568\",\"total\":\"33456926720\",\"constrained\":\"1073741824\",\"available\":\"1062633472\",\"unameStatus\":0,\"unameHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}\n",
+        "stderr": ""
+      },
+      {
+        "label": "node installed .27 host module",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=64",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-engine-r1.mjs"
+        ],
+        "code": 0,
+        "stdout": "{\"engine\":\"node\",\"version\":\"26.10.0\",\"platform\":\"linux-x64\",\"profile\":\"installed\",\"memory\":{\"free\":{\"error\":false,\"bytes\":8,\"value\":\"27241197568\"},\"total\":{\"error\":false,\"bytes\":8,\"value\":\"33456926720\"},\"constrained\":{\"error\":false,\"bytes\":8,\"value\":\"1073741824\"},\"available\":{\"error\":false,\"bytes\":8,\"value\":\"1050230784\"}},\"uname\":{\"error\":false,\"fieldsHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}}\n",
+        "stderr": ""
+      },
+      {
+        "label": "node candidate host module",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=64",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-engine-r1.mjs",
+          "candidate"
+        ],
+        "code": 0,
+        "stdout": "{\"engine\":\"node\",\"version\":\"26.10.0\",\"platform\":\"linux-x64\",\"profile\":\"candidate\",\"memory\":{\"free\":{\"error\":false,\"bytes\":8,\"value\":\"27232165888\"},\"total\":{\"error\":false,\"bytes\":8,\"value\":\"33456926720\"},\"constrained\":{\"error\":false,\"bytes\":8,\"value\":\"1073741824\"},\"available\":{\"error\":false,\"bytes\":8,\"value\":\"1049726976\"}},\"uname\":{\"error\":false,\"fieldsHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}}\n",
+        "stderr": ""
+      },
+      {
+        "label": "node native after",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/native-memory-api-cgroup-r2/native-memory"
+        ],
+        "code": 0,
+        "stdout": "{\"libuv\":\"1.48.0\",\"free\":\"27232165888\",\"total\":\"33456926720\",\"constrained\":\"1073741824\",\"available\":\"1061588992\",\"unameStatus\":0,\"unameHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno native before",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/native-memory-api-cgroup-r2/native-memory"
+        ],
+        "code": 0,
+        "stdout": "{\"libuv\":\"1.48.0\",\"free\":\"27231907840\",\"total\":\"33456926720\",\"constrained\":\"1073741824\",\"available\":\"1061937152\",\"unameStatus\":0,\"unameHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno installed .27 host module",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "-A",
+          "--v8-flags=--max-old-space-size=64",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-engine-r1.mjs"
+        ],
+        "code": 0,
+        "stdout": "{\"engine\":\"deno\",\"version\":\"2.9.7\",\"platform\":\"linux-x64\",\"profile\":\"installed\",\"memory\":{\"free\":{\"error\":false,\"bytes\":8,\"value\":\"27231911936\"},\"total\":{\"error\":false,\"bytes\":8,\"value\":\"33456926720\"},\"constrained\":{\"error\":false,\"bytes\":8,\"value\":\"1073741824\"},\"available\":{\"error\":false,\"bytes\":8,\"value\":\"27231911936\"}},\"uname\":{\"error\":false,\"fieldsHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"362e382e302d3133392d67656e65726963\",\"7838365f3634\"]}}\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno candidate host module",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+          "run",
+          "-A",
+          "--v8-flags=--max-old-space-size=64",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-engine-r1.mjs",
+          "candidate"
+        ],
+        "code": 0,
+        "stdout": "{\"engine\":\"deno\",\"version\":\"2.9.7\",\"platform\":\"linux-x64\",\"profile\":\"candidate\",\"memory\":{\"free\":{\"error\":false,\"bytes\":8,\"value\":\"27249643520\"},\"total\":{\"error\":false,\"bytes\":8,\"value\":\"33456926720\"},\"constrained\":{\"error\":false,\"bytes\":8,\"value\":\"1073741824\"},\"available\":{\"error\":false,\"bytes\":8,\"value\":\"1044983808\"}},\"uname\":{\"error\":false,\"fieldsHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}}\n",
+        "stderr": ""
+      },
+      {
+        "label": "deno native after",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/native-memory-api-cgroup-r2/native-memory"
+        ],
+        "code": 0,
+        "stdout": "{\"libuv\":\"1.48.0\",\"free\":\"27249643520\",\"total\":\"33456926720\",\"constrained\":\"1073741824\",\"available\":\"1061408768\",\"unameStatus\":0,\"unameHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun native before",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/native-memory-api-cgroup-r2/native-memory"
+        ],
+        "code": 0,
+        "stdout": "{\"libuv\":\"1.48.0\",\"free\":\"27249643520\",\"total\":\"33456926720\",\"constrained\":\"1073741824\",\"available\":\"1061453824\",\"unameStatus\":0,\"unameHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun installed .27 host module",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-engine-r1.mjs"
+        ],
+        "code": 0,
+        "stdout": "{\"engine\":\"bun\",\"version\":\"1.4.2\",\"platform\":\"linux-x64\",\"profile\":\"installed\",\"memory\":{\"free\":{\"error\":false,\"bytes\":8,\"value\":\"27254820864\"},\"total\":{\"error\":false,\"bytes\":8,\"value\":\"33456926720\"},\"constrained\":{\"error\":false,\"bytes\":8,\"value\":\"1073741824\"},\"available\":{\"error\":false,\"bytes\":8,\"value\":\"27254820864\"}},\"uname\":{\"error\":false,\"fieldsHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}}\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun candidate host module",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+          "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/memory-api-engine-r1.mjs",
+          "candidate"
+        ],
+        "code": 0,
+        "stdout": "{\"engine\":\"bun\",\"version\":\"1.4.2\",\"platform\":\"linux-x64\",\"profile\":\"candidate\",\"memory\":{\"free\":{\"error\":false,\"bytes\":8,\"value\":\"27254267904\"},\"total\":{\"error\":false,\"bytes\":8,\"value\":\"33456926720\"},\"constrained\":{\"error\":false,\"bytes\":8,\"value\":\"1073741824\"},\"available\":{\"error\":false,\"bytes\":8,\"value\":\"1052270592\"}},\"uname\":{\"error\":false,\"fieldsHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}}\n",
+        "stderr": ""
+      },
+      {
+        "label": "bun native after",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/native-memory-api-cgroup-r2/native-memory"
+        ],
+        "code": 0,
+        "stdout": "{\"libuv\":\"1.48.0\",\"free\":\"27254267904\",\"total\":\"33456926720\",\"constrained\":\"1073741824\",\"available\":\"1061134336\",\"unameStatus\":0,\"unameHex\":[\"4c696e7578\",\"362e382e302d3133392d67656e65726963\",\"233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236\",\"7838365f3634\"]}\n",
+        "stderr": ""
+      },
+      {
+        "label": "system-host unit controls",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+          "--max-old-space-size=128",
+          "--test",
+          "--test-concurrency=1",
+          "--test-reporter=tap",
+          "/home/lastmjs/development/lasm/compiler/test/node-system.test.mjs"
+        ],
+        "code": 0,
+        "stdout": "TAP version 13\n# Subtest: Linux system file reader preserves its bounded-read contract\nok 1 - Linux system file reader preserves its bounded-read contract\n  ---\n  duration_ms: 7.960432\n  type: 'test'\n  ...\n# Subtest: Linux system information preserves all four native uname fields\nok 2 - Linux system information preserves all four native uname fields\n  ---\n  duration_ms: 12.348817\n  type: 'test'\n  ...\n# Subtest: system operations expose host identities, group lookup, and consistent environment updates\nok 3 - system operations expose host identities, group lookup, and consistent environment updates\n  ---\n  duration_ms: 36.920767\n  type: 'test'\n  ...\n# Subtest: system errors retain libuv constructors/codes and random requests support concurrent completion\nok 4 - system errors retain libuv constructors/codes and random requests support concurrent completion\n  ---\n  duration_ms: 2.726032\n  type: 'test'\n  ...\n1..4\n# tests 4\n# suites 0\n# pass 4\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 146.374676\n",
+        "stderr": ""
+      }
+    ],
+    "observations": [
+      {
+        "target": "node",
+        "nativeBefore": {
+          "libuv": "1.48.0",
+          "free": "27241197568",
+          "total": "33456926720",
+          "constrained": "1073741824",
+          "available": "1062633472",
+          "unameStatus": 0,
+          "unameHex": [
+            "4c696e7578",
+            "362e382e302d3133392d67656e65726963",
+            "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+            "7838365f3634"
+          ]
+        },
+        "sourceHost": {
+          "engine": "node",
+          "version": "26.10.0",
+          "platform": "linux-x64",
+          "profile": "installed",
+          "memory": {
+            "free": {
+              "error": false,
+              "bytes": 8,
+              "value": "27241197568"
+            },
+            "total": {
+              "error": false,
+              "bytes": 8,
+              "value": "33456926720"
+            },
+            "constrained": {
+              "error": false,
+              "bytes": 8,
+              "value": "1073741824"
+            },
+            "available": {
+              "error": false,
+              "bytes": 8,
+              "value": "1050230784"
+            }
+          },
+          "uname": {
+            "error": false,
+            "fieldsHex": [
+              "4c696e7578",
+              "362e382e302d3133392d67656e65726963",
+              "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+              "7838365f3634"
+            ]
+          }
+        },
+        "candidateHost": {
+          "engine": "node",
+          "version": "26.10.0",
+          "platform": "linux-x64",
+          "profile": "candidate",
+          "memory": {
+            "free": {
+              "error": false,
+              "bytes": 8,
+              "value": "27232165888"
+            },
+            "total": {
+              "error": false,
+              "bytes": 8,
+              "value": "33456926720"
+            },
+            "constrained": {
+              "error": false,
+              "bytes": 8,
+              "value": "1073741824"
+            },
+            "available": {
+              "error": false,
+              "bytes": 8,
+              "value": "1049726976"
+            }
+          },
+          "uname": {
+            "error": false,
+            "fieldsHex": [
+              "4c696e7578",
+              "362e382e302d3133392d67656e65726963",
+              "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+              "7838365f3634"
+            ]
+          }
+        },
+        "nativeAfter": {
+          "libuv": "1.48.0",
+          "free": "27232165888",
+          "total": "33456926720",
+          "constrained": "1073741824",
+          "available": "1061588992",
+          "unameStatus": 0,
+          "unameHex": [
+            "4c696e7578",
+            "362e382e302d3133392d67656e65726963",
+            "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+            "7838365f3634"
+          ]
+        },
+        "comparison": {
+          "operationErrors": [],
+          "constrainedMatchesNative": true,
+          "availableWithinNativeConstraint": true,
+          "unameMatchesNative": true,
+          "candidateUnameMatchesNative": true,
+          "candidateAllOperationsSucceed": true,
+          "candidateConstraintMatchesNative": true,
+          "candidateTotalMatchesNative": true,
+          "candidateAvailableWithinNativeConstraint": true
+        }
+      },
+      {
+        "target": "deno",
+        "nativeBefore": {
+          "libuv": "1.48.0",
+          "free": "27231907840",
+          "total": "33456926720",
+          "constrained": "1073741824",
+          "available": "1061937152",
+          "unameStatus": 0,
+          "unameHex": [
+            "4c696e7578",
+            "362e382e302d3133392d67656e65726963",
+            "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+            "7838365f3634"
+          ]
+        },
+        "sourceHost": {
+          "engine": "deno",
+          "version": "2.9.7",
+          "platform": "linux-x64",
+          "profile": "installed",
+          "memory": {
+            "free": {
+              "error": false,
+              "bytes": 8,
+              "value": "27231911936"
+            },
+            "total": {
+              "error": false,
+              "bytes": 8,
+              "value": "33456926720"
+            },
+            "constrained": {
+              "error": false,
+              "bytes": 8,
+              "value": "1073741824"
+            },
+            "available": {
+              "error": false,
+              "bytes": 8,
+              "value": "27231911936"
+            }
+          },
+          "uname": {
+            "error": false,
+            "fieldsHex": [
+              "4c696e7578",
+              "362e382e302d3133392d67656e65726963",
+              "362e382e302d3133392d67656e65726963",
+              "7838365f3634"
+            ]
+          }
+        },
+        "candidateHost": {
+          "engine": "deno",
+          "version": "2.9.7",
+          "platform": "linux-x64",
+          "profile": "candidate",
+          "memory": {
+            "free": {
+              "error": false,
+              "bytes": 8,
+              "value": "27249643520"
+            },
+            "total": {
+              "error": false,
+              "bytes": 8,
+              "value": "33456926720"
+            },
+            "constrained": {
+              "error": false,
+              "bytes": 8,
+              "value": "1073741824"
+            },
+            "available": {
+              "error": false,
+              "bytes": 8,
+              "value": "1044983808"
+            }
+          },
+          "uname": {
+            "error": false,
+            "fieldsHex": [
+              "4c696e7578",
+              "362e382e302d3133392d67656e65726963",
+              "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+              "7838365f3634"
+            ]
+          }
+        },
+        "nativeAfter": {
+          "libuv": "1.48.0",
+          "free": "27249643520",
+          "total": "33456926720",
+          "constrained": "1073741824",
+          "available": "1061408768",
+          "unameStatus": 0,
+          "unameHex": [
+            "4c696e7578",
+            "362e382e302d3133392d67656e65726963",
+            "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+            "7838365f3634"
+          ]
+        },
+        "comparison": {
+          "operationErrors": [],
+          "constrainedMatchesNative": true,
+          "availableWithinNativeConstraint": false,
+          "unameMatchesNative": false,
+          "candidateUnameMatchesNative": true,
+          "candidateAllOperationsSucceed": true,
+          "candidateConstraintMatchesNative": true,
+          "candidateTotalMatchesNative": true,
+          "candidateAvailableWithinNativeConstraint": true
+        }
+      },
+      {
+        "target": "bun",
+        "nativeBefore": {
+          "libuv": "1.48.0",
+          "free": "27249643520",
+          "total": "33456926720",
+          "constrained": "1073741824",
+          "available": "1061453824",
+          "unameStatus": 0,
+          "unameHex": [
+            "4c696e7578",
+            "362e382e302d3133392d67656e65726963",
+            "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+            "7838365f3634"
+          ]
+        },
+        "sourceHost": {
+          "engine": "bun",
+          "version": "1.4.2",
+          "platform": "linux-x64",
+          "profile": "installed",
+          "memory": {
+            "free": {
+              "error": false,
+              "bytes": 8,
+              "value": "27254820864"
+            },
+            "total": {
+              "error": false,
+              "bytes": 8,
+              "value": "33456926720"
+            },
+            "constrained": {
+              "error": false,
+              "bytes": 8,
+              "value": "1073741824"
+            },
+            "available": {
+              "error": false,
+              "bytes": 8,
+              "value": "27254820864"
+            }
+          },
+          "uname": {
+            "error": false,
+            "fieldsHex": [
+              "4c696e7578",
+              "362e382e302d3133392d67656e65726963",
+              "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+              "7838365f3634"
+            ]
+          }
+        },
+        "candidateHost": {
+          "engine": "bun",
+          "version": "1.4.2",
+          "platform": "linux-x64",
+          "profile": "candidate",
+          "memory": {
+            "free": {
+              "error": false,
+              "bytes": 8,
+              "value": "27254267904"
+            },
+            "total": {
+              "error": false,
+              "bytes": 8,
+              "value": "33456926720"
+            },
+            "constrained": {
+              "error": false,
+              "bytes": 8,
+              "value": "1073741824"
+            },
+            "available": {
+              "error": false,
+              "bytes": 8,
+              "value": "1052270592"
+            }
+          },
+          "uname": {
+            "error": false,
+            "fieldsHex": [
+              "4c696e7578",
+              "362e382e302d3133392d67656e65726963",
+              "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+              "7838365f3634"
+            ]
+          }
+        },
+        "nativeAfter": {
+          "libuv": "1.48.0",
+          "free": "27254267904",
+          "total": "33456926720",
+          "constrained": "1073741824",
+          "available": "1061134336",
+          "unameStatus": 0,
+          "unameHex": [
+            "4c696e7578",
+            "362e382e302d3133392d67656e65726963",
+            "233133392d5562756e747520534d5020505245454d50545f44594e414d494320536174204175672020312030333a35323a3035205554432032303236",
+            "7838365f3634"
+          ]
+        },
+        "comparison": {
+          "operationErrors": [],
+          "constrainedMatchesNative": true,
+          "availableWithinNativeConstraint": false,
+          "unameMatchesNative": true,
+          "candidateUnameMatchesNative": true,
+          "candidateAllOperationsSucceed": true,
+          "candidateConstraintMatchesNative": true,
+          "candidateTotalMatchesNative": true,
+          "candidateAvailableWithinNativeConstraint": true
+        }
+      }
+    ],
+    "completed": true,
+    "nativeControlSha256": "99a680be46377b300501188cac50f5a92bb930aa65840265d8736abbc9cbd3e2",
+    "unitTestsPassed": true,
+    "inputsUnchanged": true,
+    "finishedAt": "2026-09-25T13:44:32.362123+00:00",
+    "result": {
+      "path": ".work/native-memory-api-cgroup-r2/result.json",
+      "sha256": "bf854dfd3fb080a5855f826f4d0980f756022e435b323b7f08d8144723f97063"
+    }
+  },
+  "package": {
+    "scope": "Local candidate assembly; installation and runtime checks are separate",
+    "tarball": "/home/lastmjs/development/lasm/compiler/.work/application-package-4.34.1-r6/lasm-compiler-0.1.0-experimental.28.tgz",
+    "sha256": "fa7ee7a3e642de88054173bbc4304b4d736312eb6207f518c7ff99671e9dc63c",
+    "compressedBytes": 125870602,
+    "installedBytes": 632862041,
+    "files": 2702,
+    "candidateVersion": "0.1.0-experimental.28",
+    "defaultLean": "4.34.1",
+    "runtime": {
+      "name": "lean-4.34.1-wasm64",
+      "identity": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e"
+    },
+    "retainedCallableRuntimeIdentity": "856650890333a9edebc2c3d21967da55cd4d04c64eaf02ae88d07b6183718e0a",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-package-4.34.1-r6-resources.json",
+    "recordedAt": "2026-09-25T13:54:01.287Z",
+    "result": {
+      "path": ".work/application-package-4.34.1-r6/result.json",
+      "sha256": "53be451dc663c7ad2a9a414c1d6736e0a1c1435f872491e8cd719569fc666bf9"
+    }
+  },
+  "installation": {
+    "receipt": {
+      "path": ".work/product-acceptance/install-candidate-4.34.1-r6.json",
+      "sha256": "0bb9235a03e11d8ee81ffbe12f10e0f6ce47d7db0c4397e254639ef0bfe87687"
+    },
+    "verifiedFiles": 2702,
+    "compiler": "/home/lastmjs/development/lasm/compiler/.work/application-installed-4.34.1-r6/project/node_modules/@lasm/compiler"
+  },
+  "archivalResourceAbort": {
+    "report": {
+      "path": ".work/product-acceptance/compile-disabled-failure-archive-r1-resources.json",
+      "sha256": "d5a608a74e1bb7cd6b2834167c718a12a60e078225462fce712577598d6de501"
+    },
+    "peakMemoryBytes": 912269312,
+    "lastMemoryBreakdown": {
+      "anon": 33046528,
+      "file": 872706048,
+      "kernel": 2203648,
+      "shmem": 0,
+      "file_mapped": 335872,
+      "inactive_file": 872333312,
+      "slab": 2038936
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "diagnosis": "Filesystem read cache exceeded the 1GiB guard proactive budget during archive verification. Streaming eviction fixes verification under the unchanged guard; no API failure, OOM, swap or limit event."
+  },
+  "packagingResourceAbort": {
+    "report": {
+      "path": ".work/product-acceptance/application-package-4.34.1-r5-resources.json",
+      "sha256": "37d6f7b6086fbb4da69e04886c16b7e55d5eb8638b2cdb50ff700c33642ef522"
+    },
+    "peakMemoryBytes": 2604773376,
+    "lastMemoryBreakdown": {
+      "anon": 1024933888,
+      "file": 1538723840,
+      "kernel": 38232064,
+      "shmem": 0,
+      "file_mapped": 200704,
+      "inactive_file": 1538723840,
+      "slab": 32636136
+    },
+    "memoryEvents": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "diagnosis": "Initial3GiB package assembly guard stopped at its proactive budget. A fresh output and4GiB guard plus256MiB npm heap completes; partialearliercandidate is preserved, with no OOM, swap or kernel limit event."
+  },
+  "peakMemoryBytes": 3902267392,
+  "minimumFreeDiskBytes": 8920989696
+}

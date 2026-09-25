@@ -46,6 +46,9 @@ export function nativeFiles({ synchronous = false } = {}) {
   const isatty = bind(windows ? '_isatty' : 'isatty', 'int', ['int']);
   const strerror = bind('strerror', 'str', ['int']);
   const uname = process.platform === 'linux' ? bind('uname', 'int', ['void *']) : null;
+  const systemRead = process.platform === 'linux' ? bind('read', 'intptr_t', ['int', 'void *', 'size_t']) : null;
+  const sysinfo = process.platform === 'linux' ? bind('sysinfo', 'int', ['void *']) : null;
+  const getpagesize = process.platform === 'linux' ? bind('getpagesize', 'int', []) : null;
   const free = bind('free', 'void', ['void *']);
   const realpath = windows ? null : bind('realpath', 'void *', ['str', 'void *']);
   const unlink = windows ? null : bind('unlink', 'int', ['str']);
@@ -159,6 +162,41 @@ export function nativeFiles({ synchronous = false } = {}) {
         if (end < 0) throw new Error('Invalid native uname field');
         return field.subarray(0, end);
       });
+    },
+    readSystemFile(path, capacity) {
+      // libuv uv__slurp: one bounded read, retry EINTR, then append a NUL.
+      // These private calls read only small procfs/cgroup metadata files.
+      if (!systemRead) throw new Error('Linux system files are unavailable');
+      if (!Number.isInteger(capacity) || capacity < 1 || capacity > 4096)
+        throw new RangeError('Invalid system-file buffer capacity');
+      const fd = openFile(Buffer.concat([path, Buffer.from([0])]), 0x80000 /* O_CLOEXEC */);
+      if (fd < 0) return undefined;
+      try {
+        const bytes = Buffer.alloc(capacity);
+        let length;
+        do { length = Number(systemRead(fd, bytes, capacity - 1)); }
+        while (length === -1 && ffi.errno() === ffi.os.errno.EINTR);
+        return length < 0 ? undefined : bytes.subarray(0, length);
+      } finally {
+        if (closeFd(fd) < 0) {
+          const errno = ffi.errno();
+          if (errno !== ffi.os.errno.EINTR && errno !== ffi.os.errno.EINPROGRESS) throw failure(errno);
+        }
+      }
+    },
+    systemMemoryInfo() {
+      if (!sysinfo) throw new Error('Linux sysinfo is unavailable');
+      // Linux x64/ARM64 struct sysinfo: unsigned long is 64 bits; the trailing
+      // memory unit is uint32 at offset 104 and the complete struct is 112 bytes.
+      const bytes = Buffer.alloc(112);
+      if (sysinfo(bytes) !== 0) return { total: 0n, free: 0n };
+      const unit = BigInt(bytes.readUInt32LE(104));
+      return { total: BigInt.asUintN(64, bytes.readBigUInt64LE(32) * unit),
+        free: BigInt.asUintN(64, bytes.readBigUInt64LE(40) * unit) };
+    },
+    pageSize() {
+      if (!getpagesize) throw new Error('Linux page size is unavailable');
+      return BigInt(getpagesize());
     },
     homeDirectory() {
       if (windows) return Buffer.from(homedir());

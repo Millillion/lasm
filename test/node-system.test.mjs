@@ -3,6 +3,20 @@ import assert from 'node:assert/strict';
 import * as os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { createNodeRuntimeHost, numbers } from '../src/node-host.mjs';
+import { nativeFiles } from '../src/native-files.mjs';
+
+test('Linux system file reader preserves its bounded-read contract', { skip: process.platform !== 'linux' }, () => {
+  const native = nativeFiles(), path = Buffer.from('/proc/self/cgroup');
+  assert.equal(native.readSystemFile(path, 1).length, 0);
+  assert.ok(native.readSystemFile(path, 4).length <= 3);
+  assert.equal(native.readSystemFile(Buffer.from('/proc/self/lasm-missing-system-file'), 32), undefined);
+  for (const size of [0, -1, 1.5, NaN, Infinity, 4097])
+    assert.throws(() => native.readSystemFile(path, size), /Invalid system-file buffer capacity/);
+  assert.ok(native.pageSize() > 0n);
+  const info = native.systemMemoryInfo();
+  assert.equal(info.total, BigInt(os.totalmem()));
+  assert.ok(info.free >= 0n && info.free <= info.total);
+});
 
 test('Linux system information preserves all four native uname fields', { skip: process.platform !== 'linux' }, async t => {
   const host = createNodeRuntimeHost(); t.after(() => host.close());

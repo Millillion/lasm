@@ -52,3 +52,22 @@ test('all full-runtime host support files exist and target validation is strict'
       assert.ok(names.has(dependency) || dependency.startsWith('native/'), `${file} needs ${dependency}`);
   }
 });
+
+test('retained callable and frozen compiler outputs include transitive host dependencies', () => {
+  const callableSource = readFileSync(new URL('../src/build.mjs', import.meta.url), 'utf8');
+  const callable = new Set([...callableSource.matchAll(/copyFileSync\(join\(root, 'src\/([^']+)'\)/g)].map(match => match[1]));
+  const stampSource = readFileSync(new URL('../src/main.mjs', import.meta.url), 'utf8');
+  const stamp = new Set([...stampSource.match(/const files = \[([^;]+)\];/)[1].matchAll(/'([^']+)'/g)].map(match => match[1]));
+  const inventories = [callable, ...['freeze-build.mjs', 'derive-host-files.mjs'].map(name => {
+    const text = readFileSync(new URL('../scripts/full-lean/' + name, import.meta.url), 'utf8');
+    const list = text.match(/(?:for \(const name of|const hostFiles =) \[('node-host\.mjs'[^\]]+)\]/)[1];
+    return new Set([...list.matchAll(/'([^']+)'/g)].map(match => match[1]));
+  })];
+  for (const names of inventories) for (const file of names) {
+    const source = readFileSync(new URL('../src/' + file, import.meta.url), 'utf8');
+    for (const [, dependency] of source.matchAll(/(?:from\s*|import\s*\(|require\s*\()\s*['"]\.\/([^'"]+\.(?:mjs|cjs))['"]/g))
+      assert.ok(names.has(dependency) || dependency.startsWith('native/'), `${file} needs ${dependency}`);
+  }
+  for (const name of ['linux-memory.mjs', 'deno-signals.mjs', 'native-signals.mjs', 'native-file-message.mjs'])
+    assert.ok(stamp.has(name), 'Legacy main cache must notice a missing ' + name);
+});
