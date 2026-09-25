@@ -2,7 +2,7 @@
 
 **Estimated finish:** Not yet estimable; complete suite/API coverage, shipping helper integration and five native platform validations remain unfinished.
 
-**Changed:** [Fresh installed Bun acceptance](evidence/lean-4.34.1-upstream-applications-bun-interrupted-2026-09-25.json) records 71 passes, three upstream exclusions, a preserved `const_fold` failure and 26 unrun registrations. Original sources, assertions, arguments and stack settings remain unchanged. Peak memory is 6.01 GiB without OOM, swap, pressure or disk stops. The worker-error diagnosis, Bun repair and standalone-helper acceptance remain unfinished.
+**Changed:** The [standalone Wasmtime preview](evidence/wasmtime-standalone-preview-2026-09-25.json) passes 39 copied-deployment comparisons and 27 descriptor checks across Node, Deno and Bun, plus 46 focused checks. Source and build tools are denied during deployment. Exits, buffers, binary output, workers and long-running mains match native Lean. Deployment peaks at 1.35 GiB without resource events. Managed CLI integration, environment limits and deleted-directory recovery remain open; installed Bun still fails `const_fold`.
 
 **Remaining:** Complete language/API and callable-library parity; ship and validate general imports, descriptors and runtime cleanup; finish all six native build/install platforms.
 

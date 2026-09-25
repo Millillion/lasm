@@ -40,6 +40,7 @@ const sources = ['scripts/full-lean/probe-wasmtime-application.mjs',
   'src/native-files.mjs', 'src/native-file-worker.mjs', 'src/native-file-worker-pool.mjs',
   'src/native-file-worker-deno.mjs', 'src/native-file-message.mjs',
   'scripts/full-lean/probes/wasmtime-canonical-imports.h'];
+sources.push('src/wasmtime-runtime.mjs', 'src/wasmtime-worker.mjs', 'src/wasmtime-artifact.mjs', 'src/wasmtime-native-stdio.mjs', 'src/wasmtime-guest-memory.mjs', 'src/wasmtime-console.mjs', 'src/wasmtime-wasi-stdio.mjs', 'src/worker-stdio.cjs', 'src/native-worker-cwd.cjs', 'src/native-pthread-factory.cjs', 'src/native-pthread-factory-deno.mjs');
 const hashes = Object.fromEntries(await Promise.all(sources.map(async path => [path, await hashFile(join(root, path))])));
 mkdirSync(output, { recursive: true });
 const report = { scope: 'Fresh native-interpreted/native-compiled and private Wasmtime helper comparisons; not installed backend or full API acceptance',

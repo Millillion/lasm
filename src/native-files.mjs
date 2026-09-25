@@ -47,6 +47,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const strerror = bind('strerror', 'str', ['int']);
   const uname = process.platform === 'linux' ? bind('uname', 'int', ['void *']) : null;
   const systemRead = process.platform === 'linux' ? bind('read', 'intptr_t', ['int', 'void *', 'size_t']) : null;
+  const descriptorWrite = windows ? null : bind('write', 'intptr_t', ['int', 'void *', 'size_t']);
   const sysinfo = process.platform === 'linux' ? bind('sysinfo', 'int', ['void *']) : null;
   const getpagesize = process.platform === 'linux' ? bind('getpagesize', 'int', []) : null;
   const free = bind('free', 'void', ['void *']);
@@ -272,6 +273,11 @@ export function nativeFiles({ synchronous = false } = {}) {
       await call(fflush, null);
       process.exit(code);
     },
+    async flushAll() {
+      // Normal CRT exit flushes every output FILE, including live handles in
+      // global Lean values. Its flush errors do not replace the exit status.
+      await call(fflush, null);
+    },
     openDirectory(path) {
       if (process.platform !== 'linux') throw failure(ffi.os.errno.ENOSYS);
       const fd = openFile(path, 0x200000 /* O_PATH */ | 0x10000 /* O_DIRECTORY */ | 0x80000 /* O_CLOEXEC */);
@@ -475,6 +481,12 @@ export function nativeFiles({ synchronous = false } = {}) {
       const { value, errno } = await call(fwrite, bytes, 1, bytes.length, file.stream);
       if (value !== bytes.length) throw failure(errno);
     },
+    async writeDescriptor(fd, bytes) {
+      if (!descriptorWrite) throw failure(ffi.os.errno.ENOSYS);
+      // A raw WASI write has no extra FILE buffer. Preserve short writes and
+      // errno; a leased worker keeps a blocked pipe off the host event loop.
+      return Number(await checked(descriptorWrite, fd, bytes, bytes.length));
+    },
     async flush(file) { await checked(fflush, file.stream); },
     unbuffer(file) {
       // _IONBF is 4 in the Windows CRT and 2 in the supported POSIX libcs.
@@ -534,6 +546,7 @@ export function nativeFiles({ synchronous = false } = {}) {
   const reference = file => ({ stream: file.stream, fd: file.fd });
   const buffer = bytes => Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   implementation = { ...adapter,
+    flushAll() { return callNativeFile('flushAll', []); },
     async open(...args) {
       return { ...await callNativeFile('open', args), tail: Promise.resolve() };
     },
@@ -555,6 +568,7 @@ export function nativeFiles({ synchronous = false } = {}) {
     async write(file, bytes) {
       if (bytes.length) await callNativeFile('write', [reference(file), bytes]);
     },
+    writeDescriptor(fd, bytes) { return callNativeFile('writeDescriptor', [fd, bytes]); },
     async getLine(file) { return buffer(await callNativeFile('getLine', [reference(file)])); },
     async readDirectory(path) { return (await callNativeFile('readDirectory', [path])).map(buffer); },
     async realPath(path) { return buffer(await callNativeFile('realPath', [path])); },

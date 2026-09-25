@@ -39,6 +39,7 @@ const inputs = ['scripts/full-lean/probe-wasmtime-owned-exit.mjs',
   'scripts/full-lean/probes/wasmtime-guest-memory.mjs', 'integration/process-output.mjs',
   'src/native-files.mjs', 'src/native-file-worker.mjs', 'src/native-file-worker-pool.mjs',
   'src/native-file-worker-deno.mjs', 'src/native-file-message.mjs'];
+inputs.push('src/wasmtime-runtime.mjs', 'src/wasmtime-worker.mjs', 'src/wasmtime-artifact.mjs', 'src/wasmtime-native-stdio.mjs', 'src/wasmtime-guest-memory.mjs', 'src/wasmtime-console.mjs', 'src/wasmtime-wasi-stdio.mjs', 'src/worker-stdio.cjs', 'src/native-worker-cwd.cjs', 'src/native-pthread-factory.cjs', 'src/native-pthread-factory-deno.mjs');
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 const report = { scope: 'Intentional private-runner assertion failure must terminate its owned process promptly; no Lean source/test changes',
   prior: priorFile, priorSha256: await hashFile(priorFile), inputs: hashes, negativeCheckSha256: await hashFile(checkFile),

@@ -1,0 +1,3187 @@
+{
+  "scope": "Copied standalone Wasmtime application preview on Linux x64 in three stock engines. Not the managed CLI backend, full IO/runtime parity, cross-CPU acceptance or six-platform support.",
+  "versions": {
+    "lean": {
+      "source": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+      "tag": "v4.34.1",
+      "publishedAt": "2026-09-24T20:24:21Z",
+      "url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v4.34.1"
+    },
+    "node": {
+      "source": "https://nodejs.org/dist/index.json",
+      "tag": "v26.10.0",
+      "date": "2026-09-21",
+      "lts": false,
+      "expected": "v26.10.0"
+    },
+    "deno": {
+      "source": "https://api.github.com/repos/denoland/deno/releases/latest",
+      "tag": "v2.9.7",
+      "publishedAt": "2026-09-17T09:04:55Z",
+      "url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+      "draft": false,
+      "prerelease": false,
+      "expected": "v2.9.7"
+    },
+    "bun": {
+      "source": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+      "tag": "bun-v1.4.2",
+      "publishedAt": "2026-09-05T05:55:48Z",
+      "url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+      "draft": false,
+      "prerelease": false,
+      "expected": "bun-v1.4.2"
+    },
+    "checkedAt": "2026-09-25T21:15:58.530048+00:00"
+  },
+  "changes": [
+    "Extract the proven private runner into the shared runtime used by diagnostics and source-independent mains.",
+    "Own process-level host IO on the supervisor, retaining guest pthreads, raw bytes, asynchronous completion and main-thread cwd behavior.",
+    "Use relative native-library lookup and verified local cache/library identities; restore normal buffered output before owned-process exit.",
+    "Prepare base pages locally without changing caller resource limits; preserve required 96 MiB worker reservations."
+  ],
+  "focused": {
+    "tests": 46,
+    "failed": 0,
+    "skipped": 0,
+    "log": {
+      "path": ".work/product-acceptance/wasmtime-standalone-4.34.1-focused-r1.log",
+      "sha256": "35fd4c4b5ebf4f93443be8aeaef54e8d49660b7416e8a435d882bcef1e0aa0d4"
+    }
+  },
+  "reports": {
+    "stdio": {
+      "path": ".work/wasmtime-standalone-4.34.1-native-stdio-r2/result.json",
+      "sha256": "3d4525367960e7fa4b150f0e6f0c656134be447812d75e970a809a3ad5449a64"
+    },
+    "sharedRuntime": {
+      "path": ".work/wasmtime-standalone-4.34.1-private-r2/result.json",
+      "sha256": "dc0daefaf7b03bb93b0277963df90bb7292627a55dedd887b77178a87ab7d0d6"
+    },
+    "negative": {
+      "path": ".work/wasmtime-standalone-4.34.1-negative-r1/result.json",
+      "sha256": "9ba252f7743b5f83ca604e318c518ca9b61ecaf8e639a1c12935a8abe3b78123"
+    },
+    "package": {
+      "path": ".work/wasmtime-standalone-4.34.1-package-r1/result.json",
+      "sha256": "29456fd5e460fc098a0a2715c1ed3a911d5720018e0651611cfcceeb8049ae04"
+    },
+    "deployment": {
+      "path": ".work/wasmtime-standalone-4.34.1-deployment-r1/result.json",
+      "sha256": "fd53b184824f9ca25500737ed51bfdbcf0768d9ba56303bc7af388fee62ded64"
+    }
+  },
+  "nativeStdio": [
+    {
+      "engine": "node",
+      "mode": "bytes",
+      "result": {
+        "errno": 0,
+        "written": 5
+      }
+    },
+    {
+      "engine": "node",
+      "mode": "closed",
+      "result": {
+        "errno": 8,
+        "written": 0
+      }
+    },
+    {
+      "engine": "node",
+      "mode": "full",
+      "result": {
+        "errno": 51,
+        "written": 0
+      }
+    },
+    {
+      "engine": "node",
+      "mode": "readonly",
+      "result": {
+        "errno": 8,
+        "written": 0
+      }
+    },
+    {
+      "engine": "node",
+      "mode": "partial",
+      "result": {
+        "errno": 0,
+        "written": 4096,
+        "received": 4096
+      }
+    },
+    {
+      "engine": "node",
+      "mode": "broken",
+      "result": {
+        "errno": 64,
+        "written": 0
+      }
+    },
+    {
+      "engine": "node",
+      "mode": "blocked",
+      "result": {
+        "errno": 0,
+        "written": 5,
+        "received": 5,
+        "hostTurnWhileBlocked": true
+      }
+    },
+    {
+      "engine": "node",
+      "mode": "buffered",
+      "result": {
+        "errno": 0,
+        "written": 5
+      }
+    },
+    {
+      "engine": "node",
+      "mode": "forced",
+      "result": {
+        "errno": 0,
+        "written": 5
+      }
+    },
+    {
+      "engine": "deno",
+      "mode": "bytes",
+      "result": {
+        "errno": 0,
+        "written": 5
+      }
+    },
+    {
+      "engine": "deno",
+      "mode": "closed",
+      "result": {
+        "errno": 8,
+        "written": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "mode": "full",
+      "result": {
+        "errno": 51,
+        "written": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "mode": "readonly",
+      "result": {
+        "errno": 8,
+        "written": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "mode": "partial",
+      "result": {
+        "errno": 0,
+        "written": 4096,
+        "received": 4096
+      }
+    },
+    {
+      "engine": "deno",
+      "mode": "broken",
+      "result": {
+        "errno": 64,
+        "written": 0
+      }
+    },
+    {
+      "engine": "deno",
+      "mode": "blocked",
+      "result": {
+        "errno": 0,
+        "written": 5,
+        "received": 5,
+        "hostTurnWhileBlocked": true
+      }
+    },
+    {
+      "engine": "deno",
+      "mode": "buffered",
+      "result": {
+        "errno": 0,
+        "written": 5
+      }
+    },
+    {
+      "engine": "deno",
+      "mode": "forced",
+      "result": {
+        "errno": 0,
+        "written": 5
+      }
+    },
+    {
+      "engine": "bun",
+      "mode": "bytes",
+      "result": {
+        "errno": 0,
+        "written": 5
+      }
+    },
+    {
+      "engine": "bun",
+      "mode": "closed",
+      "result": {
+        "errno": 8,
+        "written": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "mode": "full",
+      "result": {
+        "errno": 51,
+        "written": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "mode": "readonly",
+      "result": {
+        "errno": 8,
+        "written": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "mode": "partial",
+      "result": {
+        "errno": 0,
+        "written": 4096,
+        "received": 4096
+      }
+    },
+    {
+      "engine": "bun",
+      "mode": "broken",
+      "result": {
+        "errno": 64,
+        "written": 0
+      }
+    },
+    {
+      "engine": "bun",
+      "mode": "blocked",
+      "result": {
+        "errno": 0,
+        "written": 5,
+        "received": 5,
+        "hostTurnWhileBlocked": true
+      }
+    },
+    {
+      "engine": "bun",
+      "mode": "buffered",
+      "result": {
+        "errno": 0,
+        "written": 5
+      }
+    },
+    {
+      "engine": "bun",
+      "mode": "forced",
+      "result": {
+        "errno": 0,
+        "written": 5
+      }
+    }
+  ],
+  "sharedRuntimeResults": [
+    {
+      "scope": "Verified application main through a private Wasmtime host integration; not shipping acceptance",
+      "application": "Main",
+      "lean": "4.34.1",
+      "engine": "node",
+      "version": "26.10.0",
+      "args": [
+        "hello \u03bb",
+        "",
+        "space argument"
+      ],
+      "leanStackSizeKb": "8192",
+      "code": 7,
+      "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+      "stderr": "",
+      "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+      "stderrBase64": "",
+      "threads": [
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "138805248",
+            "guestStackBytes": "67108864",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "cleaned": false,
+          "exited": false,
+          "strongref": true
+        },
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "222756864",
+            "guestStackBytes": "8388608",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "cleaned": false,
+          "exited": false,
+          "strongref": false
+        },
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "247988224",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "result": {
+            "kind": "thread-result",
+            "pthread": "247988224",
+            "result": "0",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296
+          },
+          "cleaned": true,
+          "exited": true,
+          "strongref": false
+        },
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "273219584",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "result": {
+            "kind": "thread-result",
+            "pthread": "273219584",
+            "result": "0",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296
+          },
+          "cleaned": true,
+          "exited": true,
+          "strongref": false
+        }
+      ],
+      "sharedBytes": "308805632",
+      "wasmEntry": "direct Node-API on verified worker stacks",
+      "controlStackBytes": 67108864,
+      "nativeStackOverflowControl": true,
+      "resolvedFunctionGlobals": [
+        {
+          "name": "emscripten_console_log",
+          "pointer": "266490"
+        },
+        {
+          "name": "emscripten_console_error",
+          "pointer": "266491"
+        },
+        {
+          "name": "emscripten_console_warn",
+          "pointer": "266492"
+        },
+        {
+          "name": "emscripten_console_trace",
+          "pointer": "266493"
+        },
+        {
+          "name": "emscripten_out",
+          "pointer": "266494"
+        },
+        {
+          "name": "emscripten_err",
+          "pointer": "266495"
+        }
+      ],
+      "termination": "Native process exit reclaims remaining workers after host output is flushed"
+    },
+    {
+      "scope": "Verified application main through a private Wasmtime host integration; not shipping acceptance",
+      "application": "Main",
+      "lean": "4.34.1",
+      "engine": "deno",
+      "version": "2.9.7",
+      "args": [
+        "hello \u03bb",
+        "",
+        "space argument"
+      ],
+      "leanStackSizeKb": "8192",
+      "code": 7,
+      "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+      "stderr": "",
+      "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+      "stderrBase64": "",
+      "threads": [
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "138805248",
+            "guestStackBytes": "67108864",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "cleaned": false,
+          "exited": false,
+          "strongref": true
+        },
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "222756864",
+            "guestStackBytes": "8388608",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "cleaned": false,
+          "exited": false,
+          "strongref": false
+        },
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "247988224",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "result": {
+            "kind": "thread-result",
+            "pthread": "247988224",
+            "result": "0",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296
+          },
+          "cleaned": true,
+          "exited": true,
+          "strongref": false
+        },
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "273219584",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "result": {
+            "kind": "thread-result",
+            "pthread": "273219584",
+            "result": "0",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296
+          },
+          "cleaned": true,
+          "exited": true,
+          "strongref": false
+        }
+      ],
+      "sharedBytes": "308805632",
+      "wasmEntry": "direct Node-API on verified worker stacks",
+      "controlStackBytes": 67108864,
+      "nativeStackOverflowControl": true,
+      "resolvedFunctionGlobals": [
+        {
+          "name": "emscripten_console_log",
+          "pointer": "266490"
+        },
+        {
+          "name": "emscripten_console_error",
+          "pointer": "266491"
+        },
+        {
+          "name": "emscripten_console_warn",
+          "pointer": "266492"
+        },
+        {
+          "name": "emscripten_console_trace",
+          "pointer": "266493"
+        },
+        {
+          "name": "emscripten_out",
+          "pointer": "266494"
+        },
+        {
+          "name": "emscripten_err",
+          "pointer": "266495"
+        }
+      ],
+      "termination": "Native process exit reclaims remaining workers after host output is flushed"
+    },
+    {
+      "scope": "Verified application main through a private Wasmtime host integration; not shipping acceptance",
+      "application": "Main",
+      "lean": "4.34.1",
+      "engine": "bun",
+      "version": "1.4.2",
+      "args": [
+        "hello \u03bb",
+        "",
+        "space argument"
+      ],
+      "leanStackSizeKb": "8192",
+      "code": 7,
+      "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+      "stderr": "",
+      "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+      "stderrBase64": "",
+      "threads": [
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "138805248",
+            "guestStackBytes": "67108864",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "cleaned": false,
+          "exited": false,
+          "strongref": true
+        },
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "222756864",
+            "guestStackBytes": "8388608",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "cleaned": false,
+          "exited": false,
+          "strongref": false
+        },
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "247988224",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "result": {
+            "kind": "thread-result",
+            "pthread": "247988224",
+            "result": "0",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296
+          },
+          "cleaned": true,
+          "exited": true,
+          "strongref": false
+        },
+        {
+          "ready": {
+            "kind": "thread-ready",
+            "pthread": "273219584",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296,
+            "ffiStackBytes": 16777216,
+            "wasmControlStackBudget": 67108864,
+            "wasmEntry": "direct Node-API",
+            "resolvedFunctionGlobals": [
+              {
+                "name": "emscripten_console_log",
+                "pointer": "266490"
+              },
+              {
+                "name": "emscripten_console_error",
+                "pointer": "266491"
+              },
+              {
+                "name": "emscripten_console_warn",
+                "pointer": "266492"
+              },
+              {
+                "name": "emscripten_console_trace",
+                "pointer": "266493"
+              },
+              {
+                "name": "emscripten_out",
+                "pointer": "266494"
+              },
+              {
+                "name": "emscripten_err",
+                "pointer": "266495"
+              }
+            ]
+          },
+          "result": {
+            "kind": "thread-result",
+            "pthread": "273219584",
+            "result": "0",
+            "guestStackBytes": "8519680",
+            "nativeStackBytes": 100663296
+          },
+          "cleaned": true,
+          "exited": true,
+          "strongref": false
+        }
+      ],
+      "sharedBytes": "308805632",
+      "wasmEntry": "direct Node-API on verified worker stacks",
+      "controlStackBytes": 67108864,
+      "nativeStackOverflowControl": true,
+      "resolvedFunctionGlobals": [
+        {
+          "name": "emscripten_console_log",
+          "pointer": "266490"
+        },
+        {
+          "name": "emscripten_console_error",
+          "pointer": "266491"
+        },
+        {
+          "name": "emscripten_console_warn",
+          "pointer": "266492"
+        },
+        {
+          "name": "emscripten_console_trace",
+          "pointer": "266493"
+        },
+        {
+          "name": "emscripten_out",
+          "pointer": "266494"
+        },
+        {
+          "name": "emscripten_err",
+          "pointer": "266495"
+        }
+      ],
+      "termination": "Native process exit reclaims remaining workers after host output is flushed"
+    }
+  ],
+  "negativeControls": [
+    {
+      "engine": "node",
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/bin/node",
+        "--max-old-space-size=128",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-lean-supervisor.mjs",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-private-r2/instance.so",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-4.34.1-compilation-r2/compiled.cwasm",
+        "d951c69e1cade705706480c50be0d59f197483ddce85f048e47482a123703129",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-private-r2/native-api.node",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-negative-r1/negative-check.json"
+      ],
+      "seconds": 2.6762072569999997,
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "Error: {\"failure\":\"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n+ actual - expected\\n\\n+ 'hello \u03bb||space argument:340282366920938463463374607431768211498\\\\n' +\\n+   'missing=true\\\\n'\\n- 'deliberately incorrect oracle for owned-process exit control'\\n\\n    at finishApplication (file:///home/lastmjs/development/lasm/compiler/src/wasmtime-runtime.mjs:353:10)\",\"trace\":[{\"kind\":\"spawn\",\"pthread\":\"138805248\",\"start\":\"5827\"},{\"kind\":\"thread-ready\",\"pthread\":\"138805248\",\"guestStackBytes\":\"67108864\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"spawn\",\"pthread\":\"222756864\",\"start\":\"5734\"},{\"kind\":\"thread-ready\",\"pthread\":\"222756864\",\"guestStackBytes\":\"8388608\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"spawn\",\"pthread\":\"247988224\",\"start\":\"5734\"},{\"kind\":\"thread-ready\",\"pthread\":\"247988224\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"spawn\",\"pthread\":\"273219584\",\"start\":\"5734\"},{\"kind\":\"thread-ready\",\"pthread\":\"273219584\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"thread-result\",\"pthread\":\"247988224\",\"result\":\"0\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296},{\"kind\":\"cleanup\",\"pthread\":\"247988224\"},{\"kind\":\"thread-result\",\"pthread\":\"273219584\",\"result\":\"0\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296},{\"kind\":\"cleanup\",\"pthread\":\"273219584\"}],\"hostOperations\":[{\"operation\":23,\"handle\":0,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"222756864\"},{\"operation\":92,\"handle\":0,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"222756864\"},{\"operation\":28,\"handle\":0,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"138805248\"},{\"operation\":10,\"handle\":0,\"mode\":\"request\",\"inputBytes\":5,\"thread\":\"247988224\"},{\"operation\":14,\"handle\":0,\"mode\":\"request\",\"inputBytes\":5,\"thread\":\"247988224\"},{\"operation\":1,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"247988224\"},{\"operation\":3,\"handle\":10,\"mode\":\"request\",\"inputBytes\":24,\"thread\":\"247988224\"},{\"operation\":0,\"handle\":10,\"mode\":\"release\",\"inputBytes\":0,\"thread\":\"247988224\"},{\"operation\":10,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"273219584\"},{\"operation\":1,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"273219584\"},{\"operation\":2,\"handle\":11,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"273219584\"},{\"operation\":2,\"handle\":11,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"273219584\"},{\"operation\":0,\"handle\":11,\"mode\":\"release\",\"inputBytes\":0,\"thread\":\"273219584\"},{\"operation\":3,\"handle\":1,\"mode\":\"request\",\"inputBytes\":65,\"thread\":\"247988224\"},{\"operation\":15,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"247988224\"},{\"operation\":10,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"247988224\"},{\"operation\":3,\"handle\":1,\"mode\":\"request\",\"inputBytes\":13,\"thread\":\"247988224\"},{\"operation\":0,\"handle\":1,\"mode\":\"release\",\"inputBytes\":0,\"thread\":\"247988224\"}]}\n    at Worker.<anonymous> (file:///home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-lean-supervisor.mjs:27:56)\n    at Worker.emit (node:events:514:20)\n    at MessagePort.<anonymous> (node:internal/worker:354:14)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:872:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28)\n"
+    },
+    {
+      "engine": "deno",
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/deno-2.9.7/deno",
+        "run",
+        "-A",
+        "--v8-flags=--max-old-space-size=128",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-lean-supervisor.mjs",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-private-r2/instance.so",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-4.34.1-compilation-r2/compiled.cwasm",
+        "d951c69e1cade705706480c50be0d59f197483ddce85f048e47482a123703129",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-private-r2/native-api.node",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-negative-r1/negative-check.json"
+      ],
+      "seconds": 5.886237955,
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "Error: {\"failure\":\"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n+ actual - expected\\n\\n+ 'hello \u03bb||space argument:340282366920938463463374607431768211498\\\\n' +\\n+   'missing=true\\\\n'\\n- 'deliberately incorrect oracle for owned-process exit control'\\n\\n    at finishApplication (file:///home/lastmjs/development/lasm/compiler/src/wasmtime-runtime.mjs:353:10)\",\"trace\":[{\"kind\":\"spawn\",\"pthread\":\"138805248\",\"start\":\"5827\"},{\"kind\":\"thread-ready\",\"pthread\":\"138805248\",\"guestStackBytes\":\"67108864\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"spawn\",\"pthread\":\"222756864\",\"start\":\"5734\"},{\"kind\":\"thread-ready\",\"pthread\":\"222756864\",\"guestStackBytes\":\"8388608\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"spawn\",\"pthread\":\"247988224\",\"start\":\"5734\"},{\"kind\":\"thread-ready\",\"pthread\":\"247988224\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"spawn\",\"pthread\":\"273219584\",\"start\":\"5734\"},{\"kind\":\"thread-ready\",\"pthread\":\"273219584\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"thread-result\",\"pthread\":\"247988224\",\"result\":\"0\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296},{\"kind\":\"cleanup\",\"pthread\":\"247988224\"},{\"kind\":\"thread-result\",\"pthread\":\"273219584\",\"result\":\"0\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296},{\"kind\":\"cleanup\",\"pthread\":\"273219584\"}],\"hostOperations\":[{\"operation\":23,\"handle\":0,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"222756864\"},{\"operation\":92,\"handle\":0,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"222756864\"},{\"operation\":28,\"handle\":0,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"138805248\"},{\"operation\":10,\"handle\":0,\"mode\":\"request\",\"inputBytes\":5,\"thread\":\"247988224\"},{\"operation\":14,\"handle\":0,\"mode\":\"request\",\"inputBytes\":5,\"thread\":\"247988224\"},{\"operation\":1,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"247988224\"},{\"operation\":3,\"handle\":10,\"mode\":\"request\",\"inputBytes\":24,\"thread\":\"247988224\"},{\"operation\":0,\"handle\":10,\"mode\":\"release\",\"inputBytes\":0,\"thread\":\"247988224\"},{\"operation\":10,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"273219584\"},{\"operation\":1,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"273219584\"},{\"operation\":2,\"handle\":11,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"273219584\"},{\"operation\":2,\"handle\":11,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"273219584\"},{\"operation\":0,\"handle\":11,\"mode\":\"release\",\"inputBytes\":0,\"thread\":\"273219584\"},{\"operation\":3,\"handle\":1,\"mode\":\"request\",\"inputBytes\":65,\"thread\":\"247988224\"},{\"operation\":15,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"247988224\"},{\"operation\":10,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"247988224\"},{\"operation\":3,\"handle\":1,\"mode\":\"request\",\"inputBytes\":13,\"thread\":\"247988224\"},{\"operation\":0,\"handle\":1,\"mode\":\"release\",\"inputBytes\":0,\"thread\":\"247988224\"}]}\n    at NodeWorker.<anonymous> (file:///home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-lean-supervisor.mjs:27:56)\n    at NodeWorker.emit (ext:deno_node/_events.mjs:4:461)\n    at NodeWorker.#dispatchWorkerThreadMessage (ext:deno_node/worker_threads.ts:1:9526)\n    at NodeWorker.#pollMessages (ext:deno_node/worker_threads.ts:1:9825)\n"
+    },
+    {
+      "engine": "bun",
+      "command": [
+        "/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/bun-1.4.2/bun-linux-x64/bun",
+        "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-lean-supervisor.mjs",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-private-r2/instance.so",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-4.34.1-compilation-r2/compiled.cwasm",
+        "d951c69e1cade705706480c50be0d59f197483ddce85f048e47482a123703129",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-private-r2/native-api.node",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-negative-r1/negative-check.json"
+      ],
+      "seconds": 3.0800537110000006,
+      "code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "Error: {\"failure\":\"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\\n+ actual - expected\\n\\n+ 'hello \u03bb||space argument:340282366920938463463374607431768211498\\\\n' +\\n+   'missing=true\\\\n'\\n- 'deliberately incorrect oracle for owned-process exit control'\\n\\n    at finishApplication (/home/lastmjs/development/lasm/compiler/src/wasmtime-runtime.mjs:353:10)\\n    at processTicksAndRejections (native:7:39)\",\"trace\":[{\"kind\":\"spawn\",\"pthread\":\"138805248\",\"start\":\"5827\"},{\"kind\":\"thread-ready\",\"pthread\":\"138805248\",\"guestStackBytes\":\"67108864\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"spawn\",\"pthread\":\"222756864\",\"start\":\"5734\"},{\"kind\":\"thread-ready\",\"pthread\":\"222756864\",\"guestStackBytes\":\"8388608\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"spawn\",\"pthread\":\"247988224\",\"start\":\"5734\"},{\"kind\":\"thread-ready\",\"pthread\":\"247988224\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"spawn\",\"pthread\":\"273219584\",\"start\":\"5734\"},{\"kind\":\"thread-ready\",\"pthread\":\"273219584\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296,\"ffiStackBytes\":16777216,\"wasmControlStackBudget\":67108864,\"wasmEntry\":\"direct Node-API\",\"resolvedFunctionGlobals\":[{\"name\":\"emscripten_console_log\",\"pointer\":\"266490\"},{\"name\":\"emscripten_console_error\",\"pointer\":\"266491\"},{\"name\":\"emscripten_console_warn\",\"pointer\":\"266492\"},{\"name\":\"emscripten_console_trace\",\"pointer\":\"266493\"},{\"name\":\"emscripten_out\",\"pointer\":\"266494\"},{\"name\":\"emscripten_err\",\"pointer\":\"266495\"}]},{\"kind\":\"thread-result\",\"pthread\":\"247988224\",\"result\":\"0\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296},{\"kind\":\"cleanup\",\"pthread\":\"247988224\"},{\"kind\":\"thread-result\",\"pthread\":\"273219584\",\"result\":\"0\",\"guestStackBytes\":\"8519680\",\"nativeStackBytes\":100663296},{\"kind\":\"cleanup\",\"pthread\":\"273219584\"}],\"hostOperations\":[{\"operation\":23,\"handle\":0,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"222756864\"},{\"operation\":92,\"handle\":0,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"222756864\"},{\"operation\":28,\"handle\":0,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"138805248\"},{\"operation\":10,\"handle\":0,\"mode\":\"request\",\"inputBytes\":5,\"thread\":\"247988224\"},{\"operation\":14,\"handle\":0,\"mode\":\"request\",\"inputBytes\":5,\"thread\":\"247988224\"},{\"operation\":1,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"247988224\"},{\"operation\":3,\"handle\":10,\"mode\":\"request\",\"inputBytes\":24,\"thread\":\"247988224\"},{\"operation\":0,\"handle\":10,\"mode\":\"release\",\"inputBytes\":0,\"thread\":\"247988224\"},{\"operation\":10,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"273219584\"},{\"operation\":1,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"273219584\"},{\"operation\":2,\"handle\":11,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"273219584\"},{\"operation\":2,\"handle\":11,\"mode\":\"request\",\"inputBytes\":0,\"thread\":\"273219584\"},{\"operation\":0,\"handle\":11,\"mode\":\"release\",\"inputBytes\":0,\"thread\":\"273219584\"},{\"operation\":3,\"handle\":1,\"mode\":\"request\",\"inputBytes\":65,\"thread\":\"247988224\"},{\"operation\":15,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"247988224\"},{\"operation\":10,\"handle\":0,\"mode\":\"request\",\"inputBytes\":22,\"thread\":\"247988224\"},{\"operation\":3,\"handle\":1,\"mode\":\"request\",\"inputBytes\":13,\"thread\":\"247988224\"},{\"operation\":0,\"handle\":1,\"mode\":\"release\",\"inputBytes\":0,\"thread\":\"247988224\"}]}\n    at <anonymous> (/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-lean-supervisor.mjs:27:60)\n    at emit (node:events:100:22)\n    at #onMessage (node:worker_threads:727:14)\n"
+    }
+  ],
+  "package": {
+    "manifest": {
+      "schema": 1,
+      "backend": "wasmtime-49.0.0",
+      "leanVersion": "4.34.1",
+      "platform": "linux",
+      "arch": "x64",
+      "files": {
+        "program.cwasm": {
+          "bytes": 610799456,
+          "sha256": "d951c69e1cade705706480c50be0d59f197483ddce85f048e47482a123703129"
+        },
+        "host/instance.so": {
+          "bytes": 64760,
+          "sha256": "190b84af7a66cef2b6450a8850e8373a981cac3a3a1cae5908ac945a35eb5bd9"
+        },
+        "host/native-api.node": {
+          "bytes": 17040,
+          "sha256": "e6a6b5fd46aef1bd36136b30ecd2110afeab68237d586bfc819c4acad84b680d"
+        },
+        "host/libwasmtime.so": {
+          "bytes": 31590960,
+          "sha256": "9594714d3c73c3087ab3d42d9614cf72973b25c181b8625ffcc46a8a75972d7e"
+        }
+      }
+    },
+    "manifestSha256": "ad389395bc0867d1723ba02dce1d131e8b8246a18703e9b8924a96a91645a87f",
+    "inputs": {
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/package-wasmtime-application.mjs": "bbc70752f18a90be4257ad7b6c4b1d38af9287331659776a15986552c883a809",
+      "/home/lastmjs/development/lasm/compiler/src/wasmtime-runtime.mjs": "427c0d5c066ef7638ea599c48c0aa26ac85bd42d4655e36eb6328b1913ca6f40",
+      "/home/lastmjs/development/lasm/compiler/src/wasmtime-worker.mjs": "20c16a35958fdffe7c097607e8715cfed7672190985263589e8c9cbf39be39b7",
+      "/home/lastmjs/development/lasm/compiler/src/wasmtime-standalone.mjs": "2649bee11c861a27365c37d7b8c6290df095fb29dfac998467f98a8c243cfce5",
+      "/home/lastmjs/development/lasm/compiler/src/wasmtime-artifact.mjs": "1ef8eff4ed55f64ab350d48d70e4553cd67dce8c245b639fad5b0ee51cd034c1",
+      "/home/lastmjs/development/lasm/compiler/src/wasmtime-native-stdio.mjs": "8ebfe22e7a9a4c50c2c662be3ee2e9cdc85d2bdc833908e8bfa8b0b35ee862d8",
+      "/home/lastmjs/development/lasm/compiler/src/wasmtime-guest-memory.mjs": "1053435d8e162630531fe0d3cd806ffa60dfb4f761e5ac5c59bc43507d2fac9f",
+      "/home/lastmjs/development/lasm/compiler/src/wasmtime-wasi-stdio.mjs": "50d4b7a9a7bb2cd893d7a35d494c3035cdae4ca2275158cbf4acfe5c0aa9884b",
+      "/home/lastmjs/development/lasm/compiler/src/wasmtime-console.mjs": "0c82bf0dbba531d4148edaa3b5e90397f28623a9676edc4ef317149148683099",
+      "/home/lastmjs/development/lasm/compiler/src/wasmtime-process-host.mjs": "bbf858f4affc3dc23376c03a7a0c146a606155b36d54012162f38b6531f60996",
+      "/home/lastmjs/development/lasm/compiler/src/node-host.mjs": "a685248eff26d6fd5220226d33cfa4444223cabda2c0b4380c22589f26ca7515",
+      "/home/lastmjs/development/lasm/compiler/src/lean-io-errors.mjs": "7da13ce1312c95df207e3399e21436fa2b61d6183f492bc8ca1fbf5d1ec821bd",
+      "/home/lastmjs/development/lasm/compiler/src/deno-stack.mjs": "9245fea3039dfdd814ad79cc5e377293cd0e0f737a4d83e25008a4ab021cbf64",
+      "/home/lastmjs/development/lasm/compiler/src/bun-stack.mjs": "eda08c019f203059fbc3dc9a6501934fffdf0d149c2496bab56f1db4ea672dc4",
+      "/home/lastmjs/development/lasm/compiler/src/posix-arguments.mjs": "1a2e421576f318a31b5f85d5cb6805240faa3dfcb013d65b7998deff31f96e34",
+      "/home/lastmjs/development/lasm/compiler/src/working-directory.mjs": "087a37aec3a9b678847809848ec3f29c8f082673c3af7ace35ed4480f92c6349",
+      "/home/lastmjs/development/lasm/compiler/src/handle-table.mjs": "c58518fb2b4e8184edfc113fc68415858918d6fae66753b04e65fe6b7e0bb825",
+      "/home/lastmjs/development/lasm/compiler/src/node-network.mjs": "205dd5e551e0f5f77ce14eeb54baa5f895ca5bc9a19f851d83058eb04af8c63f",
+      "/home/lastmjs/development/lasm/compiler/src/native-tcp.mjs": "81cadab2cd801876a1ee468090fa60d7a22cb9322bf9f3405613ba3752480588",
+      "/home/lastmjs/development/lasm/compiler/src/node-process.mjs": "e3f06b5a0de9167df3df7c3cc6474f39de2a66b075588c1ee938afa35de3154e",
+      "/home/lastmjs/development/lasm/compiler/src/native-process.mjs": "2d2a744a5b2eec926c6774e44d9f09ac41d21514fb5f9f460238ef6196b7f4a2",
+      "/home/lastmjs/development/lasm/compiler/src/process-launcher.mjs": "766c42bdb5cde90da0126f14a335824f7fb1a22054ab8d8882df09be77c6cfbe",
+      "/home/lastmjs/development/lasm/compiler/src/process-exec.mjs": "fee6bd17d72fb93d4e6d60256f7a2259aa8d5547bd8f199a93d29545653d2fa5",
+      "/home/lastmjs/development/lasm/compiler/src/node-udp.mjs": "b4c1cf428bfecceb7386e46da32eb441ebee64920d77c87008c85e5ce9871599",
+      "/home/lastmjs/development/lasm/compiler/src/node-system.mjs": "8918a6d070323c197722f0a02ac4ac4e6c21e70ef9d94db87eb6c95d07674b9e",
+      "/home/lastmjs/development/lasm/compiler/src/linux-memory.mjs": "859efdcdd3a06cf5274b709ac580dc7715b5cee59fd715ce85beb2eedf1d261e",
+      "/home/lastmjs/development/lasm/compiler/src/node-signal.mjs": "4ef1e74af9dc7c687152a50d1adf620e281fd8ae7abdf1e21500fcb4726a78fa",
+      "/home/lastmjs/development/lasm/compiler/src/deno-signals.mjs": "245ba8b999b053eaccef39adeb62cd10eefce78ebf4812ad669be3cb8b79b8fb",
+      "/home/lastmjs/development/lasm/compiler/src/native-signals.mjs": "570dd2f18f6d3b9be79fa56baf55dfe3109a78fe61eb016a17043dafbd5bc525",
+      "/home/lastmjs/development/lasm/compiler/src/application-signals.mjs": "930105c774225a6cd25b8990254523f3f527dec2b10e1d34b0c2076824a9ab25",
+      "/home/lastmjs/development/lasm/compiler/src/application-metadata-runtime.mjs": "d56663c1ee0c51d408e2a72b4bae45d9e74529e7229ec57b612939e2afd11af7",
+      "/home/lastmjs/development/lasm/compiler/src/thread-id.cjs": "dcec6da112d1cdefebd943e83828b0506d7819167e1b81ae3724ee1effa940d9",
+      "/home/lastmjs/development/lasm/compiler/src/native-pthread-factory.cjs": "3615c8b9e73d51794d1cf4e1de49eb746fb45923f851634ddc51994dfa6bf478",
+      "/home/lastmjs/development/lasm/compiler/src/native-pthread-factory-deno.mjs": "fc78704a3a73116bf3ccb7448f07762723bb2ea62fc747c2494e629e3aea1abc",
+      "/home/lastmjs/development/lasm/compiler/src/native-files.mjs": "b026d2d0f2990f773244f8be1e3e769d4e7db7c0675bf408dac2995f0b9aa907",
+      "/home/lastmjs/development/lasm/compiler/src/native-clock.mjs": "01af32358be5125f0ebbc0e17b9df54aa3a38385f10476b8ea9ee59c934a4114",
+      "/home/lastmjs/development/lasm/compiler/src/native-windows-timezone.mjs": "a0ff6db97ac171acb6b1c5e093ffde8de26936617ad9fefb226cd9034a0d51dc",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-worker.mjs": "147c062b4db2a58df5b95c327dcacd37fe075e3a63dbd2138e90629c10df70b0",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-worker-pool.mjs": "264027b58ffdbf8f323b5e169f5c3301b33423cf72ac0ee11217ed6be5ae6c8d",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-worker-deno.mjs": "c80058f1ced5dbaffabf21515e68015e7d97400334d724aff320ae05a133e544",
+      "/home/lastmjs/development/lasm/compiler/src/native-file-message.mjs": "593ce6261a6f2a9e18fef93ec0caafad793303ab0b5d045a0769678e4c0828db",
+      "/home/lastmjs/development/lasm/compiler/src/native-worker-cwd.cjs": "69080ceea6aeac63baf9da1839c4e95913c7e9e893b93e036c4bdca82b09512b",
+      "/home/lastmjs/development/lasm/compiler/src/worker-stdio.cjs": "eb5afd5cd4cdaddff135559182f129963ea511fbea37a9a5aedd35b305630dc8",
+      "/home/lastmjs/development/lasm/compiler/src/native-dns.mjs": "2380cc0bd99e7f3aef582e39db08954b148a59e93740efb742aa9a64f45b7e16",
+      "/home/lastmjs/development/lasm/compiler/src/native-interfaces.mjs": "6a5c99ef69a83f9ef199dfc1136b30ac4dc10b4fd69f2d4a0cf173f2ae23ad2c",
+      "/home/lastmjs/development/lasm/compiler/src/native-abort.cjs": "76fb690bdb790c72be9bf742995ffd879eb64617869e853d09fb535dc898157a",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-instantiate-lean.c": "538c32075e4e2dcb93d6b85360079ac85f056df193cf69594cd7f86fb5aa92da",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-canonical-imports.h": "b34892bc581d519d9a066c987f97d9c157eaa8f6b4df373bbb75650da5dff72a",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-native-api.c": "5042bdfcdf6096ccc9c0d8de415284a386b4ddccbd969d846a2a36e830fbdfc2",
+      "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-process-setup.c": "45f998846b30341a641dd2be7a3a20692f2e1240f393cec0de4f886352fe63cf"
+    },
+    "commands": [
+      {
+        "program": "python3",
+        "args": [
+          "-I",
+          "-B",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/prepare-wasmtime-probe.py"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "{\"version\": \"49.0.0\", \"archiveSha256\": \"8f181711f4cf4ddd084d7d54d13d10d44e3c622b0f03bfb8b2cc7afbd85cc131\", \"files\": 115, \"selectedBytes\": 32341429}\n",
+        "stderr": ""
+      },
+      {
+        "program": "cc",
+        "args": [
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-shared",
+          "-fPIC",
+          "-I/home/lastmjs/development/lasm/compiler/.cache/wasmtime-49.0.0/include",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-instantiate-lean.c",
+          "-L/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/dist/host",
+          "-lwasmtime",
+          "-Wl,-rpath,$ORIGIN",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/dist/host/instance.so"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "program": "cc",
+        "args": [
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-process-setup.c",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/dist/host/instance.so",
+          "-Wl,-rpath,/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/dist/host",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/process-setup-control"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "program": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/process-setup-control",
+        "args": [],
+        "code": 0,
+        "signal": null,
+        "stdout": "base pages prepared without inherited setup; resource limits preserved\n",
+        "stderr": ""
+      },
+      {
+        "program": "cc",
+        "args": [
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-shared",
+          "-fPIC",
+          "-I/home/lastmjs/development/lasm/compiler/.cache/js-runtimes/node-26.10.0/include/node",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/probes/wasmtime-native-api.c",
+          "-ldl",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/dist/host/native-api.node"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "program": "readelf",
+        "args": [
+          "-d",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/dist/host/instance.so"
+        ],
+        "code": 0,
+        "signal": null,
+        "stdout": "\nDynamic section at offset 0xcde0 contains 26 entries:\n  Tag        Type                         Name/Value\n 0x0000000000000001 (NEEDED)             Shared library: [libwasmtime.so]\n 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]\n 0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN]\n 0x000000000000000c (INIT)               0x3000\n 0x000000000000000d (FINI)               0x9870\n 0x0000000000000019 (INIT_ARRAY)         0xddd0\n 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0xddd8\n 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x2f0\n 0x0000000000000005 (STRTAB)             0x1058\n 0x0000000000000006 (SYMTAB)             0x3c8\n 0x000000000000000a (STRSZ)              3232 (bytes)\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000003 (PLTGOT)             0xdfe8\n 0x0000000000000002 (PLTRELSZ)           2616 (bytes)\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000017 (JMPREL)             0x1f58\n 0x0000000000000007 (RELA)               0x1e98\n 0x0000000000000008 (RELASZ)             192 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000006ffffffe (VERNEED)            0x1e08\n 0x000000006fffffff (VERNEEDNUM)         1\n 0x000000006ffffff0 (VERSYM)             0x1cf8\n 0x000000006ffffff9 (RELACOUNT)          3\n 0x0000000000000000 (NULL)               0x0\n",
+        "stderr": ""
+      }
+    ],
+    "limitations": [
+      "Native compilation still uses maintainer C tools.",
+      "Native caches currently infer build-host CPU features; relocation tests do not establish portability to a different CPU.",
+      "The experimental C loader still rejects empty environments and environment blocks above one MiB; general environment acceptance remains open.",
+      "Complete WASI descriptors, dynamic imports, keepalive/cancellation and reusable disposal remain unimplemented.",
+      "This preview packages one native platform and no additional runtime Lean module data."
+    ]
+  },
+  "deployment": {
+    "scope": "Fresh native interpreted/compiled controls and copied standalone preview in stock engines with source, build tools and original artifacts denied by Landlock. Linux x64; not managed CLI or complete runtime acceptance.",
+    "packageFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/result.json",
+    "packageSha256": "29456fd5e460fc098a0a2715c1ed3a911d5720018e0651611cfcceeb8049ae04",
+    "originalSource": "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/project/Main.lean",
+    "sourceSha256": "027fe6d34fd43ab4ed157acda145ae67a660ea5e9b615f698af48fcc54727fe3",
+    "inputs": {
+      "integration/wasmtime-standalone.mjs": "dee2b3f3363c81e30f61e1b11c8ff09a9707c64b7f0785823a680d028be7128b",
+      "integration/process-output.mjs": "1bed1db3404fa273103f666bd64a99be0181208507d3186c5c05933875416e75",
+      "scripts/check-deployed-application.mjs": "93b81a950ace266568a9c14f99a8cfbef1bdf4ee24d140681fd78f0b23f6e795",
+      "scripts/full-lean/restrict-filesystem.py": "c5770b46b49fbeb0c2bb45244802fcb684eaa5315cc1942660b1441a688b6a93"
+    },
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/wasmtime-standalone-4.34.1-deployment-r1-resources.json",
+    "profile": "cold",
+    "isolated": "/tmp/lasm-wasmtime-deploy-uJYVoG",
+    "commands": [
+      {
+        "label": "generate native application",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "-j1",
+          "-Dlinter.all=false",
+          "-Dcompiler.postponeCompile=false",
+          "-c",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/main.c",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/Main.lean"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source",
+        "code": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutBase64": "",
+        "stderrBase64": "",
+        "signal": null
+      },
+      {
+        "label": "compile native application",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/leanc",
+          "-O2",
+          "-DNDEBUG",
+          "-o",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/native-main",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/main.c"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source",
+        "code": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutBase64": "",
+        "stderrBase64": "",
+        "signal": null
+      },
+      {
+        "label": "native interpreted main",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "-Dlinter.all=false",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/Main.lean",
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/interpreted-0",
+        "code": 7,
+        "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "signal": null
+      },
+      {
+        "label": "native compiled main",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/native-main",
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/compiled-0",
+        "code": 7,
+        "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "signal": null
+      },
+      {
+        "label": "native interpreted main",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "-Dlinter.all=false",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/Main.lean",
+          "fail"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/interpreted-1",
+        "code": 1,
+        "stdout": "",
+        "stderr": "uncaught exception: ordinary failure \u03bb\n",
+        "stdoutBase64": "",
+        "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg==",
+        "signal": null
+      },
+      {
+        "label": "native compiled main",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/native-main",
+          "fail"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/compiled-1",
+        "code": 1,
+        "stdout": "",
+        "stderr": "uncaught exception: ordinary failure \u03bb\n",
+        "stdoutBase64": "",
+        "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg==",
+        "signal": null
+      },
+      {
+        "label": "native interpreted main",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "-Dlinter.all=false",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/Main.lean"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/interpreted-2",
+        "code": 7,
+        "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "signal": null
+      },
+      {
+        "label": "native compiled main",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/native-main"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/compiled-2",
+        "code": 7,
+        "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "signal": null
+      },
+      {
+        "label": "native interpreted main",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+          "-Dlinter.all=false",
+          "--run",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/Main.lean",
+          "line\nvalue",
+          "\ud83c\udf09",
+          "\t"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/interpreted-3",
+        "code": 7,
+        "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+        "stderrBase64": "",
+        "signal": null
+      },
+      {
+        "label": "native compiled main",
+        "command": [
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/native-main",
+          "line\nvalue",
+          "\ud83c\udf09",
+          "\t"
+        ],
+        "cwd": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/compiled-3",
+        "code": 7,
+        "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+        "stderrBase64": "",
+        "signal": null
+      },
+      {
+        "label": "node source/tool denial",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/node-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/node",
+          "--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/data/deny.mjs"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data",
+        "code": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutBase64": "",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "node isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/node-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/node",
+          "--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs",
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/node-0",
+        "code": 7,
+        "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "node isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/node-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/node",
+          "--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs",
+          "fail"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/node-1",
+        "code": 1,
+        "stdout": "",
+        "stderr": "uncaught exception: ordinary failure \u03bb\n",
+        "stdoutBase64": "",
+        "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg==",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "node isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/node-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/node",
+          "--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/node-2",
+        "code": 7,
+        "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "node isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/node-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/node",
+          "--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs",
+          "line\nvalue",
+          "\ud83c\udf09",
+          "\t"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/node-3",
+        "code": 7,
+        "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "deno source/tool denial",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/deno-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deno",
+          "run",
+          "--no-config",
+          "-A",
+          "--v8-flags=--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/data/deny.mjs"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data",
+        "code": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutBase64": "",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "deno isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/deno-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deno",
+          "run",
+          "--no-config",
+          "-A",
+          "--v8-flags=--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs",
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/deno-0",
+        "code": 7,
+        "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "deno isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/deno-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deno",
+          "run",
+          "--no-config",
+          "-A",
+          "--v8-flags=--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs",
+          "fail"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/deno-1",
+        "code": 1,
+        "stdout": "",
+        "stderr": "uncaught exception: ordinary failure \u03bb\n",
+        "stdoutBase64": "",
+        "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg==",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "deno isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/deno-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deno",
+          "run",
+          "--no-config",
+          "-A",
+          "--v8-flags=--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/deno-2",
+        "code": 7,
+        "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "deno isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/deno-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deno",
+          "run",
+          "--no-config",
+          "-A",
+          "--v8-flags=--max-old-space-size=128",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs",
+          "line\nvalue",
+          "\ud83c\udf09",
+          "\t"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/deno-3",
+        "code": 7,
+        "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "bun source/tool denial",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/bun-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/bun",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/data/deny.mjs"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data",
+        "code": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutBase64": "",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "bun isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/bun-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/bun",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs",
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/bun-0",
+        "code": 7,
+        "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "bun isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/bun-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/bun",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs",
+          "fail"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/bun-1",
+        "code": 1,
+        "stdout": "",
+        "stderr": "uncaught exception: ordinary failure \u03bb\n",
+        "stdoutBase64": "",
+        "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg==",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "bun isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/bun-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/bun",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/bun-2",
+        "code": 7,
+        "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      },
+      {
+        "label": "bun isolated application",
+        "command": [
+          "/usr/bin/python3",
+          "/home/lastmjs/development/lasm/compiler/scripts/full-lean/restrict-filesystem.py",
+          "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/bun-rules.json",
+          "--",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/bun",
+          "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb/main.mjs",
+          "line\nvalue",
+          "\ud83c\udf09",
+          "\t"
+        ],
+        "cwd": "/tmp/lasm-wasmtime-deploy-uJYVoG/data/bun-3",
+        "code": 7,
+        "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+        "stderr": "",
+        "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+        "stderrBase64": "",
+        "isolation": "[lasm] Landlock ABI 4: filesystem access restricted before execution",
+        "signal": null
+      }
+    ],
+    "comparisons": [
+      {
+        "engine": "node",
+        "args": [
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "fail"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg=="
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg=="
+        }
+      },
+      {
+        "engine": "node",
+        "args": [],
+        "expected": {
+          "code": 7,
+          "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "line\nvalue",
+          "\ud83c\udf09",
+          "\t"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "fail"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg=="
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg=="
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [],
+        "expected": {
+          "code": 7,
+          "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "line\nvalue",
+          "\ud83c\udf09",
+          "\t"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "hello \u03bb",
+          "",
+          "space argument"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "hello \u03bb||space argument:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "aGVsbG8gzrt8fHNwYWNlIGFyZ3VtZW50OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "fail"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg=="
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary failure \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBmYWlsdXJlIM67Cg=="
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [],
+        "expected": {
+          "code": 7,
+          "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": ":340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "OjM0MDI4MjM2NjkyMDkzODQ2MzQ2MzM3NDYwNzQzMTc2ODIxMTQ5OAptaXNzaW5nPXRydWUK",
+          "stderrBase64": ""
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "line\nvalue",
+          "\ud83c\udf09",
+          "\t"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+          "stderrBase64": ""
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "line\nvalue|\ud83c\udf09|\t:340282366920938463463374607431768211498\nmissing=true\n",
+          "stderr": "",
+          "stdoutBase64": "bGluZQp2YWx1ZXzwn4yJfAk6MzQwMjgyMzY2OTIwOTM4NDYzNDYzMzc0NjA3NDMxNzY4MjExNDk4Cm1pc3Npbmc9dHJ1ZQo=",
+          "stderrBase64": ""
+        }
+      }
+    ],
+    "denials": [
+      {
+        "engine": "node",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ab9c8eecf9f82d6693cdc3accced17034065c8d96213b0aa76a7e803d20ae1da",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/node-rules.json"
+      },
+      {
+        "engine": "deno",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/deno-rules.json"
+      },
+      {
+        "engine": "bun",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/bun-rules.json"
+      }
+    ],
+    "passed": true,
+    "native": {
+      "version": "4.34.1",
+      "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+      "identity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b"
+    },
+    "deployment": {
+      "directory": "/tmp/lasm-wasmtime-deploy-uJYVoG/deployment space \u03bb",
+      "manifestSha256": "ad389395bc0867d1723ba02dce1d131e8b8246a18703e9b8924a96a91645a87f",
+      "deniedFiles": [
+        "/home/lastmjs/development/lasm/compiler/.work/application-cold-4.34.1-r1/workspace/project/Main.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-deployment-r1/native-source/Main.lean",
+        "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b/bin/lean",
+        "/home/lastmjs/development/lasm/compiler/package.json",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-lean-4.34.1-compilation-r2/compiled.cwasm",
+        "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-4.34.1-package-r1/dist/host/instance.so",
+        "/home/lastmjs/development/lasm/compiler/src/wasmtime-runtime.mjs"
+      ],
+      "path": "",
+      "sourceAndBuildContentsDenied": true,
+      "expectedResultsPresent": false
+    },
+    "inputsUnchanged": true,
+    "finishedAt": "2026-09-25T21:18:18.765Z",
+    "verifiedTemporaryDeploymentRemoved": true
+  },
+  "resources": {
+    "wasmtime-standalone-4.34.1-focused-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-4.34.1-focused-r1-resources.json",
+        "sha256": "9d378a3b8a602ab6d5e4cc6effae3002be0f7331a1cce7838c665b22bd916ea0"
+      },
+      "limits": {
+        "memoryMax": 2147483648,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1717986918,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 175644672,
+      "minimumHostAvailable": 26535137280,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-4.34.1-native-stdio-r2": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-4.34.1-native-stdio-r2-resources.json",
+        "sha256": "1d9f3f00c2927bfed24470ee9fc911957eb0703b72d9ca55f2d9e7185ab26a6f"
+      },
+      "limits": {
+        "memoryMax": 1610612736,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1288490188,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 46190592,
+      "minimumHostAvailable": 26827423744,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-4.34.1-restore-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-4.34.1-restore-r1-resources.json",
+        "sha256": "6994a69a2f81f278b79b692355018da477e9caa3805648860b5d47521c7fb6d5"
+      },
+      "limits": {
+        "memoryMax": 1610612736,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1288490188,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 210833408,
+      "minimumHostAvailable": 26713497600,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-4.34.1-private-r2": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-4.34.1-private-r2-resources.json",
+        "sha256": "adcad7c9eea577720057906cd12fd5a50f7a2edc3d42b97d84c3f84c363cecc4"
+      },
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 550584320,
+      "minimumHostAvailable": 26222796800,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-4.34.1-negative-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-4.34.1-negative-r1-resources.json",
+        "sha256": "65898f3a1d6bc5f2c7bcf8b9158f626c40ffb92602ca839b1de958c55464aeea"
+      },
+      "limits": {
+        "memoryMax": 2147483648,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1717986918,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 453668864,
+      "minimumHostAvailable": 26387787776,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-4.34.1-package-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-4.34.1-package-r1-resources.json",
+        "sha256": "f8eeb1ffff379ad112b76442011c53237bfbdf3d4209fe469c2a837128632487"
+      },
+      "limits": {
+        "memoryMax": 3221225472,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 2576980377,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 739696640,
+      "minimumHostAvailable": 26735927296,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    },
+    "wasmtime-standalone-4.34.1-deployment-r1": {
+      "receipt": {
+        "path": ".work/product-acceptance/wasmtime-standalone-4.34.1-deployment-r1-resources.json",
+        "sha256": "ad7452f144fddbe45b482a96d58b2da63302abdd8de825d5ef1feb024cff202a"
+      },
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 1452851200,
+      "minimumHostAvailable": 26331131904,
+      "result": {
+        "code": 0,
+        "signal": null
+      },
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryEvents": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0
+      },
+      "swapBytes": 0
+    }
+  },
+  "preservedFailures": [
+    {
+      "receipt": {
+        "path": ".work/wasmtime-standalone-4.34.1-native-stdio-r1/result.json",
+        "sha256": "c0cb05348d7d5651f2aa5c1268677376622d533644ae0d0b95171f6fbf6b742f"
+      },
+      "classification": "Supplementary harness used ordinary JS teardown, adding a Node closed-stdout diagnostic. The retry uses the deployed owned-process flush/_Exit sequence, retaining exact original C oracle and byte/error/status assertions.",
+      "repair": {
+        "path": ".work/product-acceptance/wasmtime-standalone-stdio-harness-repair-r1.json",
+        "sha256": "a2789ef8caf8034b9a8adbb6298339b84aac6c0d9cb9c60e652d89df52ac90f8"
+      }
+    },
+    {
+      "receipt": {
+        "path": ".work/wasmtime-standalone-4.34.1-private-r1/result.json",
+        "sha256": "bfbd991a95639730e0c38745e1c3d4c68f28ea62fcd3abe35cf8acdc33491e06"
+      },
+      "classification": "Node rejected a parent V8 heap flag replayed as an explicit Worker flag. Both internal worker paths now use their cwd preload and existing explicit heap/stack resourceLimits; the fresh three-engine retry passes."
+    },
+    {
+      "receipt": {
+        "path": ".work/wasmtime-standalone-lifecycle-4.34.1-deployment-r1/result.json",
+        "sha256": "7713d1ec8f35601cb15b580a56dfd222813020bbcaee47bfacc3a090bd5f94fd"
+      },
+      "classification": "Supplementary native oracle setup: Lean --run cannot evaluate same-module initialize declarations. Retry loads the unchanged compiled module through an import-only Runner.lean. Original Lean application, C-compiled control, inputs and assertions unchanged. No deployed target was run before the first comparison failed.",
+      "repair": {
+        "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-native-oracle-repair-r1.json",
+        "sha256": "034c0bc2e4cf8bf04c69107ff71fef499bc9e6ca08bab433ecc7281a2bc95a1c"
+      }
+    }
+  ],
+  "upstreamTestsChanged": false,
+  "remaining": [
+    "Complete deleted-working-directory recovery after matching the native error, and empty/large environment controls.",
+    "Remove diagnostic environment bounds and select/verify portable native CPU targets.",
+    "Complete general imports/descriptors, runtime lifetime and module-data support.",
+    "Integrate automatic helper provisioning and compilation into the managed package; repair and rerun Bun suite acceptance.",
+    "Validate all six native platforms and complete language/API coverage."
+  ],
+  "recordedAt": "2026-09-25T21:35:39.042114+00:00",
+  "lifecycle": {
+    "scope": "Nine supplementary cases compared in three engines to fresh interpreted and C-compiled native Lean. Original upstream suite untouched. The deleted-cwd case matches a native error before reaching relative recovery; that recovery remains untested here.",
+    "report": {
+      "path": ".work/wasmtime-standalone-lifecycle-4.34.1-deployment-r2/result.json",
+      "sha256": "8e83263871d9c15709c51a9a3e06972932bf25912dd46917a6d607bf0ade9aa7"
+    },
+    "source": {
+      "path": "integration/fixtures/StandaloneLifecycle.lean",
+      "sha256": "adcd0d8d02635ce4d590b831973ed764ecb81e45a3abc14030b91321857051f2"
+    },
+    "nativeOracleAdaptation": {
+      "kind": "import completed module before interpreted main",
+      "reason": "Native Lean rejects same-module initialize declarations during --run",
+      "entrypoint": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-lifecycle-4.34.1-deployment-r2/native-source/Runner.lean",
+      "sha256": "4966cf957507429962538c70f626393fdb71124f7c8557bb283bc62b61e847d4",
+      "applicationSourceUnchanged": true
+    },
+    "package": {
+      "path": ".work/wasmtime-standalone-lifecycle-4.34.1-package-r1/result.json",
+      "sha256": "e1fa263f3a7bf62d7cd11916532370c7d7e4ee52019fb582c7ecb3a0ba86c803"
+    },
+    "comparisons": [
+      {
+        "engine": "node",
+        "args": [
+          "buffered"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "exit"
+        ],
+        "expected": {
+          "code": 19,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 19,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "forced"
+        ],
+        "expected": {
+          "code": 23,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 23,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "high-exit"
+        ],
+        "expected": {
+          "code": 255,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 255,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "error"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary lifecycle error \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBsaWZlY3ljbGUgZXJyb3IgzrsK",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary lifecycle error \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBsaWZlY3ljbGUgZXJyb3IgzrsK",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "stdio"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "\u0000\ufffd\u03bb\n",
+          "stderr": "standalone debug \u03bb\n\ufffd\u0000\n",
+          "stdoutBase64": "AP/Ouwo=",
+          "stderrBase64": "c3RhbmRhbG9uZSBkZWJ1ZyDOuwr+AAo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "\u0000\ufffd\u03bb\n",
+          "stderr": "standalone debug \u03bb\n\ufffd\u0000\n",
+          "stdoutBase64": "AP/Ouwo=",
+          "stderrBase64": "c3RhbmRhbG9uZSBkZWJ1ZyDOuwr+AAo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "cwd"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "cwd and dedicated worker passed\n",
+          "stderr": "",
+          "stdoutBase64": "Y3dkIGFuZCBkZWRpY2F0ZWQgd29ya2VyIHBhc3NlZAo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "cwd and dedicated worker passed\n",
+          "stderr": "",
+          "stdoutBase64": "Y3dkIGFuZCBkZWRpY2F0ZWQgd29ya2VyIHBhc3NlZAo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "removed-cwd"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: failed to retrieve current working directory\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBmYWlsZWQgdG8gcmV0cmlldmUgY3VycmVudCB3b3JraW5nIGRpcmVjdG9yeQo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: failed to retrieve current working directory\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBmYWlsZWQgdG8gcmV0cmlldmUgY3VycmVudCB3b3JraW5nIGRpcmVjdG9yeQo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "node",
+        "args": [
+          "wait"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "application outlived diagnostic deadline\n",
+          "stderr": "",
+          "stdoutBase64": "YXBwbGljYXRpb24gb3V0bGl2ZWQgZGlhZ25vc3RpYyBkZWFkbGluZQo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "application outlived diagnostic deadline\n",
+          "stderr": "",
+          "stdoutBase64": "YXBwbGljYXRpb24gb3V0bGl2ZWQgZGlhZ25vc3RpYyBkZWFkbGluZQo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "buffered"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "exit"
+        ],
+        "expected": {
+          "code": 19,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 19,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "forced"
+        ],
+        "expected": {
+          "code": 23,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 23,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "high-exit"
+        ],
+        "expected": {
+          "code": 255,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 255,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "error"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary lifecycle error \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBsaWZlY3ljbGUgZXJyb3IgzrsK",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary lifecycle error \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBsaWZlY3ljbGUgZXJyb3IgzrsK",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "stdio"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "\u0000\ufffd\u03bb\n",
+          "stderr": "standalone debug \u03bb\n\ufffd\u0000\n",
+          "stdoutBase64": "AP/Ouwo=",
+          "stderrBase64": "c3RhbmRhbG9uZSBkZWJ1ZyDOuwr+AAo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "\u0000\ufffd\u03bb\n",
+          "stderr": "standalone debug \u03bb\n\ufffd\u0000\n",
+          "stdoutBase64": "AP/Ouwo=",
+          "stderrBase64": "c3RhbmRhbG9uZSBkZWJ1ZyDOuwr+AAo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "cwd"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "cwd and dedicated worker passed\n",
+          "stderr": "",
+          "stdoutBase64": "Y3dkIGFuZCBkZWRpY2F0ZWQgd29ya2VyIHBhc3NlZAo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "cwd and dedicated worker passed\n",
+          "stderr": "",
+          "stdoutBase64": "Y3dkIGFuZCBkZWRpY2F0ZWQgd29ya2VyIHBhc3NlZAo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "removed-cwd"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: failed to retrieve current working directory\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBmYWlsZWQgdG8gcmV0cmlldmUgY3VycmVudCB3b3JraW5nIGRpcmVjdG9yeQo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: failed to retrieve current working directory\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBmYWlsZWQgdG8gcmV0cmlldmUgY3VycmVudCB3b3JraW5nIGRpcmVjdG9yeQo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "deno",
+        "args": [
+          "wait"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "application outlived diagnostic deadline\n",
+          "stderr": "",
+          "stdoutBase64": "YXBwbGljYXRpb24gb3V0bGl2ZWQgZGlhZ25vc3RpYyBkZWFkbGluZQo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "application outlived diagnostic deadline\n",
+          "stderr": "",
+          "stdoutBase64": "YXBwbGljYXRpb24gb3V0bGl2ZWQgZGlhZ25vc3RpYyBkZWFkbGluZQo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "buffered"
+        ],
+        "expected": {
+          "code": 7,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 7,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "exit"
+        ],
+        "expected": {
+          "code": 19,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 19,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "forced"
+        ],
+        "expected": {
+          "code": 23,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 23,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": "",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "high-exit"
+        ],
+        "expected": {
+          "code": 255,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 255,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "error"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary lifecycle error \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBsaWZlY3ljbGUgZXJyb3IgzrsK",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: ordinary lifecycle error \u03bb\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBvcmRpbmFyeSBsaWZlY3ljbGUgZXJyb3IgzrsK",
+          "bufferedFile": "AP/Ouwo=",
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "stdio"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "\u0000\ufffd\u03bb\n",
+          "stderr": "standalone debug \u03bb\n\ufffd\u0000\n",
+          "stdoutBase64": "AP/Ouwo=",
+          "stderrBase64": "c3RhbmRhbG9uZSBkZWJ1ZyDOuwr+AAo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "\u0000\ufffd\u03bb\n",
+          "stderr": "standalone debug \u03bb\n\ufffd\u0000\n",
+          "stdoutBase64": "AP/Ouwo=",
+          "stderrBase64": "c3RhbmRhbG9uZSBkZWJ1ZyDOuwr+AAo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "cwd"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "cwd and dedicated worker passed\n",
+          "stderr": "",
+          "stdoutBase64": "Y3dkIGFuZCBkZWRpY2F0ZWQgd29ya2VyIHBhc3NlZAo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "cwd and dedicated worker passed\n",
+          "stderr": "",
+          "stdoutBase64": "Y3dkIGFuZCBkZWRpY2F0ZWQgd29ya2VyIHBhc3NlZAo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "removed-cwd"
+        ],
+        "expected": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: failed to retrieve current working directory\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBmYWlsZWQgdG8gcmV0cmlldmUgY3VycmVudCB3b3JraW5nIGRpcmVjdG9yeQo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 1,
+          "stdout": "",
+          "stderr": "uncaught exception: failed to retrieve current working directory\n",
+          "stdoutBase64": "",
+          "stderrBase64": "dW5jYXVnaHQgZXhjZXB0aW9uOiBmYWlsZWQgdG8gcmV0cmlldmUgY3VycmVudCB3b3JraW5nIGRpcmVjdG9yeQo=",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      },
+      {
+        "engine": "bun",
+        "args": [
+          "wait"
+        ],
+        "expected": {
+          "code": 0,
+          "stdout": "application outlived diagnostic deadline\n",
+          "stderr": "",
+          "stdoutBase64": "YXBwbGljYXRpb24gb3V0bGl2ZWQgZGlhZ25vc3RpYyBkZWFkbGluZQo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        },
+        "actual": {
+          "code": 0,
+          "stdout": "application outlived diagnostic deadline\n",
+          "stderr": "",
+          "stdoutBase64": "YXBwbGljYXRpb24gb3V0bGl2ZWQgZGlhZ25vc3RpYyBkZWFkbGluZQo=",
+          "stderrBase64": "",
+          "bufferedFile": null,
+          "temporaryDirectoriesRemoved": true
+        }
+      }
+    ],
+    "denials": [
+      {
+        "engine": "node",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ab9c8eecf9f82d6693cdc3accced17034065c8d96213b0aa76a7e803d20ae1da",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-lifecycle-4.34.1-deployment-r2/node-rules.json"
+      },
+      {
+        "engine": "deno",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "ce6a052beb97c2b92de67077e3f3924ba7c9661ede0d8dc2f66a116a3c841f21",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-lifecycle-4.34.1-deployment-r2/deno-rules.json"
+      },
+      {
+        "engine": "bun",
+        "control": {
+          "code": 0,
+          "stdout": "",
+          "stderr": "",
+          "stdoutBase64": "",
+          "stderrBase64": ""
+        },
+        "executableSha256": "a83d263767d839e4d2649ca8e35d07159c7afc99afdc96d731ced29e056dda0c",
+        "ruleFile": "/home/lastmjs/development/lasm/compiler/.work/wasmtime-standalone-lifecycle-4.34.1-deployment-r2/bun-rules.json"
+      }
+    ],
+    "resources": [
+      {
+        "name": "build-r1",
+        "resourceReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-build-r1-resources.json",
+          "sha256": "9ba2898e35bf354f3c709286e03694f1a4e015e176bc0b48afccbdd13182f2e3"
+        },
+        "diskReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-build-r1-disk.json",
+          "sha256": "0e39f714d1c9acfcff86609b3a69e1cfe85d01c8314efb8f962d6a06172b0c73"
+        },
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3430940672,
+        "minimumFreeBytes": 8044752896,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      {
+        "name": "format-r1",
+        "resourceReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-format-r1-resources.json",
+          "sha256": "02556047889ff4e63055995aa2db2903895c7c3b3c4b2b406260f59f6f0639c0"
+        },
+        "diskReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-format-r1-disk.json",
+          "sha256": "ca83dbf74cd63b755440e2058794e0c3613978b891580b6687ce4af958c242ce"
+        },
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 3311874048,
+        "minimumFreeBytes": 7934296064,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      {
+        "name": "compilation-r1",
+        "resourceReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-compilation-r1-resources.json",
+          "sha256": "ac69c880663785023a11e59f8d6795823b25d172e93ef55801fff4b5861b693b"
+        },
+        "diskReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-compilation-r1-disk.json",
+          "sha256": "cda0fc900ad50f4a0f08244e93d14938c1549506fde6b1dfde9527dc3199cf61"
+        },
+        "limits": {
+          "memoryMax": 8589934592,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 6871947673,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 5735727104,
+        "minimumFreeBytes": 7322914816,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      {
+        "name": "package-r1",
+        "resourceReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-package-r1-resources.json",
+          "sha256": "9ef36a4b6d5dbbef7d1669ea697031410f65b0f8333e7e00932f672c112543cc"
+        },
+        "diskReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-package-r1-disk.json",
+          "sha256": "fb2cdafa66d076b80b767d8a2d82310c1d0cf606a2a5f7e2ffa2c4f93a13d038"
+        },
+        "limits": {
+          "memoryMax": 3221225472,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 2576980377,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 754241536,
+        "minimumFreeBytes": 6666272768,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      },
+      {
+        "name": "deployment-r2",
+        "resourceReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-deployment-r2-resources.json",
+          "sha256": "742e2cf4ba14a683a2dddee0683178f9e25871083308dfb2043d2f5a62928452"
+        },
+        "diskReceipt": {
+          "path": ".work/product-acceptance/wasmtime-standalone-lifecycle-4.34.1-deployment-r2-disk.json",
+          "sha256": "97c1a5288a8f8da6071042ada0f9cc63f6e3f3aaead4bc6612bbab1ee5efa6e7"
+        },
+        "limits": {
+          "memoryMax": 6442450944,
+          "memoryHigh": "infinity",
+          "stopMemoryBytes": 5153960755,
+          "memorySwapMax": 0,
+          "tasksMax": 1024,
+          "nice": 0,
+          "coreFileBytes": 0
+        },
+        "peakMemoryBytes": 1390505984,
+        "minimumFreeBytes": 5852397568,
+        "unitReleased": true,
+        "memoryEvents": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0
+        },
+        "swapBytes": 0
+      }
+    ],
+    "verifiedTemporaryDeploymentRemoved": true
+  }
+}

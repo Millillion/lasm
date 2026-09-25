@@ -17,8 +17,10 @@ const restore = values => {
 // Stock Bun needs both a larger OS worker reservation and a larger JSC budget.
 // A bundled private interposer supplies the former. Same-PID exec initializes
 // both before any Lean code; visible environment values are restored afterward.
-export function prepareBunStack(entrypoint) {
+export function prepareBunStack(entrypoint, { minimumStackMiB = 0 } = {}) {
   if (!process.versions.bun || !isMainThread || process.platform !== 'linux') return;
+  if (!Number.isFinite(minimumStackMiB) || minimumStackMiB < 0)
+    throw new Error('Invalid minimum Bun worker stack');
   const require = createRequire(import.meta.url);
   const bundled = new URL('./native/node_modules/koffi/index.cjs', import.meta.url);
   const ffi = existsSync(bundled) ? require(fileURLToPath(bundled)) : require('koffi');
@@ -48,6 +50,8 @@ export function prepareBunStack(entrypoint) {
         || state.nativeValues.some(value => value !== null && (typeof value !== 'string'
           || Buffer.from(value, 'base64').toString('base64') !== value || Buffer.from(value, 'base64').includes(0))))
       throw new Error('Invalid private Bun stack environment transport');
+    if (state.bytes < minimumStackMiB * 1024 ** 2)
+      throw new Error('The initialized Bun worker stack is too small for this runtime');
     if (Number(libc.func('size_t lasm_bun_stack_reservation_bytes()')()) !== state.bytes)
       throw new Error('Bun worker stack helper did not initialize correctly');
     restoreNative(state.nativeValues); restore(state.values);
@@ -69,7 +73,10 @@ export function prepareBunStack(entrypoint) {
   if (process.env.XDG_CONFIG_HOME) configs.push(join(process.env.XDG_CONFIG_HOME, '.bunfig.toml'));
   if (configs.some(path => existsSync(path))) return;
 
-  const stackMiB = Number(process.env.LASM_VM_STACK_MB ?? 64);
+  const requestedMiB = Number(process.env.LASM_VM_STACK_MB ?? 64);
+  if (!Number.isFinite(requestedMiB) || requestedMiB < 4)
+    throw new Error('Invalid LASM_VM_STACK_MB for Bun (minimum 4 MiB)');
+  const stackMiB = Math.max(requestedMiB, minimumStackMiB);
   const bytes = Math.ceil(stackMiB * 1024 ** 2 / 4096) * 4096;
   if (!Number.isFinite(stackMiB) || !Number.isSafeInteger(bytes) || bytes < 4 * 1024 ** 2)
     throw new Error('Invalid LASM_VM_STACK_MB for Bun (minimum 4 MiB)');

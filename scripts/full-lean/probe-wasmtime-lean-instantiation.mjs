@@ -45,6 +45,7 @@ const inputs = ['scripts/full-lean/probes/wasmtime-instantiate-lean.c',
   'scripts/full-lean/probes/wasmtime-native-api.c', 'scripts/full-lean/probes/wasmtime-lean-supervisor.mjs',
   'scripts/full-lean/probes/wasmtime-console.mjs', 'scripts/full-lean/probes/wasmtime-guest-memory.mjs',
   'scripts/full-lean/probes/wasmtime-canonical-imports.h'];
+inputs.push('src/wasmtime-runtime.mjs', 'src/wasmtime-worker.mjs', 'src/wasmtime-artifact.mjs', 'src/wasmtime-native-stdio.mjs', 'src/wasmtime-guest-memory.mjs', 'src/wasmtime-console.mjs', 'src/wasmtime-wasi-stdio.mjs', 'src/worker-stdio.cjs', 'src/native-worker-cwd.cjs', 'src/native-pthread-factory.cjs', 'src/native-pthread-factory-deno.mjs');
 const hashes = Object.fromEntries(await Promise.all(inputs.map(async path => [path, await hashFile(join(root, path))])));
 const report = { scope: runMain
   ? 'Unchanged const_fold main through a private Wasmtime integration and native Lean oracles; not shipping backend or general API acceptance'

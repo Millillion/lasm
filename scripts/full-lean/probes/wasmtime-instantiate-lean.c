@@ -1,13 +1,12 @@
 #define _GNU_SOURCE
-// Private diagnostic only. Selected imports have real host implementations;
-// unimplemented imports trap. Pure exports do not establish full API acceptance.
+// Shared by the private diagnostics and the standalone application preview.
+// Selected imports have real host implementations; unimplemented imports trap.
 #include <wasmtime.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/prctl.h>
-#include <sys/resource.h>
 #include <sys/random.h>
 #include <errno.h>
 #include <pthread.h>
@@ -608,16 +607,28 @@ static wasm_engine_t *create_engine(size_t wasm_stack_budget) {
     return wasm_engine_new_with_config(config);
 }
 
+int lasm_lean_prepare_process(char *error, size_t capacity) {
+    // Keep native Wasm allocations on base pages in this process. Deployment
+    // must not depend on inheriting the maintainer's build wrapper. This changes
+    // no system setting or resource limit; the test guard owns those limits.
+    if (prctl(PR_SET_THP_DISABLE, 1, 0, 0, 0) != 0 ||
+        prctl(PR_GET_THP_DISABLE, 0, 0, 0, 0) != 1) {
+        snprintf(error, capacity, "cannot prepare Wasm base pages: %s", strerror(errno));
+        return 1;
+    }
+    return 0;
+}
+
 static lean_probe_t *instance_new(size_t wasm_stack_budget, const char *trusted_cache, date_callback_t date_now,
     mailbox_callback_t schedule_mailbox,
     const uint8_t *environment, size_t environment_size, size_t environment_count,
     const char *program_name,
     lean_probe_t *parent, spawn_callback_t spawn, thread_event_callback_t thread_event,
     char *error, size_t capacity) {
-    const struct rlimit no_core = {0, 0};
-    if (!date_now || !schedule_mailbox || setrlimit(RLIMIT_CORE, &no_core) != 0 || prctl(PR_GET_THP_DISABLE, 0, 0, 0, 0) != 1) {
-        snprintf(error, capacity, "requires core suppression and guarded base pages"); return NULL;
+    if (!date_now || !schedule_mailbox) {
+        snprintf(error, capacity, "requires clock and mailbox callbacks"); return NULL;
     }
+    if (lasm_lean_prepare_process(error, capacity)) return NULL;
     lean_probe_t *probe = calloc(1, sizeof(*probe));
     if (!probe) { snprintf(error, capacity, "probe allocation failed"); return NULL; }
     if (!program_name || strlen(program_name) > 65536) {

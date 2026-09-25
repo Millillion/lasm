@@ -13,6 +13,10 @@ runtime. Both remain within the product's compatibility goal. Items labeled
 callable below apply to that earlier path, not to all executable applications.
 See [the IO guide](docs/IO.md) for the interface-to-backend mapping.
 
+The [standalone native-helper preview](docs/WASMTIME_PREVIEW.md) adds copied
+Linux x64 deployment evidence in all three engines. Managed CLI integration,
+general helper/API parity and the other native platforms remain unfinished.
+
 - [ ] Complete fresh Lean 4.34.1 application, language and API acceptance.
   The [runtime rebuild](docs/evidence/lean-4.34.1-runtime-build-2026-09-25.json)
   compiles all 2,516 modules and verifies every generated C archive and object;
