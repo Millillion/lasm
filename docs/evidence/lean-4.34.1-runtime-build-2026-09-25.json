@@ -1,0 +1,356 @@
+{
+  "scope": "Fresh Lean 4.34.1 full application-library build, packaging and source inventory; installed Wasm behavior and other native platforms remain separate unverified gates",
+  "recordedAt": "2026-09-25T04:33:07.628724+00:00",
+  "versions": {
+    "checkedAt": "2026-09-25T04:28:45.499195+00:00",
+    "scope": "Official stable versions for the fresh Lean 4.34.1 application acceptance campaign",
+    "sources": {
+      "lean": {
+        "url": "https://api.github.com/repos/leanprover/lean4/releases/latest",
+        "tag_name": "v4.34.1",
+        "published_at": "2026-09-24T20:24:21Z",
+        "html_url": "https://github.com/leanprover/lean4/releases/tag/v4.34.1",
+        "prerelease": false,
+        "draft": false,
+        "target_commitish": "master"
+      },
+      "node": {
+        "url": "https://nodejs.org/dist/index.json",
+        "version": "v26.10.0",
+        "date": "2026-09-21",
+        "lts": false
+      },
+      "deno": {
+        "url": "https://api.github.com/repos/denoland/deno/releases/latest",
+        "tag_name": "v2.9.7",
+        "published_at": "2026-09-17T09:04:55Z",
+        "html_url": "https://github.com/denoland/deno/releases/tag/v2.9.7",
+        "prerelease": false,
+        "draft": false,
+        "target_commitish": "main"
+      },
+      "bun": {
+        "url": "https://api.github.com/repos/oven-sh/bun/releases/latest",
+        "tag_name": "bun-v1.4.2",
+        "published_at": "2026-09-05T05:55:48Z",
+        "html_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.2",
+        "prerelease": false,
+        "draft": false,
+        "target_commitish": "744846f844374847c902b5e7fd59b4342a51ef99"
+      }
+    }
+  },
+  "build": {
+    "schema": 1,
+    "lean": "4.34.1",
+    "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "sourceArchiveSha256": "2714b59e868977f0458e2735dab8ad346ca33f72d16241307b3b70ce7d1947fc",
+    "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+    "patches": {
+      "wasm-build": "d7cbceaada08cdbf762adb5ef96485f1e101a010450b5e4689bbeed60cb94965",
+      "compact-alignment": "071e70af2a4b58e1744b178ba1ee094c0d2701bcefef4653995675656f4daedb",
+      "thread-runtime": "2e4a2efd1a209cabd2caa893e5dfa8e26174f82ed2a808145b9faafff667265a",
+      "sdk-mimalloc": "ecef94dbbc5481d72f363360e8d7686964bc683e4e16abb6cb7e851adcb81fba",
+      "c-inputs": "ff01c0e773a2ec96bc87e39acb8e8a6e205390cdeb955c6019325da3e1769035",
+      "region-allocation": "d8584427270436c68bdcbaaa75da56e74a572983a585022fb84923c979ae1787",
+      "host-platform": "de1d33de36b72d17ae2350bf912a636c0db511b426b6ca428b3fa2834d4ae61c",
+      "host-linux": "77f66fc789821bcce694a9683dd079d5ce0f8c73902b91095d8a8f10fd88fa4a",
+      "host-backtrace": "55a0559e972f7db3eeeab0d521458a3c30416ecff76362bb54f148f0798577f8",
+      "libuv-source": "0681c682f09c5752897b7e882c16ed2b413522876047cb52ff2d29ddad4a2421"
+    },
+    "sdkPatchSha256": "30831eade8835dfa36b92f9354a1fcaaa4ec0315a06deb79d1c72508abef4664",
+    "emscripten": "6.0.9",
+    "gmpSha256": "f0f100818d80c59ed95b297fb5217d3493633b9df5a464ed0ebdf30a13f3b5b3",
+    "memoryLayout": "wasm64",
+    "threading": "pthreads",
+    "allocator": "mimalloc",
+    "purpose": "AOT application libraries; no Wasm compiler executable",
+    "sdk": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+    "sdkMode": "managed",
+    "sdkIdentity": "f7f38a7dfcaf36d68484f883b0dcc7d71bea019c1def3466588c1c9a3799edb6",
+    "sdkDriverIdentity": "791ace8e149c2c5e97a1f272dcb70c05eb61744ec06ba24c97e0176ca5085bf7",
+    "sdkToolCache": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains",
+    "nativePrefix": "/home/lastmjs/development/lasm/compiler/.work/application-installed-r3/workspace/toolchains/artifacts/3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+    "source": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.1-r1/source",
+    "build": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.1-r1/build",
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-runtime-4.34.1-r1-resources.json"
+  },
+  "bundle": {
+    "scope": "Versioned application build inputs; managed CLI and installed-package validation remain pending",
+    "target": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34.1-r1/lean-4.34.1-wasm64",
+    "manifestSha256": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+    "files": 18,
+    "installedBytes": 363726260,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-runtime-bundle-4.34.1-r1-resources.json"
+  },
+  "progress": {
+    "status": "complete",
+    "completed": 2516,
+    "groups": [
+      "Init",
+      "Std",
+      "Lean",
+      "Lake"
+    ]
+  },
+  "postBuildVerification": {
+    "scope": "Post-build streaming verification of generated C archives, compiled objects, complete bundle files and recorded current build inputs",
+    "modules": 2516,
+    "bundleFiles": 18,
+    "buildInputsUnchanged": true,
+    "originalGeneratedCSha256Verified": true,
+    "compressedGeneratedCSha256Verified": true,
+    "compiledObjectsVerified": true,
+    "completeBundleVerified": true,
+    "passed": true,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/verify-runtime-4.34.1-r1-resources.json",
+    "finishedAt": "2026-09-25T04:31:35.893066+00:00"
+  },
+  "recordedBuildInputs": {
+    "scope": "Recorded current build/package inputs; copied C/C++ host sources match the active build tree",
+    "recordedAt": "2026-09-25T04:22:08.269835+00:00",
+    "files": {
+      "scripts/full-lean/build-application-runtime.mjs": "a69f559dddfa33f69a1de33c5667d622612d8e5c4b9c9815acd5d86ebef78b55",
+      "scripts/full-lean/package-application-runtime.mjs": "666d6791b70724b5854ac09a481a7130ff6fc4639843a6a01e55b6bc080442c7",
+      "scripts/full-lean/generate-exports.mjs": "b189070788587815e44271a7a41f819979ead206318b6727e42f498783156aaf",
+      "scripts/full-lean/configure-host.mjs": "f73be3d2d637035dd9ef94e1c44f1d7a6a16f730cc87b0b51aebcb2a2b36baf9",
+      "scripts/full-lean/base-pages.py": "f983bcfb3473b1f14fb733a40d26bc934bfbcee9adf4bcd929bec266194c8c7a",
+      "scripts/full-lean/run-bounded.mjs": "083f8bf680bbf4e413fbc348e06b8a385ad58b9a04920a462e432a4ba773682f",
+      "runtime/node.hpp": "12756d4ab0f75c72bb3cb02311e2d6dd471dc027e3278458b8af6c0ccf4aa3f3",
+      "runtime/node-io.cpp": "ec253c27e341779f1bf86749792b57a77865d686b980ae8bee681adb0b678590",
+      "runtime/node-async.cpp": "965a08173d61158e8fa34f109daa3076ab61275c738f61deb1cbdb85a15735b6",
+      "runtime/node-system.cpp": "77b30c63c3834db7630e04b338cafc41f3b46c19aa88722f29fc75ee67097c86",
+      "scripts/full-lean/host-pre.js": "03a391b22729144a1a8d91051854e0f52fb126f05e63eb04ba08e0a0f3d8aadb",
+      "scripts/full-lean/host-library.js": "051dfe26ba1f5a57a78069a306e83f358e8d0878c2e924456bb250141e55c01b",
+      "scripts/full-lean/emscripten-pre.js": "491e7960427820704e3d435caf5ec3c8a30c3b1e7d20d2fca81b143553bd8bae"
+    }
+  },
+  "apiInventory": {
+    "scope": "Native metadata from every compiled standard module; all behavioral coverage remains unverified",
+    "lean": "4.34.1",
+    "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "nativeArtifactIdentity": "3348d03b07e4ea41ab76774b295143bbd58989e9deaf80c4b2bf2fc96158b58b",
+    "libraryInventorySha256": "ff9d12609bcee65eb36a050ec84ebd2e614c00288f362b0663309e8d7177e115",
+    "inventorySourceSha256": "332903d875f493c93054066d668133a601e66d4629330e01102e22f879548363",
+    "targetManifest": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-bundle-4.34.1-r1/lean-4.34.1-wasm64/target.json",
+    "targetManifestSha256": "cfc9aa9ebda6984f2bfab8ab5b7debed2e8a0a525c9a32bc0aeb1bc83600a94e",
+    "externInventory": "/home/lastmjs/development/lasm/compiler/.work/application-api-inventory-4.34.1-r1/externs.json",
+    "externInventorySha256": "dd3ee9edb109ce50b5424bedf7d54c1a3b042f5c7b05ef4ad7826c594a912dd1",
+    "rawInventory": "/home/lastmjs/development/lasm/compiler/.work/application-api-inventory-4.34.1-r1/declarations.json",
+    "rawInventorySha256": "e29fd1fb739a2ac24dfad91b6808ef7d0da233340ac32fc631515198c67c42ea",
+    "compilerOutputSha256": "6a221f3145b79fcfeaa60332e43f4743046cfe08574e5ccd01b874399d48b6ce",
+    "compiledModules": 2516,
+    "importedModules": 2516,
+    "declarations": 72985,
+    "groups": {
+      "Init": 13631,
+      "Std": 11724,
+      "Lean": 42196,
+      "Lake": 5434
+    },
+    "ioFsDeclarations": 163,
+    "httpDeclarations": 2087,
+    "externDeclarations": 925,
+    "standardCSymbols": 875,
+    "excludedTheorems": 91361,
+    "excludedInternalNames": 54280,
+    "resourceReport": "/home/lastmjs/development/lasm/compiler/.work/product-acceptance/application-api-inventory-4.34.1-r1-resources.json",
+    "recordedAt": "2026-09-25T04:29:25.739Z"
+  },
+  "runtimeSourceIndex": {
+    "schema": 1,
+    "scope": "Lexical source index for review; no preprocessing, link proof, dynamic-call tracing or behavioral passes",
+    "lean": "4.34.1",
+    "leanCommit": "5045d0056413266e57c625dcd7c365b10e377c52",
+    "runtime": "/home/lastmjs/development/lasm/compiler/.work/application-runtime-4.34.1-r1",
+    "patches": {
+      "wasm-build": "d7cbceaada08cdbf762adb5ef96485f1e101a010450b5e4689bbeed60cb94965",
+      "compact-alignment": "071e70af2a4b58e1744b178ba1ee094c0d2701bcefef4653995675656f4daedb",
+      "thread-runtime": "2e4a2efd1a209cabd2caa893e5dfa8e26174f82ed2a808145b9faafff667265a",
+      "sdk-mimalloc": "ecef94dbbc5481d72f363360e8d7686964bc683e4e16abb6cb7e851adcb81fba",
+      "c-inputs": "ff01c0e773a2ec96bc87e39acb8e8a6e205390cdeb955c6019325da3e1769035",
+      "region-allocation": "d8584427270436c68bdcbaaa75da56e74a572983a585022fb84923c979ae1787",
+      "host-platform": "de1d33de36b72d17ae2350bf912a636c0db511b426b6ca428b3fa2834d4ae61c",
+      "host-linux": "77f66fc789821bcce694a9683dd079d5ce0f8c73902b91095d8a8f10fd88fa4a",
+      "host-backtrace": "55a0559e972f7db3eeeab0d521458a3c30416ecff76362bb54f148f0798577f8",
+      "libuv-source": "0681c682f09c5752897b7e882c16ed2b413522876047cb52ff2d29ddad4a2421"
+    },
+    "apiInventoryReport": "/home/lastmjs/development/lasm/compiler/.work/application-api-inventory-4.34.1-r1/result.json",
+    "apiInventoryReportSha256": "18f32e75aa0d0c6b6d886da1a049258d475f9e6bca75e5c137e149a61e519009",
+    "externInventorySha256": "dd3ee9edb109ce50b5424bedf7d54c1a3b042f5c7b05ef4ad7826c594a912dd1",
+    "hostOverridesSha256": "6e37b1c682907a722d50918cc4e036c58978e40d76853d9802d4756e54323dc6",
+    "standardLibraryAuditSha256": "ff9d12609bcee65eb36a050ec84ebd2e614c00288f362b0663309e8d7177e115",
+    "leanModuleSourcesVerified": 2516,
+    "sourceFiles": 209,
+    "sourceBytes": 1617203,
+    "externDeclarations": 925,
+    "standardSymbols": 875,
+    "symbolsWithReferences": 770,
+    "symbolsWithDefinitionCandidates": 767,
+    "symbolsWithLeanExportCandidates": 59,
+    "symbolsWithSdkSourceCandidates": 49,
+    "hostReplacementSymbols": 126,
+    "emscriptenBranchCandidates": 14,
+    "ambiguousCandidateBodies": 0,
+    "symbolsWithoutImplementationCandidates": 0,
+    "limitations": [
+      "Lexical matches do not prove selected definitions or behavior.",
+      "Macro-generated and token-pasted bodies require compiler-assisted tracing.",
+      "Private callees, callbacks, inline extern forms and Lean fallback bodies still require dependency tracing.",
+      "All per-symbol behavioral fields remain unverified."
+    ],
+    "recordedAt": "2026-09-25T04:29:44.514Z",
+    "artifacts": {
+      "symbols.json": {
+        "sha256": "58268f1a42cb0ae8d239fc5458d2dada13949133005053235e7805639b29906e",
+        "bytes": 644421
+      },
+      "emscripten-branches.json": {
+        "sha256": "00bc60fcd5b99a129acf887504aa89a51726c071f265f98260ac113059ba7f23",
+        "bytes": 9879
+      },
+      "unresolved.json": {
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "bytes": 3
+      },
+      "ambiguous-bodies.json": {
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "bytes": 3
+      }
+    }
+  },
+  "resources": {
+    "application-runtime-4.34.1-r1": {
+      "path": ".work/product-acceptance/application-runtime-4.34.1-r1-resources.json",
+      "sha256": "bb1003e9a2e3bf0105d388eb2b9b2e1125aeab8d99652266e5154a378d84c69c",
+      "startedAt": "2026-09-25T03:08:24.245Z",
+      "finishedAt": "2026-09-25T04:23:42.044Z",
+      "limits": {
+        "memoryMax": 8589934592,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 6871947673,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 2575622144,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    "application-runtime-bundle-4.34.1-r1": {
+      "path": ".work/product-acceptance/application-runtime-bundle-4.34.1-r1-resources.json",
+      "sha256": "2623b8b6f6e9e560419060cff99f9308b24d3543f1d64ccc515ddd7ee337ba46",
+      "startedAt": "2026-09-25T04:24:30.110Z",
+      "finishedAt": "2026-09-25T04:25:06.878Z",
+      "limits": {
+        "memoryMax": 6442450944,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 5153960755,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 2337763328,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    "application-api-inventory-4.34.1-r1": {
+      "path": ".work/product-acceptance/application-api-inventory-4.34.1-r1-resources.json",
+      "sha256": "bf81ee0e8f2fdbbad9bdc304d90481ddf62bb397922ea71529896a95a346c95d",
+      "startedAt": "2026-09-25T04:29:07.380Z",
+      "finishedAt": "2026-09-25T04:29:25.844Z",
+      "limits": {
+        "memoryMax": 4294967296,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 3435973836,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 1260777472,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    "runtime-extern-sources-4.34.1-r1": {
+      "path": ".work/product-acceptance/runtime-extern-sources-4.34.1-r1-resources.json",
+      "sha256": "dde45dbcaacce8d1f61dbd87fd12c60a5823586ec08c79d54fc9b68c39b638cb",
+      "startedAt": "2026-09-25T04:29:43.431Z",
+      "finishedAt": "2026-09-25T04:29:44.616Z",
+      "limits": {
+        "memoryMax": 2147483648,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1717986918,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 155078656,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    "verify-runtime-4.34.1-r1": {
+      "path": ".work/product-acceptance/verify-runtime-4.34.1-r1-resources.json",
+      "sha256": "fc59632bc5ee189a5824cedf3e1ead1fa3dde66581dc43c395c5846a81997caf",
+      "startedAt": "2026-09-25T04:31:29.876Z",
+      "finishedAt": "2026-09-25T04:31:35.982Z",
+      "limits": {
+        "memoryMax": 1610612736,
+        "memoryHigh": "infinity",
+        "stopMemoryBytes": 1288490188,
+        "memorySwapMax": 0,
+        "tasksMax": 1024,
+        "nice": 0,
+        "coreFileBytes": 0
+      },
+      "peakMemoryBytes": 28180480,
+      "unitReleased": true,
+      "resourceLimited": false,
+      "memoryThrottled": false,
+      "result": {
+        "code": 0,
+        "signal": null
+      }
+    }
+  },
+  "unitTests": {
+    "log": ".work/product-acceptance/application-runtime-catalog-4.34.1-r1.log",
+    "sha256": "a131e55d44a770fc69b247095a16940b0d12aec013cbb8509def40e8846699be",
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "retainedIndexes": {
+    "docs/compatibility/lean-4.34.1-extern-declarations.json": "dd3ee9edb109ce50b5424bedf7d54c1a3b042f5c7b05ef4ad7826c594a912dd1",
+    "docs/compatibility/lean-4.34.1-runtime-source-index.json": "58268f1a42cb0ae8d239fc5458d2dada13949133005053235e7805639b29906e"
+  },
+  "limitations": [
+    "This rebuild and inventory do not establish deployed behavior.",
+    "The checkout validated default remains Lean 4.34.0 pending fresh installed acceptance.",
+    "All per-symbol behavior fields remain unverified.",
+    "Previous release evidence keeps its original version and scope."
+  ]
+}

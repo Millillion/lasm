@@ -5,14 +5,18 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve, join, relative } from 'node:path';
 import { createHash } from 'node:crypto';
+import { gunzipSync } from 'node:zlib';
 
-const [runtimeArg, outputArg] = process.argv.slice(2);
-if (!runtimeArg || !outputArg) throw new Error('Supply COMPLETED_APPLICATION_RUNTIME NEW_OUTPUT');
+const [runtimeArg, outputArg, apiReportArg, ...extra] = process.argv.slice(2);
+if (!runtimeArg || !outputArg || extra.length) throw new Error('Supply COMPLETED_APPLICATION_RUNTIME NEW_OUTPUT [MATCHING_API_INVENTORY_REPORT]');
 const runtime = resolve(runtimeArg), output = resolve(outputArg);
 if (existsSync(output)) throw new Error('Preserve previous source audits');
 const input = JSON.parse(readFileSync(join(runtime, 'build-inputs.json'), 'utf8'));
-assert.equal(input.lean, '4.34.0');
-const inventoryFile = resolve('docs/compatibility/lean-4.34-extern-declarations.json');
+const apiReport = apiReportArg ? JSON.parse(readFileSync(resolve(apiReportArg))) : undefined;
+if (apiReport) {
+  assert.equal(apiReport.lean, input.lean); assert.equal(apiReport.leanCommit, input.leanCommit);
+} else assert.equal(input.lean, '4.34.0', 'Supply matching declaration evidence for another Lean version');
+const inventoryFile = apiReport?.externInventory ?? resolve('docs/compatibility/lean-4.34-extern-declarations.json');
 const inventoryBytes = readFileSync(inventoryFile), declarations = JSON.parse(inventoryBytes);
 const overridesFile = join(input.source, 'src/lasm/overrides.json');
 const overridesBytes = readFileSync(overridesFile), overrides = JSON.parse(overridesBytes);
@@ -20,6 +24,10 @@ const libraryFile = join(runtime, 'standard-library-audit.json');
 const libraryBytes = readFileSync(libraryFile), library = JSON.parse(libraryBytes);
 assert.equal(library.leanCommit, input.leanCommit);
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+if (apiReport) {
+  assert.equal(hash(inventoryBytes), apiReport.externInventorySha256);
+  assert.equal(hash(libraryBytes), apiReport.libraryInventorySha256);
+}
 const entries = new Map();
 for (const declaration of declarations) {
   for (const external of declaration.externs.filter(item => item.kind === 'standard')) {
@@ -127,12 +135,16 @@ for (const module of library.modules) {
     const entry = entries.get(match[1]);
     if (!entry) continue;
     const generated = join(input.build, 'generated-c', module.module + '.c');
-    const cBytes = readFileSync(generated);
+    const archived = !existsSync(generated), cFile = generated + (archived ? '.gz' : '');
+    const storedBytes = readFileSync(cFile);
+    if (archived && module.cArchiveSha256) assert.equal(hash(storedBytes), module.cArchiveSha256);
+    const cBytes = archived ? gunzipSync(storedBytes) : storedBytes;
     assert.equal(hash(cBytes), module.cSha256, 'Audited generated C changed: ' + generated);
     const cText = mask(cBytes.toString('utf8'));
     const definitions = [...functionHeads(cText, [entry.symbol])]
       .map(match => ({ line: cText.slice(0, match.index).split('\n').length }));
-    leanExportFiles[name] = { sha256: module.sourceSha256, generatedC: relative(input.build, generated), cSha256: module.cSha256 };
+    leanExportFiles[name] = { sha256: module.sourceSha256, generatedC: relative(input.build, cFile), cSha256: module.cSha256,
+      ...(archived ? { archiveSha256: hash(storedBytes) } : {}) };
     (entry.leanExportCandidates ??= []).push({ path: name, line: text.slice(0, match.index).split('\n').length,
       generatedDefinitions: definitions });
   }
@@ -142,8 +154,8 @@ for (const module of library.modules) {
 for (const entry of entries.values()) {
   if (entry.definitionCandidates.length || entry.leanExportCandidates?.length || entry.symbol.startsWith('lean_')) continue;
   const name = 'system/lib/libc/musl/src/math/' + entry.symbol + '.c';
-  const path = join(input.sdk, 'upstream/emscripten', name);
-  if (!existsSync(path)) continue;
+  const path = [join(input.sdk, 'upstream/emscripten', name), join(input.sdk, 'emscripten', name)].find(existsSync);
+  if (!path) continue;
   const bytes = readFileSync(path);
   cLibraryFiles[name] = { sha256: hash(bytes), bytes: bytes.length };
   entry.sdkSourceCandidates = [name];
@@ -155,6 +167,7 @@ const unresolved = rows.filter(row => !row.definitionCandidates.length
   references: row.references, declarations: row.declarations }));
 const report = { schema: 1, scope: 'Lexical source index for review; no preprocessing, link proof, dynamic-call tracing or behavioral passes',
   lean: input.lean, leanCommit: input.leanCommit, runtime, patches: input.patches,
+  ...(apiReportArg ? { apiInventoryReport: resolve(apiReportArg), apiInventoryReportSha256: hash(readFileSync(resolve(apiReportArg))) } : {}),
   externInventorySha256: hash(inventoryBytes), hostOverridesSha256: hash(overridesBytes),
   standardLibraryAuditSha256: hash(libraryBytes), leanModuleSourcesVerified: library.modules.length,
   sourceFiles: Object.keys(files).length, sourceBytes: Object.values(files).reduce((n, row) => n + row.bytes, 0),

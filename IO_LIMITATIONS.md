@@ -6,11 +6,13 @@ build platforms. Its [application pipeline status](docs/APPLICATION_PIPELINE.md)
 and [unchanged upstream inventory](docs/UPSTREAM_APPLICATION_TESTS.md) are tracked
 separately from the earlier runtime evidence below.
 
-- [ ] Complete the new Lean 4.34.1 runtime rebuild and fresh Wasm/application
-  acceptance. The [native bootstrap and patch regressions](docs/evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
+- [ ] Complete fresh Lean 4.34.1 Wasm/application acceptance. The
+  [complete runtime rebuild](docs/evidence/lean-4.34.1-runtime-build-2026-09-25.json)
+  now compiles all 2,516 modules and verifies every generated C archive and
+  object. The [native bootstrap and patch regressions](docs/evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
   pass on Linux x64, and exact source comparison validates retaining the existing
   IO error policy. The release also changes reference-counting runtime headers
-  and library code, which require rebuilt objects and fresh execution evidence.
+  and library code; fresh deployed execution evidence remains required.
   Earlier results below remain scoped to 4.34.0 or their stated older version.
 
 - [ ] Revalidate every existing IO result against the shipping Lean 4.34 AOT
@@ -29,8 +31,8 @@ separately from the earlier runtime evidence below.
   This does not close the full API audit or other native platform obligations.
 - [ ] Complete the latest-release declaration/API audit and native differential
   coverage in all three stock engines and all six OS/architecture combinations.
-  The [Lean 4.34 surface inventory](docs/compatibility/API_SURFACE_4_34.md) now
-  covers all 2,516 compiled modules and 72,983 non-theorem, non-internal
+  The [Lean 4.34.1 surface inventory](docs/compatibility/API_SURFACE_4_34.md) now
+  covers all 2,516 compiled modules and 72,985 non-theorem, non-internal
   declarations, including 925 extern declarations. Implementation and behavior
   coverage remain unverified individually; these counts are not API passes.
 - [ ] Complete native platform-query acceptance on all six host combinations.

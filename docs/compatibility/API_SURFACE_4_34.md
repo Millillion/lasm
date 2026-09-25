@@ -1,4 +1,14 @@
-# Lean 4.34 application API inventory
+# Lean 4.34.1 refresh
+
+The latest-release target is now 4.34.1. Its fresh
+[runtime build and inventory](../evidence/lean-4.34.1-runtime-build-2026-09-25.json)
+cover 2,516 modules, 72,985 declarations, 163 `IO.FS` declarations, 2,087
+`Std.Http` declarations, 925 extern declarations and 875 standard C symbols.
+The versioned declaration and source indexes preserve all behavioral fields as
+unverified. The earlier measurements below retain their 4.34.0 scope; matching
+counts do not carry behavioral passes to a new release.
+
+## Lean 4.34.0 application API inventory
 
 The [recorded audit](../evidence/application-api-inventory-2026-09-23.json) imports
 all **2,516 modules** in the application runtime's compiled-library manifest.

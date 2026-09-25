@@ -3,6 +3,7 @@
 import { writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { gunzipSync } from 'node:zlib';
 import { root, resolveLean } from '../../src/toolchain.mjs';
 import { runtimeAbiArchives, isRuntimeExport, definedAbiSymbols } from './runtime-abi.mjs';
 
@@ -69,8 +70,9 @@ console.log(JSON.stringify({ output, exported: exports.length, defined: symbols.
 const generated = existsSync(join(build, 'generated-c')) ? join(build, 'generated-c') : join(build, 'lib/temp');
 const files = dir => readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? files(join(dir, e.name)) : [join(dir, e.name)]);
 const declarations = new Map();
-for (const path of [...files(generated).filter(path => path.endsWith('.c')), ...application.sources]) {
-  const source = readFileSync(path, 'utf8');
+for (const path of [...files(generated).filter(path => path.endsWith('.c') ||
+    path.endsWith('.c.gz') && !existsSync(path.slice(0, -3))), ...application.sources]) {
+  const source = path.endsWith('.gz') ? gunzipSync(readFileSync(path)).toString('utf8') : readFileSync(path, 'utf8');
   for (const match of source.matchAll(/^(?:LEAN_EXPORT\s+)?(?:extern\s+)?((?:const\s+)?(?:lean_object\s*\*|uint\d+_t|size_t|double|float|void)\s+(lp?_[A-Za-z0-9_]+)(?:\([^\n;{}]*\))?)\s*[;{=]/gm)) {
     if (symbols.has(match[2])) declarations.set(match[2], `extern ${match[1]};`);
   }

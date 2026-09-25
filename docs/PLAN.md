@@ -105,7 +105,8 @@ not the primary getting-started workflow.
   The 2026-09-25 UTC refresh found Lean 4.34.1, published September 24; it is now
   the latest-release acceptance target. The three engine versions are unchanged.
   [Native bootstrap and patch regressions pass](evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
-  on Linux x64. The new runtime rebuild and Wasm acceptance remain pending;
+  on Linux x64. The [complete runtime rebuild](evidence/lean-4.34.1-runtime-build-2026-09-25.json)
+  now passes; fresh installed Wasm acceptance remains pending;
   existing 4.34.0 evidence and the validated default retain their original scope.
 - Select Lean through the standard `lean-toolchain` file, for example
   `leanprover/lean4:v4.34.0`. Preserve the ability to change Lean versions and

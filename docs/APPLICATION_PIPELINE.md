@@ -17,11 +17,17 @@ Its [verified native bootstrap](evidence/lean-4.34.1-native-bootstrap-2026-09-25
 passes on Linux x64, including the unchanged upstream reference-count regression,
 both new BitVec tests and interpreted-versus-compiled ordinary IO/error cases.
 The catalog accepts explicit 4.34.1 pins and preserves the 4.34.0 default pending
-its matching application bundle. Source comparison verifies that the IO error
+fresh installed-application acceptance. Source comparison verifies that the IO error
 constructor and decoder files are unchanged, so the reviewed host policy accepts
 4.34.1. The native checks do not validate its Wasm runtime or other platforms.
-All application libraries are being rebuilt with the changed runtime headers;
-older binaries and acceptance results are not relabeled.
+The [complete runtime rebuild and API inventory](evidence/lean-4.34.1-runtime-build-2026-09-25.json)
+now cover all 2,516 modules with the changed runtime headers. The guarded build
+and packaging peak at 2.40 and 2.18 GiB respectively, with no resource events.
+Generated C is losslessly archived after compilation and verified by streaming
+decompression before its original is removed. Fresh declaration metadata and
+source indexing cover 72,985 declarations and 875 standard C symbols; these
+counts are not behavioral passes. Older binaries and acceptance results retain
+their original versions.
 
 Downloads use upstream-published SHA256 digests and exact compressed sizes. Both
 downloads and extraction stream their data. Installation stages privately and

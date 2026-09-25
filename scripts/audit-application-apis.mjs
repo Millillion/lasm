@@ -11,16 +11,22 @@ import { hashFile } from '../src/managed-artifacts.mjs';
 
 await ensureResourceGuard();
 const root = resolve(fileURLToPath(new URL('../', import.meta.url)));
-const output = resolve(process.argv[2]);
+const [outputArg, libraryArg, targetArg, ...extra] = process.argv.slice(2);
+if (!outputArg || extra.length || !!libraryArg !== !!targetArg)
+  throw new Error('Supply NEW_OUTPUT [STANDARD_LIBRARY_AUDIT MATCHING_TARGET_MANIFEST]');
+const output = resolve(outputArg);
 if (existsSync(output)) throw new Error('Use a fresh API audit directory');
-mkdirSync(output, { recursive: true });
-writeFileSync(join(output, 'lean-toolchain'), 'leanprover/lean4:v4.34.0\n');
-const lean = await provisionLean(output);
-const libraryFile = join(root, '.work/application-runtime-4.34.0/standard-library-audit.json');
+const libraryFile = libraryArg ? resolve(libraryArg) : join(root, '.work/application-runtime-4.34.0/standard-library-audit.json');
 const library = JSON.parse(readFileSync(libraryFile, 'utf8'));
-const target = JSON.parse(readFileSync(join(root, '.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/target.json'), 'utf8'));
-if (lean.commit !== library.leanCommit || await hashFile(libraryFile) !== target.standardLibraryAuditSha256)
-  throw new Error('Native compiler or compiled module inventory does not match the runtime bundle');
+const targetFile = targetArg ? resolve(targetArg) : join(root, '.work/application-runtime-bundle-4.34-r1/lean-4.34.0-wasm64/target.json');
+const target = JSON.parse(readFileSync(targetFile, 'utf8'));
+if (target.lean !== library.lean || target.leanCommit !== library.leanCommit ||
+    await hashFile(libraryFile) !== target.standardLibraryAuditSha256)
+  throw new Error('Compiled module inventory does not match the selected runtime bundle');
+mkdirSync(output, { recursive: true });
+writeFileSync(join(output, 'lean-toolchain'), `leanprover/lean4:v${library.lean}\n`);
+const lean = await provisionLean(output);
+if (lean.commit !== library.leanCommit) throw new Error('Native compiler does not match the selected runtime bundle');
 const modules = library.modules.map(row => row.module.replaceAll('/', '.'));
 for (const row of library.modules) {
   const file = join(lean.prefix, 'src/lean', ...(row.module.startsWith('Lake') ? ['lake'] : []), row.module + '.lean');
@@ -50,9 +56,13 @@ const externs = data.declarations.filter(row => row.externs.length);
 const symbols = [...new Set(externs.flatMap(row => row.externs.filter(entry => entry.kind === 'standard').map(entry => entry.symbol)))].sort();
 const counts = {};
 for (const row of data.declarations) counts[row.module?.split('.')[0] ?? '(current)'] = (counts[row.module?.split('.')[0] ?? '(current)'] ?? 0) + 1;
+const externInventory = join(output, 'externs.json');
+writeFileSync(externInventory, JSON.stringify(externs, null, 2) + '\n');
 const report = { scope: 'Native metadata from every compiled standard module; all behavioral coverage remains unverified',
   lean: lean.version, leanCommit: lean.commit, nativeArtifactIdentity: lean.identity,
   libraryInventorySha256: await hashFile(libraryFile), inventorySourceSha256: await hashFile(script),
+  targetManifest: targetFile, targetManifestSha256: await hashFile(targetFile),
+  externInventory, externInventorySha256: await hashFile(externInventory),
   rawInventory: raw, rawInventorySha256: await hashFile(raw), compilerOutputSha256: await hashFile(compilerOutput), compiledModules: modules.length,
   importedModules: data.modules.length, declarations: data.declarations.length, groups: counts,
   ioFsDeclarations: data.declarations.filter(row => row.name.startsWith('IO.FS.')).length,
@@ -60,6 +70,5 @@ const report = { scope: 'Native metadata from every compiled standard module; al
   externDeclarations: externs.length, standardCSymbols: symbols.length,
   excludedTheorems: data.excludedTheorems, excludedInternalNames: data.excludedInternalNames,
   resourceReport: process.env.LASM_RESOURCE_REPORT, recordedAt: new Date().toISOString() };
-writeFileSync(join(output, 'externs.json'), JSON.stringify(externs, null, 2) + '\n');
 writeFileSync(join(output, 'result.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report, null, 2));
